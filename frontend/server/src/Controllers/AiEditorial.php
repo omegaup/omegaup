@@ -151,14 +151,18 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             $connected = $redis->connect($redisHost, $redisPort, $timeout);
 
             if (!$connected) {
-                throw new \Exception(
-                    "Failed to connect to Redis at {$redisHost}:{$redisPort}"
+                throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                    'redisConnectionFailed',
+                    null,
+                    ['host' => $redisHost, 'port' => strval($redisPort),]
                 );
             }
 
             /** @psalm-suppress RedundantCondition REDIS_PASS is really a variable */
             if (REDIS_PASS !== '' && !$redis->auth(REDIS_PASS)) {
-                throw new \Exception('Redis authentication failed');
+                throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                    'redisAuthenticationFailed'
+                );
             }
 
             // Validate auth token before queuing
@@ -282,18 +286,64 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         $action = $r->ensureString('action');
         $language = $r->ensureOptionalString('language');
 
+        self::validateReviewAction($action);
+        $job = self::getJobForReview($jobId);
+        $problem = self::getProblemForJob($job);
+        self::validateProblemAdminPermissions($r->identity, $problem);
+        self::validateJobStatus($job);
+
+        if ($action === 'approve') {
+            self::approveEditorial(
+                $r->identity,
+                $jobId,
+                $job,
+                $problem,
+                $language
+            );
+        } else {
+            self::rejectEditorial($jobId);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Validate the review action parameter
+     *
+     * @param string $action
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    private static function validateReviewAction(string $action): void {
         if (!in_array($action, ['approve', 'reject'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid'
             );
         }
+    }
 
+    /**
+     * Get and validate the AI editorial job
+     *
+     * @param string $jobId
+     * @return \OmegaUp\DAO\VO\AIEditorialJobs
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    private static function getJobForReview(string $jobId): \OmegaUp\DAO\VO\AIEditorialJobs {
         $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
         if (is_null($job)) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
+        return $job;
+    }
 
-        // Get problem to check permissions
+    /**
+     * Get and validate the problem for a job
+     *
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $job
+     * @return \OmegaUp\DAO\VO\Problems
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    private static function getProblemForJob(\OmegaUp\DAO\VO\AIEditorialJobs $job): \OmegaUp\DAO\VO\Problems {
         if (is_null($job->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -301,66 +351,122 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
+        return $problem;
+    }
 
-        // Check if user has admin permissions for this problem
-        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
+    /**
+     * Validate user has problem admin permissions
+     *
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    private static function validateProblemAdminPermissions(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
+    ): void {
+        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
+    }
 
-        // Check if job is in completed status
+    /**
+     * Validate job is in completed status
+     *
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $job
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    private static function validateJobStatus(\OmegaUp\DAO\VO\AIEditorialJobs $job): void {
         if ($job->status !== self::STATUS_COMPLETED) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid'
             );
         }
+    }
 
-        if ($action === 'approve') {
-            // Update job status
-            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
-                $jobId,
-                self::REVIEW_STATUS_APPROVED
-            );
+    /**
+     * Approve and publish the editorial
+     *
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param string $jobId
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $job
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @param null|string $language
+     */
+    private static function approveEditorial(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $jobId,
+        \OmegaUp\DAO\VO\AIEditorialJobs $job,
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?string $language
+    ): void {
+        \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
+            $jobId,
+            self::REVIEW_STATUS_APPROVED
+        );
 
-            // Publish the editorial using existing Problem API
-            $solutionMarkdown = null;
-            if ($language === 'en' && !is_null($job->md_en)) {
-                $solutionMarkdown = $job->md_en;
-            } elseif ($language === 'es' && !is_null($job->md_es)) {
-                $solutionMarkdown = $job->md_es;
-            } elseif ($language === 'pt' && !is_null($job->md_pt)) {
-                $solutionMarkdown = $job->md_pt;
-            } else {
-                // Default to English if no language specified or content not found
-                $solutionMarkdown = $job->md_en ?? $job->md_es ?? $job->md_pt;
-            }
-
-            if (!is_null($solutionMarkdown)) {
-                // Skip publishing in test environment to avoid gitserver dependencies
-                // Check if we're in a test environment by looking for PHPUnit class
-                if (class_exists('\PHPUnit\Framework\TestCase', false)) {
-                    // We're in test environment - skip actual publishing
-                    // The test focuses on job status updates, not the publishing logic
-                } else {
-                    // Production environment - perform actual publishing
-                    self::publishEditorial(
-                        $r->identity,
-                        $problem,
-                        $solutionMarkdown,
-                        $language
-                    );
-                }
-            }
-        } else {
-            // Reject the job
-            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
-                $jobId,
-                self::REVIEW_STATUS_REJECTED
+        $solutionMarkdown = self::getSolutionMarkdownByLanguage(
+            $job,
+            $language
+        );
+        if (!is_null($solutionMarkdown) && !self::isTestEnvironment()) {
+            self::publishEditorial(
+                $identity,
+                $problem,
+                $solutionMarkdown,
+                $language
             );
         }
+    }
 
-        return ['status' => 'ok'];
+    /**
+     * Get solution markdown for the specified language
+     *
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $job
+     * @param null|string $language
+     * @return null|string
+     */
+    private static function getSolutionMarkdownByLanguage(
+        \OmegaUp\DAO\VO\AIEditorialJobs $job,
+        ?string $language
+    ): ?string {
+        $markdown = null;
+
+        if ($language === 'en' && !is_null($job->md_en)) {
+            $markdown = $job->md_en;
+        } elseif ($language === 'es' && !is_null($job->md_es)) {
+            $markdown = $job->md_es;
+        } elseif ($language === 'pt' && !is_null($job->md_pt)) {
+            $markdown = $job->md_pt;
+        } else {
+            // Default to English if no language specified or content not found
+            $markdown = $job->md_en ?? $job->md_es ?? $job->md_pt;
+        }
+
+        return $markdown;
+    }
+
+    /**
+     * Check if running in test environment
+     *
+     * @return bool
+     */
+    private static function isTestEnvironment(): bool {
+        return class_exists('\PHPUnit\Framework\TestCase', false);
+    }
+
+    /**
+     * Reject the editorial
+     *
+     * @param string $jobId
+     */
+    private static function rejectEditorial(string $jobId): void {
+        \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
+            $jobId,
+            self::REVIEW_STATUS_REJECTED
+        );
     }
 
     /**

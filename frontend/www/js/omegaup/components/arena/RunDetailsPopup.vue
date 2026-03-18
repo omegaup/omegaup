@@ -148,22 +148,22 @@
                 >{{ T.wordsDownloadCode }}</a
               >
             </li>
-            <li>
-              <a
-                v-if="data.admin"
-                class="output"
-                :href="`/api/run/download/run_alias/${data.guid}/`"
-                >{{ T.wordsDownloadOutput }}</a
-              >
-            </li>
-            <li>
-              <a
-                v-if="data.admin"
-                class="details"
-                :href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
-                >{{ T.wordsDownloadDetails }}</a
-              >
-            </li>
+            <template v-if="data.admin">
+              <li>
+                <a
+                  class="output"
+                  :href="`/api/run/download/run_alias/${data.guid}/`"
+                  >{{ T.wordsDownloadOutput }}</a
+                >
+              </li>
+              <li>
+                <a
+                  class="details"
+                  :href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
+                  >{{ T.wordsDownloadDetails }}</a
+                >
+              </li>
+            </template>
           </ul>
         </div>
         <div v-if="data.judged_by" class="judged_by">
@@ -275,14 +275,14 @@ export default class ArenaRunDetailsPopup extends Vue {
     feedbackList: { lineNumber: number; feedback: string }[],
     guid: string,
   ) {
-    this.$parent.$parent.$parent.$parent.$emit('save-feedback-list', {
+    this.$parent?.$parent?.$parent?.$parent?.$emit('save-feedback-list', {
       feedbackList,
       guid,
     });
   }
 
   onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string) {
-    this.$parent.$parent.$parent.$parent.$emit('submit-feedback-thread', {
+    this.$parent?.$parent?.$parent?.$parent?.$emit('submit-feedback-thread', {
       feedback,
       guid,
     });

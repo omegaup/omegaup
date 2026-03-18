@@ -77,8 +77,8 @@ class I18nLinter(linters.Linter):
 
         result: List[str] = []
         for key in sorted(strings.keys()):
-            result.append('%s = "%s"\n' %
-                          (key, strings[key][lang].replace('"', r'\"')))
+            escaped_value = strings[key][lang].replace('"', r'\"')
+            result.append(f'{key} = "{escaped_value}"\n')
         return ''.join(result)
 
     @staticmethod
@@ -124,7 +124,7 @@ class I18nLinter(linters.Linter):
             filename = f'{self._TEMPLATES_PATH}/{lang}.lang'
             languages.add(lang)
             for lineno, line in enumerate(
-                    contents_callback(filename).split(b'\n')[:-1]):
+                    contents_callback(filename).splitlines()):
                 try:
                     row = line.decode('utf-8')
                     key, value = re.compile(r'\s+=\s+').split(row.strip(), 1)

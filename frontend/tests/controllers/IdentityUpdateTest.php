@@ -312,7 +312,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'username' => $username,
                 'password' => $newPassword,
             ]));
-            $this->fail('User shold not be able to change password');
+            $this->fail('User should not be able to change password');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
@@ -463,7 +463,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identity->password = $originalPassword;
         $identityLogin = self::login($creatorIdentity);
 
-        // Normal user will try change the passowrd of an identity
+        // Normal user will try change the password of an identity
         ['user' => $normalUser, 'identity' => $normalIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($normalIdentity);
 

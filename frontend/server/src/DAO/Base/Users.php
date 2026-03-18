@@ -56,7 +56,10 @@ abstract class Users {
                 `parental_verification_token` = ?,
                 `parent_email_verification_initial` = ?,
                 `parent_email_verification_deadline` = ?,
-                `parent_email_id` = ?
+                `parent_email_id` = ?,
+                `x_url` = ?,
+                `linkedin_url` = ?,
+                `github_url` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -131,6 +134,9 @@ abstract class Users {
                 null :
                 intval($Users->parent_email_id)
             ),
+            $Users->x_url,
+            $Users->linkedin_url,
+            $Users->github_url,
             intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -177,7 +183,10 @@ abstract class Users {
                 `Users`.`parental_verification_token`,
                 `Users`.`parent_email_verification_initial`,
                 `Users`.`parent_email_verification_deadline`,
-                `Users`.`parent_email_id`
+                `Users`.`parent_email_id`,
+                `Users`.`x_url`,
+                `Users`.`linkedin_url`,
+                `Users`.`github_url`
             FROM
                 `Users`
             WHERE
@@ -343,7 +352,10 @@ abstract class Users {
                 `Users`.`parental_verification_token`,
                 `Users`.`parent_email_verification_initial`,
                 `Users`.`parent_email_verification_deadline`,
-                `Users`.`parent_email_id`
+                `Users`.`parent_email_id`,
+                `Users`.`x_url`,
+                `Users`.`linkedin_url`,
+                `Users`.`github_url`
             FROM
                 `Users`
             ORDER BY
@@ -412,8 +424,14 @@ abstract class Users {
                     `parental_verification_token`,
                     `parent_email_verification_initial`,
                     `parent_email_verification_deadline`,
-                    `parent_email_id`
+                    `parent_email_id`,
+                    `x_url`,
+                    `linkedin_url`,
+                    `github_url`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -510,6 +528,9 @@ abstract class Users {
                 null :
                 intval($Users->parent_email_id)
             ),
+            $Users->x_url,
+            $Users->linkedin_url,
+            $Users->github_url,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

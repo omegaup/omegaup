@@ -63,7 +63,7 @@ describe('MultipleCasesInput.vue', () => {
       store,
     });
 
-    // These any are neccesary since wrapper.vm doesn't load the component's methods to typescript, even if they exist
+    // These any are necessary since wrapper.vm doesn't load the component's methods to typescript, even if they exist
     const invalidString = 'INVALID STRING234 !@#!@#';
     const result = (wrapper.vm as any).formatter(invalidString);
     expect(result).toBe('invalidstring234');

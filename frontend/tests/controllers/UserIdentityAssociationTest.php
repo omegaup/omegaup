@@ -15,7 +15,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Basic test for creating a single identity and associating it
-     * with a registred user
+     * with a registered user
      */
     public function testAssociateIdentityWithUser() {
         [

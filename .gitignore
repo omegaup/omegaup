@@ -128,3 +128,10 @@ cypress/downloads/*
 # to check for inefficient queries.
 # Once the inefficient queries are fixed, this file should be deleted.
 stuff/inefficient_queries.csv
+
+
+# Ignore files with the `.log` extension in the root directory
+*.log
+
+# Ignore Claude Code instructions
+CLAUDE.md
