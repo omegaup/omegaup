@@ -1542,6 +1542,7 @@ export default class Form extends Vue {
   margin-top: 0.25rem;
 }
 
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 ::v-deep .modal-footer .btn {
   background-color: var(--btn-ok-background-color);
   border-color: var(--btn-ok-background-color);
