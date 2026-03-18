@@ -2256,7 +2256,7 @@ const translations: { [key: string]: string; } = {
   wordsPointsDistributionInIntervals: "Points distribution in intervals of 100",
   wordsPointsDistributionProblem: "Points distribution for problem: %(alias)",
   wordsPointsForRank: "Points for ranking",
-  wordsPointsForRankTooltip: "These points respresent the actual value of this problem. Solving it will decrease its value. For details follow this link.",
+  wordsPointsForRankTooltip: "These points represent the actual value of this problem. Solving it will decrease its value for everyone.",
   wordsPortuguese: "Portuguese",
   wordsPractice: "Practice",
   wordsPrevPage: "Previous page",
