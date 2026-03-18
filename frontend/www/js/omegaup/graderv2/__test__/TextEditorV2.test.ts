@@ -42,9 +42,9 @@ describe('TextEditorV2.vue', () => {
 
   beforeEach(() => {
     Object.assign(store.getters, {
-      'theme': 'vs-dark',
-      'testContents': 'Initial store content\nLine 2',
-      'testModule': 'my_program',
+      theme: 'vs-dark',
+      testContents: 'Initial store content\nLine 2',
+      testModule: 'my_program',
     });
     (store.dispatch as jest.Mock).mockClear();
   });
