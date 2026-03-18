@@ -8,6 +8,8 @@ import { OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import T from '../lang';
 
+let previousSourceBlobURL: string | null = null;
+
 interface RunSubmit {
   classname: string;
   username: string;
@@ -147,9 +149,9 @@ function numericSort<T extends { [key: string]: any }>(key: string) {
         let nx = 0,
           ny = 0;
         while (i < x[key].length && isDigit(x[key][i]))
-          nx = nx * 10 + parseInt(x[key][i++]);
+          nx = nx * 10 + parseInt(x[key][i++], 10);
         while (j < y[key].length && isDigit(y[key][j]))
-          ny = ny * 10 + parseInt(y[key][j++]);
+          ny = ny * 10 + parseInt(y[key][j++], 10);
         i--;
         j--;
         if (nx != ny) return nx - ny;
@@ -195,6 +197,14 @@ function displayRunDetails({
     groups = detailsGroups;
   }
 
+  if (previousSourceBlobURL) {
+    window.URL.revokeObjectURL(previousSourceBlobURL);
+  }
+  const newBlobURL = window.URL.createObjectURL(
+    new Blob([runDetails.source || ''], { type: 'text/plain' }),
+  );
+  previousSourceBlobURL = newBlobURL;
+
   return {
     ...runDetails,
     ...{
@@ -202,9 +212,7 @@ function displayRunDetails({
       judged_by: runDetails.judged_by || '',
       source: sourceHTML,
       source_link: sourceLink,
-      source_url: window.URL.createObjectURL(
-        new Blob([runDetails.source || ''], { type: 'text/plain' }),
-      ),
+      source_url: newBlobURL,
       source_name: `Main.${runDetails.language}`,
       groups,
       show_diff: request.isAdmin ? runDetails.show_diff : 'none',
