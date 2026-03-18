@@ -5393,6 +5393,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $extra_wall_time
      * @omegaup-request-param int|null $input_limit
      * @omegaup-request-param null|string $lang
+     * @omegaup-request-param null|string $language
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param int|null $memory_limit
      * @omegaup-request-param string $message
@@ -5559,6 +5560,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'directory',
                 ['statements', 'solutions']
             );
+            $statementLanguage = $r->ensureOptionalString(
+                'language',
+                required: false,
+                validator: function (string $lang): bool {
+                    \OmegaUp\Validators::validateInEnum(
+                        $lang,
+                        'lang',
+                        self::VALID_LANGUAGES
+                    );
+                    return true;
+                }
+            ) ?? '';
 
             $contents = $r->ensureString('contents');
 
@@ -5572,7 +5585,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Validators::validateInEnum(
                     $language,
                     'lang',
-                    \OmegaUp\Controllers\Problem::ISO639_1
+                    self::VALID_LANGUAGES
                 );
                 self::updateStatement(
                     $r->identity,
@@ -5585,7 +5598,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problemParams->updatePublished
                 );
             }
-            $details = self::getProblemEditDetails($problem, $r->identity);
+            $details = self::getProblemEditDetails(
+                $problem,
+                $r->identity,
+                $statementLanguage
+            );
+            if ($directory === 'solutions') {
+                $extraInfo['solution'] = \OmegaUp\Controllers\Problem::getProblemSolution(
+                    $problem,
+                    $problem->commit,
+                    $statementLanguage !== '' ? $statementLanguage : $lang
+                );
+            }
+            $result['templateProperties']['payload'] = array_merge(
+                $details,
+                self::getCommonPayloadForTypeScript($r->identity)
+            );
+            $result['templateProperties']['payload'] = array_merge(
+                $extraInfo,
+                $result['templateProperties']['payload']
+            );
         } elseif ($request === 'cases') {
             $contents = $r->ensureString('contents');
             $data = json_decode($contents, true);
@@ -5674,13 +5706,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemEditDetails(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $statementLanguage = ''
     ) {
         $details = self::getProblemDetails(
             $identity,
             $problem,
             problemset: null,
-            statementLanguage: '',
+            statementLanguage: $statementLanguage,
             showSolvers: false,
             preventProblemsetOpen: false,
         );
