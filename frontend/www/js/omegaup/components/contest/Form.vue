@@ -859,11 +859,9 @@
     </div>
     <b-modal
       v-model="showModal"
-      ok-variant="danger"
-      cancel-variant="success"
       :title="T.contestNewFormPresetOverwriteWarningModalTitle"
       :ok-title="T.wordsConfirm"
-      :cancel-title="T.wordsCancel"
+      ok-only
       @ok="
         applyPreset(changePresetTo);
         hasFormChanged = true;
@@ -1325,10 +1323,10 @@ export default class Form extends Vue {
     if (this.hasFormChanged && !this.update) {
       this.changePresetTo = presetType;
       this.showModal = true;
-    } else {
-      this.applyPreset(presetType);
-      this.hasFormChanged = true;
+      return;
     }
+    this.applyPreset(presetType);
+    this.hasFormChanged = true;
   }
 
   applyPreset(presetType: PresetType): void {
@@ -1540,5 +1538,15 @@ export default class Form extends Vue {
   color: var(--form-character-counter-color, #6c757d);
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+
+::v-deep .modal-footer .btn {
+  background-color: var(--btn-ok-background-color);
+  border-color: var(--btn-ok-background-color);
+  color: var(--btn-ok-font-color);
+
+  &:hover {
+    color: var(--btn-ok-font-color--hover);
+  }
 }
 </style>
