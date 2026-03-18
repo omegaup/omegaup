@@ -54,10 +54,7 @@
                 class="form-control mb-2"
                 rows="10"
               ></textarea>
-              <button
-                class="btn btn-primary btn-sm mr-2"
-                @click="saveReadme"
-              >
+              <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
                 {{ T.wordsSaveChanges }}
               </button>
               <button
@@ -319,7 +316,6 @@
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import * as api from '../../api';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
@@ -490,20 +486,22 @@ export default class ViewProfile extends Vue {
   }
 
   saveReadme(): void {
-    api.User.saveReadme({ readme: this.readmeEditContent })
-      .then(() => {
+    this.$emit('save-readme', {
+      readme: this.readmeEditContent,
+      onSuccess: () => {
         this.currentReadme = this.readmeEditContent;
         this.isEditingReadme = false;
-      })
-      .catch(ui.apiError);
+      },
+    });
   }
 
   reportReadme(): void {
-    api.User.reportReadme({ username: this.profile.username ?? '' })
-      .then(() => {
+    this.$emit('report-readme', {
+      username: this.profile.username ?? '',
+      onSuccess: () => {
         this.readmeReportSubmitted = true;
-      })
-      .catch(ui.apiError);
+      },
+    });
   }
 
   @Watch('selectedTab')
