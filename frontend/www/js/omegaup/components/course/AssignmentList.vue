@@ -17,7 +17,10 @@
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortContent }">
-          <tr v-for="assignment in currentContent" :key="assignment.alias">
+          <tr
+            v-for="assignment in currentContent"
+            :key="assignment.alias"
+          >
             <td>
               <button
                 v-tooltip="T.courseAssignmentReorder"
@@ -41,7 +44,9 @@
               </template>
             </td>
             <td class="align-middle">
-              <a :href="assignmentUrl(assignment)">{{ assignment.name }}</a>
+              <a :href="assignmentUrl(assignment)">
+                {{ assignment.name }}
+              </a>
             </td>
             <td class="text-center">
               <button
@@ -80,6 +85,7 @@
           </tr>
         </tbody>
       </table>
+
       <div>
         <button
           v-if="currentContent.length > 1"
@@ -92,6 +98,7 @@
         </button>
       </div>
     </div>
+
     <div
       v-show="assignmentFormMode === AssignmentFormMode.Default"
       class="card-footer"
