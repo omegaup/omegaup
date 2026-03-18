@@ -3019,6 +3019,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @TODO: This should be called only in the grader->frontend callback and only IFF
+     * verdict = AC (and not test run)     
+     * 
      * Expires rank caches and scoreboard caches.
      * 
      * Rank caches (PROBLEMS_SOLVED_RANK, USER_COMPARE_DATA) only
