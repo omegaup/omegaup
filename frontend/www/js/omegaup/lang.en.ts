@@ -1678,7 +1678,6 @@ const translations: { [key: string]: string; } = {
   profileRankUnrated: "Unrated",
   profileReadme: "README",
   profileReadmeAddPrompt: "Add a README to tell visitors about yourself.",
-  profileReadmeDisabled: "This README has been disabled due to reports.",
   profileReadmeReport: "Report README",
   profileReadmeReportSuccess: "Report submitted. Thank you.",
   profileSchool: "School",
