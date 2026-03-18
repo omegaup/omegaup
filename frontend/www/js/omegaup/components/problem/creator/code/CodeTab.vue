@@ -39,13 +39,11 @@
           </div>
         </div>
       </div>
-      <div class="form-group row mt-3 align-items-center">
-        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
+      <div class="form-group d-flex flex-nowrap mt-3 align-items-center">
+        <label class="col-form-label mb-0 mr-2 text-nowrap">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div
-          class="col-12 col-sm-auto pl-sm-0 d-flex align-items-center overflow-hidden"
-        >
+        <div class="d-flex align-items-center overflow-hidden">
           <input
             data-problem-creator-code-input
             class="text-truncate mw-100"
