@@ -205,6 +205,9 @@ export default class ProblemFinderWizard extends Vue {
 
 .tags-input {
   margin: 1em 0 3em;
+  /deep/ .tags-input-wrapper-default {
+    flex-wrap: wrap;
+  }
 }
 
 .tags-input input {
