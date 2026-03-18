@@ -191,14 +191,21 @@ def get_problem_aggregates(
         problem_tag_votes: Dict[str, int] = collections.defaultdict(int)
         problem_tag_votes_n = 0
         for row in cur.fetchall():
-            contents = json.loads(row[0])
+            try:
+                contents = json.loads(row[0])
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                logging.exception('Failed to parse contents')
+                continue
+
             before_ac = contents.get('before_ac', False)
             user_score = row[1]
             weighting_factor = get_weighting_factor(
                 user_score, rank_cutoffs,
                 WEIGHTING_FACTORS if not before_ac else
                 BEFORE_AC_WEIGHTING_FACTORS)
-            if 'quality' in contents and contents['quality'] is not None:
+            if ('quality' in contents and
+                    isinstance(contents['quality'], int) and
+                    0 <= contents['quality'] < VOTES_NUM):
                 # TODO: This is just provisional until
                 # obtaining the before_ac weighting factors
                 quality_votes[contents['quality']].count += (
@@ -206,7 +213,8 @@ def get_problem_aggregates(
                 quality_votes[contents['quality']].weighted_sum += (
                     weighting_factor)
             if ('difficulty' in contents and
-                    contents['difficulty'] is not None):
+                    isinstance(contents['difficulty'], int) and
+                    0 <= contents['difficulty'] < VOTES_NUM):
                 difficulty_votes[contents['difficulty']].count += (
                     1 if not before_ac else 0)
                 difficulty_votes[contents['difficulty']].weighted_sum += (

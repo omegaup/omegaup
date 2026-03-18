@@ -33,9 +33,16 @@ describe('Test IDE', () => {
     cy.login(loginOptions[0]);
     cy.visit('/grader/ephemeral/');
 
+    // First click: triggers JSZip generation asynchronously.
     cy.get('[data-zip-download]').should('be.visible').click();
-    cy.wait(1000); // wait a little bit to make sure the file is ready
-    cy.get('[data-zip-download]').should('be.visible').click(); // cypress/downloads
+
+    // Wait for the async generation to finish and update the href
+    cy.get('[data-zip-download]')
+      .should('have.attr', 'href')
+      .and('not.be.empty');
+
+    // Second click: actually triggers the browser download
+    cy.get('[data-zip-download]').click();
 
     const fileName = `${Util.DUMMY_PROBLEM.alias}.zip`;
     const filePath = `cypress/downloads/${fileName}`;
