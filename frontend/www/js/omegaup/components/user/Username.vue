@@ -60,7 +60,7 @@ export default class Username extends Vue {
 <style lang="scss" scope>
 @import '../../../../sass/main.scss';
 
-span.username {
+span {
   display: inline-block;
   max-width: 100%;
   overflow-wrap: anywhere;
