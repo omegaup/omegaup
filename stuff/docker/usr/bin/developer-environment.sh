@@ -77,6 +77,7 @@ if [[ ! -d /opt/omegaup/stuff/venv/lib/python3.8/site-packages/wheel ]]; then
   python3 -m pip install wheel
 fi
 python3 -m pip install -r /opt/omegaup/stuff/requirements.txt
+python3 -m pip install -r /opt/omegaup/stuff/ai_editorial_worker/requirements.txt
 
 # Ensure that the database version is up to date.
 if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exists ; then

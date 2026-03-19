@@ -3076,6 +3076,7 @@ export namespace types {
     columns: string[];
     difficulty: string;
     frequentTags: types.TagWithProblemCount[];
+    hideProblemTagsPreference: boolean;
     keyword: string;
     language: string;
     languages: string[];
@@ -4358,6 +4359,7 @@ export namespace types {
   }
 
   export interface ProblemListPayload {
+    attemptedProblemAliases: string[];
     column: string;
     columns: string[];
     keyword: string;
@@ -4369,6 +4371,7 @@ export namespace types {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     selectedTags: string[];
+    solvedProblemAliases: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -4398,7 +4401,7 @@ export namespace types {
   }
 
   export interface ProblemSettings {
-    Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Cases: types.SettingsCaseGroup[];
     Interactive?: {
       Interfaces: {
         [key: string]: { [key: string]: types.InteractiveInterface };
@@ -4886,6 +4889,16 @@ export namespace types {
     time_limit: string;
   }
 
+  export interface SettingsCase {
+    Name: string;
+    Weight: number;
+  }
+
+  export interface SettingsCaseGroup {
+    Cases: types.SettingsCase[];
+    Name: string;
+  }
+
   export interface Signature {
     email: string;
     name: string;
@@ -5182,6 +5195,7 @@ export namespace types {
       problems_solved?: number;
       rank?: number;
     };
+    readme?: string;
     scholar_degree?: string;
     school?: string;
     school_id?: number;
@@ -6244,8 +6258,12 @@ export namespace messages {
   export type UserRemoveGroupResponse = {};
   export type UserRemoveRoleRequest = { [key: string]: any };
   export type UserRemoveRoleResponse = {};
+  export type UserReportReadmeRequest = { [key: string]: any };
+  export type UserReportReadmeResponse = {};
   export type UserRevokeAPITokenRequest = { [key: string]: any };
   export type UserRevokeAPITokenResponse = {};
+  export type UserSaveReadmeRequest = { [key: string]: any };
+  export type UserSaveReadmeResponse = {};
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
@@ -7122,9 +7140,15 @@ export namespace controllers {
     removeRole: (
       params?: messages.UserRemoveRoleRequest,
     ) => Promise<messages.UserRemoveRoleResponse>;
+    reportReadme: (
+      params?: messages.UserReportReadmeRequest,
+    ) => Promise<messages.UserReportReadmeResponse>;
     revokeAPIToken: (
       params?: messages.UserRevokeAPITokenRequest,
     ) => Promise<messages.UserRevokeAPITokenResponse>;
+    saveReadme: (
+      params?: messages.UserSaveReadmeRequest,
+    ) => Promise<messages.UserSaveReadmeResponse>;
     selectCoderOfTheMonth: (
       params?: messages.UserSelectCoderOfTheMonthRequest,
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;
