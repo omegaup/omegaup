@@ -120,10 +120,7 @@ OmegaUp.on('ready', async () => {
             })
               .then(time.remoteTimeAdapter)
               .then((response) => {
-                if (
-                  response.runs === null ||
-                  response.runs.length === 0
-                ) {
+                if (response.runs === null || response.runs.length === 0) {
                   this.endOfResults = true;
                 } else {
                   this.currentOffset = nextOffset;
@@ -232,4 +229,3 @@ OmegaUp.on('ready', async () => {
     refreshRuns();
   }, 5 * 60 * 1000);
 });
-
