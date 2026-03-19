@@ -3018,10 +3018,18 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Expires the known ranks
-     *
      * @TODO: This should be called only in the grader->frontend callback and only IFF
      * verdict = AC (and not test run)
+     *
+     * Expires rank caches and scoreboard caches.
+     *
+     * Rank caches (PROBLEMS_SOLVED_RANK, USER_COMPARE_DATA) only
+     * change when a submission receives an AC verdict, so callers
+     * must guard invocations accordingly.  Scoreboard caches are
+     * invalidated separately in Run::apiCreate() on every new
+     * submission (verdict is unknown at that point).  This function
+     * is now called conditionally in apiRejudge, apiDisqualify and
+     * apiRequalify (AC verdict + normal submission type).
      *
      * @return void
      */
