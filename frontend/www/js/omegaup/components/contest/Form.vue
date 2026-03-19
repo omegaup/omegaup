@@ -1569,6 +1569,7 @@ export default class Form extends Vue {
   box-shadow: none !important;
   background-color: var(--secondary) !important;
   border-color: var(--secondary) !important;
+  z-index: 0;
 }
 .btn-group .btn:hover {
   z-index: 0;
