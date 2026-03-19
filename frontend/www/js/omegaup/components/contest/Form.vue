@@ -7,6 +7,7 @@
       <!-- Style Presets -->
       <div class="btn-group d-block mb-3 text-center introjs-style">
         <button
+          :class="{ selected: currentPreset === PresetType.OMI }"
           class="btn btn-secondary"
           data-contest-omi
           type="button"
@@ -15,6 +16,7 @@
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.PreIOI }"
           class="btn btn-secondary"
           data-contest-preioi
           type="button"
@@ -23,6 +25,7 @@
           {{ T.contestNewForm }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.Conacup }"
           class="btn btn-secondary"
           data-contest-conacup
           type="button"
@@ -31,6 +34,7 @@
           {{ T.contestNewFormConacupStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.ICPC }"
           class="btn btn-secondary"
           data-contest-icpc
           type="button"
@@ -1133,6 +1137,7 @@ export default class Form extends Vue {
   hasFormChanged = false;
   showModal: boolean = false;
   changePresetTo: PresetType | null = null;
+  currentPreset: PresetType | null = null;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -1333,6 +1338,7 @@ export default class Form extends Vue {
 
   applyPreset(presetType: PresetType): void {
     const preset = CONTEST_PRESETS[presetType];
+    this.currentPreset = presetType;
 
     if (preset.languages) {
       const allLangs = Object.keys(this.allLanguages);
@@ -1551,5 +1557,20 @@ export default class Form extends Vue {
   &:hover {
     color: var(--btn-ok-font-color--hover);
   }
+}
+
+.btn-group .btn.selected {
+  outline: 3px solid #c0c4c7 !important;
+  z-index: 1 !important;
+}
+
+// Overwrite default bootstrap focus styles
+.btn-group .btn:focus {
+  box-shadow: none !important;
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+}
+.btn-group .btn:hover {
+  z-index: 0;
 }
 </style>
