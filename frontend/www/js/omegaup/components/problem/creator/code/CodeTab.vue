@@ -43,14 +43,33 @@
         <label class="col-form-label mb-0 mr-2 text-nowrap">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div class="d-flex align-items-center overflow-hidden">
+        <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
           <input
+            ref="fileInput"
             data-problem-creator-code-input
-            class="text-truncate mw-100"
+            class="d-none"
             type="file"
             name="file"
             @change="handleInputFile"
           />
+          <button
+            class="btn btn-secondary btn-sm text-nowrap"
+            type="button"
+            @click="$refs.fileInput.click()"
+          >
+            Choose File
+          </button>
+          <div class="mx-2 text-nowrap" style="overflow-x: auto; max-width: 100px;">
+            {{ selectedFileName || 'No file chosen' }}
+          </div>
+          <button
+            v-if="selectedFileName"
+            class="btn btn-sm text-danger p-0 flex-shrink-0"
+            type="button"
+            @click="clearFile"
+          >
+            🗑️
+          </button>
         </div>
       </div>
       <div class="row">
@@ -100,6 +119,7 @@ export default class CodeTab extends Vue {
   selectedLanguage = '';
   codeInternal = T.problemCreatorEmpty;
   extensionInternal = T.problemCreatorEmpty;
+  selectedFileName = '';
 
   get code(): string {
     return this.codeInternal;
@@ -176,6 +196,7 @@ export default class CodeTab extends Vue {
     const file = this.readFile(ev.target as HTMLInputElement);
 
     if (file) {
+      this.selectedFileName = file.name;
       if (this.inputLimit && file.size >= this.inputLimit) {
         alert(
           ui.formatString(T.problemCreatorCodeUploadFilesize, {
@@ -206,6 +227,13 @@ export default class CodeTab extends Vue {
 
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
+  }
+
+  clearFile(): void {
+    this.selectedFileName = '';
+    (this.$refs.fileInput as HTMLInputElement).value = '';
+    this.code = T.problemCreatorEmpty;
+    this.extension = T.problemCreatorEmpty;
   }
 
   updateCode() {
