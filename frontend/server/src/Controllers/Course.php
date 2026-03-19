@@ -3525,8 +3525,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             // including courses with registration mode
             $r->identity = null;
         }
-        $page = $r->ensureOptionalInt('page') ?? 1;
-        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
+        $clarificationsPage = $r->ensureOptionalInt('page') ?? 1;
+        $clarificationsPageSize = $r->ensureOptionalInt('page_size') ?? 100;
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
@@ -3556,8 +3556,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course,
             $group,
             $assignmentAlias,
-            $page,
-            $pageSize
+            $clarificationsPage,
+            $clarificationsPageSize
         );
     }
 
@@ -4720,9 +4720,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Users $currentUser,
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
-        string $assignmentAlias,
-        int $page,
-        int $pageSize
+        ?string $assignmentAlias,
+        ?int $clarificationsPage,
+        ?int $clarificationsPageSize
     ): array {
         $assignment = self::validateCourseAssignmentAlias(
             $course,
@@ -4841,8 +4841,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $currentIdentity,
                         $assignmentAlias,
-                        $page,
-                        $pageSize
+                        $clarificationsPage,
+                        $clarificationsPageSize
                     ),
                     'currentAssignment' => [
                         'name' => $assignment->name,
@@ -5393,9 +5393,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
         ?\OmegaUp\DAO\VO\Identities $identity = null,
-        string $assignmentAlias,
-        int $page,
-        int $pageSize
+        ?string $assignmentAlias = "",
+        ?int $clarificationsPage = 1,
+        ?int $clarificationsPageSize = 100
     ): array {
         $isAdmin = false;
         $isCurator = false;
@@ -5432,17 +5432,17 @@ class Course extends \OmegaUp\Controllers\Controller {
                     course: $course,
                     isAdmin: ($isAdmin || $isCurator || $isTeachingAssistant),
                     currentIdentity: $identity,
-                    page: $page,
-                    pageSize: $pageSize,
+                    page: $clarificationsPage,
+                    pageSize: $clarificationsPageSize,
                 );
 
         $clarificationsPagerItems = \OmegaUp\Pager::paginateWithUrl(
             $clarifications['totalRows'],
-            $pageSize,
-            $page,
+            $clarificationsPageSize,
+            $clarificationsPage,
             "/course/{$course->alias}/assignment/{$assignmentAlias}",
             adjacent: 5,
-            params: [],
+            params: ['page_size' => $clarificationsPageSize],
         );
 
         // This is necessary to stay at the same 'clarifications' URL fragment
@@ -5460,6 +5460,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             ),
             'clarifications' => $clarifications['clarifications'],
             'clarificationsPagerItems' => $clarificationsPagerItems,
+            'clarificationsPage' => $clarificationsPage,
+            'clarificationsPageSize' => $clarificationsPageSize,
             'name' => strval($course->name),
             'description' => strval($course->description),
             'objective' => $course->objective,

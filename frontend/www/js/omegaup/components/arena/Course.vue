@@ -214,6 +214,8 @@
           :username="isAdmin && users.length != 0 ? users[0].username : null"
           :clarifications="currentClarifications"
           :pager-items="course.clarificationsPagerItems"
+          :page="course.clarificationsPage"
+          :page-size="course.clarificationsPageSize"
           :is-admin="isAdmin"
           :allow-filter-by-assignment="true"
           :show-new-clarification-popup="showNewClarificationPopup"
