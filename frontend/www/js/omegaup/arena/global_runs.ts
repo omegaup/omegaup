@@ -30,7 +30,7 @@ OmegaUp.on('ready', async () => {
   } catch (e: any) {
     ui.apiError(e);
   }
-  new Vue({
+  const vueInstance = new Vue({
     el: '#main-container',
     components: {
       'omegaup-arena-runs': arena_Runs,
@@ -224,8 +224,8 @@ OmegaUp.on('ready', async () => {
 
   refreshRuns();
   setInterval(() => {
-    this.currentOffset = 0;
-    this.endOfResults = false;
+    vueInstance.$data.currentOffset = 0;
+    vueInstance.$data.endOfResults = false;
     refreshRuns();
   }, 5 * 60 * 1000);
 });
