@@ -1043,6 +1043,7 @@ const translations: { [key: string]: string; } = {
   navViewProblems: "(Br0w53 Pr0b13m5)",
   navViewProblemsAll: "(Pr0b13m5 Li57)",
   navViewProfile: "(My pr0fi13)",
+  navbarGoToHomepage: "(G0 70 h0m3pag3)",
   navbarLogin: "(L0g in)",
   navbarRegister: "(Sign up)",
   navbarScrollToTop: "(Scr011 70 70p)",

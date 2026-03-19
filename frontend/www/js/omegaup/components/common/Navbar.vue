@@ -8,7 +8,7 @@
         <a
           class="navbar-brand p-3 mr-0 mr-sm-3"
           href="/"
-          :title="T.navbarScrollToTop"
+          :title="logoTooltip"
           @click.prevent="handleLogoClick"
         >
           <img
@@ -364,7 +364,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import $ from 'jquery';
 import * as ui from '../../ui';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import notifications_List from '../notification/List.vue';
@@ -430,6 +429,7 @@ export default class Navbar extends Vue {
   ui = ui;
   AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
+  scrollY: number = 0;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
@@ -497,20 +497,41 @@ export default class Navbar extends Vue {
     }
   }
 
+  get logoTooltip(): string {
+    if (this.scrollY > 0) {
+      return this.T.navbarScrollToTop;
+    }
+    return this.T.navbarGoToHomepage;
+  }
+
+  updateScroll(): void {
+    this.scrollY = window.scrollY;
+  }
+
   handleLogoClick(): void {
-    if (window.scrollY > 0) {
+    const isAtTop = window.scrollY <= 0;
+    const isHome = window.location.pathname === '/';
+
+    if (!isAtTop) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (window.location.pathname !== '/') {
+      return;
+    }
+
+    if (!isHome) {
       window.location.href = '/';
     }
   }
 
   mounted() {
     document.addEventListener('click', this.handleDocumentClick);
+    window.addEventListener('scroll', this.updateScroll);
+
+    this.updateScroll();
   }
 
   beforeDestroy() {
     document.removeEventListener('click', this.handleDocumentClick);
+    window.removeEventListener('scroll', this.updateScroll);
   }
 
   private handleDocumentClick(event: MouseEvent) {

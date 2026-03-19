@@ -1043,6 +1043,7 @@ const translations: { [key: string]: string; } = {
   navViewProblems: "Procurar Problemas",
   navViewProblemsAll: "Lista de Problemas",
   navViewProfile: "Meu perfil",
+  navbarGoToHomepage: "Ir para a p\u00e1gina inicial",
   navbarLogin: "Entrar",
   navbarRegister: "Inscrever-se",
   navbarScrollToTop: "Ir para o topo",
