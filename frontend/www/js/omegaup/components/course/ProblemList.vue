@@ -7,13 +7,13 @@
       <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
-      <div v-if="!problems || problems.length === 0" class="empty-state text-center p-5">
+      <div v-if="(!problems || problems.length === 0) && !showForm" class="empty-state text-center p-5">
   <h5>{{ emptyTableLabel }}</h5>
 
   <button
     data-add-problem
     class="btn btn-primary mt-3"
-    @click="$el.querySelector('.card-footer')?.scrollIntoView({ behavior: 'smooth' })"
+    @click="showForm = true"
   >
     {{ addProblemButtonLabel }}
   </button>
@@ -83,7 +83,7 @@
         </div>
       </div>
     </div>
-    <div class="card-footer">
+    <div v-if="showForm || (problems && problems.length > 0)" class="card-footer">
       <form @submit.prevent="">
         <div class="row">
           <div class="col-md-12">
@@ -177,12 +177,12 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="!problemAlias"
+                :disabled="!addProblemButtonDisabled"
                 @click.prevent="
                   onSaveProblem(assignment, {
                     alias: problemAlias.key,
                     points: points,
-                    commit: selectedRevision.commit,
+                    commit: selectedRevision?.commit,
                     is_extra_problem: isExtraProblem,
                   })
                 "
@@ -247,6 +247,7 @@ export default class CourseProblemList extends Vue {
   taggedProblemAlias = '';
   problemAlias: null | types.ListItem = null;
   points = 100;
+  showForm = false;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
   useLatestVersion = true;
