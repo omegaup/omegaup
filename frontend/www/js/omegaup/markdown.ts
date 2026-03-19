@@ -580,17 +580,17 @@ export class Converter {
   // Renders Mermaid diagrams in the specified container.
   // Searches for all code blocks with 'language-mermaid' class and converts
   // them to SVG diagrams.
-  public renderMermaidDiagrams(container: HTMLElement): void {
+  public renderMermaidDiagrams(container: HTMLElement): Promise<void> {
     const codeBlocks = container.querySelectorAll(
       'pre > code.language-mermaid',
     );
 
     if (codeBlocks.length === 0) {
-      return; // No mermaid diagrams found, exit early
+      return Promise.resolve();
     }
 
     // Load mermaid dynamically only when needed
-    import('mermaid')
+    return import('mermaid')
       .then((mermaidModule) => {
         const mermaid = mermaidModule.default;
 
@@ -607,6 +607,8 @@ export class Converter {
           });
           this._mermaidLoaded = true;
         }
+
+        const renderPromises: Promise<void>[] = [];
 
         codeBlocks.forEach((block, index) => {
           let code = block.textContent || '';
@@ -628,8 +630,8 @@ export class Converter {
           tempContainer.innerHTML = `<div class="mermaid">${code}</div>`;
           document.body.appendChild(tempContainer);
 
-          // Render the diagram
-          mermaid
+          // Render the diagram and collect the promise
+          const renderPromise = mermaid
             .render(id, code)
             .then(({ svg }: { svg: string }) => {
               // Clean up temporary container
@@ -654,10 +656,15 @@ export class Converter {
               errorMsg.textContent = `Error rendering diagram: ${error.message}`;
               pre.parentElement?.insertBefore(errorMsg, pre);
             });
+          renderPromises.push(renderPromise);
         });
+
+        // Wait for all render promises to complete
+        return Promise.all(renderPromises);
       })
       .catch((error) => {
         console.error('Error loading mermaid module:', error);
+        throw error;  // Re-throw to propagate the error to the caller
       });
   }
 
