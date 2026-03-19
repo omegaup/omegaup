@@ -212,13 +212,13 @@ export default class CourseIntro extends Vue {
   color: $omegaup-pink;
 }
 
-  h5.intro-subtitle {
-    color: $omegaup-grey;
-    width: 20rem;
-    border-bottom: 4px solid $omegaup-primary--accent;
-  }
+h5.intro-subtitle {
+  color: $omegaup-grey;
+  width: 20rem;
+  border-bottom: 4px solid $omegaup-primary--accent;
+}
 
-  [data-markdown-statement] a {
-    overflow-wrap: anywhere;
-  }
-  </style>
+[data-markdown-statement] a {
+  overflow-wrap: anywhere;
+}
+</style>
