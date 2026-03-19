@@ -1560,7 +1560,7 @@ export default class Form extends Vue {
 }
 
 .btn-group .btn.selected {
-  outline: 3px solid #c0c4c7 !important;
+  outline: 3px solid var(--btn-contest-preset-outline-color) !important;
   z-index: 1 !important;
 }
 
