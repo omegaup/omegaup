@@ -731,8 +731,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 course: null,
                 isAdmin: $contestAdmin,
                 currentIdentity: $identity,
-                offset: null,
-                rowcount: 100,
+                page: 1,
+                pageSize: 100,
             )['clarifications'],
             'problems' => $problems,
             'submissionDeadline' => $contestDetails['submission_deadline'] ?? $contest->finish_time,
@@ -4076,8 +4076,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $contest
                 ),
                 currentIdentity: $r->identity,
-                offset: $offset,
-                rowcount: $rowcount,
+                page: $offset,
+                pageSize: $rowcount,
             )['clarifications'],
         ];
     }

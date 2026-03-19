@@ -5022,8 +5022,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         course: $course,
                         isAdmin: $isAdmin,
                         currentIdentity: $r->identity,
-                        offset: null,
-                        rowcount: 100,
+                        page: 1,
+                        pageSize: 100,
                     )['clarifications'],
                     'problems' => $problemsResponseArray,
                     'runs' => [],
@@ -6310,8 +6310,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 course: $course,
                 isAdmin: $isAdmin || $isTeachingAssistant,
                 currentIdentity: $r->identity,
-                offset: $offset,
-                rowcount: $rowcount
+                page: $offset,
+                pageSize: $rowcount
             )['clarifications'],
         ];
     }
@@ -6358,8 +6358,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             course: $course,
             isAdmin: $isAdmin || $isTeachingAssistant,
             currentIdentity: $r->identity,
-            offset: $page,
-            rowcount: $pageSize
+            page: $page,
+            pageSize: $pageSize
         );
 
         return [
