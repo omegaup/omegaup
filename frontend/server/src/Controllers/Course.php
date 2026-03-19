@@ -5393,7 +5393,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
         ?\OmegaUp\DAO\VO\Identities $identity = null,
-        ?string $assignmentAlias = "",
+        ?string $assignmentAlias = '',
         ?int $clarificationsPage = 1,
         ?int $clarificationsPageSize = 100
     ): array {
