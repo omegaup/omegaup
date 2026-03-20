@@ -17,7 +17,7 @@ import {
 import { types } from '../api_types';
 import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 
-const rowCount = 20;
+const rowCount = 100;
 
 OmegaUp.on('ready', async () => {
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
