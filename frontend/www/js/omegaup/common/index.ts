@@ -18,7 +18,7 @@ OmegaUp.on('ready', () => {
     problems_solved: user.problems_solved,
   }));
 
-  new Vue({
+  const vueInstance: any = new Vue({
     el: '#main-container',
     components: {
       'omegaup-homepage': Homepage,
@@ -32,7 +32,7 @@ OmegaUp.on('ready', () => {
           .catch(ui.apiError);
       },
     },
-    render: function (createElement) {
+    render: function (createElement): any {
       return createElement('omegaup-homepage', {
         props: {
           coderOfTheMonth: payload.coderOfTheMonthData
@@ -63,7 +63,7 @@ OmegaUp.on('ready', () => {
           isUnder13User: commonPayload.isUnder13User,
         },
         on: {
-          'record-cookie-consent': this.recordCookieConsent,
+          'record-cookie-consent': vueInstance.recordCookieConsent,
         },
       });
     },
