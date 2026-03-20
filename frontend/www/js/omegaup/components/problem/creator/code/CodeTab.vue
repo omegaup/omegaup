@@ -39,11 +39,11 @@
           </div>
         </div>
       </div>
-      <div class="form-group d-flex flex-nowrap mt-3 align-items-center">
+      <div class="form-group d-flex flex-nowrap overflow-auto mt-3 align-items-center">
         <label class="col-form-label mb-0 mr-2 text-nowrap">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+        <div class="d-flex align-items-center flex-grow-1">
           <input
             ref="fileInput"
             data-problem-creator-code-input
@@ -55,12 +55,12 @@
           <button
             class="btn btn-secondary btn-sm text-nowrap"
             type="button"
-            @click="$refs.fileInput.click()"
+            @click="fileInput.click()"
           >
-            Choose File
+            {{ T.problemCreatorCodeChooseFile }}
           </button>
-          <div class="mx-2 text-nowrap" style="overflow-x: auto; max-width: 100px;">
-            {{ selectedFileName || 'No file chosen' }}
+          <div class="mx-2 text-nowrap">
+            {{ selectedFileName || T.problemCreatorCodeNoFileChosen }}
           </div>
           <button
             v-if="selectedFileName"
@@ -68,7 +68,7 @@
             type="button"
             @click="clearFile"
           >
-            🗑️
+            <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
           </button>
         </div>
       </div>
@@ -89,7 +89,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../../../omegaup';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
@@ -99,20 +99,27 @@ import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 import { TabIndex } from '../Tabs.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+library.add(fas);
 
 Vue.use(VueCookies, { expires: -1 });
 
 @Component({
   components: {
     'omegaup-creator-code-view': creator_CodeView,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class CodeTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
   @Prop() activeTabIndex!: TabIndex;
+  @Ref('fileInput') fileInput!: HTMLInputElement;
 
-  inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
+  inputLimit = 512 * 1024;
   T = T;
   ui = ui;
   omegaup = omegaup;
@@ -231,7 +238,7 @@ export default class CodeTab extends Vue {
 
   clearFile(): void {
     this.selectedFileName = '';
-    (this.$refs.fileInput as HTMLInputElement).value = '';
+    this.fileInput.value = '';
     this.code = T.problemCreatorEmpty;
     this.extension = T.problemCreatorEmpty;
   }

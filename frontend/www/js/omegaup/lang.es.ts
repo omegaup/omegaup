@@ -1247,6 +1247,8 @@ const translations: { [key: string]: string; } = {
   problemCreatorCodeTabIntroWriteCodeIntro: "Usa el editor de c\u00f3digo para escribir o modificar tu soluci\u00f3n.",
   problemCreatorCodeTabIntroWriteCodeTitle: "Escribe c\u00f3digo",
   problemCreatorCodeUpload: "O sube un archivo",
+  problemCreatorCodeChooseFile: "Elegir archivo",
+  problemCreatorCodeNoFileChosen: "Ningún archivo seleccionado",
   problemCreatorCodeUploadFilesize: "El l\u00edmite para subir archivos son %(limit)",
   problemCreatorContentPlaceHolder: "Contenido",
   problemCreatorCreateNewProblem: "Crear nuevo problema",
