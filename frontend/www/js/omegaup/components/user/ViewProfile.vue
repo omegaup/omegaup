@@ -2,8 +2,7 @@
   <div class="container-fluid p-0 mt-0">
     <div
       v-if="
-        isReadmeEnabled &&
-        (currentReadme !== null || profile.is_own_profile)
+        isReadmeEnabled && (currentReadme !== null || profile.is_own_profile)
       "
       class="row mb-3"
     >
