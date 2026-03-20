@@ -50,7 +50,11 @@
               <th>{{ rank.place }}</th>
               <th>
                 <div class="username" data-test-merged-username>
-                  {{ rank.username }}
+                  <omegaup-user-username
+                    :classname="rank.classname"
+                    :linkify="true"
+                    :username="rank.username"
+                  ></omegaup-user-username>
                 </div>
                 <div class="name">
                   {{ rank.username != rank.name ? rank.name : ' ' }}
@@ -102,10 +106,12 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
 import Multiselect from 'vue-multiselect';
+import user_Username from '../user/Username.vue';
 
 @Component({
   components: {
     Multiselect,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class ScoreboardMerge extends Vue {
