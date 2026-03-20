@@ -4,10 +4,19 @@
     <div class="card-body">
       <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
-          {{ T.courseContentEmpty }}
+          
+          <h4 class="mb-2">{{ T.courseContentEmpty }}</h4>
           <br />
-          {{ T.courseGetStarted }}
+          <p class="text-muted mb-4">{{ T.courseGetStarted }}
+          </p>
+          <br>
+          <font-awesome-icon
+            icon="book-open"
+            size="3x"
+            class="mb-3 text-muted"
+          />
         </div>
+        
       </div>
       <table v-else class="table table-striped">
         <thead>
