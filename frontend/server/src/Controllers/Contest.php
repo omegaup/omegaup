@@ -4054,10 +4054,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $offset = $r->ensureOptionalInt('offset');
-        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
-        if ($offset < 0) {
-            $offset = 0;
+        $page = $r->ensureOptionalInt('offset') ?? 1;
+        $pageSize = $r->ensureOptionalInt('rowcount') ?? 1000;
+        if ($page < 1) {
+            $page = 1;
         }
 
         $contest = self::validateContest(
@@ -4076,8 +4076,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $contest
                 ),
                 currentIdentity: $r->identity,
-                page: $offset,
-                pageSize: $rowcount,
+                page: $page,
+                pageSize: $pageSize,
             )['clarifications'],
         ];
     }

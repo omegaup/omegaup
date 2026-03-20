@@ -5426,7 +5426,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $clarifications = is_null($identity)
-                ? []
+                ? ['clarifications' => [], 'totalRows' => 0]
                 : \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                     contest: null,
                     course: $course,
@@ -6277,10 +6277,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $offset = $r->ensureOptionalInt('offset');
-        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
-        if ($offset < 0) {
-            $offset = 0;
+        $page = $r->ensureOptionalInt('offset') ?? 1;
+        $pageSize = $r->ensureOptionalInt('rowcount') ?? 1000;
+        if ($page < 1) {
+            $page = 1;
         }
 
         $course = self::validateCourseExists(
@@ -6312,8 +6312,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 course: $course,
                 isAdmin: $isAdmin || $isTeachingAssistant,
                 currentIdentity: $r->identity,
-                page: $offset,
-                pageSize: $rowcount
+                page: $page,
+                pageSize: $pageSize
             )['clarifications'],
         ];
     }
