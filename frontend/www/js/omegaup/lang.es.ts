@@ -441,6 +441,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormPointDecrementFactorDesc: "Un n\u00famero entre 0 y 1 inclusive. Si este n\u00famero es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estar\u00e1 dado por (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), donde PT es el penalty en minutos del env\u00edo y TT el tiempo total del concurso, en minutos.",
   contestNewFormPointsDecayFactorInvalid: "El factor de decaimiento de puntos debe estar entre 0 y 1",
   contestNewFormPresetOverwriteWarning: "Aplicar este predeterminado sobrescribir\u00e1 los valores actuales del formulario. \u00bfContinuar?",
+  contestNewFormPresetOverwriteWarningModalTitle: "Cambiar predeterminado",
   contestNewFormPrivacy: "Privacidad (opcional)",
   contestNewFormProcessing: "Procesando...",
   contestNewFormRecommended: "Concurso recomendado",
