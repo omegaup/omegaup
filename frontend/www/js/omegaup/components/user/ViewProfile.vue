@@ -1,7 +1,10 @@
 <template>
   <div class="container-fluid p-0 mt-0">
     <div
-      v-if="currentReadme !== null || profile.is_own_profile"
+      v-if="
+        isReadmeEnabled &&
+        (currentReadme !== null || profile.is_own_profile)
+      "
       class="row mb-3"
     >
       <div class="col-md-12">
@@ -318,6 +321,7 @@ import {
   Course,
   Problem,
 } from '../../linkable_resource';
+import { Experiments } from '../../omegaup';
 import * as ui from '../../ui';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
@@ -407,6 +411,7 @@ export default class ViewProfile extends Vue {
   isEditingReadme = false;
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
+  isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];

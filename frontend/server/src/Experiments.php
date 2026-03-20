@@ -41,7 +41,10 @@ class Experiments {
     /**
      * An array with all the known experiments.
      */
+    const USER_README = 'user_readme';
+
     private const KNOWN_EXPERIMENTS = [
+        self::USER_README,
     ];
 
     /**
