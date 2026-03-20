@@ -2236,6 +2236,10 @@ export const User = {
     messages.UserProfileStatisticsRequest,
     messages.UserProfileStatisticsResponse
   >('/api/user/profileStatistics/'),
+  recordCookieConsent: apiCall<
+    messages.UserRecordCookieConsentRequest,
+    messages.UserRecordCookieConsentResponse
+  >('/api/user/recordCookieConsent/'),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse
