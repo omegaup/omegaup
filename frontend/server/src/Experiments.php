@@ -235,6 +235,14 @@ class Experiments {
     }
 
     /**
+     * Resets the global instance so that it will be recreated on the next call
+     * to getInstance(). Useful in tests when experiment defines change.
+     */
+    public static function resetInstance(): void {
+        self::$_instance = null;
+    }
+
+    /**
      * Returns the global instance of Experiments.
      */
     public static function getInstance(): Experiments {

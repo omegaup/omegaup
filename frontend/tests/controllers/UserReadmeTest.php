@@ -3,6 +3,15 @@
  * Tests for user profile README.
  */
 class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        if (!defined('EXPERIMENT_USER_README')) {
+            define('EXPERIMENT_USER_README', true);
+        }
+        // Reset the singleton so it picks up the newly defined constant.
+        \OmegaUp\Experiments::resetInstance();
+    }
+
     /**
      * Tests creating a new README for a user.
      */
