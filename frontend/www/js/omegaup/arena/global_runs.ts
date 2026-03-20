@@ -41,7 +41,7 @@ OmegaUp.on('ready', async () => {
       popupDisplayed,
       guid,
       runDetailsData: runDetails,
-      loading: false,
+      loading: true,
       endOfResults: false,
       currentOffset: 0,
     }),
@@ -219,7 +219,10 @@ OmegaUp.on('ready', async () => {
       .then((response) => {
         onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
-      .catch(ui.apiError);
+      .catch(ui.apiError)
+      .finally(() => {
+        vueInstance.$data.loading = false;
+      });
   }
 
   refreshRuns();
