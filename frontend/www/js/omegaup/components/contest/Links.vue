@@ -19,12 +19,16 @@
         }}</a>
         <a
           class="list-group-item"
-          :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}`"
+          :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}${
+            isContestFinished ? '#ranking' : ''
+          }`"
           >{{ T.contestScoreboardLink }}</a
         >
         <a
           class="list-group-item"
-          :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}`"
+          :href="`/arena/${contest.alias}/scoreboard/${
+            contest.scoreboard_url_admin
+          }${isContestFinished ? '#ranking' : ''}`"
           >{{ T.contestScoreboardAdminLink }}</a
         >
         <a
@@ -49,6 +53,10 @@ export default class Links extends Vue {
 
   T = T;
   contest = this.data;
+
+  get isContestFinished(): boolean {
+    return this.contest.finish_time < new Date();
+  }
 
   @Emit('download-csv-scoreboard')
   onDownloadCsv(contestAlias: string): string {
