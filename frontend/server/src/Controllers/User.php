@@ -5368,6 +5368,8 @@ class User extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
         ];
     }
+
+    /**  
      * Saves (creates or updates) the README for the authenticated user's profile.
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException if the user is not authenticated
