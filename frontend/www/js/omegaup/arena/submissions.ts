@@ -279,3 +279,14 @@ export function onRefreshRuns({
     trackRun({ run });
   }
 }
+
+export function onAppendRuns({
+  runs,
+  totalRuns,
+}: {
+  runs: types.Run[];
+  totalRuns: number;
+}): void {
+  runsStore.commit('setTotalRuns', totalRuns);
+  runsStore.commit('appendRuns', runs);
+}
