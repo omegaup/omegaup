@@ -2252,10 +2252,18 @@ export const User = {
     messages.UserRemoveRoleRequest,
     messages.UserRemoveRoleResponse
   >('/api/user/removeRole/'),
+  reportReadme: apiCall<
+    messages.UserReportReadmeRequest,
+    messages.UserReportReadmeResponse
+  >('/api/user/reportReadme/'),
   revokeAPIToken: apiCall<
     messages.UserRevokeAPITokenRequest,
     messages.UserRevokeAPITokenResponse
   >('/api/user/revokeAPIToken/'),
+  saveReadme: apiCall<
+    messages.UserSaveReadmeRequest,
+    messages.UserSaveReadmeResponse
+  >('/api/user/saveReadme/'),
   selectCoderOfTheMonth: apiCall<
     messages.UserSelectCoderOfTheMonthRequest,
     messages.UserSelectCoderOfTheMonthResponse

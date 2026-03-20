@@ -121,14 +121,6 @@
                   "
                 ></omegaup-common-typeahead>
               </label>
-              <button
-                type="button"
-                class="close"
-                style="float: none"
-                @click="filterProblem = null"
-              >
-                &times;
-              </button>
             </template>
 
             <template v-if="showUser">
