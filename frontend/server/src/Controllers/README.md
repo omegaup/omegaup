@@ -1,7 +1,9 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -283,10 +285,13 @@
   - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
   - [`/api/user/profile/`](#apiuserprofile)
   - [`/api/user/profileStatistics/`](#apiuserprofilestatistics)
+  - [`/api/user/recordCookieConsent/`](#apiuserrecordcookieconsent)
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
+  - [`/api/user/reportReadme/`](#apiuserreportreadme)
   - [`/api/user/revokeAPIToken/`](#apiuserrevokeapitoken)
+  - [`/api/user/saveReadme/`](#apiusersavereadme)
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
@@ -312,6 +317,20 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 # Admin
 
+Admin Controller
+
+## `/api/admin/getMaintenanceMode/`
+
+### Description
+
+Get maintenance mode status
+
+### Returns
+
+```typescript
+types.MaintenanceModeStatus;
+```
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
@@ -330,6 +349,26 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/setMaintenanceMode/`
+
+### Description
+
+Set maintenance mode
+
+### Parameters
+
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `enabled`    | `null\|bool`   |             |          |
+| `message_en` | `null\|string` |             |          |
+| `message_es` | `null\|string` |             |          |
+| `message_pt` | `null\|string` |             |          |
+| `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
 
 # AiEditorial
 
@@ -5612,6 +5651,22 @@ Get profile statistics including solved problems by difficulty and tags distribu
 | `solved`     | `number`                                                              |
 | `tags`       | `List[{ count: number; name: string; }]`                              |
 
+## `/api/user/recordCookieConsent/`
+
+### Description
+
+API endpoint to record user's cookie consent decision
+
+### Parameters
+
+| Name       | Type   | Description | Required |
+| ---------- | ------ | ----------- | -------- |
+| `accepted` | `bool` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
 ## `/api/user/removeExperiment/`
 
 ### Description
@@ -5662,6 +5717,22 @@ Removes the role from the user.
 
 _Nothing_
 
+## `/api/user/reportReadme/`
+
+### Description
+
+Reports the README of a user's profile.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
 ## `/api/user/revokeAPIToken/`
 
 ### Description
@@ -5673,6 +5744,22 @@ Revokes an API token associated with the user.
 | Name   | Type     | Description                                                          | Required |
 | ------ | -------- | -------------------------------------------------------------------- | -------- |
 | `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/saveReadme/`
+
+### Description
+
+Saves (creates or updates) the README for the authenticated user's profile.
+
+### Parameters
+
+| Name     | Type           | Description | Required |
+| -------- | -------------- | ----------- | -------- |
+| `readme` | `null\|string` |             |          |
 
 ### Returns
 

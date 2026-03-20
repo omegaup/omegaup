@@ -20,7 +20,9 @@ This project aims to improve the platform’s performance by optimizing SQL quer
 * One Integration test that analyzes the EXPLAIN of all queries to determine if it's efficient or not.
 * One integration test that analyzes the performance of all queries by running them on a synthetic dataset with dimensions comparable to those of production. 
 
-The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in [this doc](https://docs.google.com/document/d/1X_fAm97L6_v9P8_R0S_Lp7X6e7x7j7z-X5z5-x5z5z5).
+The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in this doc:
+https://docs.google.com/document/d/1kEOL3HoJT-dYeguU315jju1nkQLC2ew9o5-bm5iiwkQ/edit
+
 
 **Current status**:
 
@@ -186,16 +188,16 @@ A project from last year's GSoC introduced the Problem Creator, a visual editor 
 
 * A technical [pdesign doc](https://docs.google.com/document/d/1qpBwJQ6QIiIXgWpb_qa6OJ8KpJPcd11x3qKiefdgPAw/edit?tab=t.0) has been written for this project. 
 * Completed backend changes:
-  * #8470 CDP classes and validations, added core CDP classes and validation logic.
-  * #8479 New method in ProblemDeployer to modify problem ZIPs, enables updating problem ZIP contents during deployment.
-  * #8554 CDPBuilder fixes and unit test coverage, fixed issues in CdpBuilder and added a unit test to ensure correctness.
-  * #8606 Language support in CDPBuilder, added multi-language support with priority based on languagePreference
-  * #8613 Backend logic for editing cases and CDP, added server-side logic to support case editing and CDP updates.
-  * Initial UI change completed: #8593 CasesForm and DeleteConfirmationForm components, introduced the base UI forms required for managing cases 
+  * [#8470](https://github.com/omegaup/omegaup/pull/8470) CDP classes and validations, added core CDP classes and validation logic.
+  * [#8479](https://github.com/omegaup/omegaup/pull/8479) New method in ProblemDeployer to modify problem ZIPs, enables updating problem ZIP contents during deployment.
+  * [#8554](https://github.com/omegaup/omegaup/pull/8554) CDPBuilder fixes and unit test coverage, fixed issues in CdpBuilder and added a unit test to ensure correctness.
+  * [#8606](https://github.com/omegaup/omegaup/pull/8606) Language support in CDPBuilder, added multi-language support with priority based on languagePreference
+  * [#8613](https://github.com/omegaup/omegaup/pull/8613) Backend logic for editing cases and CDP, added server-side logic to support case editing and CDP updates.
+  * Initial UI change completed: [#8593](https://github.com/omegaup/omegaup/pull/8593) CasesForm and DeleteConfirmationForm components, introduced the base UI forms required for managing cases
 * Pending work (mostly UI-related)
-  * #8471 Integrate CDP into the problem form and handle external ZIPs
-  * #8492 UI implementation for the editing interface
-  * #8595 UI integration: Edit view, CaseEdit, and Sidebar
+  * [#8471](https://github.com/omegaup/omegaup/pull/8471) Integrate CDP into the problem form and handle external ZIPs
+  * [#8492](https://github.com/omegaup/omegaup/pull/8492) UI implementation for the editing interface
+  * [#8595](https://github.com/omegaup/omegaup/pull/8595) UI integration: Edit view, CaseEdit, and Sidebar
 
 **Expected results**:
 
@@ -236,7 +238,7 @@ If you are interested spending this summer collaborating with us, first of all, 
 ### Phase One: Complete our test 
 
  - First, create an account at [omegaUp.com](https://omegaUp.com).
- - Join to our GSoC 2026 [omegaUp Test](https://omegaup.com/contest/gsoc2026). The test consists of 3 problems, you have to solve at least 2 of them in order to pass. **In the case of plagiarism, we will disqualify those applicants involved**, so please don't share your solutions with your fellow applicants.
+ - Join to our GSoC 2026 [omegaUp Test](https://omegaup.com/arena/gsoc2026). The test consists of 3 problems, you have to solve at least 2 of them in order to pass. **In the case of plagiarism, we will disqualify those applicants involved**, so please don't share your solutions with your fellow applicants.
 
 ### Phase Two: Familiarize yourself with our codebase
 

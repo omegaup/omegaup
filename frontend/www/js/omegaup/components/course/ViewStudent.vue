@@ -138,7 +138,10 @@
                   >
                   <div v-show="showFeedbackForm" class="form-group">
                     <p>{{ T.submissionFeedbackAnimationButton }}</p>
-                    <img src="/media/submission_feedback_demo.gif" />
+                    <img
+                      src="/media/submission_feedback_demo.gif"
+                      :alt="T.submissionFeedbackDemoAlt"
+                    />
                   </div>
                 </div>
               </template>

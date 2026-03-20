@@ -7,7 +7,11 @@
     />
     <div class="card-body">
       <div class="text-center rounded-circle bottom-margin">
-        <img class="rounded-circle" :src="profile.gravatar_92" />
+        <img
+          class="rounded-circle"
+          :src="profile.gravatar_92"
+          :alt="profile.username"
+        />
       </div>
     </div>
     <div class="card-title text-center">

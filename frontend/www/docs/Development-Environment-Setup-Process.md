@@ -94,7 +94,7 @@ If you want to run the JavaScript/TypeScript tests locally (outside of Docker), 
 
 ### Prerequisites
 
-1. **Node.js**: Install Node.js (version 16 or higher recommended)
+1. **Node.js**: Install Node.js (version 20 or higher recommended; CI and Cypress tooling expect Node 20+)
 2. **Yarn**: Install Yarn package manager
 
 ### Setup Steps
@@ -249,6 +249,16 @@ password=omegaup
 EOF
 ln -sf ~/.mysql.docker.cnf .my.cnf
 ```
+
+---
+
+If you encounter errors related to Node.js version mismatch or `yarn install` failing after pulling the latest changes, rebuild the frontend container:
+
+```bash
+docker compose build frontend
+docker compose up
+```
+
 ---
 ### Issue : `phpminiadmin` / `venv` Permission denied during `docker compose up`
 
