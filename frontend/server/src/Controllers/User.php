@@ -1669,7 +1669,12 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $readmeContent = null;
-        if (!is_null($identity->user_id)) {
+        if (
+            !is_null($identity->user_id) &&
+            \OmegaUp\Experiments::getInstance()->isEnabled(
+                \OmegaUp\Experiments::USER_README
+            )
+        ) {
             $readme = \OmegaUp\DAO\UserReadmes::getByUserId(
                 $identity->user_id
             );
@@ -5380,6 +5385,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $readme
      */
     public static function apiSaveReadme(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::USER_README
+        );
         $r->ensureMainUserIdentity();
 
         $content = $r->ensureOptionalString(
@@ -5430,6 +5438,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiReportReadme(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::USER_README
+        );
         $r->ensureMainUserIdentity();
 
         $username = $r->ensureString(

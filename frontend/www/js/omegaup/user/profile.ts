@@ -535,6 +535,26 @@ OmegaUp.on('ready', () => {
             if (!this.profile.username) return;
             this.loadHeatmapDataForYear(this.profile.username, year);
           },
+          'save-readme': ({
+            readme,
+            onSuccess,
+          }: {
+            readme: string;
+            onSuccess: () => void;
+          }) => {
+            api.User.saveReadme({ readme }).then(onSuccess).catch(ui.apiError);
+          },
+          'report-readme': ({
+            username,
+            onSuccess,
+          }: {
+            username: string;
+            onSuccess: () => void;
+          }) => {
+            api.User.reportReadme({ username })
+              .then(onSuccess)
+              .catch(ui.apiError);
+          },
         },
       });
     },
