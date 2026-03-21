@@ -6344,7 +6344,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $list['totalRows'],
                         $pageSize,
                         $page,
-                        "/course/{$course->alias}/clarifications/",
+                        "/course/{$course->alias}/clarification/",
                         adjacent: 2,
                         params: [],
                     ),
