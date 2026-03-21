@@ -4032,6 +4032,7 @@ export namespace types {
   }
 
   export interface MergedScoreboardEntry {
+    classname: string;
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
     place?: number;
@@ -6252,6 +6253,8 @@ export namespace messages {
     solved: number;
     tags: { count: number; name: string }[];
   };
+  export type UserRecordCookieConsentRequest = { [key: string]: any };
+  export type UserRecordCookieConsentResponse = {};
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -7131,6 +7134,9 @@ export namespace controllers {
     profileStatistics: (
       params?: messages.UserProfileStatisticsRequest,
     ) => Promise<messages.UserProfileStatisticsResponse>;
+    recordCookieConsent: (
+      params?: messages.UserRecordCookieConsentRequest,
+    ) => Promise<messages.UserRecordCookieConsentResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;
