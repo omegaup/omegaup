@@ -1,0 +1,871 @@
+[35mcomposer.lock[m[36m:[m[32m44[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m127[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m171[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m226[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m297[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m403[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m497[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m605[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m669[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m730[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m829[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m894[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m939[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1009[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1051[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1107[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1205[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1289[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1361[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1483[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1528[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1578[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1630[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1684[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1737[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1786[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1823[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1882[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m1949[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2022[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2101[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2178[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2258[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2337[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2422[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2510[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2585[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2653[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2723[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2802[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2871[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m2943[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3000[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3046[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3091[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3156[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3206[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3255[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3312[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3367[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3418[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3461[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3524[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3581[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3637[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3698[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3760[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3813[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3871[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3933[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m3997[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4056[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4115[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4207[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4282[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4338[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4394[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4450[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4507[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4592[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4649[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4717[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4779[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4872[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m4943[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5001[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5056[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5111[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5186[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5240[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5293[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5350[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5409[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5482[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5561[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5645[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5727[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5813[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5882[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m5993[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m6050[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcomposer.lock[m[36m:[m[32m6105[m[36m:[m            "[1;31mnotification[m-url": "https://packagist.org/downloads/",
+[35mcypress/support/e2e.ts[m[36m:[m[32m10[m[36m:[m      'ResizeObserver loop completed with undelivered [1;31mnotification[ms',
+[35mcypress/support/pageObjects/groupPage.ts[m[36m:[m[32m5[m[36m:[m   * Dismisses the global [1;31mnotification[m alert by clicking its close button.
+[35mcypress/support/pageObjects/groupPage.ts[m[36m:[m[32m11[m[36m:[m    // Uses role="alert" selector which works with both old jQuery and new Vue [1;31mnotification[ms
+[35mcypress/support/pageObjects/profilePage.ts[m[36m:[m[32m15[m[36m:[m    // Wait for success [1;31mnotification[m and dismiss it
+[35mcypress/support/pageObjects/profilePage.ts[m[36m:[m[32m159[m[36m:[m    // Wait for success [1;31mnotification[m and dismiss it
+[35mfrontend/database/00091_userBadges_and_notifications.sql[m[36m:[m[32m34[m[36m:[m  `[1;31mnotification[m_id` int(11) NOT NULL AUTO_INCREMENT,
+[35mfrontend/database/00091_userBadges_and_notifications.sql[m[36m:[m[32m39[m[36m:[m  PRIMARY KEY (`[1;31mnotification[m_id`),
+[35mfrontend/database/dao_schema.sql[m[36m:[m[32m575[m[36m:[m  `[1;31mnotification[m_id` int NOT NULL AUTO_INCREMENT,
+[35mfrontend/database/dao_schema.sql[m[36m:[m[32m580[m[36m:[m  PRIMARY KEY (`[1;31mnotification[m_id`),
+[35mfrontend/database/schema.sql[m[36m:[m[32m575[m[36m:[m  `[1;31mnotification[m_id` int NOT NULL AUTO_INCREMENT,
+[35mfrontend/database/schema.sql[m[36m:[m[32m580[m[36m:[m  PRIMARY KEY (`[1;31mnotification[m_id`),
+[35mfrontend/privacy/privacy_policy/en.md[m[36m:[m[32m31[m[36m:[mOmegaUp has the discretion to update this privacy policy at any time. When we do, we will post a [1;31mnotification[m on the main page of our Site, revise the updated date at the bottom of this page. We encourage Users to frequently check this page for any changes to stay informed about how we are helping to protect the personal information we collect. You acknowledge and agree that it is your responsibility to review this privacy policy periodically and become aware of modifications.
+[35mfrontend/privacy/privacy_policy/es.md[m[36m:[m[32m31[m[36m:[mOmegaUp has the discretion to update this privacy policy at any time. When we do, we will post a [1;31mnotification[m on the main page of our Site, revise the updated date at the bottom of this page. We encourage Users to frequently check this page for any changes to stay informed about how we are helping to protect the personal information we collect. You acknowledge and agree that it is your responsibility to review this privacy policy periodically and become aware of modifications.
+[35mfrontend/privacy/privacy_policy/pt.md[m[36m:[m[32m31[m[36m:[mOmegaUp has the discretion to update this privacy policy at any time. When we do, we will post a [1;31mnotification[m on the main page of our Site, revise the updated date at the bottom of this page. We encourage Users to frequently check this page for any changes to stay informed about how we are helping to protect the personal information we collect. You acknowledge and agree that it is your responsibility to review this privacy policy periodically and become aware of modifications.
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m122[m[36m:[m                '[1;31mnotification[mCourseClarificationRequest'
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m124[m[36m:[m            $[1;31mnotification[mType = \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST;
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m144[m[36m:[m                '[1;31mnotification[mContestClarificationRequest'
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m146[m[36m:[m            $[1;31mnotification[mType = \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_REQUEST;
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m202[m[36m:[m            $[1;31mnotification[mType,
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m372[m[36m:[m        // Send [1;31mnotification[m to author
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m378[m[36m:[m                        '[1;31mnotification[mContestClarificationResponse'
+[35mfrontend/server/src/Controllers/Clarification.php[m[36m:[m[32m392[m[36m:[m                        '[1;31mnotification[mCourseClarificationResponse'
+[35mfrontend/server/src/Controllers/Contest.php[m[36m:[m[32m1757[m[36m:[m        $[1;31mnotification[mContents = [
+[35mfrontend/server/src/Controllers/Contest.php[m[36m:[m[32m1761[m[36m:[m                    '[1;31mnotification[mContestRegisterRequest'
+[35mfrontend/server/src/Controllers/Contest.php[m[36m:[m[32m1781[m[36m:[m            $[1;31mnotification[ms = array_map(
+[35mfrontend/server/src/Controllers/Contest.php[m[36m:[m[32m1784[m[36m:[m                    'contents' => json_encode($[1;31mnotification[mContents),
+[35mfrontend/server/src/Controllers/Contest.php[m[36m:[m[32m1788[m[36m:[m            \OmegaUp\DAO\Notifications::createBulk($[1;31mnotification[ms);
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m1113[m[36m:[m     * @param string $[1;31mnotification[mType
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m1118[m[36m:[m        string $[1;31mnotification[mType
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m1131[m[36m:[m        if ($[1;31mnotification[mType == \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_PROBLEM_ADDED) {
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m1133[m[36m:[m                '[1;31mnotification[mCourseAssignmentProblemAdded'
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m1137[m[36m:[m                '[1;31mnotification[mCourseAssignmentAdded'
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m1148[m[36m:[m            $[1;31mnotification[mType,
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2172[m[36m:[m                        '[1;31mnotification[mCourseRegistrationAccepted'
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2174[m[36m:[m                    $[1;31mnotification[mType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2177[m[36m:[m                        '[1;31mnotification[mCourseRegistrationRejected'
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2179[m[36m:[m                    $[1;31mnotification[mType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2184[m[36m:[m                    $[1;31mnotification[mType,
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2593[m[36m:[m                        '[1;31mnotification[mCourseRegistrationManual'
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m2857[m[36m:[m                new \OmegaUp\TranslationString('[1;31mnotification[mCourseAddAdmin'),
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m3104[m[36m:[m                    '[1;31mnotification[mCourseAddTeachingAssistant'
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m3305[m[36m:[m     * Request feedback and its corresponding [1;31mnotification[m
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m3400[m[36m:[m            new \OmegaUp\TranslationString('[1;31mnotification[mCourseRequestFeedback'),
+[35mfrontend/server/src/Controllers/Course.php[m[36m:[m[32m5285[m[36m:[m                    '[1;31mnotification[mCourseRegistrationRequest'
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m9[m[36m:[m * @psalm-type Notification=array{contents: NotificationContents, [1;31mnotification[m_id: int, timestamp: \OmegaUp\Timestamp}
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m13[m[36m:[m     * Creates a new [1;31mnotification[m for an arbitrary request for access from a
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m35[m[36m:[m                                    '[1;31mnotification[mContestRegisterationAccepted'
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m38[m[36m:[m                                    '[1;31mnotification[mContestRegisterationRejected'
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m67[m[36m:[m        $[1;31mnotification[ms = [];
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m69[m[36m:[m            $[1;31mnotification[ms[] = new \OmegaUp\DAO\VO\Notifications([
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m76[m[36m:[m                                '[1;31mnotification[mNewContestCertificate'
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m89[m[36m:[m        \OmegaUp\DAO\Notifications::createBulk($[1;31mnotification[ms);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m93[m[36m:[m     * Returns a list of unread [1;31mnotification[ms for user
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m95[m[36m:[m     * @return array{[1;31mnotification[ms: list<Notification>}
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m100[m[36m:[m        $[1;31mnotification[ms = [];
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m104[m[36m:[m            \OmegaUp\DAO\Notifications::getUnreadNotifications($r->user) as $[1;31mnotification[m
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m107[m[36m:[m            $[1;31mnotification[m['contents'] = json_decode(
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m108[m[36m:[m                $[1;31mnotification[m['contents'],
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m111[m[36m:[m            $[1;31mnotification[ms[] = $[1;31mnotification[m;
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m113[m[36m:[m        $[1;31mnotification[ms = array_reverse($[1;31mnotification[ms);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m115[m[36m:[m            '[1;31mnotification[ms' => $[1;31mnotification[ms,
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m120[m[36m:[m     * Updates [1;31mnotification[ms as read in database
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m122[m[36m:[m     * @omegaup-request-param mixed $[1;31mnotification[ms
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m128[m[36m:[m        if (empty($r['[1;31mnotification[ms'])) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m131[m[36m:[m                '[1;31mnotification[ms'
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m134[m[36m:[m        $[1;31mnotification[ms = [];
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m135[m[36m:[m        if (is_string($r['[1;31mnotification[ms'])) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m136[m[36m:[m            foreach (explode(',', $r['[1;31mnotification[ms']) as $id) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m137[m[36m:[m                $[1;31mnotification[ms[] = intval($id);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m139[m[36m:[m        } elseif (is_array($r['[1;31mnotification[ms'])) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m141[m[36m:[m            foreach ($r['[1;31mnotification[ms'] as $id) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m142[m[36m:[m                $[1;31mnotification[ms[] = intval($id);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m145[m[36m:[m        foreach ($[1;31mnotification[ms as $id) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m146[m[36m:[m            $[1;31mnotification[m = \OmegaUp\DAO\Notifications::getByPK($id);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m147[m[36m:[m            if (is_null($[1;31mnotification[m)) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m149[m[36m:[m                    '[1;31mnotification[mNotFound'
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m152[m[36m:[m            if ($[1;31mnotification[m->user_id !== $r->user->user_id) {
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m157[m[36m:[m            $[1;31mnotification[m->read = true;
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m158[m[36m:[m            \OmegaUp\DAO\Notifications::update($[1;31mnotification[m);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m166[m[36m:[m     * This function creates a new [1;31mnotification[m
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m178[m[36m:[m        $[1;31mnotification[ms = [];
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m180[m[36m:[m            $[1;31mnotification[ms[] = new \OmegaUp\DAO\VO\Notifications([
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m186[m[36m:[m        \OmegaUp\DAO\Notifications::createBulk($[1;31mnotification[ms);
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m190[m[36m:[m     * This function helps to create a new [1;31mnotification[m for the clarifications
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m198[m[36m:[m        string $[1;31mnotification[mType,
+[35mfrontend/server/src/Controllers/Notification.php[m[36m:[m[32m206[m[36m:[m                    'type' => $[1;31mnotification[mType,
+[35mfrontend/server/src/Controllers/QualityNomination.php[m[36m:[m[32m842[m[36m:[m     * Send a mail with demotion [1;31mnotification[m to the original creator
+[35mfrontend/server/src/Controllers/QualityNomination.php[m[36m:[m[32m868[m[36m:[m            $[1;31mnotification[mContents = \OmegaUp\ApiUtils::formatString(
+[35mfrontend/server/src/Controllers/QualityNomination.php[m[36m:[m[32m887[m[36m:[m            $[1;31mnotification[mContents = \OmegaUp\ApiUtils::formatString(
+[35mfrontend/server/src/Controllers/QualityNomination.php[m[36m:[m[32m912[m[36m:[m                    'message' => $[1;31mnotification[mContents,
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m153[m[36m:[m- [Notification](#[1;31mnotification[m)
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m154[m[36m:[m  - [`/api/[1;31mnotification[m/myList/`](#api[1;31mnotification[mmylist)
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m155[m[36m:[m  - [`/api/[1;31mnotification[m/readNotifications/`](#api[1;31mnotification[mread[1;31mnotification[ms)
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m2417[m[36m:[mRequest feedback and its corresponding [1;31mnotification[m
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m3066[m[36m:[m## `/api/[1;31mnotification[m/myList/`
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m3070[m[36m:[mReturns a list of unread [1;31mnotification[ms for user
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m3076[m[36m:[m| `[1;31mnotification[ms` | `List[types.Notification]` |
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m3078[m[36m:[m## `/api/[1;31mnotification[m/readNotifications/`
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m3082[m[36m:[mUpdates [1;31mnotification[ms as read in database
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m3088[m[36m:[m| `[1;31mnotification[ms` | `mixed` |             |          |
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m4584[m[36m:[malso it creates a [1;31mnotification[m
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m4610[m[36m:[malso it creates a [1;31mnotification[m
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m5649[m[36m:[mParses and validates a filter string to be used for event [1;31mnotification[m
+[35mfrontend/server/src/Controllers/README.md[m[36m:[m[32m5654[m[36m:[mfor. If the caller has enough privileges to receive [1;31mnotification[ms for
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m294[m[36m:[m        string $[1;31mnotification[mType = \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m296[m[36m:[m        $[1;31mnotification[mTranslationString = new \OmegaUp\TranslationString(
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m297[m[36m:[m            '[1;31mnotification[mCourseSubmissionFeedback'
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m299[m[36m:[m        if ($[1;31mnotification[mType === \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK_THREAD) {
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m300[m[36m:[m            $[1;31mnotification[mTranslationString = new \OmegaUp\TranslationString(
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m301[m[36m:[m                '[1;31mnotification[mCourseSubmissionFeedbackThread'
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m306[m[36m:[m            $[1;31mnotification[mTranslationString,
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m307[m[36m:[m            $[1;31mnotification[mType,
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m319[m[36m:[m     * also it creates a [1;31mnotification[m
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m461[m[36m:[m     * Sends a [1;31mnotification[m to all the participants of a thread
+[35mfrontend/server/src/Controllers/Submission.php[m[36m:[m[32m509[m[36m:[m     * also it creates a [1;31mnotification[m
+[35mfrontend/server/src/Controllers/User.php[m[36m:[m[32m3164[m[36m:[m     * Parses and validates a filter string to be used for event [1;31mnotification[m
+[35mfrontend/server/src/Controllers/User.php[m[36m:[m[32m3169[m[36m:[m     * for. If the caller has enough privileges to receive [1;31mnotification[ms for
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m41[m[36m:[m                    `[1;31mnotification[m_id` = ?
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m54[m[36m:[m            intval($Notifications->[1;31mnotification[m_id),
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m71[m[36m:[m        int $[1;31mnotification[m_id
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m75[m[36m:[m                `Notifications`.`[1;31mnotification[m_id`,
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m84[m[36m:[m                    `[1;31mnotification[m_id` = ?
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m87[m[36m:[m        $params = [$[1;31mnotification[m_id];
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m107[m[36m:[m        int $[1;31mnotification[m_id
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m116[m[36m:[m                    `[1;31mnotification[m_id` = ?
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m118[m[36m:[m        $params = [$[1;31mnotification[m_id];
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m170[m[36m:[m                    `[1;31mnotification[m_id` = ?
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m173[m[36m:[m            $Notifications->[1;31mnotification[m_id
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m204[m[36m:[m        string $orden = '[1;31mnotification[m_id',
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m220[m[36m:[m                `Notifications`.`[1;31mnotification[m_id`,
+[35mfrontend/server/src/DAO/Base/Notifications.php[m[36m:[m[32m296[m[36m:[m        $Notifications->[1;31mnotification[m_id = (
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m37[m[36m:[m     * @return list<array{contents: string, [1;31mnotification[m_id: int, timestamp: \OmegaUp\Timestamp}>
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m44[m[36m:[m                `n`.`[1;31mnotification[m_id`,
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m55[m[36m:[m        /** @var list<array{contents: string, [1;31mnotification[m_id: int, timestamp: \OmegaUp\Timestamp}> */
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m63[m[36m:[m     * Creates multiple [1;31mnotification[ms in a single bulk INSERT query.
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m64[m[36m:[m     * This method is optimized for creating many [1;31mnotification[ms at once,
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m67[m[36m:[m     * @param list<\OmegaUp\DAO\VO\Notifications> $[1;31mnotification[ms Array of Notification objects to create
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m70[m[36m:[m    public static function createBulk(array $[1;31mnotification[ms): int {
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m71[m[36m:[m        if (empty($[1;31mnotification[ms)) {
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m78[m[36m:[m        foreach ($[1;31mnotification[ms as $[1;31mnotification[m) {
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m81[m[36m:[m                is_null($[1;31mnotification[m->user_id) ?
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m83[m[36m:[m                intval($[1;31mnotification[m->user_id)
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m86[m[36m:[m                $[1;31mnotification[m->timestamp
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m88[m[36m:[m            $params[] = intval($[1;31mnotification[m->read);
+[35mfrontend/server/src/DAO/Notifications.php[m[36m:[m[32m89[m[36m:[m            $params[] = $[1;31mnotification[m->contents;
+[35mfrontend/server/src/DAO/VO/Notifications.php[m[36m:[m[32m19[m[36m:[m        '[1;31mnotification[m_id' => true,
+[35mfrontend/server/src/DAO/VO/Notifications.php[m[36m:[m[32m36[m[36m:[m        if (isset($data['[1;31mnotification[m_id'])) {
+[35mfrontend/server/src/DAO/VO/Notifications.php[m[36m:[m[32m37[m[36m:[m            $this->[1;31mnotification[m_id = intval(
+[35mfrontend/server/src/DAO/VO/Notifications.php[m[36m:[m[32m38[m[36m:[m                $data['[1;31mnotification[m_id']
+[35mfrontend/server/src/DAO/VO/Notifications.php[m[36m:[m[32m80[m[36m:[m    public $[1;31mnotification[m_id = 0;
+[35mfrontend/templates/en.lang[m[36m:[m[32m741[m[36m:[mdemotionProblemEmailWarningBody = "<p>Dear %(user_name):</p><p>A warning has been put on your problem %(problem_name) in omegaUp because it was reported by the users. The omegaUp team has reviewed this report and confirmed that the problem has room for improvement because %(reason).</p><p>To remove the warning [1;31mnotification[m on the problem please follow the steps below:</p><p><ol><li>Review and edit your problem.</li><li>Once you have resolved the reason on why a warning has been put on your problem, send an email to quality@omegaup.com to be reviewed.</li></lo></p><p>If the steps mentioned above are not followed, the problem will show a warning sign in the list of problems.</p><p>omegaUp is a platform to help users improve their software engineering skills by solving code problems and competing in programing contests. omegaUp welcomes all the problems that help meet that goal.</p><p>Thanks,</p><p>omegaUp team</p>"
+[35mfrontend/templates/en.lang[m[36m:[m[32m989[m[36m:[m[1;31mnotification[mContestClarificationRequest = "A new clarification has been requested for problem %(problemAlias) of the contest %(contestAlias), that you manage."
+[35mfrontend/templates/en.lang[m[36m:[m[32m990[m[36m:[m[1;31mnotification[mContestClarificationResponse = "Your clarification request for problem %(problemAlias) of the contest %(contestAlias), has been answered."
+[35mfrontend/templates/en.lang[m[36m:[m[32m991[m[36m:[m[1;31mnotification[mContestRegisterRequest = "%(username) has requested to register for the contest %(contestTitle) that you manage."
+[35mfrontend/templates/en.lang[m[36m:[m[32m992[m[36m:[m[1;31mnotification[mContestRegisterationAccepted = "Your registration request for contest %(contestTitle) has been **accepted**."
+[35mfrontend/templates/en.lang[m[36m:[m[32m993[m[36m:[m[1;31mnotification[mContestRegisterationRejected = "Your registration request for contest %(contestTitle) has been **rejected**."
+[35mfrontend/templates/en.lang[m[36m:[m[32m994[m[36m:[m[1;31mnotification[mCourseAddAdmin = "You have been invited to be an administrator for course %(courseName)."
+[35mfrontend/templates/en.lang[m[36m:[m[32m995[m[36m:[m[1;31mnotification[mCourseAddTeachingAssistant = "You have been invited to be a teaching assistant for course %(courseName)."
+[35mfrontend/templates/en.lang[m[36m:[m[32m996[m[36m:[m[1;31mnotification[mCourseAssignmentAdded = "New content has been added to course %(courseName)."
+[35mfrontend/templates/en.lang[m[36m:[m[32m997[m[36m:[m[1;31mnotification[mCourseAssignmentProblemAdded = "A new problem has been added to an assignment for course %(courseName)."
+[35mfrontend/templates/en.lang[m[36m:[m[32m998[m[36m:[m[1;31mnotification[mCourseClarificationRequest = "A new clarification has been requested for problem %(problemAlias) of the course %(courseName), that you manage."
+[35mfrontend/templates/en.lang[m[36m:[m[32m999[m[36m:[m[1;31mnotification[mCourseClarificationResponse = "Your clarification request for problem %(problemAlias) of the course %(courseName), has been answered."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1000[m[36m:[m[1;31mnotification[mCourseRegistrationAccepted = "Your registration request for course %(courseName) has been **accepted**."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1001[m[36m:[m[1;31mnotification[mCourseRegistrationManual = "You have been invited to join the course %(courseName)."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1002[m[36m:[m[1;31mnotification[mCourseRegistrationRejected = "Your registration request for course %(courseName) has been **rejected**."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1003[m[36m:[m[1;31mnotification[mCourseRegistrationRequest = "**%(username)** has requested access to course %(courseName)."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1004[m[36m:[m[1;31mnotification[mCourseRequestFeedback = "**%(username)** has requested feedback to the assignment ***%(assignmentName)*** in the course ***%(courseName)***"
+[35mfrontend/templates/en.lang[m[36m:[m[32m1005[m[36m:[m[1;31mnotification[mCourseSubmissionFeedback = "The feedback about your submission for problem ***%(problemAlias)*** of the course ***%(courseName)*** has been submitted"
+[35mfrontend/templates/en.lang[m[36m:[m[32m1006[m[36m:[m[1;31mnotification[mCourseSubmissionFeedbackThread = "**%(username)** has responded to feedback on the submission for the problem ***%(problemAlias)*** in the course ***%(courseName)***"
+[35mfrontend/templates/en.lang[m[36m:[m[32m1007[m[36m:[m[1;31mnotification[mNewBadge = "You have received a new badge: **%(badgeName)**."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1008[m[36m:[m[1;31mnotification[mNewContestCertificate = "Congratulations! You have received a certificate for your recent achievement in the \"%(contest_title)\" contest. Click to download it."
+[35mfrontend/templates/en.lang[m[36m:[m[32m1009[m[36m:[m[1;31mnotification[mNotFound = "Notification not found"
+[35mfrontend/templates/en.lang[m[36m:[m[32m1010[m[36m:[m[1;31mnotification[msMarkAllAsRead = "Mark all as read"
+[35mfrontend/templates/en.lang[m[36m:[m[32m1011[m[36m:[m[1;31mnotification[msNoNewNotifications = "No new [1;31mnotification[ms."
+[35mfrontend/templates/es.lang[m[36m:[m[32m989[m[36m:[m[1;31mnotification[mContestClarificationRequest = "Ha sido solicitada una nueva clarificación para el problema %(problemAlias) del concurso %(contestAlias), que administras."
+[35mfrontend/templates/es.lang[m[36m:[m[32m990[m[36m:[m[1;31mnotification[mContestClarificationResponse = "Su pedido de clarificación para el problema %(problemAlias) del concurso %(contestAlias), ha sido respondido."
+[35mfrontend/templates/es.lang[m[36m:[m[32m991[m[36m:[m[1;31mnotification[mContestRegisterRequest = "%(username) ha pedido registrarse para el concurso %(contestTitle) que tú manejas."
+[35mfrontend/templates/es.lang[m[36m:[m[32m992[m[36m:[m[1;31mnotification[mContestRegisterationAccepted = "La solicitud de registro para el concurso %(contestTitle) ha sido **aceptada**."
+[35mfrontend/templates/es.lang[m[36m:[m[32m993[m[36m:[m[1;31mnotification[mContestRegisterationRejected = "La solicitud de registro para el concurso %(contestTitle) ha sido **rechazada**."
+[35mfrontend/templates/es.lang[m[36m:[m[32m994[m[36m:[m[1;31mnotification[mCourseAddAdmin = "Has sido invitado a ser administrador del curso %(courseName)."
+[35mfrontend/templates/es.lang[m[36m:[m[32m995[m[36m:[m[1;31mnotification[mCourseAddTeachingAssistant = "Has sido invitado a ser un asistente de enseñanza del curso %(courseName)."
+[35mfrontend/templates/es.lang[m[36m:[m[32m996[m[36m:[m[1;31mnotification[mCourseAssignmentAdded = "Se ha agregado nuevo contenido al curso %(courseName)."
+[35mfrontend/templates/es.lang[m[36m:[m[32m997[m[36m:[m[1;31mnotification[mCourseAssignmentProblemAdded = "Se ha agregado un nuevo problema a una asignación del curso %(courseName)."
+[35mfrontend/templates/es.lang[m[36m:[m[32m998[m[36m:[m[1;31mnotification[mCourseClarificationRequest = "Ha sido solicitada una nueva clarificación para el problema %(problemAlias) del curso %(courseName), que administras."
+[35mfrontend/templates/es.lang[m[36m:[m[32m999[m[36m:[m[1;31mnotification[mCourseClarificationResponse = "Su pedido de clarificación para el problema %(problemAlias) del curso %(courseName), ha sido respondido."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1000[m[36m:[m[1;31mnotification[mCourseRegistrationAccepted = "Tu solicitud de registro en el curso %(courseName) ha sido **aceptada**."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1001[m[36m:[m[1;31mnotification[mCourseRegistrationManual = "Has sido invitado a unirte al curso %(courseName)."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1002[m[36m:[m[1;31mnotification[mCourseRegistrationRejected = "Tu solicitud de registro en el curso %(courseName) ha sido **rechazada**."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1003[m[36m:[m[1;31mnotification[mCourseRegistrationRequest = "**%(username)** ha solicitado acceso al curso %(courseName)."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1004[m[36m:[m[1;31mnotification[mCourseRequestFeedback = "**%(username)** ha solicitado retroalimentacion en la asignacion ***%(assignmentName)*** del curso ***%(courseName)***"
+[35mfrontend/templates/es.lang[m[36m:[m[32m1005[m[36m:[m[1;31mnotification[mCourseSubmissionFeedback = "Ha sido enviada la retroalimentación sobre su envío para el problema ***%(problemAlias)*** en el curso ***%(courseName)***"
+[35mfrontend/templates/es.lang[m[36m:[m[32m1006[m[36m:[m[1;31mnotification[mCourseSubmissionFeedbackThread = "**%(username)** ha respondido en una retroalimentación sobre el envío para el problema ***%(problemAlias)*** en el curso ***%(courseName)***"
+[35mfrontend/templates/es.lang[m[36m:[m[32m1007[m[36m:[m[1;31mnotification[mNewBadge = "Has recibido una nueva insignia: **%(badgeName)**."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1008[m[36m:[m[1;31mnotification[mNewContestCertificate = "¡Felicidades! Has recibido un diploma por tu reciente logro en el concurso \"%(contest_title)\". Haz clic para descargarlo."
+[35mfrontend/templates/es.lang[m[36m:[m[32m1009[m[36m:[m[1;31mnotification[mNotFound = "No se encontró la notificación"
+[35mfrontend/templates/es.lang[m[36m:[m[32m1010[m[36m:[m[1;31mnotification[msMarkAllAsRead = "Marcar todo como leído"
+[35mfrontend/templates/es.lang[m[36m:[m[32m1011[m[36m:[m[1;31mnotification[msNoNewNotifications = "No hay nuevas notificaciones."
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m989[m[36m:[m[1;31mnotification[mContestClarificationRequest = "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), 7ha7 y0u manag3.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m990[m[36m:[m[1;31mnotification[mContestClarificationResponse = "(Y0ur c1arifica7i0n r3qu357 f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), ha5 b33n an5w3r3d.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m991[m[36m:[m[1;31mnotification[mContestRegisterRequest = "(%(username) ha5 r3qu3573d 70 r3gi573r f0r 7h3 c0n7357 %(contestTitle) 7ha7 y0u manag3.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m992[m[36m:[m[1;31mnotification[mContestRegisterationAccepted = "(Y0ur r3gi57ra7i0n r3qu357 f0r c0n7357 %(contestTitle) ha5 b33n **acc3p73d**.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m993[m[36m:[m[1;31mnotification[mContestRegisterationRejected = "(Y0ur r3gi57ra7i0n r3qu357 f0r c0n7357 %(contestTitle) ha5 b33n **r3j3c73d**.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m994[m[36m:[m[1;31mnotification[mCourseAddAdmin = "(Y0u hav3 b33n invi73d 70 b3 an admini57ra70r f0r c0ur53 %(courseName).)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m995[m[36m:[m[1;31mnotification[mCourseAddTeachingAssistant = "(Y0u hav3 b33n invi73d 70 b3 a 73aching a55i57an7 f0r c0ur53 %(courseName).)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m996[m[36m:[m[1;31mnotification[mCourseAssignmentAdded = "(N3w c0n73n7 ha5 b33n add3d 70 c0ur53 %(courseName).)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m997[m[36m:[m[1;31mnotification[mCourseAssignmentProblemAdded = "(A n3w pr0b13m ha5 b33n add3d 70 an a55ignm3n7 f0r c0ur53 %(courseName).)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m998[m[36m:[m[1;31mnotification[mCourseClarificationRequest = "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0ur53 %(courseName), 7ha7 y0u manag3.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m999[m[36m:[m[1;31mnotification[mCourseClarificationResponse = "(Y0ur c1arifica7i0n r3qu357 f0r pr0b13m %(problemAlias) 0f 7h3 c0ur53 %(courseName), ha5 b33n an5w3r3d.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1000[m[36m:[m[1;31mnotification[mCourseRegistrationAccepted = "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **acc3p73d**.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1001[m[36m:[m[1;31mnotification[mCourseRegistrationManual = "(Y0u hav3 b33n invi73d 70 j0in 7h3 c0ur53 %(courseName).)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1002[m[36m:[m[1;31mnotification[mCourseRegistrationRejected = "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **r3j3c73d**.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1003[m[36m:[m[1;31mnotification[mCourseRegistrationRequest = "(**%(username)** ha5 r3qu3573d acc355 70 c0ur53 %(courseName).)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1004[m[36m:[m[1;31mnotification[mCourseRequestFeedback = "(**%(username)** ha5 r3qu3573d f33dback 70 7h3 a55ignm3n7 ***%(assignmentName)*** in 7h3 c0ur53 ***%(courseName)***)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1005[m[36m:[m[1;31mnotification[mCourseSubmissionFeedback = "(Th3 f33dback ab0u7 y0ur 5ubmi55i0n f0r pr0b13m ***%(problemAlias)*** 0f 7h3 c0ur53 ***%(courseName)*** ha5 b33n 5ubmi773d)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1006[m[36m:[m[1;31mnotification[mCourseSubmissionFeedbackThread = "(**%(username)** ha5 r35p0nd3d 70 f33dback 0n 7h3 5ubmi55i0n f0r 7h3 pr0b13m ***%(problemAlias)*** in 7h3 c0ur53 ***%(courseName)***)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1007[m[36m:[m[1;31mnotification[mNewBadge = "(Y0u hav3 r3c3iv3d a n3w badg3: **%(badgeName)**.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1008[m[36m:[m[1;31mnotification[mNewContestCertificate = "(C0ngra7u1a7i0n5! Y0u hav3 r3c3iv3d a c3r7ifica73 f0r y0ur r3c3n7 achi3v3m3n7 in 7h3 \"%(contest_title)\" c0n7357. C1ick 70 d0wn10ad i7.)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1009[m[36m:[m[1;31mnotification[mNotFound = "(N07ifica7i0n n07 f0und)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1010[m[36m:[m[1;31mnotification[msMarkAllAsRead = "(Mark a11 a5 r3ad)"
+[35mfrontend/templates/pseudo.lang[m[36m:[m[32m1011[m[36m:[m[1;31mnotification[msNoNewNotifications = "(N0 n3w n07ifica7i0n5.)"
+[35mfrontend/templates/pt.lang[m[36m:[m[32m989[m[36m:[m[1;31mnotification[mContestClarificationRequest = "Uma nova clarificação tem sido solicitada para o problema %(problemAlias) do concurso %(contestAlias), que você administra."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m990[m[36m:[m[1;31mnotification[mContestClarificationResponse = "Seu pedido de clarificação para o problema %(problemAlias) do concurso %(contestAlias), tem sido respondido."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m991[m[36m:[m[1;31mnotification[mContestRegisterRequest = "%(username) solicitou registro para o concurso %(contestTitle) que você gerencia."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m992[m[36m:[m[1;31mnotification[mContestRegisterationAccepted = "Sua solicitação de inscrição para o concurso %(contestTitle) foi **aceita**."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m993[m[36m:[m[1;31mnotification[mContestRegisterationRejected = "Sua solicitação de inscrição para o concurso %(contestTitle) foi **rejeitada**."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m994[m[36m:[m[1;31mnotification[mCourseAddAdmin = "Você foi convidado para ser um administrador do curso %(courseName)."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m995[m[36m:[m[1;31mnotification[mCourseAddTeachingAssistant = "Você foi convidado para ser um assistente de ensino para o curso %(courseName)."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m996[m[36m:[m[1;31mnotification[mCourseAssignmentAdded = "Novo conteúdo foi adicionado ao curso %(courseName)."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m997[m[36m:[m[1;31mnotification[mCourseAssignmentProblemAdded = "Um novo problema foi adicionado a um exercício em %(courseName)."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m998[m[36m:[m[1;31mnotification[mCourseClarificationRequest = "Uma nova clarificação tem sido solicitada para o problema %(problemAlias) do curso %(courseName), que você administra."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m999[m[36m:[m[1;31mnotification[mCourseClarificationResponse = "Seu pedido de clarificação para o problema %(problemAlias) do curso %(courseName), tem sido respondido."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1000[m[36m:[m[1;31mnotification[mCourseRegistrationAccepted = "Seu pedido de registro no curso %(courseName), tem sido **aceitado**."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1001[m[36m:[m[1;31mnotification[mCourseRegistrationManual = "Você foi convidado para participar do curso %(courseName)."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1002[m[36m:[m[1;31mnotification[mCourseRegistrationRejected = "Seu pedido de registro no curso %(courseName), tem sido **rejeitado**."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1003[m[36m:[m[1;31mnotification[mCourseRegistrationRequest = "**%(username)** tem solicitado acceso ao curso %(courseName)."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1004[m[36m:[m[1;31mnotification[mCourseRequestFeedback = "**%(username)** tem solicitado feedback sobre a tarefa ***%(assignmentName)*** do curso ***%(courseName)***"
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1005[m[36m:[m[1;31mnotification[mCourseSubmissionFeedback = "O feedback sobre sua submisão para o problema ***%(problemAlias)*** no curso ***%(courseName)*** tem sido submetida."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1006[m[36m:[m[1;31mnotification[mCourseSubmissionFeedbackThread = "**%(username)** respondeu em um feedback sobre seu envio para o problema ***%(problemAlias)*** no curso ***%(courseName)***"
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1007[m[36m:[m[1;31mnotification[mNewBadge = "Você tem recebido um novo distintivo: **%(badgeName)**"
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1008[m[36m:[m[1;31mnotification[mNewContestCertificate = "Parabéns! Você recebeu um diploma por sua conquista recente no concurso \"%(contest_title)\". Clique para baixá-lo."
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1009[m[36m:[m[1;31mnotification[mNotFound = "Notificação não encontrada"
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1010[m[36m:[m[1;31mnotification[msMarkAllAsRead = "Marcar tudo como lido"
+[35mfrontend/templates/pt.lang[m[36m:[m[32m1011[m[36m:[m[1;31mnotification[msNoNewNotifications = "Não há novas notificações."
+[35mfrontend/templates/template.tpl[m[36m:[m[32m50[m[36m:[m    {% jsInclude 'common_global_[1;31mnotification[ms' omitRuntime %}
+[35mfrontend/templates/template.tpl[m[36m:[m[32m55[m[36m:[m      <div id="global-[1;31mnotification[ms" role="status" aria-live="polite" aria-atomic="false" aria-relevant="additions"></div>
+[35mfrontend/tests/badges/BadgesTest.php[m[36m:[m[32m212[m[36m:[m    private static function getBadgesFromNotificationContents(array $[1;31mnotification[ms): array {
+[35mfrontend/tests/badges/BadgesTest.php[m[36m:[m[32m214[m[36m:[m        foreach ($[1;31mnotification[ms as $[1;31mnotification[m) {
+[35mfrontend/tests/badges/BadgesTest.php[m[36m:[m[32m215[m[36m:[m            $badges[] = $[1;31mnotification[m['contents']['badge'];
+[35mfrontend/tests/badges/BadgesTest.php[m[36m:[m[32m287[m[36m:[m            // Now check if [1;31mnotification[ms have been created for both users
+[35mfrontend/tests/badges/BadgesTest.php[m[36m:[m[32m293[m[36m:[m                $userOneNotifications['[1;31mnotification[ms']
+[35mfrontend/tests/badges/BadgesTest.php[m[36m:[m[32m313[m[36m:[m                $userTwoNotifications['[1;31mnotification[ms']
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m115[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::countAll();
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m116[m[36m:[m        $this->assertSame(0, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m126[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::countAll();
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m127[m[36m:[m        //Should add one [1;31mnotification[m per contestant
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m128[m[36m:[m        $this->assertSame($numOfIdentities, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m133[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getAll();
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m154[m[36m:[m        //Check the [1;31mnotification[ms data
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m155[m[36m:[m        foreach ($[1;31mnotification[ms as $[1;31mnotification[m) {
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m156[m[36m:[m            $contents = json_decode($[1;31mnotification[m->contents, true);
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m162[m[36m:[m                '[1;31mnotification[mNewContestCertificate',
+[35mfrontend/tests/controllers/CertificatesTest.php[m[36m:[m[32m170[m[36m:[m                "/certificates/mine/#{$verificationCodes[$[1;31mnotification[m->user_id]}",
+[35mfrontend/tests/controllers/ClarificationUpdateTest.php[m[36m:[m[32m121[m[36m:[m        // Verify if [1;31mnotification[m has been created
+[35mfrontend/tests/controllers/ClarificationUpdateTest.php[m[36m:[m[32m126[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/ClarificationUpdateTest.php[m[36m:[m[32m129[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/ClarificationUpdateTest.php[m[36m:[m[32m131[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/CourseClarificationsTest.php[m[36m:[m[32m81[m[36m:[m        // Verify [1;31mnotification[m for admin
+[35mfrontend/tests/controllers/CourseClarificationsTest.php[m[36m:[m[32m88[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/CourseClarificationsTest.php[m[36m:[m[32m91[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CourseClarificationsTest.php[m[36m:[m[32m93[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m134[m[36m:[m        // student call api to send [1;31mnotification[ms to all administrators
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m186[m[36m:[m        // Verify if [1;31mnotification[m has been sent to admins
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m193[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m196[m[36m:[m        $this->assertCount(2, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m198[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[1]['contents'], true);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m208[m[36m:[m        // Verify if [1;31mnotification[m has been sent to admins group members
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m215[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m218[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m220[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m232[m[36m:[m        // Verify if [1;31mnotification[m has been sent to teaching assistants
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m239[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m242[m[36m:[m        $this->assertCount(2, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m244[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[1]['contents'], true);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m254[m[36m:[m        // Verify if [1;31mnotification[m has been sent to a teaching assistants
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m262[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m265[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m267[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m283[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m286[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/CourseNotificationsRequestFeedbackTest.php[m[36m:[m[32m288[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m168[m[36m:[m        $this->assertCount(1, $response['[1;31mnotification[ms']);
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m171[m[36m:[m            $response['[1;31mnotification[ms'][0]['contents']['type']
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m175[m[36m:[m            $response['[1;31mnotification[ms'][0]['contents']['body']['localizationParams']['courseName']
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m268[m[36m:[m            $[1;31mnotification[ms = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m270[m[36m:[m            ]))['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m274[m[36m:[m                $[1;31mnotification[ms[0]['contents']['type']
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m280[m[36m:[m            $[1;31mnotification[ms = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m282[m[36m:[m            ]))['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/CourseRegistrationTest.php[m[36m:[m[32m286[m[36m:[m                $[1;31mnotification[ms[0]['contents']['type']
+[35mfrontend/tests/controllers/CourseStudentAddTest.php[m[36m:[m[32m52[m[36m:[m        $[1;31mnotification[mContents = $response['[1;31mnotification[ms'][0]['contents'];
+[35mfrontend/tests/controllers/CourseStudentAddTest.php[m[36m:[m[32m54[m[36m:[m        $this->assertCount(1, $response['[1;31mnotification[ms']);
+[35mfrontend/tests/controllers/CourseStudentAddTest.php[m[36m:[m[32m57[m[36m:[m            $[1;31mnotification[mContents['type']
+[35mfrontend/tests/controllers/CourseStudentAddTest.php[m[36m:[m[32m61[m[36m:[m            $[1;31mnotification[mContents['body']['localizationParams']['courseName']
+[35mfrontend/tests/controllers/CourseUsersTest.php[m[36m:[m[32m243[m[36m:[m        $[1;31mnotification[mContents = $response['[1;31mnotification[ms'][0]['contents'];
+[35mfrontend/tests/controllers/CourseUsersTest.php[m[36m:[m[32m245[m[36m:[m        $this->assertCount(1, $response['[1;31mnotification[ms']);
+[35mfrontend/tests/controllers/CourseUsersTest.php[m[36m:[m[32m248[m[36m:[m            $[1;31mnotification[mContents['type']
+[35mfrontend/tests/controllers/CourseUsersTest.php[m[36m:[m[32m252[m[36m:[m            $[1;31mnotification[mContents['body']['localizationParams']['courseName']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m23[m[36m:[m        // Get all unread [1;31mnotification[ms through API
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m29[m[36m:[m        $[1;31mnotification[ms = $results['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m30[m[36m:[m        $this->assertSame(1, sizeof($[1;31mnotification[ms));
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m33[m[36m:[m            $[1;31mnotification[ms[0]['contents']['badge']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m58[m[36m:[m        // Get all unread [1;31mnotification[ms (3) for user
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m64[m[36m:[m        $[1;31mnotification[ms = $results['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m67[m[36m:[m        // Ignore the first unread [1;31mnotification[m
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m68[m[36m:[m        for ($i = 1; $i < sizeof($[1;31mnotification[ms); $i++) {
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m69[m[36m:[m            $ids[] = $[1;31mnotification[ms[$i]['[1;31mnotification[m_id'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m72[m[36m:[m        // Mark [1;31mnotification[ms as read
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m76[m[36m:[m            '[1;31mnotification[ms' => $ids,
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m79[m[36m:[m        // Get all unread [1;31mnotification[ms (1) for user
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m84[m[36m:[m        $[1;31mnotification[ms = $results['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m85[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m95[m[36m:[m                '[1;31mnotification[ms' => [],
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m100[m[36m:[m            $this->assertSame($e->parameter, '[1;31mnotification[ms');
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m106[m[36m:[m                '[1;31mnotification[ms' => ['10'],
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m110[m[36m:[m            $this->assertSame($e->getMessage(), '[1;31mnotification[mNotFound');
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m116[m[36m:[m        $[1;31mnotification[m = new \OmegaUp\DAO\VO\Notifications([
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m122[m[36m:[m        \OmegaUp\DAO\Notifications::create($[1;31mnotification[m);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m131[m[36m:[m                '[1;31mnotification[ms' => [$[1;31mnotification[m->[1;31mnotification[m_id],
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m150[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getAll();
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m151[m[36m:[m        $this->assertCount(0, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m158[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getAll();
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m159[m[36m:[m        $this->assertCount($n, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m186[m[36m:[m        // Get all unread [1;31mnotification[ms through API
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m188[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\Controllers\Notification::apiMyList(
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m192[m[36m:[m        )['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m194[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m198[m[36m:[m            $[1;31mnotification[ms[0]['contents']['type']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m201[m[36m:[m            '[1;31mnotification[mContestClarificationRequest'
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m205[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationString']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m209[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['url']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m216[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationParams']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m229[m[36m:[m        // Get all unread [1;31mnotification[ms through API
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m232[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\Controllers\Notification::apiMyList(
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m236[m[36m:[m        )['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m238[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m242[m[36m:[m            $[1;31mnotification[ms[0]['contents']['type']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m245[m[36m:[m            '[1;31mnotification[mContestClarificationResponse'
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m249[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationString']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m253[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['url']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m260[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationParams']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m296[m[36m:[m        // Get all unread [1;31mnotification[ms through API
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m298[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\Controllers\Notification::apiMyList(
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m302[m[36m:[m        )['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m304[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m308[m[36m:[m            $[1;31mnotification[ms[0]['contents']['type']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m311[m[36m:[m            '[1;31mnotification[mCourseClarificationRequest'
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m315[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationString']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m319[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['url']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m326[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationParams']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m339[m[36m:[m        // Get all unread [1;31mnotification[ms through API
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m342[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\Controllers\Notification::apiMyList(
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m346[m[36m:[m        )['[1;31mnotification[ms'];
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m348[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m352[m[36m:[m            $[1;31mnotification[ms[0]['contents']['type']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m355[m[36m:[m            '[1;31mnotification[mCourseClarificationResponse'
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m359[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationString']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m363[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['url']
+[35mfrontend/tests/controllers/NotificationTest.php[m[36m:[m[32m370[m[36m:[m            $[1;31mnotification[ms[0]['contents']['body']['localizationParams']
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m56[m[36m:[m        // Verify [1;31mnotification[m for admin
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m57[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m60[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m62[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m167[m[36m:[m        // Verify [1;31mnotification[m for admin
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m168[m[36m:[m        $[1;31mnotification[ms = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m171[m[36m:[m        $this->assertCount(1, $[1;31mnotification[ms);
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m173[m[36m:[m        $contents = json_decode($[1;31mnotification[ms[0]['contents'], true);
+[35mfrontend/tests/controllers/SubmissionFeedbackTest.php[m[36m:[m[32m614[m[36m:[m        // student call api to send [1;31mnotification[ms to all administrators
+[35mfrontend/www/docs/Controllers.md[m[36m:[m[32m159[m[36m:[m- [Notification](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#[1;31mnotification[m)
+[35mfrontend/www/docs/Controllers.md[m[36m:[m[32m160[m[36m:[m  - [`/api/[1;31mnotification[m/myList/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#api[1;31mnotification[mmylist)
+[35mfrontend/www/docs/Controllers.md[m[36m:[m[32m161[m[36m:[m  - [`/api/[1;31mnotification[m/readNotifications/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#api[1;31mnotification[mread[1;31mnotification[ms)
+[35mfrontend/www/docs/Google-Summer-of-Code-2018-Ideas-List.md[m[36m:[m[32m149[m[36m:[mWhen you subscribe to our mailing list make sure to subscribe for [1;31mnotification[ms. [Here](http://www.youtube.com/watch?v=CnyO5XoTD4A&t=2m2s) is how to do that.
+[35mfrontend/www/docs/Grader.md[m[36m:[m[32m3[m[36m:[m_Grader_ is responsible for managing the queue of submissions waiting to be judged. Once _Arena_/_Frontend_ notifies it that a problem needs to be judged, it checks the corresponding record in the database, forwards it to the appropriate evaluation queue (local, UVa, PKU, TJU, LiveArchive, SPOJ), and changes its status to “waiting.” At that point, _Grader_ “washes its hands” and goes back to waiting for the next [1;31mnotification[m.
+[35mfrontend/www/docs/Grader.md[m[36m:[m[32m9[m[36m:[mFor local evaluation, _Grader_ must maintain a list of registered Runners so it can send them the source code and (cacheable) input test cases. Each Runner returns, for each test case, either an error [1;31mnotification[m (if something went wrong) or the program output along with metadata such as runtime and memory usage. With that information, Grader runs the validator on each output, compares it to the expected output, and produces a final numerical score for the submission (usually the sum of all case scores). Finally, _Grader_ updates the submission record in the database.
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m1[m[36m:[mThe `Notification.vue` component must be able to display all pending [1;31mnotification[ms for a user.
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m2[m[36m:[mTo achieve this, these [1;31mnotification[ms must first be loaded into the `Notifications` table in the database. The `contents` field of each element in this table is a JSON that must have the following structure:
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m6[m[36m:[m  type: [1;31mnotification[mType,
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m11[m[36m:[mThe `type` field will tell the `Notification.vue` component what format the [1;31mnotification[m should have. Currently supported [1;31mnotification[m types are:
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m15[m[36m:[m- `general_[1;31mnotification[m`: Used for general purpose [1;31mnotification[ms, requires a `message` and optional `url` field 
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m16[m[36m:[m- System [1;31mnotification[ms using the `body` field structure:
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m19[m[36m:[m    "type": "[1;31mnotification[m-type",
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m32[m[36m:[mEach [1;31mnotification[m type may require different payload fields and will render with specific styles in the [`Notification.vue`](frontend/www/js/omegaup/components/[1;31mnotification[m/Notification.vue) component.
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m34[m[36m:[mThe `any_field` can have any name you want, it works as a "payload", carrying the relevant information for the [1;31mnotification[m to be properly displayed.
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m43[m[36m:[mThe [1;31mnotification[m indicates that it is of type badge and the `badge` field works as a payload to indicate it's for the `500score` badge.
+[35mfrontend/www/docs/How-to-add-new-notifications.md[m[36m:[m[32m45[m[36m:[mFrom the `Notifications.vue` component, this is supported through: https://github.com/omegaup/omegaup/blob/master/frontend/www/js/omegaup/components/[1;31mnotification[m/Notification.vue#L58, and the various styles that are applied.
+[35mfrontend/www/docs/Useful-links.md[m[36m:[m[32m24[m[36m:[m- [How to add [1;31mnotification[ms to the DB](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-add-new-[1;31mnotification[ms.md)
+[35mfrontend/www/js/omegaup/api.ts[m[36m:[m[32m1284[m[36m:[m  >('/api/[1;31mnotification[m/myList/', (x) => {
+[35mfrontend/www/js/omegaup/api.ts[m[36m:[m[32m1285[m[36m:[m    x.[1;31mnotification[ms = ((x) => {
+[35mfrontend/www/js/omegaup/api.ts[m[36m:[m[32m1293[m[36m:[m    })(x.[1;31mnotification[ms);
+[35mfrontend/www/js/omegaup/api.ts[m[36m:[m[32m1299[m[36m:[m  >('/api/[1;31mnotification[m/readNotifications/'),
+[35mfrontend/www/js/omegaup/api_types.ts[m[36m:[m[32m4075[m[36m:[m    [1;31mnotification[m_id: number;
+[35mfrontend/www/js/omegaup/api_types.ts[m[36m:[m[32m5763[m[36m:[m    [1;31mnotification[ms: types.Notification[];
+[35mfrontend/www/js/omegaup/common/global_notifications.ts[m[36m:[m[32m6[m[36m:[m  const mountPoint = document.getElementById('global-[1;31mnotification[ms');
+[35mfrontend/www/js/omegaup/common/global_notifications.ts[m[36m:[m[32m12[m[36m:[m    el: '#global-[1;31mnotification[ms',
+[35mfrontend/www/js/omegaup/common/global_notifications.ts[m[36m:[m[32m14[m[36m:[m      'omegaup-global-[1;31mnotification[ms': common_GlobalNotifications,
+[35mfrontend/www/js/omegaup/common/global_notifications.ts[m[36m:[m[32m17[m[36m:[m      return createElement('omegaup-global-[1;31mnotification[ms');
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m33[m[36m:[m      [1;31mnotification[ms: [] as types.Notification[],
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m56[m[36m:[m          [1;31mnotification[ms: this.[1;31mnotification[ms,
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m69[m[36m:[m          'read-[1;31mnotification[ms': (
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m70[m[36m:[m            [1;31mnotification[ms: types.Notification[],
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m74[m[36m:[m              [1;31mnotification[ms: [1;31mnotification[ms.map(
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m75[m[36m:[m                ([1;31mnotification[m) => [1;31mnotification[m.[1;31mnotification[m_id,
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m80[m[36m:[m                commonNavbar.[1;31mnotification[ms = data.[1;31mnotification[ms;
+[35mfrontend/www/js/omegaup/common/navbar.ts[m[36m:[m[32m130[m[36m:[m        commonNavbar.[1;31mnotification[ms = data.[1;31mnotification[ms;
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m2[m[36m:[mimport [1;31mnotification[msStore, {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m5[m[36m:[m} from '../../[1;31mnotification[msStore';
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m9[m[36m:[m * GlobalNotifications displays platform-wide [1;31mnotification[m banners.
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m21[m[36m:[m      description: 'The [1;31mnotification[m message to display',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m26[m[36m:[m      description: 'The type of [1;31mnotification[m (affects styling)',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m31[m[36m:[m      description: 'Position of the [1;31mnotification[m on screen',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m37[m[36m:[m  // Decorator to dispatch [1;31mnotification[ms before each story renders
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m40[m[36m:[m      // Clear any previous [1;31mnotification[ms first to prevent accumulation
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m41[m[36m:[m      [1;31mnotification[msStore.dispatch('dismissNotifications');
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m42[m[36m:[m      // Dispatch the [1;31mnotification[m to the store before rendering
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m43[m[36m:[m      [1;31mnotification[msStore.dispatch('displayStatus', {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m63[m[36m:[m      <global-[1;31mnotification[ms />
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m113[m[36m:[m    message: 'This [1;31mnotification[m appears at the bottom of the page.',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m123[m[36m:[m    message: 'Toast [1;31mnotification[m in the top-right corner.',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.stories.ts[m[36m:[m[32m133[m[36m:[m    message: 'Toast [1;31mnotification[m in the bottom-right corner.',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.test.ts[m[36m:[m[32m7[m[36m:[m} from '../../[1;31mnotification[msStore';
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.test.ts[m[36m:[m[32m27[m[36m:[m// Mock the [1;31mnotification[msStore module to return our controlled store instance
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.test.ts[m[36m:[m[32m28[m[36m:[mjest.mock('../../[1;31mnotification[msStore', () => {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.test.ts[m[36m:[m[32m29[m[36m:[m  const actual = jest.requireActual('../../[1;31mnotification[msStore');
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.test.ts[m[36m:[m[32m39[m[36m:[m            '../../[1;31mnotification[msStore',
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.test.ts[m[36m:[m[32m75[m[36m:[m    // Dispatch to show a danger [1;31mnotification[m
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m2[m[36m:[m  <transition name="[1;31mnotification[m-slide">
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m27[m[36m:[mimport [1;31mnotification[msStore from '../../[1;31mnotification[msStore';
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m37[m[36m:[m    return [1;31mnotification[msStore.getters.isVisible;
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m41[m[36m:[m    return [1;31mnotification[msStore.getters.message;
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m45[m[36m:[m    return [1;31mnotification[msStore.getters.alertClass;
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m49[m[36m:[m    return [1;31mnotification[msStore.getters.positionClass;
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m53[m[36m:[m    [1;31mnotification[msStore.dispatch('dismissNotifications');
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m95[m[36m:[m    // Override Markdown component styling for [1;31mnotification[ms
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m118[m[36m:[m.[1;31mnotification[m-slide-enter-active,
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m119[m[36m:[m.[1;31mnotification[m-slide-leave-active {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m124[m[36m:[m  // Override transform-origin for bottom-positioned [1;31mnotification[ms
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m125[m[36m:[m  &.[1;31mnotification[m-bottom,
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m126[m[36m:[m  &.[1;31mnotification[m-bottom-right {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m131[m[36m:[m.[1;31mnotification[m-slide-enter,
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m132[m[36m:[m.[1;31mnotification[m-slide-leave-to {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m138[m[36m:[m// .[1;31mnotification[m-top is the default (full-width banner at top), no additional styles needed
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m140[m[36m:[m.[1;31mnotification[m-bottom {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m148[m[36m:[m.[1;31mnotification[m-top-right {
+[35mfrontend/www/js/omegaup/components/common/GlobalNotifications.vue[m[36m:[m[32m159[m[36m:[m.[1;31mnotification[m-bottom-right {
+[35mfrontend/www/js/omegaup/components/common/Navbar.test.ts[m[36m:[m[32m27[m[36m:[m    [1;31mnotification[ms: [],
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m30[m[36m:[m            <omegaup-[1;31mnotification[ms-clarifications
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m33[m[36m:[m            ></omegaup-[1;31mnotification[ms-clarifications>
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m34[m[36m:[m            <omegaup-[1;31mnotification[m-list
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m36[m[36m:[m              :[1;31mnotification[ms="[1;31mnotification[ms"
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m38[m[36m:[m            ></omegaup-[1;31mnotification[m-list>
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m93[m[36m:[m                <omegaup-[1;31mnotification[ms-clarifications
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m96[m[36m:[m                ></omegaup-[1;31mnotification[ms-clarifications>
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m97[m[36m:[m                <omegaup-[1;31mnotification[m-list
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m99[m[36m:[m                  :[1;31mnotification[ms="[1;31mnotification[ms"
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m101[m[36m:[m                ></omegaup-[1;31mnotification[m-list>
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m360[m[36m:[mimport [1;31mnotification[ms_Clarifications from '../[1;31mnotification[m/Clarifications.vue';
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m361[m[36m:[mimport [1;31mnotification[ms_List from '../[1;31mnotification[m/List.vue';
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m381[m[36m:[m    'omegaup-[1;31mnotification[m-list': [1;31mnotification[ms_List,
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m382[m[36m:[m    'omegaup-[1;31mnotification[ms-clarifications': [1;31mnotification[ms_Clarifications,
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m407[m[36m:[m  @Prop() [1;31mnotification[ms!: types.Notification[];
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m451[m[36m:[m  readNotifications([1;31mnotification[ms: types.Notification[], url?: string): void {
+[35mfrontend/www/js/omegaup/components/common/Navbar.vue[m[36m:[m[32m452[m[36m:[m    this.$emit('read-[1;31mnotification[ms', [1;31mnotification[ms, url);
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m5[m[36m:[mimport [1;31mnotification[m_Clarifications from './Clarifications.vue';
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m28[m[36m:[m  it('Should handle empty [1;31mnotification[ms list for clarifications', () => {
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m29[m[36m:[m    const wrapper = mount([1;31mnotification[m_Clarifications, {
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m35[m[36m:[m    expect(wrapper.text()).toBe(T.[1;31mnotification[msNoNewNotifications);
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m39[m[36m:[m    const wrapper = mount([1;31mnotification[m_Clarifications, {
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m46[m[36m:[m      T.[1;31mnotification[msMarkAllAsRead,
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m49[m[36m:[m    expect(wrapper.text()).toBe(T.[1;31mnotification[msNoNewNotifications);
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m53[m[36m:[m    const wrapper = mount([1;31mnotification[m_Clarifications, {
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m60[m[36m:[m      T.[1;31mnotification[msMarkAllAsRead,
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m65[m[36m:[m    // There is only one [1;31mnotification[m, so "Mark as all read" button does not appear
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.test.ts[m[36m:[m[32m66[m[36m:[m    expect(wrapper.text()).not.toContain(T.[1;31mnotification[msMarkAllAsRead);
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m3[m[36m:[m    <audio v-if="isAdmin" ref="[1;31mnotification[m-audio" data-[1;31mnotification[m-audio>
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m4[m[36m:[m      <source src="/media/[1;31mnotification[m.mp3" type="audio/mpeg" />
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m9[m[36m:[m      class="nav-link dropdown-toggle px-2 [1;31mnotification[m-toggle"
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m21[m[36m:[m    <div class="dropdown-menu dropdown-menu-right [1;31mnotification[m-dropdown">
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m23[m[36m:[m        {{ T.[1;31mnotification[msNoNewNotifications }}
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m41[m[36m:[m          <div class="w-100 align-items-center pt-1 [1;31mnotification[m-link">
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m59[m[36m:[m            {{ T.[1;31mnotification[msMarkAllAsRead }}</a
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m94[m[36m:[m    const audio = this.$refs['[1;31mnotification[m-audio'] as HTMLMediaElement;
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m151[m[36m:[m.[1;31mnotification[m-link {
+[35mfrontend/www/js/omegaup/components/notification/Clarifications.vue[m[36m:[m[32m156[m[36m:[m      var(--[1;31mnotification[ms-[1;31mnotification[m-link-background-color--hover),
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m6[m[36m:[m      class="nav-link dropdown-toggle px-2 [1;31mnotification[m-toggle"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m13[m[36m:[m        v-show="!![1;31mnotification[ms.length"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m15[m[36m:[m        >{{ [1;31mnotification[ms.length }}</span
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m19[m[36m:[m      class="dropdown-menu dropdown-menu-right [1;31mnotification[m-dropdown position-absolute mt-2"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m21[m[36m:[m      <div v-if="[1;31mnotification[ms.length === 0" class="text-center">
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m22[m[36m:[m        {{ T.[1;31mnotification[msNoNewNotifications }}
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m28[m[36m:[m        @click="$emit('read', [1;31mnotification[ms, null)"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m30[m[36m:[m        {{ T.[1;31mnotification[msMarkAllAsRead }} ✔️
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m33[m[36m:[m        ><omegaup-[1;31mnotification[m
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m34[m[36m:[m          v-for="[1;31mnotification[m in [1;31mnotification[ms"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m35[m[36m:[m          :key="[1;31mnotification[m.[1;31mnotification[m_id"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m36[m[36m:[m          data-[1;31mnotification[m-list
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m37[m[36m:[m          :[1;31mnotification[m="[1;31mnotification[m"
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m39[m[36m:[m        ></omegaup-[1;31mnotification[m
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m59[m[36m:[m    'omegaup-[1;31mnotification[m': Notification,
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m63[m[36m:[m  @Prop() [1;31mnotification[ms!: types.Notification[];
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m66[m[36m:[m  readSingleNotification([1;31mnotification[m: types.Notification, url?: string): void {
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m67[m[36m:[m    this.$emit('read', [[1;31mnotification[m], url);
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m73[m[36m:[m.[1;31mnotification[m-toggle {
+[35mfrontend/www/js/omegaup/components/notification/List.vue[m[36m:[m[32m93[m[36m:[m.[1;31mnotification[m-dropdown {
+[35mfrontend/www/js/omegaup/components/notification/Notification.test.ts[m[36m:[m[32m3[m[36m:[mimport [1;31mnotification[m_Notification from './Notification.vue';
+[35mfrontend/www/js/omegaup/components/notification/Notification.test.ts[m[36m:[m[32m8[m[36m:[m    const wrapper = mount([1;31mnotification[m_Notification, {
+[35mfrontend/www/js/omegaup/components/notification/Notification.test.ts[m[36m:[m[32m10[m[36m:[m        [1;31mnotification[m: {
+[35mfrontend/www/js/omegaup/components/notification/Notification.test.ts[m[36m:[m[32m14[m[36m:[m              localizationString: '[1;31mnotification[mCourseRegistrationRejected',
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m5[m[36m:[m      <div class="[1;31mnotification[m-date">
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m10[m[36m:[m        @click.prevent="$emit('remove', [1;31mnotification[m, null)"
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m17[m[36m:[m      :class="{ '[1;31mnotification[m-link': url }"
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m21[m[36m:[m      <template v-if="[1;31mnotification[mMarkdown">
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m22[m[36m:[m        <omegaup-markdown :markdown="[1;31mnotification[mMarkdown"></omegaup-markdown>
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m51[m[36m:[m  @Prop() [1;31mnotification[m!: types.Notification;
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m54[m[36m:[m    if (this.[1;31mnotification[m.contents.body) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m55[m[36m:[m      return this.[1;31mnotification[m.contents.body.iconUrl;
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m58[m[36m:[m    switch (this.[1;31mnotification[m.contents.type) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m60[m[36m:[m        return `/media/dist/badges/${this.[1;31mnotification[m.contents.badge}.svg`;
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m62[m[36m:[m        if (this.[1;31mnotification[m.contents.status == 'banned') {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m66[m[36m:[m      case 'general_[1;31mnotification[m':
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m74[m[36m:[m    switch (this.[1;31mnotification[m.contents.type) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m76[m[36m:[m        return this.[1;31mnotification[m.contents.message || '';
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m77[m[36m:[m      case 'general_[1;31mnotification[m':
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m78[m[36m:[m        return this.[1;31mnotification[m.contents.message || '';
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m84[m[36m:[m  get [1;31mnotification[mMarkdown(): string {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m85[m[36m:[m    if (this.[1;31mnotification[m.contents.body) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m87[m[36m:[m        T[this.[1;31mnotification[m.contents.body.localizationString],
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m88[m[36m:[m        this.[1;31mnotification[m.contents.body.localizationParams,
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m91[m[36m:[m    switch (this.[1;31mnotification[m.contents.type) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m93[m[36m:[m        return ui.formatString(T.[1;31mnotification[mNewBadge, {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m94[m[36m:[m          badgeName: T[`badge_${this.[1;31mnotification[m.contents.badge}_name`],
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m102[m[36m:[m    if (this.[1;31mnotification[m.contents.body) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m103[m[36m:[m      return this.[1;31mnotification[m.contents.body.url;
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m106[m[36m:[m    switch (this.[1;31mnotification[m.contents.type) {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m107[m[36m:[m      case 'general_[1;31mnotification[m':
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m108[m[36m:[m        return this.[1;31mnotification[m.contents.url || '';
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m110[m[36m:[m        return `/badge/${this.[1;31mnotification[m.contents.badge}/`;
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m120[m[36m:[m    return time.formatDateLocalHHMM(this.[1;31mnotification[m.timestamp);
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m125[m[36m:[m      this.$emit('remove', this.[1;31mnotification[m, this.url);
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m137[m[36m:[m.[1;31mnotification[m-date {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m139[m[36m:[m  color: var(--[1;31mnotification[ms-[1;31mnotification[m-date-font-color);
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m142[m[36m:[m.[1;31mnotification[m-link {
+[35mfrontend/www/js/omegaup/components/notification/Notification.vue[m[36m:[m[32m147[m[36m:[m      var(--[1;31mnotification[ms-[1;31mnotification[m-link-background-color--hover),
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m742[m[36m:[m	"demotionProblemEmailWarningBody": "<p>Dear %(user_name):</p><p>A warning has been put on your problem %(problem_name) in omegaUp because it was reported by the users. The omegaUp team has reviewed this report and confirmed that the problem has room for improvement because %(reason).</p><p>To remove the warning [1;31mnotification[m on the problem please follow the steps below:</p><p><ol><li>Review and edit your problem.</li><li>Once you have resolved the reason on why a warning has been put on your problem, send an email to quality@omegaup.com to be reviewed.</li></lo></p><p>If the steps mentioned above are not followed, the problem will show a warning sign in the list of problems.</p><p>omegaUp is a platform to help users improve their software engineering skills by solving code problems and competing in programing contests. omegaUp welcomes all the problems that help meet that goal.</p><p>Thanks,</p><p>omegaUp team</p>",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m990[m[36m:[m	"[1;31mnotification[mContestClarificationRequest": "A new clarification has been requested for problem %(problemAlias) of the contest %(contestAlias), that you manage.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m991[m[36m:[m	"[1;31mnotification[mContestClarificationResponse": "Your clarification request for problem %(problemAlias) of the contest %(contestAlias), has been answered.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m992[m[36m:[m	"[1;31mnotification[mContestRegisterRequest": "%(username) has requested to register for the contest %(contestTitle) that you manage.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m993[m[36m:[m	"[1;31mnotification[mContestRegisterationAccepted": "Your registration request for contest %(contestTitle) has been **accepted**.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m994[m[36m:[m	"[1;31mnotification[mContestRegisterationRejected": "Your registration request for contest %(contestTitle) has been **rejected**.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m995[m[36m:[m	"[1;31mnotification[mCourseAddAdmin": "You have been invited to be an administrator for course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m996[m[36m:[m	"[1;31mnotification[mCourseAddTeachingAssistant": "You have been invited to be a teaching assistant for course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m997[m[36m:[m	"[1;31mnotification[mCourseAssignmentAdded": "New content has been added to course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m998[m[36m:[m	"[1;31mnotification[mCourseAssignmentProblemAdded": "A new problem has been added to an assignment for course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m999[m[36m:[m	"[1;31mnotification[mCourseClarificationRequest": "A new clarification has been requested for problem %(problemAlias) of the course %(courseName), that you manage.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1000[m[36m:[m	"[1;31mnotification[mCourseClarificationResponse": "Your clarification request for problem %(problemAlias) of the course %(courseName), has been answered.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1001[m[36m:[m	"[1;31mnotification[mCourseRegistrationAccepted": "Your registration request for course %(courseName) has been **accepted**.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1002[m[36m:[m	"[1;31mnotification[mCourseRegistrationManual": "You have been invited to join the course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1003[m[36m:[m	"[1;31mnotification[mCourseRegistrationRejected": "Your registration request for course %(courseName) has been **rejected**.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1004[m[36m:[m	"[1;31mnotification[mCourseRegistrationRequest": "**%(username)** has requested access to course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1005[m[36m:[m	"[1;31mnotification[mCourseRequestFeedback": "**%(username)** has requested feedback to the assignment ***%(assignmentName)*** in the course ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1006[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedback": "The feedback about your submission for problem ***%(problemAlias)*** of the course ***%(courseName)*** has been submitted",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1007[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedbackThread": "**%(username)** has responded to feedback on the submission for the problem ***%(problemAlias)*** in the course ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1008[m[36m:[m	"[1;31mnotification[mNewBadge": "You have received a new badge: **%(badgeName)**.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1009[m[36m:[m	"[1;31mnotification[mNewContestCertificate": "Congratulations! You have received a certificate for your recent achievement in the \"%(contest_title)\" contest. Click to download it.",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1010[m[36m:[m	"[1;31mnotification[mNotFound": "Notification not found",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1011[m[36m:[m	"[1;31mnotification[msMarkAllAsRead": "Mark all as read",
+[35mfrontend/www/js/omegaup/lang.en.json[m[36m:[m[32m1012[m[36m:[m	"[1;31mnotification[msNoNewNotifications": "No new [1;31mnotification[ms.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m743[m[36m:[m  demotionProblemEmailWarningBody: "<p>Dear %(user_name):</p><p>A warning has been put on your problem %(problem_name) in omegaUp because it was reported by the users. The omegaUp team has reviewed this report and confirmed that the problem has room for improvement because %(reason).</p><p>To remove the warning [1;31mnotification[m on the problem please follow the steps below:</p><p><ol><li>Review and edit your problem.</li><li>Once you have resolved the reason on why a warning has been put on your problem, send an email to quality@omegaup.com to be reviewed.</li></lo></p><p>If the steps mentioned above are not followed, the problem will show a warning sign in the list of problems.</p><p>omegaUp is a platform to help users improve their software engineering skills by solving code problems and competing in programing contests. omegaUp welcomes all the problems that help meet that goal.</p><p>Thanks,</p><p>omegaUp team</p>",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m991[m[36m:[m  [1;31mnotification[mContestClarificationRequest: "A new clarification has been requested for problem %(problemAlias) of the contest %(contestAlias), that you manage.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m992[m[36m:[m  [1;31mnotification[mContestClarificationResponse: "Your clarification request for problem %(problemAlias) of the contest %(contestAlias), has been answered.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m993[m[36m:[m  [1;31mnotification[mContestRegisterRequest: "%(username) has requested to register for the contest %(contestTitle) that you manage.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m994[m[36m:[m  [1;31mnotification[mContestRegisterationAccepted: "Your registration request for contest %(contestTitle) has been **accepted**.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m995[m[36m:[m  [1;31mnotification[mContestRegisterationRejected: "Your registration request for contest %(contestTitle) has been **rejected**.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m996[m[36m:[m  [1;31mnotification[mCourseAddAdmin: "You have been invited to be an administrator for course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m997[m[36m:[m  [1;31mnotification[mCourseAddTeachingAssistant: "You have been invited to be a teaching assistant for course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m998[m[36m:[m  [1;31mnotification[mCourseAssignmentAdded: "New content has been added to course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m999[m[36m:[m  [1;31mnotification[mCourseAssignmentProblemAdded: "A new problem has been added to an assignment for course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1000[m[36m:[m  [1;31mnotification[mCourseClarificationRequest: "A new clarification has been requested for problem %(problemAlias) of the course %(courseName), that you manage.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1001[m[36m:[m  [1;31mnotification[mCourseClarificationResponse: "Your clarification request for problem %(problemAlias) of the course %(courseName), has been answered.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1002[m[36m:[m  [1;31mnotification[mCourseRegistrationAccepted: "Your registration request for course %(courseName) has been **accepted**.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1003[m[36m:[m  [1;31mnotification[mCourseRegistrationManual: "You have been invited to join the course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1004[m[36m:[m  [1;31mnotification[mCourseRegistrationRejected: "Your registration request for course %(courseName) has been **rejected**.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1005[m[36m:[m  [1;31mnotification[mCourseRegistrationRequest: "**%(username)** has requested access to course %(courseName).",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1006[m[36m:[m  [1;31mnotification[mCourseRequestFeedback: "**%(username)** has requested feedback to the assignment ***%(assignmentName)*** in the course ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1007[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedback: "The feedback about your submission for problem ***%(problemAlias)*** of the course ***%(courseName)*** has been submitted",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1008[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedbackThread: "**%(username)** has responded to feedback on the submission for the problem ***%(problemAlias)*** in the course ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1009[m[36m:[m  [1;31mnotification[mNewBadge: "You have received a new badge: **%(badgeName)**.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1010[m[36m:[m  [1;31mnotification[mNewContestCertificate: "Congratulations! You have received a certificate for your recent achievement in the \"%(contest_title)\" contest. Click to download it.",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1011[m[36m:[m  [1;31mnotification[mNotFound: "Notification not found",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1012[m[36m:[m  [1;31mnotification[msMarkAllAsRead: "Mark all as read",
+[35mfrontend/www/js/omegaup/lang.en.ts[m[36m:[m[32m1013[m[36m:[m  [1;31mnotification[msNoNewNotifications: "No new [1;31mnotification[ms.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m990[m[36m:[m	"[1;31mnotification[mContestClarificationRequest": "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), que administras.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m991[m[36m:[m	"[1;31mnotification[mContestClarificationResponse": "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), ha sido respondido.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m992[m[36m:[m	"[1;31mnotification[mContestRegisterRequest": "%(username) ha pedido registrarse para el concurso %(contestTitle) que t\u00fa manejas.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m993[m[36m:[m	"[1;31mnotification[mContestRegisterationAccepted": "La solicitud de registro para el concurso %(contestTitle) ha sido **aceptada**.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m994[m[36m:[m	"[1;31mnotification[mContestRegisterationRejected": "La solicitud de registro para el concurso %(contestTitle) ha sido **rechazada**.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m995[m[36m:[m	"[1;31mnotification[mCourseAddAdmin": "Has sido invitado a ser administrador del curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m996[m[36m:[m	"[1;31mnotification[mCourseAddTeachingAssistant": "Has sido invitado a ser un asistente de ense\u00f1anza del curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m997[m[36m:[m	"[1;31mnotification[mCourseAssignmentAdded": "Se ha agregado nuevo contenido al curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m998[m[36m:[m	"[1;31mnotification[mCourseAssignmentProblemAdded": "Se ha agregado un nuevo problema a una asignaci\u00f3n del curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m999[m[36m:[m	"[1;31mnotification[mCourseClarificationRequest": "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del curso %(courseName), que administras.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1000[m[36m:[m	"[1;31mnotification[mCourseClarificationResponse": "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del curso %(courseName), ha sido respondido.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1001[m[36m:[m	"[1;31mnotification[mCourseRegistrationAccepted": "Tu solicitud de registro en el curso %(courseName) ha sido **aceptada**.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1002[m[36m:[m	"[1;31mnotification[mCourseRegistrationManual": "Has sido invitado a unirte al curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1003[m[36m:[m	"[1;31mnotification[mCourseRegistrationRejected": "Tu solicitud de registro en el curso %(courseName) ha sido **rechazada**.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1004[m[36m:[m	"[1;31mnotification[mCourseRegistrationRequest": "**%(username)** ha solicitado acceso al curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1005[m[36m:[m	"[1;31mnotification[mCourseRequestFeedback": "**%(username)** ha solicitado retroalimentacion en la asignacion ***%(assignmentName)*** del curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1006[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedback": "Ha sido enviada la retroalimentaci\u00f3n sobre su env\u00edo para el problema ***%(problemAlias)*** en el curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1007[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedbackThread": "**%(username)** ha respondido en una retroalimentaci\u00f3n sobre el env\u00edo para el problema ***%(problemAlias)*** en el curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1008[m[36m:[m	"[1;31mnotification[mNewBadge": "Has recibido una nueva insignia: **%(badgeName)**.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1009[m[36m:[m	"[1;31mnotification[mNewContestCertificate": "\u00a1Felicidades! Has recibido un diploma por tu reciente logro en el concurso \"%(contest_title)\". Haz clic para descargarlo.",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1010[m[36m:[m	"[1;31mnotification[mNotFound": "No se encontr\u00f3 la notificaci\u00f3n",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1011[m[36m:[m	"[1;31mnotification[msMarkAllAsRead": "Marcar todo como le\u00eddo",
+[35mfrontend/www/js/omegaup/lang.es.json[m[36m:[m[32m1012[m[36m:[m	"[1;31mnotification[msNoNewNotifications": "No hay nuevas notificaciones.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m991[m[36m:[m  [1;31mnotification[mContestClarificationRequest: "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), que administras.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m992[m[36m:[m  [1;31mnotification[mContestClarificationResponse: "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), ha sido respondido.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m993[m[36m:[m  [1;31mnotification[mContestRegisterRequest: "%(username) ha pedido registrarse para el concurso %(contestTitle) que t\u00fa manejas.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m994[m[36m:[m  [1;31mnotification[mContestRegisterationAccepted: "La solicitud de registro para el concurso %(contestTitle) ha sido **aceptada**.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m995[m[36m:[m  [1;31mnotification[mContestRegisterationRejected: "La solicitud de registro para el concurso %(contestTitle) ha sido **rechazada**.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m996[m[36m:[m  [1;31mnotification[mCourseAddAdmin: "Has sido invitado a ser administrador del curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m997[m[36m:[m  [1;31mnotification[mCourseAddTeachingAssistant: "Has sido invitado a ser un asistente de ense\u00f1anza del curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m998[m[36m:[m  [1;31mnotification[mCourseAssignmentAdded: "Se ha agregado nuevo contenido al curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m999[m[36m:[m  [1;31mnotification[mCourseAssignmentProblemAdded: "Se ha agregado un nuevo problema a una asignaci\u00f3n del curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1000[m[36m:[m  [1;31mnotification[mCourseClarificationRequest: "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del curso %(courseName), que administras.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1001[m[36m:[m  [1;31mnotification[mCourseClarificationResponse: "Su pedido de clarificaci\u00f3n para el problema %(problemAlias) del curso %(courseName), ha sido respondido.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1002[m[36m:[m  [1;31mnotification[mCourseRegistrationAccepted: "Tu solicitud de registro en el curso %(courseName) ha sido **aceptada**.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1003[m[36m:[m  [1;31mnotification[mCourseRegistrationManual: "Has sido invitado a unirte al curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1004[m[36m:[m  [1;31mnotification[mCourseRegistrationRejected: "Tu solicitud de registro en el curso %(courseName) ha sido **rechazada**.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1005[m[36m:[m  [1;31mnotification[mCourseRegistrationRequest: "**%(username)** ha solicitado acceso al curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1006[m[36m:[m  [1;31mnotification[mCourseRequestFeedback: "**%(username)** ha solicitado retroalimentacion en la asignacion ***%(assignmentName)*** del curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1007[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedback: "Ha sido enviada la retroalimentaci\u00f3n sobre su env\u00edo para el problema ***%(problemAlias)*** en el curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1008[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedbackThread: "**%(username)** ha respondido en una retroalimentaci\u00f3n sobre el env\u00edo para el problema ***%(problemAlias)*** en el curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1009[m[36m:[m  [1;31mnotification[mNewBadge: "Has recibido una nueva insignia: **%(badgeName)**.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1010[m[36m:[m  [1;31mnotification[mNewContestCertificate: "\u00a1Felicidades! Has recibido un diploma por tu reciente logro en el concurso \"%(contest_title)\". Haz clic para descargarlo.",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1011[m[36m:[m  [1;31mnotification[mNotFound: "No se encontr\u00f3 la notificaci\u00f3n",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1012[m[36m:[m  [1;31mnotification[msMarkAllAsRead: "Marcar todo como le\u00eddo",
+[35mfrontend/www/js/omegaup/lang.es.ts[m[36m:[m[32m1013[m[36m:[m  [1;31mnotification[msNoNewNotifications: "No hay nuevas notificaciones.",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m990[m[36m:[m	"[1;31mnotification[mContestClarificationRequest": "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), 7ha7 y0u manag3.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m991[m[36m:[m	"[1;31mnotification[mContestClarificationResponse": "(Y0ur c1arifica7i0n r3qu357 f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), ha5 b33n an5w3r3d.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m992[m[36m:[m	"[1;31mnotification[mContestRegisterRequest": "(%(username) ha5 r3qu3573d 70 r3gi573r f0r 7h3 c0n7357 %(contestTitle) 7ha7 y0u manag3.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m993[m[36m:[m	"[1;31mnotification[mContestRegisterationAccepted": "(Y0ur r3gi57ra7i0n r3qu357 f0r c0n7357 %(contestTitle) ha5 b33n **acc3p73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m994[m[36m:[m	"[1;31mnotification[mContestRegisterationRejected": "(Y0ur r3gi57ra7i0n r3qu357 f0r c0n7357 %(contestTitle) ha5 b33n **r3j3c73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m995[m[36m:[m	"[1;31mnotification[mCourseAddAdmin": "(Y0u hav3 b33n invi73d 70 b3 an admini57ra70r f0r c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m996[m[36m:[m	"[1;31mnotification[mCourseAddTeachingAssistant": "(Y0u hav3 b33n invi73d 70 b3 a 73aching a55i57an7 f0r c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m997[m[36m:[m	"[1;31mnotification[mCourseAssignmentAdded": "(N3w c0n73n7 ha5 b33n add3d 70 c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m998[m[36m:[m	"[1;31mnotification[mCourseAssignmentProblemAdded": "(A n3w pr0b13m ha5 b33n add3d 70 an a55ignm3n7 f0r c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m999[m[36m:[m	"[1;31mnotification[mCourseClarificationRequest": "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0ur53 %(courseName), 7ha7 y0u manag3.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1000[m[36m:[m	"[1;31mnotification[mCourseClarificationResponse": "(Y0ur c1arifica7i0n r3qu357 f0r pr0b13m %(problemAlias) 0f 7h3 c0ur53 %(courseName), ha5 b33n an5w3r3d.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1001[m[36m:[m	"[1;31mnotification[mCourseRegistrationAccepted": "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **acc3p73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1002[m[36m:[m	"[1;31mnotification[mCourseRegistrationManual": "(Y0u hav3 b33n invi73d 70 j0in 7h3 c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1003[m[36m:[m	"[1;31mnotification[mCourseRegistrationRejected": "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **r3j3c73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1004[m[36m:[m	"[1;31mnotification[mCourseRegistrationRequest": "(**%(username)** ha5 r3qu3573d acc355 70 c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1005[m[36m:[m	"[1;31mnotification[mCourseRequestFeedback": "(**%(username)** ha5 r3qu3573d f33dback 70 7h3 a55ignm3n7 ***%(assignmentName)*** in 7h3 c0ur53 ***%(courseName)***)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1006[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedback": "(Th3 f33dback ab0u7 y0ur 5ubmi55i0n f0r pr0b13m ***%(problemAlias)*** 0f 7h3 c0ur53 ***%(courseName)*** ha5 b33n 5ubmi773d)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1007[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedbackThread": "(**%(username)** ha5 r35p0nd3d 70 f33dback 0n 7h3 5ubmi55i0n f0r 7h3 pr0b13m ***%(problemAlias)*** in 7h3 c0ur53 ***%(courseName)***)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1008[m[36m:[m	"[1;31mnotification[mNewBadge": "(Y0u hav3 r3c3iv3d a n3w badg3: **%(badgeName)**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1009[m[36m:[m	"[1;31mnotification[mNewContestCertificate": "(C0ngra7u1a7i0n5! Y0u hav3 r3c3iv3d a c3r7ifica73 f0r y0ur r3c3n7 achi3v3m3n7 in 7h3 \"%(contest_title)\" c0n7357. C1ick 70 d0wn10ad i7.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1010[m[36m:[m	"[1;31mnotification[mNotFound": "(N07ifica7i0n n07 f0und)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1011[m[36m:[m	"[1;31mnotification[msMarkAllAsRead": "(Mark a11 a5 r3ad)",
+[35mfrontend/www/js/omegaup/lang.pseudo.json[m[36m:[m[32m1012[m[36m:[m	"[1;31mnotification[msNoNewNotifications": "(N0 n3w n07ifica7i0n5.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m991[m[36m:[m  [1;31mnotification[mContestClarificationRequest: "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), 7ha7 y0u manag3.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m992[m[36m:[m  [1;31mnotification[mContestClarificationResponse: "(Y0ur c1arifica7i0n r3qu357 f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), ha5 b33n an5w3r3d.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m993[m[36m:[m  [1;31mnotification[mContestRegisterRequest: "(%(username) ha5 r3qu3573d 70 r3gi573r f0r 7h3 c0n7357 %(contestTitle) 7ha7 y0u manag3.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m994[m[36m:[m  [1;31mnotification[mContestRegisterationAccepted: "(Y0ur r3gi57ra7i0n r3qu357 f0r c0n7357 %(contestTitle) ha5 b33n **acc3p73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m995[m[36m:[m  [1;31mnotification[mContestRegisterationRejected: "(Y0ur r3gi57ra7i0n r3qu357 f0r c0n7357 %(contestTitle) ha5 b33n **r3j3c73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m996[m[36m:[m  [1;31mnotification[mCourseAddAdmin: "(Y0u hav3 b33n invi73d 70 b3 an admini57ra70r f0r c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m997[m[36m:[m  [1;31mnotification[mCourseAddTeachingAssistant: "(Y0u hav3 b33n invi73d 70 b3 a 73aching a55i57an7 f0r c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m998[m[36m:[m  [1;31mnotification[mCourseAssignmentAdded: "(N3w c0n73n7 ha5 b33n add3d 70 c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m999[m[36m:[m  [1;31mnotification[mCourseAssignmentProblemAdded: "(A n3w pr0b13m ha5 b33n add3d 70 an a55ignm3n7 f0r c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1000[m[36m:[m  [1;31mnotification[mCourseClarificationRequest: "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0ur53 %(courseName), 7ha7 y0u manag3.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1001[m[36m:[m  [1;31mnotification[mCourseClarificationResponse: "(Y0ur c1arifica7i0n r3qu357 f0r pr0b13m %(problemAlias) 0f 7h3 c0ur53 %(courseName), ha5 b33n an5w3r3d.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1002[m[36m:[m  [1;31mnotification[mCourseRegistrationAccepted: "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **acc3p73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1003[m[36m:[m  [1;31mnotification[mCourseRegistrationManual: "(Y0u hav3 b33n invi73d 70 j0in 7h3 c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1004[m[36m:[m  [1;31mnotification[mCourseRegistrationRejected: "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **r3j3c73d**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1005[m[36m:[m  [1;31mnotification[mCourseRegistrationRequest: "(**%(username)** ha5 r3qu3573d acc355 70 c0ur53 %(courseName).)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1006[m[36m:[m  [1;31mnotification[mCourseRequestFeedback: "(**%(username)** ha5 r3qu3573d f33dback 70 7h3 a55ignm3n7 ***%(assignmentName)*** in 7h3 c0ur53 ***%(courseName)***)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1007[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedback: "(Th3 f33dback ab0u7 y0ur 5ubmi55i0n f0r pr0b13m ***%(problemAlias)*** 0f 7h3 c0ur53 ***%(courseName)*** ha5 b33n 5ubmi773d)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1008[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedbackThread: "(**%(username)** ha5 r35p0nd3d 70 f33dback 0n 7h3 5ubmi55i0n f0r 7h3 pr0b13m ***%(problemAlias)*** in 7h3 c0ur53 ***%(courseName)***)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1009[m[36m:[m  [1;31mnotification[mNewBadge: "(Y0u hav3 r3c3iv3d a n3w badg3: **%(badgeName)**.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1010[m[36m:[m  [1;31mnotification[mNewContestCertificate: "(C0ngra7u1a7i0n5! Y0u hav3 r3c3iv3d a c3r7ifica73 f0r y0ur r3c3n7 achi3v3m3n7 in 7h3 \"%(contest_title)\" c0n7357. C1ick 70 d0wn10ad i7.)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1011[m[36m:[m  [1;31mnotification[mNotFound: "(N07ifica7i0n n07 f0und)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1012[m[36m:[m  [1;31mnotification[msMarkAllAsRead: "(Mark a11 a5 r3ad)",
+[35mfrontend/www/js/omegaup/lang.pseudo.ts[m[36m:[m[32m1013[m[36m:[m  [1;31mnotification[msNoNewNotifications: "(N0 n3w n07ifica7i0n5.)",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m990[m[36m:[m	"[1;31mnotification[mContestClarificationRequest": "Uma nova clarifica\u00e7\u00e3o tem sido solicitada para o problema %(problemAlias) do concurso %(contestAlias), que voc\u00ea administra.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m991[m[36m:[m	"[1;31mnotification[mContestClarificationResponse": "Seu pedido de clarifica\u00e7\u00e3o para o problema %(problemAlias) do concurso %(contestAlias), tem sido respondido.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m992[m[36m:[m	"[1;31mnotification[mContestRegisterRequest": "%(username) solicitou registro para o concurso %(contestTitle) que voc\u00ea gerencia.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m993[m[36m:[m	"[1;31mnotification[mContestRegisterationAccepted": "Sua solicita\u00e7\u00e3o de inscri\u00e7\u00e3o para o concurso %(contestTitle) foi **aceita**.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m994[m[36m:[m	"[1;31mnotification[mContestRegisterationRejected": "Sua solicita\u00e7\u00e3o de inscri\u00e7\u00e3o para o concurso %(contestTitle) foi **rejeitada**.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m995[m[36m:[m	"[1;31mnotification[mCourseAddAdmin": "Voc\u00ea foi convidado para ser um administrador do curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m996[m[36m:[m	"[1;31mnotification[mCourseAddTeachingAssistant": "Voc\u00ea foi convidado para ser um assistente de ensino para o curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m997[m[36m:[m	"[1;31mnotification[mCourseAssignmentAdded": "Novo conte\u00fado foi adicionado ao curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m998[m[36m:[m	"[1;31mnotification[mCourseAssignmentProblemAdded": "Um novo problema foi adicionado a um exerc\u00edcio em %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m999[m[36m:[m	"[1;31mnotification[mCourseClarificationRequest": "Uma nova clarifica\u00e7\u00e3o tem sido solicitada para o problema %(problemAlias) do curso %(courseName), que voc\u00ea administra.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1000[m[36m:[m	"[1;31mnotification[mCourseClarificationResponse": "Seu pedido de clarifica\u00e7\u00e3o para o problema %(problemAlias) do curso %(courseName), tem sido respondido.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1001[m[36m:[m	"[1;31mnotification[mCourseRegistrationAccepted": "Seu pedido de registro no curso %(courseName), tem sido **aceitado**.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1002[m[36m:[m	"[1;31mnotification[mCourseRegistrationManual": "Voc\u00ea foi convidado para participar do curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1003[m[36m:[m	"[1;31mnotification[mCourseRegistrationRejected": "Seu pedido de registro no curso %(courseName), tem sido **rejeitado**.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1004[m[36m:[m	"[1;31mnotification[mCourseRegistrationRequest": "**%(username)** tem solicitado acceso ao curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1005[m[36m:[m	"[1;31mnotification[mCourseRequestFeedback": "**%(username)** tem solicitado feedback sobre a tarefa ***%(assignmentName)*** do curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1006[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedback": "O feedback sobre sua submis\u00e3o para o problema ***%(problemAlias)*** no curso ***%(courseName)*** tem sido submetida.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1007[m[36m:[m	"[1;31mnotification[mCourseSubmissionFeedbackThread": "**%(username)** respondeu em um feedback sobre seu envio para o problema ***%(problemAlias)*** no curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1008[m[36m:[m	"[1;31mnotification[mNewBadge": "Voc\u00ea tem recebido um novo distintivo: **%(badgeName)**",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1009[m[36m:[m	"[1;31mnotification[mNewContestCertificate": "Parab\u00e9ns! Voc\u00ea recebeu um diploma por sua conquista recente no concurso \"%(contest_title)\". Clique para baix\u00e1-lo.",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1010[m[36m:[m	"[1;31mnotification[mNotFound": "Notifica\u00e7\u00e3o n\u00e3o encontrada",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1011[m[36m:[m	"[1;31mnotification[msMarkAllAsRead": "Marcar tudo como lido",
+[35mfrontend/www/js/omegaup/lang.pt.json[m[36m:[m[32m1012[m[36m:[m	"[1;31mnotification[msNoNewNotifications": "N\u00e3o h\u00e1 novas notifica\u00e7\u00f5es.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m991[m[36m:[m  [1;31mnotification[mContestClarificationRequest: "Uma nova clarifica\u00e7\u00e3o tem sido solicitada para o problema %(problemAlias) do concurso %(contestAlias), que voc\u00ea administra.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m992[m[36m:[m  [1;31mnotification[mContestClarificationResponse: "Seu pedido de clarifica\u00e7\u00e3o para o problema %(problemAlias) do concurso %(contestAlias), tem sido respondido.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m993[m[36m:[m  [1;31mnotification[mContestRegisterRequest: "%(username) solicitou registro para o concurso %(contestTitle) que voc\u00ea gerencia.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m994[m[36m:[m  [1;31mnotification[mContestRegisterationAccepted: "Sua solicita\u00e7\u00e3o de inscri\u00e7\u00e3o para o concurso %(contestTitle) foi **aceita**.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m995[m[36m:[m  [1;31mnotification[mContestRegisterationRejected: "Sua solicita\u00e7\u00e3o de inscri\u00e7\u00e3o para o concurso %(contestTitle) foi **rejeitada**.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m996[m[36m:[m  [1;31mnotification[mCourseAddAdmin: "Voc\u00ea foi convidado para ser um administrador do curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m997[m[36m:[m  [1;31mnotification[mCourseAddTeachingAssistant: "Voc\u00ea foi convidado para ser um assistente de ensino para o curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m998[m[36m:[m  [1;31mnotification[mCourseAssignmentAdded: "Novo conte\u00fado foi adicionado ao curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m999[m[36m:[m  [1;31mnotification[mCourseAssignmentProblemAdded: "Um novo problema foi adicionado a um exerc\u00edcio em %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1000[m[36m:[m  [1;31mnotification[mCourseClarificationRequest: "Uma nova clarifica\u00e7\u00e3o tem sido solicitada para o problema %(problemAlias) do curso %(courseName), que voc\u00ea administra.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1001[m[36m:[m  [1;31mnotification[mCourseClarificationResponse: "Seu pedido de clarifica\u00e7\u00e3o para o problema %(problemAlias) do curso %(courseName), tem sido respondido.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1002[m[36m:[m  [1;31mnotification[mCourseRegistrationAccepted: "Seu pedido de registro no curso %(courseName), tem sido **aceitado**.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1003[m[36m:[m  [1;31mnotification[mCourseRegistrationManual: "Voc\u00ea foi convidado para participar do curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1004[m[36m:[m  [1;31mnotification[mCourseRegistrationRejected: "Seu pedido de registro no curso %(courseName), tem sido **rejeitado**.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1005[m[36m:[m  [1;31mnotification[mCourseRegistrationRequest: "**%(username)** tem solicitado acceso ao curso %(courseName).",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1006[m[36m:[m  [1;31mnotification[mCourseRequestFeedback: "**%(username)** tem solicitado feedback sobre a tarefa ***%(assignmentName)*** do curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1007[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedback: "O feedback sobre sua submis\u00e3o para o problema ***%(problemAlias)*** no curso ***%(courseName)*** tem sido submetida.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1008[m[36m:[m  [1;31mnotification[mCourseSubmissionFeedbackThread: "**%(username)** respondeu em um feedback sobre seu envio para o problema ***%(problemAlias)*** no curso ***%(courseName)***",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1009[m[36m:[m  [1;31mnotification[mNewBadge: "Voc\u00ea tem recebido um novo distintivo: **%(badgeName)**",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1010[m[36m:[m  [1;31mnotification[mNewContestCertificate: "Parab\u00e9ns! Voc\u00ea recebeu um diploma por sua conquista recente no concurso \"%(contest_title)\". Clique para baix\u00e1-lo.",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1011[m[36m:[m  [1;31mnotification[mNotFound: "Notifica\u00e7\u00e3o n\u00e3o encontrada",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1012[m[36m:[m  [1;31mnotification[msMarkAllAsRead: "Marcar tudo como lido",
+[35mfrontend/www/js/omegaup/lang.pt.ts[m[36m:[m[32m1013[m[36m:[m  [1;31mnotification[msNoNewNotifications: "N\u00e3o h\u00e1 novas notifica\u00e7\u00f5es.",
+[35mfrontend/www/js/omegaup/notificationsStore.test.ts[m[36m:[m[32m7[m[36m:[m} from './[1;31mnotification[msStore';
+[35mfrontend/www/js/omegaup/notificationsStore.test.ts[m[36m:[m[32m9[m[36m:[mdescribe('[1;31mnotification[msStore', () => {
+[35mfrontend/www/js/omegaup/notificationsStore.test.ts[m[36m:[m[32m42[m[36m:[m      it('should increment counter on each [1;31mnotification[m', () => {
+[35mfrontend/www/js/omegaup/notificationsStore.test.ts[m[36m:[m[32m58[m[36m:[m        // First show a [1;31mnotification[m
+[35mfrontend/www/js/omegaup/notificationsStore.test.ts[m[36m:[m[32m112[m[36m:[m    it('should show [1;31mnotification[m with message and type', () => {
+[35mfrontend/www/js/omegaup/notificationsStore.ts[m[36m:[m[32m9[m[36m:[m * Message types for [1;31mnotification[ms, matching Bootstrap alert classes.
+[35mfrontend/www/js/omegaup/notificationsStore.ts[m[36m:[m[32m19[m[36m:[m * Positions for [1;31mnotification[ms.
+[35mfrontend/www/js/omegaup/notificationsStore.ts[m[36m:[m[32m110[m[36m:[m        // Show the [1;31mnotification[m
+[35mfrontend/www/js/omegaup/notificationsStore.ts[m[36m:[m[32m123[m[36m:[m            // Only hide if no new [1;31mnotification[m has been shown
+[35mfrontend/www/js/omegaup/notificationsStore.ts[m[36m:[m[32m147[m[36m:[m        `[1;31mnotification[m-${state.position}`,
+[35mfrontend/www/js/omegaup/notificationsStore.ts[m[36m:[m[32m159[m[36m:[m * Factory function to create a fresh [1;31mnotification[ms store instance.
+[35mfrontend/www/js/omegaup/ui.ts[m[36m:[m[32m5[m[36m:[mimport [1;31mnotification[msStore, {
+[35mfrontend/www/js/omegaup/ui.ts[m[36m:[m[32m8[m[36m:[m} from './[1;31mnotification[msStore';
+[35mfrontend/www/js/omegaup/ui.ts[m[36m:[m[32m103[m[36m:[m  [1;31mnotification[msStore.dispatch('displayStatus', {
+[35mfrontend/www/js/omegaup/ui.ts[m[36m:[m[32m142[m[36m:[m  // Dispatch to Vuex store to hide [1;31mnotification[m
+[35mfrontend/www/js/omegaup/ui.ts[m[36m:[m[32m143[m[36m:[m  [1;31mnotification[msStore.dispatch('dismissNotifications');
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m218[m[36m:[m  --[1;31mnotification[ms-clarifications-scrollbar-track-background-color: #f5f5f5;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m219[m[36m:[m  --[1;31mnotification[ms-clarifications-scrollbar-background-color: #f5f5f5;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m220[m[36m:[m  --[1;31mnotification[ms-clarifications-scrollbar-thumb-background-color: #808080;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m221[m[36m:[m  --[1;31mnotification[ms-clarifications-drawer-li-border-top-color: #f2f2f2;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m222[m[36m:[m  --[1;31mnotification[ms-clarifications-drawer-li-a-font-color: #333;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m223[m[36m:[m  --[1;31mnotification[ms-clarifications-drawer-li-background-color--active: #678dd7;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m224[m[36m:[m  --[1;31mnotification[ms-clarifications-drawer-li-font-color--active: #fff;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m225[m[36m:[m  --[1;31mnotification[ms-[1;31mnotification[m-date-font-color: #666;
+[35mfrontend/www/sass/base/_variables.scss[m[36m:[m[32m226[m[36m:[m  --[1;31mnotification[ms-[1;31mnotification[m-link-background-color--hover: #000;
+[35mfrontend/www/third_party/js/jquery-3.5.1.js[m[36m:[m[32m7568[m[36m:[m			// If this was an empty animation, synthesize a final progress [1;31mnotification[m
+[35mstuff/cron/assign_badges.py[m[36m:[m[32m2[m[36m:[m''' Assigns users badges and creates the [1;31mnotification[ms.'''
+[35mstuff/cron/assign_badges.py[m[36m:[m[32m60[m[36m:[m    [1;31mnotification[ms_tuples = []
+[35mstuff/cron/assign_badges.py[m[36m:[m[32m63[m[36m:[m        [1;31mnotification[ms_tuples.append(
+[35mstuff/cron/assign_badges.py[m[36m:[m[32m77[m[36m:[m        VALUES (%s, %s)''', [1;31mnotification[ms_tuples)
+[35mstuff/cron/assign_badges.py[m[36m:[m[32m104[m[36m:[m        description='Assign badges and create [1;31mnotification[ms.')
+[35mstuff/dataset_generator/settings.yml[m[36m:[m[32m44[m[36m:[m      [1;31mnotification[ms: 2000
+[35mstuff/dataset_generator/settings.yml[m[36m:[m[32m60[m[36m:[m      [1;31mnotification[ms: 10
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m84[m[36m:[m            [1;31mnotification[ms = []
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m95[m[36m:[m                    [1;31mnotification[ms.append(
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m100[m[36m:[m                                    '[1;31mnotification[mNewContestCertificate',
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m139[m[36m:[m                            VALUES (%s, %s)''', [1;31mnotification[ms)
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m156[m[36m:[m                            user_id = [1;31mnotification[ms[index][0]
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m157[m[36m:[m                            [1;31mnotification[ms[index] = (user_id, json.dumps({
+[35mstuff/pipelines/contest_callback.py[m[36m:[m[32m161[m[36m:[m                                        '[1;31mnotification[mNewContestCertificate',
+[35mwebpack.config-frontend.js[m[36m:[m[32m46[m[36m:[m    common_global_[1;31mnotification[ms:
+[35mwebpack.config-frontend.js[m[36m:[m[32m47[m[36m:[m      './frontend/www/js/omegaup/common/global_[1;31mnotification[ms.ts',

@@ -60,7 +60,6 @@ export default class GlobalNotifications extends Vue {
 
 .alert {
   position: fixed;
-  top: 56px; // Below navbar
   left: 0;
   right: 0;
   z-index: 1029;
@@ -135,10 +134,13 @@ export default class GlobalNotifications extends Vue {
 }
 
 // Position variations
-// .notification-top is the default (full-width banner at top), no additional styles needed
+.notification-top {
+  top: 56px;
+}
 
 .notification-bottom {
   position: fixed;
+  top: auto;
   bottom: 0;
   left: 0;
   right: 0;
@@ -147,7 +149,7 @@ export default class GlobalNotifications extends Vue {
 
 .notification-top-right {
   position: fixed;
-  top: 60px; // Below navbar
+  top: 56px;
   right: 1rem;
   left: auto;
   max-width: 400px;
@@ -158,6 +160,7 @@ export default class GlobalNotifications extends Vue {
 
 .notification-bottom-right {
   position: fixed;
+  top: auto;
   bottom: 1rem;
   right: 1rem;
   left: auto;
