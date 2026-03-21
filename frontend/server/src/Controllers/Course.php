@@ -5444,7 +5444,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $clarificationsPage,
             "/course/{$course->alias}/assignment/{$assignmentAlias}",
             adjacent: 5,
-            params: ['page_size' => (string) $clarificationsPageSize],
+            params: ['page_size' => strval($clarificationsPageSize)],
         );
 
         // This is necessary to stay at the same 'clarifications' URL fragment
