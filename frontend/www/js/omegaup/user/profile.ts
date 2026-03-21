@@ -228,6 +228,22 @@ OmegaUp.on('ready', () => {
       }
     }
   }
+
+  // Handle browser back/forward button navigation for hash-based tabs
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+    for (const viewProfileTab of Object.values(ViewProfileTabs)) {
+      if (hash === viewProfileTab) {
+        userProfile.viewProfileSelectedTab = viewProfileTab;
+        userProfile.selectedTab = 'view-profile';
+        return;
+      }
+    }
+    if (hash) {
+      userProfile.selectedTab = hash;
+    }
+  };
+
   const userProfile = new Vue({
     el: '#main-container',
     components: {
@@ -241,6 +257,7 @@ OmegaUp.on('ready', () => {
         apiTokens: commonPayload.apiTokens,
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
+        viewProfileSelectedTab,
         searchResultSchools: searchResultSchools,
         availableYears: [currentYear] as number[],
         isLoading: true,
@@ -343,7 +360,7 @@ OmegaUp.on('ready', () => {
           countries: payload.countries,
           programmingLanguages: payload.programmingLanguages,
           hasPassword: this.hasPassword,
-          viewProfileSelectedTab,
+          viewProfileSelectedTab: this.viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
           availableYears: this.availableYears,
           isLoading: this.isLoading,
@@ -360,8 +377,13 @@ OmegaUp.on('ready', () => {
                   userBasicInformation.username,
                 );
                 userProfile.profile.username = userBasicInformation.username;
+                userProfile.profile.name = userBasicInformation.name;
+                userProfile.profile.gender = userBasicInformation.gender;
                 userProfile.profile.country_id =
                   userBasicInformation.country_id;
+                userProfile.profile.state_id = userBasicInformation.state_id;
+                userProfile.profile.birth_date =
+                  userBasicInformation.birth_date ?? undefined;
                 ui.success(T.userEditSuccess);
               })
               .catch(ui.apiError);
@@ -477,7 +499,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'request-delete-account': () => {
-            api.User.deleteRequest()
+            api.User.deleteRequest({})
               .then(({ token }) => {
                 api.User.deleteConfirm({ token })
                   .then(() => {
@@ -496,7 +518,7 @@ OmegaUp.on('ready', () => {
                   ui.formatString(T.apiTokenSuccessfullyCreated, {
                     token: token,
                   }),
-                  false,
+                  { autoHide: false },
                 );
               })
               .catch(ui.apiError);
@@ -517,6 +539,8 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+  window.addEventListener('hashchange', onHashChange);
+
   function refreshIdentityList() {
     api.User.listAssociatedIdentities({})
       .then((data) => {

@@ -119,6 +119,41 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Checks that the receiver of a private clarification can view it.
+     */
+    public function testShowClarificationAsReceiver() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        ['user' => $authorUser, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $receiverUser, 'identity' => $receiverIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $this->detourBroadcasterCalls();
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $authorIdentity,
+            null,
+            $receiverIdentity->username
+        );
+
+        $r = new \OmegaUp\Request();
+        $r['clarification_id'] = $clarificationData['response']['clarification_id'];
+
+        $login = self::login($receiverIdentity);
+        $r['auth_token'] = $login->auth_token;
+
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
+
+        $this->assertClarification($r['clarification_id'], $response);
+    }
+
+    /**
      * Checks that private clarifications cant be viewed by someone else
      */
     public function testClarificationsCreatedPrivateAsDefault() {
