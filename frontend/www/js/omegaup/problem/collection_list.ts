@@ -76,6 +76,7 @@ OmegaUp.on('ready', () => {
           columnName: columnName,
           difficulty: difficulty,
           quality: quality,
+          hideProblemTagsPreference: payload.hideProblemTagsPreference,
         },
         on: {
           'apply-filter': (

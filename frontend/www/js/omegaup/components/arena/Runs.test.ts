@@ -1,4 +1,5 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
+jest.mock('vue-infinite-scroll', () => ({}));
 
 import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
@@ -413,5 +414,43 @@ describe('Runs.vue', () => {
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
       expect(wrapper.vm.filterUsername).toBeFalsy();
     });
+  });
+
+  it('Should show loading skeleton when loading prop is true', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        loading: true,
+        endOfResults: false,
+      },
+    });
+
+    expect(wrapper.findAll('.loading-line').length).toBe(3);
+  });
+
+  it('Should not show loading skeleton when loading prop is false', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        loading: false,
+        endOfResults: false,
+      },
+    });
+
+    expect(wrapper.findAll('.loading-line').length).toBe(0);
+  });
+
+  it('Should not show pager when showPager is false', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        showPager: false,
+      },
+    });
+
+    expect(wrapper.find('.pager-controls').exists()).toBeFalsy();
   });
 });

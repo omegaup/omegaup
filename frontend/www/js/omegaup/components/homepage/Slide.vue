@@ -1,9 +1,9 @@
 <template>
   <div class="container-lg p-4">
     <div
-      class="slide d-flex align-items-center justify-content-around flex-wrap flex-lg-nowrap"
+      class="slide d-flex align-items-center justify-content-center flex-column flex-lg-row"
     >
-      <div class="titles-width">
+      <div class="titles-width text-center text-lg-left mb-4 mb-lg-0">
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
@@ -16,10 +16,9 @@
           {{ button.text[T.locale] }}
         </a>
       </div>
-      <div>
+      <div class="image-container d-flex justify-content-center">
         <img
-          class="d-block image-width"
-          height="320"
+          class="d-block img-fluid image-width"
           :src="imageSrc"
           :alt="title"
         />
@@ -53,10 +52,10 @@ export default class Slide extends Vue {
 
 <style lang="scss" scoped>
 .slide {
-  height: 43.5rem;
+  min-height: 43.5rem;
 
-  @media only screen and (min-width: 767px) {
-    height: 31rem;
+  @media only screen and (min-width: 992px) {
+    min-height: 31rem;
   }
 
   h2 {
@@ -75,10 +74,17 @@ a.slide-button {
   letter-spacing: 0.03rem;
   font-size: 1.08rem;
 }
-.image-width {
+.image-container {
+  width: 100%;
   max-width: 480px;
 }
+.image-width {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
 .titles-width {
+  width: 100%;
   max-width: 640px;
 }
 </style>

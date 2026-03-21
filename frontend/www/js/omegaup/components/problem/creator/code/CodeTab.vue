@@ -83,7 +83,7 @@ import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 import { TabIndex } from '../Tabs.vue';
 
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 @Component({
   components: {
