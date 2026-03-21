@@ -4,23 +4,35 @@
       <h5>
         {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ addCardHeaderDescLabel }}</span>
+      <span v-if="problems && problems.length === 0">
+  {{ addCardHeaderDescLabel }}
+</span>
     </div>
     <div class="card-body">
   <!-- EMPTY STATE -->
-  <div
-    v-if="(!problems || problems.length === 0) && !showForm"
-    class="empty-state text-center p-5"
-  >
-    <h5>{{ emptyTableLabel }}</h5>
+ <div
+  v-if="(!problems || problems.length === 0) && !showForm"
+  class="text-center p-5"
+>
+  <!-- ICON -->
+  <font-awesome-icon icon="code" size="3x" class="mb-3" />
 
-    <button
-      class="btn btn-primary mt-3"
-      @click="showForm = true"
-    >
-      {{ addButtonLabel }}
-    </button>
-  </div>
+  <!-- TITLE -->
+  <h5>{{ emptyTableLabel }}</h5>
+
+  <!-- SUBTITLE -->
+  <p class="text-muted">
+    {{ addCardHeaderDescLabel }}
+  </p>
+
+  <!-- BUTTON -->
+  <button
+    class="btn btn-primary mt-3"
+    @click="showForm = true"
+  >
+    {{ addButtonLabel }}
+  </button>
+</div>
 
   <!-- NORMAL TABLE -->
   <div v-else>
@@ -57,7 +69,7 @@
    <div
   class="card-footer"
   data-course-add-problem
-  v-if="showForm || problems.length > 0"
+  v-if="showForm || (problems && problems.length > 0)"
 >
       <form>
         <div class="row">

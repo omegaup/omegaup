@@ -4,24 +4,35 @@
       <h5>
         {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ addCardHeaderDescLabel }}</span>
+     <span v-if="problems && problems.length === 0">
+  {{ addCardHeaderDescLabel }}
+</span>
     </div>
  <div class="card-body">
   <!-- EMPTY STATE -->
   <div
-   v-if="problems.length === 0 && !showForm"
-    class="empty-state text-center p-5"
+  v-if="(!problems || problems.length === 0) && !showForm"
+  class="text-center p-5"
+>
+  <!-- ICON -->
+  <font-awesome-icon icon="code" size="3x" class="mb-3" />
+
+  <!-- TITLE -->
+  <h5>{{ emptyTableLabel }}</h5>
+
+  <!-- SUBTITLE -->
+  <p class="text-muted">
+    {{ addCardHeaderDescLabel }}
+  </p>
+
+  <!-- BUTTON -->
+  <button
+    class="btn btn-primary mt-3"
+    @click="showForm = true"
   >
-    <h5>{{ emptyTableLabel }}</h5>
-
-    <button
-      class="btn btn-primary mt-3"
-      @click="showForm = true"
-    >
-      {{ addProblemButtonLabel }}
-    </button>
-  </div>
-
+    {{ addProblemButtonLabel }}
+  </button>
+</div>
   <!-- NORMAL CONTENT -->
   <div v-else>
     <table class="table table-striped">
@@ -52,7 +63,7 @@
     </div>
   </div>
 </div>
-    <div v-if="showForm || problems.length > 0" class="card-footer">
+    <div v-if="showForm || (problems && problems.length > 0)" class="card-footer">
       <form @submit.prevent="">
         <div class="row">
           <div class="col-md-12">
