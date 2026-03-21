@@ -39,7 +39,9 @@
           </div>
         </div>
       </div>
-      <div class="form-group d-flex flex-nowrap overflow-auto mt-3 align-items-center">
+      <div
+        class="form-group d-flex flex-nowrap overflow-auto mt-3 align-items-center"
+      >
         <label class="col-form-label mb-0 mr-2 text-nowrap">
           {{ T.problemCreatorCodeUpload }}
         </label>
