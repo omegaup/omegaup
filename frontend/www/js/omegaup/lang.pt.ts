@@ -1240,6 +1240,8 @@ const translations: { [key: string]: string; } = {
   problemCreatorCasesTabIntroSidebarIntro: "Use esta barra lateral para gerenciar seus casos de teste.",
   problemCreatorCasesTabIntroSidebarTitle: "Barra lateral de casos de teste",
   problemCreatorCode: "C\u00f3digo",
+  problemCreatorCodeChooseFile: "Escolher arquivo",
+  problemCreatorCodeNoFileChosen: "Nenhum arquivo selecionado",
   problemCreatorCodeSave: "Salvar",
   problemCreatorCodeTabIntroSaveCodeIntro: "Quando terminar, clique aqui para salvar suas altera\u00e7\u00f5es.",
   problemCreatorCodeTabIntroSaveCodeTitle: "Salvar c\u00f3digo",
