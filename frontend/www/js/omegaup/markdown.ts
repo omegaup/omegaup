@@ -65,11 +65,9 @@ export class Converter {
     const templates: { [key: string]: string } = {};
     if (options.preview) {
       templates['libinteractive:download'] =
-        '<code class="libinteractive-download">' +
-        '<i class="glyphicon glyphicon-download-alt"></i></code>';
+        '<code class="libinteractive-download">📥</code>';
       templates['output-only:download'] =
-        '<code class="output-only-download">' +
-        '<i class="glyphicon glyphicon-download-alt"></i></code>';
+        '<code class="output-only-download">📥</code>';
     } else {
       templates[
         'libinteractive:download'
