@@ -133,11 +133,12 @@ def get_modified_files(root: str) -> Set[str]:
                 'diff',
                 '-z',
                 '--name-only',
-                merge_base,
+                '--diff-filter=d',
+                f'{merge_base}...HEAD',
             ],
             check=True,
             stdout=subprocess.PIPE,
-            cwd=root).stdout.strip(b'\x00').split(b'\x00'))
+            cwd=root).stdout.strip(b'\x00').split(b'\x00') if filename)
 
 
 def _expected_database_schema(*,
