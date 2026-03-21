@@ -949,7 +949,8 @@ def update_schools_stats(
         logging.exception('Failed to update all schools stats')
         dbconn.rollback()
         raise
-    
+
+
 def main() -> None:
     '''Main entrypoint.'''
 
