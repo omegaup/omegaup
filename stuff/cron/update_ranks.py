@@ -950,9 +950,6 @@ def update_schools_stats(
         dbconn.rollback()
         raise
     
-    
-
-
 def main() -> None:
     '''Main entrypoint.'''
 
