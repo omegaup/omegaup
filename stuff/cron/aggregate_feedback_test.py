@@ -111,6 +111,87 @@ class AggregateFeedbackTest(unittest.TestCase):
         self.assertEqual(called_ids, problem_ids)
         self.assertEqual(dbconn.rollback_calls, 1)
 
+    def test_incremental_mode_processes_all_problems(self) -> None:
+        '''aggregate_feedback processes incremental problems with watermark.'''
+        problem_ids = [10, 20, 30]
+        dbconn = _FakeDBConnection(problem_ids)
+
+        called_ids: List[int] = []
+
+        def fake_fill_rank_cutoffs(dbconn_arg: Any) -> Any:
+            del dbconn_arg
+            return []
+
+        def fake_get_global_averages(
+                dbconn_arg: Any, rank_cutoffs_arg: Any) -> Any:
+            del dbconn_arg, rank_cutoffs_arg
+            return (None, None)
+
+        def fake_get_last_processed(dbconn_arg: Any) -> int:
+            del dbconn_arg
+            return (
+                aggregate_feedback.QUALITYNOMINATION_QUESTION_CHANGE_ID + 1)
+
+        def fake_aggregate_problem_feedback(
+                dbconn_arg: Any,
+                problem_id: int,
+                rank_cutoffs_arg: Any,
+                global_quality_average_arg: Any,
+                global_difficulty_average_arg: Any) -> None:
+            del (dbconn_arg, rank_cutoffs_arg, global_quality_average_arg,
+                 global_difficulty_average_arg)
+            called_ids.append(problem_id)
+
+        def fake_get_current_max_id(dbconn_arg: Any) -> int:
+            del dbconn_arg
+            return (
+                aggregate_feedback.QUALITYNOMINATION_QUESTION_CHANGE_ID + 2)
+
+        def fake_update_last_processed(dbconn_arg: Any, value: int) -> None:
+            del dbconn_arg, value
+
+        original_fill_rank_cutoffs = aggregate_feedback.fill_rank_cutoffs
+        original_get_global = (
+            aggregate_feedback.get_global_quality_and_difficulty_average)
+        original_get_last_processed = (
+            aggregate_feedback.get_last_processed_qualitynomination_id)
+        original_aggregate_problem_feedback = (
+            aggregate_feedback.aggregate_problem_feedback)
+        original_get_current_max_id = (
+            aggregate_feedback.get_current_max_qualitynomination_id)
+        original_update_last_processed = (
+            aggregate_feedback.update_last_processed_qualitynomination_id)
+
+        aggregate_feedback.fill_rank_cutoffs = cast(
+            Any, fake_fill_rank_cutoffs)
+        aggregate_feedback.get_global_quality_and_difficulty_average = cast(
+            Any, fake_get_global_averages)
+        aggregate_feedback.get_last_processed_qualitynomination_id = cast(
+            Any, fake_get_last_processed)
+        aggregate_feedback.aggregate_problem_feedback = cast(
+            Any, fake_aggregate_problem_feedback)
+        aggregate_feedback.get_current_max_qualitynomination_id = cast(
+            Any, fake_get_current_max_id)
+        aggregate_feedback.update_last_processed_qualitynomination_id = cast(
+            Any, fake_update_last_processed)
+
+        try:
+            aggregate_feedback.aggregate_feedback(cast(Any, dbconn))
+        finally:
+            aggregate_feedback.fill_rank_cutoffs = original_fill_rank_cutoffs
+            aggregate_feedback.get_global_quality_and_difficulty_average = (
+                original_get_global)
+            aggregate_feedback.get_last_processed_qualitynomination_id = (
+                original_get_last_processed)
+            aggregate_feedback.aggregate_problem_feedback = (
+                original_aggregate_problem_feedback)
+            aggregate_feedback.get_current_max_qualitynomination_id = (
+                original_get_current_max_id)
+            aggregate_feedback.update_last_processed_qualitynomination_id = (
+                original_update_last_processed)
+
+        self.assertEqual(called_ids, problem_ids)
+
 
 if __name__ == '__main__':
     unittest.main()
