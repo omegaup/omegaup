@@ -3557,6 +3557,9 @@ export namespace types {
     archived: boolean;
     assignments: types.CourseAssignment[];
     clarifications: types.Clarification[];
+    clarificationsPage: number;
+    clarificationsPageSize: number;
+    clarificationsPagerItems: types.PageItem[];
     description: string;
     finish_time?: Date;
     is_admin: boolean;

@@ -101,8 +101,9 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 cl.public
         ';
 
-        /** @var int */
         $countQuery = $sqlCount . $sqlFrom;
+
+        /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $countQuery,
             $params
@@ -114,6 +115,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
 
         $query = $sqlSelect . $sqlFrom . $sqlOrderBy . $sqlLimit;
 
+        /** @var list<array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params
