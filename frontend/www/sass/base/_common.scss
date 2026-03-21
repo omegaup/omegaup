@@ -48,7 +48,7 @@ body {
   max-width: 900px;
   margin-right: auto;
   margin-left: auto;
-  top: 70px; // offset to avoid navbar overlap
+  top: 61px;
   width: 100%;
 }
 
@@ -160,12 +160,4 @@ pre > code {
   max-height: 25vh;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-img {
-  -webkit-user-drag: none;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
 }
