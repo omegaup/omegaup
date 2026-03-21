@@ -14,8 +14,8 @@ RUN apt-get update -y && \
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+    corepack enable && \
+    corepack prepare yarn@stable --activate
 
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
@@ -23,7 +23,6 @@ RUN apt-get update -y && \
         git \
         mysql-client-core-8.0 \
         nginx \
-        nodejs \
         openjdk-18-jre-headless \
         php8.1 \
         php8.1-apcu \
@@ -41,7 +40,6 @@ RUN apt-get update -y && \
         supervisor \
         wait-for-it \
         xz-utils \
-        yarn \
         && \
     apt-get autoremove -y && \
     apt-get clean
@@ -67,7 +65,11 @@ COPY ./etc/sudoers.d/* /etc/sudoers.d/
 RUN chmod 440 /etc/sudoers.d/ubuntu
 COPY ./usr/bin/* /usr/bin/
 RUN chmod +x /usr/bin/yarn-dev.sh /usr/bin/developer-environment.sh
+# Copy MySQL config to both locations: /home/ubuntu/.my.cnf is needed for Linux
+# (where ~ resolves to /home/ubuntu), and /.my.cnf is needed for macOS users
+# (where ~ may resolve to / inside the container depending on the user context).
 COPY ./my.cnf /home/ubuntu/.my.cnf
+COPY ./my.cnf /.my.cnf
 
 RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
 USER ubuntu
@@ -81,4 +83,8 @@ ENV PATH=/opt/omegaup/stuff/venv/bin:$PATH
 
 CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mysql:13306", "--", \
      "/bin/bash", "-c", \
-     "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; exec /usr/bin/supervisord"]
+     "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; \
+      cd /opt/omegaup && \
+      yarn install && \
+      yarn run dev-all & \
+      exec /usr/bin/supervisord"]
