@@ -983,14 +983,12 @@ def update_schools_stats(
     try:
         try:
             update_schools_solved_problems(cur)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update schools solved problems')
             raise
 
         try:
             update_school_rank(cur)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update school ranking')
             raise
@@ -998,14 +996,18 @@ def update_schools_stats(
         try:
             update_school_of_the_month_candidates(cur, cur_readonly, date,
                                                   update_school_of_the_month)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to update candidates to school of the month')
             raise
+
+        # Commit all school stats updates automatically.
+        dbconn.commit()
         logging.info('Schools stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all schools stats')
+        dbconn.rollback()
+        raise
 
 
 def main() -> None:
