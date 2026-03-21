@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Contestant=array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ScoreboardMergePayload=array{contests: list<ContestListItem>}
- * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
+ * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, classname: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
  * @psalm-type ContestReport=array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type ContestReportDetailsPayload=array{contestAlias: string, contestReport: list<ContestReport>}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
@@ -4500,6 +4500,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $mergedScoreboard[$username] = [
                         'name' => $userResults['name'],
                         'username' => $username,
+                        'classname' => $userResults['classname'],
                         'contests' => [],
                         'total' => [
                             'points' => 0.0,

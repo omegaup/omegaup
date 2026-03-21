@@ -1,5 +1,11 @@
 <template>
-  <div class="mt-2" data-runs>
+  <div
+    v-infinite-scroll="() => $emit('fetch-more-data')"
+    class="mt-2"
+    data-runs
+    infinite-scroll-disabled="isScrollDisabled"
+    infinite-scroll-distance="10"
+  >
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
@@ -14,27 +20,27 @@
     >
       <div>
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
-        <div v-if="showPager">
-          <div class="pager-controls">
-            <button
-              data-button-page-previous
-              :disabled="filterOffset <= 0"
-              @click="filterOffset--"
-            >
-              &lt;
-            </button>
-            {{ currentPage }}
-            <button
-              data-button-page-next
-              :disabled="
-                totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
-              "
-              @click="filterOffset++"
-            >
-              &gt;
-            </button>
-          </div>
+        <div v-if="showPager" class="pager-controls">
+          <button
+            data-button-page-previous
+            :disabled="filterOffset <= 0"
+            @click="filterOffset--"
+          >
+            &lt;
+          </button>
+          {{ currentPage }}
+          <button
+            data-button-page-next
+            :disabled="
+              totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
+            "
+            @click="filterOffset++"
+          >
+            &gt;
+          </button>
+        </div>
 
+        <div v-if="shouldShowFilters">
           <div class="filters row">
             <label class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
@@ -406,6 +412,13 @@
               </td>
               <td v-else></td>
             </tr>
+            <template v-if="loading">
+              <tr v-for="index in 3" :key="`loading-${index}`">
+                <td colspan="16">
+                  <div class="loading-line"></div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -429,6 +442,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import infiniteScroll from 'vue-infinite-scroll';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -488,6 +502,9 @@ export enum PopupDisplayed {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
 export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
@@ -496,6 +513,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showDetails!: boolean;
   @Prop({ default: false }) showDisqualify!: boolean;
   @Prop({ default: false }) showPager!: boolean;
+  @Prop({ default: null }) showFilters!: boolean | null;
   @Prop({ default: false }) showPoints!: boolean;
   @Prop({ default: false }) showProblem!: boolean;
   @Prop({ default: false }) showRejudge!: boolean;
@@ -516,6 +534,8 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) inContest!: boolean;
+  @Prop({ default: false }) loading!: boolean;
+  @Prop({ default: false }) endOfResults!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -535,6 +555,14 @@ export default class Runs extends Vue {
 
   get currentPage(): number {
     return this.filterOffset + 1;
+  }
+
+  get isScrollDisabled(): boolean {
+    return this.loading || this.endOfResults;
+  }
+
+  get shouldShowFilters(): boolean {
+    return this.showFilters !== null ? this.showFilters : this.showPager;
   }
 
   get filteredRuns(): types.Run[] {
@@ -965,5 +993,32 @@ export default class Runs extends Vue {
 .status-rfe {
   background: var(--arena-runs-table-status-rfe-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.loading-line {
+  height: 49px;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>
