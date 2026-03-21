@@ -3023,10 +3023,18 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Expires the known ranks
-     *
      * @TODO: This should be called only in the grader->frontend callback and only IFF
      * verdict = AC (and not test run)
+     *
+     * Expires rank caches and scoreboard caches.
+     *
+     * Rank caches (PROBLEMS_SOLVED_RANK, USER_COMPARE_DATA) only
+     * change when a submission receives an AC verdict, so callers
+     * must guard invocations accordingly.  Scoreboard caches are
+     * invalidated separately in Run::apiCreate() on every new
+     * submission (verdict is unknown at that point).  This function
+     * is now called conditionally in apiRejudge, apiDisqualify and
+     * apiRequalify (AC verdict + normal submission type).
      *
      * @return void
      */
@@ -5338,6 +5346,31 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'user_compare',
+        ];
+    }
+
+    /**
+     * API endpoint to record user's cookie consent decision
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param bool $accepted
+     */
+    public static function apiRecordCookieConsent(\OmegaUp\Request $r): array {
+        // Validate and retrieve the accepted parameter
+        $accepted = $r->ensureBool('accepted');
+
+        // Log the cookie consent decision
+        self::$log->info('Cookie consent recorded', [
+            'accepted' => $accepted,
+        ]);
+
+        return [
+            'status' => 'ok',
         ];
     }
 

@@ -88,6 +88,16 @@ export default class Clarifications extends Vue {
   flashInterval: number = 0;
   unreadClarifications = this.clarifications;
 
+  beforeDestroy() {
+    if (this.flashInterval) {
+      clearInterval(this.flashInterval);
+      this.flashInterval = 0;
+    }
+    if (document.title.indexOf('!') === 0) {
+      document.title = document.title.substring(2);
+    }
+  }
+
   @Watch('clarifications')
   onPropertyChanged(newValue: types.Clarification[]): void {
     this.unreadClarifications = newValue;
