@@ -652,4 +652,12 @@ OmegaUp.on('ready', () => {
     },
   });
   const component = courseEdit.$refs.component as course_Edit;
+
+  // Handle browser back/forward navigation for hash-based tabs
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+    courseEdit.$data.initialTab = hash || 'course';
+  };
+
+  window.addEventListener('hashchange', onHashChange);
 });

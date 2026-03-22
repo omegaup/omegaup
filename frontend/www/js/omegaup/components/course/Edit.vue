@@ -159,6 +159,38 @@ import type { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import { AdmissionMode } from '../common/Publish.vue';
 
+const now = new Date();
+const finishTime = new Date();
+finishTime.setHours(finishTime.getHours() + 5);
+const defaultStartTime = now;
+const defaultFinishTime = finishTime;
+const availableTabs = [
+  'course',
+  'content',
+  'problems',
+  'admission-mode',
+  'students',
+  'admins',
+  'clone',
+  'archive',
+];
+const emptyAssignment: types.CourseAssignment = {
+  problemset_id: 0,
+  alias: '',
+  description: '',
+  name: '',
+  has_runs: false,
+  max_points: 0,
+  start_time: defaultStartTime,
+  finish_time: defaultFinishTime,
+  opened: false,
+  order: 1,
+  scoreboard_url: '',
+  scoreboard_url_admin: '',
+  assignment_type: 'homework',
+  problemCount: 0,
+};
+
 @Component({
   components: {
     'omegaup-course-form': course_Form,
