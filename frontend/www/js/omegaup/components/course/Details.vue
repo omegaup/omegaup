@@ -199,7 +199,7 @@
       </div>
     </div>
     <template v-else>
-      <div class="mt-4 mb-1">
+      <div class="mt-4 mb-3 course-progress-container">
         <div class="progress w-50 mx-auto">
           <div
             class="progress-bar text-dark"
@@ -213,7 +213,7 @@
           </div>
         </div>
         <div
-          class="w-50 mx-auto d-flex justify-content-between text-center progress-text"
+          class="w-50 mx-auto d-flex justify-content-between align-items-center progress-text"
         >
           <p class="my-0 text-uppercase">
             {{ T.courseDetailsProgress }}
@@ -426,8 +426,20 @@ export default class CourseDetails extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
+.course-progress-container{
+  .prgress{
+     min-height: 1.5rem;
+}
+
 .progress-text {
   font-size: 0.85rem;
+  margin-top: 0.5rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.progress-text p{
+   margin-bottom: 0;
 }
 
 .progress-bar {
