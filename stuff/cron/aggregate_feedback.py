@@ -18,7 +18,10 @@ import sys
 from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
 
-from mysql.connector import errorcode
+from mysql.connector import (
+    errorcode,
+    errors as mysql_errors,  # type: ignore[attr-defined]
+)
 
 sys.path.insert(
     0,
@@ -107,18 +110,21 @@ class RankCutoff(NamedTuple):
 def get_last_processed_qualitynomination_id(
         dbconn: lib.db.Connection) -> int:
     '''Return the watermark for aggregate_feedback runs.'''
-    with dbconn.cursor() as cur:
-        cur.execute(
-            """SELECT
-                       `last_processed_qualitynomination_id`
-                   FROM
-                       `Cron_AggregateFeedback_State`
-                   WHERE
-                        `singleton_id` = 1;""")
-        row = cur.fetchone()
-        if not row:
-            return QUALITYNOMINATION_QUESTION_CHANGE_ID
-        return int(row[0])
+    try:
+        with dbconn.cursor() as cur:
+            cur.execute(
+                """SELECT
+                           `last_processed_qualitynomination_id`
+                       FROM
+                           `Cron_AggregateFeedback_State`
+                       WHERE
+                           `singleton_id` = 1;""")
+            rows = list(cur.fetchall())
+            if not rows:
+                return QUALITYNOMINATION_QUESTION_CHANGE_ID
+            return int(rows[0][0])
+    except mysql_errors.Error:  # type: ignore[attr-defined]
+        return QUALITYNOMINATION_QUESTION_CHANGE_ID
 
 
 def update_last_processed_qualitynomination_id(
@@ -153,8 +159,8 @@ def get_current_max_qualitynomination_id(
                    WHERE
                        qn.`nomination` = 'suggestion';""",
             (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
-        (max_id,) = cur.fetchone()
-        return int(max_id)
+        rows = list(cur.fetchall())
+        return int(rows[0][0])
 
 
 def fill_rank_cutoffs(
