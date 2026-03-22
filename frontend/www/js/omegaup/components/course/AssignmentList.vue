@@ -4,7 +4,6 @@
     <div class="card-body">
       <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
-          
           <h4 class="mb-2">{{ T.courseContentEmpty }}</h4>
           <br />
           <p class="text-muted mb-4">{{ T.courseGetStarted }}
