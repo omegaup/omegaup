@@ -130,18 +130,21 @@ def get_last_processed_qualitynomination_id(
 def update_last_processed_qualitynomination_id(
         dbconn: lib.db.Connection, value: int) -> None:
     '''Persist the aggregate_feedback watermark.'''
-    with dbconn.cursor() as cur:
-        cur.execute(
-            """INSERT INTO
-                       `Cron_AggregateFeedback_State`(
-                           `singleton_id`,
-                           `last_processed_qualitynomination_id`)
-                   VALUES (1, %s)
-                   ON DUPLICATE KEY UPDATE
-                       `last_processed_qualitynomination_id` = VALUES(
-                           `last_processed_qualitynomination_id`);""",
-            (value,))
-    dbconn.conn.commit()
+    try:
+        with dbconn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO
+                           `Cron_AggregateFeedback_State`(
+                               `singleton_id`,
+                               `last_processed_qualitynomination_id`)
+                       VALUES (1, %s)
+                       ON DUPLICATE KEY UPDATE
+                           `last_processed_qualitynomination_id` = VALUES(
+                               `last_processed_qualitynomination_id`);""",
+                (value,))
+        dbconn.conn.commit()
+    except Exception:  # pylint: disable=broad-except
+        return
 
 
 def get_current_max_qualitynomination_id(
