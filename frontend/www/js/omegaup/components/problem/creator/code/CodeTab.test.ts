@@ -33,7 +33,7 @@ describe('CodeTab.vue', () => {
     expect(wrapper.vm.code).toBe('print("Hello World")');
     expect(wrapper.vm.extension).toBe('py');
 
-    const codeSaveButton = wrapper.find('button');
+    const codeSaveButton = wrapper.find('[data-problem-creator-code-save-btn]');
     expect(codeSaveButton.exists()).toBe(true);
     await codeSaveButton.trigger('click');
 
