@@ -56,6 +56,7 @@ export class Converter {
   private _settings?: types.ProblemSettingsDistrib;
   private _sourceMapping?: SourceMapping;
   private _imageMapping?: ImageMapping;
+  private _mermaidLoaded = false;
 
   constructor(options: ConverterOptions = {}) {
     this._converter = getSanitizingConverter();
@@ -64,11 +65,9 @@ export class Converter {
     const templates: { [key: string]: string } = {};
     if (options.preview) {
       templates['libinteractive:download'] =
-        '<code class="libinteractive-download">' +
-        '<i class="glyphicon glyphicon-download-alt"></i></code>';
+        '<code class="libinteractive-download">📥</code>';
       templates['output-only:download'] =
-        '<code class="output-only-download">' +
-        '<i class="glyphicon glyphicon-download-alt"></i></code>';
+        '<code class="output-only-download">📥</code>';
     } else {
       templates[
         'libinteractive:download'
@@ -576,5 +575,130 @@ export class Converter {
       delete this._imageMapping;
       delete this._settings;
     }
+  }
+
+  // Renders Mermaid diagrams in the specified container.
+  // Searches for all code blocks with 'language-mermaid' class and converts
+  // them to SVG diagrams.
+  public async renderMermaidDiagrams(container: HTMLElement): Promise<void> {
+    const codeBlocks = container.querySelectorAll(
+      'pre > code.language-mermaid',
+    );
+
+    if (codeBlocks.length === 0) {
+      return; // No mermaid diagrams found, exit early
+    }
+
+    try {
+      //await the import
+      const mermaidModule = await import('mermaid');
+      const mermaid = mermaidModule.default;
+
+      //Initialize only once
+      if (!this._mermaidLoaded) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'strict',
+          fontFamily: 'trebuchet ms, verdana, arial, sans-serif',
+          flowchart: {
+            htmlLabels: false,
+          },
+        });
+        this._mermaidLoaded = true;
+      }
+
+      //Collect all render promises
+      const renderPromises = Array.from(codeBlocks).map(
+        async (block, index) => {
+          let code = block.textContent || '';
+          const id = `mermaid-diagram-${Date.now()}-${index}`;
+          const pre = block.parentElement;
+
+          if (!pre) return;
+          // Pre-process: Replace Font Awesome placeholders with emoji before
+          // rendering
+          code = this.preprocessFontAwesomeIcons(code);
+
+          // Create a temporary visible container so Mermaid can calculate
+          // dimensions correctly
+
+          const tempContainer = document.createElement('div');
+          tempContainer.style.position = 'absolute';
+          tempContainer.style.left = '-9999px';
+          tempContainer.style.visibility = 'hidden';
+          tempContainer.innerHTML = `<div class="mermaid">${code}</div>`;
+          document.body.appendChild(tempContainer);
+
+          try {
+            // Render the diagram
+            const { svg } = await mermaid.render(id, code);
+            // Clean up temporary container
+            document.body.removeChild(tempContainer);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mermaid-diagram';
+            wrapper.innerHTML = svg;
+
+            pre.replaceWith(wrapper);
+          } catch (error: any) {
+            console.error('Mermaid rendering error:', error);
+            // Clean up temporary container on error
+            if (document.body.contains(tempContainer)) {
+              document.body.removeChild(tempContainer);
+            }
+            // Keep original code block if there's an error
+
+            pre.classList.add('mermaid-error');
+
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'mermaid-error-message';
+            errorMsg.textContent = `Error rendering diagram: ${error.message}`;
+
+            pre.parentElement?.insertBefore(errorMsg, pre);
+
+            throw error; //propagate individual render error
+          }
+        },
+      );
+
+      //Wait for ALL diagrams
+      await Promise.all(renderPromises);
+    } catch (error) {
+      console.error('Error loading/rendering mermaid:', error);
+      throw error; //propagate to caller (VERY IMPORTANT)
+    }
+  }
+
+  // Pre-processes Mermaid code to replace Font Awesome icon placeholders with
+  // emoji.
+  // This is done before rendering so Mermaid can calculate proper dimensions.
+  private preprocessFontAwesomeIcons(code: string): string {
+    // Map of Font Awesome icon names to emoji alternatives
+    const iconMap: { [key: string]: string } = {
+      desktop: '💻',
+      terminal: '⌨️',
+      cloud: '☁️',
+      database: '🗄️',
+      server: '🖥️',
+      laptop: '💻',
+      mobile: '📱',
+      code: '💾',
+      users: '👥',
+      user: '👤',
+      cog: '⚙️',
+      cogs: '⚙️',
+      check: '✓',
+      times: '✗',
+      'arrow-right': '→',
+      'arrow-left': '←',
+      play: '▶',
+      stop: '■',
+    };
+
+    // Replace all fa:fa-* patterns with corresponding emoji
+    return code.replace(/fa:fa-([\w-]+)/g, (match, iconName) => {
+      return iconMap[iconName] || '';
+    });
   }
 }

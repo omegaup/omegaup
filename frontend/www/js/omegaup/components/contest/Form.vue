@@ -7,6 +7,7 @@
       <!-- Style Presets -->
       <div class="btn-group d-block mb-3 text-center introjs-style">
         <button
+          :class="{ selected: currentPreset === PresetType.OMI }"
           class="btn btn-secondary"
           data-contest-omi
           type="button"
@@ -15,6 +16,7 @@
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.PreIOI }"
           class="btn btn-secondary"
           data-contest-preioi
           type="button"
@@ -23,6 +25,7 @@
           {{ T.contestNewForm }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.Conacup }"
           class="btn btn-secondary"
           data-contest-conacup
           type="button"
@@ -31,6 +34,7 @@
           {{ T.contestNewFormConacupStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.ICPC }"
           class="btn btn-secondary"
           data-contest-icpc
           type="button"
@@ -857,6 +861,18 @@
         </div>
       </form>
     </div>
+    <b-modal
+      v-model="showModal"
+      :title="T.contestNewFormPresetOverwriteWarningModalTitle"
+      :ok-title="T.wordsConfirm"
+      ok-only
+      @ok="
+        applyPreset(changePresetTo);
+        hasFormChanged = true;
+      "
+    >
+      {{ T.contestNewFormPresetOverwriteWarning }}
+    </b-modal>
   </div>
 </template>
 
@@ -873,6 +889,8 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 import {
   FontAwesomeIcon,
@@ -884,7 +902,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { isValidAlias } from '../../validators';
 library.add(fas);
 
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 export enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -1117,6 +1135,9 @@ export default class Form extends Vue {
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;
+  showModal: boolean = false;
+  changePresetTo: PresetType | null = null;
+  currentPreset: PresetType | null = null;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -1271,6 +1292,9 @@ export default class Form extends Vue {
 
   clearFieldError(fieldName: FieldName | string): void {
     delete this.localErrors[fieldName];
+    if (Object.keys(this.localErrors).length === 0) {
+      ui.dismissNotifications();
+    }
     this.$forceUpdate();
   }
 
@@ -1304,17 +1328,17 @@ export default class Form extends Vue {
 
   confirmPresetChange(presetType: PresetType): void {
     if (this.hasFormChanged && !this.update) {
-      if (!confirm(T.contestNewFormPresetOverwriteWarning)) {
-        return;
-      }
+      this.changePresetTo = presetType;
+      this.showModal = true;
+      return;
     }
-
     this.applyPreset(presetType);
     this.hasFormChanged = true;
   }
 
   applyPreset(presetType: PresetType): void {
     const preset = CONTEST_PRESETS[presetType];
+    this.currentPreset = presetType;
 
     if (preset.languages) {
       const allLangs = Object.keys(this.allLanguages);
@@ -1522,5 +1546,32 @@ export default class Form extends Vue {
   color: var(--form-character-counter-color, #6c757d);
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .modal-footer .btn {
+  background-color: var(--btn-ok-background-color);
+  border-color: var(--btn-ok-background-color);
+  color: var(--btn-ok-font-color);
+
+  &:hover {
+    color: var(--btn-ok-font-color--hover);
+  }
+}
+
+.btn-group .btn.selected {
+  outline: 3px solid var(--btn-contest-preset-outline-color) !important;
+  z-index: 1 !important;
+}
+
+// Overwrite default bootstrap focus styles
+.btn-group .btn:focus {
+  box-shadow: none !important;
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  z-index: 0;
+}
+.btn-group .btn:hover {
+  z-index: 0;
 }
 </style>

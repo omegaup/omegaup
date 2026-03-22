@@ -98,10 +98,18 @@ export const ACL = {
 };
 
 export const Admin = {
+  getMaintenanceMode: apiCall<
+    messages.AdminGetMaintenanceModeRequest,
+    messages.AdminGetMaintenanceModeResponse
+  >('/api/admin/getMaintenanceMode/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  setMaintenanceMode: apiCall<
+    messages.AdminSetMaintenanceModeRequest,
+    messages.AdminSetMaintenanceModeResponse
+  >('/api/admin/setMaintenanceMode/'),
 };
 
 export const AiEditorial = {
@@ -2228,6 +2236,10 @@ export const User = {
     messages.UserProfileStatisticsRequest,
     messages.UserProfileStatisticsResponse
   >('/api/user/profileStatistics/'),
+  recordCookieConsent: apiCall<
+    messages.UserRecordCookieConsentRequest,
+    messages.UserRecordCookieConsentResponse
+  >('/api/user/recordCookieConsent/'),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse
@@ -2240,10 +2252,18 @@ export const User = {
     messages.UserRemoveRoleRequest,
     messages.UserRemoveRoleResponse
   >('/api/user/removeRole/'),
+  reportReadme: apiCall<
+    messages.UserReportReadmeRequest,
+    messages.UserReportReadmeResponse
+  >('/api/user/reportReadme/'),
   revokeAPIToken: apiCall<
     messages.UserRevokeAPITokenRequest,
     messages.UserRevokeAPITokenResponse
   >('/api/user/revokeAPIToken/'),
+  saveReadme: apiCall<
+    messages.UserSaveReadmeRequest,
+    messages.UserSaveReadmeResponse
+  >('/api/user/saveReadme/'),
   selectCoderOfTheMonth: apiCall<
     messages.UserSelectCoderOfTheMonthRequest,
     messages.UserSelectCoderOfTheMonthResponse

@@ -5,7 +5,12 @@
       data-enable-hover-dropdown
     >
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
+        <a
+          class="navbar-brand p-3 mr-0 mr-sm-3"
+          href="/"
+          :title="logoTooltip"
+          @click.prevent="handleLogoClick"
+        >
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -339,7 +344,7 @@
       ></omegaup-user-next-registered-contest>
       <div
         v-if="mentorCanChooseCoder"
-        class="alert alert-info alert-dismissible fade show"
+        class="alert alert-info alert-dismissible fade show mentor-can-choose-coder"
         role="alert"
       >
         <button type="button" class="close" data-dismiss="alert">
@@ -424,6 +429,7 @@ export default class Navbar extends Vue {
   ui = ui;
   AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
+  scrollY: number = 0;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
@@ -490,13 +496,63 @@ export default class Navbar extends Vue {
           : this.formattedSignupURL;
     }
   }
+
+  get logoTooltip(): string {
+    if (this.scrollY > 0) {
+      return this.T.navbarScrollToTop;
+    }
+    return this.T.navbarGoToHomepage;
+  }
+
+  updateScroll(): void {
+    this.scrollY = window.scrollY;
+  }
+
+  handleLogoClick(): void {
+    const isAtTop = window.scrollY <= 0;
+    const isHome = window.location.pathname === '/';
+
+    if (!isAtTop) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (!isHome) {
+      window.location.href = '/';
+    }
+  }
+
+  mounted() {
+    document.addEventListener('click', this.handleDocumentClick);
+    window.addEventListener('scroll', this.updateScroll);
+
+    this.updateScroll();
+  }
+
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleDocumentClick);
+    window.removeEventListener('scroll', this.updateScroll);
+  }
+
+  private handleDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const navbar = this.$el as HTMLElement;
+
+    if (!navbar.contains(target)) {
+      const navbarCollapse = navbar.querySelector('.navbar-collapse.show');
+
+      if (!navbarCollapse) return;
+
+      ($(navbarCollapse) as any).collapse('hide');
+    }
+  }
 }
 </script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-.alert-info {
+.mentor-can-choose-coder {
   margin: 1rem;
 }
 

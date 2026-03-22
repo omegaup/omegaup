@@ -3076,6 +3076,7 @@ export namespace types {
     columns: string[];
     difficulty: string;
     frequentTags: types.TagWithProblemCount[];
+    hideProblemTagsPreference: boolean;
     keyword: string;
     language: string;
     languages: string[];
@@ -3110,10 +3111,12 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    maintenanceMessage?: types.MaintenanceMessage;
     mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
+    preferredLanguage: string;
     profileProgress: number;
     userClassname: string;
     userCountry: string;
@@ -4015,12 +4018,32 @@ export namespace types {
     verifyEmailSuccessfully?: string;
   }
 
+  export interface MaintenanceMessage {
+    message: string;
+    type: string;
+  }
+
+  export interface MaintenanceModeStatus {
+    enabled: boolean;
+    message_en?: string;
+    message_es?: string;
+    message_pt?: string;
+    type: string;
+  }
+
   export interface MergedScoreboardEntry {
+    classname: string;
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
     place?: number;
     total: { penalty: number; points: number };
     username: string;
+  }
+
+  export interface MessageLanguages {
+    en: string;
+    es: string;
+    pt: string;
   }
 
   export interface NavbarProblemsetProblem {
@@ -4107,6 +4130,13 @@ export namespace types {
     school_name?: string;
     state_id?: string;
     username: string;
+  }
+
+  export interface PredefinedTemplate {
+    id: string;
+    message: types.MessageLanguages;
+    title: types.MessageLanguages;
+    type: string;
   }
 
   export interface PrivacyPolicyDetailsPayload {
@@ -4330,6 +4360,7 @@ export namespace types {
   }
 
   export interface ProblemListPayload {
+    attemptedProblemAliases: string[];
     column: string;
     columns: string[];
     keyword: string;
@@ -4341,6 +4372,7 @@ export namespace types {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     selectedTags: string[];
+    solvedProblemAliases: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -4370,7 +4402,7 @@ export namespace types {
   }
 
   export interface ProblemSettings {
-    Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Cases: types.SettingsCaseGroup[];
     Interactive?: {
       Interfaces: {
         [key: string]: { [key: string]: types.InteractiveInterface };
@@ -4858,6 +4890,16 @@ export namespace types {
     time_limit: string;
   }
 
+  export interface SettingsCase {
+    Name: string;
+    Weight: number;
+  }
+
+  export interface SettingsCaseGroup {
+    Cases: types.SettingsCase[];
+    Name: string;
+  }
+
   export interface Signature {
     email: string;
     name: string;
@@ -4975,6 +5017,8 @@ export namespace types {
   }
 
   export interface SupportDetailsPayload {
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
     roleNamesWithDescription: types.UserRole[];
   }
 
@@ -5152,6 +5196,7 @@ export namespace types {
       problems_solved?: number;
       rank?: number;
     };
+    readme?: string;
     scholar_degree?: string;
     school?: string;
     school_id?: number;
@@ -5247,6 +5292,8 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5261,6 +5308,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminSetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminSetMaintenanceModeResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6204,14 +6253,20 @@ export namespace messages {
     solved: number;
     tags: { count: number; name: string }[];
   };
+  export type UserRecordCookieConsentRequest = { [key: string]: any };
+  export type UserRecordCookieConsentResponse = {};
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
   export type UserRemoveGroupResponse = {};
   export type UserRemoveRoleRequest = { [key: string]: any };
   export type UserRemoveRoleResponse = {};
+  export type UserReportReadmeRequest = { [key: string]: any };
+  export type UserReportReadmeResponse = {};
   export type UserRevokeAPITokenRequest = { [key: string]: any };
   export type UserRevokeAPITokenResponse = {};
+  export type UserSaveReadmeRequest = { [key: string]: any };
+  export type UserSaveReadmeResponse = {};
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
@@ -6251,9 +6306,15 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getMaintenanceMode: (
+      params?: messages.AdminGetMaintenanceModeRequest,
+    ) => Promise<messages.AdminGetMaintenanceModeResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    setMaintenanceMode: (
+      params?: messages.AdminSetMaintenanceModeRequest,
+    ) => Promise<messages.AdminSetMaintenanceModeResponse>;
   }
 
   export interface AiEditorial {
@@ -7073,6 +7134,9 @@ export namespace controllers {
     profileStatistics: (
       params?: messages.UserProfileStatisticsRequest,
     ) => Promise<messages.UserProfileStatisticsResponse>;
+    recordCookieConsent: (
+      params?: messages.UserRecordCookieConsentRequest,
+    ) => Promise<messages.UserRecordCookieConsentResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;
@@ -7082,9 +7146,15 @@ export namespace controllers {
     removeRole: (
       params?: messages.UserRemoveRoleRequest,
     ) => Promise<messages.UserRemoveRoleResponse>;
+    reportReadme: (
+      params?: messages.UserReportReadmeRequest,
+    ) => Promise<messages.UserReportReadmeResponse>;
     revokeAPIToken: (
       params?: messages.UserRevokeAPITokenRequest,
     ) => Promise<messages.UserRevokeAPITokenResponse>;
+    saveReadme: (
+      params?: messages.UserSaveReadmeRequest,
+    ) => Promise<messages.UserSaveReadmeResponse>;
     selectCoderOfTheMonth: (
       params?: messages.UserSelectCoderOfTheMonthRequest,
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;
