@@ -212,10 +212,14 @@ export default class Ephemeral extends Vue {
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   readonly themeToRef: { [key: string]: string } = {
-    [Util.MonacoThemes
-      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
-    [Util.MonacoThemes
-      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+    [Util.MonacoThemes.VSLight]: new URL(
+      './golden-layout/goldenlayout-light-theme.css',
+      import.meta.url,
+    ).href,
+    [Util.MonacoThemes.VSDark]: new URL(
+      './golden-layout/goldenlayout-dark-theme.css',
+      import.meta.url,
+    ).href,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -844,5 +848,5 @@ a:hover {
   color: var(--zip-button-color--hover);
 }
 
-@import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
+@import './golden-layout/goldenlayout-base.css';
 </style>
