@@ -184,7 +184,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 $isDeadlock = in_array($errorCode, [1205, 1213]);
 
                 if (!$isDeadlock) {
-                    throw $e;// throw immediately for non-deadlock errors
+                    throw $e; // throw immediately for non-deadlock errors
                 }
 
                 $retryCount++;
