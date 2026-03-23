@@ -30,6 +30,7 @@
           @update-existing-options="
             (query) => $emit('update-search-result-problems', query)
           "
+          @keydown="handleKeyDown"
         ></omegaup-common-typeahead>
         <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
@@ -114,6 +115,17 @@ export default class ProblemSearchBar extends Vue {
 
   get currentKeywordValue(): null | string {
     return this.currentKeyword?.value ?? null;
+  }
+
+  private handleKeyDown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter') return;
+
+    const target = event.target as HTMLInputElement;
+    const query = target?.value?.trim();
+
+    if (!query) return;
+
+    this.$emit('update-search-result-problems', query);
   }
 }
 </script>
