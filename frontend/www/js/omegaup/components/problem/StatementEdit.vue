@@ -93,6 +93,7 @@
           name="contents"
           :value="JSON.stringify(statements)"
         />
+        <input type="hidden" name="language" :value="currentLanguage" />
         <input type="hidden" name="directory" :value="markdownType" />
         <input type="hidden" name="problem_alias" :value="alias" />
         <input type="hidden" name="request" value="markdown" />
@@ -188,7 +189,7 @@ export default class ProblemStatementEdit extends Vue {
   onCurrentMarkdownChange(newMarkdown: string): types.ProblemStatement {
     return {
       images: this.statement.images,
-      language: this.statement.language,
+      language: this.currentLanguage,
       sources: this.statement.sources,
       markdown: newMarkdown,
     };
