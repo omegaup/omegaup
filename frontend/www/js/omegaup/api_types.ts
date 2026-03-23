@@ -3557,6 +3557,9 @@ export namespace types {
     archived: boolean;
     assignments: types.CourseAssignment[];
     clarifications: types.Clarification[];
+    clarificationsPage: number;
+    clarificationsPageSize: number;
+    clarificationsPagerItems: types.PageItem[];
     description: string;
     finish_time?: Date;
     is_admin: boolean;
@@ -6253,8 +6256,6 @@ export namespace messages {
     solved: number;
     tags: { count: number; name: string }[];
   };
-  export type UserRecordCookieConsentRequest = { [key: string]: any };
-  export type UserRecordCookieConsentResponse = {};
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -7134,9 +7135,6 @@ export namespace controllers {
     profileStatistics: (
       params?: messages.UserProfileStatisticsRequest,
     ) => Promise<messages.UserProfileStatisticsResponse>;
-    recordCookieConsent: (
-      params?: messages.UserRecordCookieConsentRequest,
-    ) => Promise<messages.UserRecordCookieConsentResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;
