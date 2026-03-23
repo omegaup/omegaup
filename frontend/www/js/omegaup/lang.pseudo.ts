@@ -1330,6 +1330,7 @@ const translations: { [key: string]: string; } = {
   submissionRunTimeInSeconds: "(%(value) 5)",
   submissionSendFeedback: "(S3nd f33dback)",
   submissionUpdateFeedback: "(Upda73 f33dback)",
+  submissionsListEmpty: "(N0 5ubmi55i0n5 f0und)",
   submissionsListTitle: "(Submi55i0n5 0n 7h3 1a57 24 h0ur5)",
   tagAdded: "(Tag 5ucc355fu11y add3d!)",
   tagNotFound: "(Tag n07 f0und)",

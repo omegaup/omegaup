@@ -55,6 +55,11 @@
             </tr>
           </thead>
           <tbody>
+            <tr v-if="submissions.length === 0">
+              <td class="empty-table-message" colspan="7">
+                {{ T.submissionsListEmpty }}
+              </td>
+            </tr>
             <tr v-for="(submission, index) in submissions" :key="index">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}

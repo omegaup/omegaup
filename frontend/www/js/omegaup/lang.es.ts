@@ -1330,6 +1330,7 @@ const translations: { [key: string]: string; } = {
   submissionRunTimeInSeconds: "%(value) s",
   submissionSendFeedback: "Enviar retroalimentaci\u00f3n",
   submissionUpdateFeedback: "Actualizar retroalimentaci\u00f3n",
+  submissionsListEmpty: "No se encontraron env\u00edos",
   submissionsListTitle: "Env\u00edos realizados en las \u00faltimas 24 horas",
   tagAdded: "Tag agregado exitosamente.",
   tagNotFound: "Etiqueta no encontrada",
