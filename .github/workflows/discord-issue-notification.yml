@@ -32,7 +32,7 @@ jobs:
             for label in "${ALLOWED_LABELS[@]}"; do
               if [ "$(echo "$CURRENT_LABEL" | tr '[:upper:]' '[:lower:]')" == "$(echo "$label" | tr '[:upper:]' '[:lower:]')" ]; then
                 echo "should_notify=true" >> $GITHUB_OUTPUT
-                echo "matched_label=$CURRENT_LABEL" >> $GITHUB_OUTPUT
+                echo "matched_label=$label" >> $GITHUB_OUTPUT
                 exit 0
               fi
             done
