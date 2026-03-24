@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container fluid class="p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -314,7 +314,7 @@
             :key="`skeleton-${index}`"
             cols="12"
             md="6"
-            lg="4"
+            lg="3"
             class="mb-4"
           >
             <omegaup-contest-skeleton></omegaup-contest-skeleton>
@@ -331,8 +331,8 @@
             :key="contestItem.contest_id"
             cols="12"
             md="6"
-            lg="4"
-            class="mb-4"
+            lg="3"
+            class="mb-4 d-flex align-items-stretch"
           >
             <omegaup-contest-card :contest="contestItem">
               <!-- Slots -->
@@ -426,7 +426,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -462,7 +462,7 @@ import {
   DropdownPlugin,
   LayoutPlugin,
 } from 'bootstrap-vue';
-import ContestCard from './ContestCard.vue';
+import ContestCard from './ContestCardv2.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
 import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
