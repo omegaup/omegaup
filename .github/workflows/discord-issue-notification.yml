@@ -2,7 +2,7 @@ name: Discord Issue Notification
 
 on:
   issues:
-    types: [labeled, opened]
+    types: [labeled]
 
 jobs:
   notify-discord:
@@ -15,28 +15,13 @@ jobs:
           ALLOWED_LABELS=("GSoC" "good first issue")
           CURRENT_LABEL="${{ github.event.label.name }}"
 
-          # For 'opened' events, check all labels
-          if [ "${{ github.event.action }}" == "opened" ]; then
-            ISSUE_LABELS='${{ toJSON(github.event.issue.labels.*.name) }}'
-            for label in "${ALLOWED_LABELS[@]}"; do
-              if echo "$ISSUE_LABELS" | grep -iq "\"$label\""; then
-                echo "should_notify=true" >> $GITHUB_OUTPUT
-                echo "matched_label=$label" >> $GITHUB_OUTPUT
-                exit 0
-              fi
-            done
-          fi
-
-          # For 'labeled' events, check the specific label (case-insensitive)
-          if [ "${{ github.event.action }}" == "labeled" ]; then
-            for label in "${ALLOWED_LABELS[@]}"; do
-              if [ "$(echo "$CURRENT_LABEL" | tr '[:upper:]' '[:lower:]')" == "$(echo "$label" | tr '[:upper:]' '[:lower:]')" ]; then
-                echo "should_notify=true" >> $GITHUB_OUTPUT
-                echo "matched_label=$label" >> $GITHUB_OUTPUT
-                exit 0
-              fi
-            done
-          fi
+          for label in "${ALLOWED_LABELS[@]}"; do
+            if [ "$(echo "$CURRENT_LABEL" | tr '[:upper:]' '[:lower:]')" == "$(echo "$label" | tr '[:upper:]' '[:lower:]')" ]; then
+              echo "should_notify=true" >> $GITHUB_OUTPUT
+              echo "matched_label=$label" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          done
 
           echo "should_notify=false" >> $GITHUB_OUTPUT
 
