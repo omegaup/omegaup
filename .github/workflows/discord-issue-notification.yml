@@ -1,4 +1,4 @@
-name: Discord Issue Thread Notification
+name: Discord Issue Notification
 
 on:
   issues:
@@ -19,7 +19,7 @@ jobs:
           if [ "${{ github.event.action }}" == "opened" ]; then
             ISSUE_LABELS='${{ toJSON(github.event.issue.labels.*.name) }}'
             for label in "${ALLOWED_LABELS[@]}"; do
-              if echo "$ISSUE_LABELS" | grep -q "\"$label\""; then
+              if echo "$ISSUE_LABELS" | grep -iq "\"$label\""; then
                 echo "should_notify=true" >> $GITHUB_OUTPUT
                 echo "matched_label=$label" >> $GITHUB_OUTPUT
                 exit 0
@@ -27,10 +27,10 @@ jobs:
             done
           fi
 
-          # For 'labeled' events, check the specific label
+          # For 'labeled' events, check the specific label (case-insensitive)
           if [ "${{ github.event.action }}" == "labeled" ]; then
             for label in "${ALLOWED_LABELS[@]}"; do
-              if [ "$CURRENT_LABEL" == "$label" ]; then
+              if [ "$(echo "$CURRENT_LABEL" | tr '[:upper:]' '[:lower:]')" == "$(echo "$label" | tr '[:upper:]' '[:lower:]')" ]; then
                 echo "should_notify=true" >> $GITHUB_OUTPUT
                 echo "matched_label=$label" >> $GITHUB_OUTPUT
                 exit 0
@@ -194,14 +194,7 @@ jobs:
               description = 'No text description available (contains only images/code/links)';
             }
 
-            // Create thread name (max 100 chars) - include label emoji
-            let threadName = `${labelEmoji} Issue #${issue.number}: ${issue.title}`;
-            if (threadName.length > 100) {
-              threadName = threadName.substring(0, 97).replace(/[\uD800-\uDBFF]$/, '') + '...';
-            }
-
             const payload = {
-              thread_name: threadName,
               embeds: [{
                 title: `${labelEmoji} Issue #${issue.number}: ${issue.title}`,
                 url: issue.html_url,
@@ -243,7 +236,7 @@ jobs:
               );
             }
 
-            const webhookUrl = new URL(webhookUrlString + '?wait=true');
+            const webhookUrl = new URL(webhookUrlString);
 
             const options = {
               hostname: webhookUrl.hostname,
