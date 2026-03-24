@@ -1,14 +1,12 @@
 <template>
   <div class="problem-list mr-3 mr-lg-0">
-    <div v-if="inAssignment" class="active" data-breadcrumbs>
-      <span>
-        <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
-        <a class="breadcrumbs-link" :href="urlAssignment">{{ courseName }}</a>
-        <template v-if="currentAssignment">
-          > <span class="breadcrumbs-link">{{ currentAssignment.name }}</span>
-        </template>
-      </span>
-    </div>
+   <b-breadcrumb v-if="inAssignment" data-breadcrumbs>
+      <b-breadcrumb-item href="/course/">{{ T.navCourses }}</b-breadcrumb-item>
+      <b-breadcrumb-item :href="urlAssignment">{{ courseName }}</b-breadcrumb-item>
+      <b-breadcrumb-item v-if="currentAssignment" active>
+        {{ currentAssignment.name }}
+      </b-breadcrumb-item>
+    </b-breadcrumb>
     <div class="summary" :class="{ active: !activeProblem }">
       <a
         class="name"
@@ -122,9 +120,6 @@ export default class ArenaNavbarProblems extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-.problem-list .breadcrumbs-link {
-  display: inherit;
-}
 
 .problem-list > div {
   width: 19em;
