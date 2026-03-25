@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container fluid class="p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -201,10 +201,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.finish_time)"
-                    :title="contestItem.finish_time.toLocaleString()"
-                  >
+                  <a :href="getTimeLink(contestItem.finish_time)">
                     {{ currentContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -274,10 +271,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.start_time)"
-                    :title="contestItem.start_time.toLocaleString()"
-                  >
+                  <a :href="getTimeLink(contestItem.start_time)">
                     {{ futureContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -350,10 +344,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.finish_time)"
-                    :title="contestItem.finish_time.toLocaleString()"
-                  >
+                  <a :href="getTimeLink(contestItem.start_time)">
                     {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -396,7 +387,7 @@
         </b-tab>
       </b-tabs>
     </b-card>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -776,7 +767,8 @@ export default ArenaContestList;
 }
 
 .contest-card {
-  height: 150px;
+  min-height: 150px;
+  height: auto;
   padding: 1rem;
 }
 
