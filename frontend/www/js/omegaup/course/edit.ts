@@ -273,7 +273,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.contentOrderUpdated);
-
+                frontend / www / js / omegaup / components / course / Edit.vue;
                 // ✅ Reset flag
                 component.assignmentList.contentOrderChanged = false;
 

@@ -17,10 +17,7 @@
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortContent }">
-          <tr
-            v-for="assignment in currentContent"
-            :key="assignment.alias"
-          >
+          <tr v-for="assignment in currentContent" :key="assignment.alias">
             <td>
               <button
                 v-tooltip="T.courseAssignmentReorder"

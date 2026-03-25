@@ -51,7 +51,7 @@
         >
       </li>
 
-      <li class="nav-item" role="presentation" data-course-edit-students">
+      <li class="nav-item" role="presentation" data-course-edit-students>
         <a
           href="#students"
           class="nav-link"
@@ -135,13 +135,52 @@
               $emit('sort-content', courseAlias, contentAliases)
           "
         ></omegaup-course-assignment-list>
+        <omegaup-course-assignment-details
+          ref="assignment-details"
+          :unlimited-duration-course="!data.course.finish_time"
+          :finish-time-course="data.course.finish_time"
+          :start-time-course="data.course.start_time"
+          :assignment="assignment"
+          :assignment-problems="assignmentProblems"
+          :tagged-problems="data.taggedProblems"
+          :invalid-parameter-name="invalidParameterName"
+          :assignment-form-mode.sync="assignmentFormMode"
+          :course-alias="data.course.alias"
+          :search-result-problems="searchResultProblems"
+          @update-search-result-problems="
+            (query) => $emit('update-search-result-problems', query)
+          "
+          @add-problem="
+            (assignment, problem) => $emit('add-problem', assignment, problem)
+          "
+          @emit-add-problem="
+            (assignment, problemAlias) =>
+              $emit('add-problem', assignment, problemAlias)
+          "
+          @emit-select-assignment="
+            (assignment) => $emit('select-assignment', assignment)
+          "
+          @remove-problem="
+            (assignment, problem) =>
+              $emit('remove-problem', assignment, problem)
+          "
+          @sort-problems="
+            (assignmentAlias, problemsAlias) =>
+              $emit('sort-problems', assignmentAlias, problemsAlias)
+          "
+          @cancel="onResetAssignmentForm"
+          @add-assignment="(params) => $emit('add-assignment', params)"
+          @update-assignment="(params) => $emit('update-assignment', params)"
+          @get-versions="(request) => $emit('get-versions', request)"
+        >
+        </omegaup-course-assignment-details>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import common_Archive from '../common/Archive.vue';
@@ -164,16 +203,6 @@ const finishTime = new Date();
 finishTime.setHours(finishTime.getHours() + 5);
 const defaultStartTime = now;
 const defaultFinishTime = finishTime;
-const availableTabs = [
-  'course',
-  'content',
-  'problems',
-  'admission-mode',
-  'students',
-  'admins',
-  'clone',
-  'archive',
-];
 const emptyAssignment: types.CourseAssignment = {
   problemset_id: 0,
   alias: '',
@@ -208,7 +237,7 @@ const emptyAssignment: types.CourseAssignment = {
   },
 })
 export default class CourseEdit extends Vue {
-  @Ref('assignmentList') readonly assignmentList!: any;
+  @Ref('assignmentList') readonly assignmentList!: Vue;
 
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
@@ -230,7 +259,7 @@ export default class CourseEdit extends Vue {
   assignments = this.data.course.assignments;
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
-  assignment = {} as any;
+  assignment: types.CourseAssignment = emptyAssignment;
   token = '';
 
   get courseURL(): string {
@@ -244,7 +273,7 @@ export default class CourseEdit extends Vue {
       this.assignmentList.contentOrderChanged
     ) {
       const confirmed = confirm(
-        'You have unsaved changes in the content order. Do you want to discard them?'
+        'You have unsaved changes in the content order. Do you want to discard them?',
       );
       if (!confirmed) {
         return;
@@ -257,8 +286,6 @@ export default class CourseEdit extends Vue {
 
     this.showTab = newTab;
   }
-
-  // ✅ ADDED (missing original method — required)
   onResetAssignmentForm(): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.Default;
     window.scrollTo(0, 0);
