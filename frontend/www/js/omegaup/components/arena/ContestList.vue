@@ -276,6 +276,22 @@
                   <template #contest-button-see-details>
                     <div v-if="tab === ContestTab.Past"></div>
                   </template>
+
+                  <template #contest-button-virtual>
+                    <div
+                      v-if="
+                        tab === ContestTab.Current || tab === ContestTab.Future
+                      "
+                    ></div>
+                  </template>
+
+                  <template #contest-button-practice>
+                    <div
+                      v-if="
+                        tab === ContestTab.Current || tab === ContestTab.Future
+                      "
+                    ></div>
+                  </template>
                 </omegaup-contest-card>
               </div>
             </div>
@@ -402,6 +418,24 @@
 
               <template #contest-button-see-details>
                 <div v-if="viewAllCategory === ContestTab.Past"></div>
+              </template>
+
+              <template #contest-button-virtual>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Current ||
+                    viewAllCategory === ContestTab.Future
+                  "
+                ></div>
+              </template>
+
+              <template #contest-button-practice>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Current ||
+                    viewAllCategory === ContestTab.Future
+                  "
+                ></div>
               </template>
             </omegaup-contest-card>
           </b-col>
@@ -899,6 +933,9 @@ export default ArenaContestList;
 
 .btn-primary {
   background-color: var(--arena-button-border-color) !important;
+}
+
+.input-group .btn-primary {
   height: 2.5rem;
   width: 7.5rem;
   display: flex;
