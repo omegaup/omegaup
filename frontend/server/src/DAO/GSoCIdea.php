@@ -7,49 +7,7 @@ namespace OmegaUp\DAO;
  */
 class GSoCIdea extends \OmegaUp\DAO\Base\GSoCIdea {
     /**
-     * @param array{
-     *     idea_id: int|string,
-     *     edition_id: int|string|null,
-     *     title: string,
-     *     brief_description: string|null,
-     *     expected_results: string|null,
-     *     preferred_skills: string|null,
-     *     possible_mentors: string|null,
-     *     estimated_hours: int|string|null,
-     *     skill_level: string|null,
-     *     status: string|null,
-     *     blog_link: string|null,
-     *     contributor_username: string|null,
-     *     created_at: string,
-     *     updated_at: string
-     * } $row
-     * @return array{idea_id: int, edition_id: int, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|null, skill_level: string|null, status: string, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}
-     */
-    private static function toPublicArray(array $row): array {
-        return [
-            'idea_id' => intval($row['idea_id']),
-            'edition_id' => intval($row['edition_id'] ?? 0),
-            'title' => $row['title'],
-            'brief_description' => $row['brief_description'],
-            'expected_results' => $row['expected_results'],
-            'preferred_skills' => $row['preferred_skills'],
-            'possible_mentors' => $row['possible_mentors'],
-            'estimated_hours' => is_null(
-                $row['estimated_hours']
-            ) ? null : intval(
-                $row['estimated_hours']
-            ),
-            'skill_level' => $row['skill_level'],
-            'status' => is_null($row['status']) ? 'Proposed' : $row['status'],
-            'blog_link' => $row['blog_link'],
-            'contributor_username' => $row['contributor_username'],
-            'created_at' => $row['created_at'],
-            'updated_at' => $row['updated_at'],
-        ];
-    }
-
-    /**
-     * @return list<array{idea_id: int, edition_id: int, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|null, skill_level: string|null, status: string, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}>
+     * @return list<array{idea_id: int|string, edition_id: int|string|null, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|string|null, skill_level: string|null, status: string|null, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}>
      */
     public static function getIdeas(
         ?int $editionId = null,
@@ -92,18 +50,11 @@ class GSoCIdea extends \OmegaUp\DAO\Base\GSoCIdea {
         }
         $sql .= ' ORDER BY e.year DESC, i.created_at DESC;';
 
-        /** @var list<array{idea_id: int|string, edition_id: int|string|null, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|string|null, skill_level: string|null, status: string|null, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}> */
-        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
-
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = self::toPublicArray($row);
-        }
-        return $result;
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
-     * @return array{idea_id: int, edition_id: int, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|null, skill_level: string|null, status: string, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}|null
+     * @return array{idea_id: int|string, edition_id: int|string|null, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|string|null, skill_level: string|null, status: string|null, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}|null
      */
     public static function getIdeaById(int $ideaId): ?array {
         $sql = '
@@ -135,12 +86,7 @@ class GSoCIdea extends \OmegaUp\DAO\Base\GSoCIdea {
             LIMIT 1;
         ';
 
-        /** @var array{idea_id: int|string, edition_id: int|string|null, title: string, brief_description: string|null, expected_results: string|null, preferred_skills: string|null, possible_mentors: string|null, estimated_hours: int|string|null, skill_level: string|null, status: string|null, blog_link: string|null, contributor_username: string|null, created_at: string, updated_at: string}|null */
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$ideaId]);
-        if (empty($row)) {
-            return null;
-        }
-        return self::toPublicArray($row);
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$ideaId]);
     }
 
     public static function createIdea(

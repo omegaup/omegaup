@@ -7,72 +7,42 @@ namespace OmegaUp\DAO;
  */
 class GSoCEdition extends \OmegaUp\DAO\Base\GSoCEdition {
     /**
-     * @return array{edition_id: int, year: int, is_active: bool, application_deadline: string|null, created_at: string, updated_at: string}
-     */
-    private static function toPublicArray(
-        \OmegaUp\DAO\VO\GSoCEdition $edition
-    ): array {
-        return [
-            'edition_id' => intval($edition->edition_id),
-            'year' => intval($edition->year),
-            'is_active' => boolval($edition->is_active),
-            'application_deadline' => is_null($edition->application_deadline)
-                ? null
-                : \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                    $edition->application_deadline
-                ),
-            'created_at' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $edition->created_at
-            ),
-            'updated_at' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $edition->updated_at
-            ),
-        ];
-    }
-
-    /**
-     * @return list<array{edition_id: int, year: int, is_active: bool, application_deadline: string|null, created_at: string, updated_at: string}>
+     * @return list<array{application_deadline: null|string, created_at: null|string, edition_id: int, is_active: bool, updated_at: null|string, year: int}>
      */
     public static function getEditions(): array {
-        $result = [];
-        foreach (self::getAll() as $edition) {
-            $result[] = self::toPublicArray($edition);
-        }
-        usort(
-            $result,
-            /**
-             * @param array{year: int} $a
-             * @param array{year: int} $b
-             */
-            function (array $a, array $b): int {
-                return $b['year'] <=> $a['year'];
-            }
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GSoCEdition::FIELD_NAMES,
+            'ge'
         );
-        return $result;
+        $sql = "
+            SELECT
+                {$fields}
+            FROM
+                `GSoC_Edition` `ge`
+            ORDER BY
+                `ge`.`year` DESC
+            LIMIT 50;
+        ";
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
-     * @return array{edition_id: int, year: int, is_active: bool, application_deadline: string|null, created_at: string, updated_at: string}|null
+     * @return array{application_deadline: null|string, created_at: null|string, edition_id: int, is_active: bool, updated_at: null|string, year: int}|null
      */
     public static function getEditionByYear(int $year): ?array {
-        $sql = '
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\GSoCEdition::FIELD_NAMES,
+            'ge'
+        );
+        $sql = "
             SELECT
-                edition_id
+                {$fields}
             FROM
-                GSoC_Edition
+                `GSoC_Edition` `ge`
             WHERE
-                year = ?
+                `ge`.`year` = ?
             LIMIT 1;
-        ';
-        /** @var array{edition_id: int|string}|null */
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$year]);
-        if (empty($row)) {
-            return null;
-        }
-        $edition = self::getByPK(intval($row['edition_id']));
-        if (is_null($edition)) {
-            return null;
-        }
-        return self::toPublicArray($edition);
+        ";
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$year]);
     }
 }
