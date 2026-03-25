@@ -75,6 +75,10 @@ OmegaUp.on('ready', () => {
           isLoading: this.isLoading,
         },
         on: {
+          'update:tab': (newTab: AvailableTabs) => {
+            this.tab = newTab;
+            window.location.hash = `#${newTab}`;
+          },
           'update-teams-group': ({
             name,
             description,
@@ -394,11 +398,8 @@ OmegaUp.on('ready', () => {
     }
 
     teamsGroupEdit.tab = hash as AvailableTabs;
-    console.log('hashchange detected:', hash);
   };
 
-  // set initial tab from hash
-  onHashChange();
-  // listen for future navigation
   window.addEventListener('hashchange', onHashChange);
+  onHashChange();
 });
