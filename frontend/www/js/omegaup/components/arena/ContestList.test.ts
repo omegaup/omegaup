@@ -230,6 +230,43 @@ describe('ContestList.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should hide empty summary sections in ArenaV2 view', async () => {
+    const contestsWithOnlyPast: types.ContestList = {
+      current: [],
+      future: [],
+      past: contests.past,
+    };
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests: contestsWithOnlyPast,
+        tab: ContestTab.Current,
+      },
+    });
+
+    const sections = wrapper.findAll('.section-container');
+    expect(sections.length).toBe(1);
+    expect(wrapper.text()).toContain('Past Contest 1');
+    expect(wrapper.text()).not.toContain('Current Contest 1');
+    expect(wrapper.text()).not.toContain('Future Contest 1');
+  });
+
+  it('Should show empty message when all summary sections are empty', async () => {
+    const emptyContests: types.ContestList = {
+      current: [],
+      future: [],
+      past: [],
+    };
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests: emptyContests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    expect(wrapper.findAll('.section-container').length).toBe(0);
+    expect(wrapper.text()).toContain(T.contestListEmpty);
+  });
+
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {

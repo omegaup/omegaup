@@ -159,15 +159,14 @@
 
     <!-- Summary View (Horizontal Scrolling) -->
     <div v-if="!viewAllCategory">
+      <div v-if="visibleContestTabs.length === 0" class="empty-category">
+        {{ T.contestListEmpty }}
+      </div>
       <div
-        v-for="(tab, index) in [
-          ContestTab.Current,
-          ContestTab.Future,
-          ContestTab.Past,
-        ]"
+        v-for="(tab, index) in visibleContestTabs"
         :key="tab"
         class="mb-5 section-container"
-        :class="{ 'section-separator': index < 2 }"
+        :class="{ 'section-separator': index < visibleContestTabs.length - 1 }"
       >
         <div
           class="d-flex justify-content-between align-items-center mb-3 px-3"
@@ -197,13 +196,7 @@
             class="horizontal-scroll-container px-3 pb-3"
             @scroll="onScroll(tab)"
           >
-            <div
-              v-if="getContestsForTab(tab).length === 0"
-              class="text-muted font-italic ml-3"
-            >
-              {{ T.contestListEmpty }}
-            </div>
-            <div v-else class="d-flex">
+            <div class="d-flex">
               <div
                 v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
                 :key="contestItem.contest_id"
@@ -588,6 +581,12 @@ class ArenaContestList extends Vue {
       default:
         return [];
     }
+  }
+
+  get visibleContestTabs(): ContestTab[] {
+    return [ContestTab.Current, ContestTab.Future, ContestTab.Past].filter(
+      (tab) => this.getContestsForTab(tab).length > 0,
+    );
   }
 
   onSearchQuery() {
