@@ -2,7 +2,7 @@ name: Discord Issue Notification
 
 on:
   issues:
-    types: [labeled, opened]
+    types: [opened, labeled]
 
 jobs:
   notify-discord:
@@ -13,9 +13,10 @@ jobs:
         id: check-label
         run: |
           ALLOWED_LABELS=("GSoC" "good first issue")
-          CURRENT_LABEL="${{ github.event.label.name }}"
 
-          # For 'opened' events, check all labels
+          # For 'opened' events: scan all labels, notify for the first qualifying one.
+          # This ensures exactly one notification even if the issue has multiple
+          # qualifying labels applied at creation time.
           if [ "${{ github.event.action }}" == "opened" ]; then
             ISSUE_LABELS='${{ toJSON(github.event.issue.labels.*.name) }}'
             for label in "${ALLOWED_LABELS[@]}"; do
@@ -25,10 +26,26 @@ jobs:
                 exit 0
               fi
             done
+            echo "should_notify=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
-          # For 'labeled' events, check the specific label (case-insensitive)
+          # For 'labeled' events: only notify if the issue is older than 60 seconds.
+          # Labels applied at issue creation also fire 'labeled' events, which are
+          # already handled by the 'opened' branch above. The age check suppresses
+          # those duplicates while still catching labels added to existing issues.
           if [ "${{ github.event.action }}" == "labeled" ]; then
+            CREATED_AT="${{ github.event.issue.created_at }}"
+            CREATED_TS=$(date -d "$CREATED_AT" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$CREATED_AT" +%s)
+            NOW_TS=$(date +%s)
+            AGE=$((NOW_TS - CREATED_TS))
+
+            if [ "$AGE" -lt 60 ]; then
+              echo "should_notify=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            CURRENT_LABEL="${{ github.event.label.name }}"
             for label in "${ALLOWED_LABELS[@]}"; do
               if [ "$(echo "$CURRENT_LABEL" | tr '[:upper:]' '[:lower:]')" == "$(echo "$label" | tr '[:upper:]' '[:lower:]')" ]; then
                 echo "should_notify=true" >> $GITHUB_OUTPUT
