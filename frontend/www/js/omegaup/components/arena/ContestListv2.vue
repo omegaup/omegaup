@@ -355,6 +355,9 @@
               <template #contest-button-see-details>
                 <div></div>
               </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
             </omegaup-contest-card>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Past">
