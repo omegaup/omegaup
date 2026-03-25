@@ -168,6 +168,7 @@
         :key="tab"
         class="mb-5 section-container"
         :class="{ 'section-separator': index < 2 }"
+        v-if="getContestsForTab(tab).length > 0"
       >
         <div
           class="d-flex justify-content-between align-items-center mb-3 px-3"
