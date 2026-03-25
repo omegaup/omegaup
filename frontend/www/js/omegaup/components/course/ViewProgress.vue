@@ -17,7 +17,7 @@
             </h6>
           </div>
           <div class="table-responsive">
-            <table class="table table-striped table-fixed mb-0 d-block">
+            <table class="table table-striped table-fixed mb-0">
               <thead>
                 <tr>
                   <th class="text-center align-middle">
@@ -417,12 +417,15 @@ export default class CourseViewProgress extends Vue {
       top: 0;
       z-index: 1;
       background: white;
+      min-width: 150px;
+      white-space: nowrap;
 
       &:first-child {
         position: sticky;
         left: 0;
         background: white;
         z-index: 2;
+        min-width: 180px;
       }
     }
   }

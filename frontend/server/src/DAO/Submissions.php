@@ -294,6 +294,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ?int $page = 1,
         ?int $rowsPerPage = 100,
     ): array {
+        $rowsPerPage = min(100, max(1, intval($rowsPerPage)));
         $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
         if (is_null($identityId)) {
             $indexHint = 'USE INDEX(PRIMARY)';
