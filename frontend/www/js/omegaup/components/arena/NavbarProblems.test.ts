@@ -33,6 +33,10 @@ describe('NavbarProblems.vue', () => {
         inAssignment: true,
         problems: [],
       },
+      stubs: {
+     'b-breadcrumb': true,
+    'b-breadcrumb-item': true,
+    },
     });
 
     expect(wrapper.find('div[data-breadcrumbs]').text()).toMatch(
@@ -53,6 +57,10 @@ describe('NavbarProblems.vue', () => {
         inAssignment: false,
         problems: [],
       },
+       stubs: {
+     'b-breadcrumb': true,
+    'b-breadcrumb-item': true,
+    },
     });
 
     expect(wrapper.find('div[data-breadcrumbs]').exists()).toBeFalsy();
