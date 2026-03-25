@@ -184,25 +184,18 @@ export default class Homepage extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
-
   cookieClickedAccept() {
-    // Set client-side cookie with Secure flag and year-9999 expiry
-    this.$cookies.set('accept-cookies', true, -1, '/', undefined, true);
-    // Emit event to parent to handle server notification
-    this.$emit('record-cookie-consent', { accepted: true });
+    // TODO: make an API to send the response to the server
+    this.$cookies.set('accept-cookies', true, -1);
   }
 
   cookieClickedDecline() {
-    // Set client-side cookie with Secure flag and year-9999 expiry
-    this.$cookies.set('accept-cookies', false, -1, '/', undefined, true);
-    // Emit event to parent to handle server notification
-    this.$emit('record-cookie-consent', { accepted: false });
+    // TODO: make an API to send the response to the server
+    this.$cookies.set('accept-cookies', false, -1);
   }
 
   cookieClickedPostpone() {
-    // Set a short-lived session cookie (1 day) so banner reappears on next visit
-    // without recording a permanent decision
-    this.$cookies.set('cookie-consent-postponed', true, '1d');
+    // TODO: make an API to send the response to the server
   }
 }
 </script>
