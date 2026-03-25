@@ -20,8 +20,8 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ?\OmegaUp\DAO\VO\Courses $course,
         bool $isAdmin,
         \OmegaUp\DAO\VO\Identities $currentIdentity,
-        ?int $offset,
-        int $rowcount
+        int $page = 1,
+        int $pageSize = 100,
     ): array {
         if (!is_null($contest)) {
             $sqlProblemsets = '
@@ -88,7 +88,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 COUNT(*)
         ';
 
-        $sql = '
+        $sqlSelect = '
             SELECT
                 cl.clarification_id,
                 ps.assignment_alias AS assignment_alias,
@@ -101,45 +101,25 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 cl.public
         ';
 
-        $query = $sql . $sqlFrom;
         $countQuery = $sqlCount . $sqlFrom;
 
-        $sqlLimit = '';
-        if (!is_null($offset)) {
-            $sqlLimit = 'LIMIT ?, ?';
-            $params[] = max(0, $offset - 1) * $rowcount;
-            $params[] = $rowcount;
-        }
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $countQuery,
+            $params
+        ) ?? 0;
 
-        $query .= $sqlOrderBy . $sqlLimit;
+        $sqlLimit = 'LIMIT ?, ?';
+        $params[] = max(0, $page - 1) * $pageSize;
+        $params[] = $pageSize;
+
+        $query = $sqlSelect . $sqlFrom . $sqlOrderBy . $sqlLimit;
 
         /** @var list<array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params
         );
-
-        // If we didn't get an offset, we know the total number of rows
-        // already, no need to query the database for it.
-        $totalRows = count($clarifications);
-        if (!is_null($offset) && $offset != 0) {
-            if ($totalRows != $rowcount) {
-                // If we did get an offset, but the number of rows we got is
-                // less than what we allowed, we've already reached the end
-                // of the list so just bump up the count to account for the
-                // starting position.
-                $totalRows += ($offset - 1) * $rowcount;
-            } else {
-                // If we exhausted the maximum number of rows to fetch it's
-                // possible there are more rows than we know about at this
-                // point, thus we need to actually query the database.
-                /** @var int */
-                $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-                    $countQuery,
-                    $params
-                ) ?? 0;
-            }
-        }
 
         return [
             'totalRows' => $totalRows,

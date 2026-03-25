@@ -2507,6 +2507,63 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testUpdateStatementProblemViaSubmitWithValidLanguage() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        $login = self::login($problemData['author']);
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+                'request' => 'markdown',
+                'message' => 'Update statement in english',
+                'directory' => 'statements',
+                'language' => 'en',
+                'contents' => json_encode([
+                    'en' => 'English statement',
+                ]),
+            ])
+        )['templateProperties'];
+
+        $this->assertArrayHasKey('payload', $response);
+        $this->assertSame('en', $response['payload']['statement']['language']);
+        $this->assertStringContainsString(
+            'English statement',
+            $response['payload']['statement']['markdown']
+        );
+    }
+
+    public function testUpdateStatementProblemViaSubmitWithInvalidLanguage() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        $login = self::login($problemData['author']);
+
+        try {
+            \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'problem' => $problemAlias,
+                    'request' => 'markdown',
+                    'message' => 'Update statement with invalid language',
+                    'directory' => 'statements',
+                    'language' => 'fr',
+                    'contents' => json_encode([
+                        'en' => 'English statement',
+                    ]),
+                ])
+            );
+            $this->fail('Expected update to fail');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame(
+                'parameterNotInExpectedSet',
+                $e->getMessage()
+            );
+        }
+    }
+
     public function testCommitModifiedZipExcludesEasyCases(): void {
         // Get a problem
         [

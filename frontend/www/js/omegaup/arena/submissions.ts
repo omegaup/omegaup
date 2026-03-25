@@ -8,6 +8,9 @@ import { OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import T from '../lang';
 
+// Track the previous source blob URL so we can revoke it to prevent memory leaks.
+let previousSourceUrl: string | null = null;
+
 interface RunSubmit {
   classname: string;
   username: string;
@@ -147,9 +150,9 @@ function numericSort<T extends { [key: string]: any }>(key: string) {
         let nx = 0,
           ny = 0;
         while (i < x[key].length && isDigit(x[key][i]))
-          nx = nx * 10 + parseInt(x[key][i++]);
+          nx = nx * 10 + parseInt(x[key][i++], 10);
         while (j < y[key].length && isDigit(y[key][j]))
-          ny = ny * 10 + parseInt(y[key][j++]);
+          ny = ny * 10 + parseInt(y[key][j++], 10);
         i--;
         j--;
         if (nx != ny) return nx - ny;
@@ -202,9 +205,18 @@ function displayRunDetails({
       judged_by: runDetails.judged_by || '',
       source: sourceHTML,
       source_link: sourceLink,
-      source_url: window.URL.createObjectURL(
-        new Blob([runDetails.source || ''], { type: 'text/plain' }),
-      ),
+      source_url: (() => {
+        // Revoke the previous blob URL to prevent memory leaks. Each call to
+        // createObjectURL pins the Blob data in memory until revokeObjectURL
+        // is called or the page is unloaded.
+        if (previousSourceUrl) {
+          window.URL.revokeObjectURL(previousSourceUrl);
+        }
+        previousSourceUrl = window.URL.createObjectURL(
+          new Blob([runDetails.source || ''], { type: 'text/plain' }),
+        );
+        return previousSourceUrl;
+      })(),
       source_name: `Main.${runDetails.language}`,
       groups,
       show_diff: request.isAdmin ? runDetails.show_diff : 'none',
@@ -266,4 +278,15 @@ export function onRefreshRuns({
   for (const run of runs) {
     trackRun({ run });
   }
+}
+
+export function onAppendRuns({
+  runs,
+  totalRuns,
+}: {
+  runs: types.Run[];
+  totalRuns: number;
+}): void {
+  runsStore.commit('setTotalRuns', totalRuns);
+  runsStore.commit('appendRuns', runs);
 }
