@@ -45,9 +45,9 @@ describe('NavbarProblems.vue', () => {
 
     expect(wrapper.text()).toMatch(
       new RegExp(
-        `${T.navCourses}.+?>.+?Curso de prueba.+?>.+?Tarea de prueba`,
-        'ms',
-      ),
+      `${T.navCourses}.+?Curso de prueba.+?Tarea de prueba`,
+      'ms',
+    ),
     );
   });
 
