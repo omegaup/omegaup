@@ -17,7 +17,9 @@ describe('Runs.vue', () => {
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
+    expect(wrapper.find('.card-header').text()).toBe(
+      T.arenaRunsLatestSubmissions,
+    );
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 
