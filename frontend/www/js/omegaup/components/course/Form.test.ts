@@ -32,6 +32,9 @@ const baseCourseFormProps = {
     unlimited_duration: false,
     languages: ['py2'],
     teaching_assistant_enabled: false,
+    clarificationsPage: 1,
+    clarificationsPageSize: 100,
+    clarificationsPagerItems: [],
   } as types.CourseDetails,
   update: true,
   searchResultSchools: [
