@@ -236,6 +236,60 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should not render Virtual/Practice dropdown in Current contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    // Virtual/Practice actions are inside the contest dropdown. For the Current tab
+    // they should be hidden entirely (not just visually).
+    expect(wrapper.text()).not.toContain(T.contestVirtualMode);
+    expect(wrapper.text()).not.toContain(T.contestPracticeMode);
+  });
+
+  it('Should not render Virtual/Practice dropdown in Future contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Future,
+      },
+    });
+
+    // Virtual/Practice actions are inside the contest dropdown. For the Future tab
+    // they should be hidden entirely (not just visually).
+    expect(wrapper.text()).not.toContain(T.contestVirtualMode);
+    expect(wrapper.text()).not.toContain(T.contestPracticeMode);
+  });
+
+  it('Should not render contest enrollment status in Current contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    // In the legacy /arena/ layout, Current contests do not show the enrollment label.
+    // `contestEnrollStatus` is a ref on the element rendered by `ContestCard.vue`.
+    expect(wrapper.find('[ref="contestEnrollStatus"]').exists()).toBe(false);
+  });
+
+  it('Should not render contest enrollment status in Future contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Future,
+      },
+    });
+
+    // In the legacy /arena/ layout, Future contests do not show the enrollment label.
+    // `contestEnrollStatus` is a ref on the element rendered by `ContestCard.vue`.
+    expect(wrapper.find('[ref="contestEnrollStatus"]').exists()).toBe(false);
+  });
+
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {

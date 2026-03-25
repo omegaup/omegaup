@@ -209,6 +209,9 @@
               <template #contest-dropdown>
                 <div></div>
               </template>
+              <template #contest-enroll-status>
+                <div></div>
+              </template>
             </omegaup-contest-card>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Current">
@@ -280,6 +283,9 @@
                 <div></div>
               </template>
               <template #contest-dropdown>
+                <div></div>
+              </template>
+              <template #contest-enroll-status>
                 <div></div>
               </template>
             </omegaup-contest-card>
