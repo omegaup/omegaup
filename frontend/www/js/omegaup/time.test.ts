@@ -301,4 +301,79 @@ describe('time', () => {
       }
     });
   });
+
+  describe('getDisplayFor*Contest', () => {
+    const dayMs = 24 * 60 * 60 * 1000;
+    const hourMs = 60 * 60 * 1000;
+
+    // Fixed "now" to make relative outputs deterministic.
+    const now = new Date(2026, 1, 10, 12, 0, 0); // Feb 10, 2026
+    const nowMs = now.getTime();
+
+    let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+    beforeEach(() => {
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => nowMs);
+    });
+    afterEach(() => {
+      if (dateNowSpy) dateNowSpy.mockRestore();
+    });
+
+    describe('getDisplayForPastContest(finishDate)', () => {
+      it.each([
+        [0, 'Terminó hace 0 minutos'],
+        [hourMs * 1, 'Terminó hace 1 hora'],
+        [hourMs * 47, 'Terminó hace 2 días'],
+        [hourMs * 48, 'Terminó hace 2 días'],
+        [dayMs * 3, 'Terminó hace 3 días'],
+        [dayMs * 14, 'Terminó hace 14 días'],
+        [dayMs * 15, 'Terminó hace 15 días'],
+        [dayMs * 30, 'Terminó hace 1 mes'],
+        [dayMs * 89, 'Terminó hace 3 meses'],
+        [dayMs * 90, 'Terminó: 12 noviembre 2025'],
+      ])('formats %p ms correctly', (diffMs, expected) => {
+        const finishDate = new Date(nowMs - diffMs);
+        expect(time.getDisplayForPastContest(finishDate)).toEqual(expected);
+      });
+    });
+
+    describe('getDisplayForCurrentContest(finishDate)', () => {
+      it.each([
+        [0, 'Termina en 0 minutos'],
+        [hourMs * 1, 'Termina en 1 hora'],
+        [hourMs * 47, 'Termina en 2 días'],
+        [hourMs * 48, 'Termina en 2 días'],
+        [dayMs * 3, 'Termina en 3 días'],
+        [dayMs * 14, 'Termina en 14 días'],
+        [dayMs * 15, 'Termina en 15 días'],
+        [dayMs * 30, 'Termina en 1 mes'],
+        [dayMs * 89, 'Termina en 3 meses'],
+        [dayMs * 90, 'Termina: 11 mayo 2026'],
+      ])('formats %p ms correctly', (diffMs, expected) => {
+        const finishDate = new Date(nowMs + diffMs);
+        expect(time.getDisplayForCurrentContest(finishDate)).toEqual(
+          expected,
+        );
+      });
+    });
+
+    describe('getDisplayForFutureContest(startDate)', () => {
+      it.each([
+        [0, 'Empieza en 0 minutos'],
+        [hourMs * 1, 'Empieza en 1 hora'],
+        [hourMs * 47, 'Empieza en 2 días'],
+        [hourMs * 48, 'Empieza en 2 días'],
+        [dayMs * 3, 'Empieza en 3 días'],
+        [dayMs * 14, 'Empieza en 14 días'],
+        [dayMs * 15, 'Empieza en 15 días'],
+        [dayMs * 30, 'Empieza en 1 mes'],
+        [dayMs * 89, 'Empieza en 3 meses'],
+        [dayMs * 90, 'Empieza: 11 mayo 2026'],
+      ])('formats %p ms correctly', (diffMs, expected) => {
+        const startDate = new Date(nowMs + diffMs);
+        expect(time.getDisplayForFutureContest(startDate)).toEqual(
+          expected,
+        );
+      });
+    });
+  });
 });

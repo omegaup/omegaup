@@ -21,22 +21,21 @@ Sugar.extend({
 let remoteDeltaTime: number = 0;
 
 export function formatFutureDateRelative(futureDate: Date): string {
-  let currentLocale;
-  switch (T.locale) {
-    case 'pt':
-      currentLocale = ptLocale;
-      break;
-    case 'en':
-      currentLocale = enLocale;
-      break;
-    default:
-      currentLocale = esLocale;
-      break;
-  }
   return formatDistanceToNow(futureDate, {
     addSuffix: true,
-    locale: currentLocale,
+    locale: getDateFnsLocale(),
   });
+}
+
+function getDateFnsLocale() {
+  switch (T.locale) {
+    case 'pt':
+      return ptLocale;
+    case 'en':
+      return enLocale;
+    default:
+      return esLocale;
+  }
 }
 
 export function formatDelta(delta: number): string {
@@ -291,18 +290,6 @@ export function formatContestDuration(
   startDate: Date,
   finishDate: Date,
 ): string {
-  let currentLocale;
-  switch (T.locale) {
-    case 'pt':
-      currentLocale = ptLocale;
-      break;
-    case 'en':
-      currentLocale = enLocale;
-      break;
-    default:
-      currentLocale = esLocale;
-      break;
-  }
   const delta = finishDate.getTime() - startDate.getTime();
   const months = Math.floor(delta / (30 * 24 * 60 * 60 * 1000));
   if (months >= 1.0) {
@@ -312,7 +299,7 @@ export function formatContestDuration(
         end: finishDate,
       }),
       {
-        locale: currentLocale,
+        locale: getDateFnsLocale(),
       },
     );
   }
@@ -348,26 +335,39 @@ function interpolate(
   );
 }
 
-const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
-const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
 
 function buildDurationString(diffMs: number): string {
-  if (diffMs < FORTY_EIGHT_HOURS_MS) {
-    const totalHours = Math.floor(diffMs / (60 * 60 * 1000));
-    if (totalHours >= 1) {
-      return totalHours === 1
-        ? T.contestDurationHour
-        : interpolate(T.contestDurationHours, { N: totalHours });
-    }
-    const totalMinutes = Math.floor(diffMs / (60 * 1000));
+  const totalMinutes = Math.max(0, Math.round(diffMs / (60 * 1000)));
+  if (diffMs < 60 * 60 * 1000) {
     return totalMinutes === 1
       ? T.contestDurationMinute
       : interpolate(T.contestDurationMinutes, { N: totalMinutes });
   }
-  const totalDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
-  return totalDays === 1
-    ? T.contestDurationDay
-    : interpolate(T.contestDurationDays, { N: totalDays });
+
+  if (diffMs < TWENTY_FOUR_HOURS_MS) {
+    const totalHours = Math.round(diffMs / (60 * 60 * 1000));
+    return totalHours === 1
+      ? T.contestDurationHour
+      : interpolate(T.contestDurationHours, { N: totalHours });
+  }
+
+  if (diffMs < THIRTY_DAYS_MS) {
+    const totalDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
+    return totalDays === 1
+      ? T.contestDurationDay
+      : interpolate(T.contestDurationDays, { N: totalDays });
+  }
+
+  const totalMonths = Math.max(1, Math.round(diffMs / THIRTY_DAYS_MS));
+  return formatDuration(
+    {
+      months: totalMonths,
+    },
+    { locale: getDateFnsLocale() },
+  );
 }
 
 /**
@@ -376,7 +376,7 @@ function buildDurationString(diffMs: number): string {
  */
 export function getDisplayForPastContest(finishDate: Date): string {
   const diffMs = Date.now() - finishDate.getTime();
-  if (diffMs < FIFTEEN_DAYS_MS) {
+  if (diffMs >= 0 && diffMs < NINETY_DAYS_MS) {
     return interpolate(T.contestEndedAgo, {
       duration: buildDurationString(diffMs),
     });
@@ -392,7 +392,7 @@ export function getDisplayForPastContest(finishDate: Date): string {
  */
 export function getDisplayForCurrentContest(finishDate: Date): string {
   const diffMs = finishDate.getTime() - Date.now();
-  if (diffMs > 0 && diffMs < FIFTEEN_DAYS_MS) {
+  if (diffMs >= 0 && diffMs < NINETY_DAYS_MS) {
     return interpolate(T.contestEndsIn, {
       duration: buildDurationString(diffMs),
     });
@@ -408,7 +408,7 @@ export function getDisplayForCurrentContest(finishDate: Date): string {
  */
 export function getDisplayForFutureContest(startDate: Date): string {
   const diffMs = startDate.getTime() - Date.now();
-  if (diffMs > 0 && diffMs < FIFTEEN_DAYS_MS) {
+  if (diffMs >= 0 && diffMs < NINETY_DAYS_MS) {
     return interpolate(T.contestStartsIn, {
       duration: buildDurationString(diffMs),
     });
