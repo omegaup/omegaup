@@ -35,12 +35,12 @@ describe('NavbarProblems.vue', () => {
       },
     });
 
-    expect(wrapper.find('div[data-breadcrumbs]').text()).toMatch(
-      new RegExp(
-        `${T.navCourses}.+?>.+?Curso de prueba.+?>.+?Tarea de prueba`,
-        'ms',
-      ),
-    );
+    const breadcrumbs = wrapper.find('nav[data-breadcrumbs]');
+    expect(breadcrumbs.exists()).toBe(true);
+    expect(breadcrumbs.findAll('li.breadcrumb-item').length).toBe(3);
+    expect(breadcrumbs.text()).toContain(T.navCourses);
+    expect(breadcrumbs.text()).toContain('Curso de prueba');
+    expect(breadcrumbs.text()).toContain('Tarea de prueba');
   });
 
   it('Should handle empty breadcrumbs in contest', async () => {
@@ -55,6 +55,6 @@ describe('NavbarProblems.vue', () => {
       },
     });
 
-    expect(wrapper.find('div[data-breadcrumbs]').exists()).toBeFalsy();
+    expect(wrapper.find('nav[data-breadcrumbs]').exists()).toBeFalsy();
   });
 });

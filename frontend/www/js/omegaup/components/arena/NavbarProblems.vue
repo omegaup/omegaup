@@ -1,14 +1,27 @@
 <template>
   <div class="problem-list mr-3 mr-lg-0">
-    <div v-if="inAssignment" class="active" data-breadcrumbs>
-      <span>
-        <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
-        <a class="breadcrumbs-link" :href="urlAssignment">{{ courseName }}</a>
-        <template v-if="currentAssignment">
-          > <span class="breadcrumbs-link">{{ currentAssignment.name }}</span>
-        </template>
-      </span>
-    </div>
+    <nav
+      v-if="inAssignment"
+      aria-label="breadcrumb"
+      class="breadcrumb-container"
+      data-breadcrumbs
+    >
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item">
+          <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a class="breadcrumbs-link" :href="urlAssignment">{{ courseName }}</a>
+        </li>
+        <li
+          v-if="currentAssignment"
+          class="breadcrumb-item active"
+          aria-current="page"
+        >
+          {{ currentAssignment.name }}
+        </li>
+      </ol>
+    </nav>
     <div class="summary" :class="{ active: !activeProblem }">
       <a
         class="name"
