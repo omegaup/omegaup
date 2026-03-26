@@ -320,7 +320,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     s.identity_id = ?
                     AND s.type= \'normal\'
                     AND s.problemset_id IS NOT NULL
-                    AND archived = 0
+                    AND c2.archived = 0
             )
             ORDER BY
                 c.contest_id DESC;';

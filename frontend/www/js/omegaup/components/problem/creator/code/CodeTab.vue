@@ -207,7 +207,7 @@ export default class CodeTab extends Vue {
     if (file) {
       this.selectedFileName = file.name;
       if (this.inputLimit && file.size >= this.inputLimit) {
-        alert(
+        ui.error(
           ui.formatString(T.problemCreatorCodeUploadFilesize, {
             limit: `${this.inputLimit / 1024} KiB`,
           }),
