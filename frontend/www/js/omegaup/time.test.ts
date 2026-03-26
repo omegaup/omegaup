@@ -350,9 +350,7 @@ describe('time', () => {
         [dayMs * 90, 'Termina: 11 mayo 2026'],
       ])('formats %p ms correctly', (diffMs, expected) => {
         const finishDate = new Date(nowMs + diffMs);
-        expect(time.getDisplayForCurrentContest(finishDate)).toEqual(
-          expected,
-        );
+        expect(time.getDisplayForCurrentContest(finishDate)).toEqual(expected);
       });
     });
 
@@ -370,9 +368,7 @@ describe('time', () => {
         [dayMs * 90, 'Empieza: 11 mayo 2026'],
       ])('formats %p ms correctly', (diffMs, expected) => {
         const startDate = new Date(nowMs + diffMs);
-        expect(time.getDisplayForFutureContest(startDate)).toEqual(
-          expected,
-        );
+        expect(time.getDisplayForFutureContest(startDate)).toEqual(expected);
       });
     });
   });
