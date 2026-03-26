@@ -17,6 +17,30 @@ OmegaUp.on('ready', () => {
       value: payload.teams_group.name,
     });
   }
+  // Valid tab hashes for the contest edit page
+  const validTabs = [
+    'new_form',
+    'problems',
+    'publish',
+    'contestants',
+    'groups',
+    'admins',
+    'links',
+    'clone',
+    'archive',
+    'certificates',
+  ];
+
+  // Handle browser back/forward button navigation for hash-based tabs
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+    if (validTabs.includes(hash)) {
+      contestEdit.initialTab = hash;
+    } else if (hash === '') {
+      contestEdit.initialTab = '';
+    }
+  };
+
   const contestEdit = new Vue({
     el: '#main-container',
     components: {
@@ -660,4 +684,5 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+  window.addEventListener('hashchange', onHashChange);
 });

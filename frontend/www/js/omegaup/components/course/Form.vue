@@ -327,8 +327,12 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
+<<<<<<< feature/course-markdown-editor
 import problem_StatementEdit from '../problem/StatementEdit.vue';
 Vue.use(VueCookies, { expire: -1 });
+=======
+Vue.use(VueCookies, { expires: -1 });
+>>>>>>> main
 
 import {
   FontAwesomeIcon,
