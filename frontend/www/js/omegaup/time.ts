@@ -368,10 +368,7 @@ export function formatContestDurationHumanReadable(
   }
 
   if (diffMs < THIRTY_DAYS_MS) {
-    const totalDays = Math.max(
-      1,
-      Math.round(diffMs / (24 * 60 * 60 * 1000)),
-    );
+    const totalDays = Math.max(1, Math.round(diffMs / (24 * 60 * 60 * 1000)));
     return totalDays === 1
       ? T.contestDurationDay
       : interpolate(T.contestDurationDays, { N: totalDays });
