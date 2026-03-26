@@ -519,39 +519,73 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
+
+        $canAccess = true;
+
         if ($contest->admission_mode === 'private') {
-            if (
-                \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
-                    $identity->identity_id,
-                    $contest->problemset_id
-                )
-            ) {
-                return true;
-            }
-            if (
-                \OmegaUp\Authorization::canSubmitToProblemset(
-                    $identity,
-                    \OmegaUp\DAO\Problemsets::getByPK(
-                        $contest->problemset_id
-                    )
-                )
-            ) {
-                return true;
-            }
-            return false;
-        } elseif (
-            $contest->admission_mode === 'registration' &&
-            !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
-        ) {
-            $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
-                $identity->identity_id,
-                $contest->problemset_id
+            $canAccess = self::canAccessPrivateContest($contest, $identity);
+        } elseif ($contest->admission_mode === 'registration') {
+            $canAccess = self::canAccessRegistrationContest(
+                $contest,
+                $identity
             );
-            if (is_null($req) || !$req->accepted) {
-                return false;
-            }
         }
-        return true;
+
+        return $canAccess;
+    }
+
+    /**
+     * Check if identity can access a private contest
+     */
+    private static function canAccessPrivateContest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        $problemsetId = intval($contest->problemset_id);
+
+        if (
+            \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
+                $identity->identity_id,
+                $problemsetId
+            )
+        ) {
+            return true;
+        }
+
+        if (
+            \OmegaUp\Authorization::canSubmitToProblemset(
+                $identity,
+                \OmegaUp\DAO\Problemsets::getByPK(
+                    $problemsetId
+                )
+            )
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if identity can access a registration-mode contest
+     */
+    private static function canAccessRegistrationContest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        if (\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
+            return true;
+        }
+
+        $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
+            $identity->identity_id,
+            $contest->problemset_id
+        );
+
+        return !is_null($req) && $req->accepted;
     }
 
     /**
@@ -1318,8 +1352,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestList'
                 ),
+                'fullWidth' => true,
             ],
-            'entrypoint' => 'arena_contest_listv2',
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 
@@ -1567,38 +1602,51 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
+        if (is_null($identity)) {
+            // No session, show the intro (if public), so that they can login.
+            return self::isPublic($contest->admission_mode);
+        }
+
         try {
-            if (is_null($identity)) {
-                // No session, show the intro (if public), so that they can login.
-                return self::isPublic($contest->admission_mode);
-            }
-            self::validateAccessContest($contest, $identity);
-            $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
+            return self::determineShowIntroForAuthenticatedUser(
                 $identity,
                 $contest
             );
-            if ($contestAdmin) {
-                return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
-            }
-            if (
-                !\OmegaUp\DAO\Contests::hasStarted($contest) &&
-                self::isInvitedToContest($contest, $identity)
-            ) {
-                return \OmegaUp\Controllers\Contest::SHOW_INTRO;
-            }
         } catch (\Exception $e) {
-            // Could not access contest. Private contests must not be leaked, so
-            // unless they were manually added beforehand, show them a 404 error.
-            if (
-                is_null($identity) ||
-                !self::isInvitedToContest($contest, $identity)
-            ) {
-                throw $e;
-            }
-            self::$log->error('Exception while trying to verify access: ' . $e);
+            return self::handleShowIntroException($e, $identity, $contest);
+        }
+    }
+
+    /**
+     * Determine if intro should be shown for authenticated user
+     */
+    private static function determineShowIntroForAuthenticatedUser(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        self::validateAccessContest($contest, $identity);
+
+        if (\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
+            return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
+        }
+
+        if (
+            !\OmegaUp\DAO\Contests::hasStarted($contest) &&
+            self::isInvitedToContest($contest, $identity)
+        ) {
             return \OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
 
+        return self::hasUserStartedContest($identity, $contest);
+    }
+
+    /**
+     * Check if user has already started the contest
+     */
+    private static function hasUserStartedContest(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
         // You already started the contest.
         $contestOpened = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
             $identity->identity_id,
@@ -1610,6 +1658,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
             return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
+
+        return \OmegaUp\Controllers\Contest::SHOW_INTRO;
+    }
+
+    /**
+     * Handle exception when determining if intro should be shown
+     */
+    private static function handleShowIntroException(
+        \Exception $e,
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        // Could not access contest. Private contests must not be leaked, so
+        // unless they were manually added beforehand, show them a 404 error.
+        if (!self::isInvitedToContest($contest, $identity)) {
+            throw $e;
+        }
+
+        self::$log->error('Exception while trying to verify access: ' . $e);
         return \OmegaUp\Controllers\Contest::SHOW_INTRO;
     }
 
@@ -2128,7 +2195,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $identity,
             $contest
         );
-        $problemsetIdentity->access_time = $problemsetIdentity->access_time;
 
         // Add time left to response
         if (is_null($contest->window_length)) {
@@ -2584,7 +2650,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             $contest->problemset_id = $problemset->problemset_id;
             $contest->penalty_calc_policy = $contest->penalty_calc_policy ?: 'sum';
-            $contest->rerun_id = $contest->rerun_id;
             if (!is_null($originalProblemsetId)) {
                 if (is_null($contest->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
@@ -5195,8 +5260,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     private static function updateContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Contests $originalContest,
-        \OmegaUp\DAO\VO\Identities $identity,
-        ?string $teamsGroupAlias = null
+        \OmegaUp\DAO\VO\Identities $identity
     ): void {
         if ($originalContest->admission_mode !== $contest->admission_mode) {
             $timestamp = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
@@ -5756,7 +5820,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleContestList'
                 ),
             ],
-            'entrypoint' => 'arena_contest_list',
+            'entrypoint' => 'arena_contest_listv2',
         ];
     }
 
