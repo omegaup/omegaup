@@ -862,7 +862,7 @@
 					"scoreboard": 100,
 					"score_mode" : "partial",
 					"points_decay_factor": 0,
-					"submissions_gap": 120,
+					"submissions_gap": 0,
 					"penalty": 0,
 					"feedback": "detailed",
 					"penalty_type": "contest_start",
