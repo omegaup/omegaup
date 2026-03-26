@@ -402,4 +402,8 @@ OmegaUp.on('ready', () => {
 
   window.addEventListener('hashchange', onHashChange);
   onHashChange();
+
+  teamsGroupEdit.$once('hook:beforeDestroy', () => {
+    window.removeEventListener('hashchange', onHashChange);
+  });
 });
