@@ -427,7 +427,7 @@ export default class CourseDetails extends Vue {
 @import '../../../../sass/main.scss';
 
 .course-progress-container{
-  .prgress{
+  .progress{
      min-height: 1.5rem;
 }
 
