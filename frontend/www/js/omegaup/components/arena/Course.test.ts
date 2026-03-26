@@ -216,6 +216,15 @@ describe('Course.vue', () => {
     verdict: 'AC',
   };
 
+
+  const breadcrumbStubs = {
+    'b-breadcrumb': {
+      template: '<div v-bind="$attrs"><slot /></div>',
+    },
+    'b-breadcrumb-item': {
+      template: '<span><slot /></span>',
+    },
+  };
   it('Should handle course in arena', async () => {
     const wrapper = mount(arena_Course, {
       propsData: {
@@ -232,6 +241,7 @@ describe('Course.vue', () => {
         users: [],
         scoreboard,
       },
+      stubs: breadcrumbStubs,
     });
 
     expect(wrapper.find('h2').text()).toContain(currentAssignment.name);
@@ -253,6 +263,7 @@ describe('Course.vue', () => {
         users: [] as types.ContestUser[],
         scoreboard,
       },
+      stubs: breadcrumbStubs,
     });
 
     await wrapper.setProps({ problem: null });
@@ -277,6 +288,7 @@ describe('Course.vue', () => {
         users: [] as types.ContestUser[],
         scoreboard,
       },
+      stubs: breadcrumbStubs,
     });
 
     await wrapper
@@ -310,6 +322,7 @@ describe('Course.vue', () => {
         scoreboard,
         showAllRuns: true,
       },
+      stubs: breadcrumbStubs,
     });
 
     await wrapper.find('a[href="#runs"]').trigger('click');
