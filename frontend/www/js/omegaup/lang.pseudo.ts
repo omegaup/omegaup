@@ -1312,6 +1312,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorNoGroup: "(N0 gr0up)",
   problemCreatorNumberOfCases: "(Numb3r 0f Ca535)",
   problemCreatorNumberOfCasesHelper: "(Th3 ca535 wi11 hav3 7h3 nam3:)",
+  problemCreatorOnlyNumbers: "(0n1y numb3r5)",
   problemCreatorOutputPlaceHolder: "(Ou7pu7)",
   problemCreatorPoints: "(P0in75)",
   problemCreatorPointsAbbreviation: "(p75)",
