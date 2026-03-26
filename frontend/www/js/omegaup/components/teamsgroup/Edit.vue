@@ -175,10 +175,6 @@ export default class TeamsGroupEdit extends Vue {
     this.$emit('update:tab', newValue);
   }
 
-  mounted(): void {
-    this.onTabChanged(this.tab);
-  }
-
   @Watch('teamsIdentities')
   onTeamsIdentitiesChanged(newValue: types.Identity[]): void {
     this.currentTeamsIdentities = newValue;
