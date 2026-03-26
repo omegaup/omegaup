@@ -104,12 +104,8 @@
             </th>
             <th scope="col" class="align-middle text-nowrap">
               <span>
-                <a
-                  data-toggle="tooltip"
-                  :href="UserRankingFeatureGuideURL"
-                  rel="tooltip"
-                  :title="T.wordsPointsForRank"
-                  :data-original-title="T.wordsPointsForRankTooltip"
+                {{ T.wordsPointsForRank }}
+                <a v-tooltip="T.wordsPointsForRankTooltip"
                   ><img src="/media/question.png" :alt="T.wordsPointsForRank"
                 /></a>
                 <omegaup-common-sort-controls
@@ -210,7 +206,12 @@
               }}/{{ problem.submissions }})
             </td>
             <td v-if="loggedIn" class="text-right align-middle">
-              {{ problem.score.toFixed(2) }}
+              <span
+                :title="getProblemStatusTitle(problem)"
+                :class="['badge', getProblemStatusClass(problem)]"
+              >
+                {{ problem.score.toFixed(2) }}
+              </span>
             </td>
             <td class="text-right align-middle">
               {{ problem.points.toFixed(2) }}
@@ -239,7 +240,6 @@ import common_SortControls from '../common/SortControls.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
-import { getBlogUrl } from '../../urlHelper';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -279,11 +279,42 @@ export default class BaseList extends Vue {
   @Prop() columnName!: string;
   @Prop() path!: string;
   @Prop({ default: true }) showProblemTags!: boolean;
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   ui = ui;
   omegaup = omegaup;
   showFinderWizard = false;
+
+  get solvedProblemAliasesSet(): Set<string> {
+    return new Set(this.solvedProblemAliases);
+  }
+
+  get attemptedProblemAliasesSet(): Set<string> {
+    return new Set(this.attemptedProblemAliases);
+  }
+
+  getProblemStatusTitle(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusSolved;
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusAttempted;
+    }
+    return T.problemStatusUnattempted;
+  }
+
+  getProblemStatusClass(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-success';
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-warning';
+    }
+    return 'badge-secondary';
+  }
+
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
@@ -304,10 +335,6 @@ export default class BaseList extends Vue {
     let tags = selectedTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
     return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
-  }
-
-  get UserRankingFeatureGuideURL(): string {
-    return getBlogUrl('UserRankingFeatureGuideURL');
   }
 }
 </script>
