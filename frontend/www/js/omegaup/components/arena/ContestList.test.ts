@@ -230,6 +230,23 @@ describe('ContestList.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should hide empty contest sections in summary mode', async () => {
+    const contestsNoFuture = {
+      ...contests,
+      future: [],
+    };
+
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests: contestsNoFuture,
+        tab: ContestTab.Current,
+      },
+    });
+
+    expect(wrapper.findAll('.section-container').length).toBe(2);
+    expect(wrapper.text()).not.toContain('Future Contest 1');
+  });
+
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
