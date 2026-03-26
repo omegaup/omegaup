@@ -236,6 +236,25 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should hide empty contest tabs in ArenaV2', async () => {
+    const contestsNoFuture = {
+      ...contests,
+      future: [],
+    };
+
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests: contestsNoFuture,
+        tab: ContestTab.Current,
+      },
+    });
+
+    expect(wrapper.findComponent({ ref: 'futureContestTab' }).exists()).toBe(
+      false,
+    );
+    expect(wrapper.findAll('.card.contest-card').length).toBeGreaterThan(0);
+  });
+
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {

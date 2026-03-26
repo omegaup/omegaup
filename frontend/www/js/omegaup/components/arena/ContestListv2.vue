@@ -3,7 +3,7 @@
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
-    <b-card no-body>
+    <b-card no-body v-if="hasAnyContests">
       <b-tabs
         class="sidebar"
         pills
@@ -170,6 +170,7 @@
           </b-container>
         </b-card>
         <b-tab
+          v-if="hasCurrentContests"
           ref="currentContestTab"
           class="scroll-content"
           :title="T.contestListCurrent"
@@ -240,6 +241,7 @@
           </div>
         </b-tab>
         <b-tab
+          v-if="hasFutureContests"
           ref="futureContestTab"
           class="scroll-content"
           :title="T.contestListFuture"
@@ -313,6 +315,7 @@
           </div>
         </b-tab>
         <b-tab
+          v-if="hasPastContests"
           ref="pastContestTab"
           class="scroll-content"
           :title="T.contestListPast"
@@ -389,6 +392,9 @@
           </div>
         </b-tab>
       </b-tabs>
+    </b-card>
+    <b-card v-else class="text-center">
+      <div class="empty-category">{{ T.contestListEmpty }}</div>
     </b-card>
   </b-container>
 </template>
@@ -541,7 +547,13 @@ class ArenaContestList extends Vue {
     this.fetchPage(params, urlObj);
   }
   mounted() {
+    this.adjustCurrentTab();
     this.fetchInitialContests();
+  }
+
+  @Watch('contests', { deep: true })
+  onContestsChanged() {
+    this.adjustCurrentTab();
   }
 
   beforeDestroy() {
@@ -662,6 +674,52 @@ class ArenaContestList extends Vue {
   get contestListEmpty(): boolean {
     if (!this.contestList) return true;
     return this.contestList.length === 0;
+  }
+
+  get hasCurrentContests(): boolean {
+    return (this.contests.current || []).length > 0;
+  }
+
+  get hasFutureContests(): boolean {
+    return (this.contests.future || []).length > 0;
+  }
+
+  get hasPastContests(): boolean {
+    return (this.contests.past || []).length > 0;
+  }
+
+  get hasAnyContests(): boolean {
+    return this.hasCurrentContests || this.hasFutureContests || this.hasPastContests;
+  }
+
+  adjustCurrentTab() {
+    if (!this.hasAnyContests) {
+      return;
+    }
+
+    if (this.currentTab === ContestTab.Current && !this.hasCurrentContests) {
+      if (this.hasFutureContests) {
+        this.currentTab = ContestTab.Future;
+      } else if (this.hasPastContests) {
+        this.currentTab = ContestTab.Past;
+      }
+    }
+
+    if (this.currentTab === ContestTab.Future && !this.hasFutureContests) {
+      if (this.hasCurrentContests) {
+        this.currentTab = ContestTab.Current;
+      } else if (this.hasPastContests) {
+        this.currentTab = ContestTab.Past;
+      }
+    }
+
+    if (this.currentTab === ContestTab.Past && !this.hasPastContests) {
+      if (this.hasCurrentContests) {
+        this.currentTab = ContestTab.Current;
+      } else if (this.hasFutureContests) {
+        this.currentTab = ContestTab.Future;
+      }
+    }
   }
 
   // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
