@@ -230,6 +230,32 @@ describe('ContestList.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should not render Virtual/Practice in Current contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    const currentContestTab = wrapper.findAll('.section-container').at(0);
+    expect(currentContestTab.text()).not.toContain(T.contestVirtualMode);
+    expect(currentContestTab.text()).not.toContain(T.contestPracticeMode);
+  });
+
+  it('Should not render Virtual/Practice in Future contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Future,
+      },
+    });
+
+    const futureContestTab = wrapper.findAll('.section-container').at(1);
+    expect(futureContestTab.text()).not.toContain(T.contestVirtualMode);
+    expect(futureContestTab.text()).not.toContain(T.contestPracticeMode);
+  });
+
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
