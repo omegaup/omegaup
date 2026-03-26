@@ -429,12 +429,5 @@ export default class CourseViewProgress extends Vue {
       }
     }
   }
-
-  tbody >>> th {
-    position: sticky;
-    left: 0;
-    background: white;
-    z-index: 1;
-  }
 }
 </style>
