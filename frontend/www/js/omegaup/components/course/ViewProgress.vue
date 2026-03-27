@@ -16,7 +16,7 @@
               }}
             </h6>
           </div>
-          <div class="table-responsive">
+          <div class="table-responsive table-scroll-container">
             <table class="table table-striped table-fixed mb-0">
               <thead>
                 <tr>
@@ -407,10 +407,12 @@ export default class CourseViewProgress extends Vue {
   top: 4rem;
 }
 
-.table-fixed {
+.table-scroll-container {
   max-height: 80vh;
   overflow: auto;
+}
 
+.table-fixed {
   thead {
     th {
       position: sticky;
