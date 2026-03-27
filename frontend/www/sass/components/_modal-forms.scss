@@ -1,0 +1,102 @@
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 320px;
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--modal-form-title-color);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.modal-form__title {
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 4px;
+    margin-top: 0.6rem;
+    border-radius: 999px;
+    background: var(--modal-form-title-accent-color);
+  }
+}
+
+.modal-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.modal-form__label {
+  font-weight: 600;
+  color: var(--modal-form-label-color);
+  margin: 0;
+}
+
+.modal-form__control {
+  width: 100%;
+  background: var(--modal-form-input-background-color);
+  border: 1px solid var(--modal-form-input-border-color);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+
+  &:hover {
+    border-color: var(--modal-form-input-border-color--hover);
+    background-color: #fff;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--modal-form-input-border-color--focus);
+    box-shadow: 0 0 0 3px var(--modal-form-input-shadow-color);
+    background-color: #fff;
+  }
+
+  &::placeholder {
+    color: var(--modal-form-hint-color);
+  }
+}
+
+textarea.modal-form__control {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.modal-form__hint {
+  color: var(--modal-form-hint-color);
+  font-size: 0.875rem;
+}
+
+.modal-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--modal-form-divider-color);
+
+  .btn {
+    min-width: 120px;
+    border-radius: 999px;
+    padding: 0.6rem 1.6rem;
+    font-weight: 600;
+    box-shadow: var(--modal-form-action-shadow);
+  }
+
+  .btn:disabled {
+    box-shadow: none;
+  }
+}
+
+.modal-form__thanks {
+  text-align: center;
+  padding: 1.8rem 0 0.75rem;
+}

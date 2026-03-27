@@ -73,10 +73,27 @@
   --markdown-mermaid-error-message-border-color: #f5c6cb;
 
   // OVERLAY POPUP
-  --overlay-popup-background-color: #eee;
-  --overlay-popup-border-color: #ccc;
-  --overlay-popup-close-background-color--hover: #eee;
+  --overlay-popup-background-color: #f8fafc;
+  --overlay-popup-border-color: #e2e8f0;
+  --overlay-popup-close-color: #475569;
+  --overlay-popup-close-background-color--hover: #e2e8f0;
+  --overlay-popup-radius: 16px;
+  --overlay-popup-shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
+  --overlay-popup-padding: 1.5rem;
   --overlay-background-color: #000;
+
+  // MODAL FORMS
+  --modal-form-title-color: #0f172a;
+  --modal-form-title-accent-color: #3b82f6;
+  --modal-form-label-color: #111827;
+  --modal-form-hint-color: #64748b;
+  --modal-form-divider-color: #e2e8f0;
+  --modal-form-input-background-color: #f8fafc;
+  --modal-form-input-border-color: #cbd5e1;
+  --modal-form-input-border-color--hover: #94a3b8;
+  --modal-form-input-border-color--focus: #2563eb;
+  --modal-form-input-shadow-color: rgba(37, 99, 235, 0.2);
+  --modal-form-action-shadow: 0 12px 25px rgba(37, 99, 235, 0.2);
 
   // CREATOR
   --creator-code-background-color: #eee;

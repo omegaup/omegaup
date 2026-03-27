@@ -1,15 +1,15 @@
 <template>
   <omegaup-overlay-popup @dismiss="onHide">
     <transition name="fade">
-      <form data-demotion-popup class="h-auto w-auto">
+      <form data-demotion-popup class="modal-form">
         <template v-if="currentView === AvailableViews.Question">
-          <div class="form-group">
-            <div class="font-weight-bold pb-4">
+          <div class="modal-form__field">
+            <div class="modal-form__title">
               {{ T.reportProblemFormQuestion }}
             </div>
             <select
               v-model="selectedReason"
-              class="control-label w-100"
+              class="modal-form__control"
               name="selectedReason"
             >
               <option value="no-problem-statement">
@@ -35,27 +35,31 @@
               </option>
             </select>
           </div>
-          <div v-if="selectedReason == 'duplicate'" class="form-group">
-            <label class="control-label w-100">{{
+          <div v-if="selectedReason == 'duplicate'" class="modal-form__field">
+            <label class="modal-form__label">{{
               T.reportProblemFormLinkToOriginalProblem
             }}</label>
-            <input v-model="original" class="w-100" name="original" />
+            <input
+              v-model="original"
+              class="modal-form__control"
+              name="original"
+            />
           </div>
-          <div class="form-group">
-            <label class="control-label w-100">{{
+          <div class="modal-form__field">
+            <label class="modal-form__label">{{
               T.reportProblemFormAdditionalComments
             }}</label>
             <textarea
               v-model="rationale"
-              class="input-text w-100"
+              class="modal-form__control"
               name="rationale"
               type="text"
             ></textarea>
           </div>
-          <div class="text-right">
+          <div class="modal-form__actions">
             <button
               data-submit-report-button
-              class="col-md-4 btn btn-primary"
+              class="btn btn-primary"
               type="submit"
               :disabled="
                 !selectedReason ||
@@ -69,7 +73,7 @@
           </div>
         </template>
         <template v-if="currentView === AvailableViews.Thanks">
-          <div class="w-100 h-100 h3 text-center">
+          <div class="modal-form__thanks">
             <h1>{{ T.reportProblemFormThanksForReview }}</h1>
           </div>
         </template>
