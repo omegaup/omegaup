@@ -363,9 +363,10 @@ export function formatContestDurationHumanReadable(
 
   if (diffMs < TWENTY_FOUR_HOURS_MS) {
     const totalHours = Math.max(1, Math.round(diffMs / ONE_HOUR_MS));
-    const duration = totalHours === 1
-      ? T.contestDurationHour
-      : interpolate(T.contestDurationHours, { N: totalHours });
+    const duration =
+      totalHours === 1
+        ? T.contestDurationHour
+        : interpolate(T.contestDurationHours, { N: totalHours });
     if (diffMs % ONE_HOUR_MS === 0) {
       return duration;
     }
@@ -374,9 +375,10 @@ export function formatContestDurationHumanReadable(
 
   if (diffMs < THIRTY_DAYS_MS) {
     const totalDays = Math.max(1, Math.round(diffMs / (24 * 60 * 60 * 1000)));
-    const duration = totalDays === 1
-      ? T.contestDurationDay
-      : interpolate(T.contestDurationDays, { N: totalDays });
+    const duration =
+      totalDays === 1
+        ? T.contestDurationDay
+        : interpolate(T.contestDurationDays, { N: totalDays });
     if (diffMs % TWENTY_FOUR_HOURS_MS === 0) {
       return duration;
     }
@@ -384,7 +386,10 @@ export function formatContestDurationHumanReadable(
   }
 
   const totalMonths = Math.max(1, Math.round(diffMs / THIRTY_DAYS_MS));
-  const duration = formatDuration({ months: totalMonths }, { locale: currentLocale });
+  const duration = formatDuration(
+    { months: totalMonths },
+    { locale: currentLocale },
+  );
   if (diffMs % THIRTY_DAYS_MS === 0) {
     return duration;
   }
