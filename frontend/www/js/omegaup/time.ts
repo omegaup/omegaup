@@ -352,6 +352,7 @@ export function formatContestDurationHumanReadable(
   const ONE_HOUR_MS = 60 * 60 * 1000;
   const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
   const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const APPROXIMATE_PREFIX = '~ ';
 
   const totalMinutes = Math.round(diffMs / (60 * 1000));
   if (diffMs < ONE_HOUR_MS) {
@@ -362,20 +363,32 @@ export function formatContestDurationHumanReadable(
 
   if (diffMs < TWENTY_FOUR_HOURS_MS) {
     const totalHours = Math.max(1, Math.round(diffMs / ONE_HOUR_MS));
-    return totalHours === 1
+    const duration = totalHours === 1
       ? T.contestDurationHour
       : interpolate(T.contestDurationHours, { N: totalHours });
+    if (diffMs % ONE_HOUR_MS === 0) {
+      return duration;
+    }
+    return `${APPROXIMATE_PREFIX}${duration}`;
   }
 
   if (diffMs < THIRTY_DAYS_MS) {
     const totalDays = Math.max(1, Math.round(diffMs / (24 * 60 * 60 * 1000)));
-    return totalDays === 1
+    const duration = totalDays === 1
       ? T.contestDurationDay
       : interpolate(T.contestDurationDays, { N: totalDays });
+    if (diffMs % TWENTY_FOUR_HOURS_MS === 0) {
+      return duration;
+    }
+    return `${APPROXIMATE_PREFIX}${duration}`;
   }
 
   const totalMonths = Math.max(1, Math.round(diffMs / THIRTY_DAYS_MS));
-  return formatDuration({ months: totalMonths }, { locale: currentLocale });
+  const duration = formatDuration({ months: totalMonths }, { locale: currentLocale });
+  if (diffMs % THIRTY_DAYS_MS === 0) {
+    return duration;
+  }
+  return `${APPROXIMATE_PREFIX}${duration}`;
 }
 
 export function formatDateForContest(date: Date): string {

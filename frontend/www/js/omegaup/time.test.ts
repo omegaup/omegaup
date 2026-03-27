@@ -303,57 +303,30 @@ describe('time', () => {
   });
 
   describe('formatContestDurationHumanReadable', () => {
-    it('Should format contest duration with human-readable units', () => {
-      const minuteMs = 60 * 1000;
-      const hourMs = 60 * 60 * 1000;
-      const dayMs = 24 * 60 * 60 * 1000;
-      const start = new Date('2021-01-01 00:00:00+00:00');
+    const minuteMs = 60 * 1000;
+    const hourMs = 60 * 60 * 1000;
+    const dayMs = 24 * 60 * 60 * 1000;
+    const start = new Date('2021-01-01 00:00:00+00:00');
 
-      expect(
-        time.formatContestDurationHumanReadable(
-          start,
-          new Date(start.getTime() + minuteMs * 45),
-        ),
-      ).toEqual('45 minutos');
-
-      // < 24 hours => nearest hour
-      expect(
-        time.formatContestDurationHumanReadable(
-          start,
-          new Date(start.getTime() + hourMs * 1.5),
-        ),
-      ).toEqual('2 horas');
-
-      // exactly 24h should fall in "days"
-      expect(
-        time.formatContestDurationHumanReadable(
-          start,
-          new Date(start.getTime() + dayMs),
-        ),
-      ).toEqual('1 día');
-
-      // < 30 days => nearest day
-      expect(
-        time.formatContestDurationHumanReadable(
-          start,
-          new Date(start.getTime() + dayMs * 15),
-        ),
-      ).toEqual('15 días');
-
-      // >= 30 days => months
-      expect(
-        time.formatContestDurationHumanReadable(
-          start,
-          new Date(start.getTime() + dayMs * 30),
-        ),
-      ).toEqual('1 mes');
-
-      expect(
-        time.formatContestDurationHumanReadable(
-          start,
-          new Date(start.getTime() + dayMs * 89),
-        ),
-      ).toEqual('3 meses');
-    });
+    it.each([
+      [minuteMs * 45, '45 minutos'],
+      [hourMs * 10, '10 horas'],
+      [hourMs * 10 + minuteMs * 10 + 10 * 1000, '~ 10 horas'],
+      [dayMs, '1 día'],
+      [dayMs * 15, '15 días'],
+      [dayMs * 15 + hourMs * 8, '~ 15 días'],
+      [dayMs * 30, '1 mes'],
+      [dayMs * 89, '~ 3 meses'],
+    ])(
+      'Should format %p ms with human-readable units',
+      (durationMs, expected) => {
+        expect(
+          time.formatContestDurationHumanReadable(
+            start,
+            new Date(start.getTime() + durationMs),
+          ),
+        ).toEqual(expected);
+      },
+    );
   });
 });
