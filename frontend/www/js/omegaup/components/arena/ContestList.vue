@@ -269,6 +269,22 @@
                     ></div>
                   </template>
 
+                  <template #contest-button-virtual>
+                    <div
+                      v-if="
+                        tab === ContestTab.Current || tab === ContestTab.Future
+                      "
+                    ></div>
+                  </template>
+
+                  <template #contest-button-practice>
+                    <div
+                      v-if="
+                        tab === ContestTab.Current || tab === ContestTab.Future
+                      "
+                    ></div>
+                  </template>
+
                   <template #contest-enroll-status>
                     <div v-if="tab === ContestTab.Past"></div>
                   </template>
@@ -392,6 +408,24 @@
                   v-if="
                     viewAllCategory === ContestTab.Future ||
                     viewAllCategory === ContestTab.Past
+                  "
+                ></div>
+              </template>
+
+              <template #contest-button-virtual>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Current ||
+                    viewAllCategory === ContestTab.Future
+                  "
+                ></div>
+              </template>
+
+              <template #contest-button-practice>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Current ||
+                    viewAllCategory === ContestTab.Future
                   "
                 ></div>
               </template>
