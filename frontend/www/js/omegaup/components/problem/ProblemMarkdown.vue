@@ -46,7 +46,7 @@ export default class ProblemMarkdown extends Vue {
 
   private vueInstances: Vue[] = [];
 
-  markdownConverter = new markdown.Converter({ preview: false });
+  markdownConverter = new markdown.Converter({ preview: this.preview });
 
   get html(): string {
     if (this.problemSettings || this.imageMapping) {
