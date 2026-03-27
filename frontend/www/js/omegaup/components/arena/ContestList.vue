@@ -5,7 +5,10 @@
     </div>
 
     <!-- Search and Filter Section -->
-    <b-card class="mb-4">
+    <b-card
+      class="mb-4"
+      style="position: sticky; top: 62px; z-index: 100; background: white;"
+    >
       <b-container>
         <b-row class="justify-content-between" align-v="center">
           <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
