@@ -146,7 +146,9 @@ export function apiError(
 ): void {
   console.error(response);
   error(
-    response.error && response.payload
+    response.error instanceof Error
+      ? T.apiUnexpectedError
+      : response.error && response.payload
       ? formatString(response.error, response.payload)
       : (response.error || 'error').toString(),
     options,
