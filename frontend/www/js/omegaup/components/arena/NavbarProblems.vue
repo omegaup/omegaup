@@ -79,11 +79,14 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+import { BBreadcrumb, BBreadcrumbItem } from 'bootstrap-vue';
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'b-breadcrumb': BBreadcrumb,
+    'b-breadcrumb-item': BBreadcrumbItem,
   },
 })
 export default class ArenaNavbarProblems extends Vue {
