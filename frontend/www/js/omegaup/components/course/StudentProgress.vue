@@ -189,6 +189,13 @@ export default class StudentProgress extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
+th {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+}
+
 .box {
   width: 20px;
   height: 20px;
