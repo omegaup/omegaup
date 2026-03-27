@@ -226,15 +226,31 @@
             T.navBlog
           }}</a>
           <hr class="menu-divider" />
-          <a class="dropdown-item" href="/problem/statement/" target="_blank" rel="noopener noreferrer">
+          <a
+            class="dropdown-item"
+            href="/problem/statement/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {{ T.navProblemStatementEditor }}
           </a>
 
-          <a class="dropdown-item" href="/grader/ephemeral/" target="_blank" rel="noopener noreferrer">
+          <a
+            class="dropdown-item"
+            href="/grader/ephemeral/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {{ T.navOmegaUpIDE }}
           </a>
 
-          <a class="dropdown-item" href="/karel.js/" target="_blank" rel="noopener noreferrer">{{ T.navKarel }} </a>
+          <a
+            class="dropdown-item"
+            href="/karel.js/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ T.navKarel }}
+          </a>
           <hr class="menu-divider" />
           <a
             class="dropdown-item text-wrap"
