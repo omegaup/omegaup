@@ -1315,6 +1315,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorNoGroup: "No group",
   problemCreatorNumberOfCases: "Number of Cases",
   problemCreatorNumberOfCasesHelper: "The cases will have the name:",
+  problemCreatorOnlyNumbers: "Only numbers",
   problemCreatorOutputPlaceHolder: "Output",
   problemCreatorPoints: "Points",
   problemCreatorPointsAbbreviation: "pts",
