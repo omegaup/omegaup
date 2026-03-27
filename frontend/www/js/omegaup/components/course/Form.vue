@@ -240,7 +240,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group container-fluid col-md-6">
+          <div class="form-group col-lg-6">
             <label class="font-weight-bold w-100 introjs-objective"
               >{{ T.courseNewFormObjective }}
               <font-awesome-icon
@@ -248,25 +248,26 @@
                 icon="info-circle"
               />
               <textarea
-                v-model="objective"
-                :disabled="readOnly"
+                v-model="objectiveStatement.markdown"
                 data-course-objective
-                class="form-control"
-                :class="{
-                  'is-invalid': invalidParameterName === 'objective',
-                }"
-                cols="30"
-                rows="5"
-                :maxlength="MAX_LENGTH.objective"
+                class="hidden-markdown-input"
               ></textarea>
+              <omegaup-problem-statementedit
+                :statement="objectiveStatement"
+                markdown-type="solutions"
+                :show-edit-controls="false"
+                title=""
+              ></omegaup-problem-statementedit>
             </label>
             <small
               class="character-counter"
               :class="{ 'text-danger': isExceedingObjective }"
-              >{{ (objective || '').length }}/{{ MAX_LENGTH.objective }}</small
+              >{{ objectiveStatement.markdown.length }}/{{
+                MAX_LENGTH.objective
+              }}</small
             >
           </div>
-          <div class="form-group container-fluid col-md-6">
+          <div class="form-group col-lg-6">
             <label class="font-weight-bold w-100 introjs-description">
               <span
                 class="field-required"
@@ -274,23 +275,23 @@
                 >{{ T.courseNewFormDescription }}</span
               >
               <textarea
-                v-model="description"
-                :disabled="readOnly"
+                v-model="descriptionStatement.markdown"
                 data-course-new-description
-                class="form-control"
-                :class="{
-                  'is-invalid': invalidParameterName === 'description',
-                }"
-                cols="30"
-                rows="5"
-                required="required"
-                :maxlength="MAX_LENGTH.description"
+                class="hidden-markdown-input"
               ></textarea>
+              <omegaup-problem-statementedit
+                :statement="descriptionStatement"
+                markdown-type="solutions"
+                :show-edit-controls="false"
+                title=""
+              ></omegaup-problem-statementedit>
             </label>
             <small
               class="character-counter"
               :class="{ 'text-danger': isExceedingDescription }"
-              >{{ description.length }}/{{ MAX_LENGTH.description }}</small
+              >{{ descriptionStatement.markdown.length }}/{{
+                MAX_LENGTH.description
+              }}</small
             >
           </div>
         </div>
@@ -326,7 +327,12 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
+<<<<<<< feature/course-markdown-editor
+import problem_StatementEdit from '../problem/StatementEdit.vue';
+Vue.use(VueCookies, { expire: -1 });
+=======
 Vue.use(VueCookies, { expires: -1 });
+>>>>>>> main
 
 import {
   FontAwesomeIcon,
@@ -370,6 +376,7 @@ const DANGER_THRESHOLD_PERCENTAGE = 0.9;
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
     'vue-multiselect': Multiselect,
+    'omegaup-problem-statementedit': problem_StatementEdit,
   },
 })
 export default class CourseDetails extends Vue {
@@ -383,18 +390,37 @@ export default class CourseDetails extends Vue {
 
   T = T;
   alias = this.course.alias;
-  description = this.course.description;
+  description = this.course.description ?? '';
   finishTime = this.course.finish_time || new Date();
   showScoreboard = this.course.show_scoreboard;
   startTime = this.course.start_time;
   name = this.course.name;
   level = this.course.level ?? '';
-  objective = this.course.objective;
+  objective = this.course.objective ?? '';
+  descriptionStatement: {
+    markdown: string;
+    language: string;
+    images: Record<string, unknown>;
+  } = {
+    markdown: this.description,
+    language: 'en',
+    images: {},
+  };
+  objectiveStatement: {
+    markdown: string;
+    language: string;
+    images: Record<string, unknown>;
+  } = {
+    markdown: this.objective,
+    language: 'en',
+    images: {},
+  };
+
   school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   needsBasicInformation = this.course.needs_basic_information;
   requestsUserInformation = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
-  selectedLanguages = this.course.languages;
+  selectedLanguages = this.course.languages ?? [];
   levelOptions = levelOptions;
   MAX_LENGTH = MAX_LENGTH;
 
@@ -416,7 +442,7 @@ export default class CourseDetails extends Vue {
   }
 
   get isDescriptionComplete(): boolean {
-    return this.description !== null && this.description.trim().length > 0;
+    return this.descriptionStatement.markdown.trim().length > 0;
   }
 
   // Computed properties for character limit danger thresholds
@@ -430,14 +456,14 @@ export default class CourseDetails extends Vue {
 
   get isExceedingDescription(): boolean {
     return (
-      this.description.length >
+      this.descriptionStatement.markdown.length >
       MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE
     );
   }
 
   get isExceedingObjective(): boolean {
     return (
-      (this.objective || '').length >
+      this.objectiveStatement.markdown.length >
       MAX_LENGTH.objective * DANGER_THRESHOLD_PERCENTAGE
     );
   }
@@ -544,7 +570,8 @@ export default class CourseDetails extends Vue {
 
   reset(): void {
     this.alias = this.course.alias;
-    this.description = this.course.description;
+    this.descriptionStatement.markdown = this.course.description ?? '';
+    this.objectiveStatement.markdown = this.course.objective ?? '';
     this.finishTime = this.course.finish_time || new Date();
     this.showScoreboard = this.course.show_scoreboard;
     this.startTime = this.course.start_time;
@@ -562,8 +589,8 @@ export default class CourseDetails extends Vue {
     }
     const request: messages.CourseUpdateRequest = {
       name: this.name,
-      description: this.description,
-      objective: this.objective,
+      description: this.descriptionStatement.markdown,
+      objective: this.objectiveStatement.markdown,
       start_time: this.startTime,
       alias: this.alias,
       languages: this.selectedLanguages,
@@ -619,5 +646,45 @@ export default class CourseDetails extends Vue {
   color: var(--form-character-counter-color, #6c757d);
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.omegaup-course-details ::v-deep {
+  .wmd-button-bar {
+    margin-bottom: 6px;
+  }
+
+  .wmd-input {
+    width: 100% !important;
+    min-height: 200px;
+    box-sizing: border-box;
+  }
+
+  [data-statement-edit-markdown] {
+    width: 100% !important;
+    min-height: 200px;
+    padding: 10px;
+    overflow-y: auto;
+    word-break: break-word;
+    white-space: normal;
+    background: var(--course-editor-background-color);
+    border: 1px solid var(--course-editor-border-color);
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: hidden;
+  }
+
+  code {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+.hidden-markdown-input {
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
 }
 </style>
