@@ -979,4 +979,17 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             $response[0]['participating']
         );
     }
+
+    public function testListAllTabsReturnsCurrentPastFuture() {
+        \OmegaUp\Test\Factories\Contest::createContest();
+        $response = \OmegaUp\Controllers\Contest::apiListAllTabs(
+            new \OmegaUp\Request(['page_size' => 50])
+        );
+        foreach (['current', 'past', 'future'] as $tab) {
+            $this->assertArrayHasKey($tab, $response);
+            $this->assertArrayHasKey('results', $response[$tab]);
+            $this->assertArrayHasKey('number_of_results', $response[$tab]);
+            $this->assertIsArray($response[$tab]['results']);
+        }
+    }
 }
