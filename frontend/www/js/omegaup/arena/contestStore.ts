@@ -153,11 +153,13 @@ export const contestStoreConfig = {
         return Promise.resolve();
       }
       commit('setLoading', true);
-      const {
-        tab_name: _tab,
-        replaceState: _rs,
-        ...listParams
-      } = payload.requestParams;
+      const p = payload.requestParams;
+      const listParams = {
+        page: p.page,
+        query: p.query,
+        sort_order: p.sort_order,
+        filter: p.filter,
+      };
       let listPromise = api.Contest.listAllTabs(listParams);
       listPromise = listPromise
         .then((response) => {
@@ -170,8 +172,12 @@ export const contestStoreConfig = {
             response,
             page: payload.requestParams.page,
           });
+          return response;
         })
-        .catch(ui.apiError)
+        .catch((err) => {
+          ui.apiError(err);
+          throw err;
+        })
         .finally(() => {
           commit('setLoading', false);
         });
