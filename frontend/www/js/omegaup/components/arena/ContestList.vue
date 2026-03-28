@@ -668,7 +668,12 @@ class ArenaContestList extends Vue {
     }
   }
   mounted() {
-    this.fetchInitialContests();
+    // Only load from the server when the parent handles `fetch-page` (arena
+    // entrypoints). Unit tests mount with static `contests` and no listener;
+    // calling fetchInitialContests() would clear those props.
+    if (this.$listeners['fetch-page']) {
+      this.fetchInitialContests();
+    }
     this.updateColumnsPerRow();
     window.addEventListener('resize', this.updateColumnsPerRow);
   }
