@@ -75,6 +75,10 @@ OmegaUp.on('ready', () => {
           isLoading: this.isLoading,
         },
         on: {
+          'update:tab': (newTab: AvailableTabs) => {
+            this.tab = newTab;
+            window.location.hash = `#${newTab}`;
+          },
           'update-teams-group': ({
             name,
             description,
@@ -384,5 +388,22 @@ OmegaUp.on('ready', () => {
         },
       });
     },
+  });
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+
+    if (!Object.values(AvailableTabs).includes(hash as AvailableTabs)) {
+      teamsGroupEdit.tab = AvailableTabs.Teams;
+      return;
+    }
+
+    teamsGroupEdit.tab = hash as AvailableTabs;
+  };
+
+  window.addEventListener('hashchange', onHashChange);
+  onHashChange();
+
+  teamsGroupEdit.$once('hook:beforeDestroy', () => {
+    window.removeEventListener('hashchange', onHashChange);
   });
 });
