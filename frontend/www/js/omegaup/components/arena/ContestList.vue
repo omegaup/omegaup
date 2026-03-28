@@ -657,9 +657,11 @@ class ArenaContestList extends Vue {
         sort_order: this.currentOrder,
         filter: this.currentFilter,
       };
-      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach((tab) => {
-        Vue.set(this.contests, tab, []);
-      });
+      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(
+        (tab) => {
+          Vue.set(this.contests, tab, []);
+        },
+      );
       this.currentPage = 1;
       this.hasMore = true;
       this.fetchPage(params, urlObj, true, true);

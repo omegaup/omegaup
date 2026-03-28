@@ -108,8 +108,7 @@ export const contestStoreConfig = {
       ];
       for (const tab of tabs) {
         const tabResponse = response[tab];
-        const existingContests =
-          page === 1 ? [] : state.contests[tab] || [];
+        const existingContests = page === 1 ? [] : state.contests[tab] || [];
         const newContests = tabResponse.results.filter(
           (newContest) =>
             !existingContests.some(
@@ -129,11 +128,7 @@ export const contestStoreConfig = {
       },
     ) {
       Vue.set(state.cache, payload.cacheKey, payload.response);
-      const tabs = [
-        ContestTab.Current,
-        ContestTab.Past,
-        ContestTab.Future,
-      ];
+      const tabs = [ContestTab.Current, ContestTab.Past, ContestTab.Future];
       for (const tab of tabs) {
         const tabCacheKey = generateCacheKey({
           ...payload.requestParams,
