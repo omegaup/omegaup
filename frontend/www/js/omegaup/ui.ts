@@ -141,7 +141,7 @@ export function warning(message: string, options?: NotificationOptions): void {
 }
 
 export function apiError(
-  response: { error?: string; payload?: any },
+  response: { error?: string | Error; payload?: any },
   options?: NotificationOptions,
 ): void {
   console.error(response);
