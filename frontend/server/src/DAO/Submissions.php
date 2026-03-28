@@ -168,6 +168,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     ): bool {
         $maxRetries = 3;
         $retryCount = 0;
+        $waitMs = 100;
 
         while ($retryCount < $maxRetries) {
             try {
@@ -178,25 +179,19 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     $contest
                 );
             } catch (\mysqli_sql_exception $e) {
-                $retryCount++;
-
                 // Check if this is a deadlock or lock timeout error
                 $errorCode = $e->getCode();
                 $isDeadlock = in_array($errorCode, [1205, 1213]);
 
-                if (!$isDeadlock || $retryCount >= $maxRetries) {
-                    throw $e;
+                if (!$isDeadlock) {
+                    throw $e; // throw immediately for non-deadlock errors
                 }
 
-                // Exponential backoff with jitter
-                $waitTime = max(
-                    value: 0,
-                    values: intval(
-                        value: min(pow(2, $retryCount - 1) * 100000, 1000000)
-                    )
-                );
-                $jitter = rand(0, 50000);
-                usleep($waitTime + $jitter);
+                $retryCount++;
+
+                if ($retryCount >= $maxRetries) {
+                    throw $e;
+                }
 
                 // Log the retry attempt if NewRelic is available
                 if (extension_loaded('newrelic')) {
@@ -205,6 +200,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                         $e
                     );
                 }
+
+                usleep($waitMs * 1000);
+                $waitMs *= 2;
             }
         }
 
@@ -297,6 +295,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ?int $rowsPerPage = 100,
         ?int $submissionIdCursor = null,
     ): array {
+        $rowsPerPage = min(100, max(1, intval($rowsPerPage)));
         $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
         if (is_null($identityId)) {
             $indexHint = 'USE INDEX(PRIMARY)';

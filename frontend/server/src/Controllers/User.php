@@ -1669,7 +1669,12 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $readmeContent = null;
-        if (!is_null($identity->user_id)) {
+        if (
+            !is_null($identity->user_id) &&
+            \OmegaUp\Experiments::getInstance()->isEnabled(
+                \OmegaUp\Experiments::USER_README
+            )
+        ) {
             $readme = \OmegaUp\DAO\UserReadmes::getByUserId(
                 $identity->user_id
             );
@@ -3028,10 +3033,18 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Expires the known ranks
-     *
      * @TODO: This should be called only in the grader->frontend callback and only IFF
      * verdict = AC (and not test run)
+     *
+     * Expires rank caches and scoreboard caches.
+     *
+     * Rank caches (PROBLEMS_SOLVED_RANK, USER_COMPARE_DATA) only
+     * change when a submission receives an AC verdict, so callers
+     * must guard invocations accordingly.  Scoreboard caches are
+     * invalidated separately in Run::apiCreate() on every new
+     * submission (verdict is unknown at that point).  This function
+     * is now called conditionally in apiRejudge, apiDisqualify and
+     * apiRequalify (AC verdict + normal submission type).
      *
      * @return void
      */
@@ -5365,6 +5378,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $readme
      */
     public static function apiSaveReadme(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::USER_README
+        );
         $r->ensureMainUserIdentity();
 
         $content = $r->ensureOptionalString(
@@ -5415,6 +5431,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiReportReadme(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::USER_README
+        );
         $r->ensureMainUserIdentity();
 
         $username = $r->ensureString(

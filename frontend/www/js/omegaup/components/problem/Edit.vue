@@ -150,9 +150,7 @@
 
       <div v-if="showTab === 'solution'" class="tab-pane active">
         <omegaup-problem-statementedit
-          :statement="
-            data.solution || { markdown: '', language: 'es', images: {} }
-          "
+          :statement="currentSolution"
           markdown-type="solutions"
           :title="data.title"
           @update-markdown-contents="
@@ -320,6 +318,14 @@ export default class ProblemEdit extends Vue {
   alias = this.data.alias;
   showTab = this.initialTab;
   currentStatement: types.ProblemStatement = this.statement;
+  currentSolution: types.ProblemStatement =
+    this.solution ||
+    ({
+      markdown: '',
+      language: 'es',
+      images: {},
+      sources: {},
+    } as types.ProblemStatement);
   showConfirmationModal = false;
 
   get activeTab(): string {
@@ -352,6 +358,18 @@ export default class ProblemEdit extends Vue {
   @Watch('statement')
   onStatementChange(newStatement: types.ProblemStatement): void {
     this.currentStatement = newStatement;
+  }
+
+  @Watch('solution')
+  onSolutionChange(newSolution: types.ProblemStatement | null): void {
+    this.currentSolution =
+      newSolution ||
+      ({
+        markdown: '',
+        language: 'es',
+        images: {},
+        sources: {},
+      } as types.ProblemStatement);
   }
 
   onGotoPrintableVersion(): void {
