@@ -207,6 +207,127 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns paginated contest lists for current, past, and future in one API call.
+     *
+     * @return array{current: array{number_of_results: int, results: list<ContestListItem>}, future: array{number_of_results: int, results: list<ContestListItem>}, past: array{number_of_results: int, results: list<ContestListItem>}}
+     *
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param int|null $participating
+     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $recommended
+     * @omegaup-request-param null|string $sort_order
+     */
+    public static function apiListAllTabs(\OmegaUp\Request $r): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            /** @var null $r->identity */
+        }
+
+        $recommended = $r->ensureOptionalInt(
+            'recommended'
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        $participating = $r->ensureOptionalInt(
+            'participating'
+        ) ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS
+        );
+        $activeFilter = \OmegaUp\DAO\Enum\ContestFilterStatus::convertToInt(
+            fieldName: 'filter',
+            field: $filter,
+            defaultValue: \OmegaUp\DAO\Enum\ContestFilterStatus::ALL
+        );
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+            $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
+        } elseif ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+            $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
+        }
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt(
+            key: 'page_size',
+            lowerBound: 1,
+            upperBound: 100
+        ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
+        $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
+            $recommended
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
+            $participating
+        );
+        $admissionMode = $r->ensureOptionalEnum(
+            'admission_mode',
+            \OmegaUp\CourseParams::VALID_ADMISSION_MODES
+        );
+        $public = (!is_null($admissionMode) && self::isPublic($admissionMode));
+
+        if (is_null($participating)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'participating'
+            );
+        }
+        $query = $r->ensureOptionalString(
+            key: 'query',
+            required: false,
+            validator: fn(string $query) => \OmegaUp\Validators::stringOfLengthInRange(
+                $query,
+                0,
+                250
+            )
+        );
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
+            required: false
+        );
+        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt(
+            fieldName: 'order',
+            field: $order,
+            defaultValue: \OmegaUp\DAO\Enum\ContestOrderStatus::NONE
+        );
+
+        /** @var array{current: array{number_of_results: int, results: list<ContestListItem>}, future: array{number_of_results: int, results: list<ContestListItem>}, past: array{number_of_results: int, results: list<ContestListItem>}} */
+        $result = [
+            'current' => ['number_of_results' => 0, 'results' => []],
+            'past' => ['number_of_results' => 0, 'results' => []],
+            'future' => ['number_of_results' => 0, 'results' => []],
+        ];
+        $tabStatuses = [
+            'current' => \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT,
+            'past' => \OmegaUp\DAO\Enum\ContestTabStatus::PAST,
+            'future' => \OmegaUp\DAO\Enum\ContestTabStatus::FUTURE,
+        ];
+        foreach ($tabStatuses as $tabKey => $activeContests) {
+            [
+                'contests' => $contests,
+                'count' => $count,
+            ] = self::getContestList(
+                $r->identity,
+                $query,
+                $page,
+                $pageSize,
+                $activeContests,
+                $recommended,
+                $public,
+                $participating,
+                $orderBy
+            );
+            $result[$tabKey] = [
+                'number_of_results' => $count,
+                'results' => $contests,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
      * @return array{contests: list<ContestListItem>, count: int}
      */
     public static function getContestList(

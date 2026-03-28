@@ -648,25 +648,21 @@ class ArenaContestList extends Vue {
       this.hasMore = true;
       this.fetchPage(params, urlObj);
     } else {
-      // Fetch all for summary view
-      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(
-        (tab) => {
-          const urlObj = new URL(window.location.href);
-          const params: UrlParams = {
-            page: 1,
-            tab_name: tab,
-            query: this.currentQuery,
-            sort_order: this.currentOrder,
-            filter: this.currentFilter,
-          };
-          // Only update URL for the Current tab to avoid overwriting it multiple times
-          // or setting it to 'past' which might be confusing.
-          // Actually, if we are in summary view, we probably don't want to set tab_name in URL at all?
-          // But the parent logic sets it based on params.tab_name.
-          // Let's just update for Current.
-          this.fetchPage(params, urlObj, tab === ContestTab.Current);
-        },
-      );
+      // Summary view: one request loads current, past, and future (see contest_list.ts).
+      const urlObj = new URL(window.location.href);
+      const params: UrlParams = {
+        page: 1,
+        tab_name: ContestTab.Current,
+        query: this.currentQuery,
+        sort_order: this.currentOrder,
+        filter: this.currentFilter,
+      };
+      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach((tab) => {
+        Vue.set(this.contests, tab, []);
+      });
+      this.currentPage = 1;
+      this.hasMore = true;
+      this.fetchPage(params, urlObj, true, true);
     }
   }
   mounted() {
@@ -777,8 +773,13 @@ class ArenaContestList extends Vue {
     }
   }
 
-  fetchPage(params: UrlParams, urlObj: URL, shouldUpdateUrl: boolean = true) {
-    this.$emit('fetch-page', { params, urlObj, shouldUpdateUrl });
+  fetchPage(
+    params: UrlParams,
+    urlObj: URL,
+    shouldUpdateUrl: boolean = true,
+    allTabs: boolean = false,
+  ) {
+    this.$emit('fetch-page', { params, urlObj, shouldUpdateUrl, allTabs });
     // Turn off refreshing after a short delay to allow parent component to respond
     setTimeout(() => {
       this.refreshing = false;

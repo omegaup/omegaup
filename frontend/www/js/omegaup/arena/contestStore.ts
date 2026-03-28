@@ -16,13 +16,17 @@ export interface UrlParams {
   query: string;
   sort_order: ContestOrder;
   filter: ContestFilter;
+  replaceState?: boolean;
 }
 
 export interface ContestState {
   // The map of contest lists.
   contests: Record<string, types.ContestListItem[]>;
   countContests: Record<string, number>;
-  cache: Record<string, messages.ContestListResponse>;
+  cache: Record<
+    string,
+    messages.ContestListResponse | messages.ContestListAllTabsResponse
+  >;
   loading: boolean;
 }
 
@@ -86,18 +90,102 @@ export const contestStoreConfig = {
         number_of_results: response.number_of_results,
       });
     },
+    applyAllTabsResponse(
+      state: ContestState,
+      {
+        response,
+        page,
+      }: {
+        response: messages.ContestListAllTabsResponse;
+        page: number;
+      },
+    ) {
+      const tabs: (keyof messages.ContestListAllTabsResponse)[] = [
+        'current',
+        'past',
+        'future',
+      ];
+      for (const tab of tabs) {
+        const tabResponse = response[tab];
+        const existingContests =
+          page === 1 ? [] : state.contests[tab] || [];
+        const newContests = tabResponse.results.filter(
+          (newContest) =>
+            !existingContests.some(
+              (existing) => existing.contest_id === newContest.contest_id,
+            ),
+        );
+        Vue.set(state.contests, tab, [...existingContests, ...newContests]);
+        Vue.set(state.countContests, tab, tabResponse.number_of_results);
+      }
+    },
+    cacheAllTabsList(
+      state: ContestState,
+      payload: {
+        cacheKey: string;
+        response: messages.ContestListAllTabsResponse;
+        requestParams: UrlParams;
+      },
+    ) {
+      Vue.set(state.cache, payload.cacheKey, payload.response);
+      const tabs = [
+        ContestTab.Current,
+        ContestTab.Past,
+        ContestTab.Future,
+      ];
+      for (const tab of tabs) {
+        const tabCacheKey = generateCacheKey({
+          ...payload.requestParams,
+          tab_name: tab,
+        });
+        Vue.set(state.cache, tabCacheKey, payload.response[tab]);
+      }
+    },
   },
   actions: {
+    fetchContestListAllTabs(
+      { commit, state }: { commit: Commit; state: ContestState },
+      payload: { requestParams: UrlParams },
+    ) {
+      const cacheKey = generateAllTabsCacheKey(payload.requestParams);
+      const cached = state.cache[cacheKey];
+      if (cached && 'current' in cached) {
+        commit('applyAllTabsResponse', {
+          response: cached as messages.ContestListAllTabsResponse,
+          page: payload.requestParams.page,
+        });
+        return Promise.resolve();
+      }
+      commit('setLoading', true);
+      const { tab_name: _tab, replaceState: _rs, ...listParams } =
+        payload.requestParams;
+      return api.Contest.listAllTabs(listParams)
+        .then((response) => {
+          commit('cacheAllTabsList', {
+            cacheKey,
+            response,
+            requestParams: payload.requestParams,
+          });
+          commit('applyAllTabsResponse', {
+            response,
+            page: payload.requestParams.page,
+          });
+        })
+        .finally(() => {
+          commit('setLoading', false);
+        });
+    },
     fetchContestList(
       { commit, state }: { commit: Commit; state: ContestState },
       payload: NamedContestListRequest,
     ) {
       const cacheKey = generateCacheKey(payload.requestParams);
-      if (state.cache[cacheKey]) {
+      const cachedList = state.cache[cacheKey];
+      if (cachedList && !('current' in cachedList)) {
         commit('updateList', {
           name: payload.name,
           cacheKey,
-          response: state.cache[cacheKey],
+          response: cachedList as messages.ContestListResponse,
           page: payload.requestParams.page,
         });
         return;
@@ -121,6 +209,10 @@ export const contestStoreConfig = {
 
 function generateCacheKey(params: UrlParams) {
   return `${params.tab_name}-${params.filter}-${params.sort_order}-${params.query}-${params.page}`;
+}
+
+function generateAllTabsCacheKey(params: UrlParams) {
+  return `all-tabs-${params.filter}-${params.sort_order}-${params.query}-${params.page}`;
 }
 
 export default new Vuex.Store<ContestState>(contestStoreConfig);

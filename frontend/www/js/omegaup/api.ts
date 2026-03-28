@@ -520,6 +520,33 @@ export const Contest = {
     })(x.results);
     return x;
   }),
+  listAllTabs: apiCall<
+    messages.ContestListAllTabsRequest,
+    messages._ContestListAllTabsServerResponse,
+    messages.ContestListAllTabsResponse
+  >('/api/contest/listAllTabs/', (x) => {
+    const convertTabResults = (tab: messages.ContestListResponse) => {
+      tab.results = ((rows) => {
+        if (!Array.isArray(rows)) {
+          return rows;
+        }
+        return rows.map((row: any) => {
+          row.finish_time = ((t: number) => new Date(t * 1000))(row.finish_time);
+          row.last_updated = ((t: number) => new Date(t * 1000))(row.last_updated);
+          row.original_finish_time = ((t: number) => new Date(t * 1000))(
+            row.original_finish_time,
+          );
+          row.start_time = ((t: number) => new Date(t * 1000))(row.start_time);
+          return row;
+        });
+      })(tab.results);
+      return tab;
+    };
+    x.current = convertTabResults(x.current);
+    x.past = convertTabResults(x.past);
+    x.future = convertTabResults(x.future);
+    return x;
+  }),
   listParticipating: apiCall<
     messages.ContestListParticipatingRequest,
     messages._ContestListParticipatingServerResponse,
