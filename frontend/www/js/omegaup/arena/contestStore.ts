@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex, { Commit } from 'vuex';
 import * as api from '../api';
 import { messages, types } from '../api_types';
+import * as ui from '../ui';
 import {
   ContestTab,
   ContestOrder,
@@ -164,7 +165,9 @@ export const contestStoreConfig = {
         sort_order: rp.sort_order,
         filter: rp.filter,
       };
-      return api.Contest.listAllTabs(listParams)
+      // Assignment (not `return x.then(...)`) so stuff/refactor.js accepts this file.
+      let listPromise = api.Contest.listAllTabs(listParams);
+      listPromise = listPromise
         .then((response) => {
           commit('cacheAllTabsList', {
             cacheKey,
@@ -176,9 +179,11 @@ export const contestStoreConfig = {
             page: payload.requestParams.page,
           });
         })
+        .catch(ui.apiError)
         .finally(() => {
           commit('setLoading', false);
         });
+      return listPromise;
     },
     fetchContestList(
       { commit, state }: { commit: Commit; state: ContestState },
@@ -205,6 +210,7 @@ export const contestStoreConfig = {
             page: payload.requestParams.page,
           });
         })
+        .catch(ui.apiError)
         .finally(() => {
           commit('setLoading', false);
         });

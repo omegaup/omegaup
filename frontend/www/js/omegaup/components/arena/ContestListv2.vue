@@ -561,7 +561,7 @@ class ArenaContestList extends Vue {
   beforeDestroy() {
     // Placeholder for cleanup when infinite scroll is re-implemented
   }
-  async loadMoreContests() {
+  loadMoreContests() {
     if (this.isScrollLoading || !this.hasMore || this.loading) return;
 
     this.isScrollLoading = true;
@@ -576,7 +576,7 @@ class ArenaContestList extends Vue {
     };
 
     try {
-      await this.fetchPage(params, urlObj);
+      this.fetchPage(params, urlObj);
       this.currentPage = nextPage;
 
       // Check if there are more contests to load (based on pageSize)
