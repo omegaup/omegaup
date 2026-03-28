@@ -26,7 +26,8 @@ Returns an array with the following information for each contest:
 |`finish_time`|int|Contest end time in UNIX timestamp format|
 |`public`|int|If `0`, the contest is private. If `1`, the contest is public|
 |`director_id`|int|ID of the user who is the contest director|
-|`window_length`|int| If not null, the contest duration will be `window_length` in minutes, and the contest timer will be specific to each user instead of general to all. The timer will start when the contestant first enters the contest. `start_time` will then determine the time at which users can start opening the contest (USACO style). The default is `null`. |`duration`|int|The duration of the contest, taking into account the value of `window_length`|
+|`window_length`|int| If not null, the contest duration will be `window_length` in minutes, and the contest timer will be specific to each user instead of general to all. The timer will start when the contestant first enters the contest. `start_time` will then determine the time at which users can start opening the contest (USACO style). The default is `null`. |
+|`duration`|int|The duration of the contest, taking into account the value of `window_length`|
 
 ## GET `contests/:contest_alias/`
 
