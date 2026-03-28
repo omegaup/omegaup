@@ -5,6 +5,8 @@ import T from '../../lang';
 import * as ui from '../../ui';
 
 import teamsgroup_Edit, { AvailableTabs } from './Edit.vue';
+import teamsgroup_FormUpdate from './FormUpdate.vue';
+import teamsgroup_Upload from './Upload.vue';
 
 describe('Edit.vue', () => {
   const propsData = {
@@ -60,5 +62,38 @@ describe('Edit.vue', () => {
 
     await wrapper.setProps({ teamsIdentities });
     expect(wrapper.vm.currentTeamsIdentities).toBe(teamsIdentities);
+  });
+
+  it('Should keep the updated contestants count across tabs', async () => {
+    const wrapper = shallowMount(teamsgroup_Edit, {
+      propsData: {
+        ...propsData,
+        numberOfContestants: 3,
+        tab: AvailableTabs.Edit,
+      },
+    });
+
+    expect(wrapper.findComponent(teamsgroup_FormUpdate).props()).toEqual(
+      expect.objectContaining({
+        numberOfContestants: 3,
+      }),
+    );
+
+    await wrapper.setProps({ numberOfContestants: 5 });
+    await wrapper.find('[data-tab-identities]').trigger('click');
+
+    expect(wrapper.findComponent(teamsgroup_Upload).props()).toEqual(
+      expect.objectContaining({
+        numberOfContestants: 5,
+      }),
+    );
+
+    await wrapper.find('[data-tab-edit]').trigger('click');
+
+    expect(wrapper.findComponent(teamsgroup_FormUpdate).props()).toEqual(
+      expect.objectContaining({
+        numberOfContestants: 5,
+      }),
+    );
   });
 });
