@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, teaching_assistant_enabled: bool, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, clarificationsPage: int, clarificationsPageSize: int, clarificationsPagerItems: list<PageItem>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, teaching_assistant_enabled: bool, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -3515,6 +3515,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
      */
     public static function getCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -3525,6 +3527,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             // including courses with registration mode
             $r->identity = null;
         }
+        $clarificationsPage = $r->ensureOptionalInt('page') ?? 1;
+        $clarificationsPageSize = $r->ensureOptionalInt('page_size') ?? 100;
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
@@ -3553,7 +3557,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->user,
             $course,
             $group,
-            $assignmentAlias
+            $assignmentAlias,
+            $clarificationsPage,
+            $clarificationsPageSize
         );
     }
 
@@ -4716,7 +4722,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Users $currentUser,
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
-        string $assignmentAlias
+        string $assignmentAlias = '',
+        int $clarificationsPage = 1,
+        int $clarificationsPageSize = 100
     ): array {
         $assignment = self::validateCourseAssignmentAlias(
             $course,
@@ -4833,7 +4841,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'courseDetails' => self::getCommonCourseDetails(
                         $course,
-                        $currentIdentity
+                        $currentIdentity,
+                        $assignmentAlias,
+                        $clarificationsPage,
+                        $clarificationsPageSize
                     ),
                     'currentAssignment' => [
                         'name' => $assignment->name,
@@ -5013,8 +5024,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         course: $course,
                         isAdmin: $isAdmin,
                         currentIdentity: $r->identity,
-                        offset: null,
-                        rowcount: 100,
+                        page: 1,
+                        pageSize: 100,
                     )['clarifications'],
                     'problems' => $problemsResponseArray,
                     'runs' => [],
@@ -5383,7 +5394,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
-        ?\OmegaUp\DAO\VO\Identities $identity = null
+        ?\OmegaUp\DAO\VO\Identities $identity = null,
+        string $assignmentAlias = '',
+        int $clarificationsPage = 1,
+        int $clarificationsPageSize = 100
     ): array {
         $isAdmin = false;
         $isCurator = false;
@@ -5413,24 +5427,43 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $clarifications = is_null($identity)
+                ? ['clarifications' => [], 'totalRows' => 0]
+                : \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                    contest: null,
+                    course: $course,
+                    isAdmin: ($isAdmin || $isCurator || $isTeachingAssistant),
+                    currentIdentity: $identity,
+                    page: $clarificationsPage,
+                    pageSize: $clarificationsPageSize,
+                );
+
+        $clarificationsPagerItems = \OmegaUp\Pager::paginateWithUrl(
+            $clarifications['totalRows'],
+            $clarificationsPageSize,
+            $clarificationsPage,
+            "/course/{$course->alias}/assignment/{$assignmentAlias}",
+            adjacent: 5,
+            params: ['page_size' => strval($clarificationsPageSize)],
+        );
+
+        // This is necessary to stay at the same 'clarifications' URL fragment
+        foreach ($clarificationsPagerItems as &$item) {
+            if (isset($item['url'])) {
+                $item['url'] .= '#clarifications';
+            }
+        }
+
         $result = [
             'assignments' => \OmegaUp\DAO\Courses::getAllAssignments(
                 strval($course->alias),
                 $isAdmin,
                 $identity
             ),
-            'clarifications' => (
-                is_null($identity)
-                ? []
-                : \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                    contest: null,
-                    course: $course,
-                    isAdmin: ($isAdmin || $isCurator || $isTeachingAssistant),
-                    currentIdentity: $identity,
-                    offset: null,
-                    rowcount: 100,
-                )['clarifications']
-            ),
+            'clarifications' => $clarifications['clarifications'],
+            'clarificationsPagerItems' => $clarificationsPagerItems,
+            'clarificationsPage' => $clarificationsPage,
+            'clarificationsPageSize' => $clarificationsPageSize,
             'name' => strval($course->name),
             'description' => strval($course->description),
             'objective' => $course->objective,
@@ -6246,10 +6279,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $offset = $r->ensureOptionalInt('offset');
-        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
-        if ($offset < 0) {
-            $offset = 0;
+        $page = $r->ensureOptionalInt('offset') ?? 1;
+        $pageSize = $r->ensureOptionalInt('rowcount') ?? 1000;
+        if ($page < 1) {
+            $page = 1;
         }
 
         $course = self::validateCourseExists(
@@ -6281,8 +6314,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 course: $course,
                 isAdmin: $isAdmin || $isTeachingAssistant,
                 currentIdentity: $r->identity,
-                offset: $offset,
-                rowcount: $rowcount
+                page: $page,
+                pageSize: $pageSize
             )['clarifications'],
         ];
     }
@@ -6329,8 +6362,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             course: $course,
             isAdmin: $isAdmin || $isTeachingAssistant,
             currentIdentity: $r->identity,
-            offset: $page,
-            rowcount: $pageSize
+            page: $page,
+            pageSize: $pageSize
         );
 
         return [
@@ -6344,7 +6377,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $list['totalRows'],
                         $pageSize,
                         $page,
-                        "/course/{$course->alias}/clarifications/",
+                        "/course/{$course->alias}/clarification/",
                         adjacent: 2,
                         params: [],
                     ),
