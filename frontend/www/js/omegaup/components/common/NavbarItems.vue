@@ -117,9 +117,7 @@
             <a class="dropdown-item" href="/profile/#problems">{{
               T.bookmarkedProblems
             }}</a>
-            <hr
-              style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
-            />
+            <hr class="menu-divider" />
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
@@ -227,6 +225,33 @@
           <a class="dropdown-item" :href="OmegaUpBlogURL" target="_blank">{{
             T.navBlog
           }}</a>
+          <hr class="menu-divider" />
+          <a
+            class="dropdown-item"
+            href="/problem/statement/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ T.navProblemStatementEditor }}
+          </a>
+
+          <a
+            class="dropdown-item"
+            href="/grader/ephemeral/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ T.navOmegaUpIDE }}
+          </a>
+
+          <a
+            class="dropdown-item"
+            href="/karel.js/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ T.navKarel }}
+          </a>
+          <hr class="menu-divider" />
           <a
             class="dropdown-item text-wrap"
             :href="AlgorithmsBookURL"
@@ -315,5 +340,11 @@ export default class NavbarItems extends Vue {
       display: block !important;
     }
   }
+}
+
+.menu-divider {
+  margin-top: 0em;
+  margin-bottom: 0em;
+  border-width: 2px;
 }
 </style>
