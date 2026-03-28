@@ -157,8 +157,13 @@ export const contestStoreConfig = {
         return Promise.resolve();
       }
       commit('setLoading', true);
-      const { tab_name: _tab, replaceState: _rs, ...listParams } =
-        payload.requestParams;
+      const rp = payload.requestParams;
+      const listParams = {
+        page: rp.page,
+        query: rp.query,
+        sort_order: rp.sort_order,
+        filter: rp.filter,
+      };
       return api.Contest.listAllTabs(listParams)
         .then((response) => {
           commit('cacheAllTabsList', {

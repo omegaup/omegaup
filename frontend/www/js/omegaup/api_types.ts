@@ -5456,9 +5456,9 @@ export namespace messages {
   export type ContestListAllTabsRequest = { [key: string]: any };
   export type _ContestListAllTabsServerResponse = any;
   export type ContestListAllTabsResponse = {
-    current: ContestListResponse;
-    future: ContestListResponse;
-    past: ContestListResponse;
+    current: { number_of_results: number; results: types.ContestListItem[] };
+    future: { number_of_results: number; results: types.ContestListItem[] };
+    past: { number_of_results: number; results: types.ContestListItem[] };
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
