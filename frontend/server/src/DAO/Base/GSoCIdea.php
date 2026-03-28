@@ -9,142 +9,110 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** UserRankCutoffs Data Access Object (DAO) Base.
+/** GSoCIdea Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\UserRankCutoffs}.
+ * {@link \OmegaUp\DAO\VO\GSoCIdea}.
  * @access public
  * @abstract
  */
-abstract class UserRankCutoffs {
-    /**
-     * Guardar registros.
-     *
-     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
-     * pasado en la base de datos. La llave primaria indicará qué instancia va
-     * a ser actualizada en base de datos. Si la llave primara o combinación de
-     * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces replace() creará una nueva fila.
-     *
-     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
-     * llave primaria están vacías.
-     *
-     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRankCutoffs}.
-     *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
-     */
-    final public static function replace(
-        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
-    ): int {
-        if (
-            empty($User_Rank_Cutoffs->classname)
-        ) {
-            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
-        }
-        $sql = '
-            REPLACE INTO
-                User_Rank_Cutoffs (
-                    `score`,
-                    `percentile`,
-                    `classname`
-                ) VALUES (
-                    ?,
-                    ?,
-                    ?
-                );';
-        $params = [
-            (
-                !is_null($User_Rank_Cutoffs->score) ?
-                floatval($User_Rank_Cutoffs->score) :
-                null
-            ),
-            (
-                !is_null($User_Rank_Cutoffs->percentile) ?
-                floatval($User_Rank_Cutoffs->percentile) :
-                null
-            ),
-            $User_Rank_Cutoffs->classname,
-        ];
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
-    }
-
+abstract class GSoCIdea {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El objeto de tipo UserRankCutoffs a actualizar.
+     * @param \OmegaUp\DAO\VO\GSoCIdea $GSoC_Idea El objeto de tipo GSoCIdea a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+        \OmegaUp\DAO\VO\GSoCIdea $GSoC_Idea
     ): int {
         $sql = '
             UPDATE
-                `User_Rank_Cutoffs`
+                `GSoC_Idea`
             SET
-                `score` = ?,
-                `percentile` = ?
+                `title` = ?,
+                `brief_description` = ?,
+                `expected_results` = ?,
+                `preferred_skills` = ?,
+                `estimated_hours` = ?,
+                `skill_level` = ?,
+                `blog_link` = ?,
+                `created_at` = ?,
+                `updated_at` = ?
             WHERE
                 (
-                    `classname` = ?
+                    `idea_id` = ?
                 );';
         $params = [
+            $GSoC_Idea->title,
+            $GSoC_Idea->brief_description,
+            $GSoC_Idea->expected_results,
+            $GSoC_Idea->preferred_skills,
             (
-                is_null($User_Rank_Cutoffs->score) ?
+                is_null($GSoC_Idea->estimated_hours) ?
                 null :
-                floatval($User_Rank_Cutoffs->score)
+                intval($GSoC_Idea->estimated_hours)
             ),
-            (
-                is_null($User_Rank_Cutoffs->percentile) ?
-                null :
-                floatval($User_Rank_Cutoffs->percentile)
+            $GSoC_Idea->skill_level,
+            $GSoC_Idea->blog_link,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $GSoC_Idea->created_at
             ),
-            $User_Rank_Cutoffs->classname,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $GSoC_Idea->updated_at
+            ),
+            intval($GSoC_Idea->idea_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\UserRankCutoffs} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\GSoCIdea} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\GSoCIdea}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\UserRankCutoffs Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\UserRankCutoffs} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\GSoCIdea Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\GSoCIdea} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        ?string $classname
-    ): ?\OmegaUp\DAO\VO\UserRankCutoffs {
+        int $idea_id
+    ): ?\OmegaUp\DAO\VO\GSoCIdea {
         $sql = '
             SELECT
-                `User_Rank_Cutoffs`.`score`,
-                `User_Rank_Cutoffs`.`percentile`,
-                `User_Rank_Cutoffs`.`classname`
+                `GSoC_Idea`.`idea_id`,
+                `GSoC_Idea`.`title`,
+                `GSoC_Idea`.`brief_description`,
+                `GSoC_Idea`.`expected_results`,
+                `GSoC_Idea`.`preferred_skills`,
+                `GSoC_Idea`.`estimated_hours`,
+                `GSoC_Idea`.`skill_level`,
+                `GSoC_Idea`.`blog_link`,
+                `GSoC_Idea`.`created_at`,
+                `GSoC_Idea`.`updated_at`
             FROM
-                `User_Rank_Cutoffs`
+                `GSoC_Idea`
             WHERE
                 (
-                    `classname` = ?
+                    `idea_id` = ?
                 )
             LIMIT 1;';
-        $params = [$classname];
+        $params = [$idea_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\UserRankCutoffs($row);
+        return new \OmegaUp\DAO\VO\GSoCIdea($row);
     }
 
     /**
-     * Verificar si existe un {@link \OmegaUp\DAO\VO\UserRankCutoffs} por llave primaria.
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\GSoCIdea} por llave primaria.
      *
-     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\GSoCIdea}
      * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
      *
      * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
@@ -153,25 +121,25 @@ abstract class UserRankCutoffs {
      * @return bool Si existe o no tal registro.
      */
     final public static function existsByPK(
-        ?string $classname
+        int $idea_id
     ): bool {
         $sql = '
             SELECT
                 COUNT(*)
             FROM
-                `User_Rank_Cutoffs`
+                `GSoC_Idea`
             WHERE
                 (
-                    `classname` = ?
+                    `idea_id` = ?
                 );';
-        $params = [$classname];
+        $params = [$idea_id];
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }
 
     /**
-     * Contar todos los registros en `User_Rank_Cutoffs`.
+     * Contar todos los registros en `GSoC_Idea`.
      *
      * Este método obtiene el número total de filas de la tabla **sin cargar campos**,
      * útil para pruebas donde sólo se valida el conteo.
@@ -183,7 +151,7 @@ abstract class UserRankCutoffs {
             SELECT
                 COUNT(*)
             FROM
-                `User_Rank_Cutoffs`;';
+                `GSoC_Idea`;';
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, []);
         return intval($count);
@@ -193,7 +161,7 @@ abstract class UserRankCutoffs {
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\GSoCIdea} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -202,24 +170,24 @@ abstract class UserRankCutoffs {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El
-     * objeto de tipo \OmegaUp\DAO\VO\UserRankCutoffs a eliminar
+     * @param \OmegaUp\DAO\VO\GSoCIdea $GSoC_Idea El
+     * objeto de tipo \OmegaUp\DAO\VO\GSoCIdea a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+        \OmegaUp\DAO\VO\GSoCIdea $GSoC_Idea
     ): void {
         $sql = '
             DELETE FROM
-                `User_Rank_Cutoffs`
+                `GSoC_Idea`
             WHERE
                 (
-                    `classname` = ?
+                    `idea_id` = ?
                 );';
         $params = [
-            $User_Rank_Cutoffs->classname
+            $GSoC_Idea->idea_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -233,7 +201,7 @@ abstract class UserRankCutoffs {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\UserRankCutoffs}.
+     * {@link \OmegaUp\DAO\VO\GSoCIdea}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -244,13 +212,13 @@ abstract class UserRankCutoffs {
      * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\UserRankCutoffs> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\UserRankCutoffs}.
+     * @return list<\OmegaUp\DAO\VO\GSoCIdea> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\GSoCIdea}.
      */
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = 'score',
+        string $orden = 'idea_id',
         string $tipoDeOrden = 'ASC'
     ): array {
         $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
@@ -266,11 +234,18 @@ abstract class UserRankCutoffs {
         );
         $sql = "
             SELECT
-                `User_Rank_Cutoffs`.`score`,
-                `User_Rank_Cutoffs`.`percentile`,
-                `User_Rank_Cutoffs`.`classname`
+                `GSoC_Idea`.`idea_id`,
+                `GSoC_Idea`.`title`,
+                `GSoC_Idea`.`brief_description`,
+                `GSoC_Idea`.`expected_results`,
+                `GSoC_Idea`.`preferred_skills`,
+                `GSoC_Idea`.`estimated_hours`,
+                `GSoC_Idea`.`skill_level`,
+                `GSoC_Idea`.`blog_link`,
+                `GSoC_Idea`.`created_at`,
+                `GSoC_Idea`.`updated_at`
             FROM
-                `User_Rank_Cutoffs`
+                `GSoC_Idea`
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
@@ -286,7 +261,7 @@ abstract class UserRankCutoffs {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\UserRankCutoffs(
+            $allData[] = new \OmegaUp\DAO\VO\GSoCIdea(
                 $row
             );
         }
@@ -297,48 +272,69 @@ abstract class UserRankCutoffs {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\GSoCIdea}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * @param \OmegaUp\DAO\VO\GSoCIdea $GSoC_Idea El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\GSoCIdea}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+        \OmegaUp\DAO\VO\GSoCIdea $GSoC_Idea
     ): int {
         $sql = '
             INSERT INTO
-                `User_Rank_Cutoffs` (
-                    `score`,
-                    `percentile`,
-                    `classname`
+                `GSoC_Idea` (
+                    `title`,
+                    `brief_description`,
+                    `expected_results`,
+                    `preferred_skills`,
+                    `estimated_hours`,
+                    `skill_level`,
+                    `blog_link`,
+                    `created_at`,
+                    `updated_at`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?
                 );';
         $params = [
+            $GSoC_Idea->title,
+            $GSoC_Idea->brief_description,
+            $GSoC_Idea->expected_results,
+            $GSoC_Idea->preferred_skills,
             (
-                is_null($User_Rank_Cutoffs->score) ?
+                is_null($GSoC_Idea->estimated_hours) ?
                 null :
-                floatval($User_Rank_Cutoffs->score)
+                intval($GSoC_Idea->estimated_hours)
             ),
-            (
-                is_null($User_Rank_Cutoffs->percentile) ?
-                null :
-                floatval($User_Rank_Cutoffs->percentile)
+            $GSoC_Idea->skill_level,
+            $GSoC_Idea->blog_link,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $GSoC_Idea->created_at
             ),
-            $User_Rank_Cutoffs->classname,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $GSoC_Idea->updated_at
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
+        $GSoC_Idea->idea_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }
