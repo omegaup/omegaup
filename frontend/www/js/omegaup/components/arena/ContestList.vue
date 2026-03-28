@@ -5,7 +5,7 @@
     </div>
 
     <!-- Search and Filter Section -->
-    <b-card class="mb-4">
+    <b-card class="mb-4 sticky-search-bar">
       <b-container>
         <b-row class="justify-content-between" align-v="center">
           <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
@@ -1032,5 +1032,12 @@ export default ArenaContestList;
 
 .scroll-right {
   right: 10px;
+}
+
+.sticky-search-bar {
+  position: sticky;
+  top: 62px;
+  z-index: 100;
+  background-color: var(--arena-scoreboard-background-color, white);
 }
 </style>
