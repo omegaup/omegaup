@@ -60,6 +60,9 @@ describe('Course.vue', () => {
     student_count: 1,
     unlimited_duration: false,
     teaching_assistant_enabled: false,
+    clarificationsPage: 1,
+    clarificationsPageSize: 100,
+    clarificationsPagerItems: [],
   };
 
   const scoreboard: types.Scoreboard = {
