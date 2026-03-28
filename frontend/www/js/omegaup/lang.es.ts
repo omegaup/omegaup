@@ -2226,6 +2226,7 @@ const translations: { [key: string]: string; } = {
   wordsLesson: "Lecci\u00f3n",
   wordsLevel: "Nivel",
   wordsLoading: "Cargando",
+  wordsNoResultsFound: "No se encontraron resultados",
   wordsLogs: "Bit\u00e1cora de ejecuci\u00f3n",
   wordsMember: "Miembro",
   wordsMemory: "Memoria",
