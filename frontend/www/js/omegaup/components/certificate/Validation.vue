@@ -57,7 +57,7 @@ export default defineComponent({
     },
     certificate: {
       type: String,
-      required: false,
+      default: undefined,
     },
   },
   data() {
