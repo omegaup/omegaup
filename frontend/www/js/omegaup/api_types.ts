@@ -3882,6 +3882,13 @@ export namespace types {
     scoreboardAlias: string;
   }
 
+  export interface HelpResource {
+    external: boolean;
+    icon: string;
+    name: string;
+    url: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
@@ -5136,14 +5143,7 @@ export namespace types {
   }
 
   export interface UserHelpPayload {
-    helpResources: types.HelpResource[];
-  }
-
-  export interface HelpResource {
-    external: boolean;
-    icon: string;
-    name: string;
-    url: string;
+    helpResources: HelpResource[];
   }
 
   export interface UserInfoForProblem {
