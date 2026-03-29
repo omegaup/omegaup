@@ -217,8 +217,16 @@ Cypress.Commands.add(
     cy.get('[name="title"]').type(contestAlias);
     cy.get('[name="alias"]').type(contestAlias);
     cy.get('[name="description"]').type(description);
-    cy.get('[data-start-date]').type(getISODateTime(startDate));
-    cy.get('[data-end-date]').type(getISODateTime(endDate));
+    // Replace entire value: datetime-local defaults from page load can differ
+    // from contestOptions dates and partial typing flakes across minute boundaries.
+    cy.get('[data-start-date]')
+      .click()
+      .type('{selectall}{backspace}', { delay: 0 })
+      .type(getISODateTime(startDate));
+    cy.get('[data-end-date]')
+      .click()
+      .type('{selectall}{backspace}', { delay: 0 })
+      .type(getISODateTime(endDate));
     cy.get('[data-target=".logistics"]').click();
     cy.get('[data-score-board-visible-time]')
       .clear()

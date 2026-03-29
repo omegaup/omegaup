@@ -154,7 +154,10 @@ export class ContestPage {
       firstTimeVisited = false;
     });
 
+    // Whole-minute instant so getISODateTime matches datetime-local resolution
+    // and is stable across the queue of commands before the create form runs.
     const now = new Date();
+    now.setSeconds(0, 0);
     const contestOptions: ContestOptions = {
       contestAlias: 'contest' + uuid().slice(0, 5),
       description: 'Test Description',
@@ -201,7 +204,10 @@ export class ContestPage {
       'have.value',
       getISODateTime(contestOptions.startDate),
     );
-    cy.get('[data-end-date]').type(getISODateTime(contestOptions.endDate));
+    cy.get('[data-end-date]').should(
+      'have.value',
+      getISODateTime(contestOptions.endDate),
+    );
     cy.get('[data-show-scoreboard-at-end]').should(
       'have.value',
       `${contestOptions.showScoreboard}`,
