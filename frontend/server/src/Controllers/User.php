@@ -57,6 +57,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  * @psalm-type UserDocument=array{name: string, url: string}
  * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
+ * @psalm-type HelpResource=array{name: string, url: string, icon: string, external: bool}
+ * @psalm-type UserHelpPayload=array{helpResources: list<HelpResource>}
  * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int|null, contestsCount: int|null}
  * @psalm-type UserComparePayload=array{user1: UserCompareData|null, user2: UserCompareData|null, username1: string|null, username2: string|null}
  */
@@ -5346,6 +5348,58 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'user_compare',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: UserHelpPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getHelpForTypeScript() {
+        $helpResources = [
+            [
+                'name' => 'tutorials',
+                'url' => 'https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4',
+                'icon' => 'video',
+                'external' => true,
+            ],
+            [
+                'name' => 'discord',
+                'url' => 'https://discord.com/invite/K3JFd9d3wk',
+                'icon' => 'chat',
+                'external' => true,
+            ],
+            [
+                'name' => 'blog',
+                'url' => 'https://blog.omegaup.com/',
+                'icon' => 'news',
+                'external' => true,
+            ],
+            [
+                'name' => 'algorithmsBook',
+                'url' => 'https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view',
+                'icon' => 'book',
+                'external' => true,
+            ],
+            [
+                'name' => 'documentation',
+                'url' => '/docs/',
+                'icon' => 'docs',
+                'external' => false,
+            ],
+            [
+                'name' => 'github',
+                'url' => 'https://github.com/omegaup/omegaup',
+                'icon' => 'code',
+                'external' => true,
+            ],
+        ];
+
+        return [
+            'templateProperties' => [
+                'payload' => ['helpResources' => $helpResources],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleHelp'),
+            ],
+            'entrypoint' => 'common_help',
         ];
     }
 
