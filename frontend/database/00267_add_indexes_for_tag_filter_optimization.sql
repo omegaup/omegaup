@@ -8,4 +8,4 @@ ALTER TABLE `Problems_Tags`
 
 -- Index for Problems to help with the allow_user_add_tags condition
 ALTER TABLE `Problems`
-  ADD INDEX `idx_problems_allow_tags` (`allow_user_add_tags`);
+  ADD INDEX `idx_problems_allow_tags` (`problem_id`, `allow_user_add_tags`);

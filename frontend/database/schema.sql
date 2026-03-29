@@ -765,7 +765,7 @@ CREATE TABLE `Problems` (
   KEY `idx_quality_seal` (`quality_seal`),
   KEY `idx_problems_title` (`title`),
   KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
-  KEY `idx_problems_allow_tags` (`allow_user_add_tags`),
+  KEY `idx_problems_allow_tags` (`problem_id`,`allow_user_add_tags`),
   FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
