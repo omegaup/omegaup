@@ -1784,4 +1784,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             'results' => $problems,
         ];
     }
+
+    /**
+     * Atomically increment the submissions counter for a problem.
+     */
+    final public static function incrementSubmissions(int $problemId): void {
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE `Problems` SET `submissions` = `submissions` + 1 WHERE `problem_id` = ?;',
+            [$problemId]
+        );
+    }
 }
