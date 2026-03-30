@@ -15,7 +15,8 @@ import logging
 import operator
 import os
 import sys
-from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
+import time
+from typing import (Any, DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
 
 from mysql.connector import errorcode
@@ -505,13 +506,39 @@ def aggregate_reviewers_feedback(
     Updates the quality_seal field on Problems table and updates the
     problem level tag.
     '''
+    attempted_problems = 0
+    successful_problems = 0
+    failed_problems = 0
+
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'quality_tag';""")
         for (problem_id, ) in cur.fetchall():
-            aggregate_reviewers_feedback_for_problem(dbconn, problem_id)
-        dbconn.conn.commit()
+            attempted_problems += 1
+            try:
+                aggregate_reviewers_feedback_for_problem(dbconn, problem_id)
+                dbconn.conn.commit()
+                successful_problems += 1
+            except Exception:  # pylint: disable=broad-except
+                failed_problems += 1
+                logging.exception(
+                    'Failed to aggregate reviewers feedback for problem %d. '
+                    'Continuing with remaining problems.',
+                    problem_id)
+                try:
+                    dbconn.conn.rollback()
+                except Exception:  # pylint: disable=broad-except
+                    logging.exception(
+                        'Failed to rollback transaction for problem %d',
+                        problem_id)
+
+    logging.info(
+        'Finished aggregating reviewers feedback: '
+        'attempted=%d successful=%d failed=%d',
+        attempted_problems,
+        successful_problems,
+        failed_problems)
 
 
 def get_last_friday() -> datetime.date:
@@ -614,34 +641,54 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
+    any_phase_failed = False
     try:
+        # Phase 1: Reviewers Feedback
+        start_time = time.monotonic()
         try:
+            logging.info('Phase 1/3: Aggregating reviewers feedback...')
             aggregate_reviewers_feedback(dbconn)
-        except:  # noqa: bare-except
+            logging.info('Phase 1/3 completed in %.2fs',
+                         time.monotonic() - start_time)
+        except Exception:  # pylint: disable=broad-except
+            any_phase_failed = True
             logging.exception(
-                'Failed to calculate problem quality seal and category.')
-            raise
+                'Phase 1/3 failed (Reviewers feedback aggregation).')
 
+        # Phase 2: General Feedback
+        start_time = time.monotonic()
         try:
+            logging.info('Phase 2/3: Aggregating user feedback...')
             aggregate_feedback(dbconn)
-        except:  # noqa: bare-except
+            logging.info('Phase 2/3 completed in %.2fs',
+                         time.monotonic() - start_time)
+        except Exception:  # pylint: disable=broad-except
+            any_phase_failed = True
             logging.exception(
-                'Failed to aggregate feedback and update problem tags.')
-            raise
+                'Phase 2/3 failed (User feedback aggregation).')
 
+        # Phase 3: Problem of the Week
+        start_time = time.monotonic()
         try:
+            logging.info('Phase 3/3: Updating problem of the week...')
             # Problem of the week HAS to be computed AFTER feedback has been
             # aggregated. It uses difficulty tags computed from feedback to
             # pick a problem of the given difficulty.
             update_problem_of_the_week(dbconn, "easy")
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
-        except:  # noqa: bare-except
-            logging.exception('Failed to update problem of the week')
-            raise
+            logging.info('Phase 3/3 completed in %.2fs',
+                         time.monotonic() - start_time)
+        except Exception:  # pylint: disable=broad-except
+            any_phase_failed = True
+            logging.exception(
+                'Phase 3/3 failed (Problem of the week update).')
     finally:
         dbconn.conn.close()
         logging.info('Done')
+
+    if any_phase_failed:
+        sys.exit(1)
 
 
 if __name__ == '__main__':
