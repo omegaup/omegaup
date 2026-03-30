@@ -27,6 +27,58 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     protected $problemsMapping;
 
     /**
+     * Test getting a list of problems for an anonymous user while filtering
+     * by multiple tags with require_all_tags = true.
+     * This covers the IDENTITY_ANONYMOUS code path in byIdentityType() +
+     * addTagFilter(), which was the source of slow queries
+     */
+    public function testProblemListWithMultipleTagsAnonymous() {
+        $tags = [
+            'problemTagArrays',
+            'problemTagBigData',
+            'problemTagGreedyAlgorithms',
+            'problemTagCharsAndStrings',
+        ];
+        // problem[i] has tags[0..i], so:
+        // problem[0]: 1 tag, problem[1]: 2 tags,
+        // problem[2]: 3 tags, problem[3]: all 4 tags.
+        $problemData = [];
+        foreach (range(0, 3) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'visibility' => 'promoted',
+                ])
+            );
+            foreach (range(0, $i) as $j) {
+                \OmegaUp\Test\Factories\Problem::addTag(
+                    $problemData[$i],
+                    $tags[$j],
+                    public: 1
+                );
+            }
+        }
+
+        // Anonymous user exercises IDENTITY_ANONYMOUS path.
+        // Three tags, require all: problem[2] and problem[3] have all three.
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'tag' => implode(',', [$tags[0], $tags[1], $tags[2]]),
+            'require_all_tags' => true,
+        ]));
+        $this->assertCount(2, $response['results']);
+
+        // Four tags, require all: only problem[3] has all four.
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'tag' => implode(',', $tags),
+            'require_all_tags' => true,
+        ]));
+        $this->assertCount(1, $response['results']);
+        $this->assertSame(
+            $problemData[3]['request']['problem_alias'],
+            $response['results'][0]['alias']
+        );
+    }
+
+    /**
      * Gets the list of problems
      */
     public function testProblemList() {
