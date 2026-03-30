@@ -30,8 +30,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Test getting a list of problems for an anonymous user while filtering
      * by multiple tags with require_all_tags = true.
      * This covers the IDENTITY_ANONYMOUS code path in byIdentityType() +
-     * addTagFilter(), which was the source of slow queries causing a
-     * "Too many connections" incident (2026-03-29).
+     * addTagFilter(), which was the source of slow queries
      */
     public function testProblemListWithMultipleTagsAnonymous() {
         $tags = [
