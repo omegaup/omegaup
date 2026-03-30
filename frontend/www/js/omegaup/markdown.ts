@@ -580,7 +580,7 @@ export class Converter {
   // Renders Mermaid diagrams in the specified container.
   // Searches for all code blocks with 'language-mermaid' class and converts
   // them to SVG diagrams.
-  public renderMermaidDiagrams(container: HTMLElement): void {
+  public async renderMermaidDiagrams(container: HTMLElement): Promise<void> {
     const codeBlocks = container.querySelectorAll(
       'pre > code.language-mermaid',
     );
@@ -589,38 +589,40 @@ export class Converter {
       return; // No mermaid diagrams found, exit early
     }
 
-    // Load mermaid dynamically only when needed
-    import('mermaid')
-      .then((mermaidModule) => {
-        const mermaid = mermaidModule.default;
+    try {
+      //await the import
+      const mermaidModule = await import('mermaid');
+      const mermaid = mermaidModule.default;
 
-        // Initialize mermaid only once
-        if (!this._mermaidLoaded) {
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: 'default',
-            securityLevel: 'strict',
-            fontFamily: 'trebuchet ms, verdana, arial, sans-serif',
-            flowchart: {
-              htmlLabels: false,
-            },
-          });
-          this._mermaidLoaded = true;
-        }
+      //Initialize only once
+      if (!this._mermaidLoaded) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'strict',
+          fontFamily: 'trebuchet ms, verdana, arial, sans-serif',
+          flowchart: {
+            htmlLabels: false,
+          },
+        });
+        this._mermaidLoaded = true;
+      }
 
-        codeBlocks.forEach((block, index) => {
+      //Collect all render promises
+      const renderPromises = Array.from(codeBlocks).map(
+        async (block, index) => {
           let code = block.textContent || '';
           const id = `mermaid-diagram-${Date.now()}-${index}`;
           const pre = block.parentElement;
 
           if (!pre) return;
-
           // Pre-process: Replace Font Awesome placeholders with emoji before
           // rendering
           code = this.preprocessFontAwesomeIcons(code);
 
           // Create a temporary visible container so Mermaid can calculate
           // dimensions correctly
+
           const tempContainer = document.createElement('div');
           tempContainer.style.position = 'absolute';
           tempContainer.style.left = '-9999px';
@@ -628,37 +630,44 @@ export class Converter {
           tempContainer.innerHTML = `<div class="mermaid">${code}</div>`;
           document.body.appendChild(tempContainer);
 
-          // Render the diagram
-          mermaid
-            .render(id, code)
-            .then(({ svg }: { svg: string }) => {
-              // Clean up temporary container
+          try {
+            // Render the diagram
+            const { svg } = await mermaid.render(id, code);
+            // Clean up temporary container
+            document.body.removeChild(tempContainer);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mermaid-diagram';
+            wrapper.innerHTML = svg;
+
+            pre.replaceWith(wrapper);
+          } catch (error: any) {
+            console.error('Mermaid rendering error:', error);
+            // Clean up temporary container on error
+            if (document.body.contains(tempContainer)) {
               document.body.removeChild(tempContainer);
+            }
+            // Keep original code block if there's an error
 
-              const wrapper = document.createElement('div');
-              wrapper.className = 'mermaid-diagram';
-              wrapper.innerHTML = svg;
+            pre.classList.add('mermaid-error');
 
-              pre.replaceWith(wrapper);
-            })
-            .catch((error: Error) => {
-              console.error('Mermaid rendering error:', error);
-              // Clean up temporary container on error
-              if (document.body.contains(tempContainer)) {
-                document.body.removeChild(tempContainer);
-              }
-              // Keep original code block if there's an error
-              pre.classList.add('mermaid-error');
-              const errorMsg = document.createElement('div');
-              errorMsg.className = 'mermaid-error-message';
-              errorMsg.textContent = `Error rendering diagram: ${error.message}`;
-              pre.parentElement?.insertBefore(errorMsg, pre);
-            });
-        });
-      })
-      .catch((error) => {
-        console.error('Error loading mermaid module:', error);
-      });
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'mermaid-error-message';
+            errorMsg.textContent = `Error rendering diagram: ${error.message}`;
+
+            pre.parentElement?.insertBefore(errorMsg, pre);
+
+            throw error; //propagate individual render error
+          }
+        },
+      );
+
+      //Wait for ALL diagrams
+      await Promise.all(renderPromises);
+    } catch (error) {
+      console.error('Error loading/rendering mermaid:', error);
+      throw error; //propagate to caller (VERY IMPORTANT)
+    }
   }
 
   // Pre-processes Mermaid code to replace Font Awesome icon placeholders with

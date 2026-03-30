@@ -72,7 +72,7 @@ export function submitRunFailed({
   errorname: string;
   run: types.Run;
 }): void {
-  alert(error ?? run);
+  ui.error(error ?? run);
   if (errorname) {
     ui.reportEvent('submission', 'submit-fail', errorname);
   }
@@ -278,4 +278,15 @@ export function onRefreshRuns({
   for (const run of runs) {
     trackRun({ run });
   }
+}
+
+export function onAppendRuns({
+  runs,
+  totalRuns,
+}: {
+  runs: types.Run[];
+  totalRuns: number;
+}): void {
+  runsStore.commit('setTotalRuns', totalRuns);
+  runsStore.commit('appendRuns', runs);
 }
