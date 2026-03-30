@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container fluid class="p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -47,11 +47,25 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown ref="dropdownOrderBy" no-caret data-dropdown-order>
+                <b-dropdown
+                  ref="dropdownOrderBy"
+                  no-caret
+                  data-dropdown-order
+                  :variant="isNonDefaultOrder ? 'primary' : 'light'"
+                >
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />
-                      {{ T.contestOrderBy }}
+                      <span v-if="isNonDefaultOrder">
+                        {{ activeOrderLabel }}
+                        <font-awesome-icon
+                          icon="times-circle"
+                          class="ml-1 reset-icon"
+                          :title="T.contestOrderBy"
+                          @click.stop="orderByEnds"
+                        />
+                      </span>
+                      <span v-else>{{ T.contestOrderBy }}</span>
                     </div>
                   </template>
                   <b-dropdown-item
@@ -126,10 +140,20 @@
                   class="mr-0"
                   no-caret
                   data-dropdown-filter
+                  :variant="isNonDefaultFilter ? 'primary' : 'light'"
                 >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
-                    {{ T.contestFilterBy }}
+                    <span v-if="isNonDefaultFilter">
+                      {{ activeFilterLabel }}
+                      <font-awesome-icon
+                        icon="times-circle"
+                        class="ml-1 reset-icon"
+                        :title="T.contestFilterBy"
+                        @click.stop="filterByAll"
+                      />
+                    </span>
+                    <span v-else>{{ T.contestFilterBy }}</span>
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -201,10 +225,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.finish_time)"
-                    :title="contestItem.finish_time.toLocaleString()"
-                  >
+                  <a :href="getTimeLink(contestItem.finish_time)">
                     {{ currentContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -274,10 +295,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.start_time)"
-                    :title="contestItem.start_time.toLocaleString()"
-                  >
+                  <a :href="getTimeLink(contestItem.start_time)">
                     {{ futureContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -350,10 +368,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.finish_time)"
-                    :title="contestItem.finish_time.toLocaleString()"
-                  >
+                  <a :href="getTimeLink(contestItem.start_time)">
                     {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -396,7 +411,7 @@
         </b-tab>
       </b-tabs>
     </b-card>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -670,6 +685,39 @@ class ArenaContestList extends Vue {
     return this.contestList.length === 0;
   }
 
+  get isNonDefaultOrder(): boolean {
+    return (
+      this.currentOrder !== ContestOrder.Ends &&
+      this.currentOrder !== ContestOrder.None
+    );
+  }
+
+  get isNonDefaultFilter(): boolean {
+    return this.currentFilter !== ContestFilter.All;
+  }
+
+  get activeOrderLabel(): string {
+    const orderLabels: Record<ContestOrder, string> = {
+      [ContestOrder.Ends]: T.contestOrderByEnds,
+      [ContestOrder.Title]: T.contestOrderByTitle,
+      [ContestOrder.Duration]: T.contestOrderByDuration,
+      [ContestOrder.Organizer]: T.contestOrderByOrganizer,
+      [ContestOrder.Contestants]: T.contestOrderByContestants,
+      [ContestOrder.SignedUp]: T.contestOrderBySignedUp,
+      [ContestOrder.None]: T.contestOrderBy,
+    };
+    return orderLabels[this.currentOrder] ?? T.contestOrderBy;
+  }
+
+  get activeFilterLabel(): string {
+    const filterLabels: Record<ContestFilter, string> = {
+      [ContestFilter.All]: T.contestFilterBy,
+      [ContestFilter.SignedUp]: T.contestFilterBySignedUp,
+      [ContestFilter.OnlyRecommended]: T.contestFilterByRecommended,
+    };
+    return filterLabels[this.currentFilter] ?? T.contestFilterBy;
+  }
+
   // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
   // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
   @Watch('tab')
@@ -776,7 +824,8 @@ export default ArenaContestList;
 }
 
 .contest-card {
-  height: 150px;
+  min-height: 150px;
+  height: auto;
   padding: 1rem;
 }
 
@@ -821,6 +870,15 @@ export default ArenaContestList;
 
   .dropdown {
     margin-right: 1rem;
+
+    .reset-icon {
+      cursor: pointer;
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
   }
 }
 
