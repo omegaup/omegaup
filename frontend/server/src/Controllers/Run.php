@@ -605,7 +605,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\Problems::incrementSubmissions(
             intval(
-         does        $problem->problem_id
+                $problem->problem_id 
             )
         );
 
