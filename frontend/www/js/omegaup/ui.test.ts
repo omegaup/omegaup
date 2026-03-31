@@ -1,5 +1,6 @@
 import * as ui from './ui';
 import * as time from './time';
+import T from './lang';
 import notificationsStore from './notificationsStore';
 
 describe('ui', () => {
@@ -97,9 +98,7 @@ describe('ui', () => {
       ui.apiError({ error: new Error('SyntaxError') });
 
       consoleSpy.mockRestore();
-      expect(notificationsStore.state.message).toBe(
-        'An unexpected error occurred. Please try again later or contact support if the problem persists.',
-      );
+      expect(notificationsStore.state.message).toBe(T.apiUnexpectedError);
     });
 
     it('onDismiss should be called when notification is dismissed', () => {
