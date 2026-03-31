@@ -800,6 +800,7 @@ CREATE TABLE `Problems_Tags` (
   `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
   KEY `tag_id` (`tag_id`),
+  KEY `idx_pt_tag_problem_source` (`tag_id`,`problem_id`,`source`),
   CONSTRAINT `fk_ptp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_ptt_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `Tags` (`tag_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tags privados para los problemas.';

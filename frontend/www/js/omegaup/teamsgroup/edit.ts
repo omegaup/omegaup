@@ -31,6 +31,9 @@ OmegaUp.on('ready', () => {
       tab: window.location.hash
         ? window.location.hash.substr(1)
         : AvailableTabs.Teams,
+      teamGroup: {
+        ...payload.teamGroup,
+      },
       teamsIdentities: payload.identities,
       teamsMembers: payload.teamsMembers,
       userErrorRow: null,
@@ -59,10 +62,10 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-teams-group-edit', {
         props: {
-          alias: payload.teamGroup.alias,
-          name: payload.teamGroup.name,
-          description: payload.teamGroup.description,
-          numberOfContestants: payload.teamGroup.numberOfContestants,
+          alias: this.teamGroup.alias,
+          name: this.teamGroup.name,
+          description: this.teamGroup.description,
+          numberOfContestants: this.teamGroup.numberOfContestants,
           maxNumberOfContestants: payload.maxNumberOfContestants,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
@@ -95,6 +98,12 @@ OmegaUp.on('ready', () => {
               numberOfContestants,
             })
               .then(() => {
+                this.teamGroup = {
+                  ...this.teamGroup,
+                  name,
+                  description,
+                  numberOfContestants,
+                };
                 ui.success(T.teamsGroupEditGroupUpdated);
               })
               .catch(ui.apiError);
