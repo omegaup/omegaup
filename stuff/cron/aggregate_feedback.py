@@ -15,6 +15,7 @@ import logging
 import operator
 import os
 import sys
+import time
 from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
 
@@ -505,13 +506,42 @@ def aggregate_reviewers_feedback(
     Updates the quality_seal field on Problems table and updates the
     problem level tag.
     '''
+    attempted_problems = 0
+    successful_problems = 0
+    failed_problems = 0
+
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'quality_tag';""")
         for (problem_id, ) in cur.fetchall():
-            aggregate_reviewers_feedback_for_problem(dbconn, problem_id)
-        dbconn.conn.commit()
+            attempted_problems += 1
+            try:
+                aggregate_reviewers_feedback_for_problem(
+                    dbconn, problem_id)
+                dbconn.conn.commit()
+                successful_problems += 1
+            except Exception:  # pylint: disable=broad-except
+                failed_problems += 1
+                logging.exception(
+                    'Failed to aggregate reviewer feedback for '
+                    'problem %d. '
+                    'Continuing with remaining problems.',
+                    problem_id)
+                try:
+                    dbconn.conn.rollback()
+                except Exception:  # pylint: disable=broad-except
+                    logging.exception(
+                        'Failed to rollback transaction for '
+                        'problem %d',
+                        problem_id)
+
+    logging.info(
+        'Finished aggregating reviewer feedback: '
+        'attempted=%d successful=%d failed=%d',
+        attempted_problems,
+        successful_problems,
+        failed_problems)
 
 
 def get_last_friday() -> datetime.date:
@@ -613,35 +643,53 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
+    overall_start = time.monotonic()
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
+    has_failures = False
     try:
         try:
+            phase_start = time.monotonic()
             aggregate_reviewers_feedback(dbconn)
+            logging.info(
+                'aggregate_reviewers_feedback completed in %.2fs',
+                time.monotonic() - phase_start)
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to calculate problem quality seal and category.')
-            raise
+            has_failures = True
 
         try:
+            phase_start = time.monotonic()
             aggregate_feedback(dbconn)
+            logging.info(
+                'aggregate_feedback completed in %.2fs',
+                time.monotonic() - phase_start)
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to aggregate feedback and update problem tags.')
-            raise
+            has_failures = True
 
         try:
             # Problem of the week HAS to be computed AFTER feedback has been
             # aggregated. It uses difficulty tags computed from feedback to
             # pick a problem of the given difficulty.
+            phase_start = time.monotonic()
             update_problem_of_the_week(dbconn, "easy")
+            logging.info(
+                'update_problem_of_the_week completed in %.2fs',
+                time.monotonic() - phase_start)
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
         except:  # noqa: bare-except
             logging.exception('Failed to update problem of the week')
-            raise
+            has_failures = True
     finally:
         dbconn.conn.close()
+        logging.info('Total execution time: %.2fs',
+                     time.monotonic() - overall_start)
         logging.info('Done')
+    if has_failures:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

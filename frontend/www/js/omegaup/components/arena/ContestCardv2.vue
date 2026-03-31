@@ -166,7 +166,7 @@ export default class ContestCardv2 extends Vue {
   ui = ui;
 
   get contestDuration(): string {
-    return time.formatContestDuration(
+    return time.formatContestDurationHumanReadable(
       this.contest.start_time,
       this.contest.finish_time,
     );
