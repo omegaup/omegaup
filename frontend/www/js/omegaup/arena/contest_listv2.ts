@@ -139,7 +139,7 @@ OmegaUp.on('ready', () => {
       filter: initialState.filter,
     }),
     // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
-    beforeDestroy() {
+    beforeUnmount() {
       window.removeEventListener('popstate', onPopState);
       window.removeEventListener('hashchange', onHashChange);
     },

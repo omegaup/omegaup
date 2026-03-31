@@ -214,7 +214,7 @@ export default class CollectionList extends Vue {
     window.addEventListener('resize', this.updateViewportMode);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     window.removeEventListener('resize', this.updateViewportMode);
   }
 

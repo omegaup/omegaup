@@ -274,7 +274,7 @@ export default class UserHeatmap extends Vue {
     this.maxStreak = bestStreak;
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     if (this.chart) {
       this.chart.destroy();
     }

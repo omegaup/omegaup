@@ -529,7 +529,7 @@ export default class Navbar extends Vue {
     this.updateScroll();
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
     window.removeEventListener('scroll', this.updateScroll);
   }

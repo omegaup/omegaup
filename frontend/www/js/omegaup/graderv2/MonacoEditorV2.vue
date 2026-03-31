@@ -305,7 +305,7 @@ export default class MonacoEditor extends Vue {
     this.onResize();
   }
 
-  destroyed(): void {
+  unmounted(): void {
     if (this.copyTimeout) clearTimeout(this.copyTimeout);
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
 

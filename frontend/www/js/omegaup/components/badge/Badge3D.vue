@@ -59,7 +59,7 @@ export default class Badge3D extends Vue {
     this.bounds = null;
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     this.onMouseLeave();
   }
 }
