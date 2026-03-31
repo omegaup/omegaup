@@ -39,8 +39,7 @@
           :github-state="githubState"
           :google-client-id="googleClientId"
           @login="(username, password) => $emit('login', username, password)"
-        >
-        </omegaup-login>
+        />
       </div>
 
       <div
@@ -54,11 +53,8 @@
           :active-tab="activeTab"
           :validate-recaptcha="validateRecaptcha"
           :use-signup-form-with-birth-date="useSignupFormWithBirthDate"
-          @register-and-login="
-            (request) => $emit('register-and-login', request)
-          "
-        >
-        </omegaup-signup>
+          @register-and-login="(request) => $emit('register-and-login', request)"
+        />
       </div>
     </div>
   </div>
@@ -70,6 +66,8 @@ import T from '../../lang';
 import VueRecaptcha from 'vue-recaptcha';
 import omegaup_Login from './Login.vue';
 import omegaup_Signup from './Signup.vue';
+import introJs, { Step } from 'intro.js';
+import 'intro.js/introjs.css';
 
 export enum AvailableTabs {
   Login = 'login',
@@ -105,6 +103,31 @@ export default class Signin extends Vue {
   setActiveTab(tab: AvailableTabs): void {
     this.activeTab = tab;
     window.location.hash = `#${tab}`;
+  }
+
+  startIntroGuide() {
+    // Example of properly typed intro steps
+    const steps: Partial<Step>[] = [
+      {
+        title: T.someStepTitle,
+        intro: T.someStepIntro,
+        element: document.querySelector('#some-element') as HTMLElement | null,
+      },
+      {
+        title: T.someOtherStepTitle,
+        intro: T.someOtherStepIntro,
+        // optional element
+      },
+    ];
+
+    introJs()
+      .setOptions({
+        steps,
+        nextLabel: T.interactiveGuideNextButton,
+        prevLabel: T.interactiveGuidePreviousButton,
+        doneLabel: T.interactiveGuideDoneButton,
+      })
+      .start();
   }
 }
 </script>

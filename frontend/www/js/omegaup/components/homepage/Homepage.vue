@@ -132,8 +132,8 @@
             src: '/media/homepage/airbnb_logo.svg',
             alt: 'airbnbLogo',
             href: 'https://news.airbnb.com/2025-community-fund/',
-          },
-        ]"
+          }]"
+        
       ></omegaup-sponsors>
     </div>
     <omegaup-cookie-accept-decline

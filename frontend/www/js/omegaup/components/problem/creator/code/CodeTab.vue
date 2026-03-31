@@ -264,28 +264,28 @@ export default class CodeTab extends Vue {
               intro: T.problemCreatorCodeTabIntroSelectLanguageIntro,
               element: document.querySelector(
                 '[data-problem-creator-code-language]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorCodeTabIntroWriteCodeTitle,
               intro: T.problemCreatorCodeTabIntroWriteCodeIntro,
               element: document.querySelector(
                 '[data-problem-creator-code-editor]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorCodeTabIntroUploadFileTitle,
               intro: T.problemCreatorCodeTabIntroUploadFileIntro,
               element: document.querySelector(
                 '[data-problem-creator-code-input]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorCodeTabIntroSaveCodeTitle,
               intro: T.problemCreatorCodeTabIntroSaveCodeIntro,
               element: document.querySelector(
                 '[data-problem-creator-code-save-btn]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
           ],
         })
@@ -296,11 +296,3 @@ export default class CodeTab extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../../../sass/main.scss';
-
-.code-edit {
-  background: var(--creator-code-background-color);
-}
-</style>

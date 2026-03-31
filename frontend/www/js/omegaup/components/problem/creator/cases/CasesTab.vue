@@ -93,23 +93,25 @@ export default class CasesTab extends Vue {
               intro: T.problemCreatorCasesTabIntroSidebarIntro,
               element: document.querySelector(
                 '[data-cases-sidebar]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorCasesTabIntroAddPanelTitle,
               intro: T.problemCreatorCasesTabIntroAddPanelIntro,
               element: document.querySelector(
                 '[data-cases-add-panel]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
           ],
         });
 
+        // Fix TS2345: callback must return boolean
         intro.onbeforechange(() => {
-          var currentStep = intro.currentStep();
+          const currentStep = intro.currentStep();
           if (currentStep === 1) {
             this.openAddWindow();
           }
+          return true; // important to satisfy introJs type
         });
 
         intro.start();
