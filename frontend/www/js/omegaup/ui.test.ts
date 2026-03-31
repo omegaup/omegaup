@@ -89,6 +89,19 @@ describe('ui', () => {
       expect(notificationsStore.state.onDismiss).toBe(callback);
     });
 
+    it('ui.apiError should show friendly message when error is an Error object', () => {
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      ui.apiError({ error: new Error('SyntaxError') });
+
+      consoleSpy.mockRestore();
+      expect(notificationsStore.state.message).toBe(
+        'An unexpected error occurred. Please try again later or contact support if the problem persists.',
+      );
+    });
+
     it('onDismiss should be called when notification is dismissed', () => {
       const callback = jest.fn();
 
