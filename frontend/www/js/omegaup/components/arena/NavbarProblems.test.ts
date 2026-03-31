@@ -33,21 +33,18 @@ describe('NavbarProblems.vue', () => {
         inAssignment: true,
         problems: [],
       },
-    stubs: {
-  'b-breadcrumb': {
-    template: '<div v-bind="$attrs"><slot /></div>',
-  },
-  'b-breadcrumb-item': {
-    template: '<span><slot /></span>',
-  },
-},
+      stubs: {
+        'b-breadcrumb': {
+          template: '<div v-bind="$attrs"><slot /></div>',
+        },
+        'b-breadcrumb-item': {
+          template: '<span><slot /></span>',
+        },
+      },
     });
 
     expect(wrapper.text()).toMatch(
-      new RegExp(
-      `${T.navCourses}.+?Curso de prueba.+?Tarea de prueba`,
-      'ms',
-    ),
+      new RegExp(`${T.navCourses}.+?Curso de prueba.+?Tarea de prueba`, 'ms'),
     );
   });
 
@@ -61,14 +58,14 @@ describe('NavbarProblems.vue', () => {
         inAssignment: false,
         problems: [],
       },
-     stubs: {
-  'b-breadcrumb': {
-    template: '<div v-bind="$attrs"><slot /></div>',
-  },
-  'b-breadcrumb-item': {
-    template: '<span><slot /></span>',
-  },
-},
+      stubs: {
+        'b-breadcrumb': {
+          template: '<div v-bind="$attrs"><slot /></div>',
+        },
+        'b-breadcrumb-item': {
+          template: '<span><slot /></span>',
+        },
+      },
     });
 
     expect(wrapper.find('div[data-breadcrumbs]').exists()).toBeFalsy();

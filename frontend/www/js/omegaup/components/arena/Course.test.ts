@@ -216,7 +216,6 @@ describe('Course.vue', () => {
     verdict: 'AC',
   };
 
-
   const breadcrumbStubs = {
     'b-breadcrumb': {
       template: '<div v-bind="$attrs"><slot /></div>',

@@ -1,8 +1,10 @@
 <template>
   <div class="problem-list mr-3 mr-lg-0">
-   <b-breadcrumb v-if="inAssignment" data-breadcrumbs>
+    <b-breadcrumb v-if="inAssignment" data-breadcrumbs>
       <b-breadcrumb-item href="/course/">{{ T.navCourses }}</b-breadcrumb-item>
-      <b-breadcrumb-item :href="urlAssignment">{{ courseName }}</b-breadcrumb-item>
+      <b-breadcrumb-item :href="urlAssignment">{{
+        courseName
+      }}</b-breadcrumb-item>
       <b-breadcrumb-item v-if="currentAssignment" active>
         {{ currentAssignment.name }}
       </b-breadcrumb-item>
