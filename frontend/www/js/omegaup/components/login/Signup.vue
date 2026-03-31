@@ -128,12 +128,13 @@
           <div class="col-md-4 offset-md-2">
             <div class="form-group">
               <input
+                id = "over13Checkbox"
                 v-model="over13Checked"
                 type="checkbox"
                 data-over-thirteen-checkbox
                 @change="updateDateRestriction"
               />
-              <label for="checkbox" class="pl-1">
+              <label for="over13checkbox" class="pl-1">
                 <omegaup-markdown
                   :markdown="T.over13yearsOld"
                 ></omegaup-markdown>
