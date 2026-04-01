@@ -15,3 +15,4 @@ CREATE TABLE `Contest_Problem_Change_Log` (
   CONSTRAINT `fk_cpcl_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 COMMENT='Log of changes to contest problems for auditability and historical tracking';
+
