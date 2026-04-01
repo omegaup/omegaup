@@ -368,7 +368,7 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
+                  <a :href="getTimeLink(contestItem.finish_time)">
                     {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
