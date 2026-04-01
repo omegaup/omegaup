@@ -393,8 +393,7 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
     attempted_problems = 0
     successful_problems = 0
     failed_problems = 0
-    start_time = time.time()
-    processed = 0
+    start_time = time.monotonic()
 
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
@@ -403,7 +402,6 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                          AND qn.`qualitynomination_id` > %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
         for (problem_id,) in cur.fetchall():
-            processed += 1
             attempted_problems += 1
             try:
                 aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
@@ -429,16 +427,13 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
         attempted_problems,
         successful_problems,
         failed_problems)
-    duration = time.time() - start_time
+    duration = time.monotonic() - start_time
     logging.info(
-        'aggregate_feedback summary: processed=%d failed=%d duration=%.2fs',
-        processed,
+        'aggregate_feedback summary: attempted=%d failed=%d duration=%.2fs',
+        attempted_problems,
         failed_problems,
         duration,
     )
-    if failed_problems == 0:
-        current_max_id = get_current_max_qualitynomination_id(dbconn)
-        update_last_processed_qualitynomination_id(dbconn, current_max_id)
 
 
 def aggregate_reviewers_feedback_for_problem(
