@@ -6,9 +6,13 @@
       :key="logo.href"
       class="p-3 mt-2 mt-md-0 sponsor-logo-container"
     >
-      <a :href="logo.href" target="_blank">
-        <img :class="logo.class" :src="logo.src" :alt="logo.alt" />
-      </a>
+      <img
+  :class="logo.class"
+  :src="logo.src"
+  :alt="logo.alt"
+  @load="onImageLoad"
+  @error="onImageLoad"
+/>
     </div>
   </div>
 </template>
@@ -25,6 +29,11 @@ export default class Sponsors extends Vue {
     href: string;
     class: string;
   }[];
+  loading: boolean = true;
+
+onImageLoad() {
+  this.loading = false;
+}
 }
 </script>
 

@@ -4,9 +4,7 @@
       <b-col>
         <b-card :header="T.problemCreatorTitle" header-class="h3">
           <creator-header
-            @download-zip-file="
-              (zipObject) => $emit('download-zip-file', zipObject)
-            "
+            @download-zip-file="(zipObject) => $emit('download-zip-file', zipObject)"
             @upload-zip-file="populateProps"
           />
           <creator-tabs
@@ -15,15 +13,9 @@
             :extension-prop="extensionProp"
             :current-solution-markdown-prop="currentSolutionMarkdownProp"
             :current-markdown-prop="currentMarkdownProp"
-            @show-update-success-message="
-              () => $emit('show-update-success-message')
-            "
-            @download-zip-file="
-              (zipObject) => $emit('download-zip-file', zipObject)
-            "
-            @download-input-file="
-              (fileObject) => $emit('download-input-file', fileObject)
-            "
+            @show-update-success-message="() => $emit('show-update-success-message')"
+            @download-zip-file="(zipObject) => $emit('download-zip-file', zipObject)"
+            @download-input-file="(fileObject) => $emit('download-input-file', fileObject)"
           />
         </b-card>
       </b-col>
@@ -38,6 +30,9 @@ import creator_Tabs from './Tabs.vue';
 import T from '../../../lang';
 import introJs from 'intro.js';
 import 'intro.js/introjs.css';
+import VueCookies from 'vue-cookies';
+
+Vue.use(VueCookies, { expires: -1 });
 
 @Component({
   components: {
@@ -71,35 +66,27 @@ export default class Creator extends Vue {
             {
               title: T.problemCreatorIntroWorkspaceTitle,
               intro: T.problemCreatorIntroWorkspaceIntro,
-              element: document.querySelector(
-                '[data-problem-creator-tabs]',
-              ) as Element,
+              element: document.querySelector('[data-problem-creator-tabs]') as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroLoadTitle,
               intro: T.problemCreatorIntroLoadIntro,
-              element: document.querySelector(
-                '[data-load-problem-button]',
-              ) as Element,
+              element: document.querySelector('[data-load-problem-button]') as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroDownloadTitle,
               intro: T.problemCreatorIntroDownloadIntro,
-              element: document.querySelector('[data-download-zip]') as Element,
+              element: document.querySelector('[data-download-zip]') as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroCreateTitle,
               intro: T.problemCreatorIntroCreateIntro,
-              element: document.querySelector(
-                '[data-create-new-problem-button]',
-              ) as Element,
+              element: document.querySelector('[data-create-new-problem-button]') as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroNameTitle,
               intro: T.problemCreatorIntroNameIntro,
-              element: document.querySelector(
-                'input[placeholder="New Problem"]',
-              ) as Element,
+              element: document.querySelector('input[placeholder="New Problem"]') as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroReadyTitle,

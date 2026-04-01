@@ -17,22 +17,17 @@ export interface RunFilters {
 }
 
 export interface RunsState {
-  // The list of runs.
   runs: types.Run[];
-
-  // The mapping of run GUIDs to indices on the runs array.
   index: Record<string, number>;
-
-  filters?: RunFilters;
-
+  filters: RunFilters; // Non-optional now
   totalRuns: number;
 }
 
 export const runsStoreConfig = {
   state: {
-    runs: [],
-    index: {},
-    filters: {},
+    runs: [] as types.Run[],
+    index: {} as Record<string, number>,
+    filters: {} as RunFilters, // always an object
     totalRuns: 0,
   },
   mutations: {
@@ -54,6 +49,7 @@ export const runsStoreConfig = {
     clear(state: RunsState) {
       state.runs.splice(0);
       state.index = {};
+      state.filters = {}; // reset filters
     },
     appendRuns(state: RunsState, runs: types.Run[]) {
       for (const run of runs) {
@@ -70,7 +66,7 @@ export const runsStoreConfig = {
       }
     },
     applyFilter(state: RunsState, filter: RunFilters) {
-      state.filters = Object.assign(state.filters, filter);
+      state.filters = { ...state.filters, ...filter };
     },
     removeFilter(
       state: RunsState,
@@ -84,9 +80,6 @@ export const runsStoreConfig = {
         | 'execution'
         | 'output',
     ) {
-      if (!state.filters) {
-        return;
-      }
       delete state.filters[filter];
     },
   },
@@ -96,6 +89,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
   state: {
     runs: [],
     index: {},
+    filters: {}, // initialize filters here too
     totalRuns: 0,
   },
   mutations: {
@@ -114,6 +108,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
     clear(state) {
       state.runs.splice(0);
       state.index = {};
+      state.filters = {}; // reset filters
     },
   },
 });

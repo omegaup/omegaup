@@ -1,9 +1,7 @@
 <template>
   <div class="card problem-form">
     <div v-if="!isUpdate" class="card-header">
-      <h3 class="card-title mb-0">
-        {{ T.problemNew }}
-      </h3>
+      <h3 class="card-title mb-0">{{ T.problemNew }}</h3>
     </div>
     <div class="text-center">
       <p class="mt-3 mb-0">
@@ -18,6 +16,7 @@
     <div class="card-body px-2 px-sm-4">
       <form ref="form" method="POST" class="form" enctype="multipart/form-data">
         <div class="accordion mb-3">
+          <!-- Basic Info -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -57,9 +56,7 @@
                     name="problem_alias"
                     type="text"
                     class="form-control"
-                    :class="{
-                      'is-invalid': errors.includes('problem_alias'),
-                    }"
+                    :class="{ 'is-invalid': errors.includes('problem_alias') }"
                     :disabled="isUpdate"
                   />
                 </div>
@@ -77,18 +74,14 @@
                   />
                 </div>
                 <div class="form-group col-md-6 introjs-file">
-                  <label class="control-label">{{
-                    T.problemEditFormFile
-                  }}</label>
+                  <label class="control-label">{{ T.problemEditFormFile }}</label>
                   <input
                     :required="!isUpdate"
                     name="problem_contents"
                     type="file"
                     accept=".zip"
                     class="form-control"
-                    :class="{
-                      'is-invalid': errors.includes('problem_contents'),
-                    }"
+                    :class="{ 'is-invalid': errors.includes('problem_contents') }"
                     @change="onUploadFile"
                   />
                 </div>
@@ -96,6 +89,7 @@
             </div>
           </div>
 
+          <!-- Tags -->
           <template v-if="!isUpdate">
             <div class="card">
               <div class="card-header">
@@ -115,10 +109,7 @@
               </div>
               <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="
-                    (selectedPublicTags.length === 0 || !problemLevel) &&
-                    currentLanguages !== ''
-                  "
+                  v-show="(selectedPublicTags.length === 0 || !problemLevel) && currentLanguages !== ''"
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
@@ -139,20 +130,14 @@
                     @emit-remove-tag="removeTag"
                     @select-problem-level="selectProblemLevel"
                   ></omegaup-problem-tags>
-                  <input
-                    name="selected_tags"
-                    :value="selectedTagsList"
-                    type="hidden"
-                  />
-                  <input
-                    name="problem_level"
-                    :value="problemLevel"
-                    type="hidden"
-                  />
+                  <input name="selected_tags" :value="selectedTagsList" type="hidden" />
+                  <input name="problem_level" :value="problemLevel" type="hidden" />
                 </div>
               </div>
             </div>
           </template>
+
+          <!-- Validation -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -180,11 +165,7 @@
                     :class="{ 'is-invalid': errors.includes('languages') }"
                     :required="!isUpdate"
                   >
-                    <option
-                      v-for="(languageText, languageName) in validLanguages"
-                      :key="languageName"
-                      :value="languageName"
-                    >
+                    <option v-for="(languageText, languageName) in validLanguages" :key="languageName" :value="languageName">
                       {{ languageText }}
                     </option>
                   </select>
@@ -199,11 +180,7 @@
                     :disabled="currentLanguages === ''"
                     required
                   >
-                    <option
-                      v-for="(validatorText, validatorIndex) in validatorTypes"
-                      :key="validatorIndex"
-                      :value="validatorIndex"
-                    >
+                    <option v-for="(validatorText, validatorIndex) in validatorTypes" :key="validatorIndex" :value="validatorIndex">
                       {{ validatorText }}
                     </option>
                   </select>
@@ -211,6 +188,8 @@
               </div>
             </div>
           </div>
+
+          <!-- Limits -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -243,6 +222,8 @@
               ></omegaup-problem-settings>
             </div>
           </div>
+
+          <!-- Access -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -264,28 +245,12 @@
                   <label>{{ T.problemEditEmailClarifications }}</label>
                   <div class="form-control">
                     <div class="form-check form-check-inline">
-                      <input
-                        v-model="emailClarifications"
-                        type="radio"
-                        name="email_clarifications"
-                        class="form-check-input"
-                        :value="true"
-                      />
-                      <label class="form-check-label">
-                        {{ T.wordsYes }}
-                      </label>
+                      <input v-model="emailClarifications" type="radio" name="email_clarifications" class="form-check-input" :value="true" />
+                      <label class="form-check-label">{{ T.wordsYes }}</label>
                     </div>
                     <div class="form-check form-check-inline">
-                      <input
-                        v-model="emailClarifications"
-                        type="radio"
-                        name="email_clarifications"
-                        class="form-check-input"
-                        :value="false"
-                      />
-                      <label class="form-check-label">
-                        {{ T.wordsNo }}
-                      </label>
+                      <input v-model="emailClarifications" type="radio" name="email_clarifications" class="form-check-input" :value="false" />
+                      <label class="form-check-label">{{ T.wordsNo }}</label>
                     </div>
                   </div>
                 </div>
@@ -293,26 +258,11 @@
                   <label>{{ T.problemEditFormAppearsAsPublic }}</label>
                   <div class="form-control">
                     <label class="form-check form-check-inline">
-                      <input
-                        v-model="isPublic"
-                        data-problem-access-radio-yes
-                        type="radio"
-                        name="visibility"
-                        class="form-check-input"
-                        :disabled="!isEditable"
-                        :value="true"
-                      />
+                      <input v-model="isPublic" data-problem-access-radio-yes type="radio" name="visibility" class="form-check-input" :disabled="!isEditable" :value="true" />
                       <span class="form-check-label">{{ T.wordsYes }}</span>
                     </label>
                     <label class="form-check form-check-inline">
-                      <input
-                        v-model="isPublic"
-                        type="radio"
-                        name="visibility"
-                        class="form-check-input"
-                        :disabled="!isEditable"
-                        :value="false"
-                      />
+                      <input v-model="isPublic" type="radio" name="visibility" class="form-check-input" :disabled="!isEditable" :value="false" />
                       <span class="form-check-label">{{ T.wordsNo }}</span>
                     </label>
                   </div>
@@ -320,6 +270,8 @@
               </div>
             </div>
           </div>
+
+          <!-- Evaluation (only for new) -->
           <template v-if="!isUpdate">
             <div class="card">
               <div class="card-header">
@@ -347,12 +299,8 @@
                       :class="{ 'is-invalid': errors.includes('show_diff') }"
                       :disabled="languages === ''"
                     >
-                      <option value="none">
-                        {{ T.problemVersionDiffModeNone }}
-                      </option>
-                      <option value="examples">
-                        {{ T.wordsOnlyExamples }}
-                      </option>
+                      <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+                      <option value="examples">{{ T.wordsOnlyExamples }}</option>
                       <option value="all">{{ T.wordsAll }}</option>
                     </select>
                   </div>
@@ -362,17 +310,11 @@
                       v-model="groupScorePolicy"
                       name="group_score_policy"
                       class="form-control"
-                      :class="{
-                        'is-invalid': errors.includes('group_score_policy'),
-                      }"
+                      :class="{ 'is-invalid': errors.includes('group_score_policy') }"
                       :disabled="languages === ''"
                     >
-                      <option value="sum-if-not-zero">
-                        {{ T.problemEditGroupScorePolicySumIfNotZero }}
-                      </option>
-                      <option value="min">
-                        {{ T.problemEditGroupScorePolicyMin }}
-                      </option>
+                      <option value="sum-if-not-zero">{{ T.problemEditGroupScorePolicySumIfNotZero }}</option>
+                      <option value="min">{{ T.problemEditGroupScorePolicyMin }}</option>
                     </select>
                   </div>
                 </div>
@@ -380,16 +322,13 @@
             </div>
           </template>
         </div>
+
+        <!-- Update form -->
         <template v-if="isUpdate">
           <div class="mt-8 row">
             <div class="form-group col-md-4">
               <label>{{ T.wordsShowCasesDiff }}</label>
-              <select
-                v-model="showDiff"
-                name="show_diff"
-                class="form-control"
-                :class="{ 'is-invalid': errors.includes('show_diff') }"
-              >
+              <select v-model="showDiff" name="show_diff" class="form-control" :class="{ 'is-invalid': errors.includes('show_diff') }">
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
                 <option value="all">{{ T.wordsAll }}</option>
@@ -397,52 +336,28 @@
             </div>
             <div class="form-group col-md-4">
               <label>{{ T.problemEditGroupScorePolicy }}</label>
-              <select
-                v-model="groupScorePolicy"
-                name="group_score_policy"
-                class="form-control"
-                :class="{ 'is-invalid': errors.includes('group_score_policy') }"
-                :disabled="languages === ''"
-              >
-                <option value="sum-if-not-zero">
-                  {{ T.problemEditGroupScorePolicySumIfNotZero }}
-                </option>
-                <option value="min">
-                  {{ T.problemEditGroupScorePolicyMin }}
-                </option>
+              <select v-model="groupScorePolicy" name="group_score_policy" class="form-control" :class="{ 'is-invalid': errors.includes('group_score_policy') }" :disabled="languages === ''">
+                <option value="sum-if-not-zero">{{ T.problemEditGroupScorePolicySumIfNotZero }}</option>
+                <option value="min">{{ T.problemEditGroupScorePolicyMin }}</option>
               </select>
             </div>
             <div class="form-group col-md-4">
-              <label class="control-label">{{
-                T.problemEditCommitMessage
-              }}</label>
-              <input
-                v-model="message"
-                required
-                class="form-control"
-                :class="{ 'is-invalid': errors.includes('message') }"
-                name="message"
-                type="text"
-              />
+              <label class="control-label">{{ T.problemEditCommitMessage }}</label>
+              <input v-model="message" required class="form-control" :class="{ 'is-invalid': errors.includes('message') }" name="message" type="text" />
             </div>
           </div>
         </template>
-        <input
-          v-if="isEditable"
-          type="hidden"
-          name="visibility"
-          :value="visibility"
-        />
+
+        <input v-if="isEditable" type="hidden" name="visibility" :value="visibility" />
         <input name="request" value="submit" type="hidden" />
         <input name="update_published" value="non-problemset" type="hidden" />
+
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
             <button
               type="submit"
               class="btn btn-primary"
-              :title="
-                !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
-              "
+              :title="!problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''"
               @click="openCollapsedIfRequired()"
             >
               {{ buttonText }}
@@ -464,6 +379,7 @@ import { types } from '../../api_types';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
+
 Vue.use(VueCookies, { expires: -1 });
 
 @Component({
@@ -479,9 +395,9 @@ export default class ProblemForm extends Vue {
   @Prop({ default: 0 }) originalVisibility!: number;
   @Prop({ default: true }) hasVisitedSection!: boolean;
 
-  @Ref('basic-info') basicInfoRef!: HTMLDivElement;
-  @Ref('tags') tagsRef!: HTMLDivElement;
-  @Ref('limits') limitsRef!: HTMLDivElement;
+  @Ref('basic-info') basicInfoRef!: HTMLButtonElement;
+  @Ref('tags') tagsRef!: HTMLButtonElement;
+  @Ref('limits') limitsRef!: HTMLButtonElement;
   @Ref('validation') validationRef!: HTMLButtonElement;
   @Ref('form') formRef!: HTMLFormElement;
 
@@ -508,66 +424,37 @@ export default class ProblemForm extends Vue {
   selectedTags = this.data.selectedTags || [];
   message = '';
   hasFile = false;
-  public = false;
   validLanguages = this.data.validLanguages;
   validatorTypes = this.data.validatorTypes;
   currentLanguages = this.data.languages;
 
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
+
     if (!this.hasVisitedSection) {
-      introJs()
-        .setOptions({
-          nextLabel: T.interactiveGuideNextButton,
-          prevLabel: T.interactiveGuidePreviousButton,
-          doneLabel: T.interactiveGuideDoneButton,
-          steps: [
-            {
-              title,
-              intro: T.createProblemInteractiveGuideWelcome,
-            },
-            {
-              element: document.querySelector('.introjs-title') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideProblemTitle,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-short-title',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuideShortTitle,
-            },
-            {
-              element: document.querySelector('.introjs-origin') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideOrigin,
-            },
-            {
-              element: document.querySelector('.introjs-file') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideFile,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-tags-and-level',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuideTagsAndLevel,
-            },
-            {
-              element: document.querySelector('.introjs-type') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideType,
-            },
-            {
-              element: document.querySelector('.introjs-validator') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideValidator,
-            },
-          ],
-        })
-        .start();
+      const typeElement = document.querySelector('.introjs-type') as HTMLElement | null;
+      const tagsElement = document.querySelector('.introjs-tags-and-level') as HTMLElement | null;
+
+      if (typeElement && tagsElement) {
+        introJs()
+          .setOptions({
+            nextLabel: T.interactiveGuideNextButton,
+            prevLabel: T.interactiveGuidePreviousButton,
+            doneLabel: T.interactiveGuideDoneButton,
+            steps: [
+              { title, intro: T.createProblemInteractiveGuideWelcome },
+              { element: typeElement, title, intro: T.createProblemInteractiveGuideProblemTitle },
+              { element: typeElement, title, intro: T.createProblemInteractiveGuideShortTitle },
+              { element: typeElement, title, intro: T.createProblemInteractiveGuideOrigin },
+              { element: typeElement, title, intro: T.createProblemInteractiveGuideFile },
+              { element: tagsElement, title, intro: T.createProblemInteractiveGuideTagsAndLevel },
+              { element: typeElement, title, intro: T.createProblemInteractiveGuideType },
+              { element: typeElement, title, intro: T.createProblemInteractiveGuideValidator },
+            ],
+          })
+          .start();
+      }
+
       this.$cookies.set('has-visited-create-problem', true, -1);
     }
   }
@@ -577,10 +464,7 @@ export default class ProblemForm extends Vue {
   }
 
   get buttonText(): string {
-    if (this.isUpdate) {
-      return T.problemEditFormUpdateProblem;
-    }
-    return T.problemEditFormCreateProblem;
+    return this.isUpdate ? T.problemEditFormUpdateProblem : T.problemEditFormCreateProblem;
   }
 
   get selectedTagsList(): string {
@@ -588,146 +472,87 @@ export default class ProblemForm extends Vue {
   }
 
   get isPublic(): boolean {
-    // when visibility is public warning, then the problem is shown as public
     return this.visibility > this.data.visibilityStatuses.private;
   }
 
   set isPublic(isPublic: boolean) {
-    if (
-      this.originalVisibility === this.data.visibilityStatuses.publicWarning ||
-      this.originalVisibility === this.data.visibilityStatuses.privateWarning
-    ) {
-      this.visibility = isPublic
-        ? this.data.visibilityStatuses.publicWarning
-        : this.data.visibilityStatuses.privateWarning;
+    const vs = this.data.visibilityStatuses;
+    if ([vs.publicWarning, vs.privateWarning].includes(this.originalVisibility)) {
+      this.visibility = isPublic ? vs.publicWarning : vs.privateWarning;
       return;
     }
-    if (
-      this.originalVisibility === this.data.visibilityStatuses.publicBanned ||
-      this.originalVisibility === this.data.visibilityStatuses.privateBanned
-    ) {
-      this.visibility = isPublic
-        ? this.data.visibilityStatuses.publicBanned
-        : this.data.visibilityStatuses.privateBanned;
+    if ([vs.publicBanned, vs.privateBanned].includes(this.originalVisibility)) {
+      this.visibility = isPublic ? vs.publicBanned : vs.privateBanned;
       return;
     }
-    this.visibility = isPublic
-      ? this.data.visibilityStatuses.public
-      : this.data.visibilityStatuses.private;
+    this.visibility = isPublic ? vs.public : vs.private;
   }
 
   get isEditable(): boolean {
-    return (
-      this.data.visibilityStatuses.publicBanned < this.visibility &&
-      this.visibility < this.data.visibilityStatuses.promoted
-    );
+    const vs = this.data.visibilityStatuses;
+    return vs.publicBanned < this.visibility && this.visibility < vs.promoted;
   }
 
   get selectedPublicTags(): string[] {
-    return this.selectedTags
-      .filter((tag) => tag.public === true)
-      .map((tag) => tag.tagname);
+    return this.selectedTags.filter((tag) => tag.public).map((tag) => tag.tagname);
   }
 
   get selectedPrivateTags(): string[] {
-    return this.selectedTags
-      .filter((tag) => tag.public === false)
-      .map((tag) => tag.tagname);
+    return this.selectedTags.filter((tag) => !tag.public).map((tag) => tag.tagname);
   }
 
   addTag(alias: string, tagname: string, isPublic: boolean): void {
-    this.selectedTags.push({
-      tagname: tagname,
-      public: isPublic,
-    });
+    this.selectedTags.push({ tagname, public: isPublic });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   removeTag(alias: string, tagname: string, isPublic: boolean): void {
-    this.selectedTags = this.selectedTags.filter(
-      (tag) => tag.tagname !== tagname,
-    );
+    this.selectedTags = this.selectedTags.filter((tag) => tag.tagname !== tagname);
   }
 
   selectProblemLevel(levelTag: string): void {
     this.problemLevel = levelTag;
   }
 
-  onUploadFile(ev: InputEvent): void {
-    const uploadedFile = ev.target as HTMLInputElement;
-    this.hasFile = uploadedFile.files !== null;
+  onUploadFile(ev: Event): void {
+    const input = ev.target as HTMLInputElement;
+    this.hasFile = !!input.files && input.files.length > 0;
   }
 
   onGenerateAlias(): void {
-    if (this.isUpdate) {
-      return;
-    }
-
-    // Remove accents
-    let generatedAlias = latinize(this.title);
-
-    // Replace whitespace
-    generatedAlias = generatedAlias.replace(/\s+/g, '-');
-
-    // Remove invalid characters
-    generatedAlias = generatedAlias.replace(/[^a-zA-Z0-9_-]/g, '');
-
-    generatedAlias = generatedAlias.substring(0, 32);
-
-    this.alias = generatedAlias;
+    if (this.isUpdate) return;
+    let generatedAlias = latinize(this.title).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9_-]/g, '');
+    this.alias = generatedAlias.substring(0, 32);
   }
 
   openCollapsedIfRequired() {
     const formData = new FormData(this.formRef);
 
-    let basicInfoCollapsed = this.basicInfoRef.classList.contains('collapsed');
+    let basicCollapsed = this.basicInfoRef.classList.contains('collapsed');
     let limitsCollapsed = this.limitsRef.classList.contains('collapsed');
-    let tagsCollapsed = !this.isUpdate
-      ? this.tagsRef.classList.contains('collapsed')
-      : false;
-    let validationCollapsed = this.validationRef
-      ? this.validationRef.classList.contains('collapsed')
-      : false;
+    let tagsCollapsed = !this.isUpdate ? this.tagsRef.classList.contains('collapsed') : false;
+    let validationCollapsed = this.validationRef ? this.validationRef.classList.contains('collapsed') : false;
 
     for (const [key, value] of formData.entries()) {
-      const isEmpty = value === '';
-      if (isEmpty) {
-        if (
-          basicInfoCollapsed &&
-          (key === 'title' || key === 'alias' || key === 'source')
-        ) {
-          this.basicInfoRef.click();
-          basicInfoCollapsed = false;
-          continue;
-        }
-        // To avoid making a complex logic check
-        if (basicInfoCollapsed && !this.isUpdate && !this.hasFile) {
-          this.basicInfoRef.click();
-          basicInfoCollapsed = false;
-          continue;
-        }
+      let isEmpty = value === '';
+      if (value instanceof File && value.size === 0) isEmpty = true;
 
+      if (isEmpty) {
+        if ((basicCollapsed && ['title', 'alias', 'source'].includes(key)) || (basicCollapsed && !this.isUpdate && !this.hasFile)) {
+          this.basicInfoRef.click();
+          basicCollapsed = false;
+          continue;
+        }
         if (tagsCollapsed && key === 'problem_level') {
           this.tagsRef.click();
           tagsCollapsed = false;
           continue;
         }
-
         if (validationCollapsed && key === 'languages') {
           this.validationRef.click();
           validationCollapsed = false;
           continue;
         }
-
-        if (
-          limitsCollapsed &&
-          (key === 'time_limit' ||
-            key === 'overall_wall_time_limit' ||
-            key === 'extra_wall_time' ||
-            key === 'memory_limit' ||
-            key === 'output_limit' ||
-            key === 'input_limit')
-        ) {
+        if (limitsCollapsed && ['time_limit', 'overall_wall_time_limit', 'extra_wall_time', 'memory_limit', 'output_limit', 'input_limit'].includes(key)) {
           this.limitsRef.click();
           limitsCollapsed = false;
           continue;
@@ -738,10 +563,7 @@ export default class ProblemForm extends Vue {
 
   @Watch('alias')
   onValueChanged(newValue: string): void {
-    if (this.isUpdate) {
-      return;
-    }
-    this.$emit('alias-changed', newValue);
+    if (!this.isUpdate) this.$emit('alias-changed', newValue);
   }
 }
 </script>
@@ -752,3 +574,4 @@ export default class ProblemForm extends Vue {
   width: 100%;
 }
 </style>
+
