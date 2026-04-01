@@ -132,6 +132,9 @@ export default class GridPaginator extends Vue {
   }
 
   private get totalPagesCount(): number {
+    if (this.rowsPerPage === 0) {
+      return 1;
+    }
     const totalRows = Math.ceil(this.filteredItems.length / this.columns);
     return Math.ceil(totalRows / this.rowsPerPage);
   }
@@ -149,6 +152,9 @@ export default class GridPaginator extends Vue {
   }
 
   private get paginatedItems(): LinkableResource[][] {
+    if (this.rowsPerPage === 0) {
+      return this.itemsRows;
+    }
     const start = this.currentPageNumber * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     return this.itemsRows.slice(start, end);
@@ -160,6 +166,7 @@ export default class GridPaginator extends Vue {
 
   @Watch('filter')
   onFilterChange(newFilter: string) {
+    this.currentPageNumber = 0;
     this.filteredItems = this.items.filter((item: LinkableResource) =>
       item.toString().toLowerCase().includes(newFilter.toLowerCase()),
     );
