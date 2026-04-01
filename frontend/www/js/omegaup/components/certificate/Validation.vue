@@ -40,18 +40,32 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class Validation extends Vue {
-  @Prop() verificationCode!: string;
-  @Prop() isValid!: boolean;
-  @Prop() certificate?: string;
-
-  T = T;
-  certificateUrl: null | string = null;
-
+// PoC: vue-property-decorator → defineComponent() (works on Vue 2.7 and Vue 3).
+export default defineComponent({
+  name: 'CertificateValidation',
+  props: {
+    verificationCode: {
+      type: String,
+      required: true,
+    },
+    isValid: {
+      type: Boolean,
+      required: true,
+    },
+    certificate: {
+      type: String,
+      default: undefined,
+    },
+  },
+  data() {
+    return {
+      T,
+      certificateUrl: null as string | null,
+    };
+  },
   created() {
     if (this.certificate === undefined) {
       return;
@@ -66,8 +80,8 @@ export default class Validation extends Vue {
       type: 'application/pdf',
     });
     this.certificateUrl = window.URL.createObjectURL(blob);
-  }
-}
+  },
+});
 </script>
 
 <style lang="scss" scoped>
