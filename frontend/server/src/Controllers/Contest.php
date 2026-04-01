@@ -83,7 +83,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
     const CONTEST_LIST_PAGE_SIZE = 10;
 
     /**
-     * Returns a list of contests
+     * Returns a paginated list of contests filtered by tab, admission mode,
+     * recommendation state, participation state, and query.
+     *
+     * Each result includes:
+     * - `window_length`: per-user contest duration in minutes (USACO-style),
+     *   or `null` when the contest uses global start/finish times.
+     * - `duration_minutes`: normalized contest length in minutes. This is
+     *   computed from `finish_time - start_time` when `window_length` is null,
+     *   otherwise it is derived from `window_length`.
      *
      * @return array{number_of_results: int, results: list<ContestListItem>}
      *
@@ -2108,9 +2116,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns details of a Contest. Requesting the details of a contest will
-     * not start the current user into that contest. In order to participate
-     * in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
+     * Returns contest details without opening the contest for the current user.
+     * Requesting this endpoint does not start participation.
+     *
+     * For contests with `window_length`, the effective
+     * `submission_deadline` can be user-specific once a user opens the contest.
+     * Use \OmegaUp\Controllers\Contest::apiOpen() to start participating.
      *
      * @return ContestDetails
      *
@@ -2713,7 +2724,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Creates a new contest
+     * Creates a new contest and its associated problemset.
+     *
+     * If `window_length` is provided, the contest uses per-user duration.
+     * If `window_length` is null, contest timing is governed by global
+     * `start_time` and `finish_time`.
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
@@ -3255,7 +3270,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds a problem to a contest
+     * Adds a problem to a contest problemset at the requested order/points.
+     * Re-adding an existing problem updates its assignment within that contest.
      *
      * @return array{status: string, solutionStatus: string}
      *
@@ -3595,9 +3611,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds a user to a contest.
+     * Adds a user (identity) to a contest.
      * By default, any user can view details of public contests.
-     * Only users added through this API can view private contests
+     * Only users added through this API can view private contests.
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -4108,7 +4124,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Get clarifications of a contest
+     * Returns contest clarifications visible to the current user.
+     * Admins can see all clarifications; non-admin users are restricted by
+     * clarification visibility rules.
      *
      * @return array{clarifications: list<Clarification>}
      *
@@ -4254,7 +4272,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns the Scoreboard
+     * Returns the contest scoreboard snapshot.
+     * Access is validated with either identity permissions or an optional
+     * scoreboard token when available.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
@@ -4792,7 +4812,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns ALL identities participating in a contest
+     * Returns all registered contest identities and contestant groups.
+     * This endpoint is restricted to contest admins.
      *
      * @return array{users: list<ContestUser>, groups: list<array{alias: string, name: string}>}
      *
@@ -4908,7 +4929,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Update a Contest
+     * Updates contest metadata and timing configuration.
+     *
+     * This endpoint supports partial updates. If `window_length` is set,
+     * the contest uses per-user timing; if null, timing is based on global
+     * `start_time`/`finish_time`.
      *
      * @return array{status: string, teamsGroupName?: string, title: string}
      *
