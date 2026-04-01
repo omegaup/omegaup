@@ -50,7 +50,7 @@
         <div class="col-md-4 col-md-offset-2 introjs-native">
           <h4>{{ T.loginNative }}</h4>
           <form class="form-horizontal">
-            <div class="form-group">
+            <div class="mb-3">
               <label for="user">{{ T.loginEmailUsername }}</label>
               <input
                 v-model="usernameOrEmail"
@@ -63,7 +63,7 @@
               />
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label for="pass"
                 >{{ T.loginPassword }} (<a
                   href="/login/password/recover/"
@@ -80,7 +80,7 @@
               />
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <button
                 data-login-submit
                 class="btn btn-primary form-control"
