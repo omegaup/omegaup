@@ -6,7 +6,7 @@
           data-prefix
           :label="T.problemCreatorPrefix"
           label-for="prefix"
-          invalid-feedback="Solo numeros"
+          :invalid-feedback="T.problemCreatorOnlyNumbers"
           class="mb-4"
         >
           <b-form-input
