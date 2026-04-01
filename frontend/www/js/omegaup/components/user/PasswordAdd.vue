@@ -20,6 +20,7 @@
           data-new-password
           :size="30"
           :required="true"
+          :show-strength-feedback="true"
           autocomplete="new-password"
         />
       </div>

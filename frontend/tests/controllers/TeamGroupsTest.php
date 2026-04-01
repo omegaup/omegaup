@@ -22,7 +22,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         foreach (range(0, $numberOfUsers - 1) as $id) {
             $usernameAndPasswordIdentities[] = [
                 'username' => "new_user_{$id}",
-                'password' => "new_user_password_{$id}",
+                'password' => "P@ssw0rd_{$id}",
             ];
         }
 
@@ -1003,7 +1003,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         foreach (range(0, $numberOfUsers - 1) as $id) {
             $usernameAndPasswordIdentities[] = [
                 'username' => "user{$id}",
-                'password' => "user_password_{$id}",
+                'password' => "P@ssw0rd_{$id}",
             ];
         }
 

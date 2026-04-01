@@ -8,6 +8,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testDeleteUserAsAdmin() {
         $username = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         $email = "{$username}@{$username}.com";
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
@@ -15,7 +16,7 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
                 'username' => $username,
-                'password' => $username,
+                'password' => $password,
                 'email' => $email,
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
                 'birth_date' => 946684800, // 01-01-2000
@@ -101,12 +102,13 @@ class UserDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\DAO\Emails::update($userEmail);
 
         $newUsername = \OmegaUp\Test\Utils::createRandomString();
+        $newPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call API mailFromUserLikelyRemoved
         try {
             \OmegaUp\Controllers\User::apiCreate(
                 new \OmegaUp\Request([
                     'username' => $newUsername,
-                    'password' => $newUsername,
+                    'password' => $newPassword,
                     'email' => $email,
                     'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
                     'birth_date' => 946684800, // 01-01-2000

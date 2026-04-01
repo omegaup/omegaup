@@ -43,7 +43,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         // be able to see all the 3 contests switching between both accounts
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $this->identityUsername = "{$group['group']->alias}:{$identityName}";
-        $this->password = \OmegaUp\Test\Utils::createRandomString();
+        $this->password = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -198,7 +198,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Set default password for all created identities
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([

@@ -436,7 +436,7 @@ jobs:
 
       - name: Run the teaching assistant for course mode
         env:
-          OMEGAUP_PASSWORD: teacher123
+          OMEGAUP_PASSWORD: Teacher_123!
           OMEGAUP_LLM_KEY: omegaup
         run: |
           cd stuff/teaching_assistant

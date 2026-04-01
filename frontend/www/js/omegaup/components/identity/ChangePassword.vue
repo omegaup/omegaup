@@ -27,6 +27,7 @@
               <omegaup-password-input
                 v-model="newPassword"
                 autocomplete="new-password"
+                :show-strength-feedback="true"
               />
             </label>
           </div>
