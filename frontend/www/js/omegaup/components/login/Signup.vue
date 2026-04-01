@@ -128,7 +128,7 @@
           <div class="col-md-4 offset-md-2">
             <div class="form-group">
               <input
-                id = "over13Checkbox"
+                id="over13Checkbox"
                 v-model="over13Checked"
                 type="checkbox"
                 data-over-thirteen-checkbox
