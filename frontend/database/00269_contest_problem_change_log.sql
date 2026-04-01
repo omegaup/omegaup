@@ -1,7 +1,7 @@
 -- Migration: Create Contest_Problem_Change_Log table
 -- for efficient storage and retrieval of contest problem change events.
 
-CREATE TABLE IF NOT EXISTS `Contest_Problem_Change_Log` (
+CREATE TABLE `Contest_Problem_Change_Log` (
   `change_id` int NOT NULL AUTO_INCREMENT,
   `contest_id` int NOT NULL COMMENT 'Contest where the problem change occurred',
   `problem_id` int NOT NULL COMMENT 'Problem that was changed',
