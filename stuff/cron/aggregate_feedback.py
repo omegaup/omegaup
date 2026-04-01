@@ -393,6 +393,7 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
     attempted_problems = 0
     successful_problems = 0
     failed_problems = 0
+    start_time = time.monotonic()
 
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
@@ -426,6 +427,13 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
         attempted_problems,
         successful_problems,
         failed_problems)
+    duration = time.monotonic() - start_time
+    logging.info(
+        'aggregate_feedback summary: attempted=%d failed=%d duration=%.2fs',
+        attempted_problems,
+        failed_problems,
+        duration,
+    )
 
 
 def aggregate_reviewers_feedback_for_problem(
