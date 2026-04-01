@@ -603,8 +603,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             ),
         ]));
 
-        $problem->submissions++;
-        \OmegaUp\DAO\Problems::update($problem);
+        \OmegaUp\DAO\Problems::incrementSubmissions(
+            intval(
+                $problem->problem_id
+            )
+        );
 
         $response = [
             'guid' => strval($submission->guid),
