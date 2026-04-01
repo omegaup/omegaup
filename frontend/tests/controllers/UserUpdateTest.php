@@ -737,4 +737,117 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $identityToGetInformation->name
         );
     }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    public function invalidBirthDateProvider(): array {
+        return [
+            'DD-MM-YYYY' => ['01-01-1990'],
+            'DD/MM/YYYY' => ['01/01/1990'],
+            'YYYY/MM/DD' => ['1990/01/01'],
+            'natural language format' => ['January 1, 1990'],
+            'missing leading zeros' => ['1990-1-1'],
+            'relative date yesterday' => ['yesterday'],
+            'relative date next week' => ['next week'],
+            'natural language next Thursday' => ['next Thursday'],
+        ];
+    }
+
+    /**
+     * Test that invalid date formats are rejected for birth_date.
+     *
+     * @dataProvider invalidBirthDateProvider
+     */
+    public function testInvalidDateFormatRejected(
+        string $invalidDate
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'birth_date' => $invalidDate,
+            ]));
+            $this->fail(
+                "Update should have failed for invalid date format: {$invalidDate}"
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('birth_date', $e->parameter);
+        }
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: \OmegaUp\Timestamp|int|string}>
+     */
+    public function validBirthDateProvider(): array {
+        // 1990-01-15 00:00:00 UTC
+        $timestamp = 632448000;
+        $expectedDate = gmdate('Y-m-d', $timestamp);
+        return [
+            'Timestamp object' => [
+                '1990-01-15',
+                new \OmegaUp\Timestamp($timestamp),
+            ],
+            'integer timestamp' => [
+                '1990-01-15',
+                $timestamp,
+            ],
+            'numeric string timestamp' => [
+                '1990-01-15',
+                strval($timestamp),
+            ],
+            'YYYY-MM-DD string' => [
+                '1990-01-15',
+                '1990-01-15',
+            ],
+        ];
+    }
+
+    /**
+     * Test that all valid date input types are accepted for birth_date.
+     *
+     * @param \OmegaUp\Timestamp|int|string $birthDateInput
+     * @dataProvider validBirthDateProvider
+     */
+    public function testValidDateFormatAccepted(
+        string $expectedDate,
+        $birthDateInput
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'birth_date' => $birthDateInput,
+        ]));
+
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($login->auth_token);
+        $this->assertSame($expectedDate, $userDb->birth_date);
+    }
+
+    /**
+     * Test that graduation_date also rejects natural language strings
+     */
+    public function testNaturalLanguageGraduationDateRejected() {
+        // Create the user to edit
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Try to set graduation_date with natural language string
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'graduation_date' => 'next Thursday',
+            ]));
+            $this->fail(
+                'Update should have failed due to natural language date string'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('graduation_date', $e->parameter);
+        }
+    }
 }
