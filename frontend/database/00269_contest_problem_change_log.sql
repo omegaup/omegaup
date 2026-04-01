@@ -10,6 +10,8 @@ CREATE TABLE `Contest_Problem_Change_Log` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`change_id`),
   KEY `idx_contest_timestamp` (`contest_id`, `timestamp`),
+  KEY `fk_cpcl_problem_id` (`problem_id`),
+  KEY `fk_cpcl_identity_id` (`identity_id`),
   CONSTRAINT `fk_cpcl_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_cpcl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_cpcl_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
