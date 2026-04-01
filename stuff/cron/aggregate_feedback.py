@@ -19,7 +19,10 @@ import time
 from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
 
-from mysql.connector import errorcode
+from mysql.connector import (
+    errorcode,
+    errors as mysql_errors,  # type: ignore[attr-defined]
+)
 
 sys.path.insert(
     0,
@@ -103,6 +106,65 @@ class RankCutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
     classname: str
     score: float
+
+
+def get_last_processed_qualitynomination_id(
+        dbconn: lib.db.Connection) -> int:
+    '''Return the watermark for aggregate_feedback runs.'''
+    try:
+        with dbconn.cursor() as cur:
+            cur.execute(
+                """SELECT
+                           `last_processed_qualitynomination_id`
+                       FROM
+                           `Cron_AggregateFeedback_State`
+                       WHERE
+                           `singleton_id` = 1;""")
+            rows = list(cur.fetchall())
+            if not rows:
+                return QUALITYNOMINATION_QUESTION_CHANGE_ID
+            return int(rows[0][0])
+    except mysql_errors.Error:  # type: ignore[attr-defined]
+        return QUALITYNOMINATION_QUESTION_CHANGE_ID
+
+
+def update_last_processed_qualitynomination_id(
+        dbconn: lib.db.Connection, value: int) -> None:
+    '''Persist the aggregate_feedback watermark.'''
+    try:
+        with dbconn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO
+                           `Cron_AggregateFeedback_State`(
+                               `singleton_id`,
+                               `last_processed_qualitynomination_id`)
+                       VALUES (1, %s)
+                       ON DUPLICATE KEY UPDATE
+                           `last_processed_qualitynomination_id` = VALUES(
+                               `last_processed_qualitynomination_id`);""",
+                (value,))
+        dbconn.conn.commit()
+    except Exception:  # pylint: disable=broad-except
+        return
+
+
+def get_current_max_qualitynomination_id(
+        dbconn: lib.db.Connection) -> int:
+    '''Return the highest suggestion qualitynomination_id.'''
+    with dbconn.cursor() as cur:
+        cur.execute(
+            """SELECT
+                       COALESCE(
+                           MAX(qn.`qualitynomination_id`),
+                           %s
+                       )
+                   FROM
+                       `QualityNominations` AS qn
+                   WHERE
+                       qn.`nomination` = 'suggestion';""",
+            (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
+        rows = list(cur.fetchall())
+        return int(rows[0][0])
 
 
 def fill_rank_cutoffs(
@@ -394,12 +456,21 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
     successful_problems = 0
     failed_problems = 0
 
+    last_processed_id = get_last_processed_qualitynomination_id(dbconn)
+
     with dbconn.cursor() as cur:
-        cur.execute("""SELECT DISTINCT qn.`problem_id`
-                       FROM `QualityNominations` as qn
-                       WHERE qn.`nomination` = 'suggestion'
-                         AND qn.`qualitynomination_id` > %s;""",
-                    (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
+        if last_processed_id <= QUALITYNOMINATION_QUESTION_CHANGE_ID:
+            cur.execute("""SELECT DISTINCT qn.`problem_id`
+                           FROM `QualityNominations` as qn
+                           WHERE qn.`nomination` = 'suggestion'
+                             AND qn.`qualitynomination_id` > %s;""",
+                        (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
+        else:
+            cur.execute("""SELECT DISTINCT qn.`problem_id`
+                           FROM `QualityNominations` as qn
+                           WHERE qn.`nomination` = 'suggestion'
+                             AND qn.`qualitynomination_id` > %s;""",
+                        (last_processed_id,))
         for (problem_id,) in cur.fetchall():
             attempted_problems += 1
             try:
@@ -426,6 +497,9 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
         attempted_problems,
         successful_problems,
         failed_problems)
+    if failed_problems == 0:
+        current_max_id = get_current_max_qualitynomination_id(dbconn)
+        update_last_processed_qualitynomination_id(dbconn, current_max_id)
 
 
 def aggregate_reviewers_feedback_for_problem(
