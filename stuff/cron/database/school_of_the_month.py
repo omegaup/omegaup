@@ -283,24 +283,30 @@ def insert_school_of_the_month_candidates(
 ) -> None:
     '''Insert school of the month candidates'''
     logging.info("Inserting school of the month candidates")
-    for index, row in enumerate(candidates):
-        cur.execute(
-            '''
-            INSERT INTO
-                `School_Of_The_Month` (
-                    `school_id`,
-                    `time`,
-                    `ranking`,
-                    `score`
-                )
-            VALUES(
-                %s,
-                %s,
-                %s,
-                %s
-            );
-            ''', (row.school_id, first_day_of_next_month,
-                  index + 1, row.score))
+    if not candidates:
+        return
+
+    rows = [
+        (row.school_id, first_day_of_next_month, index + 1, row.score)
+        for index, row in enumerate(candidates)
+    ]
+
+    cur.executemany(
+        '''
+        INSERT INTO
+            `School_Of_The_Month` (
+                `school_id`,
+                `time`,
+                `ranking`,
+                `score`
+            )
+        VALUES(
+            %s,
+            %s,
+            %s,
+            %s
+        );
+        ''', rows)
 
 
 def get_last_12_schools_of_the_month(
