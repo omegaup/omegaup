@@ -63,7 +63,7 @@ export default class Typeahead extends Vue {
     }, this.debounceDelay);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     // Clean up timer on component destruction
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
