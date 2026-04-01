@@ -127,19 +127,17 @@
         <div class="row">
           <div class="col-md-4 offset-md-2">
             <div class="form-group">
-
-    <label class="pl-1">
-    <input
-      v-model="over13Checked"
-      type="checkbox"
-      data-over-thirteen-checkbox
-      @change="updateDateRestriction"
-    />
-    <omegaup-markdown
-      :markdown="T.over13yearsOld"
-    ></omegaup-markdown>
-    </label>
-   
+              <label class="pl-1">
+                <input
+                  v-model="over13Checked"
+                  type="checkbox"
+                  data-over-thirteen-checkbox
+                  @change="updateDateRestriction"
+                />
+                <omegaup-markdown
+                  :markdown="T.over13yearsOld"
+                ></omegaup-markdown>
+              </label>
             </div>
           </div>
         </div>
