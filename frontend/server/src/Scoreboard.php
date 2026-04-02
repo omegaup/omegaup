@@ -13,9 +13,10 @@ namespace OmegaUp;
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  */
-class Scoreboard {
+class Scoreboard
+{
     // Column to return total score per user
-    const TOTAL_COLUMN = 'total';
+    public const TOTAL_COLUMN = 'total';
 
     /** @var \OmegaUp\ScoreboardParams */
     private $params;
@@ -29,7 +30,8 @@ class Scoreboard {
     /** @var bool */
     private static $isLastRunFromCache = false;
 
-    public function __construct(\OmegaUp\ScoreboardParams $params) {
+    public function __construct(\OmegaUp\ScoreboardParams $params)
+    {
         $this->params = $params;
         $this->log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(false);
@@ -48,9 +50,9 @@ class Scoreboard {
         $cache = null;
         // A few scoreboard options are not cacheable.
         if (
-            !$sortByName && is_null(
-                $filterUsersBy
-            ) && !$this->params->only_ac
+            !$sortByName &&
+            is_null($filterUsersBy) &&
+            !$this->params->only_ac
         ) {
             if ($this->params->admin) {
                 $cache = new \OmegaUp\Cache(
@@ -89,14 +91,13 @@ class Scoreboard {
             filterUsersBy: $filterUsersBy,
             groupId: $this->params->group_id,
             // Treat admin as contestant in virtual contest.
-            excludeAdmin: !$this->params->virtual,
+            excludeAdmin: !$this->params->virtual
         );
 
         // Get all problems given problemset
-        $rawProblemsetProblems =
-            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
-                $this->params->problemset_id
-            );
+        $rawProblemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
+            $this->params->problemset_id
+        );
 
         $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $this->params
@@ -104,14 +105,16 @@ class Scoreboard {
 
         if ($this->params->score_mode === 'max_per_group') {
             // The way to calculate the score is different in this mode
-            $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
+            $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
                 $this->params->problemset_id,
-                $scoreboardTimeLimit
+                $this->params->only_ac,
+                onlyBest: false
             );
         } else {
             $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
                 $this->params->problemset_id,
-                $this->params->only_ac
+                $this->params->only_ac,
+                $this->params->score_mode === 'partial'
             );
         }
 
@@ -148,9 +151,9 @@ class Scoreboard {
         );
 
         if (!is_null($cache)) {
-            $timeout =  is_null($this->params->finish_time) ?
-                0 :
-                max(
+            $timeout = is_null($this->params->finish_time)
+                ? 0
+                : max(
                     0,
                     $this->params->finish_time->time - \OmegaUp\Time::get()
                 );
@@ -165,7 +168,8 @@ class Scoreboard {
      *
      * @return list<ScoreboardEvent>
      */
-    public function events(): array {
+    public function events(): array
+    {
         $result = null;
 
         $contestantEventsCache = new \OmegaUp\Cache(
@@ -208,23 +212,22 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
-            showAllRuns: $this->params->admin,
+            showAllRuns: true,
             filterUsersBy: null,
-            groupId: null,
-            // Treat admin as contestant.
-            excludeAdmin: !$this->params->virtual,
+            groupId: $this->params->group_id, // Treat admin as contestant.
+            excludeAdmin: !$this->params->virtual
         );
 
         // Get all problems given problemset
-        $rawProblemsetProblems =
-            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
-                $this->params->problemset_id
-            );
-
-        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
+        $rawProblemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
             $this->params->problemset_id
         );
 
+        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
+            $this->params->problemset_id,
+            $this->params->only_ac,
+            $this->params->score_mode === 'partial'
+        );
         $problemMapping = [];
 
         $order = 0;
@@ -244,12 +247,9 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout = is_null($this->params->finish_time) ?
-            0 :
-            max(
-                0,
-                $this->params->finish_time->time - \OmegaUp\Time::get()
-            );
+        $timeout = is_null($this->params->finish_time)
+            ? 0
+            : max(0, $this->params->finish_time->time - \OmegaUp\Time::get());
         if ($canUseContestantCache) {
             $contestantEventsCache->set($result, $timeout);
         } elseif ($canUseAdminCache) {
@@ -265,7 +265,9 @@ class Scoreboard {
      *
      * @param \OmegaUp\ScoreboardParams $params
      */
-    public static function invalidateScoreboardCache(\OmegaUp\ScoreboardParams $params): void {
+    public static function invalidateScoreboardCache(
+        \OmegaUp\ScoreboardParams $params
+    ): void {
         $log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         $log->info('Invalidating scoreboard cache.');
 
@@ -293,7 +295,9 @@ class Scoreboard {
     /**
      * Force refresh of Scoreboard caches
      */
-    public static function refreshScoreboardCache(\OmegaUp\ScoreboardParams $params): void {
+    public static function refreshScoreboardCache(
+        \OmegaUp\ScoreboardParams $params
+    ): void {
         $problemsetExists = \OmegaUp\DAO\Problemsets::existsByPK(
             $params->problemset_id
         );
@@ -311,14 +315,13 @@ class Scoreboard {
             filterUsersBy: null,
             groupId: null,
             // Treat admin as contestant in virtual contest.
-            excludeAdmin: !$params->virtual,
+            excludeAdmin: !$params->virtual
         );
 
         // Get all problems given problemset
-        $rawProblemsetProblems =
-            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
-                $params->problemset_id
-            );
+        $rawProblemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
+            $params->problemset_id
+        );
 
         $problemMapping = [];
 
@@ -337,13 +340,17 @@ class Scoreboard {
         );
 
         $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $params->problemset_id
+            $params->problemset_id,
+            $params->only_ac,
+            $params->score_mode === 'partial'
         );
+
         if ($params->score_mode === 'max_per_group') {
             // The way to calculate the score is different in this mode
-            $contestRuns = \OmegaUp\DAO\RunsGroups::getProblemsetRunsGroups(
+            $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
                 $params->problemset_id,
-                $scoreboardTimeLimit
+                $params->only_ac,
+                false
             );
         } else {
             $contestRuns = $contestRunsForEvents;
@@ -351,12 +358,9 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout =  is_null($params->finish_time) ?
-            0 :
-            max(
-                0,
-                $params->finish_time->time - \OmegaUp\Time::get()
-            );
+        $timeout = is_null($params->finish_time)
+            ? 0
+            : max(0, $params->finish_time->time - \OmegaUp\Time::get());
 
         $contestantScoreboardCache = new \OmegaUp\Cache(
             \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX,
@@ -376,19 +380,22 @@ class Scoreboard {
             $params->scoreboard_pct,
             $params->score_mode,
             $params->show_scoreboard_after,
-            sortByName: false,
+            sortByName: false
         );
 
         $contestantEventCache = new \OmegaUp\Cache(
             \OmegaUp\Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX,
             strval($params->problemset_id)
         );
-        $contestantEventCache->set(\OmegaUp\Scoreboard::calculateEvents(
-            $params,
-            $contestRunsForEvents,
-            $rawContestIdentities,
-            $problemMapping
-        ), $timeout);
+        $contestantEventCache->set(
+            \OmegaUp\Scoreboard::calculateEvents(
+                $params,
+                $contestRunsForEvents,
+                $rawContestIdentities,
+                $problemMapping
+            ),
+            $timeout
+        );
 
         // Admin cache
         $params->admin = true; // Temporarily set for admin cache
@@ -414,7 +421,7 @@ class Scoreboard {
             $params->scoreboard_pct,
             $params->score_mode,
             $params->show_scoreboard_after,
-            sortByName: false,
+            sortByName: false
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
         $params->admin = false;
@@ -423,12 +430,15 @@ class Scoreboard {
             \OmegaUp\Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX,
             strval($params->problemset_id)
         );
-        $adminEventCache->set(\OmegaUp\Scoreboard::calculateEvents(
-            $params,
-            $contestRunsForEvents,
-            $rawContestIdentities,
-            $problemMapping
-        ), $timeout);
+        $adminEventCache->set(
+            \OmegaUp\Scoreboard::calculateEvents(
+                $params,
+                $contestRunsForEvents,
+                $rawContestIdentities,
+                $problemMapping
+            ),
+            $timeout
+        );
 
         // Try to broadcast the updated scoreboards:
         $log = \Monolog\Registry::omegaup()->withName('Scoreboard');
@@ -441,12 +451,12 @@ class Scoreboard {
                 json_encode([
                     'message' => '/scoreboard/update/',
                     'scoreboard_type' => 'contestant',
-                    'scoreboard' => $contestantScoreboard
+                    'scoreboard' => $contestantScoreboard,
                 ]),
-                true,  // public
-                null,  // username
-                -1,  // user_id
-                true  // user_only
+                true, // public
+                null, // username
+                -1, // user_id
+                true // user_only
             );
             \OmegaUp\Grader::getInstance()->broadcast(
                 $params->alias,
@@ -455,12 +465,12 @@ class Scoreboard {
                 json_encode([
                     'message' => '/scoreboard/update/',
                     'scoreboard_type' => 'admin',
-                    'scoreboard' => $adminScoreboard
+                    'scoreboard' => $adminScoreboard,
                 ]),
-                false,  // public
-                null,  // username
-                -1,  // user_id
-                false  // user_only
+                false, // public
+                null, // username
+                -1, // user_id
+                false // user_only
             );
         } catch (\Exception $e) {
             $log->error('Error broadcasting scoreboard', ['exception' => $e]);
@@ -475,12 +485,10 @@ class Scoreboard {
         \OmegaUp\ScoreboardParams $params
     ): ?\OmegaUp\Timestamp {
         if (
-            $params->admin
-            || is_null($params->finish_time)
-            || (
-                (\OmegaUp\Time::get() >= $params->finish_time->time)
-                && $params->show_scoreboard_after
-            )
+            $params->admin ||
+            is_null($params->finish_time) ||
+            (\OmegaUp\Time::get() >= $params->finish_time->time &&
+                $params->show_scoreboard_after)
         ) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
@@ -581,7 +589,7 @@ class Scoreboard {
                     'points' => 0.0,
                     'percent' => 0.0,
                     'penalty' => 0.0,
-                    'runs' => 0
+                    'runs' => 0,
                 ];
             }
 
@@ -589,9 +597,9 @@ class Scoreboard {
             $identitiesInfo[$contestant['identity_id']] = [
                 'problems' => $identityProblems,
                 'username' => $contestant['username'],
-                'name' => $contestant['name'] ?
-                    $contestant['name'] :
-                    $contestant['username'],
+                'name' => $contestant['name']
+                    ? $contestant['name']
+                    : $contestant['username'],
                 'country' => $contestant['country_id'] ?? 'xx',
                 'classname' => $contestant['classname'],
                 'is_invited' => boolval($contestant['is_invited']),
@@ -602,34 +610,39 @@ class Scoreboard {
             ];
         }
 
+        $identityProblemsScoreByGroup = [];
         foreach ($contestRuns as $run) {
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
-            $contestScore = $run['contest_score'];
-            $score = $run['score'];
             $isTest = $run['type'] == 'test';
 
-            $problem =&
-                $identitiesInfo[$identityId]['problems'][$problemMapping[$problemId]['order']];
-
-            if (!array_key_exists($identityId, $testOnly)) {
-                // Hay un usuario en la lista de Runs,
-                // que no fue regresado por \OmegaUp\DAO\Runs::getAllRelevantIdentities()
+            if (!array_key_exists($problemId, $problemMapping)) {
                 continue;
             }
 
-            if ($testOnly[$identityId]) {
-                $testOnly[$identityId] = $isTest;
+            $problem =
+                &$identitiesInfo[$identityId]['problems'][
+                    $problemMapping[$problemId]['order']
+                ];
+
+            if (!array_key_exists($identityId, $testOnly)) {
+                continue;
             }
+
+            $testOnly[$identityId] = $testOnly[$identityId] && $isTest;
             $noRuns[$identityId] = false;
+
             if (!$showAllRuns) {
-                if ($isTest || ($scoreboardPct === 0 && !$showScoreboardAfter)) {
+                if (
+                    $isTest ||
+                    ($scoreboardPct === 0 && !$showScoreboardAfter)
+                ) {
                     continue;
                 }
                 if (
-                    !is_null($scoreboardTimeLimit)
-                    && !empty($run['time'])
-                    && $run['time']->time >= $scoreboardTimeLimit->time
+                    !is_null($scoreboardTimeLimit) &&
+                    !empty($run['time']) &&
+                    $run['time']->time >= $scoreboardTimeLimit->time
                 ) {
                     $problem['runs']++;
                     $problem['pending'] = true;
@@ -637,35 +650,54 @@ class Scoreboard {
                 }
             }
 
-            $totalPenalty = $run['penalty'] + $problem['runs'] * $contestPenalty;
-            $roundedScore = round(floatval($contestScore), 2);
-            if (
-                $problem['points'] < $roundedScore ||
-                $problem['points'] == $roundedScore &&
-                $problem['penalty'] > $totalPenalty
-            ) {
-                $problem['points'] = $roundedScore;
-                $problem['percent'] = round($score * 100, 2);
-                $problem['penalty'] = $totalPenalty;
-
-                if ($withRunDetails === true && !empty($run['guid'])) {
-                    $runDetails = [];
-
-                    $runDetailsRequest = new \OmegaUp\Request([
-                        'run_alias' => $run['guid'],
-                        'auth_token' => $authToken,
-                    ]);
-                    $runDetails = \OmegaUp\Controllers\Run::apiDetails(
-                        $runDetailsRequest
+            if ($scoreMode == 'max_per_group') {
+                $contestScore = self::getMaxPerGroupScore(
+                    $identityProblemsScoreByGroup,
+                    $run['score_by_group'] ?? null,
+                    $identityId,
+                    $problemId,
+                    $problemMapping[$problemId]['maxScore']
+                );
+                $problem['points'] = max(
+                    $problem['points'],
+                    round(floatval($contestScore), 2)
+                );
+            } else {
+                if (
+                    $scoreMode !== 'all_or_nothing' ||
+                    floatval($run['score']) >= 1.0
+                ) {
+                    $problem['points'] = max(
+                        $problem['points'],
+                        round(floatval($run['contest_score']), 2)
                     );
-                    unset($runDetails['source']);
-                    $problem['run_details'] = $runDetails;
                 }
             }
-            if ($scoreMode == 'max_per_group') {
-                $problem['runs'] = $run['submission_count'] ?? 0;
-            } else {
+
+            $problem['percent'] = round($run['score'] * 100, 2);
+            $problem['penalty'] = $run['penalty'];
+
+            if (
+                $withRunDetails === true &&
+                !empty($run['guid']) &&
+                $problem['points'] > 0.0
+            ) {
+                $runDetailsRequest = new \OmegaUp\Request([
+                    'run_alias' => $run['guid'],
+                    'auth_token' => $authToken,
+                ]);
+                $runDetails = \OmegaUp\Controllers\Run::apiDetails(
+                    $runDetailsRequest
+                );
+                unset($runDetails['source']);
+                $problem['run_details'] = $runDetails;
+            }
+
+            if ($scoreMode === 'max_per_group') {
                 $problem['runs']++;
+            } else {
+                $problem['runs'] =
+                    $run['total_submissions'] ?? $problem['runs'] + 1;
             }
         }
 
@@ -701,7 +733,7 @@ class Scoreboard {
              * @param array{order: int, alias: string} $a
              * @param array{order: int, alias: string} $b
              */
-            fn (array $a, array $b) => $a['order'] - $b['order']
+            fn(array $a, array $b) => $a['order'] - $b['order']
         );
 
         return [
@@ -731,13 +763,12 @@ class Scoreboard {
                  * @param ScoreboardRankingEntry $b
                  */
                 function (array $a, array $b): int {
-                    if ($a[self::TOTAL_COLUMN]['points'] != $b[self::TOTAL_COLUMN]['points']) {
-                        return ($a[self::TOTAL_COLUMN]['points'] < $b[self::TOTAL_COLUMN]['points']) ? 1 : -1;
+                    $pointsA = round(floatval($a[self::TOTAL_COLUMN]['points']), 2);
+                    $pointsB = round(floatval($b[self::TOTAL_COLUMN]['points']), 2);
+                    if ($pointsA != $pointsB) {
+                        return $pointsA < $pointsB ? 1 : -1;
                     }
-                    if ($a[self::TOTAL_COLUMN]['penalty'] != $b[self::TOTAL_COLUMN]['penalty']) {
-                        return ($a[self::TOTAL_COLUMN]['penalty'] > $b[self::TOTAL_COLUMN]['penalty']) ? 1 : -1;
-                    }
-                    return strcasecmp($a['username'], $b['username']);
+                    return strcmp($a['username'], $b['username']);
                 }
             );
         } else {
@@ -748,7 +779,7 @@ class Scoreboard {
                  * @param ScoreboardRankingEntry $a
                  * @param ScoreboardRankingEntry $b
                  */
-                fn (array $a, array $b) => strcasecmp(
+                fn(array $a, array $b) => strcasecmp(
                     $a['username'],
                     $b['username']
                 )
@@ -757,34 +788,21 @@ class Scoreboard {
 
         // Append the place for each user
         $currentPoints = -1;
-        $currentPenalty = -1;
-        $place = 1;
+        $place = 0;
         $draws = 1;
         foreach ($scoreboard as &$userData) {
+            $points = round(floatval($userData['total']['points']), 2);
             if ($currentPoints === -1) {
-                $currentPoints = $userData['total']['points'];
-                $currentPenalty = $userData['total']['penalty'];
-            } else {
-                // If not in draw
-                if (
-                    $userData['total']['points'] < $currentPoints ||
-                    $userData['total']['penalty'] > $currentPenalty
-                ) {
-                    $currentPoints = $userData['total']['points'];
-                    $currentPenalty = $userData['total']['penalty'];
-
-                    $place += $draws;
-                    $draws = 1;
-                } elseif (
-                    $userData['total']['points'] == $currentPoints &&
-                           $userData['total']['penalty'] == $currentPenalty
-                ) {
-                    $draws++;
-                }
+                $currentPoints = $points;
+                $place = 1;
+            } elseif ($points < $currentPoints) {
+                $place += $draws;
+                $draws = 1;
+                $currentPoints = $points;
+            } elseif ($points == $currentPoints) {
+                $draws++;
             }
-
             if (!$sortByName) {
-                // Set the place for the current user
                 $userData['place'] = $place;
             }
         }
@@ -812,7 +830,7 @@ class Scoreboard {
 
         /** @var list<ScoreboardEvent> */
         $result = [];
-        /** @var array<int, array<int, array{points: int, penalty: int}>> */
+        /** @var array<int, array<int, array{points: float, penalty: float}>> */
         $identityProblemsScore = [];
         $identityProblemsScoreByGroup = [];
         $contestStart = $params->start_time;
@@ -820,22 +838,30 @@ class Scoreboard {
             $params
         );
 
-        // Calculate score for each contestant x problem x run
         foreach ($contestRuns as $run) {
             if (!$params->admin && $run['type'] != 'normal') {
                 continue;
             }
 
+            $identityId = $run['identity_id'];
+            $problemId = $run['problem_id'];
+
+            if (!isset($contestIdentities[$identityId])) {
+                continue;
+            }
+
             if (
-                !is_null($scoreboardTimeLimit)
-                && !empty($run['time'])
-                && $run['time']->time >= $scoreboardTimeLimit->time
+                !is_null($scoreboardTimeLimit) &&
+                !empty($run['time']) &&
+                $run['time']->time >= $scoreboardTimeLimit->time
             ) {
                 continue;
             }
 
-            $identityId = $run['identity_id'];
-            $problemId = $run['problem_id'];
+            if (!array_key_exists($problemId, $problemMapping)) {
+                continue;
+            }
+
             if ($params->score_mode === 'max_per_group') {
                 if (!isset($run['score_by_group'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -855,36 +881,27 @@ class Scoreboard {
             }
 
             if (!isset($identityProblemsScore[$identityId])) {
-                $identityProblemsScore[$identityId] = [
-                    $problemId => [
-                        'points' => 0.0,
-                        'penalty' => 0.0,
-                    ],
-                ];
-            } elseif (!isset($identityProblemsScore[$identityId][$problemId])) {
+                $identityProblemsScore[$identityId] = [];
+            }
+            if (!isset($identityProblemsScore[$identityId][$problemId])) {
                 $identityProblemsScore[$identityId][$problemId] = [
                     'points' => 0.0,
                     'penalty' => 0.0,
                 ];
             }
 
-            $problemData =& $identityProblemsScore[$identityId][$problemId];
-
-            if ($problemData['points'] >= $contestScore && $params->show_all_runs) {
-                continue;
-            }
-
+            $problemData = &$identityProblemsScore[$identityId][$problemId];
             $problemData['points'] = max(
                 $problemData['points'],
                 round(floatval($contestScore), 2)
             );
-            $problemData['penalty'] = 0.0;
+            $problemData['penalty'] = round(floatval($run['penalty']), 2);
 
-            if (!isset($contestIdentities[$identityId])) {
+            if ($problemData['points'] == 0.0) {
                 continue;
             }
 
-            $identity =& $contestIdentities[$identityId];
+            $identity = &$contestIdentities[$identityId];
 
             $data = [
                 'name' => $identity['name'] ?? $identity['username'],
@@ -895,8 +912,8 @@ class Scoreboard {
                 ),
                 'problem' => [
                     'alias' => $problemMapping[$problemId]['alias'],
-                    'points' => round(floatval($contestScore), 2),
-                    'penalty' => 0.0,
+                    'points' => $problemData['points'],
+                    'penalty' => $problemData['penalty'],
                 ],
                 'country' => $identity['country_id'] ?? 'xx',
                 'classname' => $identity['classname'],
@@ -907,19 +924,18 @@ class Scoreboard {
                 ],
             ];
 
-            foreach ($identityProblemsScore[$identityId] as $problem) {
-                $data['total']['points'] += $problem['points'];
+            foreach ($identityProblemsScore[$identityId] as $problemScore) {
+                $data['total']['points'] += $problemScore['points'];
                 if ($params->penalty_calc_policy == 'sum') {
-                    $data['total']['penalty'] += $problem['penalty'];
+                    $data['total']['penalty'] += $problemScore['penalty'];
                 } else {
                     $data['total']['penalty'] = max(
                         $data['total']['penalty'],
-                        $problem['penalty']
+                        $problemScore['penalty']
                     );
                 }
             }
 
-            // Add contestant results to scoreboard data
             $result[] = $data;
         }
 
@@ -929,7 +945,8 @@ class Scoreboard {
     /**
      * Set last run from cache for testing purposes
      */
-    private function setIsLastRunFromCacheForTesting(bool $value): void {
+    private function setIsLastRunFromCacheForTesting(bool $value): void
+    {
         if (!\OmegaUp\Scoreboard::$isTestRun) {
             return;
         }
@@ -955,7 +972,9 @@ class Scoreboard {
 
         if (!is_array($scoreByGroupArray)) {
             throw new \RuntimeException(
-                'json_decode failed with: ' . json_last_error() . "for : {$scoreByGroup}"
+                'json_decode failed with: ' .
+                json_last_error() .
+                "for : {$scoreByGroup}"
             );
         }
 
@@ -967,17 +986,21 @@ class Scoreboard {
                 $problemId => $scoreByGroupArray,
             ];
         } elseif (
-            !isset(
-                $identityProblemsScoreByGroup[$identityId][$problemId]
-            )
+            !isset($identityProblemsScoreByGroup[$identityId][$problemId])
         ) {
-            $identityProblemsScoreByGroup[$identityId][$problemId] = $scoreByGroupArray;
+            $identityProblemsScoreByGroup[$identityId][
+                $problemId
+            ] = $scoreByGroupArray;
         }
 
         foreach ($groupNames as $groupName) {
-            $identityProblemsScoreByGroup[$identityId][$problemId][$groupName] = max(
+            $identityProblemsScoreByGroup[$identityId][$problemId][
+                $groupName
+            ] = max(
                 $scoreByGroupArray[$groupName],
-                $identityProblemsScoreByGroup[$identityId][$problemId][$groupName]
+                $identityProblemsScoreByGroup[$identityId][$problemId][
+                    $groupName
+                ]
             );
         }
 
@@ -989,14 +1012,16 @@ class Scoreboard {
     /**
      * Get last run from Cache value
      */
-    public static function getIsLastRunFromCacheForTesting(): bool {
+    public static function getIsLastRunFromCacheForTesting(): bool
+    {
         return \OmegaUp\Scoreboard::$isLastRunFromCache;
     }
 
     /**
      * Enable testing extras
      */
-    public static function setIsTestRunForTesting(bool $value): void {
+    public static function setIsTestRunForTesting(bool $value): void
+    {
         \OmegaUp\Scoreboard::$isTestRun = $value;
     }
 }
