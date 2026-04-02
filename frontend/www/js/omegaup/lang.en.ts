@@ -624,6 +624,7 @@ const translations: { [key: string]: string; } = {
   courseExtraPointsProblem: "Valid for extra points",
   courseExtraPointsProblemDesc: "The points of this problem are counted only if the course's maximum score is not reached.",
   courseExtraPointsProblemLabel: "Extra points problem",
+  courseGetStarted: "Get started with your course by adding some content!",
   courseGroupNotFound: "Course group not found",
   courseHomepageStudentsSectionAlt: "Students section",
   courseHomepageStudentsSectionContent: "**Students**\n\n- Get instant feedback on their solutions.\n- Learn professional skills.\n- Access public online courses 24/7.\n",
