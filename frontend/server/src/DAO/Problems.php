@@ -310,17 +310,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!is_null($query)) {
             if (is_numeric($query)) {
                 $clauses[] = [
-                    "(
-                    p.title LIKE CONCAT('%', ?, '%') OR
-                    p.alias LIKE CONCAT('%', ?, '%') OR
+                    '(
+                    MATCH(p.alias, p.title) AGAINST (?) OR
                     p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
+                    )',
+                    [$query, intval($query)],
                 ];
             } else {
                 $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
+                    'MATCH(p.alias, p.title) AGAINST (?)',
+                    [$query],
                 ];
             }
         }
@@ -1202,8 +1201,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!empty($query)) {
             $sql .= '
                 WHERE
-                    p.`title` LIKE CONCAT("%", ?, "%") OR
-                    p.`alias` LIKE CONCAT("%", ?, "%")
+                    MATCH(p.alias, p.title) AGAINST (?)
             ';
             $params[] = $query;
             $params[] = $query;
@@ -1300,10 +1298,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sqlQuery = '';
         if (!empty($query)) {
             $sqlQuery = ' AND (
-                p.title LIKE CONCAT("%", ?, "%") OR
-                p.alias LIKE CONCAT("%", ?, "%")
+                MATCH(p.alias, p.title) AGAINST (?)
             )';
-            $params[] = $query;
             $params[] = $query;
         }
 
@@ -1372,10 +1368,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sqlQuery = '';
         if (!empty($query)) {
             $sqlQuery = ' AND (
-                p.title LIKE CONCAT("%", ?, "%") OR
-                p.alias LIKE CONCAT("%", ?, "%")
+                MATCH(p.alias, p.title) AGAINST (?)
             )';
-            $params[] = $query;
             $params[] = $query;
         }
 
@@ -1756,8 +1750,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                             Problems p
                         WHERE
                             (
-                                title LIKE CONCAT('%', ?, '%') OR
-                                alias LIKE CONCAT('%', ?, '%') OR
+                                MATCH(p.alias, p.title) AGAINST (?)
                                 problem_id = ?
                             )
                         UNION ALL
