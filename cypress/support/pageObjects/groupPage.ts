@@ -69,7 +69,7 @@ export class GroupPage {
   createTeamGroup(teamGroupOptions: TeamGroupOptions): void {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-user-teams-groups]').click();
-    cy.get('[href="/teamsgroup/new/"]').click();
+    cy.get('[href="/teamsgroup/new/"]').first().click();
 
     cy.get('[name="title"]').type(teamGroupOptions.groupTitle);
     cy.get('[name="description"]').type(teamGroupOptions.groupDescription);
