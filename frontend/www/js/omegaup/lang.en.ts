@@ -2352,7 +2352,9 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
-  zipPrepare: "Prepare zip file",
+  zipPrepare: 'Prepare zip file',
+  teamsGroupsEmptyTitle: 'No teams groups created yet',
+  teamsGroupsEmptyDescription: 'Create your first group to start collaborating with your team.',
 };
 
 export {translations as default};
