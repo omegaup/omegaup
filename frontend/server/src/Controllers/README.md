@@ -4602,11 +4602,12 @@ for given page and username.
 
 ### Parameters
 
-| Name       | Type           | Description | Required |
-| ---------- | -------------- | ----------- | -------- |
-| `page`     | `int\|null`    |             |          |
-| `pageSize` | `int\|null`    |             |          |
-| `username` | `string\|null` |             |          |
+| Name                 | Type           | Description | Required |
+| -------------------- | -------------- | ----------- | -------- |
+| `page`               | `int\|null`    |             |          |
+| `pageSize`           | `int\|null`    |             |          |
+| `submissionIdCursor` | `int\|null`    |             |          |
+| `username`           | `string\|null` |             |          |
 
 ### Returns
 

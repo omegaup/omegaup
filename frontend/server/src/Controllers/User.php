@@ -2872,13 +2872,14 @@ class User extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         string $filteredBy,
         int $offset,
-        int $rowCount
+        int $rowCount,
+        ?int $rankingCursor = null
     ): array {
         $selectedFilter = self::getSelectedFilter(
             $loggedIdentity,
             $filteredBy
         );
-        $rankCacheName = "{$offset}-{$rowCount}-{$filteredBy}-{$selectedFilter['value']}";
+        $rankCacheName = "{$offset}-{$rowCount}-{$filteredBy}-{$selectedFilter['value']}-{$rankingCursor}";
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEMS_SOLVED_RANK,
             $rankCacheName,
@@ -2889,7 +2890,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 $loggedIdentity,
                 $filteredBy,
                 $offset,
-                $rowCount
+                $rowCount,
+                $rankingCursor
             ): array {
                 $selectedFilter = self::getSelectedFilter(
                     $loggedIdentity,
@@ -2901,7 +2903,8 @@ class User extends \OmegaUp\Controllers\Controller {
                     'ranking',
                     'ASC',
                     $selectedFilter['filteredBy'],
-                    $selectedFilter['value']
+                    $selectedFilter['value'],
+                    $rankingCursor
                 );
             },
             APC_USER_CACHE_USER_RANK_TIMEOUT
@@ -2915,14 +2918,16 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getAuthorsRank(
         int $offset,
-        int $rowCount
+        int $rowCount,
+        ?int $authorRankingCursor = null
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK,
-            "{$offset}-{$rowCount}",
+            "{$offset}-{$rowCount}-{$authorRankingCursor}",
             fn () => \OmegaUp\DAO\UserRank::getAuthorsRank(
                 $offset,
-                $rowCount
+                $rowCount,
+                $authorRankingCursor
             ),
             APC_USER_CACHE_USER_RANK_TIMEOUT
         );
@@ -2939,13 +2944,15 @@ class User extends \OmegaUp\Controllers\Controller {
         string $filteredBy,
         int $offset,
         int $rowCount,
-        array $params
+        array $params,
+        ?int $rankingCursor = null
     ) {
         $ranking = self::getRankByProblemsSolved(
             $loggedIdentity,
             filteredBy: $filteredBy,
             offset: $offset,
-            rowCount: $rowCount
+            rowCount: $rowCount,
+            rankingCursor: $rankingCursor
         );
         $pager = \OmegaUp\Pager::paginateWithUrl(
             $ranking['total'],
@@ -2990,14 +2997,17 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $authorRankingCursor
      */
     public static function getAuthorRankForTypeScript(\OmegaUp\Request $r) {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
+        $authorRankingCursor = $r->ensureOptionalInt('authorRankingCursor');
 
         $authorsRanking = self::getAuthorsRank(
             $page,
-            $length
+            $length,
+            $authorRankingCursor
         );
         return [
             'templateProperties' => [
@@ -4133,10 +4143,12 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $filter
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $rankingCursor
      */
     public static function getRankForTypeScript(\OmegaUp\Request $r) {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
+        $rankingCursor = $r->ensureOptionalInt('rankingCursor');
         $filter = $r->ensureOptionalEnum(
             'filter',
             [
@@ -4163,6 +4175,7 @@ class User extends \OmegaUp\Controllers\Controller {
             return self::getRankToLoggedOutUser(
                 offset: $page,
                 rowCount: $length,
+                rankingCursor: $rankingCursor,
             );
         }
         return self::getRankToLoggedInUser(
@@ -4171,6 +4184,7 @@ class User extends \OmegaUp\Controllers\Controller {
             offset: $page,
             rowCount: $length,
             params: $params,
+            rankingCursor: $rankingCursor,
         );
     }
 
@@ -4184,6 +4198,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getRankToLoggedOutUser(
         int $offset,
         int $rowCount,
+        ?int $rankingCursor = null,
     ) {
         [
             'ranking' => $ranking,
@@ -4194,6 +4209,7 @@ class User extends \OmegaUp\Controllers\Controller {
             offset: $offset,
             rowCount: $rowCount,
             params: [],
+            rankingCursor: $rankingCursor,
         );
         return [
             'templateProperties' => [
@@ -4225,7 +4241,8 @@ class User extends \OmegaUp\Controllers\Controller {
         string $filteredBy,
         int $offset,
         int $rowCount,
-        array $params
+        array $params,
+        ?int $rankingCursor = null
     ) {
         $availableFilters = [];
         if (!is_null($loggedIdentity->country_id)) {
@@ -4266,6 +4283,7 @@ class User extends \OmegaUp\Controllers\Controller {
             offset: $offset,
             rowCount: $rowCount,
             params: $params,
+            rankingCursor: $rankingCursor,
         );
 
         return [

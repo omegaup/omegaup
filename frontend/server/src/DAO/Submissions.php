@@ -293,6 +293,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ?int $identityId = null,
         ?int $page = 1,
         ?int $rowsPerPage = 100,
+        ?int $submissionIdCursor = null,
     ): array {
         $rowsPerPage = min(100, max(1, intval($rowsPerPage)));
         $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
@@ -356,13 +357,29 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             $params[] = $identityId;
         }
 
-        $sql .= '
-            ORDER BY
-                s.submission_id DESC
-            LIMIT ?, ?;
-        ';
-        $params[] = max(0, $page - 1) * $rowsPerPage;
-        $params[] = intval($rowsPerPage);
+        if (!is_null($submissionIdCursor)) {
+            $sql .= '
+                AND s.submission_id < ?
+            ';
+            $params[] = $submissionIdCursor;
+        }
+
+        if (is_null($submissionIdCursor)) {
+            $sql .= '
+                ORDER BY
+                    s.submission_id DESC
+                LIMIT ?, ?;
+            ';
+            $params[] = max(0, $page - 1) * $rowsPerPage;
+            $params[] = intval($rowsPerPage);
+        } else {
+            $sql .= '
+                ORDER BY
+                    s.submission_id DESC
+                LIMIT ?;
+            ';
+            $params[] = intval($rowsPerPage);
+        }
 
         /** @var list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
