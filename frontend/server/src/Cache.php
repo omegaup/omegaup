@@ -582,6 +582,7 @@ class Cache {
     const DATA_CASES_FILES = 'data-cases-files-';
     const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
     const PROBLEM_IDENTITY_TYPE = 'problems-identity-type-';
+    const PROBLEM_ADMIN_CONTAINERS = 'problem-admin-containers-';
 
     /** @var \Monolog\Logger */
     private $log;
