@@ -2249,6 +2249,7 @@ const translations: { [key: string]: string; } = {
   wordsNextPage: "P\u00e1gina siguiente",
   wordsNo: "No",
   wordsNoComment: "Sin comentarios",
+  wordsNoResultsFound: "No se encontraron resultados",
   wordsNoSubmissions: "Lectura (Sin env\u00edos)",
   wordsNone: "Nada",
   wordsNotApplicable: "N/A",
