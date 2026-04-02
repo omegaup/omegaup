@@ -36,6 +36,8 @@
     <omegaup-problem-base-list
       :problems="problems"
       :logged-in="loggedIn"
+      :admin-courses="adminCourses"
+      :admin-contests="adminContests"
       :selected-tags="selectedTags"
       :pager-items="pagerItems"
       :wizard-tags="wizardTags"
@@ -55,6 +57,8 @@
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
+      @add-to-course="(data) => $emit('add-to-course', data)"
+      @add-to-contest="(data) => $emit('add-to-contest', data)"
     ></omegaup-problem-base-list>
   </div>
 </template>
@@ -79,6 +83,15 @@ import problem_BaseList from './BaseList.vue';
 export default class List extends Vue {
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
+  @Prop({ default: () => [] }) adminCourses!: {
+    alias: string;
+    name: string;
+    assignments: { alias: string; name: string; assignment_type: string }[];
+  }[];
+  @Prop({ default: () => [] }) adminContests!: {
+    alias: string;
+    title: string;
+  }[];
   @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
