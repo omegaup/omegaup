@@ -55,81 +55,166 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     ): array {
         $sql = '
         SELECT
-            bpr.assignment_alias,
-            bpr.problem_alias,
-            IFNULL(VARIANCE(bpr.max_user_score_for_problem), 0) AS variance,
-            IFNULL(AVG(bpr.max_user_score_for_problem), 0) AS average,
-            IFNULL(AVG(
-                CASE WHEN bpr.max_user_percent_for_problem >= 1 THEN 1 ELSE 0 END
-            ) * 100, 0) AS completed_score_percentage,
-            IFNULL(AVG(
-                CASE WHEN bpr.max_user_percent_for_problem > 0.6 THEN 1 ELSE 0 END
-            ) * 100, 0) AS high_score_percentage,
-            IFNULL(AVG(
-                CASE WHEN bpr.max_user_percent_for_problem = 0 THEN 1 ELSE 0 END
-            ) * 100, 0) AS low_score_percentage,
-            IFNULL(MIN(bpr.max_user_score_for_problem), 0) as minimum,
-            IFNULL(MAX(bpr.max_user_score_for_problem), 0) as maximum,
-            bpr.max_points,
-            IFNULL(AVG(bpr.run_count), 0) AS avg_runs
-        FROM (
-            SELECT
-                pr.assignment_id,
-                pr.assignment_alias,
-                pr.problem_alias,
-                pr.problem_id,
-                pr.order,
-                pr.max_points,
-                IFNULL(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
-                IFNULL(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
-                IFNULL(COUNT(`r`.`submission_id`), 0) AS run_count
-            FROM
-                `Groups_Identities` AS `gi`
-            CROSS JOIN
+            pr.assignment_alias,
+            pr.problem_alias,
+            IFNULL(
+                (SUM(
+                    COALESCE(ss.max_user_score_for_problem, 0) *
+                    COALESCE(ss.max_user_score_for_problem, 0)
+                ) / NULLIF(ANY_VALUE(gc.total_identities), 0)) -
+                POW(
+                    SUM(COALESCE(ss.max_user_score_for_problem, 0)) /
+                    NULLIF(ANY_VALUE(gc.total_identities), 0),
+                    2
+                ),
+                0
+            ) AS variance,
+            IFNULL(
+                SUM(COALESCE(ss.max_user_score_for_problem, 0)) /
+                NULLIF(ANY_VALUE(gc.total_identities), 0),
+                0
+            ) AS average,
+            IFNULL(
+                SUM(
+                    CASE
+                        WHEN COALESCE(ss.max_user_percent_for_problem, 0) >= 1
+                            THEN 1
+                        ELSE 0
+                    END
+                ) / NULLIF(ANY_VALUE(gc.total_identities), 0) * 100,
+                0
+            ) AS completed_score_percentage,
+            IFNULL(
+                SUM(
+                    CASE
+                        WHEN COALESCE(ss.max_user_percent_for_problem, 0) > 0.6
+                            THEN 1
+                        ELSE 0
+                    END
+                ) / NULLIF(ANY_VALUE(gc.total_identities), 0) * 100,
+                0
+            ) AS high_score_percentage,
+            IFNULL(
                 (
+                    SUM(
+                        CASE
+                            WHEN COALESCE(ss.max_user_percent_for_problem, 0) = 0
+                                THEN 1
+                            ELSE 0
+                        END
+                    ) + (ANY_VALUE(gc.total_identities) - COUNT(ss.identity_id))
+                ) / NULLIF(ANY_VALUE(gc.total_identities), 0) * 100,
+                0
+            ) AS low_score_percentage,
+            IFNULL(
+                CASE
+                    WHEN COUNT(ss.identity_id) < ANY_VALUE(gc.total_identities) THEN 0
+                    ELSE MIN(ss.max_user_score_for_problem)
+                END,
+                0
+            ) AS minimum,
+            IFNULL(MAX(ss.max_user_score_for_problem), 0) AS maximum,
+            pr.max_points,
+            IFNULL(
+                SUM(COALESCE(ss.run_count, 0)) /
+                NULLIF(ANY_VALUE(gc.total_identities), 0),
+                0
+            ) AS avg_runs
+        FROM
+            (
                 SELECT
                     `a`.`assignment_id`,
                     `a`.`alias` AS assignment_alias,
                     `a`.`problemset_id`,
                     `p`.`problem_id`,
                     `p`.`alias` AS problem_alias,
-                    `psp`.`points` as max_points,
+                    `psp`.`points` AS max_points,
                     `psp`.`order`
                 FROM
                     `Assignments` AS `a`
                 INNER JOIN
-                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `a`.`problemset_id`
+                    `Problemset_Problems` AS `psp`
+                ON
+                    `psp`.`problemset_id` = `a`.`problemset_id`
                 INNER JOIN
-                    `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
+                    `Problems` AS `p`
+                ON
+                    `p`.`problem_id` = `psp`.`problem_id`
                 WHERE
                     `a`.`course_id` = ?
                     AND `p`.`languages` <> ""
                 GROUP BY
                     `a`.`assignment_id`, `p`.`problem_id`
-                ) AS pr
-            LEFT JOIN
-                `Submissions` AS `s`
-            ON
-                `s`.`problem_id` = `pr`.`problem_id`
-                AND `s`.`identity_id` = `gi`.`identity_id`
-                AND `s`.`problemset_id` = `pr`.`problemset_id`
-            LEFT JOIN
-                `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
-            WHERE
-                `gi`.`group_id` = ?
-            GROUP BY
-                `gi`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
-        ) AS bpr
+            ) AS pr
+        CROSS JOIN
+            (
+                SELECT
+                    COUNT(*) AS total_identities
+                FROM
+                    `Groups_Identities`
+                WHERE
+                    `group_id` = ?
+            ) AS gc
+        LEFT JOIN
+            (
+                SELECT
+                    `s`.`identity_id`,
+                    `s`.`problem_id`,
+                    `s`.`problemset_id`,
+                    IFNULL(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
+                    IFNULL(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
+                    IFNULL(COUNT(`r`.`submission_id`), 0) AS run_count
+                FROM
+                    `Submissions` AS `s`
+                INNER JOIN
+                    `Runs` AS `r`
+                ON
+                    `r`.`run_id` = `s`.`current_run_id`
+                INNER JOIN
+                    `Groups_Identities` AS `gi`
+                ON
+                    `gi`.`identity_id` = `s`.`identity_id`
+                    AND `gi`.`group_id` = ?
+                INNER JOIN
+                    (
+                        SELECT
+                            `a`.`problemset_id`,
+                            `psp`.`problem_id`
+                        FROM
+                            `Assignments` AS `a`
+                        INNER JOIN
+                            `Problemset_Problems` AS `psp`
+                        ON
+                            `psp`.`problemset_id` = `a`.`problemset_id`
+                        INNER JOIN
+                            `Problems` AS `p`
+                        ON
+                            `p`.`problem_id` = `psp`.`problem_id`
+                        WHERE
+                            `a`.`course_id` = ?
+                            AND `p`.`languages` <> ""
+                        GROUP BY
+                            `a`.`problemset_id`, `psp`.`problem_id`
+                    ) AS pr2
+                ON
+                    `pr2`.`problemset_id` = `s`.`problemset_id`
+                    AND `pr2`.`problem_id` = `s`.`problem_id`
+                GROUP BY
+                    `s`.`identity_id`, `s`.`problem_id`, `s`.`problemset_id`
+            ) AS ss
+        ON
+            `ss`.`problem_id` = `pr`.`problem_id`
+            AND `ss`.`problemset_id` = `pr`.`problemset_id`
         GROUP BY
-            bpr.problem_alias, bpr.assignment_alias
+            pr.problem_alias, pr.assignment_alias
         ORDER BY
-            bpr.assignment_id, bpr.order, bpr.problem_id;
+            pr.assignment_id, pr.order, pr.problem_id;
         ';
 
         /** @var list<array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [ $courseId, $groupId ]
+            [ $courseId, $groupId, $groupId, $courseId ]
         );
         return $results;
     }
