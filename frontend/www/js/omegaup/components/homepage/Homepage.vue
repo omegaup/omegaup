@@ -159,7 +159,7 @@ import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
 import homepage_Cookie from './CookieConsent.vue';
 import VueCookies from 'vue-cookies';
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 @Component({
   components: {

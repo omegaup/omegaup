@@ -1,9 +1,13 @@
 <template>
-  <label class="switch-container font-weight-bold" :class="size">
+  <label
+    class="switch-container font-weight-bold"
+    :class="[size, { disabled }]"
+  >
     <div class="switch">
       <input
         v-model="currentCheckedValue"
         :value="currentCheckedValue"
+        :disabled="disabled"
         type="checkbox"
       />
       <span class="slider round"></span>
@@ -29,6 +33,7 @@ export default class ToggleSwitch extends Vue {
   @Prop({ default: 'Check' }) textDescription!: string;
   @Prop({ default: true }) checkedValue!: boolean;
   @Prop({ default: ToggleSwitchSize.Large }) size!: ToggleSwitchSize;
+  @Prop({ default: false }) disabled!: boolean;
 
   currentCheckedValue = this.checkedValue;
 
@@ -36,6 +41,11 @@ export default class ToggleSwitch extends Vue {
   @Emit('update:value')
   onUpdateInput(newValue: boolean): boolean {
     return newValue;
+  }
+
+  @Watch('checkedValue')
+  onCheckedValueChanged(newValue: boolean): void {
+    this.currentCheckedValue = newValue;
   }
 }
 </script>
@@ -174,5 +184,18 @@ input {
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
   }
+}
+
+.switch-container.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.switch-container.disabled .slider {
+  cursor: not-allowed;
+}
+
+.switch-container.disabled input {
+  pointer-events: none;
 }
 </style>
