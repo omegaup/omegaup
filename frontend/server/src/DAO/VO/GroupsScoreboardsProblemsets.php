@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class GroupsScoreboardsProblemsets extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'group_scoreboard_id' => true,
         'problemset_id' => true,
         'only_ac' => true,

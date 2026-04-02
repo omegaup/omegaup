@@ -9,9 +9,9 @@ class Grader {
     /** @var null|\OmegaUp\Grader */
     private static $_instance = null;
 
-    const REQUEST_MODE_JSON = 1;
-    const REQUEST_MODE_RAW = 2;
-    const REQUEST_MODE_PASSTHRU = 3;
+    public const REQUEST_MODE_JSON = 1;
+    public const REQUEST_MODE_RAW = 2;
+    public const REQUEST_MODE_PASSTHRU = 3;
 
     /**
      * This is needed to prevent Psalm from complaining every time this shows

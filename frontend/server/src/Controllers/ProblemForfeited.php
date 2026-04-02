@@ -6,7 +6,7 @@
  * ProblemForfeitedController
  */
 class ProblemForfeited extends \OmegaUp\Controllers\Controller {
-    const SOLUTIONS_ALLOWED_TO_SEE_PER_DAY = 5;
+    public const SOLUTIONS_ALLOWED_TO_SEE_PER_DAY = 5;
 
     /**
      * Returns the number of solutions allowed

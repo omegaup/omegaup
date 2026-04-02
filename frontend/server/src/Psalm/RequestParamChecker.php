@@ -25,7 +25,7 @@ class RequestParamChecker implements
      * A mapping of \OmegaUp\Request::ensureXxx() methods to the type that they
      * are enforcing the API parameter to be.
      */
-    const ENSURE_TYPE_MAPPING = [
+    public const ENSURE_TYPE_MAPPING = [
         'OmegaUp\\Request::ensurebool' => 'bool',
         'OmegaUp\\Request::ensureoptionalbool' => 'bool|null',
         'OmegaUp\\Request::ensureint' => 'int',
@@ -42,7 +42,7 @@ class RequestParamChecker implements
      * A mapping of \OmegaUp\Validator::validateXxx() methods to the type that they
      * are enforcing the API parameter to be.
      */
-    const VALIDATOR_TYPE_MAPPING = [
+    public const VALIDATOR_TYPE_MAPPING = [
         'OmegaUp\\Validators::validatenumber' => 'int',
         'OmegaUp\\Validators::validatenumberinrange' => 'int',
         'OmegaUp\\Validators::validateoptionalnumber' => 'int|null',

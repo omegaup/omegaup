@@ -14,12 +14,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
      */
-    const REVIEWERS_PER_NOMINATION = 2;
+    public const REVIEWERS_PER_NOMINATION = 2;
 
     // Number of rows shown in nominations list
-    const PAGE_SIZE = 100;
+    public const PAGE_SIZE = 100;
 
-    const ALLOWED_TAGS = [
+    public const ALLOWED_TAGS = [
         'problemTopic2Sat',
         'problemTopicArrays',
         'problemTopicBacktracking',
@@ -63,7 +63,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTopicTwoPointers',
     ];
 
-    const ALLOWED_PUBLIC_TAGS = [
+    public const ALLOWED_PUBLIC_TAGS = [
         'problemTagArithmetic',
         'problemTagConditionals',
         'problemTagLoops',
@@ -210,7 +210,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagNumericalMethods',
     ];
 
-    const LEVEL_TAGS = [
+    public const LEVEL_TAGS = [
         'problemLevelAdvancedCompetitiveProgramming',
         'problemLevelAdvancedSpecializedTopics',
         'problemLevelBasicIntroductionToProgramming',

@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class ProblemOfTheWeek extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'problem_of_the_week_id' => true,
         'problem_id' => true,
         'time' => true,

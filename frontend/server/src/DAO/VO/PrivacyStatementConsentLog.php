@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class PrivacyStatementConsentLog extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'privacystatement_consent_id' => true,
         'identity_id' => true,
         'privacystatement_id' => true,
