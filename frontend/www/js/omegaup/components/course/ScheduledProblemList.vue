@@ -4,44 +4,73 @@
       <h5>
         {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ addCardHeaderDescLabel }}</span>
+      <span v-if="problems && problems.length === 0">
+  {{ addCardHeaderDescLabel }}
+</span>
     </div>
     <div class="card-body">
-      <div v-if="problems.length == 0" class="empty-table-message">
-        {{ emptyTableLabel }}
-      </div>
-      <div v-else>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>{{ problemTableHeaderLabel }}</th>
-              <th>{{ pointsTableHeaderLabel }}</th>
-              <th>{{ T.contestAddproblemProblemRemove }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="problem in problems" :key="problem.alias">
-              <td class="align-middle">
-                <a :href="`/arena/problem/${problem.alias}/`">{{
-                  problem.alias
-                }}</a>
-              </td>
-              <td class="align-middle">{{ problem.points }}</td>
-              <td class="button-column align-middle">
-                <button
-                  class="btn btn-link"
-                  :title="removeButtonLabel"
-                  @click.prevent="onRemoveProblem(problem)"
-                >
-                  <font-awesome-icon icon="trash" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="card-footer" data-course-add-problem>
+  <!-- EMPTY STATE -->
+ <div
+  v-if="(!problems || problems.length === 0) && !showForm"
+  class="text-center p-5"
+>
+  <!-- ICON -->
+  <font-awesome-icon icon="code" size="3x" class="mb-3" />
+
+  <!-- TITLE -->
+  <h5>{{ emptyTableLabel }}</h5>
+
+  <!-- SUBTITLE -->
+  <p class="text-muted">
+    {{ addCardHeaderDescLabel }}
+  </p>
+
+  <!-- BUTTON -->
+  <button
+    class="btn btn-primary mt-3"
+    @click="showForm = true"
+  >
+    {{ addButtonLabel }}
+  </button>
+</div>
+
+  <!-- NORMAL TABLE -->
+  <div v-else>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>{{ problemTableHeaderLabel }}</th>
+          <th>{{ pointsTableHeaderLabel }}</th>
+          <th>{{ T.contestAddproblemProblemRemove }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="problem in problems" :key="problem.alias">
+          <td class="align-middle">
+            <a :href="`/arena/problem/${problem.alias}/`">
+              {{ problem.alias }}
+            </a>
+          </td>
+          <td class="align-middle">{{ problem.points }}</td>
+          <td class="button-column align-middle">
+            <button
+              class="btn btn-link"
+              :title="removeButtonLabel"
+              @click.prevent="onRemoveProblem(problem)"
+            >
+              <font-awesome-icon icon="trash" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+   <div
+  class="card-footer"
+  data-course-add-problem
+  v-if="showForm || (problems && problems.length > 0)"
+>
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -125,6 +154,7 @@ export default class CourseScheduledProblemList extends Vue {
   T = T;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
+  showForm = false;
   taggedProblemAlias = '';
   problemAlias: null | types.ListItem = null;
   points = 100;
