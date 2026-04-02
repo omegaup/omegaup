@@ -10,6 +10,8 @@ FROM
         `Contests` AS `c`
       INNER JOIN
         `ACLs` AS `a` ON `a`.`acl_id` = `c`.`acl_id`
+      WHERE
+        `c`.`last_updated` >= CONCAT(YEAR(NOW()) - 2, '-01-01 00:00:00')
     )
     UNION DISTINCT
     (
@@ -20,6 +22,8 @@ FROM
         `Problems` AS `p`
       INNER JOIN
         `ACLs` AS `a` ON `p`.`acl_id` = `a`.`acl_id`
+      WHERE
+        `p`.`creation_date` >= CONCAT(YEAR(NOW()) - 2, '-01-01 00:00:00')
     )
     UNION DISTINCT
     (
@@ -30,10 +34,9 @@ FROM
         `Submissions` AS `s`
       INNER JOIN
         `Users` AS `u` ON `s`.`identity_id` = `u`.`main_identity_id`
-      INNER JOIN
-        `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
       WHERE
-        `r`.`verdict` = 'AC'
+        `s`.`verdict` = 'AC'
+        AND `s`.`time` >= CONCAT(YEAR(NOW()) - 2, '-01-01 00:00:00')
     )
   ) AS `activity`
 WHERE
