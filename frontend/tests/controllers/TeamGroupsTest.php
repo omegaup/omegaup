@@ -439,6 +439,15 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['results'];
         $this->assertEmpty($identities);
+
+        // Single-character query returns empty (min length optimization)
+        $identities = \OmegaUp\Controllers\User::apiList(
+            new \OmegaUp\Request([
+                'query' => 'u',
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        )['results'];
+        $this->assertEmpty($identities);
     }
 
     /**
