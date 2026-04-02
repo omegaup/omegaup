@@ -133,7 +133,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'tab_name',
             \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
         );
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt(
             key: 'page_size',
             lowerBound: 1,
@@ -343,7 +343,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
 
@@ -389,7 +389,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         $query = $r->ensureOptionalString('query');
         $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
@@ -1282,7 +1282,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             field: $tabName,
             defaultValue: \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
         );
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'page_size'
         ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
@@ -2302,7 +2302,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
         $contestAlias = $r->ensureString(
             'contest_alias',
@@ -2350,7 +2350,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
         $alias = $r->ensureString(
@@ -5742,7 +5742,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        $page = $r->ensureOptionalInt('page') ?? 1; // The default page is 1 always
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1; // The default page is 1 always
         $pageSize = $r->ensureOptionalInt(
             'page_size'
         ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;

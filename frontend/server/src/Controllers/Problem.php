@@ -3933,7 +3933,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS
             )
         ) ?? '';
-        $page = $r->ensureOptionalInt('page') ?? 0;
+        $page = $r->ensureOptionalInt('page', lowerBound: 0) ?? 0;
         $language = $r->ensureOptionalEnum(
             'language',
             array_merge(
@@ -4079,7 +4079,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Defaults for offset and rowcount
-        $page = $r->ensureOptionalInt('page');
+        $page = $r->ensureOptionalInt('page', lowerBound: 1);
         $offset = null;
         if (is_null($page)) {
             $offset = $r->ensureOptionalInt('offset') ?? 0;
@@ -4230,7 +4230,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'page_size'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
@@ -4327,7 +4327,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
 
         $query = substr(
             $r->ensureOptionalString('query') ?? '',

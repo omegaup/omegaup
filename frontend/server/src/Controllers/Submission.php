@@ -25,7 +25,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $pageSize
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
@@ -67,7 +67,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      */
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $username = $r->ensureString('username');
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT;
@@ -128,7 +128,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $username = $r->ensureOptionalString('username');
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT;
