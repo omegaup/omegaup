@@ -32,7 +32,7 @@ class FileHandler {
         }
 
         do {
-            $path = $dir . $prefix . mt_rand(0, 9999999);
+            $path = $dir . $prefix . bin2hex(random_bytes(8));
         } while (!@mkdir($path, $mode, true));
 
         return $path;
