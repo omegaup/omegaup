@@ -7,8 +7,39 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type CarouselItem=array{ carousel_item_id: int, title: string, excerpt: string, image_url: string, link: string, button_title: string, expiration_date: \OmegaUp\Timestamp|null, status: bool}
  * @psalm-type CarouselItemListPayload=array{carouselItems: list<CarouselItem>}
+ * @psalm-type CarouselManagementPayload=array{carouselItems: list<CarouselItem>}
  */
 class CarouselItems extends \OmegaUp\Controllers\Controller {
+    /**
+     * Helper function to transform CarouselItems DAO objects to API response format
+     *
+     * @param \OmegaUp\DAO\VO\CarouselItems[] $items
+     * @param bool $activeOnly
+     * @return array
+     */
+    private static function transformCarouselItems(
+        array $items,
+        bool $activeOnly = false
+    ): array {
+        $filteredItems = $activeOnly
+            ? array_filter($items, fn($item) => $item->status === 'active')
+            : $items;
+
+        return array_map(
+            fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
+                'carousel_item_id' => $item->carousel_item_id,
+                'title' => $item->title,
+                'excerpt' => $item->excerpt,
+                'image_url' => $item->image_url,
+                'link' => $item->link,
+                'button_title' => $item->button_title,
+                'expiration_date' => $item->expiration_date,
+                'status' => $item->status == 'active'
+            ],
+            $filteredItems
+        );
+    }
+
     /**
      * Create a new Carousel Item
      *
@@ -39,6 +70,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                 ? null
                 : new \OmegaUp\Timestamp(strtotime($expiration)),
             'status' => $r->ensureBool('status') ? 'active' : 'inactive',
+            'user_id' => $r->identity->user_id,
         ]);
 
         \OmegaUp\DAO\Base\CarouselItems::create($carouselItem);
@@ -122,7 +154,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * List all Carousel Items (admin only)
+     * List Carousel Items (admin only)
+     *
+     * @omegaup-request-param bool $active_only
      *
      * @return CarouselItemListPayload
      */
@@ -132,45 +166,47 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $activeOnly = $r->ensureOptionalBool('active_only') ?? false;
+        $items = $activeOnly
+            ? \OmegaUp\DAO\CarouselItems::getActiveItems()
+            : \OmegaUp\DAO\Base\CarouselItems::getAll();
+
         return [
-            'carouselItems' => array_map(
-                fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'carousel_item_id' => $item->carousel_item_id ?? 0,
-                    'title' => $item->title ?? '',
-                    'excerpt' => $item->excerpt ?? '',
-                    'image_url' => $item->image_url ?? '',
-                    'link' => $item->link ?? '',
-                    'button_title' => $item->button_title ?? '',
-                    'expiration_date' => $item->expiration_date,
-                    'status' => $item->status == 'active'
-                ],
-                \OmegaUp\DAO\Base\CarouselItems::getAll()
+            'carouselItems' => self::transformCarouselItems(
+                $items,
+                $activeOnly
             ),
         ];
     }
 
     /**
-     * List all active Carousel Items (homepage)
+     * Get carousel management page details for TypeScript
      *
-     * @return CarouselItemListPayload
+     * @return array{templateProperties: array{payload: CarouselManagementPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @psalm-return array{templateProperties: array{payload: CarouselManagementPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function apiListActive(\OmegaUp\Request $r): array {
-        $activeItems = \OmegaUp\DAO\CarouselItems::getActiveItems();
+    public static function getCarouselManagementDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         return [
-            'carouselItems' => array_map(
-                fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'carousel_item_id' => $item->carousel_item_id ?? 0,
-                    'title' => $item->title ?? '',
-                    'excerpt' => $item->excerpt ?? '',
-                    'image_url' => $item->image_url ?? '',
-                    'link' => $item->link ?? '',
-                    'button_title' => $item->button_title ?? '',
-                    'expiration_date' => $item->expiration_date,
-                    'status' => $item->status == 'active'
+            'templateProperties' => [
+                'payload' => [
+                    'carouselItems' => self::transformCarouselItems(
+                        \OmegaUp\DAO\Base\CarouselItems::getAll(),
+                        false
+                    ),
                 ],
-                $activeItems
-            ),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCarouselManagement'
+                ),
+            ],
+            'entrypoint' => 'admin_carousel',
         ];
     }
 }
