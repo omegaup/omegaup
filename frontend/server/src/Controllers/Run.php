@@ -842,6 +842,16 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $debug = $r->ensureOptionalBool('debug') ?? false;
+        if (
+            $debug
+            && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
         if ($run->status == 'new' || $run->status == 'waiting') {
             self::$log->info('Run already in the rejudge queue. Ignoring');
             return ['status' => 'ok'];
@@ -865,7 +875,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\Grader::getInstance()->rejudge(
                 [$run],
-                $r->ensureOptionalBool('debug') ?? false
+                $debug
             );
         } catch (\Exception $e) {
             self::$log->error(
