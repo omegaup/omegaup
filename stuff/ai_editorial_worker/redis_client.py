@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, cast
 
 import redis  # type: ignore
 
@@ -29,12 +29,13 @@ class RedisJobClient:
             )
 
             # Test connection - mypy fix: assert client is not None
-            if self.client is not None:
-                self.client.ping()
-                logging.info(
-                    'Connected to Redis at %s:%s',
-                    self.config['host'], self.config['port']
-                )
+            assert self.client is not None
+            self.client.ping()
+            logging.info(
+                'Connected to Redis at %s:%s',
+                self.config['host'], 
+                self.config['port'],
+            )
 
         except redis.RedisError as e:
             logging.error('Redis connection error: %s', e)
@@ -116,9 +117,9 @@ class RedisJobClient:
             raise ValueError("Job JSON cannot be empty")
 
         try:
-            # Fix mypy: explicitly cast json.loads result
-            parsed_data: Dict[str, Any] = json.loads(job_json)
+           # Fix mypy: explicitly cast json.loads result
+            parsed_data = cast(Dict[str, Any], json.loads(job_json))
             return parsed_data
         except json.JSONDecodeError as e:
             logging.error('Invalid job JSON: %s', e)
-            raise
+        raise
