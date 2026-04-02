@@ -2,7 +2,7 @@
   <div class="omegaup-course-assignmentlist card">
     <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
-      <div v-if="content.length === 0" class="card-body">
+      <div v-if="currentContent.length === 0" class="card-body">
         <div class="empty-table-message">
           {{ T.courseContentEmpty }}
         </div>
@@ -17,7 +17,7 @@
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortContent }">
-          <tr v-for="assignment in content" :key="assignment.alias">
+          <tr v-for="assignment in currentContent" :key="assignment.alias">
             <td>
               <button
                 v-tooltip="T.courseAssignmentReorder"
@@ -41,7 +41,9 @@
               </template>
             </td>
             <td class="align-middle">
-              <a :href="assignmentUrl(assignment)">{{ assignment.name }}</a>
+              <a :href="assignmentUrl(assignment)">
+                {{ assignment.name }}
+              </a>
             </td>
             <td class="text-center">
               <button
@@ -80,11 +82,12 @@
           </tr>
         </tbody>
       </table>
+
       <div>
         <button
-          v-if="content.length > 1"
+          v-if="currentContent.length > 1"
           class="btn btn-primary"
-          :class="{ disabled: !contentOrderChanged }"
+          :disabled="!contentOrderChanged"
           role="button"
           @click="saveNewOrder"
         >
@@ -92,6 +95,7 @@
         </button>
       </div>
     </div>
+
     <div
       v-show="assignmentFormMode === AssignmentFormMode.Default"
       class="card-footer"
@@ -151,7 +155,22 @@ export default class CourseAssignmentList extends Vue {
   contentOrderChanged = false;
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
-  currentContent: types.CourseAssignment[] = this.content;
+  currentContent: types.CourseAssignment[] = [...this.content];
+
+  mounted(): void {
+    window.addEventListener('beforeunload', this.warnBeforeLeaving);
+  }
+
+  beforeUnmount(): void {
+    window.removeEventListener('beforeunload', this.warnBeforeLeaving);
+  }
+
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    if (this.contentOrderChanged) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  }
 
   assignmentUrl(assignment: omegaup.Assignment): string {
     return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
@@ -179,7 +198,9 @@ export default class CourseAssignmentList extends Vue {
 
   @Watch('content')
   onContentChanged(newValue: types.CourseAssignment[]): void {
-    this.currentContent = newValue;
+    if (!this.contentOrderChanged) {
+      this.currentContent = [...newValue];
+    }
   }
 }
 </script>
