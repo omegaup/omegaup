@@ -26,7 +26,7 @@
               :value="karel"
               :width="160"
             ></toggle-button>
-            <tags-input
+            
               v-model="selectedTags"
               element-id="tags"
               :existing-tags="tagObjects"
