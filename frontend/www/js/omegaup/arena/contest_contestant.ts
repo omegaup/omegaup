@@ -81,6 +81,16 @@ OmegaUp.on('ready', async () => {
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
   }
+
+  window.addEventListener('hashchange', () => {
+    const locationHash = window.location.hash.replace('#', '').split('/');
+    const tab = getSelectedValidTab(locationHash[0], contestAdmin);
+
+    if ((contestContestant as any).activeTab !== tab) {
+      (contestContestant as any).activeTab = tab;
+    }
+  });
+
   const {
     guid,
     popupDisplayed,
@@ -164,6 +174,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      activeTab: getSelectedValidTab(locationHash[0], contestAdmin),
       searchResultUsers: [] as types.ListItem[],
       nextSubmissionTimestamp,
       nextExecutionTimestamp,
@@ -186,7 +197,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
-          activeTab,
+          activeTab: this.activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
           miniRankingUsers: rankingStore.state.miniRankingUsers,
@@ -428,7 +439,8 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
           'update:activeTab': (tabName: string) => {
-            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
+            (contestContestant as any).activeTab = tabName;
+            window.location.hash = tabName;
           },
           'reset-hash': ({
             selectedTab,
@@ -438,18 +450,10 @@ OmegaUp.on('ready', async () => {
             alias: string;
           }) => {
             if (!alias) {
-              history.replaceState(
-                { selectedTab },
-                'resetHash',
-                `#${selectedTab}`,
-              );
+              window.location.hash = selectedTab;
               return;
             }
-            history.replaceState(
-              { selectedTab, alias },
-              'resetHash',
-              `#${selectedTab}/${alias}`,
-            );
+            window.location.hash = `${selectedTab}/${alias}`;
           },
           'new-submission-popup-displayed': () => {
             if (this.shouldShowFirstAssociatedIdentityRunWarning) {

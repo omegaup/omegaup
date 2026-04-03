@@ -16,7 +16,7 @@
             aria-controls="report"
             aria-selected="true"
             :class="{ active: showTab === 'report' }"
-            @click="showTab = 'report'"
+            @click="onTabChange('report')"
             >{{ T.activityReportReport }}</a
           >
         </li>
@@ -29,7 +29,7 @@
             aria-controls="users"
             aria-selected="false"
             :class="{ active: showTab === 'users' }"
-            @click="showTab = 'users'"
+            @click="onTabChange('users')"
             >{{ T.activityReportUsers }}</a
           >
         </li>
@@ -42,7 +42,7 @@
             aria-controls="origins"
             aria-selected="false"
             :class="{ active: showTab === 'origins' }"
-            @click="showTab = 'origins'"
+            @click="onTabChange('origins')"
             >{{ T.activityReportOrigins }}</a
           >
         </li>
@@ -233,6 +233,26 @@ export default class ActivityFeed extends Vue {
   T = T;
   time = time;
   showTab = 'report';
+
+  onTabChange(tab: string) {
+    if (this.showTab !== tab) {
+      this.showTab = tab;
+      window.location.hash = tab;
+    }
+  }
+
+  syncFromHash() {
+    const tab = window.location.hash.replace('#', '') || 'report';
+
+    if (this.showTab !== tab) {
+      this.showTab = tab;
+    }
+  }
+
+  mounted() {
+    window.addEventListener('hashchange', this.syncFromHash);
+    this.syncFromHash(); // handle initial load
+  }
 
   addMapping(mapping: Mapping, key: string, value: string): void {
     if (key in mapping) {
