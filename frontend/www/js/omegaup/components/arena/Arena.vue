@@ -70,6 +70,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { Tab } from '../problem/Details.vue';
+import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class Arena extends Vue {
@@ -114,6 +115,11 @@ export default class Arena extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  @Watch('activeTab')
+  onActiveTabChanged(newTab: string) {
+    this.selectedTab = newTab;
   }
 
   @Emit('update:activeTab')
