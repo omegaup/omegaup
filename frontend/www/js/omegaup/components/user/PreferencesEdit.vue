@@ -26,7 +26,7 @@
         data-preferred-language
         class="custom-select"
       >
-        <option value=""></option>
+        <option value="" disabled selected>{{ T.profilePreferredLanguagePlaceholder }}</option>
         <option
           v-for="[extension, name] in Object.entries(programmingLanguages)"
           :key="extension"
@@ -90,7 +90,6 @@
           @change="handlePrivateProfileCheckboxChange"
         />{{ T.userEditPrivateProfile }}
       </label>
-      <!-- id-lint off -->
       <b-button
         id="popover-private-profile"
         class="ml-1"
@@ -100,7 +99,6 @@
       >
         <font-awesome-icon :icon="['fas', 'question-circle']" />
       </b-button>
-      <!-- id-lint on -->
       <b-popover
         :show.sync="show"
         target="popover-private-profile"
