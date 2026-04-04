@@ -961,89 +961,89 @@ export namespace types {
           if (x instanceof Object) {
             Object.keys(x).forEach(
               (y) =>
-              (x[y] = ((x) => {
-                x.creation_date = ((x: number) => new Date(x * 1000))(
-                  x.creation_date,
-                );
-                if (
-                  typeof x.nextExecutionTimestamp !== 'undefined' &&
-                  x.nextExecutionTimestamp !== null
-                )
-                  x.nextExecutionTimestamp = ((x: number) =>
-                    new Date(x * 1000))(x.nextExecutionTimestamp);
-                if (
-                  typeof x.nextSubmissionTimestamp !== 'undefined' &&
-                  x.nextSubmissionTimestamp !== null
-                )
-                  x.nextSubmissionTimestamp = ((x: number) =>
-                    new Date(x * 1000))(x.nextSubmissionTimestamp);
-                if (
-                  typeof x.problemsetter !== 'undefined' &&
-                  x.problemsetter !== null
-                )
-                  x.problemsetter = ((x) => {
-                    if (
-                      typeof x.creation_date !== 'undefined' &&
-                      x.creation_date !== null
-                    )
-                      x.creation_date = ((x: number) => new Date(x * 1000))(
-                        x.creation_date,
-                      );
-                    return x;
-                  })(x.problemsetter);
-                if (typeof x.runs !== 'undefined' && x.runs !== null)
-                  x.runs = ((x) => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map((x) => {
+                (x[y] = ((x) => {
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                  if (
+                    typeof x.nextExecutionTimestamp !== 'undefined' &&
+                    x.nextExecutionTimestamp !== null
+                  )
+                    x.nextExecutionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextExecutionTimestamp);
+                  if (
+                    typeof x.nextSubmissionTimestamp !== 'undefined' &&
+                    x.nextSubmissionTimestamp !== null
+                  )
+                    x.nextSubmissionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextSubmissionTimestamp);
+                  if (
+                    typeof x.problemsetter !== 'undefined' &&
+                    x.problemsetter !== null
+                  )
+                    x.problemsetter = ((x) => {
                       if (
-                        typeof x.details !== 'undefined' &&
-                        x.details !== null
+                        typeof x.creation_date !== 'undefined' &&
+                        x.creation_date !== null
                       )
-                        x.details = ((x) => {
-                          if (
-                            typeof x.feedback !== 'undefined' &&
-                            x.feedback !== null
-                          )
-                            x.feedback = ((x) => {
-                              x.date = ((x: number) => new Date(x * 1000))(
-                                x.date,
-                              );
-                              if (
-                                typeof x.feedback_thread !== 'undefined' &&
-                                x.feedback_thread !== null
-                              )
-                                x.feedback_thread = ((x) => {
-                                  if (!Array.isArray(x)) {
-                                    return x;
-                                  }
-                                  return x.map((x) => {
-                                    x.timestamp = ((x: number) =>
-                                      new Date(x * 1000))(x.timestamp);
-                                    return x;
-                                  });
-                                })(x.feedback_thread);
-                              return x;
-                            })(x.feedback);
-                          return x;
-                        })(x.details);
-                      x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        x.creation_date = ((x: number) => new Date(x * 1000))(
+                          x.creation_date,
+                        );
                       return x;
-                    });
-                  })(x.runs);
-                if (typeof x.solvers !== 'undefined' && x.solvers !== null)
-                  x.solvers = ((x) => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map((x) => {
-                      x.time = ((x: number) => new Date(x * 1000))(x.time);
-                      return x;
-                    });
-                  })(x.solvers);
-                return x;
-              })(x[y])),
+                    })(x.problemsetter);
+                  if (typeof x.runs !== 'undefined' && x.runs !== null)
+                    x.runs = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.details !== 'undefined' &&
+                          x.details !== null
+                        )
+                          x.details = ((x) => {
+                            if (
+                              typeof x.feedback !== 'undefined' &&
+                              x.feedback !== null
+                            )
+                              x.feedback = ((x) => {
+                                x.date = ((x: number) => new Date(x * 1000))(
+                                  x.date,
+                                );
+                                if (
+                                  typeof x.feedback_thread !== 'undefined' &&
+                                  x.feedback_thread !== null
+                                )
+                                  x.feedback_thread = ((x) => {
+                                    if (!Array.isArray(x)) {
+                                      return x;
+                                    }
+                                    return x.map((x) => {
+                                      x.timestamp = ((x: number) =>
+                                        new Date(x * 1000))(x.timestamp);
+                                      return x;
+                                    });
+                                  })(x.feedback_thread);
+                                return x;
+                              })(x.feedback);
+                            return x;
+                          })(x.details);
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        return x;
+                      });
+                    })(x.runs);
+                  if (typeof x.solvers !== 'undefined' && x.solvers !== null)
+                    x.solvers = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        return x;
+                      });
+                    })(x.solvers);
+                  return x;
+                })(x[y])),
             );
           }
           return x;
@@ -2481,21 +2481,21 @@ export namespace types {
               if (x instanceof Object) {
                 Object.keys(x).forEach(
                   (y) =>
-                  (x[y] = ((x) => {
-                    x.data = ((x) => {
-                      x.finish_time = ((x: number) => new Date(x * 1000))(
-                        x.finish_time,
-                      );
-                      x.last_updated = ((x: number) => new Date(x * 1000))(
-                        x.last_updated,
-                      );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
-                      );
+                    (x[y] = ((x) => {
+                      x.data = ((x) => {
+                        x.finish_time = ((x: number) => new Date(x * 1000))(
+                          x.finish_time,
+                        );
+                        x.last_updated = ((x: number) => new Date(x * 1000))(
+                          x.last_updated,
+                        );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      })(x.data);
                       return x;
-                    })(x.data);
-                    return x;
-                  })(x[y])),
+                    })(x[y])),
                 );
               }
               return x;
@@ -5143,7 +5143,7 @@ export namespace types {
   }
 
   export interface UserHelpPayload {
-    helpResources: HelpResource[];
+    helpResources: types.HelpResource[];
   }
 
   export interface UserInfoForProblem {
