@@ -2002,6 +2002,7 @@ const translations: { [key: string]: string; } = {
   userEditPreferences: "Prefer\u00eancias",
   userEditPreferencesSuccess: "Prefer\u00eancias atualizadas com sucesso.",
   userEditPreferredProgrammingLanguage: "Linguagem de programa\u00e7\u00e3o preferida",
+  userEditPreferredProgrammingLanguagePlaceholder: "Escolha o idioma",
   userEditPrimary: "Prim\u00e1ria",
   userEditPrivateProfile: "Gostaria de esconder os detalhes do perfil de outros?",
   userEditProfileImage: "Imagem do perfil",
