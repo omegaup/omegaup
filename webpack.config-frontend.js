@@ -41,6 +41,7 @@ module.exports = {
       './frontend/www/js/omegaup/certificate/validation.ts',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
     common_docs: './frontend/www/js/omegaup/common/docs.ts',
+    common_help: './frontend/www/js/omegaup/common/help.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.ts',
     common_index: './frontend/www/js/omegaup/common/index.ts',
     common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
