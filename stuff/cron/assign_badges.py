@@ -101,6 +101,7 @@ def process_badges(
             logging.info('New owners: %s', new_owners)
             if new_owners:
                 save_new_owners(badge, new_owners, cur)
+        except Exception:
             dbconn.conn.commit()
             successful += 1
         except Exception:  # pylint: disable=broad-except
