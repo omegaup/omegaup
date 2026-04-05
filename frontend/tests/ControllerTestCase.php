@@ -24,6 +24,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         );
         \OmegaUp\Controllers\Session::invalidateCache();
         \OmegaUp\Controllers\Session::invalidateLocalCache();
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
         // Mock time
         $currentTime = time();
