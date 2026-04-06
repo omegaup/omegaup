@@ -74,21 +74,24 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
     /**
      * @return null|\OmegaUp\DAO\VO\Emails
      */
-    final public static function getByEmail(string $email) {
+    final public static function getByEmail(string $email): ?\OmegaUp\DAO\VO\Emails {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Emails::FIELD_NAMES,
             'Emails'
         );
-        $sql = "SELECT
-                    {$fields}
-                FROM
-                    `Emails`
-                WHERE
-                    `email` = ?
-                LIMIT 1;";
+        $sql = "SELECT {$fields} FROM `Emails` WHERE `email` = ? LIMIT 1;";
         $params = [$email];
-        /** @var null|array{email: null|string, email_id: int, user_id: int|null} */
+        
+        /** @var array|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+
+        // 1. Agar row empty hai toh null return karo (Actual Fix)
+        if (empty($row)) {
+            return null;
+        }
+
+        // 2. Data ko modify mat karo (strtoupper hatao), seedha VO return karo
+        // Taki database ka exact data application ko mile
         return new \OmegaUp\DAO\VO\Emails($row);
     }
 }
