@@ -54,6 +54,7 @@ const translations: { [key: string]: string; } = {
   apiTokenSuccessfullyCreated: "Token successfully created, copy the token since it will be displayed only once: <span><code>%(token)</code></span>",
   apiTokenSuccessfullyRevoked: "Token successfully revoked",
   apiTokenTimestamp: "Timestamp",
+  apiUnexpectedError: "An unexpected error occurred. Please try again later or contact support if the problem persists.",
   arbitrateRequestAcceptSuccessfully: "The request has been successfully approved",
   arbitrateRequestDenySuccessfully: "The request has been successfully denied",
   arenaClarificationCreate: "Type your clarification here:",
