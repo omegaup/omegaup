@@ -53,6 +53,7 @@
 	"apiTokenSuccessfullyCreated": "(T0k3n 5ucc355fu11y cr3a73d, c0py 7h3 70k3n 5inc3 i7 wi11 b3 di5p1ay3d 0n1y 0nc3: <5pan><c0d3>%(token)</c0d3></5pan>)",
 	"apiTokenSuccessfullyRevoked": "(T0k3n 5ucc355fu11y r3v0k3d)",
 	"apiTokenTimestamp": "(Tim357amp)",
+	"apiUnexpectedError": "(An un3xp3c73d 3rr0r 0ccurr3d. P13a53 7ry again 1a73r 0r c0n7ac7 5upp0r7 if 7h3 pr0b13m p3r5i575.)",
 	"arbitrateRequestAcceptSuccessfully": "(Th3 r3qu357 ha5 b33n 5ucc355fu11y appr0v3d)",
 	"arbitrateRequestDenySuccessfully": "(Th3 r3qu357 ha5 b33n 5ucc355fu11y d3ni3d)",
 	"arenaClarificationCreate": "(Typ3 y0ur c1arifica7i0n h3r3:)",
