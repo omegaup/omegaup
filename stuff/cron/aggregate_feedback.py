@@ -650,6 +650,7 @@ def main() -> None:
         try:
             phase_start = time.monotonic()
             aggregate_reviewers_feedback(dbconn)
+        except Exception:
             logging.info(
                 'aggregate_reviewers_feedback completed in %.2fs',
                 time.monotonic() - phase_start)
@@ -661,6 +662,7 @@ def main() -> None:
         try:
             phase_start = time.monotonic()
             aggregate_feedback(dbconn)
+        except Exception:
             logging.info(
                 'aggregate_feedback completed in %.2fs',
                 time.monotonic() - phase_start)
@@ -680,7 +682,7 @@ def main() -> None:
                 time.monotonic() - phase_start)
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
-        except:  # noqa: bare-except
+        except Exception:
             logging.exception('Failed to update problem of the week')
             has_failures = True
     finally:
