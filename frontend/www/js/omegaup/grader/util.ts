@@ -1,6 +1,7 @@
 import languages from '../../../../data/languages.json';
 import { types } from '../api_types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function vuexGet(store: any, name: string) {
   if (typeof store.getters[name] !== 'undefined') return store.getters[name];
   let o = store.state;
@@ -12,7 +13,8 @@ export function vuexGet(store: any, name: string) {
   return o;
 }
 
-export function vuexSet(store: any, name: string, value: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function vuexSet(store: any, name: string, value: unknown) {
   store.commit(name, value);
 }
 export const units: { [key: string]: number } = {
@@ -27,10 +29,7 @@ export const units: { [key: string]: number } = {
 
 export const splitMeasurement = (
   measurement: string,
-): {
-  numericalValue: number;
-  unit: string;
-} => {
+): { numericalValue: number; unit: string } => {
   for (const unit in units) {
     if (measurement.endsWith(unit)) {
       const numberPart = measurement.slice(0, -unit.length);
@@ -49,10 +48,7 @@ export const splitMeasurement = (
 };
 
 export function parseDuration(value: number | string) {
-  if (typeof value === 'number') {
-    return value;
-  }
-
+  if (typeof value === 'number') return value;
   const { numericalValue, unit } = splitMeasurement(value);
   return numericalValue * units[unit];
 }
@@ -64,22 +60,23 @@ export interface LanguageInfo {
   language: string;
 }
 
-export const supportedLanguages: Record<string, LanguageInfo> = languages;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const supportedLanguages: Record<
+  string,
+  LanguageInfo
+> = languages as any;
 
 export const supportedExtensions: string[] = [
   ...new Set(
     Object.values(supportedLanguages).map((language) => language.extension),
   ),
 ];
-export const extensionToLanguages: {
-  [key: string]: string[];
-} = Object.values(supportedLanguages).reduce<{
-  [key: string]: string[];
-}>((acc, languageInfo) => {
+
+export const extensionToLanguages: { [key: string]: string[] } = Object.values(
+  supportedLanguages,
+).reduce<{ [key: string]: string[] }>((acc, languageInfo) => {
   const { extension, language } = languageInfo;
-  if (!acc[extension]) {
-    acc[extension] = [];
-  }
+  if (!acc[extension]) acc[extension] = [];
   acc[extension].push(language);
   return acc;
 }, {});
@@ -88,15 +85,32 @@ export function asyncError(err: Error) {
   console.error('Async error', err);
 }
 
-// Wraps a function `f(...args)` into `f(key)(...args)` that is called at most
-// once every `delay` milliseconds. `f(key).flush()` will cause the function to
-// be called immediately.
-type ThrottledFunction<T extends any[]> = {
+export function announceToScreenReader(
+  message: string,
+  politeness: 'polite' | 'assertive' = 'polite',
+): void {
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'status');
+  announcement.setAttribute('aria-live', politeness);
+  announcement.className = 'sr-only';
+  announcement.textContent = message;
+
+  document.body.appendChild(announcement);
+  setTimeout(() => {
+    try {
+      document.body.removeChild(announcement);
+    } catch {
+      /* Ignored */
+    }
+  }, 1000);
+}
+
+type ThrottledFunction<T extends unknown[]> = {
   (...args: T): void;
   flush?: () => void;
 };
 
-export function throttle<T extends any[]>(
+export function throttle<T extends unknown[]>(
   f: (...args: T) => void,
   delay: number,
 ): (key: string) => ThrottledFunction<T> {
@@ -118,9 +132,7 @@ export function throttle<T extends any[]>(
           timeout: setTimeout(() => {
             const { args } = timeouts[key];
             delete timeouts[key];
-            if (args !== null) {
-              throttled(key)(...args);
-            }
+            if (args !== null) throttled(key)(...args);
           }, delay),
           args: null,
         };
@@ -128,20 +140,15 @@ export function throttle<T extends any[]>(
     }
 
     wrapped.flush = () => {
-      if (!(key in timeouts)) {
-        return;
-      }
+      if (!(key in timeouts)) return;
       const { timeout, args } = timeouts[key];
       delete timeouts[key];
       clearTimeout(timeout);
-      if (args !== null) {
-        f(...args);
-      }
+      if (args !== null) f(...args);
     };
 
     return wrapped;
   };
-
   return throttled;
 }
 
@@ -153,11 +160,7 @@ export const DUMMY_PROBLEM: types.ProblemInfo = {
   alias: 'dummy-problem',
   settings: {
     cases: {
-      sample: {
-        in: '1 2\n',
-        out: '3\n',
-        weight: 1,
-      },
+      sample: { in: '1 2\n', out: '3\n', weight: 1 },
       long: {
         in: '123456789012345678 123456789012345678\n',
         out: '246913578024691356\n',
@@ -171,12 +174,8 @@ export const DUMMY_PROBLEM: types.ProblemInfo = {
       OverallWallTimeLimit: '3s',
       TimeLimit: '1s',
     },
-    validator: {
-      name: 'token-numeric',
-      tolerance: 1e-9,
-    },
+    validator: { name: 'token-numeric', tolerance: 1e-9 },
   },
-  // the only attributes required for full IDE are the above
   accepts_submissions: false,
   karel_problem: false,
   commit: 'NA',
@@ -202,17 +201,7 @@ export const DUMMY_PROBLEM: types.ProblemInfo = {
     images: {},
     sources: {},
     language: 'en',
-    markdown: `# test with embed code
-Here we can add code.
-<details>
-<summary>
-  Example:
-</summary>
-
-{{sample.cpp}}
-
-</details>
-    `,
+    markdown: `# test\n{{sample.cpp}}`,
   },
   title: 'Dummy Problem',
   visibility: 2,
