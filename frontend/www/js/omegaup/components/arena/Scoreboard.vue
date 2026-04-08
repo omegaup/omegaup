@@ -1,9 +1,9 @@
-<template>
+kya isme change kar skte h??<template>
   <div class="omegaup-scoreboard px-2">
     <slot name="scoreboard-header">
       <div class="text-center mt-4 pt-2">
         <h2 class="mb-4">
-          <span>{{ title }}</span>
+          <span> {{ title }}</span>
           <slot name="socket-status">
             <sup :class="socketClass" :title="socketStatusTitle">{{
               socketStatus
@@ -55,13 +55,16 @@
           <tr>
             <th><!-- legend --></th>
             <th><!-- position --></th>
-            <th>{{ T.contestParticipant }}</th>
-            <th>{{ T.wordsTotal }}</th>
-            <th v-for="(problem, index) in problems" :key="problem.alias">
-              <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
-                ui.columnName(index)
-              }}</a>
-            </th>
+            <th>{{ participantsHeader || 'MY PARTICIPANTS' }}</th>
+            <th>Total Points</th>
+           <th v-for="(problem, index) in problems" :key="problem.alias">
+             <a :href="'#problems/' + problem.alias" :title="problem.alias">
+               {{ ui.columnName(index) }}
+             <span v-if="problemSolveCounts[problem.alias] !== undefined">
+               ({{ problemSolveCounts[problem.alias] }} AC)
+             </span>
+             </a>
+           </th>
           </tr>
         </thead>
         <tbody>
@@ -118,7 +121,7 @@
       </table>
     </div>
     <div class="footer">
-      {{ lastUpdatedString }}
+      Modified by ME | omegaUp UI
     </div>
   </div>
 </template>
@@ -152,9 +155,10 @@ export default class ArenaScoreboard extends Vue {
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: false }) showAllContestants!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-  @Prop() title!: string;
   @Prop({ default: null }) finishTime!: null | Date;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
+  @Prop({ default: 'My Custom Scoreboard' }) title!: string;
+  @Prop({ default: 'MY PARTICIPANTS' }) participantsHeader!: string;
 
   T = T;
   ui = ui;
@@ -220,12 +224,30 @@ export default class ArenaScoreboard extends Vue {
     }
   }
 
-  showUser(userIsInvited: boolean): boolean {
-    // Invited users filter is only available in contests, in a course all users
-    // are visible in scoreboard.
-    if (!this.showInvitedUsersFilter) return true;
-    return userIsInvited || !this.onlyShowExplicitlyInvited;
-  }
+get problemSolveCounts(): Record<string, number> {
+  // ✅ Safety check (IMPORTANT for PR)
+  if (!this.ranking || !this.problems) return {};
+
+  const counts: Record<string, number> = {};
+
+  // Initialize counts
+  this.problems.forEach((problem) => {
+    counts[problem.alias] = 0;
+  });
+
+  // Count accepted solutions
+  this.ranking.forEach((user) => {
+    user.problems.forEach((p, index) => {
+      if (p.percent === 100) {
+        const problem = this.problems[index];
+        if (problem) {
+          counts[problem.alias]++;
+        }
+      }
+    });
+  });
+
+  return counts;
 }
 </script>
 
@@ -248,6 +270,12 @@ export default class ArenaScoreboard extends Vue {
   table {
     border-collapse: collapse;
     width: 100%;
+  }
+
+  th span {
+  font-size: 0.8em;
+  color: var(--arena-scoreboard-header-ac-color);
+  margin-left: 0.2em;
   }
 
   th {
@@ -361,3 +389,4 @@ export default class ArenaScoreboard extends Vue {
   }
 }
 </style>
+
