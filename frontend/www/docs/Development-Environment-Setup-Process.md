@@ -94,7 +94,7 @@ If you want to run the JavaScript/TypeScript tests locally (outside of Docker), 
 
 ### Prerequisites
 
-1. **Node.js**: Install Node.js (version 16 or higher recommended)
+1. **Node.js**: Install Node.js (version 20 or higher recommended; CI and Cypress tooling expect Node 20+)
 2. **Yarn**: Install Yarn package manager
 
 ### Setup Steps

@@ -1,13 +1,43 @@
 #!/usr/bin/env python3
 '''Updates the user ranking.'''
 
+# pylint: disable=too-many-lines
+
 import argparse
 import datetime
 import json
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence, Dict, Set
+from typing import List, NamedTuple, Sequence, Dict, Set, Optional
+
+
+class UserRankRow(NamedTuple):
+    '''Represents a row for User_Rank inserts.'''
+
+    user_id: int
+    ranking: int
+    problems_solved_count: int
+    score: float
+    username: str
+    name: str
+    country_id: Optional[str]
+    state_id: Optional[str]
+    school_id: Optional[int]
+
+
+class AuthorRankRow(NamedTuple):
+    '''Represents a row for author ranking inserts.'''
+
+    user_id: int
+    username: str
+    author_score: float
+    author_ranking: int
+    name: str
+    country_id: Optional[str]
+    state_id: Optional[str]
+    school_id: Optional[int]
+
 
 import mysql.connector
 import mysql.connector.cursor
@@ -211,23 +241,38 @@ def update_user_rank(
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
     cur.execute('DELETE FROM `User_Rank`;')
-    for index, row in enumerate(cur_readonly.fetchall()):
-        if row['score'] != prev_score:
-            rank = index + 1
-        score = row.get('score', 0)
-        scores.append(score)
-        prev_score = score
-        cur.execute(
-            '''
+    insert_user_rank_sql = '''
                     INSERT INTO
                         `User_Rank` (`user_id`, `ranking`,
                                      `problems_solved_count`, `score`,
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
-            (row['user_id'], rank, row['problems_solved_count'], score,
-             row['username'], row['name'], row['country_id'], row['state_id'],
-             row['school_id']))
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+    user_rank_rows: List[UserRankRow] = []
+    batch_size = 1000
+    for index, row in enumerate(cur_readonly):
+        if row['score'] != prev_score:
+            rank = index + 1
+        score = row.get('score', 0)
+        scores.append(score)
+        prev_score = score
+        user_rank_rows.append(
+            UserRankRow(
+                user_id=row['user_id'],
+                ranking=rank,
+                problems_solved_count=row['problems_solved_count'],
+                score=score,
+                username=row['username'],
+                name=row['name'],
+                country_id=row['country_id'],
+                state_id=row['state_id'],
+                school_id=row['school_id'],
+            ))
+        if len(user_rank_rows) >= batch_size:
+            cur.executemany(insert_user_rank_sql, user_rank_rows)
+            user_rank_rows.clear()
+    if user_rank_rows:
+        cur.executemany(insert_user_rank_sql, user_rank_rows)
     return scores
 
 
@@ -280,12 +325,7 @@ def update_author_rank(
 
     prev_score = None
     rank = 0
-    for index, row in enumerate(cur_readonly.fetchall()):
-        if row['author_score'] != prev_score:
-            rank = index + 1
-        prev_score = row['author_score']
-        cur.execute(
-            '''
+    insert_author_rank_sql = '''
                     INSERT INTO
                         `User_Rank` (`user_id`, `username`, `author_score`,
                                      `author_ranking`, `name`, `country_id`,
@@ -293,11 +333,30 @@ def update_author_rank(
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY
                         UPDATE
-                            author_ranking = %s,
-                            author_score = %s;''',
-            (row['user_id'], row['username'], row['author_score'], rank,
-             row['name'], row['country_id'], row['state_id'], row['school_id'],
-             rank, row['author_score']))
+                            author_ranking = VALUES(author_ranking),
+                            author_score = VALUES(author_score);'''
+    author_rank_rows: List[AuthorRankRow] = []
+    batch_size = 1000
+    for index, row in enumerate(cur_readonly):
+        if row['author_score'] != prev_score:
+            rank = index + 1
+        prev_score = row['author_score']
+        author_rank_rows.append(
+            AuthorRankRow(
+                user_id=row['user_id'],
+                username=row['username'],
+                author_score=row['author_score'],
+                author_ranking=rank,
+                name=row['name'],
+                country_id=row['country_id'],
+                state_id=row['state_id'],
+                school_id=row['school_id'],
+            ))
+        if len(author_rank_rows) >= batch_size:
+            cur.executemany(insert_author_rank_sql, author_rank_rows)
+            author_rank_rows.clear()
+    if author_rank_rows:
+        cur.executemany(insert_author_rank_sql, author_rank_rows)
 
 
 def update_user_rank_cutoffs(cur: mysql.connector.cursor.MySQLCursorDict,
@@ -924,14 +983,12 @@ def update_schools_stats(
     try:
         try:
             update_schools_solved_problems(cur)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update schools solved problems')
             raise
 
         try:
             update_school_rank(cur)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update school ranking')
             raise
@@ -939,14 +996,18 @@ def update_schools_stats(
         try:
             update_school_of_the_month_candidates(cur, cur_readonly, date,
                                                   update_school_of_the_month)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to update candidates to school of the month')
             raise
+
+        # Commit all school stats updates automatically.
+        dbconn.commit()
         logging.info('Schools stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all schools stats')
+        dbconn.rollback()
+        raise
 
 
 def main() -> None:

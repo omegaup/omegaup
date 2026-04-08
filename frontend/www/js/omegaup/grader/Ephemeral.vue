@@ -213,9 +213,9 @@ export default class Ephemeral extends Vue {
 
   readonly themeToRef: { [key: string]: string } = {
     [Util.MonacoThemes
-      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+      .VSLight]: `/third_party/css/golden-layout/goldenlayout-light-theme.css`,
     [Util.MonacoThemes
-      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+      .VSDark]: `/third_party/css/golden-layout/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -804,10 +804,24 @@ export default class Ephemeral extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
+@import '../../../third_party/css/golden-layout/goldenlayout-base.css';
 
 div > section {
   min-height: 60em;
 }
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .lm_item_container {
+  background-color: var(--vs-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .lm_item_container .vs-dark {
+  background-color: var(--vs-dark-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 div {
   &.vs-dark {
     background: var(--vs-dark-background-color);
@@ -820,13 +834,14 @@ div {
       color: var(--vs-dark-font-color);
     }
   }
+
   &.vs {
     background: var(--vs-background-color);
     border-bottom: 1px solid var(--vs-background-color);
   }
 }
+
 a:hover {
   color: var(--zip-button-color--hover);
 }
-@import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 </style>

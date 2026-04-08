@@ -112,5 +112,68 @@ class AggregateFeedbackTest(unittest.TestCase):
         self.assertEqual(dbconn.rollback_calls, 1)
 
 
+class _FakeReviewerDBConnection:
+    '''Minimal db connection stub for
+    aggregate_feedback.aggregate_reviewers_feedback.'''
+
+    def __init__(self, problem_ids: List[int]) -> None:
+        self._problem_ids = problem_ids
+        self.commit_calls = 0
+        self.rollback_calls = 0
+        self.conn = self
+
+    def cursor(self) -> _FakeCursor:
+        '''Creates a new fake cursor over the configured problem_ids.'''
+        return _FakeCursor(self._problem_ids)
+
+    def commit(self) -> None:
+        '''Records that a commit was requested on the fake connection.'''
+        self.commit_calls += 1
+
+    def rollback(self) -> None:
+        '''Records that a rollback was requested on the fake connection.'''
+        self.rollback_calls += 1
+
+
+class AggregateReviewersFeedbackTest(unittest.TestCase):
+    '''Tests for aggregate_feedback.aggregate_reviewers_feedback.'''
+
+    def test_single_problem_failure_does_not_stop_others(self) -> None:
+        '''One failing problem should not prevent others from updating.'''
+        problem_ids = [10, 20, 30]
+        failing_problem_id = 20
+        dbconn = _FakeReviewerDBConnection(problem_ids)
+
+        called_ids: List[int] = []
+
+        def fake_aggregate_reviewers_feedback_for_problem(
+                dbconn_arg: Any,
+                problem_id: int) -> None:
+            del dbconn_arg
+            called_ids.append(problem_id)
+            if problem_id == failing_problem_id:
+                raise RuntimeError('simulated failure for testing')
+
+        original = (
+            aggregate_feedback.aggregate_reviewers_feedback_for_problem)
+
+        aggregate_feedback.aggregate_reviewers_feedback_for_problem = cast(
+            Any, fake_aggregate_reviewers_feedback_for_problem)
+
+        try:
+            aggregate_feedback.aggregate_reviewers_feedback(
+                cast(Any, dbconn))
+        finally:
+            aggregate_feedback.aggregate_reviewers_feedback_for_problem = (
+                original)
+
+        # All three problems should have been attempted.
+        self.assertEqual(called_ids, problem_ids)
+        # One rollback for the failing problem.
+        self.assertEqual(dbconn.rollback_calls, 1)
+        # Two commits for the two successful problems.
+        self.assertEqual(dbconn.commit_calls, 2)
+
+
 if __name__ == '__main__':
     unittest.main()

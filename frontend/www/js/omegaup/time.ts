@@ -319,6 +319,83 @@ export function formatContestDuration(
   return formatDelta(delta);
 }
 
+/**
+ * Formats contest duration for ArenaV2 cards.
+ *
+ * Heuristic:
+ * - < 1 hour: show minutes
+ * - < 24 hours: round to nearest hour (~X hours)
+ * - < 30 days: round to nearest day (~X days)
+ * - >= 30 days: convert to months (~X months)
+ *
+ * This intentionally differs from `formatContestDuration` which uses a
+ * mix of `formatDelta` (HH:MM:SS-style) and `date-fns/intervalToDuration`.
+ */
+export function formatContestDurationHumanReadable(
+  startDate: Date,
+  finishDate: Date,
+): string {
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
+  }
+
+  const diffMs = Math.max(0, finishDate.getTime() - startDate.getTime());
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const APPROXIMATE_PREFIX = '~ ';
+
+  const totalMinutes = Math.round(diffMs / (60 * 1000));
+  if (diffMs < ONE_HOUR_MS) {
+    return totalMinutes === 1
+      ? T.contestDurationMinute
+      : interpolate(T.contestDurationMinutes, { N: totalMinutes });
+  }
+
+  if (diffMs < TWENTY_FOUR_HOURS_MS) {
+    const totalHours = Math.max(1, Math.round(diffMs / ONE_HOUR_MS));
+    const duration =
+      totalHours === 1
+        ? T.contestDurationHour
+        : interpolate(T.contestDurationHours, { N: totalHours });
+    if (diffMs % ONE_HOUR_MS === 0) {
+      return duration;
+    }
+    return `${APPROXIMATE_PREFIX}${duration}`;
+  }
+
+  if (diffMs < THIRTY_DAYS_MS) {
+    const totalDays = Math.max(1, Math.round(diffMs / (24 * 60 * 60 * 1000)));
+    const duration =
+      totalDays === 1
+        ? T.contestDurationDay
+        : interpolate(T.contestDurationDays, { N: totalDays });
+    if (diffMs % TWENTY_FOUR_HOURS_MS === 0) {
+      return duration;
+    }
+    return `${APPROXIMATE_PREFIX}${duration}`;
+  }
+
+  const totalMonths = Math.max(1, Math.round(diffMs / THIRTY_DAYS_MS));
+  const duration = formatDuration(
+    { months: totalMonths },
+    { locale: currentLocale },
+  );
+  if (diffMs % THIRTY_DAYS_MS === 0) {
+    return duration;
+  }
+  return `${APPROXIMATE_PREFIX}${duration}`;
+}
+
 export function formatDateForContest(date: Date): string {
   let currentLocale;
   let dateFormat: string;
