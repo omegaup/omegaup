@@ -979,4 +979,62 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             $response[0]['participating']
         );
     }
+
+    public function testContestListWhenIdentityJoinsToPublicContests() {
+        // Create 5 contests
+        $numberOfContests = 5;
+        $contestData = [];
+        foreach (range(0, $numberOfContests - 1) as $i) {
+            $contestData[$i] = \OmegaUp\Test\Factories\Contest::createContest();
+        }
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        $identityParticipatingContests = array_filter(
+            $response['results'],
+            fn($contest) => $contest['participating'] != 0,
+        );
+
+        // Identity shouldn't belong to any contest
+        $this->assertCount(0, $identityParticipatingContests);
+
+        // 5 contests should be visible
+        $this->assertCount(5, $response['results']);
+
+        // Identity joins two contests
+        \OmegaUp\Controllers\Contest::apiOpen(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData[2]['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        \OmegaUp\Controllers\Contest::apiOpen(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData[4]['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        $identityParticipatingContests = array_filter(
+            $response['results'],
+            fn($contest) => $contest['participating'] != 0,
+        );
+
+        // Now, identity should belong to 2 contests
+        $this->assertCount(2, $identityParticipatingContests);
+
+        // 5 contests should be visible no matter if the identity joins to some contests
+        $this->assertCount(5, $response['results']);
+    }
 }
