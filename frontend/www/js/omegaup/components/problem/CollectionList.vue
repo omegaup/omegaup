@@ -1,16 +1,17 @@
 <template>
   <div class="container-fluid p-5 max-width mx-auto">
-    <div class="row">
-      <div class="col col-md-3 d-flex align-items-center">
-        <a href="/problem/collection/" data-nav-problems-collection>{{
-          T.problemCollectionBackCollections
-        }}</a>
-      </div>
-      <div class="col mb-4">
-        <h1 class="title-font p-0">{{ title }}</h1>
-      </div>
+    <h1 class="title-font p-0 mb-2 text-center">{{ title }}</h1>
+    <div class="mb-4">
+      <a href="/problem/collection/" data-nav-problems-collection>{{
+        T.problemCollectionBackCollections
+      }}</a>
     </div>
-    <div class="d-flex flex-row">
+    <div class="d-flex flex-row collection-layout">
+      <div
+        v-if="isMobileViewport && filtersVisible"
+        class="filters-backdrop"
+        @click="filtersVisible = false"
+      ></div>
       <div
         class="filters-sidebar"
         :class="{ 'filters-hidden': !filtersVisible }"
@@ -32,44 +33,57 @@
           "
         ></omegaup-problem-filter-tags>
 
-        <div class="mb-3">
+        <div
+          class="problem-tags-toggle-row mb-3"
+          :title="isProblemTagsLocked ? T.problemTagsLockedByPreferences : ''"
+        >
           <omegaup-toggle-switch
             data-problem-tags-toggle
-            :checked-value="showProblemTags"
+            :checked-value="effectiveShowProblemTags"
             :text-description="T.userEditShowProblemTags"
             :size="ToggleSwitchSize.Small"
-            @update:value="(value) => (showProblemTags = value)"
+            :disabled="isProblemTagsLocked"
+            @update:value="
+              (value) => {
+                if (!isProblemTagsLocked) showProblemTags = value;
+              }
+            "
           ></omegaup-toggle-switch>
+          <span v-if="isProblemTagsLocked" class="problem-tags-lock">
+            <font-awesome-icon icon="lock" />
+          </span>
         </div>
-        <omegaup-problem-filter-difficulty
-          :selected-difficulty="difficulty"
-          @change-difficulty="
-            (difficulty) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedTags,
-              )
-          "
-        ></omegaup-problem-filter-difficulty>
+        <div class="filter-cards">
+          <omegaup-problem-filter-difficulty
+            :selected-difficulty="difficulty"
+            @change-difficulty="
+              (difficulty) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedTags,
+                )
+            "
+          ></omegaup-problem-filter-difficulty>
 
-        <omegaup-problem-filter-quality
-          :quality="quality"
-          @change-quality="
-            (quality) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedTags,
-              )
-          "
-        ></omegaup-problem-filter-quality>
+          <omegaup-problem-filter-quality
+            :quality="quality"
+            @change-quality="
+              (quality) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedTags,
+                )
+            "
+          ></omegaup-problem-filter-quality>
+        </div>
       </div>
 
       <button
@@ -112,7 +126,7 @@
           :sort-order="sortOrder"
           :column-name="columnName"
           :path="`/problem/collection/${level}/`"
-          :show-problem-tags="showProblemTags"
+          :show-problem-tags="effectiveShowProblemTags"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit(
@@ -149,6 +163,8 @@ import {
 
 library.add(faChevronLeft, faChevronRight);
 
+const MOBILE_BREAKPOINT = 576;
+
 @Component({
   components: {
     'omegaup-problem-filter-tags': problem_FilterTags,
@@ -178,20 +194,55 @@ export default class CollectionList extends Vue {
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
   @Prop() quality!: string;
+  @Prop({ default: false }) hideProblemTagsPreference!: boolean;
 
   T = T;
   ToggleSwitchSize = ToggleSwitchSize;
   level = this.data.level;
-  filtersVisible = true;
+  filtersVisible =
+    typeof window === 'undefined'
+      ? true
+      : window.innerWidth >= MOBILE_BREAKPOINT;
   showProblemTags = true;
+  isMobileViewport =
+    typeof window === 'undefined'
+      ? false
+      : window.innerWidth < MOBILE_BREAKPOINT;
+
+  mounted(): void {
+    this.updateViewportMode();
+    window.addEventListener('resize', this.updateViewportMode);
+  }
+
+  beforeDestroy(): void {
+    window.removeEventListener('resize', this.updateViewportMode);
+  }
+
+  updateViewportMode(): void {
+    const wasMobileViewport = this.isMobileViewport;
+    this.isMobileViewport = window.innerWidth < MOBILE_BREAKPOINT;
+    if (this.isMobileViewport === wasMobileViewport) {
+      return;
+    }
+    this.filtersVisible = !this.isMobileViewport;
+  }
 
   get problemsToShow(): omegaup.Problem[] {
-    if (this.showProblemTags) return this.problems;
+    if (this.effectiveShowProblemTags) return this.problems;
     // Keep filtering logic intact but hide rendered tags by stripping them.
     return this.problems.map((problem) => ({
       ...problem,
       tags: [],
     }));
+  }
+
+  get isProblemTagsLocked(): boolean {
+    return this.hideProblemTagsPreference;
+  }
+
+  get effectiveShowProblemTags(): boolean {
+    if (this.isProblemTagsLocked) return false;
+    return this.showProblemTags;
   }
 
   get publicQualityTags(): types.TagWithProblemCount[] {
@@ -242,6 +293,17 @@ export default class CollectionList extends Vue {
   max-width: 75rem;
 }
 
+.problem-tags-toggle-row {
+  display: flex;
+  align-items: center;
+}
+
+.problem-tags-lock {
+  font-size: 0.9rem;
+  margin-left: 2px;
+  cursor: help;
+}
+
 .filters-sidebar {
   width: 250px;
   min-width: 250px;
@@ -268,5 +330,57 @@ export default class CollectionList extends Vue {
 .main-content-wrapper {
   min-width: 0;
   flex: 1;
+}
+
+.collection-layout {
+  position: relative;
+}
+
+.filters-backdrop {
+  display: none;
+}
+
+@media (max-width: 575.98px) {
+  .filters-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    width: min(18rem, 85vw);
+    min-width: min(18rem, 85vw);
+    height: 100%;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    background: var(--problem-collection-list-mobile-sidebar-background-color);
+    border-right: 1px solid
+      var(--problem-collection-list-mobile-sidebar-border-color);
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, opacity 0.2s ease;
+  }
+
+  .filters-sidebar.filters-hidden {
+    width: min(18rem, 85vw);
+    min-width: min(18rem, 85vw);
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+
+  .filter-toggle {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 30;
+  }
+
+  .filters-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .main-content-wrapper {
+    width: 100%;
+  }
 }
 </style>

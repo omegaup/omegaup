@@ -79,6 +79,10 @@ OmegaUp.on('ready', () => {
           hasVisitedSection: payload.hasVisitedSection,
         },
         on: {
+          'update:tab': (newTab: AvailableTabs) => {
+            this.tab = newTab;
+            window.location.hash = `#${newTab}`;
+          },
           'update-group': (name: string, description: string) => {
             api.Group.update({
               alias: payload.groupAlias,
@@ -324,5 +328,22 @@ OmegaUp.on('ready', () => {
         },
       });
     },
+  });
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+
+    if (!Object.values(AvailableTabs).includes(hash as AvailableTabs)) {
+      groupEdit.tab = AvailableTabs.Members;
+      return;
+    }
+
+    groupEdit.tab = hash as AvailableTabs;
+  };
+
+  window.addEventListener('hashchange', onHashChange);
+  onHashChange();
+
+  groupEdit.$once('hook:beforeDestroy', () => {
+    window.removeEventListener('hashchange', onHashChange);
   });
 });
