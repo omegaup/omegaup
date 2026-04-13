@@ -221,6 +221,24 @@ CREATE TABLE `Contest_Log` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Contest_Problem_Change_Log` (
+  `change_id` int NOT NULL AUTO_INCREMENT,
+  `contest_id` int NOT NULL COMMENT 'Concurso donde ocurrió el cambio de problema',
+  `problem_id` int NOT NULL COMMENT 'Problema que fue cambiado',
+  `user_id` int NOT NULL COMMENT 'Usuario que realizó el cambio (auditoría)',
+  `change_type` enum('added','modified','removed') NOT NULL COMMENT 'Tipo de cambio',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`change_id`),
+  KEY `idx_contest_timestamp` (`contest_id`,`timestamp`),
+  KEY `fk_cpcl_problem_id` (`problem_id`),
+  KEY `fk_cpcl_user_id` (`user_id`),
+  CONSTRAINT `fk_cpcl_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
+  CONSTRAINT `fk_cpcl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
+  CONSTRAINT `fk_cpcl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de cambios de problemas en concursos para auditoría e historial.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Contests` (
   `contest_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso',
   `problemset_id` int NOT NULL COMMENT 'La lista de problemas de este concurso',
@@ -262,6 +280,7 @@ CREATE TABLE `Contests` (
   KEY `fk_cc_rerun_id` (`rerun_id`),
   KEY `idx_contests_title_archived` (`title`,`archived`),
   KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
+  KEY `idx_acl_archived` (`acl_id`,`archived`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
