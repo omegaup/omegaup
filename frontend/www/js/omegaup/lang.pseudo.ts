@@ -2274,6 +2274,7 @@ const translations: { [key: string]: string; } = {
   wordsPortuguese: "(P0r7ugu353)",
   wordsPractice: "(Prac7ic3)",
   wordsPrevPage: "(Pr3vi0u5 pag3)",
+  wordsPreview: "(Pr3vi3w)",
   wordsPrevious: "(Pr3vi0u5)",
   wordsPrivacyPolicy: "(Privacy P01icy)",
   wordsPrivacyPolicyAccepted: "(Y0u hav3 acc3p73d 7h3 privacy p01icy)",
