@@ -44,14 +44,12 @@
         </thead>
         <tbody>
           <tr v-for="apiToken in apiTokens" :key="apiToken.name">
-            <td data-label="Token">{{ apiToken.name }}</td>
-            <td data-label="Timestamp">{{ formatTime(apiToken.timestamp) }}</td>
-            <td data-label="Last used">{{ formatTime(apiToken.last_used) }}</td>
-            <td data-label="Reset time">
-              {{ formatTime(apiToken.rate_limit.reset) }}
-            </td>
-            <td data-label="Remaining">{{ apiToken.rate_limit.remaining }}</td>
-            <td data-label="Limit">{{ apiToken.rate_limit.limit }}</td>
+            <td :data-label="T.apiTokenName">{{ apiToken.name }}</td>
+            <td :data-label="T.apiTokenTimestamp">{{ formatTime(apiToken.timestamp) }}</td>
+            <td :data-label="T.apiTokenLastTimeUsed">{{ formatTime(apiToken.last_used) }}</td>
+            <td :data-label="T.apiTokenResetTime">{{ formatTime(apiToken.rate_limit.reset) }}</td>
+            <td :data-label="T.apiTokenRemaining">{{ apiToken.rate_limit.remaining }}</td>
+            <td :data-label="T.apiTokenLimit">{{ apiToken.rate_limit.limit }}</td>
             <td>
               <button
                 class="btn btn-secondary btn-sm"
@@ -111,15 +109,52 @@ export default class ManageApiTokens extends Vue {
 <style lang="scss" scoped>
 .table-responsive {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
+// Tablet aur Desktop ke liye normal table
 .table {
-  white-space: nowrap;
+  th, td { vertical-align: middle; }
+}
 
-  th,
-  td {
-    vertical-align: middle;
+// Mobile ke liye Card Layout (Max-width: 768px)
+@media screen and (max-width: 768px) {
+  .table-responsive { border: none; }
+  
+  .table {
+    display: block;
+    thead { display: none; } // Headers chhupa diye
+    
+    tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fdfdfd;
+    }
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      border: none;
+      padding: 8px 5px;
+      text-align: right;
+
+      // Ye label dikhayega left side pe
+      &::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #555;
+        text-align: left;
+      }
+      
+      // Revoke button wala cell
+      &:last-child {
+        justify-content: center;
+        border-top: 1px solid #eee;
+        margin-top: 5px;
+      }
+    }
   }
 }
 </style>
