@@ -413,11 +413,17 @@ export default class UserRank extends Vue {
   flex-shrink: 0;
 }
 .coder-username {
-  width: 100px;
   flex-shrink: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.coder-name {
+  word-break: normal;
+  overflow-wrap: break-word;
+  min-width: 100px;
+  display: inline-block;
 }
 
 .coder-username a {
@@ -431,5 +437,10 @@ export default class UserRank extends Vue {
 [data-user-rank] table td,
 [data-user-rank] table th {
   vertical-align: middle !important;
+}
+@media screen and (max-width: 480px) {
+  .coder-cell {
+    flex-wrap: wrap; // Agar naam lamba ho toh username ke niche chala jaye
+  }
 }
 </style>
