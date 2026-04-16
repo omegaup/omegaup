@@ -1,6 +1,6 @@
 import { shallowMount, Wrapper } from '@vue/test-utils';
 import Vue from 'vue';
-import Chartsv2 from './Chartsv2.vue';
+import Charts from './Charts.vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
@@ -37,12 +37,12 @@ function mountComponent(
   data: omegaup.RunInfo[] = [],
   username = 'testuser',
 ): Wrapper<Vue> {
-  return shallowMount(Chartsv2, {
+  return shallowMount(Charts, {
     propsData: { data, username },
   });
 }
 
-describe('Chartsv2.vue', () => {
+describe('Charts.vue', () => {
   // Group 1: Rendering & Defaults
   describe('Rendering & Defaults', () => {
     it('mounts with empty data without crashing', () => {
