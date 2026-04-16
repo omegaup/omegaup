@@ -154,6 +154,128 @@ describe('EventsSocket', () => {
     expect(client.socketStatus).toEqual(SocketStatus.Failed);
   });
 
+  it('should clear intervals when the connection is closed', async () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+
+    // Step 1: Simulate socket failing to connect (fallback path)
+    // setupPolls is called internally; we replicate that here by setting socket=null
+    (client as any).socket = null;
+    (client as any).setupPolls();
+
+    // Step 2: clarificationInterval and rankingInterval are now active
+    expect((client as any).clarificationInterval).not.toBeNull();
+    expect((client as any).rankingInterval).not.toBeNull();
+
+    // Step 3: Socket reconnects — fresh server accepts the connection
+    WS.clean();
+    const freshServer = new WS(`ws://${options.locationHost}/events/`, {
+      selectProtocol: () => 'com.omegaup.events',
+      jsonProtocol: true,
+    });
+
+    client.shouldRetry = true;
+    (client as any).connectSocket().catch(() => {});
+    jest.runOnlyPendingTimers();
+    await freshServer.connected;
+
+    // Step 4: onopen fires — polling intervals must be cleared
+    expect((client as any).clarificationInterval).toBeNull();
+    expect((client as any).rankingInterval).toBeNull();
+  });
+
+  it('should not leak polling intervals during reconnect cycles with setupPolls', async () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+
+    // === Cycle 1: fail → poll → reconnect → clear ===
+
+    // Simulate connection failure / fallback
+    (client as any).socket = null;
+    (client as any).setupPolls();
+
+    const clarificationInterval1 = (client as any).clarificationInterval;
+    const rankingInterval1 = (client as any).rankingInterval;
+
+    expect(clarificationInterval1).not.toBeNull();
+    expect(rankingInterval1).not.toBeNull();
+
+    // Reconnect — fresh server accepts the connection
+    WS.clean();
+    let freshServer = new WS(`ws://${options.locationHost}/events/`, {
+      selectProtocol: () => 'com.omegaup.events',
+      jsonProtocol: true,
+    });
+    client.shouldRetry = true;
+    (client as any).connectSocket().catch(() => {});
+    jest.runOnlyPendingTimers();
+    await freshServer.connected;
+
+    // Intervals must be cleared after onopen
+    expect((client as any).clarificationInterval).toBeNull();
+    expect((client as any).rankingInterval).toBeNull();
+
+    // === Cycle 2: fail → poll → reconnect → clear ===
+
+    // Capture current (null) before next failure
+    const prevClarification2 = (client as any).clarificationInterval;
+    const prevRanking2 = (client as any).rankingInterval;
+
+    // Simulate next failure and fallback
+    freshServer.close();
+    (client as any).socket = null;
+    (client as any).setupPolls();
+
+    // New intervals must be non-null and different from the previous (null) ones
+    expect((client as any).clarificationInterval).not.toBeNull();
+    expect((client as any).rankingInterval).not.toBeNull();
+    expect((client as any).clarificationInterval).not.toBe(prevClarification2);
+    expect((client as any).rankingInterval).not.toBe(prevRanking2);
+
+    // Reconnect again
+    WS.clean();
+    freshServer = new WS(`ws://${options.locationHost}/events/`, {
+      selectProtocol: () => 'com.omegaup.events',
+      jsonProtocol: true,
+    });
+    client.shouldRetry = true;
+    (client as any).connectSocket().catch(() => {});
+    jest.runOnlyPendingTimers();
+    await freshServer.connected;
+
+    expect((client as any).clarificationInterval).toBeNull();
+    expect((client as any).rankingInterval).toBeNull();
+
+    // === Cycle 3: fail → poll → reconnect → clear ===
+
+    const prevClarification3 = (client as any).clarificationInterval;
+    const prevRanking3 = (client as any).rankingInterval;
+
+    freshServer.close();
+    (client as any).socket = null;
+    (client as any).setupPolls();
+
+    expect((client as any).clarificationInterval).not.toBeNull();
+    expect((client as any).rankingInterval).not.toBeNull();
+    expect((client as any).clarificationInterval).not.toBe(prevClarification3);
+    expect((client as any).rankingInterval).not.toBe(prevRanking3);
+
+    // Reconnect a third time
+    WS.clean();
+    freshServer = new WS(`ws://${options.locationHost}/events/`, {
+      selectProtocol: () => 'com.omegaup.events',
+      jsonProtocol: true,
+    });
+    client.shouldRetry = true;
+    (client as any).connectSocket().catch(() => {});
+    jest.runOnlyPendingTimers();
+    await freshServer.connected;
+
+    expect((client as any).clarificationInterval).toBeNull();
+    expect((client as any).rankingInterval).toBeNull();
+
+    // Clean up keepalive timer so afterEach's runOnlyPendingTimers doesn't fire on a closed socket
+    (client as any).onclose();
+  });
+
   it('should handle a socket when server sends /run/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 

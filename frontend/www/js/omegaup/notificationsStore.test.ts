@@ -19,6 +19,7 @@ describe('notificationsStore', () => {
       visible: false,
       counter: 0,
       autoHideTimeout: null,
+      onDismiss: null,
     };
     storeConfig = createNotificationsStoreConfig();
   });
@@ -29,6 +30,7 @@ describe('notificationsStore', () => {
         const payload = {
           message: 'Test error message',
           type: MessageType.Danger,
+          onDismiss: null,
         };
 
         storeConfig.mutations.showNotification(state, payload);
@@ -37,12 +39,27 @@ describe('notificationsStore', () => {
         expect(state.type).toBe(MessageType.Danger);
         expect(state.visible).toBe(true);
         expect(state.counter).toBe(1);
+        expect(state.onDismiss).toBeNull();
+      });
+
+      it('should set onDismiss callback', () => {
+        const callback = jest.fn();
+        const payload = {
+          message: 'Test message',
+          type: MessageType.Info,
+          onDismiss: callback,
+        };
+
+        storeConfig.mutations.showNotification(state, payload);
+
+        expect(state.onDismiss).toBe(callback);
       });
 
       it('should increment counter on each notification', () => {
         const payload = {
           message: 'Test message',
           type: MessageType.Success,
+          onDismiss: null,
         };
 
         storeConfig.mutations.showNotification(state, payload);
@@ -59,12 +76,14 @@ describe('notificationsStore', () => {
         state.message = 'Test message';
         state.type = MessageType.Info;
         state.visible = true;
+        state.onDismiss = jest.fn();
 
         storeConfig.mutations.hideNotification(state);
 
         expect(state.message).toBeNull();
         expect(state.type).toBeNull();
         expect(state.visible).toBe(false);
+        expect(state.onDismiss).toBeNull();
       });
     });
   });
@@ -78,6 +97,7 @@ describe('notificationsStore', () => {
       store1.commit('showNotification', {
         message: 'Store 1 message',
         type: MessageType.Danger,
+        onDismiss: null,
       });
 
       // store2 should be unaffected
@@ -96,6 +116,7 @@ describe('notificationsStore', () => {
       expect(store.state.visible).toBe(false);
       expect(store.state.counter).toBe(0);
       expect(store.state.autoHideTimeout).toBeNull();
+      expect(store.state.onDismiss).toBeNull();
     });
   });
 
@@ -132,6 +153,56 @@ describe('notificationsStore', () => {
       });
 
       expect(store.state.position).toBe(NotificationPosition.TopRight);
+    });
+
+    it('should set onDismiss callback when provided', () => {
+      const store = createNotificationsStore();
+      const callback = jest.fn();
+
+      store.dispatch('displayStatus', {
+        message: 'Test message',
+        type: MessageType.Info,
+        onDismiss: callback,
+      });
+
+      expect(store.state.onDismiss).toBe(callback);
+    });
+  });
+
+  describe('dismissNotifications action', () => {
+    it('should trigger onDismiss callback if present', () => {
+      const store = createNotificationsStore();
+      const callback = jest.fn();
+
+      // Manually set state for testing
+      store.replaceState({
+        ...store.state,
+        visible: true,
+        onDismiss: callback,
+      });
+
+      store.dispatch('dismissNotifications');
+
+      expect(callback).toHaveBeenCalled();
+      expect(store.state.visible).toBe(false);
+      expect(store.state.onDismiss).toBeNull();
+    });
+
+    it('should not fail if onDismiss is null', () => {
+      const store = createNotificationsStore();
+
+      // Manually set state for testing
+      store.replaceState({
+        ...store.state,
+        visible: true,
+        onDismiss: null,
+      });
+
+      expect(() => {
+        store.dispatch('dismissNotifications');
+      }).not.toThrow();
+
+      expect(store.state.visible).toBe(false);
     });
   });
 });

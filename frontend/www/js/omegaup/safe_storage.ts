@@ -32,7 +32,7 @@ export class SafeStorage {
         const key = localStorage.key(i);
         if (key && key.startsWith('clarification-')) {
           const timestamp = localStorage.getItem(key);
-          if (timestamp && parseInt(timestamp) < thirtyDaysAgo) {
+          if (timestamp && parseInt(timestamp, 10) < thirtyDaysAgo) {
             localStorage.removeItem(key);
           }
         }
