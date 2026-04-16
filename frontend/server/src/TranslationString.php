@@ -11,7 +11,6 @@ class TranslationString implements \JsonSerializable {
      */
     public function __construct(
         public readonly string $message,
-        /** @var array<string, mixed> */
         public readonly array $args = [],
     ) {
     }
