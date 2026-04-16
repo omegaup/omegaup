@@ -235,7 +235,7 @@ describe('Charts.vue', () => {
     // Known Bug 1: groupedPeriods mutates props.data in-place (lines 227, 234–251).
     // stats = this.data is a reference; .day/.week/.month/.year are written onto
     // each prop object, violating Vue's one-way data flow.
-    // Remove .skip once the bug is fixed.
+    // TODO(#9750): Remove .skip once the bug is fixed.
     it.skip('[Bug 1] groupedPeriods should not mutate prop data objects', () => {
       const data = freshData();
       const wrapper = mountComponent(data);
@@ -325,7 +325,7 @@ describe('Charts.vue', () => {
     // (emptyPeriodRunCount, emptyGroupedPeriods) by reference at lines 197–198.
     // Two instances share the same object, so B's computation overwrites A's
     // cached result. Fix: clone the objects before use.
-    // Remove .skip once the bug is fixed.
+    // TODO(#9779): Remove .skip once the bug is fixed.
     it.skip('[Bug 2] each instance should have isolated normalizedPeriodRunCounts', () => {
       // Mount instance A with sample data
       const dataA = freshData();
@@ -361,7 +361,7 @@ describe('Charts.vue', () => {
     // line 263, so verdicts like CE/JE/MLE/OLE/VE produce NaN via
     // undefined + N at line 264. Fix: initialize all 10 verdicts, or guard
     // against missing keys.
-    // Remove .skip once the bug is fixed.
+    // TODO(#9751): Remove .skip once the bug is fixed.
     it.skip('[Bug 3] groupedPeriods should produce numeric counts for all verdicts', () => {
       const wrapper = mountComponent(freshData());
       const vm = wrapper.vm as any;
