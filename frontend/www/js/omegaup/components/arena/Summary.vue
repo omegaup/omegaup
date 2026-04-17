@@ -35,7 +35,7 @@
         <td>
           {{
             time.formatTimestamp(
-              new Date(starTime.getTime() + (duration * scoreboard) / 100),
+              new Date(startTime.getTime() + (duration * scoreboard) / 100),
             )
           }}
         </td>
