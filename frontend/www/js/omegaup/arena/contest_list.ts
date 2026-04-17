@@ -119,10 +119,12 @@ OmegaUp.on('ready', () => {
             params,
             urlObj,
             shouldUpdateUrl = true,
+            allTabs = false,
           }: {
             params: UrlParams;
             urlObj: URL;
             shouldUpdateUrl?: boolean;
+            allTabs?: boolean;
           }) => {
             for (const [key, value] of Object.entries(params)) {
               if (value) {
@@ -134,10 +136,16 @@ OmegaUp.on('ready', () => {
             if (shouldUpdateUrl) {
               window.history.pushState({}, '', urlObj);
             }
-            await contestStore.dispatch('fetchContestList', {
-              requestParams: params,
-              name: params.tab_name,
-            });
+            if (allTabs) {
+              await contestStore.dispatch('fetchContestListAllTabs', {
+                requestParams: params,
+              });
+            } else {
+              await contestStore.dispatch('fetchContestList', {
+                requestParams: params,
+                name: params.tab_name,
+              });
+            }
           },
         },
       });

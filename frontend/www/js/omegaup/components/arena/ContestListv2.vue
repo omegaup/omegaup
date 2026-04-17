@@ -18,7 +18,7 @@
                 <form @submit.prevent="onSearchQuery">
                   <div class="input-group">
                     <input
-                      v-model.lazy="currentQuery"
+                      v-model="currentQuery"
                       class="form-control nav-link"
                       type="text"
                       name="query"
@@ -27,6 +27,7 @@
                       autocapitalize="off"
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
+                      @input="onSearchQueryDebounced"
                       @keyup.enter="onSearchQuery"
                     />
                     <button
@@ -415,6 +416,18 @@
 </template>
 
 <script lang="ts">
+const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
+  let timer: number | null = null;
+  return (...args: any[]) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn(...args);
+    }, waitTime) as any;
+  };
+};
+
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -514,6 +527,10 @@ class ArenaContestList extends Vue {
   // Flag to track the very first load — initial URL normalization should use
   // replaceState to avoid creating an extra history entry (see issue #9161)
   isInitialLoad: boolean = true;
+
+  onSearchQueryDebounced = debounce(() => {
+    this.onSearchQuery();
+  }, 300);
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {

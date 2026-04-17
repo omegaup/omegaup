@@ -5453,6 +5453,13 @@ export namespace messages {
     number_of_results: number;
     results: types.ContestListItem[];
   };
+  export type ContestListAllTabsRequest = { [key: string]: any };
+  export type _ContestListAllTabsServerResponse = any;
+  export type ContestListAllTabsResponse = {
+    current: { number_of_results: number; results: types.ContestListItem[] };
+    future: { number_of_results: number; results: types.ContestListItem[] };
+    past: { number_of_results: number; results: types.ContestListItem[] };
+  };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
   export type ContestListParticipatingResponse = {
@@ -6460,6 +6467,9 @@ export namespace controllers {
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;
+    listAllTabs: (
+      params?: messages.ContestListAllTabsRequest,
+    ) => Promise<messages.ContestListAllTabsResponse>;
     listParticipating: (
       params?: messages.ContestListParticipatingRequest,
     ) => Promise<messages.ContestListParticipatingResponse>;

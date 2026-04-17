@@ -52,6 +52,7 @@
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
+  - [`/api/contest/listAllTabs/`](#apicontestlistalltabs)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
@@ -1199,6 +1200,33 @@ Returns a list of contests
 | ------------------- | ----------------------------- |
 | `number_of_results` | `number`                      |
 | `results`           | `List[types.ContestListItem]` |
+
+## `/api/contest/listAllTabs/`
+
+### Description
+
+Returns paginated contest lists for current, past, and future in one API call.
+
+### Parameters
+
+| Name             | Type                                        | Description | Required |
+| ---------------- | ------------------------------------------- | ----------- | -------- |
+| `page`           | `int`                                       |             | ✓        |
+| `page_size`      | `int`                                       |             | ✓        |
+| `query`          | `string`                                    |             | ✓        |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |          |
+| `participating`  | `int\|null`                                 |             |          |
+| `recommended`    | `int\|null`                                 |             |          |
+| `sort_order`     | `null\|string`                              |             |          |
+
+### Returns
+
+| Name      | Type                                                               |
+| --------- | ------------------------------------------------------------------ |
+| `current` | `{ number_of_results: number; results: types.ContestListItem[]; }` |
+| `future`  | `{ number_of_results: number; results: types.ContestListItem[]; }` |
+| `past`    | `{ number_of_results: number; results: types.ContestListItem[]; }` |
 
 ## `/api/contest/listParticipating/`
 
