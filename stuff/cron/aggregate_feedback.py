@@ -419,21 +419,18 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
     failed_problems = 0
 
     with dbconn.cursor() as cur:
-        if not last_processed_qualitynomination_id:
+        if (last_processed_qualitynomination_id is None or
+                last_processed_qualitynomination_id == 0):
             cur.execute("""SELECT DISTINCT qn.`problem_id`
                            FROM `QualityNominations` as qn
-                           WHERE qn.`nomination` = 'suggestion'
-                             AND qn.`qualitynomination_id` > %s;""",
-                        (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
+                           WHERE qn.`nomination` = 'suggestion';""")
         else:
             cur.execute("""SELECT DISTINCT qn.`problem_id`
                            FROM `QualityNominations` as qn
                            WHERE qn.`nomination` = 'suggestion'
                              AND qn.`qualitynomination_id` > %s
-                             AND qn.`qualitynomination_id` > %s
                              AND qn.`qualitynomination_id` <= %s;""",
-                        (QUALITYNOMINATION_QUESTION_CHANGE_ID,
-                         last_processed_qualitynomination_id,
+                        (last_processed_qualitynomination_id,
                          max_qualitynomination_id))
         for (problem_id,) in cur.fetchall():
             attempted_problems += 1
