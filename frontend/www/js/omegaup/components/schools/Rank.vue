@@ -65,7 +65,7 @@
       </tbody>
     </table>
     <div v-if="showHeader" class="card-footer">
-      <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
+      <a href="/rank/schools/">{{ T.rankSeeGeneralRanking }}</a>
     </div>
     <div v-else class="card-footer">
       <omegaup-common-paginator

@@ -57,7 +57,7 @@ class Validators {
         }
 
         // Validate data is string
-        if (!is_string($parameter) || empty($parameter)) {
+        if (!is_string($parameter) || !self::stringNonEmpty($parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $parameterName
@@ -69,7 +69,7 @@ class Validators {
      * Check whether parameter value is non-empty string
      */
     public static function stringNonEmpty(string $parameter): bool {
-        return !empty($parameter);
+        return trim($parameter) !== '';
     }
 
     /**
@@ -864,7 +864,7 @@ class Validators {
      */
     public static function validateZipFilePath(string $filePath): void {
         foreach (self::ZIP_FORBIDDEN_PATH_CHARS as $char) {
-            if (strpos($filePath, $char) !== false) {
+            if (str_contains($filePath, $char)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalidZipFilePath',
                     'zipFile'

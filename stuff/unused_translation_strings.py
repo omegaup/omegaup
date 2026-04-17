@@ -73,6 +73,9 @@ def _main() -> None:
             # Verdict translations and their descriptions.
             if translation_string_name.startswith('verdict'):
                 continue
+            # Parameter name translations (constructed dynamically in PHP).
+            if translation_string_name == 'parameterName_finish_time':
+                continue
             # public / student course information description
             if translation_string_name.endswith(
                     'CourseInformationDescription'):

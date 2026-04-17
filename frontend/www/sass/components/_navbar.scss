@@ -1,0 +1,9 @@
+/* Help menu dropdown: allow width to grow based on content */
+.navbar .dropdown-menu.help-dropdown {
+  min-width: max-content;
+  max-width: 420px;
+}
+
+.navbar .dropdown-menu.help-dropdown .dropdown-item {
+  white-space: normal;
+}

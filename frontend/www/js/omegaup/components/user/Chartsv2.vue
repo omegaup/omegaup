@@ -82,6 +82,19 @@ interface NormalizedRunCounts {
   selected?: boolean;
 }
 
+const VERDICT_LABELS: Record<string, string> = {
+  AC: T.verdictAC,
+  PA: T.verdictPA,
+  WA: T.verdictWA,
+  TLE: T.verdictTLE,
+  RTE: T.verdictRTE,
+  CE: T.verdictCE,
+  JE: T.verdictJE,
+  MLE: T.verdictMLE,
+  OLE: T.verdictOLE,
+  VE: T.verdictVE,
+};
+
 const emptyGroupedPeriods = {
   day: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
   week: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
@@ -308,7 +321,20 @@ export default class UserCharts extends Vue {
       },
       tooltip: {
         headerFormat: '<b>{point.x}</b><br/>',
-        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
+        formatter(this: any): string {
+          const verdictFull =
+            VERDICT_LABELS[this.series.name] || this.series.name;
+          return (
+            '<b>' +
+            this.x +
+            '</b><br/>' +
+            verdictFull +
+            ': ' +
+            this.y +
+            '<br/>Total: ' +
+            this.point.stackTotal
+          );
+        },
       },
       plotOptions: {
         column: {
@@ -347,7 +373,15 @@ export default class UserCharts extends Vue {
       yAxis: {
         title: { text: '' },
       },
-      tooltip: { pointFormat: '{series.name}: {point.y}' },
+      tooltip: {
+        formatter(this: any): string {
+          const verdictFull =
+            VERDICT_LABELS[this.point.name] || this.point.name;
+          return (
+            T.profileStatisticsRuns + ': ' + this.y + '<br/>' + verdictFull
+          );
+        },
+      },
       plotOptions: {
         pie: {
           allowPointSelect: true,

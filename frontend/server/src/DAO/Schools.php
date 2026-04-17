@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
-     * Finds schools that cotains 'name'
+     * Finds schools that contains 'name'
      *
      * @param string $name
      * @return list<\OmegaUp\DAO\VO\Schools>

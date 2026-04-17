@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Contestant=array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ScoreboardMergePayload=array{contests: list<ContestListItem>}
- * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
+ * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, classname: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
  * @psalm-type ContestReport=array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type ContestReportDetailsPayload=array{contestAlias: string, contestReport: list<ContestReport>}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
@@ -78,7 +78,8 @@ namespace OmegaUp\Controllers;
 
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
-    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
+    const MAX_CONTEST_LENGTH_SECONDS = 60 * 60 * 24 * 31; // 31 days
+    const MAX_CONTEST_LENGTH_SYSADMIN_SECONDS = 60 * 60 * 24 * 60; // 60 days
     const CONTEST_LIST_PAGE_SIZE = 10;
 
     /**
@@ -518,39 +519,73 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
+
+        $canAccess = true;
+
         if ($contest->admission_mode === 'private') {
-            if (
-                \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
-                    $identity->identity_id,
-                    $contest->problemset_id
-                )
-            ) {
-                return true;
-            }
-            if (
-                \OmegaUp\Authorization::canSubmitToProblemset(
-                    $identity,
-                    \OmegaUp\DAO\Problemsets::getByPK(
-                        $contest->problemset_id
-                    )
-                )
-            ) {
-                return true;
-            }
-            return false;
-        } elseif (
-            $contest->admission_mode === 'registration' &&
-            !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
-        ) {
-            $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
-                $identity->identity_id,
-                $contest->problemset_id
+            $canAccess = self::canAccessPrivateContest($contest, $identity);
+        } elseif ($contest->admission_mode === 'registration') {
+            $canAccess = self::canAccessRegistrationContest(
+                $contest,
+                $identity
             );
-            if (is_null($req) || !$req->accepted) {
-                return false;
-            }
         }
-        return true;
+
+        return $canAccess;
+    }
+
+    /**
+     * Check if identity can access a private contest
+     */
+    private static function canAccessPrivateContest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        $problemsetId = intval($contest->problemset_id);
+
+        if (
+            \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
+                $identity->identity_id,
+                $problemsetId
+            )
+        ) {
+            return true;
+        }
+
+        if (
+            \OmegaUp\Authorization::canSubmitToProblemset(
+                $identity,
+                \OmegaUp\DAO\Problemsets::getByPK(
+                    $problemsetId
+                )
+            )
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if identity can access a registration-mode contest
+     */
+    private static function canAccessRegistrationContest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        if (\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
+            return true;
+        }
+
+        $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
+            $identity->identity_id,
+            $contest->problemset_id
+        );
+
+        return !is_null($req) && $req->accepted;
     }
 
     /**
@@ -730,8 +765,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 course: null,
                 isAdmin: $contestAdmin,
                 currentIdentity: $identity,
-                offset: null,
-                rowcount: 100,
+                page: 1,
+                pageSize: 100,
             )['clarifications'],
             'problems' => $problems,
             'submissionDeadline' => $contestDetails['submission_deadline'] ?? $contest->finish_time,
@@ -1317,8 +1352,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestList'
                 ),
+                'fullWidth' => true,
             ],
-            'entrypoint' => 'arena_contest_listv2',
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 
@@ -1566,38 +1602,51 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
+        if (is_null($identity)) {
+            // No session, show the intro (if public), so that they can login.
+            return self::isPublic($contest->admission_mode);
+        }
+
         try {
-            if (is_null($identity)) {
-                // No session, show the intro (if public), so that they can login.
-                return self::isPublic($contest->admission_mode);
-            }
-            self::validateAccessContest($contest, $identity);
-            $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
+            return self::determineShowIntroForAuthenticatedUser(
                 $identity,
                 $contest
             );
-            if ($contestAdmin) {
-                return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
-            }
-            if (
-                !\OmegaUp\DAO\Contests::hasStarted($contest) &&
-                self::isInvitedToContest($contest, $identity)
-            ) {
-                return \OmegaUp\Controllers\Contest::SHOW_INTRO;
-            }
         } catch (\Exception $e) {
-            // Could not access contest. Private contests must not be leaked, so
-            // unless they were manually added beforehand, show them a 404 error.
-            if (
-                is_null($identity) ||
-                !self::isInvitedToContest($contest, $identity)
-            ) {
-                throw $e;
-            }
-            self::$log->error('Exception while trying to verify access: ' . $e);
+            return self::handleShowIntroException($e, $identity, $contest);
+        }
+    }
+
+    /**
+     * Determine if intro should be shown for authenticated user
+     */
+    private static function determineShowIntroForAuthenticatedUser(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        self::validateAccessContest($contest, $identity);
+
+        if (\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
+            return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
+        }
+
+        if (
+            !\OmegaUp\DAO\Contests::hasStarted($contest) &&
+            self::isInvitedToContest($contest, $identity)
+        ) {
             return \OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
 
+        return self::hasUserStartedContest($identity, $contest);
+    }
+
+    /**
+     * Check if user has already started the contest
+     */
+    private static function hasUserStartedContest(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
         // You already started the contest.
         $contestOpened = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
             $identity->identity_id,
@@ -1609,6 +1658,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
             return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
+
+        return \OmegaUp\Controllers\Contest::SHOW_INTRO;
+    }
+
+    /**
+     * Handle exception when determining if intro should be shown
+     */
+    private static function handleShowIntroException(
+        \Exception $e,
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        // Could not access contest. Private contests must not be leaked, so
+        // unless they were manually added beforehand, show them a 404 error.
+        if (!self::isInvitedToContest($contest, $identity)) {
+            throw $e;
+        }
+
+        self::$log->error('Exception while trying to verify access: ' . $e);
         return \OmegaUp\Controllers\Contest::SHOW_INTRO;
     }
 
@@ -1898,6 +1966,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User '{$r->identity->username}' joined contest '{$response['contest']->alias}'"
         );
+
+        // Invalidate user compare data cache since contest count changed
+        \OmegaUp\Controllers\User::invalidateUserCompareDataCache(
+            strval($r->identity->username)
+        );
+
         return ['status' => 'ok'];
     }
 
@@ -2121,7 +2195,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $identity,
             $contest
         );
-        $problemsetIdentity->access_time = $problemsetIdentity->access_time;
 
         // Add time left to response
         if (is_null($contest->window_length)) {
@@ -2577,7 +2650,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             $contest->problemset_id = $problemset->problemset_id;
             $contest->penalty_calc_policy = $contest->penalty_calc_policy ?: 'sum';
-            $contest->rerun_id = $contest->rerun_id;
             if (!is_null($originalProblemsetId)) {
                 if (is_null($contest->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2835,11 +2907,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contestLength = $finishTime->time - $startTime->time;
         }
 
-        // Validate max contest length
-        if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
+        // Validate max contest length (sys-admins get an extended limit)
+        $isSystemAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
+        $maxContestLength = $isSystemAdmin
+            ? \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SYSADMIN_SECONDS
+            : \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS;
+
+        if ($contestLength > $maxContestLength) {
+            $maxDays = intval($maxContestLength / (60 * 60 * 24)); // Convert seconds to days
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestLengthTooLong',
-                'finish_time'
+                'finish_time',
+                ['max_days' => strval($maxDays)]
             );
         }
 
@@ -4040,10 +4119,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $offset = $r->ensureOptionalInt('offset');
-        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
-        if ($offset < 0) {
-            $offset = 0;
+        $page = $r->ensureOptionalInt('offset') ?? 1;
+        $pageSize = $r->ensureOptionalInt('rowcount') ?? 1000;
+        if ($page < 1) {
+            $page = 1;
         }
 
         $contest = self::validateContest(
@@ -4062,8 +4141,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $contest
                 ),
                 currentIdentity: $r->identity,
-                offset: $offset,
-                rowcount: $rowcount,
+                page: $page,
+                pageSize: $pageSize,
             )['clarifications'],
         ];
     }
@@ -4486,6 +4565,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $mergedScoreboard[$username] = [
                         'name' => $userResults['name'],
                         'username' => $username,
+                        'classname' => $userResults['classname'],
                         'contests' => [],
                         'total' => [
                             'points' => 0.0,
@@ -5175,13 +5255,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * This function reviews changes in penalty type, admission mode, finish
-     * time and window length to recalcualte information previously stored
+     * time and window length to recalculate information previously stored
      */
     private static function updateContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Contests $originalContest,
-        \OmegaUp\DAO\VO\Identities $identity,
-        ?string $teamsGroupAlias = null
+        \OmegaUp\DAO\VO\Identities $identity
     ): void {
         if ($originalContest->admission_mode !== $contest->admission_mode) {
             $timestamp = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
@@ -5741,7 +5820,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleContestList'
                 ),
             ],
-            'entrypoint' => 'arena_contest_list',
+            'entrypoint' => 'arena_contest_listv2',
         ];
     }
 

@@ -162,7 +162,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($result['nominationStatus']['solved']);
         $this->assertFalse($result['nominationStatus']['tried']);
 
-        // Identity is able to ceate a new run
+        // Identity is able to create a new run
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity

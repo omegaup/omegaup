@@ -150,7 +150,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
 
         {
@@ -420,7 +420,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('ok', $response['status']);
 
-        // Check statment contents
+        // Check statement contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemData['request']['problem_alias']
         );
@@ -488,7 +488,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('ok', $response['status']);
 
-        // Check statment contents
+        // Check statement contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemData['request']['problem_alias']
         );
@@ -2269,7 +2269,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame(0, $response['visibility']);
 
-        // Updated problem setttings and visibility
+        // Updated problem settings and visibility
         $newTimeLimit = 3000.0;
         $newExtraWallTime = 200.0;
         $newMemoryLimit = 8000;
@@ -2505,6 +2505,63 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $markdownPT,
             $response['statement']['markdown']
         );
+    }
+
+    public function testUpdateStatementProblemViaSubmitWithValidLanguage() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        $login = self::login($problemData['author']);
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+                'request' => 'markdown',
+                'message' => 'Update statement in english',
+                'directory' => 'statements',
+                'language' => 'en',
+                'contents' => json_encode([
+                    'en' => 'English statement',
+                ]),
+            ])
+        )['templateProperties'];
+
+        $this->assertArrayHasKey('payload', $response);
+        $this->assertSame('en', $response['payload']['statement']['language']);
+        $this->assertStringContainsString(
+            'English statement',
+            $response['payload']['statement']['markdown']
+        );
+    }
+
+    public function testUpdateStatementProblemViaSubmitWithInvalidLanguage() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        $login = self::login($problemData['author']);
+
+        try {
+            \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'problem' => $problemAlias,
+                    'request' => 'markdown',
+                    'message' => 'Update statement with invalid language',
+                    'directory' => 'statements',
+                    'language' => 'fr',
+                    'contents' => json_encode([
+                        'en' => 'English statement',
+                    ]),
+                ])
+            );
+            $this->fail('Expected update to fail');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame(
+                'parameterNotInExpectedSet',
+                $e->getMessage()
+            );
+        }
     }
 
     public function testCommitModifiedZipExcludesEasyCases(): void {

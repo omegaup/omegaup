@@ -24,45 +24,63 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         array &$args,
         array &$clauses
     ): void {
+        // Pre-fetch tag IDs to avoid subquery
+        $placeholders = implode(',', array_fill(0, count($tags), '?'));
+        $tagIdSql = "SELECT tag_id, public FROM Tags WHERE name IN ({$placeholders})";
+
+        /** @var list<array{public: bool, tag_id: int}> */
+        $tagResults = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $tagIdSql,
+            $tags
+        );
+
+        if (empty($tagResults)) {
+            // No matching tags found, add impossible condition
+            $clauses[] = ['1 = 0', []];
+            return;
+        }
+
+        $tagIds = array_map(fn($row) => $row['tag_id'], $tagResults);
+        $allTagsPublic = array_reduce(
+            $tagResults,
+            fn($carry, $row) => $carry && ($row['public'] === true),
+            true
+        );
+
         // Look for problems matching ALL tags or not
-        $havingClause = $requireAllTags ? 'HAVING (COUNT(pt.tag_id) = ?)' : '';
-        $placeholders = array_fill(0, count($tags), '?');
-        $placeholders = join(',', $placeholders);
+        $havingClause = $requireAllTags ? 'HAVING (COUNT(DISTINCT pt.tag_id) = ?)' : '';
+        $tagPlaceholders = implode(',', array_fill(0, count($tagIds), '?'));
+
         $sql .= "
             INNER JOIN (
                 SELECT
                     pt.problem_id,
-                    BIT_AND(t.public) as public
+                    ? AS public
                 FROM
                     Problems_Tags pt
-                INNER JOIN
+                STRAIGHT_JOIN
                     Problems pp
                 ON
                     pp.problem_id = pt.problem_id
-                INNER JOIN
-                    Tags t
-                ON
-                    pt.tag_id = t.tag_id
-                WHERE pt.tag_id IN (
-                    SELECT t.tag_id
-                    FROM Tags t
-                    WHERE t.name in ($placeholders)
-                )
-                AND (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
+                WHERE
+                    pt.tag_id IN ({$tagPlaceholders})
+                    AND (pp.allow_user_add_tags = 1 OR pt.source <> 'voted')
                 GROUP BY
                     pt.problem_id
                 {$havingClause}
             ) ptp ON ptp.problem_id = p.problem_id";
-        $args = array_merge($args, $tags);
+
+        $args[] = $allTagsPublic ? 1 : 0;
+        $args = array_merge($args, $tagIds);
         if ($requireAllTags) {
-            $args[] = count($tags);
+            $args[] = count($tagIds);
         }
 
         if ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
             array_push(
                 $clauses,
                 [
-                    '(ptp.public OR id.identity_id = ?)',
+                    '(ptp.public = 1 OR id.identity_id = ?)',
                     [$identityId],
                 ]
             );
@@ -70,7 +88,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             array_push(
                 $clauses,
                 [
-                    'ptp.public',
+                    'ptp.public = 1',
                     [],
                 ]
             );
@@ -1783,5 +1801,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return [
             'results' => $problems,
         ];
+    }
+
+    /**
+     * Atomically increment the submissions counter for a problem.
+     */
+    final public static function incrementSubmissions(int $problemId): void {
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE `Problems` SET `submissions` = `submissions` + 1 WHERE `problem_id` = ?;',
+            [$problemId]
+        );
     }
 }

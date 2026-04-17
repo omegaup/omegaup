@@ -356,6 +356,66 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('31', $e->getErrorMessage());
+        }
+    }
+
+    /**
+     * Sys-admin contest admins can extend contests up to 60 days
+     */
+    public function testUpdateContestLengthAsSysAdmin() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $admin);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $startTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $contest->start_time
+        )->time;
+        $newFinishTime = $startTime + (60 * 60 * 24 * 60);
+
+        $login = self::login($admin);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'finish_time' => $newFinishTime,
+            ])
+        );
+        $this->assertSame('ok', $response['status']);
+    }
+
+    /**
+     * Sys-admin contest admins cannot exceed 60 days
+     */
+    public function testUpdateContestTooLongAsSysAdmin() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $admin);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $startTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $contest->start_time
+        )->time;
+        $newFinishTime = $startTime + (60 * 60 * 24 * 61);
+
+        $login = self::login($admin);
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'finish_time' => $newFinishTime,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('60', $e->getErrorMessage());
         }
     }
 

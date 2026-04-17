@@ -1,7 +1,9 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -254,6 +256,7 @@
   - [`/api/user/changePassword/`](#apiuserchangepassword)
   - [`/api/user/coderOfTheMonth/`](#apiusercoderofthemonth)
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
+  - [`/api/user/compare/`](#apiusercompare)
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
@@ -276,7 +279,9 @@
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
+  - [`/api/user/reportReadme/`](#apiuserreportreadme)
   - [`/api/user/revokeAPIToken/`](#apiuserrevokeapitoken)
+  - [`/api/user/saveReadme/`](#apiusersavereadme)
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
@@ -296,11 +301,25 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `acls` | `{ acl_id: number; alias: string; type: string; users: { role_description: string; role_id: number; role_name: string; user_id: number; username: string; }[]; }[]` |
+| Name   | Type                                                                                                                                                                    |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `acls` | `List[{ acl_id: number; alias: string; type: string; users: { role_description: string; role_id: number; role_name: string; user_id: number; username: string; }[]; }]` |
 
 # Admin
+
+Admin Controller
+
+## `/api/admin/getMaintenanceMode/`
+
+### Description
+
+Get maintenance mode status
+
+### Returns
+
+```typescript
+types.MaintenanceModeStatus;
+```
 
 ## `/api/admin/platformReportStats/`
 
@@ -310,16 +329,36 @@ Get stats for an overall platform report.
 
 ### Parameters
 
-| Name         | Type        | Description |
-| ------------ | ----------- | ----------- |
-| `end_time`   | `int\|null` |             |
-| `start_time` | `int\|null` |             |
+| Name         | Type        | Description | Required |
+| ------------ | ----------- | ----------- | -------- |
+| `end_time`   | `int\|null` |             |          |
+| `start_time` | `int\|null` |             |          |
 
 ### Returns
 
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/setMaintenanceMode/`
+
+### Description
+
+Set maintenance mode
+
+### Parameters
+
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `enabled`    | `null\|bool`   |             |          |
+| `message_en` | `null\|string` |             |          |
+| `message_es` | `null\|string` |             |          |
+| `message_pt` | `null\|string` |             |          |
+| `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
 
 # AiEditorial
 
@@ -333,11 +372,11 @@ Generate AI editorial for a problem
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `language`      | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `auth_token`    | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `language`      | `string`       |             | ✓        |
+| `problem_alias` | `string`       |             | ✓        |
+| `auth_token`    | `null\|string` |             |          |
 
 ### Returns
 
@@ -355,11 +394,11 @@ When approved, the editorial is published to gitserver
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `action`   | `string`       |             |
-| `job_id`   | `string`       |             |
-| `language` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `action`   | `string`       |             | ✓        |
+| `job_id`   | `string`       |             | ✓        |
+| `language` | `null\|string` |             |          |
 
 ### Returns
 
@@ -373,15 +412,30 @@ Get status of an AI editorial job
 
 ### Parameters
 
-| Name     | Type     | Description |
-| -------- | -------- | ----------- |
-| `job_id` | `string` |             |
+| Name     | Type     | Description | Required |
+| -------- | -------- | ----------- | -------- |
+| `job_id` | `string` |             | ✓        |
 
 ### Returns
 
 | Name  | Type                          |
 | ----- | ----------------------------- |
 | `job` | `types.AiEditorialJobDetails` |
+
+**`types.AiEditorialJobDetails` fields:**
+
+| Name                 | Type      | Required |
+| -------------------- | --------- | -------- |
+| `created_at`         | `Date`    | ✓        |
+| `error_message`      | `string`  |          |
+| `is_retriable`       | `boolean` | ✓        |
+| `job_id`             | `string`  | ✓        |
+| `md_en`              | `string`  |          |
+| `md_es`              | `string`  |          |
+| `md_pt`              | `string`  |          |
+| `problem_alias`      | `string`  | ✓        |
+| `status`             | `string`  | ✓        |
+| `validation_verdict` | `string`  |          |
 
 ## `/api/aiEditorial/updateJob/`
 
@@ -394,15 +448,15 @@ and content in the database after processing completion.
 
 ### Parameters
 
-| Name                 | Type           | Description |
-| -------------------- | -------------- | ----------- |
-| `job_id`             | `string`       |             |
-| `status`             | `string`       |             |
-| `error_message`      | `null\|string` |             |
-| `md_en`              | `null\|string` |             |
-| `md_es`              | `null\|string` |             |
-| `md_pt`              | `null\|string` |             |
-| `validation_verdict` | `null\|string` |             |
+| Name                 | Type           | Description | Required |
+| -------------------- | -------------- | ----------- | -------- |
+| `job_id`             | `string`       |             | ✓        |
+| `status`             | `string`       |             | ✓        |
+| `error_message`      | `null\|string` |             |          |
+| `md_en`              | `null\|string` |             |          |
+| `md_es`              | `null\|string` |             |          |
+| `md_pt`              | `null\|string` |             |          |
+| `validation_verdict` | `null\|string` |             |          |
 
 ### Returns
 
@@ -418,11 +472,11 @@ AuthorizationController
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-| `token`         | `string` |             |
-| `username`      | `mixed`  |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
+| `token`         | `string` |             | ✓        |
+| `username`      | `mixed`  |             |          |
 
 ### Returns
 
@@ -446,9 +500,9 @@ assignation timestamp for a certain badge
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `badge_alias` | `null\|string` |             |
+| Name          | Type           | Description | Required |
+| ------------- | -------------- | ----------- | -------- |
+| `badge_alias` | `null\|string` |             |          |
 
 ### Returns
 
@@ -477,9 +531,9 @@ for current user.
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `badge_alias` | `null\|string` |             |
+| Name          | Type           | Description | Required |
+| ------------- | -------------- | ----------- | -------- |
+| `badge_alias` | `null\|string` |             |          |
 
 ### Returns
 
@@ -495,9 +549,9 @@ Returns a list of badges owned by current user
 
 ### Returns
 
-| Name     | Type            |
-| -------- | --------------- |
-| `badges` | `types.Badge[]` |
+| Name     | Type                |
+| -------- | ------------------- |
+| `badges` | `List[types.Badge]` |
 
 ## `/api/badge/userList/`
 
@@ -507,15 +561,15 @@ Returns a list of badges owned by a certain user
 
 ### Parameters
 
-| Name              | Type    | Description |
-| ----------------- | ------- | ----------- |
-| `target_username` | `mixed` |             |
+| Name              | Type    | Description | Required |
+| ----------------- | ------- | ----------- | -------- |
+| `target_username` | `mixed` |             |          |
 
 ### Returns
 
-| Name     | Type            |
-| -------- | --------------- |
-| `badges` | `types.Badge[]` |
+| Name     | Type                |
+| -------- | ------------------- |
+| `badges` | `List[types.Badge]` |
 
 # CarouselItems
 
@@ -529,15 +583,15 @@ Create a new Carousel Item
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `buttonTitle`     | `string`       |             |
-| `excerpt`         | `string`       |             |
-| `image_url`       | `string`       |             |
-| `link`            | `string`       |             |
-| `status`          | `bool`         |             |
-| `title`           | `string`       |             |
-| `expiration_date` | `null\|string` |             |
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `buttonTitle`     | `string`       |             | ✓        |
+| `excerpt`         | `string`       |             | ✓        |
+| `image_url`       | `string`       |             | ✓        |
+| `link`            | `string`       |             | ✓        |
+| `status`          | `bool`         |             | ✓        |
+| `title`           | `string`       |             | ✓        |
+| `expiration_date` | `null\|string` |             |          |
 
 ### Returns
 
@@ -551,9 +605,9 @@ Delete a Carousel Item
 
 ### Parameters
 
-| Name               | Type  | Description |
-| ------------------ | ----- | ----------- |
-| `carousel_item_id` | `int` |             |
+| Name               | Type  | Description | Required |
+| ------------------ | ----- | ----------- | -------- |
+| `carousel_item_id` | `int` |             | ✓        |
 
 ### Returns
 
@@ -585,16 +639,16 @@ Update a Carousel Item
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `buttonTitle`      | `string`       |             |
-| `carousel_item_id` | `int`          |             |
-| `excerpt`          | `string`       |             |
-| `image_url`        | `string`       |             |
-| `link`             | `string`       |             |
-| `status`           | `bool`         |             |
-| `title`            | `string`       |             |
-| `expiration_date`  | `null\|string` |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `buttonTitle`      | `string`       |             | ✓        |
+| `carousel_item_id` | `int`          |             | ✓        |
+| `excerpt`          | `string`       |             | ✓        |
+| `image_url`        | `string`       |             | ✓        |
+| `link`             | `string`       |             | ✓        |
+| `status`           | `bool`         |             | ✓        |
+| `title`            | `string`       |             | ✓        |
+| `expiration_date`  | `null\|string` |             |          |
 
 ### Returns
 
@@ -612,10 +666,10 @@ Generates all the certificates for a contest given its contest alias.
 
 ### Parameters
 
-| Name                  | Type           | Description |
-| --------------------- | -------------- | ----------- |
-| `certificates_cutoff` | `int\|null`    |             |
-| `contest_alias`       | `string\|null` |             |
+| Name                  | Type           | Description | Required |
+| --------------------- | -------------- | ----------- | -------- |
+| `certificates_cutoff` | `int\|null`    |             |          |
+| `contest_alias`       | `string\|null` |             |          |
 
 ### Returns
 
@@ -629,9 +683,9 @@ API to generate the certificate PDF
 
 ### Parameters
 
-| Name                | Type     | Description |
-| ------------------- | -------- | ----------- |
-| `verification_code` | `string` |             |
+| Name                | Type     | Description | Required |
+| ------------------- | -------- | ----------- | -------- |
+| `verification_code` | `string` |             | ✓        |
 
 ### Returns
 
@@ -647,15 +701,15 @@ Get all the certificates belonging to a user
 
 ### Parameters
 
-| Name      | Type        | Description |
-| --------- | ----------- | ----------- |
-| `user_id` | `int\|null` |             |
+| Name      | Type        | Description | Required |
+| --------- | ----------- | ----------- | -------- |
+| `user_id` | `int\|null` |             |          |
 
 ### Returns
 
-| Name           | Type                          |
-| -------------- | ----------------------------- |
-| `certificates` | `types.CertificateListItem[]` |
+| Name           | Type                              |
+| -------------- | --------------------------------- |
+| `certificates` | `List[types.CertificateListItem]` |
 
 ## `/api/certificate/validateCertificate/`
 
@@ -665,9 +719,9 @@ API to validate a certificate
 
 ### Parameters
 
-| Name                | Type     | Description |
-| ------------------- | -------- | ----------- |
-| `verification_code` | `string` |             |
+| Name                | Type     | Description | Required |
+| ------------------- | -------- | ----------- | -------- |
+| `verification_code` | `string` |             | ✓        |
 
 ### Returns
 
@@ -687,14 +741,14 @@ Creates a Clarification for a contest or an assignment of a course
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `message`          | `string`       |             |
-| `problem_alias`    | `string`       |             |
-| `assignment_alias` | `string\|null` |             |
-| `contest_alias`    | `string\|null` |             |
-| `course_alias`     | `string\|null` |             |
-| `username`         | `null\|string` |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `message`          | `string`       |             | ✓        |
+| `problem_alias`    | `string`       |             | ✓        |
+| `assignment_alias` | `string\|null` |             |          |
+| `contest_alias`    | `string\|null` |             |          |
+| `course_alias`     | `string\|null` |             |          |
+| `username`         | `null\|string` |             |          |
 
 ### Returns
 
@@ -710,9 +764,9 @@ API for getting a clarification
 
 ### Parameters
 
-| Name               | Type  | Description |
-| ------------------ | ----- | ----------- |
-| `clarification_id` | `int` |             |
+| Name               | Type  | Description | Required |
+| ------------------ | ----- | ----------- | -------- |
+| `clarification_id` | `int` |             | ✓        |
 
 ### Returns
 
@@ -732,12 +786,12 @@ Update a clarification
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `clarification_id` | `int`          |             |
-| `answer`           | `null\|string` |             |
-| `message`          | `null\|string` |             |
-| `public`           | `bool\|null`   |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `clarification_id` | `int`          |             | ✓        |
+| `answer`           | `null\|string` |             |          |
+| `message`          | `null\|string` |             |          |
+| `public`           | `bool\|null`   |             |          |
 
 ### Returns
 
@@ -755,19 +809,19 @@ Returns a report with all user activity for a contest.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `length`        | `int\|null`    |             |
-| `page`          | `int\|null`    |             |
-| `token`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `length`        | `int\|null`    |             |          |
+| `page`          | `int\|null`    |             |          |
+| `token`         | `null\|string` |             |          |
 
 ### Returns
 
-| Name         | Type                    |
-| ------------ | ----------------------- |
-| `events`     | `types.ActivityEvent[]` |
-| `pagerItems` | `types.PageItem[]`      |
+| Name         | Type                        |
+| ------------ | --------------------------- |
+| `events`     | `List[types.ActivityEvent]` |
+| `pagerItems` | `List[types.PageItem]`      |
 
 ## `/api/contest/addAdmin/`
 
@@ -777,10 +831,10 @@ Adds an admin to a contest
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `contest_alias`   | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `contest_alias`   | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -794,10 +848,10 @@ Adds a group to a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `group`         | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `group`         | `string` |             | ✓        |
 
 ### Returns
 
@@ -811,10 +865,10 @@ Adds a group admin to a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `group`         | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `group`         | `string` |             | ✓        |
 
 ### Returns
 
@@ -828,13 +882,13 @@ Adds a problem to a contest
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `contest_alias`    | `string`       |             |
-| `order_in_contest` | `int`          |             |
-| `points`           | `float`        |             |
-| `problem_alias`    | `string`       |             |
-| `commit`           | `null\|string` |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `contest_alias`    | `string`       |             | ✓        |
+| `order_in_contest` | `int`          |             | ✓        |
+| `points`           | `float`        |             | ✓        |
+| `problem_alias`    | `string`       |             | ✓        |
+| `commit`           | `null\|string` |             |          |
 
 ### Returns
 
@@ -852,10 +906,10 @@ Only users added through this API can view private contests
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `contest_alias`   | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `contest_alias`   | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -871,10 +925,10 @@ remaining time from the contest, or register the opened time.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `token`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `token`         | `null\|string` |             |          |
 
 ### Returns
 
@@ -891,17 +945,17 @@ the director).
 
 ### Parameters
 
-| Name            | Type         | Description |
-| --------------- | ------------ | ----------- |
-| `page`          | `int\|null`  |             |
-| `page_size`     | `int\|null`  |             |
-| `show_archived` | `bool\|null` |             |
+| Name            | Type         | Description | Required |
+| --------------- | ------------ | ----------- | -------- |
+| `page`          | `int\|null`  |             |          |
+| `page_size`     | `int\|null`  |             |          |
+| `show_archived` | `bool\|null` |             |          |
 
 ### Returns
 
-| Name       | Type              |
-| ---------- | ----------------- |
-| `contests` | `types.Contest[]` |
+| Name       | Type                  |
+| ---------- | --------------------- |
+| `contests` | `List[types.Contest]` |
 
 ## `/api/contest/admins/`
 
@@ -911,16 +965,16 @@ Returns all contest administrators
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name           | Type                                                   |
+| -------------- | ------------------------------------------------------ |
+| `admins`       | `List[{ role: string; username: string; }]`            |
+| `group_admins` | `List[{ alias: string; name: string; role: string; }]` |
 
 ## `/api/contest/arbitrateRequest/`
 
@@ -928,12 +982,12 @@ Returns all contest administrators
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `username`      | `string`       |             |
-| `note`          | `null\|string` |             |
-| `resolution`    | `mixed`        |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `username`      | `string`       |             | ✓        |
+| `note`          | `null\|string` |             |          |
+| `resolution`    | `mixed`        |             |          |
 
 ### Returns
 
@@ -947,10 +1001,10 @@ Archives or Unarchives a contest if user is the creator
 
 ### Parameters
 
-| Name            | Type         | Description |
-| --------------- | ------------ | ----------- |
-| `contest_alias` | `string`     |             |
-| `archive`       | `bool\|null` |             |
+| Name            | Type         | Description | Required |
+| --------------- | ------------ | ----------- | -------- |
+| `contest_alias` | `string`     |             | ✓        |
+| `archive`       | `bool\|null` |             |          |
 
 ### Returns
 
@@ -964,17 +1018,17 @@ Get clarifications of a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `offset`        | `int`    |             |
-| `rowcount`      | `int`    |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `offset`        | `int`    |             | ✓        |
+| `rowcount`      | `int`    |             | ✓        |
 
 ### Returns
 
-| Name             | Type                    |
-| ---------------- | ----------------------- |
-| `clarifications` | `types.Clarification[]` |
+| Name             | Type                        |
+| ---------------- | --------------------------- |
+| `clarifications` | `List[types.Clarification]` |
 
 ## `/api/contest/clone/`
 
@@ -984,14 +1038,14 @@ Clone a contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `description`   | `string`       |             |
-| `start_time`    | `int`          |             |
-| `title`         | `string`       |             |
-| `alias`         | `null\|string` |             |
-| `auth_token`    | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `description`   | `string`       |             | ✓        |
+| `start_time`    | `int`          |             | ✓        |
+| `title`         | `string`       |             | ✓        |
+| `alias`         | `null\|string` |             |          |
+| `auth_token`    | `null\|string` |             |          |
 
 ### Returns
 
@@ -1009,15 +1063,15 @@ previously agreed to share their information.
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name          | Type                 |
-| ------------- | -------------------- |
-| `contestants` | `types.Contestant[]` |
+| Name          | Type                     |
+| ------------- | ------------------------ |
+| `contestants` | `List[types.Contestant]` |
 
 ## `/api/contest/create/`
 
@@ -1027,32 +1081,32 @@ Creates a new contest
 
 ### Parameters
 
-| Name                        | Type                                                       | Description |
-| --------------------------- | ---------------------------------------------------------- | ----------- |
-| `finish_time`               | `int`                                                      |             |
-| `start_time`                | `int`                                                      |             |
-| `submissions_gap`           | `int`                                                      |             |
-| `window_length`             | `int`                                                      |             |
-| `admission_mode`            | `'private'\|'public'\|'registration'\|null`                |             |
-| `alias`                     | `null\|string`                                             |             |
-| `check_plagiarism`          | `bool\|null`                                               |             |
-| `contest_for_teams`         | `bool\|null`                                               |             |
-| `description`               | `null\|string`                                             |             |
-| `feedback`                  | `'detailed'\|'none'\|'summary'\|null`                      |             |
-| `languages`                 | `null\|string`                                             |             |
-| `needs_basic_information`   | `bool\|null`                                               |             |
-| `penalty`                   | `int\|null`                                                |             |
-| `penalty_calc_policy`       | `'max'\|'sum'\|null`                                       |             |
-| `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
-| `points_decay_factor`       | `float\|null`                                              |             |
-| `problems`                  | `null\|string`                                             |             |
-| `recommended`               | `bool\|null`                                               |             |
-| `requests_user_information` | `bool\|null`                                               |             |
-| `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
-| `scoreboard`                | `float\|null`                                              |             |
-| `show_scoreboard_after`     | `bool\|null`                                               |             |
-| `teams_group_alias`         | `null\|string`                                             |             |
-| `title`                     | `null\|string`                                             |             |
+| Name                        | Type                                                       | Description | Required |
+| --------------------------- | ---------------------------------------------------------- | ----------- | -------- |
+| `finish_time`               | `int`                                                      |             | ✓        |
+| `start_time`                | `int`                                                      |             | ✓        |
+| `submissions_gap`           | `int`                                                      |             | ✓        |
+| `window_length`             | `int`                                                      |             | ✓        |
+| `admission_mode`            | `'private'\|'public'\|'registration'\|null`                |             |          |
+| `alias`                     | `null\|string`                                             |             |          |
+| `check_plagiarism`          | `bool\|null`                                               |             |          |
+| `contest_for_teams`         | `bool\|null`                                               |             |          |
+| `description`               | `null\|string`                                             |             |          |
+| `feedback`                  | `'detailed'\|'none'\|'summary'\|null`                      |             |          |
+| `languages`                 | `null\|string`                                             |             |          |
+| `needs_basic_information`   | `bool\|null`                                               |             |          |
+| `penalty`                   | `int\|null`                                                |             |          |
+| `penalty_calc_policy`       | `'max'\|'sum'\|null`                                       |             |          |
+| `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |          |
+| `points_decay_factor`       | `float\|null`                                              |             |          |
+| `problems`                  | `null\|string`                                             |             |          |
+| `recommended`               | `bool\|null`                                               |             |          |
+| `requests_user_information` | `bool\|null`                                               |             |          |
+| `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |          |
+| `scoreboard`                | `float\|null`                                              |             |          |
+| `show_scoreboard_after`     | `bool\|null`                                               |             |          |
+| `teams_group_alias`         | `null\|string`                                             |             |          |
+| `title`                     | `null\|string`                                             |             |          |
 
 ### Returns
 
@@ -1064,10 +1118,10 @@ _Nothing_
 
 ### Parameters
 
-| Name         | Type     | Description |
-| ------------ | -------- | ----------- |
-| `alias`      | `string` |             |
-| `start_time` | `int`    |             |
+| Name         | Type     | Description | Required |
+| ------------ | -------- | ----------- | -------- |
+| `alias`      | `string` |             | ✓        |
+| `start_time` | `int`    |             | ✓        |
 
 ### Returns
 
@@ -1085,10 +1139,10 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `token`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `token`         | `null\|string` |             |          |
 
 ### Returns
 
@@ -1102,9 +1156,9 @@ types.ContestDetails;
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `contest_ids` | `string` |             |
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `contest_ids` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1120,24 +1174,24 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type                                        | Description |
-| ---------------- | ------------------------------------------- | ----------- |
-| `page`           | `int`                                       |             |
-| `page_size`      | `int`                                       |             |
-| `query`          | `string`                                    |             |
-| `tab_name`       | `string`                                    |             |
-| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |
-| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |
-| `participating`  | `int\|null`                                 |             |
-| `recommended`    | `int\|null`                                 |             |
-| `sort_order`     | `null\|string`                              |             |
+| Name             | Type                                        | Description | Required |
+| ---------------- | ------------------------------------------- | ----------- | -------- |
+| `page`           | `int`                                       |             | ✓        |
+| `page_size`      | `int`                                       |             | ✓        |
+| `query`          | `string`                                    |             | ✓        |
+| `tab_name`       | `string`                                    |             | ✓        |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |          |
+| `participating`  | `int\|null`                                 |             |          |
+| `recommended`    | `int\|null`                                 |             |          |
+| `sort_order`     | `null\|string`                              |             |          |
 
 ### Returns
 
-| Name                | Type                      |
-| ------------------- | ------------------------- |
-| `number_of_results` | `number`                  |
-| `results`           | `types.ContestListItem[]` |
+| Name                | Type                          |
+| ------------------- | ----------------------------- |
+| `number_of_results` | `number`                      |
+| `results`           | `List[types.ContestListItem]` |
 
 ## `/api/contest/listParticipating/`
 
@@ -1147,19 +1201,19 @@ Returns a list of contests where current user is participating in
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `page`          | `int\|null`    |             |
-| `page_size`     | `int\|null`    |             |
-| `query`         | `null\|string` |             |
-| `show_archived` | `bool\|null`   |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `page`          | `int\|null`    |             |          |
+| `page_size`     | `int\|null`    |             |          |
+| `query`         | `null\|string` |             |          |
+| `show_archived` | `bool\|null`   |             |          |
 
 ### Returns
 
-| Name       | Type              |
-| ---------- | ----------------- |
-| `contests` | `types.Contest[]` |
-| `count`    | `number`          |
+| Name       | Type                  |
+| ---------- | --------------------- |
+| `contests` | `List[types.Contest]` |
+| `count`    | `number`              |
 
 ## `/api/contest/myList/`
 
@@ -1169,19 +1223,19 @@ Returns a list of contests where current user is the director
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `page`          | `int\|null`    |             |
-| `page_size`     | `int\|null`    |             |
-| `query`         | `null\|string` |             |
-| `show_archived` | `bool\|null`   |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `page`          | `int\|null`    |             |          |
+| `page_size`     | `int\|null`    |             |          |
+| `query`         | `null\|string` |             |          |
+| `show_archived` | `bool\|null`   |             |          |
 
 ### Returns
 
-| Name       | Type              |
-| ---------- | ----------------- |
-| `contests` | `types.Contest[]` |
-| `count`    | `number`          |
+| Name       | Type                  |
+| ---------- | --------------------- |
+| `contests` | `List[types.Contest]` |
+| `count`    | `number`              |
 
 ## `/api/contest/open/`
 
@@ -1191,13 +1245,13 @@ Joins a contest - explicitly adds a identity to a contest.
 
 ### Parameters
 
-| Name                     | Type           | Description |
-| ------------------------ | -------------- | ----------- |
-| `contest_alias`          | `string`       |             |
-| `privacy_git_object_id`  | `string`       |             |
-| `statement_type`         | `string`       |             |
-| `share_user_information` | `bool\|null`   |             |
-| `token`                  | `null\|string` |             |
+| Name                     | Type           | Description | Required |
+| ------------------------ | -------------- | ----------- | -------- |
+| `contest_alias`          | `string`       |             | ✓        |
+| `privacy_git_object_id`  | `string`       |             | ✓        |
+| `statement_type`         | `string`       |             | ✓        |
+| `share_user_information` | `bool\|null`   |             |          |
+| `token`                  | `null\|string` |             |          |
 
 ### Returns
 
@@ -1211,18 +1265,18 @@ Get clarifications of problem in a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `offset`        | `int`    |             |
-| `problem_alias` | `string` |             |
-| `rowcount`      | `int`    |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `offset`        | `int`    |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
+| `rowcount`      | `int`    |             | ✓        |
 
 ### Returns
 
-| Name             | Type                    |
-| ---------------- | ----------------------- |
-| `clarifications` | `types.Clarification[]` |
+| Name             | Type                        |
+| ---------------- | --------------------------- |
+| `clarifications` | `List[types.Clarification]` |
 
 ## `/api/contest/problems/`
 
@@ -1232,15 +1286,15 @@ Gets the problems from a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name       | Type                                    |
-| ---------- | --------------------------------------- |
-| `problems` | `types.ProblemsetProblemWithVersions[]` |
+| Name       | Type                                        |
+| ---------- | ------------------------------------------- |
+| `problems` | `List[types.ProblemsetProblemWithVersions]` |
 
 ## `/api/contest/publicDetails/`
 
@@ -1248,9 +1302,9 @@ Gets the problems from a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1264,9 +1318,9 @@ types.ContestPublicDetails;
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1280,10 +1334,10 @@ Removes an admin from a contest
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `contest_alias`   | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `contest_alias`   | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1297,10 +1351,10 @@ Removes a group from a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `group`         | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `group`         | `string` |             | ✓        |
 
 ### Returns
 
@@ -1314,10 +1368,10 @@ Removes a group admin from a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `group`         | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `group`         | `string` |             | ✓        |
 
 ### Returns
 
@@ -1331,10 +1385,10 @@ Removes a problem from a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1348,10 +1402,10 @@ Remove a user from a private contest
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `contest_alias`   | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `contest_alias`   | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1365,10 +1419,10 @@ Replace the teams group assigned to a contest
 
 ### Parameters
 
-| Name                | Type     | Description                  |
-| ------------------- | -------- | ---------------------------- |
-| `contest_alias`     | `string` | The alias of the contest     |
-| `teams_group_alias` | `string` | The alias of the teams group |
+| Name                | Type     | Description                  | Required |
+| ------------------- | -------- | ---------------------------- | -------- |
+| `contest_alias`     | `string` | The alias of the contest     | ✓        |
+| `teams_group_alias` | `string` | The alias of the teams group | ✓        |
 
 ### Returns
 
@@ -1382,22 +1436,22 @@ Returns a detailed report of the contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `auth_token`    | `null\|string` |             |
-| `filterBy`      | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `auth_token`    | `null\|string` |             |          |
+| `filterBy`      | `null\|string` |             |          |
 
 ### Returns
 
-| Name          | Type                                  |
-| ------------- | ------------------------------------- |
-| `finish_time` | `Date`                                |
-| `problems`    | `{ alias: string; order: number; }[]` |
-| `ranking`     | `types.ContestReport[]`               |
-| `start_time`  | `Date`                                |
-| `time`        | `Date`                                |
-| `title`       | `string`                              |
+| Name          | Type                                      |
+| ------------- | ----------------------------------------- |
+| `finish_time` | `Date`                                    |
+| `problems`    | `List[{ alias: string; order: number; }]` |
+| `ranking`     | `List[types.ContestReport]`               |
+| `start_time`  | `Date`                                    |
+| `time`        | `Date`                                    |
+| `title`       | `string`                                  |
 
 ## `/api/contest/requests/`
 
@@ -1405,16 +1459,16 @@ Returns a detailed report of the contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name            | Type                                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `contest_alias` | `string`                                                                                                                             |
-| `users`         | `{ accepted: boolean; admin?: { username?: string; }; country: string; last_update: Date; request_time: Date; username: string; }[]` |
+| Name            | Type                                                                                                                                     |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `contest_alias` | `string`                                                                                                                                 |
+| `users`         | `List[{ accepted: boolean; admin?: { username?: string; }; country: string; last_update: Date; request_time: Date; username: string; }]` |
 
 ## `/api/contest/role/`
 
@@ -1422,10 +1476,10 @@ Returns a detailed report of the contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `token`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `token`         | `null\|string` |             |          |
 
 ### Returns
 
@@ -1441,23 +1495,23 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `contest_alias` | `string`                                                                                                                                                                                                            |             |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
-| `offset`        | `int\|null`                                                                                                                                                                                                         |             |
-| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
-| `username`      | `null\|string`                                                                                                                                                                                                      |             |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
+| Name            | Type                                                                                                                                                                                                                | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `contest_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`        | `int\|null`                                                                                                                                                                                                         |             |          |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
+| `username`      | `null\|string`                                                                                                                                                                                                      |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
 
 ### Returns
 
-| Name        | Type          |
-| ----------- | ------------- |
-| `runs`      | `types.Run[]` |
-| `totalRuns` | `number`      |
+| Name        | Type              |
+| ----------- | ----------------- |
+| `runs`      | `List[types.Run]` |
+| `totalRuns` | `number`          |
 
 ## `/api/contest/runsDiff/`
 
@@ -1467,17 +1521,17 @@ Return a report of which runs would change due to a version change.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `version`       | `string`       |             |
-| `problem_alias` | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `version`       | `string`       |             | ✓        |
+| `problem_alias` | `null\|string` |             |          |
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                   |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `diff` | `{ guid: string; new_score: number; new_status: string; new_verdict: string; old_score: number; old_status: string; old_verdict: string; problemset_id: number; username: string; }[]` |
+| Name   | Type                                                                                                                                                                                       |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `diff` | `List[{ guid: string; new_score: number; new_status: string; new_verdict: string; old_score: number; old_status: string; old_verdict: string; problemset_id: number; username: string; }]` |
 
 ## `/api/contest/scoreboard/`
 
@@ -1487,10 +1541,10 @@ Returns the Scoreboard
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `token`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `token`         | `null\|string` |             |          |
 
 ### Returns
 
@@ -1506,16 +1560,16 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `token`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `token`         | `null\|string` |             |          |
 
 ### Returns
 
-| Name     | Type                      |
-| -------- | ------------------------- |
-| `events` | `types.ScoreboardEvent[]` |
+| Name     | Type                          |
+| -------- | ----------------------------- |
+| `events` | `List[types.ScoreboardEvent]` |
 
 ## `/api/contest/scoreboardMerge/`
 
@@ -1525,17 +1579,17 @@ Gets the accomulative scoreboard for an array of contests
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `contest_aliases`  | `string`       |             |
-| `contest_params`   | `mixed`        |             |
-| `usernames_filter` | `null\|string` |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `contest_aliases`  | `string`       |             | ✓        |
+| `contest_params`   | `mixed`        |             |          |
+| `usernames_filter` | `null\|string` |             |          |
 
 ### Returns
 
-| Name      | Type                            |
-| --------- | ------------------------------- |
-| `ranking` | `types.MergedScoreboardEntry[]` |
+| Name      | Type                                |
+| --------- | ----------------------------------- |
+| `ranking` | `List[types.MergedScoreboardEntry]` |
 
 ## `/api/contest/searchUsers/`
 
@@ -1545,16 +1599,16 @@ Search users in contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `query`         | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `string`       |             | ✓        |
+| `query`         | `null\|string` |             |          |
 
 ### Returns
 
-| Name      | Type               |
-| --------- | ------------------ |
-| `results` | `types.ListItem[]` |
+| Name      | Type                   |
+| --------- | ---------------------- |
+| `results` | `List[types.ListItem]` |
 
 ## `/api/contest/setRecommended/`
 
@@ -1565,10 +1619,10 @@ Only omegaUp admins and support team members can call this API.
 
 ### Parameters
 
-| Name            | Type         | Description |
-| --------------- | ------------ | ----------- |
-| `contest_alias` | `string`     |             |
-| `value`         | `bool\|null` |             |
+| Name            | Type         | Description | Required |
+| --------------- | ------------ | ----------- | -------- |
+| `contest_alias` | `string`     |             | ✓        |
+| `value`         | `bool\|null` |             |          |
 
 ### Returns
 
@@ -1582,9 +1636,9 @@ Stats of a contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `null\|string` |             |          |
 
 ### Returns
 
@@ -1593,7 +1647,7 @@ Stats of a contest
 | `distribution`       | `{ [key: number]: number; }` |
 | `max_wait_time`      | `Date`                       |
 | `max_wait_time_guid` | `string`                     |
-| `pending_runs`       | `string[]`                   |
+| `pending_runs`       | `List[string]`               |
 | `size_of_bucket`     | `number`                     |
 | `total_points`       | `number`                     |
 | `total_runs`         | `number`                     |
@@ -1607,34 +1661,34 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                                                       | Description |
-| -------------------------------------------- | ---------------------------------------------------------- | ----------- |
-| `contest_alias`                              | `string`                                                   |             |
-| `finish_time`                                | `int`                                                      |             |
-| `start_time`                                 | `int`                                                      |             |
-| `submissions_gap`                            | `int`                                                      |             |
-| `window_length`                              | `int`                                                      |             |
-| `admission_mode`                             | `null\|string`                                             |             |
-| `alias`                                      | `null\|string`                                             |             |
-| `check_plagiarism`                           | `bool\|null`                                               |             |
-| `contest_for_teams`                          | `bool\|null`                                               |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                               |             |
-| `description`                                | `null\|string`                                             |             |
-| `feedback`                                   | `'detailed'\|'none'\|'summary'\|null`                      |             |
-| `languages`                                  | `null\|string`                                             |             |
-| `needs_basic_information`                    | `bool\|null`                                               |             |
-| `penalty`                                    | `int\|null`                                                |             |
-| `penalty_calc_policy`                        | `'max'\|'sum'\|null`                                       |             |
-| `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
-| `points_decay_factor`                        | `float\|null`                                              |             |
-| `problems`                                   | `null\|string`                                             |             |
-| `recommended`                                | `bool\|null`                                               |             |
-| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
-| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
-| `scoreboard`                                 | `float\|null`                                              |             |
-| `show_scoreboard_after`                      | `bool\|null`                                               |             |
-| `teams_group_alias`                          | `null\|string`                                             |             |
-| `title`                                      | `null\|string`                                             |             |
+| Name                                         | Type                                                       | Description | Required |
+| -------------------------------------------- | ---------------------------------------------------------- | ----------- | -------- |
+| `contest_alias`                              | `string`                                                   |             | ✓        |
+| `finish_time`                                | `int`                                                      |             | ✓        |
+| `start_time`                                 | `int`                                                      |             | ✓        |
+| `submissions_gap`                            | `int`                                                      |             | ✓        |
+| `window_length`                              | `int`                                                      |             | ✓        |
+| `admission_mode`                             | `null\|string`                                             |             |          |
+| `alias`                                      | `null\|string`                                             |             |          |
+| `check_plagiarism`                           | `bool\|null`                                               |             |          |
+| `contest_for_teams`                          | `bool\|null`                                               |             |          |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                               |             |          |
+| `description`                                | `null\|string`                                             |             |          |
+| `feedback`                                   | `'detailed'\|'none'\|'summary'\|null`                      |             |          |
+| `languages`                                  | `null\|string`                                             |             |          |
+| `needs_basic_information`                    | `bool\|null`                                               |             |          |
+| `penalty`                                    | `int\|null`                                                |             |          |
+| `penalty_calc_policy`                        | `'max'\|'sum'\|null`                                       |             |          |
+| `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |          |
+| `points_decay_factor`                        | `float\|null`                                              |             |          |
+| `problems`                                   | `null\|string`                                             |             |          |
+| `recommended`                                | `bool\|null`                                               |             |          |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |          |
+| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |          |
+| `scoreboard`                                 | `float\|null`                                              |             |          |
+| `show_scoreboard_after`                      | `bool\|null`                                               |             |          |
+| `teams_group_alias`                          | `null\|string`                                             |             |          |
+| `title`                                      | `null\|string`                                             |             |          |
 
 ### Returns
 
@@ -1652,11 +1706,11 @@ option is turned on
 
 ### Parameters
 
-| Name            | Type                 | Description |
-| --------------- | -------------------- | ----------- |
-| `contest_alias` | `string`             |             |
-| `end_time`      | `\OmegaUp\Timestamp` |             |
-| `username`      | `string`             |             |
+| Name            | Type                 | Description | Required |
+| --------------- | -------------------- | ----------- | -------- |
+| `contest_alias` | `string`             |             | ✓        |
+| `end_time`      | `\OmegaUp\Timestamp` |             | ✓        |
+| `username`      | `string`             |             | ✓        |
 
 ### Returns
 
@@ -1670,16 +1724,16 @@ Returns ALL identities participating in a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name     | Type                                 |
-| -------- | ------------------------------------ |
-| `groups` | `{ alias: string; name: string; }[]` |
-| `users`  | `types.ContestUser[]`                |
+| Name     | Type                                     |
+| -------- | ---------------------------------------- |
+| `groups` | `List[{ alias: string; name: string; }]` |
+| `users`  | `List[types.ContestUser]`                |
 
 # Course
 
@@ -1693,18 +1747,18 @@ Returns a report with all user activity for a course.
 
 ### Parameters
 
-| Name           | Type        | Description |
-| -------------- | ----------- | ----------- |
-| `course_alias` | `string`    |             |
-| `length`       | `int\|null` |             |
-| `page`         | `int\|null` |             |
+| Name           | Type        | Description | Required |
+| -------------- | ----------- | ----------- | -------- |
+| `course_alias` | `string`    |             | ✓        |
+| `length`       | `int\|null` |             |          |
+| `page`         | `int\|null` |             |          |
 
 ### Returns
 
-| Name         | Type                    |
-| ------------ | ----------------------- |
-| `events`     | `types.ActivityEvent[]` |
-| `pagerItems` | `types.PageItem[]`      |
+| Name         | Type                        |
+| ------------ | --------------------------- |
+| `events`     | `List[types.ActivityEvent]` |
+| `pagerItems` | `List[types.PageItem]`      |
 
 ## `/api/course/addAdmin/`
 
@@ -1714,10 +1768,10 @@ Adds an admin to a course
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `course_alias`    | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `course_alias`    | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1731,10 +1785,10 @@ Adds an group admin to a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-| `group`        | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
+| `group`        | `string` |             | ✓        |
 
 ### Returns
 
@@ -1748,10 +1802,10 @@ Adds an group teaching assistant to a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-| `group`        | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
+| `group`        | `string` |             | ✓        |
 
 ### Returns
 
@@ -1765,14 +1819,14 @@ Adds a problem to an assignment
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `assignment_alias` | `string`       |             |
-| `course_alias`     | `string`       |             |
-| `points`           | `float`        |             |
-| `problem_alias`    | `string`       |             |
-| `commit`           | `null\|string` |             |
-| `is_extra_problem` | `null\|bool`   |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `assignment_alias` | `string`       |             | ✓        |
+| `course_alias`     | `string`       |             | ✓        |
+| `points`           | `float`        |             | ✓        |
+| `problem_alias`    | `string`       |             | ✓        |
+| `commit`           | `null\|string` |             |          |
+| `is_extra_problem` | `null\|bool`   |             |          |
 
 ### Returns
 
@@ -1788,15 +1842,15 @@ Add Student to Course.
 
 ### Parameters
 
-| Name                           | Type         | Description |
-| ------------------------------ | ------------ | ----------- |
-| `accept_teacher_git_object_id` | `string`     |             |
-| `course_alias`                 | `string`     |             |
-| `privacy_git_object_id`        | `string`     |             |
-| `share_user_information`       | `bool`       |             |
-| `statement_type`               | `string`     |             |
-| `usernameOrEmail`              | `string`     |             |
-| `accept_teacher`               | `bool\|null` |             |
+| Name                           | Type         | Description | Required |
+| ------------------------------ | ------------ | ----------- | -------- |
+| `accept_teacher_git_object_id` | `string`     |             | ✓        |
+| `course_alias`                 | `string`     |             | ✓        |
+| `privacy_git_object_id`        | `string`     |             | ✓        |
+| `share_user_information`       | `bool`       |             | ✓        |
+| `statement_type`               | `string`     |             | ✓        |
+| `usernameOrEmail`              | `string`     |             | ✓        |
+| `accept_teacher`               | `bool\|null` |             |          |
 
 ### Returns
 
@@ -1810,10 +1864,10 @@ Adds a teaching assistant to a course
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `course_alias`    | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `course_alias`    | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1827,9 +1881,9 @@ Returns all details of a given Course
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `alias` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -1845,18 +1899,18 @@ Returns all course administrators
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name                        | Type                                               |
-| --------------------------- | -------------------------------------------------- |
-| `admins`                    | `{ role: string; username: string; }[]`            |
-| `group_admins`              | `{ alias: string; name: string; role: string; }[]` |
-| `group_teaching_assistants` | `{ alias: string; name: string; role: string; }[]` |
-| `teaching_assistants`       | `{ role: string; username: string; }[]`            |
+| Name                        | Type                                                   |
+| --------------------------- | ------------------------------------------------------ |
+| `admins`                    | `List[{ role: string; username: string; }]`            |
+| `group_admins`              | `List[{ alias: string; name: string; role: string; }]` |
+| `group_teaching_assistants` | `List[{ alias: string; name: string; role: string; }]` |
+| `teaching_assistants`       | `List[{ role: string; username: string; }]`            |
 
 ## `/api/course/arbitrateRequest/`
 
@@ -1867,11 +1921,11 @@ interested to join the course.
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-| `resolution`   | `bool`   |             |
-| `username`     | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
+| `resolution`   | `bool`   |             | ✓        |
+| `username`     | `string` |             | ✓        |
 
 ### Returns
 
@@ -1885,10 +1939,10 @@ Archives or un-archives a course
 
 ### Parameters
 
-| Name           | Type      | Description |
-| -------------- | --------- | ----------- |
-| `archive`      | `boolean` |             |
-| `course_alias` | `string`  |             |
+| Name           | Type      | Description | Required |
+| -------------- | --------- | ----------- | -------- |
+| `archive`      | `boolean` |             | ✓        |
+| `course_alias` | `string`  |             | ✓        |
 
 ### Returns
 
@@ -1902,27 +1956,27 @@ Returns details of a given assignment
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `assignment` | `string`       |             |
-| `course`     | `string`       |             |
-| `token`      | `null\|string` |             |
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `assignment` | `string`       |             | ✓        |
+| `course`     | `string`       |             | ✓        |
+| `token`      | `null\|string` |             |          |
 
 ### Returns
 
-| Name                | Type                        |
-| ------------------- | --------------------------- |
-| `admin`             | `boolean`                   |
-| `alias`             | `string`                    |
-| `assignment_type`   | `string`                    |
-| `courseAssignments` | `types.CourseAssignment[]`  |
-| `description`       | `string`                    |
-| `director`          | `string`                    |
-| `finish_time`       | `Date`                      |
-| `name`              | `string`                    |
-| `problems`          | `types.ProblemsetProblem[]` |
-| `problemset_id`     | `number`                    |
-| `start_time`        | `Date`                      |
+| Name                | Type                            |
+| ------------------- | ------------------------------- |
+| `admin`             | `boolean`                       |
+| `alias`             | `string`                        |
+| `assignment_type`   | `string`                        |
+| `courseAssignments` | `List[types.CourseAssignment]`  |
+| `description`       | `string`                        |
+| `director`          | `string`                        |
+| `finish_time`       | `Date`                          |
+| `name`              | `string`                        |
+| `problems`          | `List[types.ProblemsetProblem]` |
+| `problemset_id`     | `number`                        |
+| `start_time`        | `Date`                          |
 
 ## `/api/course/assignmentScoreboard/`
 
@@ -1932,11 +1986,11 @@ Gets Scoreboard for an assignment
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `assignment` | `string`       |             |
-| `course`     | `string`       |             |
-| `token`      | `null\|string` |             |
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `assignment` | `string`       |             | ✓        |
+| `course`     | `string`       |             | ✓        |
+| `token`      | `null\|string` |             |          |
 
 ### Returns
 
@@ -1952,17 +2006,17 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `assignment` | `string`       |             |
-| `course`     | `string`       |             |
-| `token`      | `null\|string` |             |
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `assignment` | `string`       |             | ✓        |
+| `course`     | `string`       |             | ✓        |
+| `token`      | `null\|string` |             |          |
 
 ### Returns
 
-| Name     | Type                      |
-| -------- | ------------------------- |
-| `events` | `types.ScoreboardEvent[]` |
+| Name     | Type                          |
+| -------- | ----------------------------- |
+| `events` | `List[types.ScoreboardEvent]` |
 
 ## `/api/course/clarifications/`
 
@@ -1972,17 +2026,17 @@ Gets the clarifications of all assignments in a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-| `offset`       | `int`    |             |
-| `rowcount`     | `int`    |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
+| `offset`       | `int`    |             | ✓        |
+| `rowcount`     | `int`    |             | ✓        |
 
 ### Returns
 
-| Name             | Type                    |
-| ---------------- | ----------------------- |
-| `clarifications` | `types.Clarification[]` |
+| Name             | Type                        |
+| ---------------- | --------------------------- |
+| `clarifications` | `List[types.Clarification]` |
 
 ## `/api/course/clone/`
 
@@ -1992,13 +2046,13 @@ Clone a course
 
 ### Parameters
 
-| Name           | Type                 | Description |
-| -------------- | -------------------- | ----------- |
-| `alias`        | `string`             |             |
-| `course_alias` | `string`             |             |
-| `name`         | `string`             |             |
-| `start_time`   | `\OmegaUp\Timestamp` |             |
-| `token`        | `null\|string`       |             |
+| Name           | Type                 | Description | Required |
+| -------------- | -------------------- | ----------- | -------- |
+| `alias`        | `string`             |             | ✓        |
+| `course_alias` | `string`             |             | ✓        |
+| `name`         | `string`             |             | ✓        |
+| `start_time`   | `\OmegaUp\Timestamp` |             | ✓        |
+| `token`        | `null\|string`       |             |          |
 
 ### Returns
 
@@ -2014,23 +2068,23 @@ Create new course API
 
 ### Parameters
 
-| Name                               | Type           | Description |
-| ---------------------------------- | -------------- | ----------- |
-| `alias`                            | `string`       |             |
-| `description`                      | `string`       |             |
-| `name`                             | `string`       |             |
-| `start_time`                       | `int`          |             |
-| `admission_mode`                   | `null\|string` |             |
-| `archived`                         | `bool\|null`   |             |
-| `finish_time`                      | `int\|null`    |             |
-| `languages`                        | `null\|string` |             |
-| `level`                            | `null\|string` |             |
-| `minimum_progress_for_certificate` | `int\|null`    |             |
-| `needs_basic_information`          | `bool\|null`   |             |
-| `objective`                        | `null\|string` |             |
-| `requests_user_information`        | `null\|string` |             |
-| `school_id`                        | `int\|null`    |             |
-| `show_scoreboard`                  | `bool\|null`   |             |
+| Name                               | Type           | Description | Required |
+| ---------------------------------- | -------------- | ----------- | -------- |
+| `alias`                            | `string`       |             | ✓        |
+| `description`                      | `string`       |             | ✓        |
+| `name`                             | `string`       |             | ✓        |
+| `start_time`                       | `int`          |             | ✓        |
+| `admission_mode`                   | `null\|string` |             |          |
+| `archived`                         | `bool\|null`   |             |          |
+| `finish_time`                      | `int\|null`    |             |          |
+| `languages`                        | `null\|string` |             |          |
+| `level`                            | `null\|string` |             |          |
+| `minimum_progress_for_certificate` | `int\|null`    |             |          |
+| `needs_basic_information`          | `bool\|null`   |             |          |
+| `objective`                        | `null\|string` |             |          |
+| `requests_user_information`        | `null\|string` |             |          |
+| `school_id`                        | `int\|null`    |             |          |
+| `show_scoreboard`                  | `bool\|null`   |             |          |
 
 ### Returns
 
@@ -2044,19 +2098,19 @@ API to Create an assignment
 
 ### Parameters
 
-| Name                 | Type                           | Description |
-| -------------------- | ------------------------------ | ----------- |
-| `alias`              | `string`                       |             |
-| `assignment_type`    | `'homework'\|'lesson'\|'test'` |             |
-| `course_alias`       | `string`                       |             |
-| `description`        | `string`                       |             |
-| `name`               | `string`                       |             |
-| `start_time`         | `\OmegaUp\Timestamp`           |             |
-| `finish_time`        | `\OmegaUp\Timestamp\|null`     |             |
-| `order`              | `int\|null`                    |             |
-| `problems`           | `null\|string`                 |             |
-| `publish_time_delay` | `int\|null`                    |             |
-| `unlimited_duration` | `bool\|null`                   |             |
+| Name                 | Type                           | Description | Required |
+| -------------------- | ------------------------------ | ----------- | -------- |
+| `alias`              | `string`                       |             | ✓        |
+| `assignment_type`    | `'homework'\|'lesson'\|'test'` |             | ✓        |
+| `course_alias`       | `string`                       |             | ✓        |
+| `description`        | `string`                       |             | ✓        |
+| `name`               | `string`                       |             | ✓        |
+| `start_time`         | `\OmegaUp\Timestamp`           |             | ✓        |
+| `finish_time`        | `\OmegaUp\Timestamp\|null`     |             |          |
+| `order`              | `int\|null`                    |             |          |
+| `problems`           | `null\|string`                 |             |          |
+| `publish_time_delay` | `int\|null`                    |             |          |
+| `unlimited_duration` | `bool\|null`                   |             |          |
 
 ### Returns
 
@@ -2070,9 +2124,9 @@ Returns details of a given course
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `alias` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2086,9 +2140,9 @@ types.CourseDetails;
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2102,16 +2156,16 @@ types.CourseDetails;
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `course_alias`  | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `course_alias`  | `string` |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name         | Type       |
-| ------------ | ---------- |
-| `identities` | `string[]` |
+| Name         | Type           |
+| ------------ | -------------- |
+| `identities` | `List[string]` |
 
 ## `/api/course/introDetails/`
 
@@ -2121,9 +2175,9 @@ Show course intro only on public courses when user is not yet registered
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2139,15 +2193,15 @@ List course assignments
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name          | Type                       |
-| ------------- | -------------------------- |
-| `assignments` | `types.CourseAssignment[]` |
+| Name          | Type                           |
+| ------------- | ------------------------------ |
+| `assignments` | `List[types.CourseAssignment]` |
 
 ## `/api/course/listSolvedProblems/`
 
@@ -2157,9 +2211,9 @@ Get Problems solved by users of a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2175,15 +2229,15 @@ List students in a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name       | Type                    |
-| ---------- | ----------------------- |
-| `students` | `types.CourseStudent[]` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `students` | `List[types.CourseStudent]` |
 
 ## `/api/course/listUnsolvedProblems/`
 
@@ -2193,9 +2247,9 @@ Get Problems unsolved by users of a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2211,15 +2265,23 @@ Returns details of a given course
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `alias` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `alias` | `string` |             | ✓        |
 
 ### Returns
 
 | Name          | Type                       |
 | ------------- | -------------------------- |
 | `assignments` | `types.AssignmentProgress` |
+
+**`types.AssignmentProgress` type:**
+
+```typescript
+{ [key: string]: types.Progress; }
+```
+
+An object with `string` keys and `types.Progress` values.
 
 ## `/api/course/problemClarifications/`
 
@@ -2229,19 +2291,19 @@ Get clarifications of problem in a contest
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `offset`           | `int`    |             |
-| `problem_alias`    | `string` |             |
-| `rowcount`         | `int`    |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
+| `offset`           | `int`    |             | ✓        |
+| `problem_alias`    | `string` |             | ✓        |
+| `rowcount`         | `int`    |             | ✓        |
 
 ### Returns
 
-| Name             | Type                    |
-| ---------------- | ----------------------- |
-| `clarifications` | `types.Clarification[]` |
+| Name             | Type                        |
+| ---------------- | --------------------------- |
+| `clarifications` | `List[types.Clarification]` |
 
 ## `/api/course/registerForCourse/`
 
@@ -2249,11 +2311,11 @@ Get clarifications of problem in a contest
 
 ### Parameters
 
-| Name                     | Type         | Description |
-| ------------------------ | ------------ | ----------- |
-| `course_alias`           | `string`     |             |
-| `accept_teacher`         | `bool\|null` |             |
-| `share_user_information` | `bool\|null` |             |
+| Name                     | Type         | Description | Required |
+| ------------------------ | ------------ | ----------- | -------- |
+| `course_alias`           | `string`     |             | ✓        |
+| `accept_teacher`         | `bool\|null` |             |          |
+| `share_user_information` | `bool\|null` |             |          |
 
 ### Returns
 
@@ -2267,10 +2329,10 @@ Removes an admin from a course
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `course_alias`    | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `course_alias`    | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2284,10 +2346,10 @@ Remove an assignment from a course
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
 
 ### Returns
 
@@ -2301,10 +2363,10 @@ Removes a group admin from a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-| `group`        | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
+| `group`        | `string` |             | ✓        |
 
 ### Returns
 
@@ -2318,10 +2380,10 @@ Removes a group teaching assistant from a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-| `group`        | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
+| `group`        | `string` |             | ✓        |
 
 ### Returns
 
@@ -2335,11 +2397,11 @@ Remove a problem from an assignment
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `problem_alias`    | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
+| `problem_alias`    | `string` |             | ✓        |
 
 ### Returns
 
@@ -2353,10 +2415,10 @@ Remove Student from Course
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `course_alias`    | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `course_alias`    | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2370,10 +2432,10 @@ Removes a teaching assistant from a course
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `course_alias`    | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `course_alias`    | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2387,11 +2449,11 @@ Request feedback and its corresponding notification
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `guid`             | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
+| `guid`             | `string` |             | ✓        |
 
 ### Returns
 
@@ -2406,15 +2468,15 @@ join the course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name    | Type                      |
-| ------- | ------------------------- |
-| `users` | `types.IdentityRequest[]` |
+| Name    | Type                          |
+| ------- | ----------------------------- |
+| `users` | `List[types.IdentityRequest]` |
 
 ## `/api/course/runs/`
 
@@ -2424,26 +2486,26 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                                                                                | Description |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `assignment_alias` | `string`                                                                                                                                                                                                            |             |
-| `course_alias`     | `string`                                                                                                                                                                                                            |             |
-| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
-| `offset`           | `int\|null`                                                                                                                                                                                                         |             |
-| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |
-| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |
-| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
-| `username`         | `null\|string`                                                                                                                                                                                                      |             |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
+| Name               | Type                                                                                                                                                                                                                | Description | Required |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
+| `course_alias`     | `string`                                                                                                                                                                                                            |             | ✓        |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |          |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`           | `int\|null`                                                                                                                                                                                                         |             |          |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |          |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |          |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |          |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
+| `username`         | `null\|string`                                                                                                                                                                                                      |             |          |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
 
 ### Returns
 
-| Name        | Type          |
-| ----------- | ------------- |
-| `runs`      | `types.Run[]` |
-| `totalRuns` | `number`      |
+| Name        | Type              |
+| ----------- | ----------------- |
+| `runs`      | `List[types.Run]` |
+| `totalRuns` | `number`          |
 
 ## `/api/course/searchUsers/`
 
@@ -2453,17 +2515,17 @@ Search users in course assignment
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `assignment_alias` | `string`       |             |
-| `course_alias`     | `string`       |             |
-| `query`            | `null\|string` |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `assignment_alias` | `string`       |             | ✓        |
+| `course_alias`     | `string`       |             | ✓        |
+| `query`            | `null\|string` |             |          |
 
 ### Returns
 
-| Name      | Type               |
-| --------- | ------------------ |
-| `results` | `types.ListItem[]` |
+| Name      | Type                   |
+| --------- | ---------------------- |
+| `results` | `List[types.ListItem]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2471,17 +2533,17 @@ Search users in course assignment
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `usernameOrEmail`  | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
+| `usernameOrEmail`  | `string` |             | ✓        |
 
 ### Returns
 
-| Name       | Type                    |
-| ---------- | ----------------------- |
-| `problems` | `types.CourseProblem[]` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `problems` | `List[types.CourseProblem]` |
 
 ## `/api/course/studentsProgress/`
 
@@ -2489,18 +2551,18 @@ Search users in course assignment
 
 ### Parameters
 
-| Name     | Type     | Description |
-| -------- | -------- | ----------- |
-| `course` | `string` |             |
-| `length` | `int`    |             |
-| `page`   | `int`    |             |
+| Name     | Type     | Description | Required |
+| -------- | -------- | ----------- | -------- |
+| `course` | `string` |             | ✓        |
+| `length` | `int`    |             | ✓        |
+| `page`   | `int`    |             | ✓        |
 
 ### Returns
 
-| Name       | Type                              |
-| ---------- | --------------------------------- |
-| `nextPage` | `number`                          |
-| `progress` | `types.StudentProgressInCourse[]` |
+| Name       | Type                                  |
+| ---------- | ------------------------------------- |
+| `nextPage` | `number`                              |
+| `progress` | `List[types.StudentProgressInCourse]` |
 
 ## `/api/course/toggleTeachingAssistant/`
 
@@ -2510,9 +2572,9 @@ Toggles the AI Teaching Assistant feature for a course
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2528,23 +2590,23 @@ Edit Course contents
 
 ### Parameters
 
-| Name                        | Type                                        | Description |
-| --------------------------- | ------------------------------------------- | ----------- |
-| `alias`                     | `string`                                    |             |
-| `languages`                 | `string`                                    |             |
-| `school_id`                 | `int`                                       |             |
-| `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
-| `description`               | `null\|string`                              |             |
-| `finish_time`               | `\OmegaUp\Timestamp\|null`                  |             |
-| `level`                     | `null\|string`                              |             |
-| `name`                      | `null\|string`                              |             |
-| `needs_basic_information`   | `bool\|null`                                |             |
-| `objective`                 | `null\|string`                              |             |
-| `recommended`               | `bool\|null`                                |             |
-| `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
-| `show_scoreboard`           | `bool\|null`                                |             |
-| `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
-| `unlimited_duration`        | `bool\|null`                                |             |
+| Name                        | Type                                        | Description | Required |
+| --------------------------- | ------------------------------------------- | ----------- | -------- |
+| `alias`                     | `string`                                    |             | ✓        |
+| `languages`                 | `string`                                    |             | ✓        |
+| `school_id`                 | `int`                                       |             | ✓        |
+| `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |          |
+| `description`               | `null\|string`                              |             |          |
+| `finish_time`               | `\OmegaUp\Timestamp\|null`                  |             |          |
+| `level`                     | `null\|string`                              |             |          |
+| `name`                      | `null\|string`                              |             |          |
+| `needs_basic_information`   | `bool\|null`                                |             |          |
+| `objective`                 | `null\|string`                              |             |          |
+| `recommended`               | `bool\|null`                                |             |          |
+| `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |          |
+| `show_scoreboard`           | `bool\|null`                                |             |          |
+| `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |          |
+| `unlimited_duration`        | `bool\|null`                                |             |          |
 
 ### Returns
 
@@ -2558,13 +2620,13 @@ Update an assignment
 
 ### Parameters
 
-| Name                 | Type                       | Description |
-| -------------------- | -------------------------- | ----------- |
-| `assignment`         | `string`                   |             |
-| `course`             | `string`                   |             |
-| `finish_time`        | `\OmegaUp\Timestamp\|null` |             |
-| `start_time`         | `\OmegaUp\Timestamp\|null` |             |
-| `unlimited_duration` | `bool\|null`               |             |
+| Name                 | Type                       | Description | Required |
+| -------------------- | -------------------------- | ----------- | -------- |
+| `assignment`         | `string`                   |             | ✓        |
+| `course`             | `string`                   |             | ✓        |
+| `finish_time`        | `\OmegaUp\Timestamp\|null` |             |          |
+| `start_time`         | `\OmegaUp\Timestamp\|null` |             |          |
+| `unlimited_duration` | `bool\|null`               |             |          |
 
 ### Returns
 
@@ -2576,10 +2638,10 @@ _Nothing_
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `assignments`  | `string` |             |
-| `course_alias` | `string` |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `assignments`  | `string` |             | ✓        |
+| `course_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2591,11 +2653,11 @@ _Nothing_
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `problems`         | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
+| `problems`         | `string` |             | ✓        |
 
 ### Returns
 
@@ -2617,6 +2679,25 @@ Calls to /status grader
 | -------- | -------------------- |
 | `grader` | `types.GraderStatus` |
 
+**`types.GraderStatus` structure:**
+
+```typescript
+{
+  broadcaster_sockets: number;
+  embedded_runner: boolean;
+  queue: {
+  run_queue_length: number;
+  runner_queue_length: number;
+  runners: string[];
+  running: {
+  id: number;
+  name: string;
+}[];
+};
+  status: string;
+}
+```
+
 # Group
 
 GroupController
@@ -2629,10 +2710,10 @@ Add identity to group
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `group_alias`     | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `group_alias`     | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2646,11 +2727,11 @@ New group
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `alias`       | `string` |             | ✓        |
+| `description` | `string` |             | ✓        |
+| `name`        | `string` |             | ✓        |
 
 ### Returns
 
@@ -2664,12 +2745,12 @@ Create a scoreboard set to a group
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `group_alias` | `string`       |             |
-| `name`        | `string`       |             |
-| `alias`       | `null\|string` |             |
-| `description` | `null\|string` |             |
+| Name          | Type           | Description | Required |
+| ------------- | -------------- | ----------- | -------- |
+| `group_alias` | `string`       |             | ✓        |
+| `name`        | `string`       |             | ✓        |
+| `alias`       | `null\|string` |             |          |
+| `description` | `null\|string` |             |          |
 
 ### Returns
 
@@ -2683,16 +2764,16 @@ Details of a group (scoreboards)
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `group_alias` | `string` |             |
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `group_alias` | `string` |             | ✓        |
 
 ### Returns
 
 | Name          | Type                                                                         |
 | ------------- | ---------------------------------------------------------------------------- |
 | `group`       | `{ alias: string; create_time: number; description: string; name: string; }` |
-| `scoreboards` | `types.GroupScoreboard[]`                                                    |
+| `scoreboards` | `List[types.GroupScoreboard]`                                                |
 
 ## `/api/group/list/`
 
@@ -2703,9 +2784,9 @@ array instead of an object since it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `query` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `query` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2721,15 +2802,15 @@ Members of a group (usernames only).
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `group_alias` | `string` |             |
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `group_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name         | Type               |
-| ------------ | ------------------ |
-| `identities` | `types.Identity[]` |
+| Name         | Type                   |
+| ------------ | ---------------------- |
+| `identities` | `List[types.Identity]` |
 
 ## `/api/group/myList/`
 
@@ -2739,9 +2820,9 @@ Returns a list of groups by owner
 
 ### Returns
 
-| Name     | Type                                                                         |
-| -------- | ---------------------------------------------------------------------------- |
-| `groups` | `{ alias: string; create_time: Date; description: string; name: string; }[]` |
+| Name     | Type                                                                             |
+| -------- | -------------------------------------------------------------------------------- |
+| `groups` | `List[{ alias: string; create_time: Date; description: string; name: string; }]` |
 
 ## `/api/group/removeUser/`
 
@@ -2751,10 +2832,10 @@ Remove user from group
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `group_alias`     | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `group_alias`     | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2768,11 +2849,11 @@ Update an existing group
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `alias`       | `string` |             | ✓        |
+| `description` | `string` |             | ✓        |
+| `name`        | `string` |             | ✓        |
 
 ### Returns
 
@@ -2790,13 +2871,13 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type         | Description |
-| ------------------ | ------------ | ----------- |
-| `contest_alias`    | `string`     |             |
-| `group_alias`      | `string`     |             |
-| `scoreboard_alias` | `string`     |             |
-| `weight`           | `float`      |             |
-| `only_ac`          | `bool\|null` |             |
+| Name               | Type         | Description | Required |
+| ------------------ | ------------ | ----------- | -------- |
+| `contest_alias`    | `string`     |             | ✓        |
+| `group_alias`      | `string`     |             | ✓        |
+| `scoreboard_alias` | `string`     |             | ✓        |
+| `weight`           | `float`      |             | ✓        |
+| `only_ac`          | `bool\|null` |             |          |
 
 ### Returns
 
@@ -2811,10 +2892,10 @@ the given scoreboard_alias
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `group_alias`      | `string` |             |
-| `scoreboard_alias` | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `group_alias`      | `string` |             | ✓        |
+| `scoreboard_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2830,15 +2911,15 @@ Details of a scoreboard
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `group_alias` | `null\|string` |             |
+| Name          | Type           | Description | Required |
+| ------------- | -------------- | ----------- | -------- |
+| `group_alias` | `null\|string` |             |          |
 
 ### Returns
 
-| Name          | Type                                                                                                                          |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `scoreboards` | `{ alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; }[]` |
+| Name          | Type                                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `scoreboards` | `List[{ alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; }]` |
 
 ## `/api/groupScoreboard/removeContest/`
 
@@ -2848,11 +2929,11 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `contest_alias`    | `string` |             |
-| `group_alias`      | `string` |             |
-| `scoreboard_alias` | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `contest_alias`    | `string` |             | ✓        |
+| `group_alias`      | `string` |             | ✓        |
+| `scoreboard_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -2870,12 +2951,12 @@ Entry point for Create bulk Identities API
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `identities`  | `string`       |             |
-| `group_alias` | `null\|string` |             |
-| `name`        | `mixed`        |             |
-| `username`    | `mixed`        |             |
+| Name          | Type           | Description | Required |
+| ------------- | -------------- | ----------- | -------- |
+| `identities`  | `string`       |             | ✓        |
+| `group_alias` | `null\|string` |             |          |
+| `name`        | `mixed`        |             |          |
+| `username`    | `mixed`        |             |          |
 
 ### Returns
 
@@ -2889,10 +2970,10 @@ Entry point for Create bulk Identities for teams API
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
-| `team_identities`  | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `team_group_alias` | `string` |             | ✓        |
+| `team_identities`  | `string` |             | ✓        |
 
 ### Returns
 
@@ -2902,17 +2983,17 @@ _Nothing_
 
 ### Description
 
-Entry point for change passowrd of an identity
+Entry point for change password of an identity
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `group_alias` | `string` |             |
-| `password`    | `string` |             |
-| `username`    | `string` |             |
-| `identities`  | `mixed`  |             |
-| `name`        | `mixed`  |             |
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `group_alias` | `string` |             | ✓        |
+| `password`    | `string` |             | ✓        |
+| `username`    | `string` |             | ✓        |
+| `identities`  | `mixed`  |             |          |
+| `name`        | `mixed`  |             |          |
 
 ### Returns
 
@@ -2926,17 +3007,17 @@ Entry point for Create an Identity API
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `gender`      | `string`       |             |
-| `name`        | `string`       |             |
-| `password`    | `string`       |             |
-| `school_name` | `string`       |             |
-| `username`    | `string`       |             |
-| `country_id`  | `null\|string` |             |
-| `group_alias` | `null\|string` |             |
-| `identities`  | `mixed`        |             |
-| `state_id`    | `null\|string` |             |
+| Name          | Type           | Description | Required |
+| ------------- | -------------- | ----------- | -------- |
+| `gender`      | `string`       |             | ✓        |
+| `name`        | `string`       |             | ✓        |
+| `password`    | `string`       |             | ✓        |
+| `school_name` | `string`       |             | ✓        |
+| `username`    | `string`       |             | ✓        |
+| `country_id`  | `null\|string` |             |          |
+| `group_alias` | `null\|string` |             |          |
+| `identities`  | `mixed`        |             |          |
+| `state_id`    | `null\|string` |             |          |
 
 ### Returns
 
@@ -2952,10 +3033,10 @@ Entry point for switching between associated identities for a user
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `usernameOrEmail` | `string`       |             |
-| `auth_token`      | `null\|string` |             |
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `usernameOrEmail` | `string`       |             | ✓        |
+| `auth_token`      | `null\|string` |             |          |
 
 ### Returns
 
@@ -2969,17 +3050,17 @@ Entry point for Update an Identity API
 
 ### Parameters
 
-| Name                | Type           | Description |
-| ------------------- | -------------- | ----------- |
-| `gender`            | `string`       |             |
-| `group_alias`       | `string`       |             |
-| `name`              | `string`       |             |
-| `original_username` | `string`       |             |
-| `school_name`       | `string`       |             |
-| `username`          | `string`       |             |
-| `country_id`        | `null\|string` |             |
-| `identities`        | `mixed`        |             |
-| `state_id`          | `null\|string` |             |
+| Name                | Type           | Description | Required |
+| ------------------- | -------------- | ----------- | -------- |
+| `gender`            | `string`       |             | ✓        |
+| `group_alias`       | `string`       |             | ✓        |
+| `name`              | `string`       |             | ✓        |
+| `original_username` | `string`       |             | ✓        |
+| `school_name`       | `string`       |             | ✓        |
+| `username`          | `string`       |             | ✓        |
+| `country_id`        | `null\|string` |             |          |
+| `identities`        | `mixed`        |             |          |
+| `state_id`          | `null\|string` |             |          |
 
 ### Returns
 
@@ -2993,17 +3074,17 @@ Entry point for Update an Identity team API
 
 ### Parameters
 
-| Name                | Type           | Description |
-| ------------------- | -------------- | ----------- |
-| `gender`            | `string`       |             |
-| `group_alias`       | `string`       |             |
-| `name`              | `string`       |             |
-| `original_username` | `string`       |             |
-| `school_name`       | `string`       |             |
-| `username`          | `string`       |             |
-| `country_id`        | `null\|string` |             |
-| `identities`        | `mixed`        |             |
-| `state_id`          | `null\|string` |             |
+| Name                | Type           | Description | Required |
+| ------------------- | -------------- | ----------- | -------- |
+| `gender`            | `string`       |             | ✓        |
+| `group_alias`       | `string`       |             | ✓        |
+| `name`              | `string`       |             | ✓        |
+| `original_username` | `string`       |             | ✓        |
+| `school_name`       | `string`       |             | ✓        |
+| `username`          | `string`       |             | ✓        |
+| `country_id`        | `null\|string` |             |          |
+| `identities`        | `mixed`        |             |          |
+| `state_id`          | `null\|string` |             |          |
 
 ### Returns
 
@@ -3021,9 +3102,9 @@ Returns a list of unread notifications for user
 
 ### Returns
 
-| Name            | Type                   |
-| --------------- | ---------------------- |
-| `notifications` | `types.Notification[]` |
+| Name            | Type                       |
+| --------------- | -------------------------- |
+| `notifications` | `List[types.Notification]` |
 
 ## `/api/notification/readNotifications/`
 
@@ -3033,9 +3114,9 @@ Updates notifications as read in database
 
 ### Parameters
 
-| Name            | Type    | Description |
-| --------------- | ------- | ----------- |
-| `notifications` | `mixed` |             |
+| Name            | Type    | Description | Required |
+| --------------- | ------- | ----------- | -------- |
+| `notifications` | `mixed` |             |          |
 
 ### Returns
 
@@ -3053,10 +3134,10 @@ Adds an admin to a problem
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `problem_alias`   | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `problem_alias`   | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3070,10 +3151,10 @@ Adds a group admin to a problem
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `group`         | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `group`         | `string` |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3087,11 +3168,11 @@ Adds a tag to a problem
 
 ### Parameters
 
-| Name            | Type         | Description |
-| --------------- | ------------ | ----------- |
-| `name`          | `string`     |             |
-| `problem_alias` | `string`     |             |
-| `public`        | `bool\|null` |             |
+| Name            | Type         | Description | Required |
+| --------------- | ------------ | ----------- | -------- |
+| `name`          | `string`     |             | ✓        |
+| `problem_alias` | `string`     |             | ✓        |
+| `public`        | `bool\|null` |             |          |
 
 ### Returns
 
@@ -3108,18 +3189,18 @@ the owner).
 
 ### Parameters
 
-| Name        | Type           | Description |
-| ----------- | -------------- | ----------- |
-| `page`      | `int`          |             |
-| `page_size` | `int`          |             |
-| `query`     | `null\|string` |             |
+| Name        | Type           | Description | Required |
+| ----------- | -------------- | ----------- | -------- |
+| `page`      | `int`          |             | ✓        |
+| `page_size` | `int`          |             | ✓        |
+| `query`     | `null\|string` |             |          |
 
 ### Returns
 
-| Name         | Type                      |
-| ------------ | ------------------------- |
-| `pagerItems` | `types.PageItem[]`        |
-| `problems`   | `types.ProblemListItem[]` |
+| Name         | Type                          |
+| ------------ | ----------------------------- |
+| `pagerItems` | `List[types.PageItem]`        |
+| `problems`   | `List[types.ProblemListItem]` |
 
 ## `/api/problem/admins/`
 
@@ -3129,16 +3210,16 @@ Returns all problem administrators
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name           | Type                        |
-| -------------- | --------------------------- |
-| `admins`       | `types.ProblemAdmin[]`      |
-| `group_admins` | `types.ProblemGroupAdmin[]` |
+| Name           | Type                            |
+| -------------- | ------------------------------- |
+| `admins`       | `List[types.ProblemAdmin]`      |
+| `group_admins` | `List[types.ProblemGroupAdmin]` |
 
 ## `/api/problem/bestScore/`
 
@@ -3148,13 +3229,13 @@ Returns the best score for a problem
 
 ### Parameters
 
-| Name             | Type           | Description |
-| ---------------- | -------------- | ----------- |
-| `contest_alias`  | `null\|string` |             |
-| `problem_alias`  | `null\|string` |             |
-| `problemset_id`  | `mixed`        |             |
-| `statement_type` | `null\|string` |             |
-| `username`       | `null\|string` |             |
+| Name             | Type           | Description | Required |
+| ---------------- | -------------- | ----------- | -------- |
+| `contest_alias`  | `null\|string` |             |          |
+| `problem_alias`  | `null\|string` |             |          |
+| `problemset_id`  | `mixed`        |             |          |
+| `statement_type` | `null\|string` |             |          |
+| `username`       | `null\|string` |             |          |
 
 ### Returns
 
@@ -3170,17 +3251,17 @@ Entry point for Problem clarifications API
 
 ### Parameters
 
-| Name            | Type        | Description |
-| --------------- | ----------- | ----------- |
-| `problem_alias` | `string`    |             |
-| `offset`        | `int\|null` |             |
-| `rowcount`      | `int\|null` |             |
+| Name            | Type        | Description | Required |
+| --------------- | ----------- | ----------- | -------- |
+| `problem_alias` | `string`    |             | ✓        |
+| `offset`        | `int\|null` |             |          |
+| `rowcount`      | `int\|null` |             |          |
 
 ### Returns
 
-| Name             | Type                    |
-| ---------------- | ----------------------- |
-| `clarifications` | `types.Clarification[]` |
+| Name             | Type                        |
+| ---------------- | --------------------------- |
+| `clarifications` | `List[types.Clarification]` |
 
 ## `/api/problem/convertZipToCdp/`
 
@@ -3194,6 +3275,17 @@ Convert an uploaded ZIP file to CDP.
 | ----- | ----------- |
 | `cdp` | `types.CDP` |
 
+**`types.CDP` fields:**
+
+| Name                      | Type                  | Required |
+| ------------------------- | --------------------- | -------- |
+| `casesStore`              | `types.CDPCasesStore` | ✓        |
+| `problemCodeContent`      | `string`              | ✓        |
+| `problemCodeExtension`    | `string`              | ✓        |
+| `problemMarkdown`         | `string`              | ✓        |
+| `problemName`             | `string`              | ✓        |
+| `problemSolutionMarkdown` | `string`              | ✓        |
+
 ## `/api/problem/create/`
 
 ### Description
@@ -3202,28 +3294,28 @@ Create a new problem
 
 ### Parameters
 
-| Name                      | Type           | Description |
-| ------------------------- | -------------- | ----------- |
-| `problem_alias`           | `string`       |             |
-| `allow_user_add_tags`     | `bool\|null`   |             |
-| `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `int\|null`    |             |
-| `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `int\|null`    |             |
-| `languages`               | `null\|string` |             |
-| `memory_limit`            | `int\|null`    |             |
-| `output_limit`            | `int\|null`    |             |
-| `overall_wall_time_limit` | `int\|null`    |             |
-| `problem_level`           | `null\|string` |             |
-| `selected_tags`           | `null\|string` |             |
-| `show_diff`               | `null\|string` |             |
-| `source`                  | `null\|string` |             |
-| `time_limit`              | `int\|null`    |             |
-| `title`                   | `null\|string` |             |
-| `update_published`        | `null\|string` |             |
-| `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `int\|null`    |             |
-| `visibility`              | `null\|string` |             |
+| Name                      | Type           | Description | Required |
+| ------------------------- | -------------- | ----------- | -------- |
+| `problem_alias`           | `string`       |             | ✓        |
+| `allow_user_add_tags`     | `bool\|null`   |             |          |
+| `email_clarifications`    | `bool\|null`   |             |          |
+| `extra_wall_time`         | `int\|null`    |             |          |
+| `group_score_policy`      | `null\|string` |             |          |
+| `input_limit`             | `int\|null`    |             |          |
+| `languages`               | `null\|string` |             |          |
+| `memory_limit`            | `int\|null`    |             |          |
+| `output_limit`            | `int\|null`    |             |          |
+| `overall_wall_time_limit` | `int\|null`    |             |          |
+| `problem_level`           | `null\|string` |             |          |
+| `selected_tags`           | `null\|string` |             |          |
+| `show_diff`               | `null\|string` |             |          |
+| `source`                  | `null\|string` |             |          |
+| `time_limit`              | `int\|null`    |             |          |
+| `title`                   | `null\|string` |             |          |
+| `update_published`        | `null\|string` |             |          |
+| `validator`               | `null\|string` |             |          |
+| `validator_time_limit`    | `int\|null`    |             |          |
+| `visibility`              | `null\|string` |             |          |
 
 ### Returns
 
@@ -3237,9 +3329,9 @@ Removes a problem whether user is the creator
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3253,15 +3345,15 @@ Entry point for Problem Details API
 
 ### Parameters
 
-| Name                      | Type           | Description |
-| ------------------------- | -------------- | ----------- |
-| `problem_alias`           | `string`       |             |
-| `contest_alias`           | `null\|string` |             |
-| `lang`                    | `null\|string` |             |
-| `prevent_problemset_open` | `bool\|null`   |             |
-| `problemset_id`           | `int\|null`    |             |
-| `show_solvers`            | `bool\|null`   |             |
-| `statement_type`          | `null\|string` |             |
+| Name                      | Type           | Description | Required |
+| ------------------------- | -------------- | ----------- | -------- |
+| `problem_alias`           | `string`       |             | ✓        |
+| `contest_alias`           | `null\|string` |             |          |
+| `lang`                    | `null\|string` |             |          |
+| `prevent_problemset_open` | `bool\|null`   |             |          |
+| `problemset_id`           | `int\|null`    |             |          |
+| `show_solvers`            | `bool\|null`   |             |          |
+| `statement_type`          | `null\|string` |             |          |
 
 ### Returns
 
@@ -3277,33 +3369,33 @@ List of public and user's private problems
 
 ### Parameters
 
-| Name                    | Type                                                                                                                               | Description |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `difficulty`            | `null\|string`                                                                                                                     |             |
-| `difficulty_range`      | `null\|string`                                                                                                                     |             |
-| `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |
-| `level`                 | `null\|string`                                                                                                                     |             |
-| `max_difficulty`        | `int\|null`                                                                                                                        |             |
-| `min_difficulty`        | `int\|null`                                                                                                                        |             |
-| `min_visibility`        | `int\|null`                                                                                                                        |             |
-| `offset`                | `int\|null`                                                                                                                        |             |
-| `only_karel`            | `bool\|null`                                                                                                                       |             |
-| `only_quality_seal`     | `bool\|null`                                                                                                                       |             |
-| `order_by`              | `''\|'accepted'\|'creation_date'\|'difficulty'\|'points'\|'problem_id'\|'quality'\|'ratio'\|'score'\|'submissions'\|'title'\|null` |             |
-| `page`                  | `int\|null`                                                                                                                        |             |
-| `programming_languages` | `null\|string`                                                                                                                     |             |
-| `query`                 | `null\|string`                                                                                                                     |             |
-| `require_all_tags`      | `bool\|null`                                                                                                                       |             |
-| `rowcount`              | `int\|null`                                                                                                                        |             |
-| `some_tags`             | `bool\|null`                                                                                                                       |             |
-| `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |
+| Name                    | Type                                                                                                                               | Description | Required |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `difficulty`            | `null\|string`                                                                                                                     |             |          |
+| `difficulty_range`      | `null\|string`                                                                                                                     |             |          |
+| `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |          |
+| `level`                 | `null\|string`                                                                                                                     |             |          |
+| `max_difficulty`        | `int\|null`                                                                                                                        |             |          |
+| `min_difficulty`        | `int\|null`                                                                                                                        |             |          |
+| `min_visibility`        | `int\|null`                                                                                                                        |             |          |
+| `offset`                | `int\|null`                                                                                                                        |             |          |
+| `only_karel`            | `bool\|null`                                                                                                                       |             |          |
+| `only_quality_seal`     | `bool\|null`                                                                                                                       |             |          |
+| `order_by`              | `''\|'accepted'\|'creation_date'\|'difficulty'\|'points'\|'problem_id'\|'quality'\|'ratio'\|'score'\|'submissions'\|'title'\|null` |             |          |
+| `page`                  | `int\|null`                                                                                                                        |             |          |
+| `programming_languages` | `null\|string`                                                                                                                     |             |          |
+| `query`                 | `null\|string`                                                                                                                     |             |          |
+| `require_all_tags`      | `bool\|null`                                                                                                                       |             |          |
+| `rowcount`              | `int\|null`                                                                                                                        |             |          |
+| `some_tags`             | `bool\|null`                                                                                                                       |             |          |
+| `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |          |
 
 ### Returns
 
-| Name      | Type                      |
-| --------- | ------------------------- |
-| `results` | `types.ProblemListItem[]` |
-| `total`   | `number`                  |
+| Name      | Type                          |
+| --------- | ----------------------------- |
+| `results` | `List[types.ProblemListItem]` |
+| `total`   | `number`                      |
 
 ## `/api/problem/listForTypeahead/`
 
@@ -3313,18 +3405,18 @@ List of public problems shown in the typeahead component
 
 ### Parameters
 
-| Name          | Type        | Description |
-| ------------- | ----------- | ----------- |
-| `query`       | `string`    |             |
-| `search_type` | `string`    |             |
-| `offset`      | `int\|null` |             |
-| `rowcount`    | `int\|null` |             |
+| Name          | Type        | Description | Required |
+| ------------- | ----------- | ----------- | -------- |
+| `query`       | `string`    |             | ✓        |
+| `search_type` | `string`    |             | ✓        |
+| `offset`      | `int\|null` |             |          |
+| `rowcount`    | `int\|null` |             |          |
 
 ### Returns
 
-| Name      | Type               |
-| --------- | ------------------ |
-| `results` | `types.ListItem[]` |
+| Name      | Type                   |
+| --------- | ---------------------- |
+| `results` | `List[types.ListItem]` |
 
 ## `/api/problem/myList/`
 
@@ -3334,18 +3426,18 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `page`     | `int`          |             |
-| `query`    | `null\|string` |             |
-| `rowcount` | `int\|null`    |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `page`     | `int`          |             | ✓        |
+| `query`    | `null\|string` |             |          |
+| `rowcount` | `int\|null`    |             |          |
 
 ### Returns
 
-| Name         | Type                      |
-| ------------ | ------------------------- |
-| `pagerItems` | `types.PageItem[]`        |
-| `problems`   | `types.ProblemListItem[]` |
+| Name         | Type                          |
+| ------------ | ----------------------------- |
+| `pagerItems` | `List[types.PageItem]`        |
+| `problems`   | `List[types.ProblemListItem]` |
 
 ## `/api/problem/randomKarelProblem/`
 
@@ -3375,9 +3467,9 @@ Rejudge problem
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3391,10 +3483,10 @@ Removes an admin from a problem
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `problem_alias`   | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `problem_alias`   | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3408,10 +3500,10 @@ Removes a group admin from a problem
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `group`         | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `group`         | `string` |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3425,10 +3517,10 @@ Removes a tag from a contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `name`          | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `name`          | `string` |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3442,25 +3534,25 @@ Entry point for Problem runs API
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `execution`     | `null\|string` |             |
-| `language`      | `null\|string` |             |
-| `offset`        | `int\|null`    |             |
-| `output`        | `null\|string` |             |
-| `problem_alias` | `null\|string` |             |
-| `rowcount`      | `int\|null`    |             |
-| `show_all`      | `bool\|null`   |             |
-| `status`        | `null\|string` |             |
-| `username`      | `null\|string` |             |
-| `verdict`       | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `execution`     | `null\|string` |             |          |
+| `language`      | `null\|string` |             |          |
+| `offset`        | `int\|null`    |             |          |
+| `output`        | `null\|string` |             |          |
+| `problem_alias` | `null\|string` |             |          |
+| `rowcount`      | `int\|null`    |             |          |
+| `show_all`      | `bool\|null`   |             |          |
+| `status`        | `null\|string` |             |          |
+| `username`      | `null\|string` |             |          |
+| `verdict`       | `null\|string` |             |          |
 
 ### Returns
 
-| Name        | Type          |
-| ----------- | ------------- |
-| `runs`      | `types.Run[]` |
-| `totalRuns` | `number`      |
+| Name        | Type              |
+| ----------- | ----------------- |
+| `runs`      | `List[types.Run]` |
+| `totalRuns` | `number`          |
 
 ## `/api/problem/runsDiff/`
 
@@ -3470,16 +3562,16 @@ Return a report of which runs would change due to a version change.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `version`       | `string`       |             |
-| `problem_alias` | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `version`       | `string`       |             | ✓        |
+| `problem_alias` | `null\|string` |             |          |
 
 ### Returns
 
-| Name   | Type               |
-| ------ | ------------------ |
-| `diff` | `types.RunsDiff[]` |
+| Name   | Type                   |
+| ------ | ---------------------- |
+| `diff` | `List[types.RunsDiff]` |
 
 ## `/api/problem/selectVersion/`
 
@@ -3489,11 +3581,11 @@ Change the version of the problem.
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `commit`           | `null\|string` |             |
-| `problem_alias`    | `null\|string` |             |
-| `update_published` | `null\|string` |             |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `commit`           | `null\|string` |             |          |
+| `problem_alias`    | `null\|string` |             |          |
+| `update_published` | `null\|string` |             |          |
 
 ### Returns
 
@@ -3507,20 +3599,35 @@ Returns the solution for a problem if conditions are satisfied.
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `contest_alias`   | `null\|string` |             |
-| `forfeit_problem` | `bool\|null`   |             |
-| `lang`            | `null\|string` |             |
-| `problem_alias`   | `null\|string` |             |
-| `problemset_id`   | `mixed`        |             |
-| `statement_type`  | `null\|string` |             |
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `contest_alias`   | `null\|string` |             |          |
+| `forfeit_problem` | `bool\|null`   |             |          |
+| `lang`            | `null\|string` |             |          |
+| `problem_alias`   | `null\|string` |             |          |
+| `problemset_id`   | `mixed`        |             |          |
+| `statement_type`  | `null\|string` |             |          |
 
 ### Returns
 
 | Name       | Type                     |
 | ---------- | ------------------------ |
 | `solution` | `types.ProblemStatement` |
+
+**`types.ProblemStatement` structure:**
+
+```typescript
+{
+  images: {
+  [key: string]: string;
+};
+  language: string;
+  markdown: string;
+  sources: {
+  [key: string]: string;
+};
+}
+```
 
 ## `/api/problem/stats/`
 
@@ -3530,16 +3637,16 @@ Stats of a problem
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
 | Name             | Type                         |
 | ---------------- | ---------------------------- |
 | `cases_stats`    | `{ [key: string]: number; }` |
-| `pending_runs`   | `string[]`                   |
+| `pending_runs`   | `List[string]`               |
 | `total_runs`     | `number`                     |
 | `verdict_counts` | `{ [key: string]: number; }` |
 
@@ -3551,16 +3658,16 @@ Returns every tag associated to a given problem.
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-| `include_voted` | `mixed`  |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
+| `include_voted` | `mixed`  |             |          |
 
 ### Returns
 
-| Name   | Type                                   |
-| ------ | -------------------------------------- |
-| `tags` | `{ name: string; public: boolean; }[]` |
+| Name   | Type                                       |
+| ------ | ------------------------------------------ |
+| `tags` | `List[{ name: string; public: boolean; }]` |
 
 ## `/api/problem/update/`
 
@@ -3570,30 +3677,30 @@ Update problem contents
 
 ### Parameters
 
-| Name                      | Type           | Description |
-| ------------------------- | -------------- | ----------- |
-| `message`                 | `string`       |             |
-| `problem_alias`           | `string`       |             |
-| `redirect`                | `bool\|string` |             |
-| `allow_user_add_tags`     | `bool\|null`   |             |
-| `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `int\|null`    |             |
-| `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `int\|null`    |             |
-| `languages`               | `null\|string` |             |
-| `memory_limit`            | `int\|null`    |             |
-| `output_limit`            | `int\|null`    |             |
-| `overall_wall_time_limit` | `int\|null`    |             |
-| `problem_level`           | `null\|string` |             |
-| `selected_tags`           | `null\|string` |             |
-| `show_diff`               | `null\|string` |             |
-| `source`                  | `null\|string` |             |
-| `time_limit`              | `int\|null`    |             |
-| `title`                   | `null\|string` |             |
-| `update_published`        | `null\|string` |             |
-| `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `int\|null`    |             |
-| `visibility`              | `null\|string` |             |
+| Name                      | Type           | Description | Required |
+| ------------------------- | -------------- | ----------- | -------- |
+| `message`                 | `string`       |             | ✓        |
+| `problem_alias`           | `string`       |             | ✓        |
+| `redirect`                | `bool\|string` |             | ✓        |
+| `allow_user_add_tags`     | `bool\|null`   |             |          |
+| `email_clarifications`    | `bool\|null`   |             |          |
+| `extra_wall_time`         | `int\|null`    |             |          |
+| `group_score_policy`      | `null\|string` |             |          |
+| `input_limit`             | `int\|null`    |             |          |
+| `languages`               | `null\|string` |             |          |
+| `memory_limit`            | `int\|null`    |             |          |
+| `output_limit`            | `int\|null`    |             |          |
+| `overall_wall_time_limit` | `int\|null`    |             |          |
+| `problem_level`           | `null\|string` |             |          |
+| `selected_tags`           | `null\|string` |             |          |
+| `show_diff`               | `null\|string` |             |          |
+| `source`                  | `null\|string` |             |          |
+| `time_limit`              | `int\|null`    |             |          |
+| `title`                   | `null\|string` |             |          |
+| `update_published`        | `null\|string` |             |          |
+| `validator`               | `null\|string` |             |          |
+| `validator_time_limit`    | `int\|null`    |             |          |
+| `visibility`              | `null\|string` |             |          |
 
 ### Returns
 
@@ -3609,10 +3716,10 @@ Updates the problem level of a problem
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `problem_alias` | `string`       |             |
-| `level_tag`     | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `problem_alias` | `string`       |             | ✓        |
+| `level_tag`     | `null\|string` |             |          |
 
 ### Returns
 
@@ -3626,31 +3733,31 @@ Updates problem solution only
 
 ### Parameters
 
-| Name                      | Type           | Description |
-| ------------------------- | -------------- | ----------- |
-| `message`                 | `string`       |             |
-| `problem_alias`           | `string`       |             |
-| `solution`                | `string`       |             |
-| `allow_user_add_tags`     | `bool\|null`   |             |
-| `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `int\|null`    |             |
-| `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `int\|null`    |             |
-| `lang`                    | `null\|string` |             |
-| `languages`               | `null\|string` |             |
-| `memory_limit`            | `int\|null`    |             |
-| `output_limit`            | `int\|null`    |             |
-| `overall_wall_time_limit` | `int\|null`    |             |
-| `problem_level`           | `null\|string` |             |
-| `selected_tags`           | `null\|string` |             |
-| `show_diff`               | `null\|string` |             |
-| `source`                  | `null\|string` |             |
-| `time_limit`              | `int\|null`    |             |
-| `title`                   | `null\|string` |             |
-| `update_published`        | `null\|string` |             |
-| `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `int\|null`    |             |
-| `visibility`              | `null\|string` |             |
+| Name                      | Type           | Description | Required |
+| ------------------------- | -------------- | ----------- | -------- |
+| `message`                 | `string`       |             | ✓        |
+| `problem_alias`           | `string`       |             | ✓        |
+| `solution`                | `string`       |             | ✓        |
+| `allow_user_add_tags`     | `bool\|null`   |             |          |
+| `email_clarifications`    | `bool\|null`   |             |          |
+| `extra_wall_time`         | `int\|null`    |             |          |
+| `group_score_policy`      | `null\|string` |             |          |
+| `input_limit`             | `int\|null`    |             |          |
+| `lang`                    | `null\|string` |             |          |
+| `languages`               | `null\|string` |             |          |
+| `memory_limit`            | `int\|null`    |             |          |
+| `output_limit`            | `int\|null`    |             |          |
+| `overall_wall_time_limit` | `int\|null`    |             |          |
+| `problem_level`           | `null\|string` |             |          |
+| `selected_tags`           | `null\|string` |             |          |
+| `show_diff`               | `null\|string` |             |          |
+| `source`                  | `null\|string` |             |          |
+| `time_limit`              | `int\|null`    |             |          |
+| `title`                   | `null\|string` |             |          |
+| `update_published`        | `null\|string` |             |          |
+| `validator`               | `null\|string` |             |          |
+| `validator_time_limit`    | `int\|null`    |             |          |
+| `visibility`              | `null\|string` |             |          |
 
 ### Returns
 
@@ -3664,31 +3771,31 @@ Updates problem statement only
 
 ### Parameters
 
-| Name                      | Type           | Description |
-| ------------------------- | -------------- | ----------- |
-| `lang`                    | `string`       |             |
-| `message`                 | `string`       |             |
-| `problem_alias`           | `string`       |             |
-| `statement`               | `string`       |             |
-| `allow_user_add_tags`     | `bool\|null`   |             |
-| `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `int\|null`    |             |
-| `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `int\|null`    |             |
-| `languages`               | `null\|string` |             |
-| `memory_limit`            | `int\|null`    |             |
-| `output_limit`            | `int\|null`    |             |
-| `overall_wall_time_limit` | `int\|null`    |             |
-| `problem_level`           | `null\|string` |             |
-| `selected_tags`           | `null\|string` |             |
-| `show_diff`               | `null\|string` |             |
-| `source`                  | `null\|string` |             |
-| `time_limit`              | `int\|null`    |             |
-| `title`                   | `null\|string` |             |
-| `update_published`        | `null\|string` |             |
-| `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `int\|null`    |             |
-| `visibility`              | `null\|string` |             |
+| Name                      | Type           | Description | Required |
+| ------------------------- | -------------- | ----------- | -------- |
+| `lang`                    | `string`       |             | ✓        |
+| `message`                 | `string`       |             | ✓        |
+| `problem_alias`           | `string`       |             | ✓        |
+| `statement`               | `string`       |             | ✓        |
+| `allow_user_add_tags`     | `bool\|null`   |             |          |
+| `email_clarifications`    | `bool\|null`   |             |          |
+| `extra_wall_time`         | `int\|null`    |             |          |
+| `group_score_policy`      | `null\|string` |             |          |
+| `input_limit`             | `int\|null`    |             |          |
+| `languages`               | `null\|string` |             |          |
+| `memory_limit`            | `int\|null`    |             |          |
+| `output_limit`            | `int\|null`    |             |          |
+| `overall_wall_time_limit` | `int\|null`    |             |          |
+| `problem_level`           | `null\|string` |             |          |
+| `selected_tags`           | `null\|string` |             |          |
+| `show_diff`               | `null\|string` |             |          |
+| `source`                  | `null\|string` |             |          |
+| `time_limit`              | `int\|null`    |             |          |
+| `title`                   | `null\|string` |             |          |
+| `update_published`        | `null\|string` |             |          |
+| `validator`               | `null\|string` |             |          |
+| `validator_time_limit`    | `int\|null`    |             |          |
+| `visibility`              | `null\|string` |             |          |
 
 ### Returns
 
@@ -3702,17 +3809,17 @@ Entry point for Problem Versions API
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `problem_alias` | `null\|string` |             |
-| `problemset_id` | `int\|null`    |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `problem_alias` | `null\|string` |             |          |
+| `problemset_id` | `int\|null`    |             |          |
 
 ### Returns
 
-| Name        | Type                     |
-| ----------- | ------------------------ |
-| `log`       | `types.ProblemVersion[]` |
-| `published` | `string`                 |
+| Name        | Type                         |
+| ----------- | ---------------------------- |
+| `log`       | `List[types.ProblemVersion]` |
+| `published` | `string`                     |
 
 # ProblemBookmark
 
@@ -3726,9 +3833,9 @@ Check if a problem is bookmarked by the current user
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3744,10 +3851,10 @@ Get list of bookmarked problems for the current user
 
 ### Returns
 
-| Name       | Type                      |
-| ---------- | ------------------------- |
-| `problems` | `types.BookmarkProblem[]` |
-| `total`    | `number`                  |
+| Name       | Type                          |
+| ---------- | ----------------------------- |
+| `problems` | `List[types.BookmarkProblem]` |
+| `total`    | `number`                      |
 
 ## `/api/problemBookmark/toggle/`
 
@@ -3757,9 +3864,9 @@ Toggle a bookmark for the current user
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -3793,15 +3900,15 @@ and the number of solutions already seen
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `assignment`    | `string`       |             |
-| `contest_alias` | `string`       |             |
-| `course`        | `string`       |             |
-| `problemset_id` | `int`          |             |
-| `auth_token`    | `mixed`        |             |
-| `token`         | `null\|string` |             |
-| `tokens`        | `mixed`        |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `assignment`    | `string`       |             | ✓        |
+| `contest_alias` | `string`       |             | ✓        |
+| `course`        | `string`       |             | ✓        |
+| `problemset_id` | `int`          |             | ✓        |
+| `auth_token`    | `mixed`        |             |          |
+| `token`         | `null\|string` |             |          |
+| `tokens`        | `mixed`        |             |          |
 
 ### Returns
 
@@ -3815,15 +3922,15 @@ types.Problemset;
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `assignment`    | `string` |             |
-| `contest_alias` | `string` |             |
-| `course`        | `string` |             |
-| `problemset_id` | `int`    |             |
-| `auth_token`    | `mixed`  |             |
-| `token`         | `mixed`  |             |
-| `tokens`        | `mixed`  |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `assignment`    | `string` |             | ✓        |
+| `contest_alias` | `string` |             | ✓        |
+| `course`        | `string` |             | ✓        |
+| `problemset_id` | `int`    |             | ✓        |
+| `auth_token`    | `mixed`  |             |          |
+| `token`         | `mixed`  |             |          |
+| `tokens`        | `mixed`  |             |          |
 
 ### Returns
 
@@ -3839,21 +3946,21 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `assignment`    | `string` |             |
-| `contest_alias` | `string` |             |
-| `course`        | `string` |             |
-| `problemset_id` | `int`    |             |
-| `auth_token`    | `mixed`  |             |
-| `token`         | `mixed`  |             |
-| `tokens`        | `mixed`  |             |
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `assignment`    | `string` |             | ✓        |
+| `contest_alias` | `string` |             | ✓        |
+| `course`        | `string` |             | ✓        |
+| `problemset_id` | `int`    |             | ✓        |
+| `auth_token`    | `mixed`  |             |          |
+| `token`         | `mixed`  |             |          |
+| `tokens`        | `mixed`  |             |          |
 
 ### Returns
 
-| Name     | Type                      |
-| -------- | ------------------------- |
-| `events` | `types.ScoreboardEvent[]` |
+| Name     | Type                          |
+| -------- | ----------------------------- |
+| `events` | `List[types.ScoreboardEvent]` |
 
 # QualityNomination
 
@@ -3926,11 +4033,11 @@ A user that has already solved a problem can dismiss suggestions. The
 
 ### Parameters
 
-| Name            | Type                                                                | Description |
-| --------------- | ------------------------------------------------------------------- | ----------- |
-| `contents`      | `string`                                                            |             |
-| `nomination`    | `'demotion'\|'dismissal'\|'promotion'\|'quality_tag'\|'suggestion'` |             |
-| `problem_alias` | `string`                                                            |             |
+| Name            | Type                                                                | Description | Required |
+| --------------- | ------------------------------------------------------------------- | ----------- | -------- |
+| `contents`      | `string`                                                            |             | ✓        |
+| `nomination`    | `'demotion'\|'dismissal'\|'promotion'\|'quality_tag'\|'suggestion'` |             | ✓        |
+| `problem_alias` | `string`                                                            |             | ✓        |
 
 ### Returns
 
@@ -3947,9 +4054,9 @@ nominator or a member of the reviewer group.
 
 ### Parameters
 
-| Name                   | Type  | Description |
-| ---------------------- | ----- | ----------- |
-| `qualitynomination_id` | `int` |             |
+| Name                   | Type  | Description | Required |
+| ---------------------- | ----- | ----------- | -------- |
+| `qualitynomination_id` | `int` |             | ✓        |
 
 ### Returns
 
@@ -3965,7 +4072,7 @@ nominator or a member of the reviewer group.
 | `qualitynomination_id` | `number`                                                                                                                                                         |
 | `reviewer`             | `boolean`                                                                                                                                                        |
 | `time`                 | `Date`                                                                                                                                                           |
-| `votes`                | `{ time: Date; user: { name: string; username: string; }; vote: number; }[]`                                                                                     |
+| `votes`                | `List[{ time: Date; user: { name: string; username: string; }; vote: number; }]`                                                                                 |
 
 ## `/api/qualityNomination/list/`
 
@@ -3973,20 +4080,20 @@ nominator or a member of the reviewer group.
 
 ### Parameters
 
-| Name       | Type                                                             | Description |
-| ---------- | ---------------------------------------------------------------- | ----------- |
-| `offset`   | `int`                                                            |             |
-| `rowcount` | `int`                                                            |             |
-| `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
-| `query`    | `null\|string`                                                   |             |
-| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
+| Name       | Type                                                             | Description | Required |
+| ---------- | ---------------------------------------------------------------- | ----------- | -------- |
+| `offset`   | `int`                                                            |             | ✓        |
+| `rowcount` | `int`                                                            |             | ✓        |
+| `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |          |
+| `query`    | `null\|string`                                                   |             |          |
+| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |          |
 
 ### Returns
 
-| Name          | Type                         |
-| ------------- | ---------------------------- |
-| `nominations` | `types.NominationListItem[]` |
-| `pager_items` | `types.PageItem[]`           |
+| Name          | Type                             |
+| ------------- | -------------------------------- |
+| `nominations` | `List[types.NominationListItem]` |
+| `pager_items` | `List[types.PageItem]`           |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3996,16 +4103,16 @@ Displays the nominations that this user has been assigned.
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name        | Type  | Description | Required |
+| ----------- | ----- | ----------- | -------- |
+| `page`      | `int` |             | ✓        |
+| `page_size` | `int` |             | ✓        |
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `nominations` | `List[{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }]` |
 
 ## `/api/qualityNomination/myList/`
 
@@ -4013,17 +4120,17 @@ Displays the nominations that this user has been assigned.
 
 ### Parameters
 
-| Name       | Type  | Description |
-| ---------- | ----- | ----------- |
-| `offset`   | `int` |             |
-| `rowcount` | `int` |             |
+| Name       | Type  | Description | Required |
+| ---------- | ----- | ----------- | -------- |
+| `offset`   | `int` |             | ✓        |
+| `rowcount` | `int` |             | ✓        |
 
 ### Returns
 
-| Name          | Type                         |
-| ------------- | ---------------------------- |
-| `nominations` | `types.NominationListItem[]` |
-| `pager_items` | `types.PageItem[]`           |
+| Name          | Type                             |
+| ------------- | -------------------------------- |
+| `nominations` | `List[types.NominationListItem]` |
+| `pager_items` | `List[types.PageItem]`           |
 
 ## `/api/qualityNomination/resolve/`
 
@@ -4033,13 +4140,13 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 
 ### Parameters
 
-| Name                   | Type                                      | Description |
-| ---------------------- | ----------------------------------------- | ----------- |
-| `problem_alias`        | `string`                                  |             |
-| `qualitynomination_id` | `int`                                     |             |
-| `rationale`            | `string`                                  |             |
-| `status`               | `'banned'\|'open'\|'resolved'\|'warning'` |             |
-| `all`                  | `bool\|null`                              |             |
+| Name                   | Type                                      | Description | Required |
+| ---------------------- | ----------------------------------------- | ----------- | -------- |
+| `problem_alias`        | `string`                                  |             | ✓        |
+| `qualitynomination_id` | `int`                                     |             | ✓        |
+| `rationale`            | `string`                                  |             | ✓        |
+| `status`               | `'banned'\|'open'\|'resolved'\|'warning'` |             | ✓        |
+| `all`                  | `bool\|null`                              |             |          |
 
 ### Returns
 
@@ -4057,9 +4164,9 @@ instructions to reset he's password, if and only if the email is valid.
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `email` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4077,9 +4184,9 @@ token and then they can send it to end user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `email` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4094,16 +4201,16 @@ token and then they can send it to end user
 
 Updates the password of a given user, this is the second and last step
 in order to reset the password. This operation is done if and only if
-the correct parameters are suplied.
+the correct parameters are supplied.
 
 ### Parameters
 
-| Name                    | Type     | Description |
-| ----------------------- | -------- | ----------- |
-| `email`                 | `string` |             |
-| `password`              | `string` |             |
-| `password_confirmation` | `string` |             |
-| `reset_token`           | `string` |             |
+| Name                    | Type     | Description | Required |
+| ----------------------- | -------- | ----------- | -------- |
+| `email`                 | `string` |             | ✓        |
+| `password`              | `string` |             | ✓        |
+| `password_confirmation` | `string` |             | ✓        |
+| `reset_token`           | `string` |             | ✓        |
 
 ### Returns
 
@@ -4136,13 +4243,13 @@ Create a new run
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `language`      | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `source`        | `string`       |             |
-| `contest_alias` | `null\|string` |             |
-| `problemset_id` | `int\|null`    |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `language`      | `string`       |             | ✓        |
+| `problem_alias` | `string`       |             | ✓        |
+| `source`        | `string`       |             | ✓        |
+| `contest_alias` | `null\|string` |             |          |
+| `problemset_id` | `int\|null`    |             |          |
 
 ### Returns
 
@@ -4161,9 +4268,9 @@ Gets the details of a run. Includes admin details if admin.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type     | Description | Required |
+| ----------- | -------- | ----------- | -------- |
+| `run_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4188,18 +4295,18 @@ Disqualify one or more submissions based on the received parameters:
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `null\|string` |             |
-| `problem_alias` | `null\|string` |             |
-| `run_alias`     | `null\|string` |             |
-| `username`      | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `contest_alias` | `null\|string` |             |          |
+| `problem_alias` | `null\|string` |             |          |
+| `run_alias`     | `null\|string` |             |          |
+| `username`      | `null\|string` |             |          |
 
 ### Returns
 
-| Name   | Type                                    |
-| ------ | --------------------------------------- |
-| `runs` | `{ guid: string; username: string; }[]` |
+| Name   | Type                                        |
+| ------ | ------------------------------------------- |
+| `runs` | `List[{ guid: string; username: string; }]` |
 
 ## `/api/run/execute/`
 
@@ -4239,9 +4346,9 @@ Get all the comments related to a submission feedback
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type     | Description | Required |
+| ----------- | -------- | ----------- | -------- |
+| `run_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4257,22 +4364,22 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `offset`        | `int`                                                                                                                                                                                                               |             |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             |
-| `rowcount`      | `int`                                                                                                                                                                                                               |             |
-| `username`      | `string`                                                                                                                                                                                                            |             |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |
+| Name            | Type                                                                                                                                                                                                                | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                               |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                               |             | ✓        |
+| `username`      | `string`                                                                                                                                                                                                            |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
 
 ### Returns
 
-| Name        | Type          |
-| ----------- | ------------- |
-| `runs`      | `types.Run[]` |
-| `totalRuns` | `number`      |
+| Name        | Type              |
+| ----------- | ----------------- |
+| `runs`      | `List[types.Run]` |
+| `totalRuns` | `number`          |
 
 ## `/api/run/rejudge/`
 
@@ -4282,10 +4389,10 @@ Re-sends a problem to Grader.
 
 ### Parameters
 
-| Name        | Type         | Description |
-| ----------- | ------------ | ----------- |
-| `run_alias` | `string`     |             |
-| `debug`     | `bool\|null` |             |
+| Name        | Type         | Description | Required |
+| ----------- | ------------ | ----------- | -------- |
+| `run_alias` | `string`     |             | ✓        |
+| `debug`     | `bool\|null` |             |          |
 
 ### Returns
 
@@ -4299,9 +4406,9 @@ Requalify a submission previously disqualified
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type     | Description | Required |
+| ----------- | -------- | ----------- | -------- |
+| `run_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4316,9 +4423,9 @@ Used in the arena, any contestant can view its own codes and compile errors
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name        | Type     | Description | Required |
+| ----------- | -------- | ----------- | -------- |
+| `run_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4336,10 +4443,10 @@ Get basic details of a run
 
 ### Parameters
 
-| Name        | Type           | Description |
-| ----------- | -------------- | ----------- |
-| `run_alias` | `string`       |             |
-| `username`  | `null\|string` |             |
+| Name        | Type           | Description | Required |
+| ----------- | -------------- | ----------- | -------- |
+| `run_alias` | `string`       |             | ✓        |
+| `username`  | `null\|string` |             |          |
 
 ### Returns
 
@@ -4359,11 +4466,11 @@ Api to create new school
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `name`       | `string`       |             |
-| `country_id` | `null\|string` |             |
-| `state_id`   | `null\|string` |             |
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `name`       | `string`       |             | ✓        |
+| `country_id` | `null\|string` |             |          |
+| `state_id`   | `null\|string` |             |          |
 
 ### Returns
 
@@ -4379,16 +4486,16 @@ Gets a list of schools
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
-| `term`  | `null\|string` |             |
+| Name    | Type           | Description | Required |
+| ------- | -------------- | ----------- | -------- |
+| `query` | `null\|string` |             |          |
+| `term`  | `null\|string` |             |          |
 
 ### Returns
 
-| Name      | Type                     |
-| --------- | ------------------------ |
-| `results` | `types.SchoolListItem[]` |
+| Name      | Type                         |
+| --------- | ---------------------------- |
+| `results` | `List[types.SchoolListItem]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -4398,9 +4505,9 @@ Selects a certain school as school of the month
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
+| Name        | Type  | Description | Required |
+| ----------- | ----- | ----------- | -------- |
+| `school_id` | `int` |             | ✓        |
 
 ### Returns
 
@@ -4418,11 +4525,11 @@ Returns a list of contests
 
 ### Parameters
 
-| Name           | Type           | Description |
-| -------------- | -------------- | ----------- |
-| `alias`        | `string`       |             |
-| `course_alias` | `null\|string` |             |
-| `token`        | `mixed`        |             |
+| Name           | Type           | Description | Required |
+| -------------- | -------------- | ----------- | -------- |
+| `alias`        | `string`       |             | ✓        |
+| `course_alias` | `null\|string` |             |          |
+| `token`        | `mixed`        |             |          |
 
 ### Returns
 
@@ -4443,16 +4550,37 @@ contestant's machine and the server.
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `auth_token` | `null\|string` |             |
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `auth_token` | `null\|string` |             |          |
 
 ### Returns
 
 | Name      | Type                   |
 | --------- | ---------------------- |
 | `session` | `types.CurrentSession` |
-| `time`    | `number`               |
+
+**`types.CurrentSession` fields:**
+
+| Name                         | Type                             | Required |
+| ---------------------------- | -------------------------------- | -------- |
+| `apiTokenId`                 | `number`                         |          |
+| `api_tokens`                 | `List[types.ApiToken]`           | ✓        |
+| `associated_identities`      | `List[types.AssociatedIdentity]` | ✓        |
+| `auth_token`                 | `string`                         |          |
+| `cacheKey`                   | `string`                         |          |
+| `classname`                  | `string`                         | ✓        |
+| `email`                      | `string`                         |          |
+| `identity`                   | `dao.Identities`                 |          |
+| `is_admin`                   | `boolean`                        | ✓        |
+| `is_under_13_user`           | `boolean`                        | ✓        |
+| `loginIdentity`              | `dao.Identities`                 |          |
+| `mentor_can_choose_coder`    | `boolean`                        | ✓        |
+| `user`                       | `dao.Users`                      |          |
+| `user_verification_deadline` | `Date`                           |          |
+| `valid`                      | `boolean`                        | ✓        |
+
+| `time` | `number` |
 
 # Submission
 
@@ -4467,17 +4595,17 @@ for given page and username.
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `page`     | `int\|null`    |             |
-| `pageSize` | `int\|null`    |             |
-| `username` | `string\|null` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `page`     | `int\|null`    |             |          |
+| `pageSize` | `int\|null`    |             |          |
+| `username` | `string\|null` |             |          |
 
 ### Returns
 
-| Name          | Type                 |
-| ------------- | -------------------- |
-| `submissions` | `types.Submission[]` |
+| Name          | Type                     |
+| ------------- | ------------------------ |
+| `submissions` | `List[types.Submission]` |
 
 ## `/api/submission/setFeedback/`
 
@@ -4488,15 +4616,15 @@ also it creates a notification
 
 ### Parameters
 
-| Name                     | Type        | Description |
-| ------------------------ | ----------- | ----------- |
-| `assignment_alias`       | `string`    |             |
-| `course_alias`           | `string`    |             |
-| `feedback`               | `string`    |             |
-| `guid`                   | `string`    |             |
-| `range_bytes_end`        | `int\|null` |             |
-| `range_bytes_start`      | `int\|null` |             |
-| `submission_feedback_id` | `int\|null` |             |
+| Name                     | Type        | Description | Required |
+| ------------------------ | ----------- | ----------- | -------- |
+| `assignment_alias`       | `string`    |             | ✓        |
+| `course_alias`           | `string`    |             | ✓        |
+| `feedback`               | `string`    |             | ✓        |
+| `guid`                   | `string`    |             | ✓        |
+| `range_bytes_end`        | `int\|null` |             |          |
+| `range_bytes_start`      | `int\|null` |             |          |
+| `submission_feedback_id` | `int\|null` |             |          |
 
 ### Returns
 
@@ -4514,12 +4642,12 @@ also it creates a notification
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `feedback_list`    | `string` |             |
-| `guid`             | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `assignment_alias` | `string` |             | ✓        |
+| `course_alias`     | `string` |             | ✓        |
+| `feedback_list`    | `string` |             | ✓        |
+| `guid`             | `string` |             | ✓        |
 
 ### Returns
 
@@ -4537,16 +4665,16 @@ Return most frequent public tags of a certain level
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `problemLevel` | `string` |             |
-| `rows`         | `int`    |             |
+| Name           | Type     | Description | Required |
+| -------------- | -------- | ----------- | -------- |
+| `problemLevel` | `string` |             | ✓        |
+| `rows`         | `int`    |             | ✓        |
 
 ### Returns
 
-| Name            | Type                          |
-| --------------- | ----------------------------- |
-| `frequent_tags` | `types.TagWithProblemCount[]` |
+| Name            | Type                              |
+| --------------- | --------------------------------- |
+| `frequent_tags` | `List[types.TagWithProblemCount]` |
 
 ## `/api/tag/list/`
 
@@ -4556,10 +4684,10 @@ Gets a list of tags
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
-| `term`  | `null\|string` |             |
+| Name    | Type           | Description | Required |
+| ------- | -------------- | ----------- | -------- |
+| `query` | `null\|string` |             |          |
+| `term`  | `null\|string` |             |          |
 
 ### Returns
 
@@ -4582,10 +4710,10 @@ Add one or more users to a given team
 
 ### Parameters
 
-| Name               | Type     | Description                    |
-| ------------------ | -------- | ------------------------------ |
-| `team_group_alias` | `string` | The username of the team.      |
-| `usernames`        | `string` | Username of all members to add |
+| Name               | Type     | Description                    | Required |
+| ------------------ | -------- | ------------------------------ | -------- |
+| `team_group_alias` | `string` | The username of the team.      | ✓        |
+| `usernames`        | `string` | Username of all members to add | ✓        |
 
 ### Returns
 
@@ -4599,12 +4727,12 @@ New team group
 
 ### Parameters
 
-| Name                  | Type        | Description |
-| --------------------- | ----------- | ----------- |
-| `alias`               | `string`    |             |
-| `description`         | `string`    |             |
-| `name`                | `string`    |             |
-| `numberOfContestants` | `int\|null` |             |
+| Name                  | Type        | Description | Required |
+| --------------------- | ----------- | ----------- | -------- |
+| `alias`               | `string`    |             | ✓        |
+| `description`         | `string`    |             | ✓        |
+| `name`                | `string`    |             | ✓        |
+| `numberOfContestants` | `int\|null` |             |          |
 
 ### Returns
 
@@ -4618,9 +4746,9 @@ Details of a team group
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `team_group_alias` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4637,9 +4765,9 @@ since it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
+| Name    | Type           | Description | Required |
+| ------- | -------------- | ----------- | -------- |
+| `query` | `null\|string` |             |          |
 
 ### Returns
 
@@ -4655,10 +4783,10 @@ Remove an existing team member of a teams group
 
 ### Parameters
 
-| Name               | Type     | Description                    |
-| ------------------ | -------- | ------------------------------ |
-| `team_group_alias` | `string` | The username of the team       |
-| `username`         | `string` | The username of user to remove |
+| Name               | Type     | Description                    | Required |
+| ------------------ | -------- | ------------------------------ | -------- |
+| `team_group_alias` | `string` | The username of the team       | ✓        |
+| `username`         | `string` | The username of user to remove | ✓        |
 
 ### Returns
 
@@ -4672,10 +4800,10 @@ Remove team from teams group
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
-| `usernameOrEmail`  | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `team_group_alias` | `string` |             | ✓        |
+| `usernameOrEmail`  | `string` |             | ✓        |
 
 ### Returns
 
@@ -4689,15 +4817,15 @@ Teams of a teams group
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
+| Name               | Type     | Description | Required |
+| ------------------ | -------- | ----------- | -------- |
+| `team_group_alias` | `string` |             | ✓        |
 
 ### Returns
 
-| Name         | Type               |
-| ------------ | ------------------ |
-| `identities` | `types.Identity[]` |
+| Name         | Type                   |
+| ------------ | ---------------------- |
+| `identities` | `List[types.Identity]` |
 
 ## `/api/teamsGroup/teamsMembers/`
 
@@ -4707,19 +4835,19 @@ Get a list of team members of a teams group
 
 ### Parameters
 
-| Name               | Type     | Description               |
-| ------------------ | -------- | ------------------------- |
-| `page`             | `int`    |                           |
-| `page_size`        | `int`    |                           |
-| `team_group_alias` | `string` | The username of the team. |
+| Name               | Type     | Description               | Required |
+| ------------------ | -------- | ------------------------- | -------- |
+| `page`             | `int`    |                           | ✓        |
+| `page_size`        | `int`    |                           | ✓        |
+| `team_group_alias` | `string` | The username of the team. | ✓        |
 
 ### Returns
 
-| Name         | Type                 |
-| ------------ | -------------------- |
-| `pageNumber` | `number`             |
-| `teamsUsers` | `types.TeamMember[]` |
-| `totalRows`  | `number`             |
+| Name         | Type                     |
+| ------------ | ------------------------ |
+| `pageNumber` | `number`                 |
+| `teamsUsers` | `List[types.TeamMember]` |
+| `totalRows`  | `number`                 |
 
 ## `/api/teamsGroup/update/`
 
@@ -4729,12 +4857,12 @@ Update an existing teams group
 
 ### Parameters
 
-| Name                  | Type        | Description |
-| --------------------- | ----------- | ----------- |
-| `alias`               | `string`    |             |
-| `description`         | `string`    |             |
-| `name`                | `string`    |             |
-| `numberOfContestants` | `int\|null` |             |
+| Name                  | Type        | Description | Required |
+| --------------------- | ----------- | ----------- | -------- |
+| `alias`               | `string`    |             | ✓        |
+| `description`         | `string`    |             | ✓        |
+| `name`                | `string`    |             | ✓        |
+| `numberOfContestants` | `int\|null` |             |          |
 
 ### Returns
 
@@ -4770,11 +4898,11 @@ Keeps a record of a user who accepts the privacy policy
 
 ### Parameters
 
-| Name                    | Type           | Description |
-| ----------------------- | -------------- | ----------- |
-| `privacy_git_object_id` | `string`       |             |
-| `statement_type`        | `string`       |             |
-| `username`              | `null\|string` |             |
+| Name                    | Type           | Description | Required |
+| ----------------------- | -------------- | ----------- | -------- |
+| `privacy_git_object_id` | `string`       |             | ✓        |
+| `statement_type`        | `string`       |             | ✓        |
+| `username`              | `null\|string` |             |          |
 
 ### Returns
 
@@ -4788,10 +4916,10 @@ Adds the experiment to the user.
 
 ### Parameters
 
-| Name         | Type     | Description |
-| ------------ | -------- | ----------- |
-| `experiment` | `string` |             |
-| `username`   | `string` |             |
+| Name         | Type     | Description | Required |
+| ------------ | -------- | ----------- | -------- |
+| `experiment` | `string` |             | ✓        |
+| `username`   | `string` |             | ✓        |
 
 ### Returns
 
@@ -4805,9 +4933,9 @@ Adds the identity to the group.
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `group` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `group` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4821,10 +4949,10 @@ Adds the role to the user.
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `role`     | `string` |             |
-| `username` | `string` |             |
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `role`     | `string` |             | ✓        |
+| `username` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4838,10 +4966,10 @@ Associates an identity to the logged user given the username
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `password` | `string` |             |
-| `username` | `string` |             |
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `password` | `string` |             | ✓        |
+| `username` | `string` |             | ✓        |
 
 ### Returns
 
@@ -4855,12 +4983,12 @@ Changes the password of a user
 
 ### Parameters
 
-| Name             | Type           | Description |
-| ---------------- | -------------- | ----------- |
-| `old_password`   | `string`       |             |
-| `username`       | `string`       |             |
-| `password`       | `null\|string` |             |
-| `permission_key` | `mixed`        |             |
+| Name             | Type           | Description | Required |
+| ---------------- | -------------- | ----------- | -------- |
+| `old_password`   | `string`       |             | ✓        |
+| `username`       | `string`       |             | ✓        |
+| `password`       | `null\|string` |             |          |
+| `permission_key` | `mixed`        |             |          |
 
 ### Returns
 
@@ -4876,16 +5004,46 @@ date, calculate it and save it.
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `category` | `mixed`        |             |
-| `date`     | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `category` | `mixed`        |             |          |
+| `date`     | `null\|string` |             |          |
 
 ### Returns
 
 | Name        | Type                |
 | ----------- | ------------------- |
 | `coderinfo` | `types.UserProfile` |
+
+**`types.UserProfile` fields:**
+
+| Name                        | Type      | Required |
+| --------------------------- | --------- | -------- |
+| `birth_date`                | `Date`    |          |
+| `classname`                 | `string`  | ✓        |
+| `country`                   | `string`  | ✓        |
+| `country_id`                | `string`  |          |
+| `email`                     | `string`  |          |
+| `gender`                    | `string`  |          |
+| `graduation_date`           | `Date`    |          |
+| `gravatar_92`               | `string`  | ✓        |
+| `has_competitive_objective` | `boolean` |          |
+| `has_learning_objective`    | `boolean` |          |
+| `has_scholar_objective`     | `boolean` |          |
+| `has_teaching_objective`    | `boolean` |          |
+| `hide_problem_tags`         | `boolean` | ✓        |
+| `is_own_profile`            | `boolean` | ✓        |
+| `is_private`                | `boolean` | ✓        |
+| `locale`                    | `string`  | ✓        |
+| `name`                      | `string`  |          |
+| `preferred_language`        | `string`  |          |
+| `scholar_degree`            | `string`  |          |
+| `school`                    | `string`  |          |
+| `school_id`                 | `number`  |          |
+| `state`                     | `string`  |          |
+| `state_id`                  | `string`  |          |
+| `username`                  | `string`  |          |
+| `verified`                  | `boolean` | ✓        |
 
 ## `/api/user/coderOfTheMonthList/`
 
@@ -4895,16 +5053,65 @@ Returns the list of coders of the month
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `category` | `mixed`        |             |
-| `date`     | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `category` | `mixed`        |             |          |
+| `date`     | `null\|string` |             |          |
 
 ### Returns
 
 | Name     | Type                        |
 | -------- | --------------------------- |
 | `coders` | `types.CoderOfTheMonthList` |
+
+**`types.CoderOfTheMonthList` fields:**
+
+| Name              | Type     | Required |
+| ----------------- | -------- | -------- |
+| `classname`       | `string` | ✓        |
+| `country_id`      | `string` | ✓        |
+| `date`            | `string` | ✓        |
+| `gravatar_32`     | `string` | ✓        |
+| `problems_solved` | `number` |          |
+| `score`           | `number` |          |
+| `username`        | `string` | ✓        |
+
+## `/api/user/compare/`
+
+### Description
+
+Compare two users' profiles and stats
+
+### Parameters
+
+| Name        | Type           | Description | Required |
+| ----------- | -------------- | ----------- | -------- |
+| `username1` | `null\|string` |             |          |
+| `username2` | `null\|string` |             |          |
+
+### Returns
+
+| Name    | Type                    |
+| ------- | ----------------------- |
+| `user1` | `types.UserCompareData` |
+
+**`types.UserCompareData` fields:**
+
+| Name                  | Type                    | Required |
+| --------------------- | ----------------------- | -------- |
+| `contestsCount`       | `number`                |          |
+| `profile`             | `types.UserProfileInfo` | ✓        |
+| `solvedProblemsCount` | `number`                |          |
+
+| `user2` | `types.UserCompareData` |
+
+**`types.UserCompareData` fields:**
+
+| Name                  | Type                    | Required |
+| --------------------- | ----------------------- | -------- |
+| `contestsCount`       | `number`                |          |
+| `profile`             | `types.UserProfileInfo` | ✓        |
+| `solvedProblemsCount` | `number`                |          |
 
 ## `/api/user/contestStats/`
 
@@ -4914,15 +5121,23 @@ Get Contests which a certain user has participated in
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
 | Name       | Type                        |
 | ---------- | --------------------------- |
 | `contests` | `types.UserProfileContests` |
+
+**`types.UserProfileContests` type:**
+
+```typescript
+{ [key: string]: { data: types.ContestParticipated; place: number; }; }
+```
+
+An object with `string` keys and `{ data: types.ContestParticipated; place: number; }` values.
 
 ## `/api/user/create/`
 
@@ -4970,9 +5185,9 @@ There is a limit of 5 API tokens that each user can have.
 
 ### Parameters
 
-| Name   | Type     | Description                                                          |
-| ------ | -------- | -------------------------------------------------------------------- |
-| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
+| Name   | Type     | Description                                                          | Required |
+| ------ | -------- | -------------------------------------------------------------------- | -------- |
+| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. | ✓        |
 
 ### Returns
 
@@ -4986,10 +5201,10 @@ There is a limit of 5 API tokens that each user can have.
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `token`    | `string`       |             |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `token`    | `string`       |             | ✓        |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5001,9 +5216,9 @@ _Nothing_
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5024,21 +5239,21 @@ Gets extra information of the identity:
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
-| Name              | Type       |
-| ----------------- | ---------- |
-| `birth_date`      | `Date`     |
-| `email`           | `string`   |
-| `last_login`      | `Date`     |
-| `roles`           | `string[]` |
-| `username`        | `string`   |
-| `verified`        | `boolean`  |
-| `within_last_day` | `boolean`  |
+| Name              | Type           |
+| ----------------- | -------------- |
+| `birth_date`      | `Date`         |
+| `email`           | `string`       |
+| `last_login`      | `Date`         |
+| `roles`           | `List[string]` |
+| `username`        | `string`       |
+| `verified`        | `boolean`      |
+| `within_last_day` | `boolean`      |
 
 ## `/api/user/generateGitToken/`
 
@@ -5059,18 +5274,18 @@ against the gitserver.
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `auth_token`      | `string`       |             |
-| `contest_alias`   | `string`       |             |
-| `contest_type`    | `string`       |             |
-| `id`              | `string`       |             |
-| `old_password`    | `string`       |             |
-| `permission_key`  | `string`       |             |
-| `username`        | `string`       |             |
-| `change_password` | `mixed`        |             |
-| `password`        | `null\|string` |             |
-| `usernameOrEmail` | `null\|string` |             |
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `auth_token`      | `string`       |             | ✓        |
+| `contest_alias`   | `string`       |             | ✓        |
+| `contest_type`    | `string`       |             | ✓        |
+| `id`              | `string`       |             | ✓        |
+| `old_password`    | `string`       |             | ✓        |
+| `permission_key`  | `string`       |             | ✓        |
+| `username`        | `string`       |             | ✓        |
+| `change_password` | `mixed`        |             |          |
+| `password`        | `null\|string` |             |          |
+| `usernameOrEmail` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5086,9 +5301,9 @@ Gets the last privacy policy accepted by user
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5104,17 +5319,17 @@ Gets a list of users.
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `query`    | `null\|string` |             |
-| `rowcount` | `null\|int`    |             |
-| `term`     | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `query`    | `null\|string` |             |          |
+| `rowcount` | `null\|int`    |             |          |
+| `term`     | `null\|string` |             |          |
 
 ### Returns
 
-| Name      | Type               |
-| --------- | ------------------ |
-| `results` | `types.ListItem[]` |
+| Name      | Type                   |
+| --------- | ---------------------- |
+| `results` | `List[types.ListItem]` |
 
 ## `/api/user/listAPITokens/`
 
@@ -5124,9 +5339,9 @@ Returns a list of all the API tokens associated with the user.
 
 ### Returns
 
-| Name     | Type               |
-| -------- | ------------------ |
-| `tokens` | `types.ApiToken[]` |
+| Name     | Type                   |
+| -------- | ---------------------- |
+| `tokens` | `List[types.ApiToken]` |
 
 ## `/api/user/listAssociatedIdentities/`
 
@@ -5136,9 +5351,9 @@ Get the identities that have been associated to the logged user
 
 ### Returns
 
-| Name         | Type                         |
-| ------------ | ---------------------------- |
-| `identities` | `types.AssociatedIdentity[]` |
+| Name         | Type                             |
+| ------------ | -------------------------------- |
+| `identities` | `List[types.AssociatedIdentity]` |
 
 ## `/api/user/listUnsolvedProblems/`
 
@@ -5148,15 +5363,15 @@ Get Problems unsolved by user
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
-| Name       | Type              |
-| ---------- | ----------------- |
-| `problems` | `types.Problem[]` |
+| Name       | Type                  |
+| ---------- | --------------------- |
+| `problems` | `List[types.Problem]` |
 
 ## `/api/user/login/`
 
@@ -5169,10 +5384,10 @@ password
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `password`        | `string` |             |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type     | Description | Required |
+| ----------------- | -------- | ----------- | -------- |
+| `password`        | `string` |             | ✓        |
+| `usernameOrEmail` | `string` |             | ✓        |
 
 ### Returns
 
@@ -5200,15 +5415,15 @@ Get Problems created by user
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
-| Name       | Type              |
-| ---------- | ----------------- |
-| `problems` | `types.Problem[]` |
+| Name       | Type                  |
+| ---------- | --------------------- |
+| `problems` | `List[types.Problem]` |
 
 ## `/api/user/problemsSolved/`
 
@@ -5218,15 +5433,15 @@ Get Problems solved by user
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
-| Name       | Type              |
-| ---------- | ----------------- |
-| `problems` | `types.Problem[]` |
+| Name       | Type                  |
+| ---------- | --------------------- |
+| `problems` | `List[types.Problem]` |
 
 ## `/api/user/profile/`
 
@@ -5236,11 +5451,11 @@ Get general user info
 
 ### Parameters
 
-| Name        | Type           | Description |
-| ----------- | -------------- | ----------- |
-| `category`  | `mixed`        |             |
-| `omit_rank` | `bool\|null`   |             |
-| `username`  | `null\|string` |             |
+| Name        | Type           | Description | Required |
+| ----------- | -------------- | ----------- | -------- |
+| `category`  | `mixed`        |             |          |
+| `omit_rank` | `bool\|null`   |             |          |
+| `username`  | `null\|string` |             |          |
 
 ### Returns
 
@@ -5256,9 +5471,9 @@ Get profile statistics including solved problems by difficulty and tags distribu
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5267,7 +5482,7 @@ Get profile statistics including solved problems by difficulty and tags distribu
 | `attempting` | `number`                                                              |
 | `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
 | `solved`     | `number`                                                              |
-| `tags`       | `{ count: number; name: string; }[]`                                  |
+| `tags`       | `List[{ count: number; name: string; }]`                              |
 
 ## `/api/user/removeExperiment/`
 
@@ -5277,10 +5492,10 @@ Removes the experiment from the user.
 
 ### Parameters
 
-| Name         | Type     | Description |
-| ------------ | -------- | ----------- |
-| `experiment` | `string` |             |
-| `username`   | `string` |             |
+| Name         | Type     | Description | Required |
+| ------------ | -------- | ----------- | -------- |
+| `experiment` | `string` |             | ✓        |
+| `username`   | `string` |             | ✓        |
 
 ### Returns
 
@@ -5294,9 +5509,9 @@ Removes the user to the group.
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `group` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `group` | `string` |             | ✓        |
 
 ### Returns
 
@@ -5310,10 +5525,26 @@ Removes the role from the user.
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `role`     | `string` |             |
-| `username` | `string` |             |
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `role`     | `string` |             | ✓        |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/reportReadme/`
+
+### Description
+
+Reports the README of a user's profile.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
 
 ### Returns
 
@@ -5327,9 +5558,25 @@ Revokes an API token associated with the user.
 
 ### Parameters
 
-| Name   | Type     | Description                                                          |
-| ------ | -------- | -------------------------------------------------------------------- |
-| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
+| Name   | Type     | Description                                                          | Required |
+| ------ | -------- | -------------------------------------------------------------------- | -------- |
+| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/saveReadme/`
+
+### Description
+
+Saves (creates or updates) the README for the authenticated user's profile.
+
+### Parameters
+
+| Name     | Type           | Description | Required |
+| -------- | -------------- | ----------- | -------- |
+| `readme` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5343,10 +5590,10 @@ Selects coder of the month for next month.
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `username` | `string` |             |
-| `category` | `mixed`  |             |
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+| `category` | `mixed`  |             |          |
 
 ### Returns
 
@@ -5360,17 +5607,17 @@ Get stats
 
 ### Parameters
 
-| Name       | Type           | Description |
-| ---------- | -------------- | ----------- |
-| `username` | `null\|string` |             |
-| `year`     | `null\|string` |             |
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `username` | `null\|string` |             |          |
+| `year`     | `null\|string` |             |          |
 
 ### Returns
 
-| Name      | Type                                                 |
-| --------- | ---------------------------------------------------- |
-| `heatmap` | `{ count: number; date: string; }[]`                 |
-| `runs`    | `{ date: string; runs: number; verdict: string; }[]` |
+| Name      | Type                                                     |
+| --------- | -------------------------------------------------------- |
+| `heatmap` | `List[{ count: number; date: string; }]`                 |
+| `runs`    | `List[{ date: string; runs: number; verdict: string; }]` |
 
 ## `/api/user/statusVerified/`
 
@@ -5380,9 +5627,9 @@ Gets verify status of a user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name    | Type     | Description | Required |
+| ------- | -------- | ----------- | -------- |
+| `email` | `string` |             | ✓        |
 
 ### Returns
 
@@ -5399,26 +5646,26 @@ Update user profile
 
 ### Parameters
 
-| Name                        | Type                                         | Description |
-| --------------------------- | -------------------------------------------- | ----------- |
-| `birth_date`                | `string`                                     |             |
-| `country_id`                | `string`                                     |             |
-| `graduation_date`           | `string`                                     |             |
-| `locale`                    | `string`                                     |             |
-| `state_id`                  | `string`                                     |             |
-| `auth_token`                | `mixed`                                      |             |
-| `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |
-| `has_competitive_objective` | `bool\|null`                                 |             |
-| `has_learning_objective`    | `bool\|null`                                 |             |
-| `has_scholar_objective`     | `bool\|null`                                 |             |
-| `has_teaching_objective`    | `bool\|null`                                 |             |
-| `hide_problem_tags`         | `bool\|null`                                 |             |
-| `is_private`                | `bool\|null`                                 |             |
-| `name`                      | `null\|string`                               |             |
-| `scholar_degree`            | `null\|string`                               |             |
-| `school_id`                 | `int\|null`                                  |             |
-| `school_name`               | `null\|string`                               |             |
-| `username`                  | `null\|string`                               |             |
+| Name                        | Type                                         | Description | Required |
+| --------------------------- | -------------------------------------------- | ----------- | -------- |
+| `birth_date`                | `string`                                     |             | ✓        |
+| `country_id`                | `string`                                     |             | ✓        |
+| `graduation_date`           | `string`                                     |             | ✓        |
+| `locale`                    | `string`                                     |             | ✓        |
+| `state_id`                  | `string`                                     |             | ✓        |
+| `auth_token`                | `mixed`                                      |             |          |
+| `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |          |
+| `has_competitive_objective` | `bool\|null`                                 |             |          |
+| `has_learning_objective`    | `bool\|null`                                 |             |          |
+| `has_scholar_objective`     | `bool\|null`                                 |             |          |
+| `has_teaching_objective`    | `bool\|null`                                 |             |          |
+| `hide_problem_tags`         | `bool\|null`                                 |             |          |
+| `is_private`                | `bool\|null`                                 |             |          |
+| `name`                      | `null\|string`                               |             |          |
+| `scholar_degree`            | `null\|string`                               |             |          |
+| `school_id`                 | `int\|null`                                  |             |          |
+| `school_name`               | `null\|string`                               |             |          |
+| `username`                  | `null\|string`                               |             |          |
 
 ### Returns
 
@@ -5432,10 +5679,10 @@ Update basic user profile info when logged with fb/gool
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `password` | `string` |             |
-| `username` | `string` |             |
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `password` | `string` |             | ✓        |
+| `username` | `string` |             | ✓        |
 
 ### Returns
 
@@ -5449,10 +5696,10 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `email`         | `string`       |             |
-| `originalEmail` | `null\|string` |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `email`         | `string`       |             | ✓        |
+| `originalEmail` | `null\|string` |             |          |
 
 ### Returns
 
@@ -5476,25 +5723,25 @@ contest updates with an access token.
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `filter`        | `string`       |             |
-| `problemset_id` | `int`          |             |
-| `auth_token`    | `null\|string` |             |
-| `contest_admin` | `null\|string` |             |
-| `contest_alias` | `null\|string` |             |
-| `token`         | `null\|string` |             |
-| `tokens`        | `mixed`        |             |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `filter`        | `string`       |             | ✓        |
+| `problemset_id` | `int`          |             | ✓        |
+| `auth_token`    | `null\|string` |             |          |
+| `contest_admin` | `null\|string` |             |          |
+| `contest_alias` | `null\|string` |             |          |
+| `token`         | `null\|string` |             |          |
+| `tokens`        | `mixed`        |             |          |
 
 ### Returns
 
-| Name               | Type       |
-| ------------------ | ---------- |
-| `admin`            | `boolean`  |
-| `contest_admin`    | `string[]` |
-| `problem_admin`    | `string[]` |
-| `problemset_admin` | `number[]` |
-| `user`             | `string`   |
+| Name               | Type           |
+| ------------------ | -------------- |
+| `admin`            | `boolean`      |
+| `contest_admin`    | `List[string]` |
+| `problem_admin`    | `List[string]` |
+| `problemset_admin` | `List[number]` |
+| `user`             | `string`       |
 
 ## `/api/user/verifyEmail/`
 
@@ -5504,10 +5751,10 @@ Verifies the user given its verification id
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `id`              | `string`       |             |
-| `usernameOrEmail` | `null\|string` |             |
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `id`              | `string`       |             | ✓        |
+| `usernameOrEmail` | `null\|string` |             |          |
 
 ### Returns
 

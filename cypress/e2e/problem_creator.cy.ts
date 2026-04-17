@@ -68,6 +68,33 @@ describe('Problem creator Test', () => {
         );
       });
 
+      it(`Should support Live Preview and Pagedown controls - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="statement"]').click();
+
+        // Type text and verify live preview (no save needed)
+        cy.get('[data-problem-creator-editor-markdown]').type(
+          'Live Preview Test ',
+        );
+        cy.get('[data-problem-creator-previewer-markdown]').should(
+          'contain.text',
+          'Live Preview Test',
+        );
+
+        // Click Bold button and verify live preview updates
+        cy.get('#wmd-bold-button').click();
+        cy.get('[data-problem-creator-editor-markdown]').should(
+          'contain.value',
+          '**strong text**',
+        );
+        // Verify preview contains strong tag (escaped or rendered?)
+        // The markdown preview renders HTML.
+        cy.get('[data-problem-creator-previewer-markdown]').should(
+          'contain.html',
+          '<strong>strong text</strong>',
+        );
+      });
+
       it(`Should write and verify the problem solution - ${mode.name}`, () => {
         mode.visit();
         cy.get('[data-problem-creator-tab="solution"]').click();

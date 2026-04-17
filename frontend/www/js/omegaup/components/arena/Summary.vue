@@ -35,7 +35,7 @@
         <td>
           {{
             time.formatTimestamp(
-              new Date(starTime.getTime() + (duration * scoreboard) / 100),
+              new Date(startTime.getTime() + (duration * scoreboard) / 100),
             )
           }}
         </td>
@@ -98,7 +98,7 @@ export default class Summary extends Vue {
       return T.wordsUnlimitedDuration;
     }
     if (this.windowLength) {
-      // Convert minutes to miliseconds
+      // Convert minutes to milliseconds
       return time.formatDelta(this.windowLength * (60 * 1000));
     }
     return time.formatDelta(this.duration);
