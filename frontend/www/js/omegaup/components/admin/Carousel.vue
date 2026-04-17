@@ -117,7 +117,7 @@
 
     <!-- Create/Edit Modal -->
     <b-modal
-      id="carousel-item-modal"
+      ref="carouselItemModal"
       size="xl"
       :title="isEditing ? T.carouselEditItem : T.carouselCreateNew"
       :ok-title="isEditing ? T.carouselUpdate : T.carouselCreate"
@@ -154,9 +154,7 @@
                 />
               </div>
               <div class="form-group col-md-6">
-                <label
-                  >{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label
-                >
+                <label>{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label>
                 <input
                   v-model="multilingualData.button_title[lang.code]"
                   type="text"
@@ -285,7 +283,7 @@ export default class Carousel extends Vue {
   }
 
   showItemModal(): void {
-    (this as any).$bvModal?.show('carousel-item-modal');
+    (this.$refs.carouselItemModal as any)?.show();
   }
 
   openCreateModal(): void {
@@ -412,7 +410,7 @@ export default class Carousel extends Vue {
     } else {
       this.$emit('create-item', this.currentItem);
     }
-    (this as any).$bvModal?.hide('carousel-item-modal');
+    (this.$refs.carouselItemModal as any)?.hide();
   }
 
   resetModalState(): void {
