@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * CarouselItemController
  *
- * @psalm-type CarouselItem=array{ carousel_item_id: int, title: string, excerpt: string, image_url: string, link: string, button_title: string, expiration_date: \OmegaUp\Timestamp|null, status: bool}
+ * @psalm-type CarouselItem=array{ carousel_item_id: int, title: string, excerpt: string, image_url: string, link: string, button_title: string, expiration_date: \OmegaUp\Timestamp|null, is_active: bool}
  * @psalm-type CarouselItemListPayload=array{carouselItems: list<CarouselItem>}
  * @psalm-type CarouselManagementPayload=array{carouselItems: list<CarouselItem>}
  */
@@ -34,7 +34,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                 'link' => $item->link,
                 'button_title' => $item->button_title,
                 'expiration_date' => $item->expiration_date,
-                'status' => $item->status == 'active'
+                'is_active' => $item->status === 'active',
             ],
             $filteredItems
         );
@@ -49,7 +49,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $link
      * @omegaup-request-param string $buttonTitle
      * @omegaup-request-param null|string $expiration_date
-     * @omegaup-request-param bool $status
+     * @omegaup-request-param bool $is_active
      *
      * @return array{status: string}
      */
@@ -60,6 +60,11 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         }
 
         $expiration = $r->ensureOptionalString('expiration_date');
+        $isActive = $r->ensureOptionalBool('is_active');
+        if (is_null($isActive)) {
+            // Backwards compatibility: older clients used `status` as boolean.
+            $isActive = $r->ensureBool('status');
+        }
         $carouselItem = new \OmegaUp\DAO\VO\CarouselItems([
             'title' => $r->ensureString('title'),
             'excerpt' => $r->ensureString('excerpt'),
@@ -69,7 +74,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             'expiration_date' => is_null($expiration)
                 ? null
                 : new \OmegaUp\Timestamp(strtotime($expiration)),
-            'status' => $r->ensureBool('status') ? 'active' : 'inactive',
+            'status' => $isActive ? 'active' : 'inactive',
             'user_id' => $r->identity->user_id,
         ]);
 
@@ -116,7 +121,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $link
      * @omegaup-request-param string $buttonTitle
      * @omegaup-request-param null|string $expiration_date
-     * @omegaup-request-param bool $status
+     * @omegaup-request-param bool $is_active
      *
      * @return array{status: string}
      */
@@ -145,9 +150,12 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             $r->ensureOptionalString('expiration_date')
         );
 
-        $carouselItem->status = $r->ensureOptionalBool(
-            'status'
-        ) ? 'active' : 'inactive';
+        $isActive = $r->ensureOptionalBool('is_active');
+        if (is_null($isActive)) {
+            // Backwards compatibility: older clients used `status` as boolean.
+            $isActive = $r->ensureOptionalBool('status');
+        }
+        $carouselItem->status = $isActive ? 'active' : 'inactive';
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
         return ['status' => 'ok'];

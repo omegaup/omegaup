@@ -211,7 +211,7 @@
           <div class="form-group col-md-6">
             <div class="form-check mt-5">
               <input
-                v-model="currentItem.status"
+                v-model="currentItem.is_active"
                 type="checkbox"
                 class="form-check-input"
               />
@@ -278,7 +278,7 @@ export default class Carousel extends Vue {
       link: '',
       button_title: '',
       expiration_date: undefined,
-      status: true,
+      is_active: true,
     };
   }
 
@@ -293,12 +293,12 @@ export default class Carousel extends Vue {
   }
 
   isItemArchived(item: types.CarouselItem): boolean {
-    // If status is false, it's archived
-    if (!item.status) {
+    // If is_active is false, it's archived
+    if (!item.is_active) {
       return true;
     }
 
-    // If status is true, check expiration_date
+    // If is_active is true, check expiration_date
     if (item.expiration_date) {
       const expirationDate = new Date(item.expiration_date);
       const now = new Date();
@@ -306,7 +306,7 @@ export default class Carousel extends Vue {
       return expirationDate < now;
     }
 
-    // If status is true and no expiration date, it's active
+    // If is_active is true and no expiration date, it's active
     return false;
   }
 
@@ -447,7 +447,7 @@ export default class Carousel extends Vue {
   }
 
   getStatusText(item: types.CarouselItem): string {
-    if (!item.status) {
+    if (!item.is_active) {
       return T.carouselInactive;
     }
 
@@ -463,7 +463,7 @@ export default class Carousel extends Vue {
   }
 
   getStatusBadgeClass(item: types.CarouselItem): Record<string, boolean> {
-    if (!item.status) {
+    if (!item.is_active) {
       return {
         badge: true,
         'badge-secondary': true,

@@ -2991,8 +2991,8 @@ export namespace types {
     excerpt: string;
     expiration_date?: Date;
     image_url: string;
+    is_active: boolean;
     link: string;
-    status: boolean;
     title: string;
   }
 

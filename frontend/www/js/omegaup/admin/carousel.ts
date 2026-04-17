@@ -37,7 +37,7 @@ OmegaUp.on('ready', () => {
               expiration_date: item.expiration_date
                 ? item.expiration_date.toISOString()
                 : null,
-              status: item.status,
+              is_active: item.is_active,
             })
               .then(() => {
                 ui.success(T.carouselItemCreated);
@@ -60,7 +60,7 @@ OmegaUp.on('ready', () => {
               expiration_date: item.expiration_date
                 ? item.expiration_date.toISOString()
                 : null,
-              status: item.status,
+              is_active: item.is_active,
             })
               .then(() => {
                 ui.success(T.carouselItemUpdated);

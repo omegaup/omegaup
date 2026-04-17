@@ -588,8 +588,8 @@ Create a new Carousel Item
 | `buttonTitle`     | `string`       |             | ✓        |
 | `excerpt`         | `string`       |             | ✓        |
 | `image_url`       | `string`       |             | ✓        |
+| `is_active`       | `bool`         |             | ✓        |
 | `link`            | `string`       |             | ✓        |
-| `status`          | `bool`         |             | ✓        |
 | `title`           | `string`       |             | ✓        |
 | `expiration_date` | `null\|string` |             |          |
 
@@ -621,9 +621,9 @@ List Carousel Items (admin only)
 
 ### Parameters
 
-| Name          | Type   | Description |
-| ------------- | ------ | ----------- |
-| `active_only` | `bool` |             |
+| Name          | Type   | Description | Required |
+| ------------- | ------ | ----------- | -------- |
+| `active_only` | `bool` |             | ✓        |
 
 ### Returns
 
@@ -645,8 +645,8 @@ Update a Carousel Item
 | `carousel_item_id` | `int`          |             | ✓        |
 | `excerpt`          | `string`       |             | ✓        |
 | `image_url`        | `string`       |             | ✓        |
+| `is_active`        | `bool`         |             | ✓        |
 | `link`             | `string`       |             | ✓        |
-| `status`           | `bool`         |             | ✓        |
 | `title`            | `string`       |             | ✓        |
 | `expiration_date`  | `null\|string` |             |          |
 
