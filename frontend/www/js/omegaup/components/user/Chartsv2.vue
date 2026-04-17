@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="card-body text-center">
     <label class="pr-4"
       ><input v-model="type" type="radio" value="delta" />
@@ -93,6 +93,14 @@ const VERDICT_LABELS: Record<string, string> = {
   MLE: T.verdictMLE,
   OLE: T.verdictOLE,
   VE: T.verdictVE,
+};
+
+const GROUPED_VERDICT_COLORS: Record<string, string> = {
+  AC: '#1b5e20',
+  PA: '#1e88e5',
+  WA: '#c62828',
+  TLE: '#f9a825',
+  RTE: '#fbc02d',
 };
 
 const emptyGroupedPeriods = {
@@ -350,6 +358,7 @@ export default class UserCharts extends Vue {
           ({
             data: x.data,
             name: x.name,
+            color: GROUPED_VERDICT_COLORS[x.name],
             type: 'column',
           } as Highcharts.SeriesColumnOptions),
       ),
@@ -405,3 +414,5 @@ export default class UserCharts extends Vue {
   }
 }
 </script>
+
+
