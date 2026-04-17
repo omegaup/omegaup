@@ -6,6 +6,10 @@ import T from '../lang';
 import Vue from 'vue';
 import { types } from '../api_types';
 
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CarouselManagementPayload();
 

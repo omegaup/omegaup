@@ -26,7 +26,7 @@
         </select>
         <button
           class="btn btn-primary float-right"
-          @click.prevent="showCreateModal = true"
+          @click.prevent="openCreateModal"
         >
           <font-awesome-icon :icon="['fas', 'plus']" />
           {{ T.carouselCreateNew }}
@@ -116,201 +116,120 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div
-      v-if="showCreateModal || showEditModal"
-      class="modal show d-block"
-      tabindex="-1"
-      role="dialog"
-      @click.self="closeModal"
+    <b-modal
+      id="carousel-item-modal"
+      size="xl"
+      :title="isEditing ? T.carouselEditItem : T.carouselCreateNew"
+      :ok-title="isEditing ? T.carouselUpdate : T.carouselCreate"
+      :cancel-title="T.wordsCancel"
+      @ok="onItemModalOk"
+      @hidden="onItemModalHidden"
     >
-      <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              {{ showEditModal ? T.carouselEditItem : T.carouselCreateNew }}
-            </h5>
-            <button
-              type="button"
-              class="close"
-              aria-label="Close"
-              @click.prevent="closeModal"
+      <form ref="carouselForm" @submit.prevent="saveItem">
+        <!-- Language Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li v-for="lang in languages" :key="lang.code" class="nav-item">
+            <a
+              class="nav-link"
+              :class="{ active: editingLanguage === lang.code }"
+              href="#"
+              @click.prevent="editingLanguage = lang.code"
             >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form @submit.prevent="saveItem">
-              <!-- Language Tabs -->
-              <ul class="nav nav-tabs mb-3" role="tablist">
-                <li v-for="lang in languages" :key="lang.code" class="nav-item">
-                  <a
-                    class="nav-link"
-                    :class="{ active: editingLanguage === lang.code }"
-                    href="#"
-                    @click.prevent="editingLanguage = lang.code"
-                  >
-                    {{ lang.name }}
-                  </a>
-                </li>
-              </ul>
+              {{ lang.name }}
+            </a>
+          </li>
+        </ul>
 
-              <!-- Multilingual Fields -->
-              <div v-for="lang in languages" :key="lang.code">
-                <div v-show="editingLanguage === lang.code">
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label>{{ T.wordsTitle }} ({{ lang.name }}) *</label>
-                      <input
-                        v-model="multilingualData.title[lang.code]"
-                        type="text"
-                        class="form-control"
-                        required
-                      />
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label
-                        >{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label
-                      >
-                      <input
-                        v-model="multilingualData.button_title[lang.code]"
-                        type="text"
-                        class="form-control"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>{{ T.carouselExcerpt }} ({{ lang.name }}) *</label>
-                    <textarea
-                      v-model="multilingualData.excerpt[lang.code]"
-                      class="form-control"
-                      rows="3"
-                      required
-                    ></textarea>
-                  </div>
-                </div>
+        <!-- Multilingual Fields -->
+        <div v-for="lang in languages" :key="lang.code">
+          <div v-show="editingLanguage === lang.code">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>{{ T.wordsTitle }} ({{ lang.name }}) *</label>
+                <input
+                  v-model="multilingualData.title[lang.code]"
+                  type="text"
+                  class="form-control"
+                  required
+                />
               </div>
-
-              <!-- Non-multilingual Fields -->
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.carouselImageUrl }} *</label>
-                  <input
-                    v-model="currentItem.image_url"
-                    type="url"
-                    class="form-control"
-                    required
-                  />
-                </div>
-                <div class="form-group col-md-6">
-                  <label>{{ T.carouselLink }} *</label>
-                  <input
-                    v-model="currentItem.link"
-                    type="url"
-                    class="form-control"
-                    required
-                  />
-                </div>
+              <div class="form-group col-md-6">
+                <label
+                  >{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label
+                >
+                <input
+                  v-model="multilingualData.button_title[lang.code]"
+                  type="text"
+                  class="form-control"
+                  required
+                />
               </div>
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>{{ T.carouselExpirationDate }}</label>
-                  <input
-                    v-model="expirationDateInput"
-                    type="datetime-local"
-                    class="form-control"
-                  />
-                  <small class="form-text text-muted">
-                    {{ T.carouselExpirationDateHint }}
-                  </small>
-                </div>
-                <div class="form-group col-md-6">
-                  <div class="form-check mt-5">
-                    <input
-                      v-model="currentItem.status"
-                      type="checkbox"
-                      class="form-check-input"
-                    />
-                    <label class="form-check-label">
-                      {{ T.carouselActive }}
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click.prevent="closeModal"
-            >
-              {{ T.wordsCancel }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click.prevent="saveItem"
-            >
-              {{ showEditModal ? T.carouselUpdate : T.carouselCreate }}
-            </button>
+            </div>
+            <div class="form-group">
+              <label>{{ T.carouselExcerpt }} ({{ lang.name }}) *</label>
+              <textarea
+                v-model="multilingualData.excerpt[lang.code]"
+                class="form-control"
+                rows="3"
+                required
+              ></textarea>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div
-      v-if="showCreateModal || showEditModal"
-      class="modal-backdrop show"
-    ></div>
 
-    <!-- Archive Confirmation Modal -->
-    <div
-      v-if="showDeleteModal"
-      class="modal show d-block"
-      tabindex="-1"
-      role="dialog"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ T.carouselDeleteConfirm }}</h5>
-            <button
-              type="button"
-              class="close"
-              aria-label="Close"
-              @click.prevent="showDeleteModal = false"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+        <!-- Non-multilingual Fields -->
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>{{ T.carouselImageUrl }} *</label>
+            <input
+              v-model="currentItem.image_url"
+              type="url"
+              class="form-control"
+              required
+            />
           </div>
-          <div class="modal-body">
-            <p>{{ T.carouselDeleteMessage }}</p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click.prevent="showDeleteModal = false"
-            >
-              {{ T.wordsCancel }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              @click.prevent="deleteItem"
-            >
-              {{ T.carouselArchive }}
-            </button>
+          <div class="form-group col-md-6">
+            <label>{{ T.carouselLink }} *</label>
+            <input
+              v-model="currentItem.link"
+              type="url"
+              class="form-control"
+              required
+            />
           </div>
         </div>
-      </div>
-    </div>
-    <div v-if="showDeleteModal" class="modal-backdrop show"></div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>{{ T.carouselExpirationDate }}</label>
+            <input
+              v-model="expirationDateInput"
+              type="datetime-local"
+              class="form-control"
+            />
+            <small class="form-text text-muted">
+              {{ T.carouselExpirationDateHint }}
+            </small>
+          </div>
+          <div class="form-group col-md-6">
+            <div class="form-check mt-5">
+              <input
+                v-model="currentItem.status"
+                type="checkbox"
+                class="form-check-input"
+              />
+              <label class="form-check-label">
+                {{ T.carouselActive }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </form>
+    </b-modal>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -335,11 +254,8 @@ export default class Carousel extends Vue {
 
   T = T;
   time = time;
-  showCreateModal = false;
-  showEditModal = false;
-  showDeleteModal = false;
+  isEditing = false;
   currentItem: types.CarouselItem = this.getEmptyItem();
-  itemToDelete: number | null = null;
   expirationDateInput = '';
   currentLanguage = 'en';
   editingLanguage = 'en';
@@ -355,30 +271,6 @@ export default class Carousel extends Vue {
     button_title: { en: '', es: '', pt: '' },
   };
 
-  @Watch('showCreateModal')
-  onShowCreateModalChanged(newVal: boolean): void {
-    if (newVal) {
-      this.currentItem = this.getEmptyItem();
-      this.expirationDateInput = '';
-      this.editingLanguage = 'en';
-      this.multilingualData = {
-        title: { en: '', es: '', pt: '' },
-        excerpt: { en: '', es: '', pt: '' },
-        button_title: { en: '', es: '', pt: '' },
-      };
-    }
-  }
-
-  @Watch('showEditModal')
-  onShowEditModalChanged(newVal: boolean): void {
-    if (newVal && this.currentItem.expiration_date) {
-      const date = new Date(this.currentItem.expiration_date);
-      this.expirationDateInput = time.formatDateTimeLocal(date);
-    } else {
-      this.expirationDateInput = '';
-    }
-  }
-
   getEmptyItem(): types.CarouselItem {
     return {
       carousel_item_id: 0,
@@ -390,6 +282,16 @@ export default class Carousel extends Vue {
       expiration_date: undefined,
       status: true,
     };
+  }
+
+  showItemModal(): void {
+    (this as any).$bvModal?.show('carousel-item-modal');
+  }
+
+  openCreateModal(): void {
+    this.isEditing = false;
+    this.resetModalState();
+    this.showItemModal();
   }
 
   isItemArchived(item: types.CarouselItem): boolean {
@@ -453,6 +355,7 @@ export default class Carousel extends Vue {
   }
 
   editItem(item: types.CarouselItem): void {
+    this.isEditing = true;
     this.currentItem = { ...item };
     this.multilingualData = {
       title: this.parseJsonField(item.title),
@@ -466,19 +369,23 @@ export default class Carousel extends Vue {
       this.expirationDateInput = '';
     }
     this.editingLanguage = 'en';
-    this.showEditModal = true;
+    this.showItemModal();
   }
 
-  confirmDelete(item: types.CarouselItem): void {
-    this.itemToDelete = item.carousel_item_id;
-    this.showDeleteModal = true;
-  }
-
-  deleteItem(): void {
-    if (this.itemToDelete !== null) {
-      this.$emit('delete-item', this.itemToDelete);
-      this.showDeleteModal = false;
-      this.itemToDelete = null;
+  async confirmDelete(item: types.CarouselItem): Promise<void> {
+    const confirmed = await (this as any).$bvModal?.msgBoxConfirm(
+      T.carouselDeleteMessage,
+      {
+        title: T.carouselDeleteConfirm,
+        okTitle: T.carouselArchive,
+        cancelTitle: T.wordsCancel,
+        okVariant: 'danger',
+        hideHeaderClose: false,
+        centered: true,
+      },
+    );
+    if (confirmed) {
+      this.$emit('delete-item', item.carousel_item_id);
     }
   }
 
@@ -500,17 +407,15 @@ export default class Carousel extends Vue {
       this.currentItem.expiration_date = undefined;
     }
 
-    if (this.showEditModal) {
+    if (this.isEditing) {
       this.$emit('update-item', this.currentItem);
     } else {
       this.$emit('create-item', this.currentItem);
     }
-    this.closeModal();
+    (this as any).$bvModal?.hide('carousel-item-modal');
   }
 
-  closeModal(): void {
-    this.showCreateModal = false;
-    this.showEditModal = false;
+  resetModalState(): void {
     this.currentItem = this.getEmptyItem();
     this.expirationDateInput = '';
     this.editingLanguage = 'en';
@@ -519,6 +424,21 @@ export default class Carousel extends Vue {
       excerpt: { en: '', es: '', pt: '' },
       button_title: { en: '', es: '', pt: '' },
     };
+  }
+
+  onItemModalOk(evt: any): void {
+    const form = this.$refs.carouselForm as HTMLFormElement | undefined;
+    if (form && !form.checkValidity()) {
+      evt.preventDefault();
+      form.reportValidity();
+      return;
+    }
+    this.saveItem();
+  }
+
+  onItemModalHidden(): void {
+    this.isEditing = false;
+    this.resetModalState();
   }
 
   truncateText(text: string, maxLength: number): string {
@@ -572,12 +492,6 @@ export default class Carousel extends Vue {
 </script>
 
 <style scoped>
-.modal.show {
-  display: block;
-}
-.modal-backdrop.show {
-  opacity: 0.5;
-}
 .nav-tabs .nav-link {
   cursor: pointer;
 }
