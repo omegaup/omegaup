@@ -90,7 +90,7 @@ export default class Carousel extends Vue {
     this.loadCarouselItems();
   }
 
-  parseJsonField(field: string | undefined): { [key: string]: string } {
+  parseJsonField(field: string): { [key: string]: string } {
     if (!field) {
       return { en: '', es: '', pt: '' };
     }
