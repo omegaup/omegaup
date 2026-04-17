@@ -590,6 +590,7 @@ Create a new Carousel Item
 | `image_url`       | `string`       |             | ✓        |
 | `is_active`       | `bool`         |             | ✓        |
 | `link`            | `string`       |             | ✓        |
+| `status`          | `bool`         |             | ✓        |
 | `title`           | `string`       |             | ✓        |
 | `expiration_date` | `null\|string` |             |          |
 
@@ -649,6 +650,7 @@ Update a Carousel Item
 | `link`             | `string`       |             | ✓        |
 | `title`            | `string`       |             | ✓        |
 | `expiration_date`  | `null\|string` |             |          |
+| `status`           | `bool\|null`   |             |          |
 
 ### Returns
 

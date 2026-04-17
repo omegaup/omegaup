@@ -15,7 +15,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\DAO\VO\CarouselItems[] $items
      * @param bool $activeOnly
-     * @return array
+     * @return list<CarouselItem>
      */
     private static function transformCarouselItems(
         array $items,
@@ -25,6 +25,10 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             ? array_filter($items, fn($item) => $item->status === 'active')
             : $items;
 
+        /** @var \OmegaUp\DAO\VO\CarouselItems[] $filteredItems */
+        $filteredItems = array_values($filteredItems);
+
+        /** @var list<CarouselItem> */
         return array_map(
             fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
                 'carousel_item_id' => $item->carousel_item_id,
@@ -43,15 +47,16 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * Create a new Carousel Item
      *
-     * @omegaup-request-param string $title
-     * @omegaup-request-param string $excerpt
-     * @omegaup-request-param string $image_url
-     * @omegaup-request-param string $link
-     * @omegaup-request-param string $buttonTitle
-     * @omegaup-request-param null|string $expiration_date
-     * @omegaup-request-param bool $is_active
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $buttonTitle
+     * @omegaup-request-param string $excerpt
+     * @omegaup-request-param null|string $expiration_date
+     * @omegaup-request-param string $image_url
+     * @omegaup-request-param bool $is_active
+     * @omegaup-request-param string $link
+     * @omegaup-request-param bool $status
+     * @omegaup-request-param string $title
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -114,16 +119,17 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * Update a Carousel Item
      *
-     * @omegaup-request-param int $carousel_item_id
-     * @omegaup-request-param string $title
-     * @omegaup-request-param string $excerpt
-     * @omegaup-request-param string $image_url
-     * @omegaup-request-param string $link
-     * @omegaup-request-param string $buttonTitle
-     * @omegaup-request-param null|string $expiration_date
-     * @omegaup-request-param bool $is_active
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $buttonTitle
+     * @omegaup-request-param int $carousel_item_id
+     * @omegaup-request-param string $excerpt
+     * @omegaup-request-param null|string $expiration_date
+     * @omegaup-request-param string $image_url
+     * @omegaup-request-param bool $is_active
+     * @omegaup-request-param string $link
+     * @omegaup-request-param bool|null $status
+     * @omegaup-request-param string $title
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
