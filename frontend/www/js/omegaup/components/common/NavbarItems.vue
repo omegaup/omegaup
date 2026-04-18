@@ -2,7 +2,7 @@
   <div class="mr-auto mt-2 mt-lg-0">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-      class="navbar-nav align-items-center px-3"
+      class="navbar-nav align-items-start px-3"
     >
       <li
         v-if="isLoggedIn"
@@ -382,7 +382,7 @@ library.add(
 
 @Component({
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
+    FontAwesomeIcon,
   },
 })
 export default class NavbarItems extends Vue {
