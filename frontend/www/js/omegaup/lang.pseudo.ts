@@ -1020,7 +1020,7 @@ const translations: { [key: string]: string; } = {
   navAllProblems: "(A11 pr0b13m5)",
   navAuthorRanking: "(C0n7ribu70r5 ranking)",
   navBlog: "(B10g)",
-  navBlogDesc: "(N3w5 and ann0unc3m3n75)",
+  navBlogDesc: "(P1a7f0rm upda735 and ar7ic135)",
   navCoderOfTheMonth: "(C0d3r 0f 7h3 m0n7h 0v3ra11)",
   navCoderOfTheMonthFemale: "(C0d3r 0f 7h3 m0n7h f0r h3r)",
   navCompareUsers: "(C0mpar3 U53r5)",

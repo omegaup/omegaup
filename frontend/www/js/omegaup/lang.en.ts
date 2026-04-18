@@ -1020,7 +1020,7 @@ const translations: { [key: string]: string; } = {
   navAllProblems: "All problems",
   navAuthorRanking: "Contributors ranking",
   navBlog: "Blog",
-  navBlogDesc: "News and announcements",
+  navBlogDesc: "Platform updates and articles",
   navCoderOfTheMonth: "Coder of the month overall",
   navCoderOfTheMonthFemale: "Coder of the month for her",
   navCompareUsers: "Compare Users",
