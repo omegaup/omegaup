@@ -30,8 +30,8 @@
       </div>
     </div>
     <div v-else>
-      <!-- Desktop / tablet: standard table -->
-      <div class="table-responsive d-none d-sm-block">
+      <!-- Desktop / tablet (md and up): standard table -->
+      <div class="table-responsive d-none d-md-block">
         <table class="table table-striped table-over">
           <thead>
             <tr>
@@ -65,8 +65,8 @@
         </table>
       </div>
 
-      <!-- Mobile: vertical card layout -->
-      <div class="d-block d-sm-none">
+      <!-- Mobile / small screens (below md): vertical card layout -->
+      <div class="d-block d-md-none">
         <div
           v-for="apiToken in apiTokens"
           :key="apiToken.name"
@@ -180,19 +180,19 @@ export default class ManageApiTokens extends Vue {
 
 // Mobile card layout
 .api-token-card {
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--user-api-token-card-border-color);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: var(--user-api-token-card-background-color);
+  box-shadow: 0 1px 3px var(--user-api-token-card-box-shadow-color);
 
   &__row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     padding: 0.35rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--user-api-token-card-row-border-color);
 
     &:last-of-type {
       border-bottom: none;
@@ -201,14 +201,14 @@ export default class ManageApiTokens extends Vue {
 
   &__label {
     font-weight: 600;
-    color: #495057;
+    color: var(--user-api-token-card-label-color);
     font-size: 0.85rem;
     flex: 0 0 45%;
     padding-right: 0.5rem;
   }
 
   &__value {
-    color: #212529;
+    color: var(--user-api-token-card-value-color);
     font-size: 0.85rem;
     flex: 0 0 55%;
     text-align: right;
