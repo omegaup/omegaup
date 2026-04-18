@@ -466,9 +466,9 @@ export default class NavbarItems extends Vue {
   height: 1.5rem;
   padding: 0.55rem;
   margin-right: 0.85rem;
-  background-color: #f1f3f5;
+  background-color: var(--header-help-dropdown-icon-background-color);
   border-radius: 4px;
-  color: #6c757d;
+  color: var(--header-help-dropdown-icon-color);
   font-size: 1.25rem;
 }
 </style>
