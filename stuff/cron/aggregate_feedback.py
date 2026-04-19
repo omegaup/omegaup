@@ -433,9 +433,13 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                            WHERE qn.`nomination` = 'suggestion'
                              AND qn.`qualitynomination_id` > %s
                              AND qn.`qualitynomination_id` <= %s;""",
-                        (max(QUALITYNOMINATION_QUESTION_CHANGE_ID,
-                             last_processed_qualitynomination_id),
-                         max_qualitynomination_id))
+                        (
+                            max(
+                                QUALITYNOMINATION_QUESTION_CHANGE_ID,
+                                last_processed_qualitynomination_id,
+                            ),
+                            max_qualitynomination_id,
+                        ))
         for (problem_id,) in cur.fetchall():
             attempted_problems += 1
             try:
