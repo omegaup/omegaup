@@ -8,6 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
+ * @psalm-type ContestProblemChangeLog=array{change_type: string, changedBy: string, problemAlias: string, timestamp: \OmegaUp\Timestamp}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string, myBestScore?: float|null, hasMyRuns?: bool|null}
  * @psalm-type ContestUser=array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}
  * @psalm-type ContestGroup=array{alias: string, name: string}
@@ -77,10 +78,67 @@ namespace OmegaUp\Controllers;
  */
 
 class Contest extends \OmegaUp\Controllers\Controller {
+    /** @var null|\OmegaUp\Broadcaster */
+    public static $broadcaster = null;
+
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 60 * 60 * 24 * 31; // 31 days
     const MAX_CONTEST_LENGTH_SYSADMIN_SECONDS = 60 * 60 * 24 * 60; // 60 days
     const CONTEST_LIST_PAGE_SIZE = 10;
+
+    /**
+     * Creates an instance of Broadcaster if not already created.
+     */
+    private static function getBroadcasterInstance(): \OmegaUp\Broadcaster {
+        if (is_null(self::$broadcaster)) {
+            self::$broadcaster = new \OmegaUp\Broadcaster();
+        }
+
+        return self::$broadcaster;
+    }
+
+    private static function isContestActive(
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        $now = \OmegaUp\Time::get();
+
+        return $contest->start_time->time <= $now &&
+            $contest->finish_time->time >= $now;
+    }
+
+    private static function logAndBroadcastContestProblemChange(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Problems $problem,
+        int $userId,
+        string $changeType
+    ): void {
+        if (!self::isContestActive($contest)) {
+            return;
+        }
+
+        try {
+            \OmegaUp\DAO\ContestProblemChangeLog::create(
+                new \OmegaUp\DAO\VO\ContestProblemChangeLog([
+                    'contest_id' => $contest->contest_id,
+                    'problem_id' => $problem->problem_id,
+                    'user_id' => $userId,
+                    'change_type' => $changeType,
+                ])
+            );
+
+            self::getBroadcasterInstance()->broadcastContestProblemChange(
+                contest: $contest,
+                problem: $problem,
+                userId: $userId,
+                changeType: $changeType
+            );
+        } catch (\Exception $e) {
+            self::$log->error(
+                'Failed to log and broadcast contest problem change',
+                ['exception' => $e],
+            );
+        }
+    }
 
     /**
      * Returns a list of contests
@@ -225,15 +283,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback =
-            /** @return array{contests: list<ContestListItem>, count: int} */
-            fn() => \OmegaUp\DAO\Contests::getAllPublicContests(
-                $page,
-                $pageSize,
-                $activeContests,
-                $recommended,
-                $query,
-                $orderBy
-            );
+                /** @return array{contests: list<ContestListItem>, count: int} */
+                fn() => \OmegaUp\DAO\Contests::getAllPublicContests(
+                    $page,
+                    $pageSize,
+                    $activeContests,
+                    $recommended,
+                    $query,
+                    $orderBy
+                );
             if (empty($query)) {
                 [
                     'contests' => $contests,
@@ -275,15 +333,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
             $callback =
-            /** @return array{contests: list<ContestListItem>, count: int} */
-            fn() => \OmegaUp\DAO\Contests::getAllContests(
-                $page,
-                $pageSize,
-                $activeContests,
-                $recommended,
-                $query,
-                $orderBy
-            );
+                /** @return array{contests: list<ContestListItem>, count: int} */
+                fn() => \OmegaUp\DAO\Contests::getAllContests(
+                    $page,
+                    $pageSize,
+                    $activeContests,
+                    $recommended,
+                    $query,
+                    $orderBy
+                );
             if (empty($query)) {
                 [
                     'contests' => $contests,
@@ -432,11 +490,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return self::getContestListInternal(
             $r,
             fn(
-                int $identityId,
-                int $page,
-                int $pageSize,
-                bool $showArchived,
-                ?string $query
+            int $identityId,
+            int $page,
+            int $pageSize,
+            bool $showArchived,
+            ?string $query
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
@@ -461,11 +519,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return self::getContestListInternal(
             $r,
             fn(
-                int $identityId,
-                int $page,
-                int $pageSize,
-                bool $showArchived,
-                ?string $query
+            int $identityId,
+            int $page,
+            int $pageSize,
+            bool $showArchived,
+            ?string $query
             ) => \OmegaUp\DAO\Contests::getContestsParticipating(
                 $identityId,
                 $page,
@@ -1209,10 +1267,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
 
                 $callback =
-                /** @return int */
-                fn() => \OmegaUp\DAO\Contests::getNumberOfContestants(
-                    $contestID
-                );
+                    /** @return int */
+                    fn() => \OmegaUp\DAO\Contests::getNumberOfContestants(
+                        $contestID
+                    );
 
                 $contestants[$contestID] = \OmegaUp\Cache::getFromCacheOrSet(
                     \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
@@ -1389,11 +1447,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestsList = self::getContestListInternal(
             $r,
             fn(
-                int $identityId,
-                int $page,
-                int $pageSize,
-                bool $showArchived,
-                ?string $query
+            int $identityId,
+            int $page,
+            int $pageSize,
+            bool $showArchived,
+            ?string $query
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
@@ -3366,6 +3424,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
+        self::logAndBroadcastContestProblemChange(
+            contest: $contest,
+            problem: $problem,
+            userId: intval($r->identity->user_id),
+            changeType: is_null($originalProblemsetProblem) ? 'added' : 'modified'
+        );
+
         $solutionStatus = \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND;
 
         if (\OmegaUp\DAO\Problems::isVisible($problem)) {
@@ -3429,7 +3494,57 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
+        self::logAndBroadcastContestProblemChange(
+            contest: $params['contest'],
+            problem: $params['problem'],
+            userId: intval($r->identity->user_id),
+            changeType: 'removed'
+        );
+
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Returns the problem change log for a contest.
+     * Queries the Contest_Problem_Change_Log table directly to get the change history of problems in a contest, including additions, removals, and modifications.
+     *
+     * @return array{logs: list<ContestProblemChangeLog>}
+     *
+     * @omegaup-request-param string $contest_alias
+     */
+    public static function apiProblemChangeLogs(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn(string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
+        if (is_null($contest) || is_null($contest->contest_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'contestNotFound'
+            );
+        }
+
+        $logs = \OmegaUp\DAO\ContestProblemChangeLog::getByContestId(
+            $contest->contest_id
+        );
+
+        // Transform column names to match frontend expectations
+        $transformedLogs = [];
+        foreach ($logs as $log) {
+            $transformedLogs[] = [
+                'change_type' => $log['change_type'],
+                'changedBy' => $log['changed_by'],
+                'problemAlias' => $log['problem_alias'],
+                'timestamp' => $log['timestamp'],
+            ];
+        }
+
+        return [
+            'logs' => $transformedLogs,
+        ];
     }
 
     /**
@@ -4773,7 +4888,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         self::$log->info(
             'Arbitrated contest for user, new accepted username='
-                . $targetIdentity->username . ', state=' . $resolution
+            . $targetIdentity->username . ', state=' . $resolution
         );
 
         $response = ['status' => 'ok'];
@@ -5047,10 +5162,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'score_mode',
             'submissions_gap',
             'feedback',
-            'penalty' => ['transform' => fn(string $value): int => max(
-                0,
-                intval($value)
-            )],
+            'penalty' => [
+                'transform' => fn(string $value): int => max(
+                    0,
+                    intval($value)
+                )
+            ],
             'penalty_type',
             'penalty_calc_policy',
             'show_scoreboard_after' => [
@@ -5060,13 +5177,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'languages' => [
                 'transform' =>
-                /** @param list<string>|string $value */
-                function ($value): ?string {
-                    if (!is_array($value)) {
-                        return $value ?: null;
+                    /** @param list<string>|string $value */
+                    function ($value): ?string {
+                        if (!is_array($value)) {
+                            return $value ?: null;
+                        }
+                        return join(',', $value);
                     }
-                    return join(',', $value);
-                }
             ],
             'admission_mode',
             'check_plagiarism',
