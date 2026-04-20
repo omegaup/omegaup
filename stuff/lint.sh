@@ -5,9 +5,27 @@ set -e
 OMEGAUP_ROOT="$(git rev-parse --show-toplevel)"
 CONTAINER_VERSION=omegaup/hook_tools:v1.0.9
 
-if [[ $# != 0 ]]; then
+# When --staged is given, only staged files are linted; the flag is passed
+# through to omegaup-hook-tools (which should use git diff --cached --name-only).
+USE_STAGED=0
+REMAINING=()
+for arg in "$@"; do
+	if [[ "$arg" == "--staged" ]]; then
+		USE_STAGED=1
+	else
+		REMAINING+=("$arg")
+	fi
+done
+
+if [[ ${#REMAINING[@]} != 0 ]]; then
 	# The caller has given us the explicit arguments.
-	ARGS="$@"
+	ARGS="${REMAINING[*]}"
+	if [[ $USE_STAGED -eq 1 ]]; then
+		ARGS="${ARGS} --staged"
+	fi
+elif [[ $USE_STAGED -eq 1 ]]; then
+	# Only --staged was passed; default to 'fix' for staged files.
+	ARGS="fix --staged"
 else
 	# Try to guess the set of changed files. Only specifying one commit so it
 	# diffs against the current working tree.
