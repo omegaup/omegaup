@@ -55,6 +55,7 @@
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
+  - [`/api/contest/problemChangeLogs/`](#apicontestproblemchangelogs)
   - [`/api/contest/problemClarifications/`](#apicontestproblemclarifications)
   - [`/api/contest/problems/`](#apicontestproblems)
   - [`/api/contest/publicDetails/`](#apicontestpublicdetails)
@@ -1263,6 +1264,25 @@ Joins a contest - explicitly adds a identity to a contest.
 ### Returns
 
 _Nothing_
+
+## `/api/contest/problemChangeLogs/`
+
+### Description
+
+Returns the problem change log for a contest.
+Queries the Contest_Problem_Change_Log table directly to get the change history of problems in a contest, including additions, removals, and modifications.
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+
+### Returns
+
+| Name   | Type                                  |
+| ------ | ------------------------------------- |
+| `logs` | `List[types.ContestProblemChangeLog]` |
 
 ## `/api/contest/problemClarifications/`
 

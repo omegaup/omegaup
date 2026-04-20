@@ -3386,6 +3386,13 @@ export namespace types {
     problems: { [key: number]: null | types.ProblemDetails };
   }
 
+  export interface ContestProblemChangeLog {
+    change_type: string;
+    changedBy: string;
+    problemAlias: string;
+    timestamp: Date;
+  }
+
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
@@ -5467,6 +5474,11 @@ export namespace messages {
   };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
+  export type ContestProblemChangeLogsRequest = { [key: string]: any };
+  export type _ContestProblemChangeLogsServerResponse = any;
+  export type ContestProblemChangeLogsResponse = {
+    logs: types.ContestProblemChangeLog[];
+  };
   export type ContestProblemClarificationsRequest = { [key: string]: any };
   export type _ContestProblemClarificationsServerResponse = any;
   export type ContestProblemClarificationsResponse = {
@@ -6469,6 +6481,9 @@ export namespace controllers {
     open: (
       params?: messages.ContestOpenRequest,
     ) => Promise<messages.ContestOpenResponse>;
+    problemChangeLogs: (
+      params?: messages.ContestProblemChangeLogsRequest,
+    ) => Promise<messages.ContestProblemChangeLogsResponse>;
     problemClarifications: (
       params?: messages.ContestProblemClarificationsRequest,
     ) => Promise<messages.ContestProblemClarificationsResponse>;

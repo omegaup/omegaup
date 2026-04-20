@@ -1322,16 +1322,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.52",
+            "version": "2.0.53",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "2552c4001631d1cc844332faea6a08a49c964b28"
+                "reference": "2d1a664b940b9b8f367185307dc010d11a2790f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/2552c4001631d1cc844332faea6a08a49c964b28",
-                "reference": "2552c4001631d1cc844332faea6a08a49c964b28",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/2d1a664b940b9b8f367185307dc010d11a2790f3",
+                "reference": "2d1a664b940b9b8f367185307dc010d11a2790f3",
                 "shasum": ""
             },
             "require": {
@@ -1412,7 +1412,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.52"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.53"
             },
             "funding": [
                 {
@@ -1428,7 +1428,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-19T02:54:44+00:00"
+            "time": "2026-04-10T01:30:02+00:00"
         },
         {
             "name": "promphp/prometheus_client_php",
