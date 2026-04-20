@@ -528,7 +528,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     public static function apiTeamsMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
         $teamGroupAlias = $r->ensureString(
             'team_group_alias',

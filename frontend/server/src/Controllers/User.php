@@ -2992,7 +2992,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      */
     public static function getAuthorRankForTypeScript(\OmegaUp\Request $r) {
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
         $authorsRanking = self::getAuthorsRank(
@@ -4135,7 +4135,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      */
     public static function getRankForTypeScript(\OmegaUp\Request $r) {
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
         $filter = $r->ensureOptionalEnum(
             'filter',
