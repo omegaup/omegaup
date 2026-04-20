@@ -121,6 +121,10 @@ export default class Header extends Vue {
     this.zipFile = this.readFile(ev.target as HTMLInputElement);
   }
 
+  created(): void {
+    this.nameInternal = this.$store.state.problemName;
+  }
+
   retrieveStore(): void {
     if (!this.zipFile) {
       return;

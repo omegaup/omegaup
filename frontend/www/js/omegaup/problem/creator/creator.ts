@@ -2,10 +2,11 @@ import problem_creator from '../../components/problem/creator/Creator.vue';
 import { OmegaUp } from '../../omegaup';
 import Vue from 'vue';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import store from './store';
+import store, { STORAGE_KEY } from './store';
 import T from '../../lang';
 import * as ui from '../../ui';
 import JSZip from 'jszip';
+import * as localStorageHelper from '../../localStorage';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -13,6 +14,17 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 OmegaUp.on('ready', () => {
   Vue.use(BootstrapVue);
   Vue.use(BootstrapVueIcons);
+
+  const isStorageAvailable = localStorageHelper.checkLocalStorageAvailability();
+  const draftRestored = localStorageHelper.checkDraftExists(STORAGE_KEY);
+
+  setTimeout(() => {
+    if (!isStorageAvailable) {
+      ui.warning(T.localStorageDraftAutosaveUnavailable);
+    } else if (draftRestored) {
+      ui.info(T.localStorageDraftRestored);
+    }
+  }, 1000);
 
   new Vue({
     el: '#main-container',
@@ -50,7 +62,6 @@ OmegaUp.on('ready', () => {
             zipContent: JSZip;
           }) => {
             zipContent.generateAsync({ type: 'blob' }).then((content) => {
-              // The following codeblock just adds a link element to the document for the download, clicks on it to download, removes the link from the document and then frees up the memory.
               const link = document.createElement('a');
               link.href = URL.createObjectURL(content);
               link.download = `${fileName}.zip`;
