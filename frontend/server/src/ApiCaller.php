@@ -208,10 +208,10 @@ class ApiCaller {
         }
 
         $mutatingPatterns = [
-            'add', 'arbitrate', 'archive', 'associate', 'bulkcreate',
-            'change', 'confirm', 'create', 'delete', 'disqualify',
-            'execute', 'expire', 'forfeit', 'generate', 'invalidate',
-            'login', 'logout', 'read', 'refresh', 'register',
+            'add', 'arbitrate', 'archive', 'associate', 'backfill',
+            'bulkcreate', 'change', 'confirm', 'create', 'delete',
+            'disqualify', 'execute', 'expire', 'forfeit', 'generate',
+            'invalidate', 'login', 'logout', 'read', 'refresh', 'register',
             'rejudge', 'remove', 'requalify', 'resolve', 'revoke',
             'select', 'set', 'toggle', 'update', 'verify',
         ];
