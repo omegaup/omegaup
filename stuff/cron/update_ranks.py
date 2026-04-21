@@ -93,13 +93,11 @@ def _parse_date(s: str) -> datetime.date:
 
 def update_problem_accepted_stats(
     cur: mysql.connector.cursor.MySQLCursorDict,
-    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
 ) -> None:
     '''Updates the problem accepted stats'''
 
     logging.info('Updating accepted stats for problems...')
-    _ = cur_readonly
     cur.execute(
         '''
         UPDATE
@@ -1035,7 +1033,7 @@ def main() -> None:
         with dbconn.cursor(buffered=True,
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
-            update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
+            update_problem_accepted_stats(cur, dbconn.conn)
             update_users_stats(cur, cur_readonly, dbconn.conn, args)
             update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
                                  args.update_school_of_the_month)
