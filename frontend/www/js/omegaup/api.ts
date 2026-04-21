@@ -573,6 +573,22 @@ export const Contest = {
   open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
     '/api/contest/open/',
   ),
+  problemChangeLogs: apiCall<
+    messages.ContestProblemChangeLogsRequest,
+    messages._ContestProblemChangeLogsServerResponse,
+    messages.ContestProblemChangeLogsResponse
+  >('/api/contest/problemChangeLogs/', (x) => {
+    x.logs = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.logs);
+    return x;
+  }),
   problemClarifications: apiCall<
     messages.ContestProblemClarificationsRequest,
     messages._ContestProblemClarificationsServerResponse,
