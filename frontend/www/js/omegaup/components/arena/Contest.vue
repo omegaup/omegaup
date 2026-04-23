@@ -378,7 +378,7 @@ export default class ArenaContest extends Vue {
     }
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.lockdown) {
       window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }

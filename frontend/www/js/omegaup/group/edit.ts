@@ -343,7 +343,7 @@ OmegaUp.on('ready', () => {
   window.addEventListener('hashchange', onHashChange);
   onHashChange();
 
-  groupEdit.$once('hook:beforeDestroy', () => {
+  groupEdit.$once('hook:beforeUnmount', () => {
     window.removeEventListener('hashchange', onHashChange);
   });
 });

@@ -565,7 +565,7 @@ class ArenaContestList extends Vue {
     this.fetchInitialContests();
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     // Placeholder for cleanup when infinite scroll is re-implemented
   }
   async loadMoreContests() {

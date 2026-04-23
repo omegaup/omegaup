@@ -199,7 +199,7 @@ export default class ProblemMarkdown extends Vue {
     }
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     for (const app of this.vueInstances) {
       app.$destroy();
       if (app.$el && app.$el.parentNode) {

@@ -503,7 +503,7 @@ export default class Ephemeral extends Vue {
     this.isCopySuccess = false;
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
   }
 

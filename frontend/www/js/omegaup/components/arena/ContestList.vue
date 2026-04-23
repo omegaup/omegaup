@@ -670,7 +670,7 @@ class ArenaContestList extends Vue {
     window.addEventListener('resize', this.updateColumnsPerRow);
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('resize', this.updateColumnsPerRow);
   }
 

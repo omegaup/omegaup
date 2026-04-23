@@ -103,7 +103,7 @@ export default class DiffEditorV2 extends Vue {
     this._resizeObserver.observe(this.$refs.wrapper as HTMLElement);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     this._resizeObserver?.disconnect();
     this._editor?.dispose();
     this._originalModel?.dispose();
