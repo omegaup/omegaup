@@ -1,0 +1,63 @@
+name: Bug Report (English)
+description: Help us improve by reporting bugs using this format
+title: "[BUG] "
+labels:
+  - bug
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and confirmed this is not a duplicate
+          required: true
+        - label: I have discussed this on [GitHub Discussions](https://github.com/omegaup/omegaup/discussions) or [Discord](https://discord.gg/K3JFd9d3wk) and received positive feedback
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Current Behavior
+
+        _Describe what happened instead of what was expected._
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behavior
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Expected Behavior
+
+        _Describe what you were originally trying to do and how you expected the platform to behave._
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## If necessary, add the following information (otherwise delete this section):
+
+        _Provide a link to an example, or a detailed list of steps to reproduce this bug._
+
+            1.
+            2.
+            3.
+            4.
+
+        _Relevant details about the environment in which you encountered this bug:_
+
+            * Browser name (e.g. Chrome 39, node.js 5.4):
+            * Operating System and version (desktop or mobile):
+            * Link to the site where this issue occurs:
+            * Screenshot:
+  - type: textarea
+    id: reproduction-and-environment
+    attributes:
+      label: Reproduction and environment (optional)
+    validations:
+      required: false
