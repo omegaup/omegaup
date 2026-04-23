@@ -132,6 +132,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $state_id
      */
     public static function apiCreate(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');

@@ -232,7 +232,8 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      * @omegaup-request-param int|null $numberOfContestants
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
+        public static function apiCreate(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentityIsOver13();
 
         $teamGroupAlias = $r->ensureString(
@@ -266,7 +267,8 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $name
      * @omegaup-request-param int|null $numberOfContestants
      */
-    public static function apiUpdate(\OmegaUp\Request $r) {
+        public static function apiUpdate(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
 
         $teamsGroupAlias = $r->ensureString(
