@@ -794,34 +794,6 @@ export namespace types {
       );
     }
 
-    export function ContestListTabPayload(
-      elementId: string = 'payload',
-    ): types.ContestListTabPayload {
-      return ((x) => {
-        x.results = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-            x.last_updated = ((x: number) => new Date(x * 1000))(
-              x.last_updated,
-            );
-            x.original_finish_time = ((x: number) => new Date(x * 1000))(
-              x.original_finish_time,
-            );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          });
-        })(x.results);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function ContestListv2Payload(
       elementId: string = 'payload',
     ): types.ContestListv2Payload {
@@ -3373,11 +3345,6 @@ export namespace types {
     query?: string;
   }
 
-  export interface ContestListTabPayload {
-    number_of_results: number;
-    results: types.ContestListItem[];
-  }
-
   export interface ContestListv2Payload {
     contests: types.ContestList;
     countContests: { current: number; future: number; past: number };
@@ -3861,8 +3828,9 @@ export namespace types {
     status: string;
   }
 
-  export interface Group {
+export interface Group {
     alias: string;
+    archived: boolean;
     create_time: Date;
     description?: string;
     name: string;
@@ -5489,13 +5457,9 @@ export namespace messages {
   };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
-  export type ContestListResponse = types.ContestListTabPayload;
-  export type ContestListAllTabsRequest = { [key: string]: any };
-  export type _ContestListAllTabsServerResponse = any;
-  export type ContestListAllTabsResponse = {
-    current: types.ContestListTabPayload;
-    future: types.ContestListTabPayload;
-    past: types.ContestListTabPayload;
+  export type ContestListResponse = {
+    number_of_results: number;
+    results: types.ContestListItem[];
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
@@ -6509,9 +6473,6 @@ export namespace controllers {
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;
-    listAllTabs: (
-      params?: messages.ContestListAllTabsRequest,
-    ) => Promise<messages.ContestListAllTabsResponse>;
     listParticipating: (
       params?: messages.ContestListParticipatingRequest,
     ) => Promise<messages.ContestListParticipatingResponse>;

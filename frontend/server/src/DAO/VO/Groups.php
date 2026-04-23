@@ -22,6 +22,7 @@ class Groups extends \OmegaUp\DAO\VO\VO {
         'alias' => true,
         'name' => true,
         'description' => true,
+        'archived' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -74,6 +75,11 @@ class Groups extends \OmegaUp\DAO\VO\VO {
                 $data['description']
             ) ? strval($data['description']) : '';
         }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
+            );
+        }
     }
 
     /**
@@ -119,4 +125,11 @@ class Groups extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $description = null;
+
+    /**
+     * Indicates whether the group has been archived (soft delete)
+     *
+     * @var bool
+     */
+    public $archived = false;
 }

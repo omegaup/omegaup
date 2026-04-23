@@ -84,7 +84,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * Returns all groups that a user can manage.
      * @param int $userId
      * @param int $identityId
-     * @return list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
+     * @return list<array{alias: string, archived: bool, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
      */
     final public static function getAllGroupsAdminedByUser(
         int $userId,
@@ -95,6 +95,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         $sql = '
             SELECT
                 DISTINCT g.alias,
+                g.archived,
                 g.create_time,
                 g.description,
                 g.name,
@@ -110,13 +111,14 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             LEFT JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
+                g.archived = FALSE AND (
                 a.owner_id = ? OR
                 (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)
+                (gr.role_id = ? AND gi.identity_id = ?))
             ORDER BY
                 g.group_id DESC;';
 
-        /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
+        /** @var list<array{alias: string, archived: bool, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
             $userId,
             \OmegaUp\Authorization::ADMIN_ROLE,

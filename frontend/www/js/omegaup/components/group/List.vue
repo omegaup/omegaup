@@ -29,6 +29,14 @@
               <a :href="groupEditUrl(group)" :title="T.wordsEdit">
                 <font-awesome-icon :icon="['fas', 'edit']" />
               </a>
+              
+                href="#"
+                class="ml-2 text-danger"
+                :title="T.groupArchive"
+                @click.prevent="onArchive(group)"
+              >
+                <font-awesome-icon :icon="['fas', 'archive']" />
+              </a>
             </td>
           </tr>
         </tbody>
@@ -44,8 +52,8 @@ import T from '../../lang';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit);
+import { faEdit, faArchive } from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faArchive);
 
 @Component({
   components: {
@@ -63,6 +71,10 @@ export default class GroupList extends Vue {
 
   groupEditUrl(group: types.Group): string {
     return `/group/${group.alias}/edit/#edit`;
+  }
+  onArchive(group: types.Group): void {
+    if (!window.confirm(T.groupArchiveConfirm)) return;
+    this.$emit('archive', group.alias);
   }
 }
 </script>

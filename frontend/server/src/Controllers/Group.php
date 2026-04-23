@@ -551,4 +551,28 @@ class Group extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'group_scoreboard_contests',
         ];
     }
+    /**
+     * Archives a group (soft delete).
+     *
+     * @param \OmegaUp\Request $r
+     * @return array{}
+     */
+    public static function apiArchive(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureIdentity();
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
+        }
+        if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $group->archived = true;
+        \OmegaUp\DAO\Groups::update($group);
+        return [];
+    }
 }
