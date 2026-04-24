@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import sys
+import time
 from typing import List, NamedTuple, Sequence, Dict, Set, Optional
 
 
@@ -1031,6 +1032,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
+    start_time = time.monotonic()
     dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     dbconn_readonly = lib.db.connect_readonly(
         lib.db.DatabaseConnectionArguments.from_args_readonly(args)) or dbconn
@@ -1038,12 +1040,31 @@ def main() -> None:
         with dbconn.cursor(buffered=True,
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
+            phase_start = time.monotonic()
             update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
+            logging.info(
+                'update_problem_accepted_stats completed in %.2fs',
+                time.monotonic() - phase_start,
+            )
+            phase_start = time.monotonic()
             update_users_stats(cur, cur_readonly, dbconn.conn, args)
+            logging.info(
+                'update_users_stats completed in %.2fs',
+                time.monotonic() - phase_start,
+            )
+            phase_start = time.monotonic()
             update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
                                  args.update_school_of_the_month)
+            logging.info(
+                'update_schools_stats completed in %.2fs',
+                time.monotonic() - phase_start,
+            )
     finally:
         dbconn.conn.close()
+        logging.info(
+            'Total execution time: %.2fs',
+            time.monotonic() - start_time,
+        )
         logging.info('Done')
 
 
