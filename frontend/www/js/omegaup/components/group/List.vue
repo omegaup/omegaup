@@ -29,7 +29,7 @@
               <a :href="groupEditUrl(group)" :title="T.wordsEdit">
                 <font-awesome-icon :icon="['fas', 'edit']" />
               </a>
-              
+              <a
                 href="#"
                 class="ml-2 text-danger"
                 :title="T.groupArchive"

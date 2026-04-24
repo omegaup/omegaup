@@ -820,6 +820,8 @@ const translations: { [key: string]: string; } = {
   groupAlreadyExists: "Ya existe un grupo con ese nombre",
   groupCreateIdentities: "Crear identidades",
   groupEditEdit: "Editar",
+  groupArchive: 'Archivar grupo',
+  groupArchiveConfirm: '¿Estás seguro de que quieres archivar este grupo?',
   groupEditGroupUpdated: "El grupo se actualiz\u00f3 correctamente.",
   groupEditMemberAdded: "Miembro agregado correctamente.",
   groupEditMemberPasswordUpdated: "Contrase\u00f1a de la identidad actualizada correctamente.",
