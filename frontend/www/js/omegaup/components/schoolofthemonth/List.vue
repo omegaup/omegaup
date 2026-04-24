@@ -1,6 +1,6 @@
 <template>
   <div class="card ranking-width">
-    <ul class="nav nav-tabs justify-content-arround">
+    <ul class="nav nav-tabs justify-content-around">
       <li class="nav-item">
         <a
           href="#"

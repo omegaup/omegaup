@@ -794,6 +794,34 @@ export namespace types {
       );
     }
 
+    export function ContestListTabPayload(
+      elementId: string = 'payload',
+    ): types.ContestListTabPayload {
+      return ((x) => {
+        x.results = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.results);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ContestListv2Payload(
       elementId: string = 'payload',
     ): types.ContestListv2Payload {
@@ -3076,6 +3104,7 @@ export namespace types {
     columns: string[];
     difficulty: string;
     frequentTags: types.TagWithProblemCount[];
+    hideProblemTagsPreference: boolean;
     keyword: string;
     language: string;
     languages: string[];
@@ -3344,6 +3373,11 @@ export namespace types {
     query?: string;
   }
 
+  export interface ContestListTabPayload {
+    number_of_results: number;
+    results: types.ContestListItem[];
+  }
+
   export interface ContestListv2Payload {
     contests: types.ContestList;
     countContests: { current: number; future: number; past: number };
@@ -3383,6 +3417,13 @@ export namespace types {
   export interface ContestPrintDetailsPayload {
     contestTitle: string;
     problems: { [key: number]: null | types.ProblemDetails };
+  }
+
+  export interface ContestProblemChangeLog {
+    change_type: string;
+    changedBy: string;
+    problemAlias: string;
+    timestamp: Date;
   }
 
   export interface ContestPublicDetails {
@@ -3556,6 +3597,9 @@ export namespace types {
     archived: boolean;
     assignments: types.CourseAssignment[];
     clarifications: types.Clarification[];
+    clarificationsPage: number;
+    clarificationsPageSize: number;
+    clarificationsPagerItems: types.PageItem[];
     description: string;
     finish_time?: Date;
     is_admin: boolean;
@@ -4031,6 +4075,7 @@ export namespace types {
   }
 
   export interface MergedScoreboardEntry {
+    classname: string;
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
     place?: number;
@@ -4400,7 +4445,7 @@ export namespace types {
   }
 
   export interface ProblemSettings {
-    Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Cases: types.SettingsCaseGroup[];
     Interactive?: {
       Interfaces: {
         [key: string]: { [key: string]: types.InteractiveInterface };
@@ -4888,6 +4933,16 @@ export namespace types {
     time_limit: string;
   }
 
+  export interface SettingsCase {
+    Name: string;
+    Weight: number;
+  }
+
+  export interface SettingsCaseGroup {
+    Cases: types.SettingsCase[];
+    Name: string;
+  }
+
   export interface Signature {
     email: string;
     name: string;
@@ -5184,6 +5239,7 @@ export namespace types {
       problems_solved?: number;
       rank?: number;
     };
+    readme?: string;
     scholar_degree?: string;
     school?: string;
     school_id?: number;
@@ -5433,9 +5489,13 @@ export namespace messages {
   };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
-  export type ContestListResponse = {
-    number_of_results: number;
-    results: types.ContestListItem[];
+  export type ContestListResponse = types.ContestListTabPayload;
+  export type ContestListAllTabsRequest = { [key: string]: any };
+  export type _ContestListAllTabsServerResponse = any;
+  export type ContestListAllTabsResponse = {
+    current: types.ContestListTabPayload;
+    future: types.ContestListTabPayload;
+    past: types.ContestListTabPayload;
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
@@ -5451,6 +5511,11 @@ export namespace messages {
   };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
+  export type ContestProblemChangeLogsRequest = { [key: string]: any };
+  export type _ContestProblemChangeLogsServerResponse = any;
+  export type ContestProblemChangeLogsResponse = {
+    logs: types.ContestProblemChangeLog[];
+  };
   export type ContestProblemClarificationsRequest = { [key: string]: any };
   export type _ContestProblemClarificationsServerResponse = any;
   export type ContestProblemClarificationsResponse = {
@@ -6246,8 +6311,12 @@ export namespace messages {
   export type UserRemoveGroupResponse = {};
   export type UserRemoveRoleRequest = { [key: string]: any };
   export type UserRemoveRoleResponse = {};
+  export type UserReportReadmeRequest = { [key: string]: any };
+  export type UserReportReadmeResponse = {};
   export type UserRevokeAPITokenRequest = { [key: string]: any };
   export type UserRevokeAPITokenResponse = {};
+  export type UserSaveReadmeRequest = { [key: string]: any };
+  export type UserSaveReadmeResponse = {};
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
@@ -6440,6 +6509,9 @@ export namespace controllers {
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;
+    listAllTabs: (
+      params?: messages.ContestListAllTabsRequest,
+    ) => Promise<messages.ContestListAllTabsResponse>;
     listParticipating: (
       params?: messages.ContestListParticipatingRequest,
     ) => Promise<messages.ContestListParticipatingResponse>;
@@ -6449,6 +6521,9 @@ export namespace controllers {
     open: (
       params?: messages.ContestOpenRequest,
     ) => Promise<messages.ContestOpenResponse>;
+    problemChangeLogs: (
+      params?: messages.ContestProblemChangeLogsRequest,
+    ) => Promise<messages.ContestProblemChangeLogsResponse>;
     problemClarifications: (
       params?: messages.ContestProblemClarificationsRequest,
     ) => Promise<messages.ContestProblemClarificationsResponse>;
@@ -7124,9 +7199,15 @@ export namespace controllers {
     removeRole: (
       params?: messages.UserRemoveRoleRequest,
     ) => Promise<messages.UserRemoveRoleResponse>;
+    reportReadme: (
+      params?: messages.UserReportReadmeRequest,
+    ) => Promise<messages.UserReportReadmeResponse>;
     revokeAPIToken: (
       params?: messages.UserRevokeAPITokenRequest,
     ) => Promise<messages.UserRevokeAPITokenResponse>;
+    saveReadme: (
+      params?: messages.UserSaveReadmeRequest,
+    ) => Promise<messages.UserSaveReadmeResponse>;
     selectCoderOfTheMonth: (
       params?: messages.UserSelectCoderOfTheMonthRequest,
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;
