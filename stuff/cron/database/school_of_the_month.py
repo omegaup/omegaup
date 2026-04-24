@@ -140,6 +140,11 @@ def get_current_problems_solved_per_month(
         ORDER BY
             `time` ASC
     '''
+    logging.info('EXPLAIN get_current_problems_solved_per_month result')
+    cur_readonly.execute('EXPLAIN ' + sql, {'months': months})
+    for row in cur_readonly.fetchall():
+        logging.info("EXPLAIN result: %s", row)
+
     cur_readonly.execute(sql, {'months': months})
     problems: List[ProblemSolved] = []
     for row in cur_readonly.fetchall():
@@ -261,6 +266,14 @@ def get_school_of_the_month_candidates(
             `score` DESC
         LIMIT 100;
     '''
+
+    logging.info('EXPLAIN get_school_of_the_month_candidates result')
+    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_current_month,
+                                            first_day_of_next_month,
+                                            first_day_of_next_month))
+    for row in cur_readonly.fetchall():
+        logging.info("EXPLAIN result: %s", row)
+
     cur_readonly.execute(
         sql, (first_day_of_current_month, first_day_of_next_month,
               first_day_of_next_month))

@@ -33,6 +33,7 @@ export interface NotificationsState {
   visible: boolean;
   counter: number;
   autoHideTimeout: ReturnType<typeof setTimeout> | null;
+  onDismiss: (() => void) | null;
 }
 
 /**
@@ -48,15 +49,21 @@ function createStoreConfig() {
       visible: false,
       counter: 0,
       autoHideTimeout: null,
+      onDismiss: null,
     } as NotificationsState,
 
     mutations: {
       showNotification(
         state: NotificationsState,
-        payload: { message: string; type: MessageType },
+        payload: {
+          message: string;
+          type: MessageType;
+          onDismiss: (() => void) | null;
+        },
       ) {
         Vue.set(state, 'message', payload.message);
         Vue.set(state, 'type', payload.type);
+        Vue.set(state, 'onDismiss', payload.onDismiss);
         Vue.set(state, 'visible', true);
         Vue.set(state, 'counter', state.counter + 1);
       },
@@ -65,6 +72,7 @@ function createStoreConfig() {
         Vue.set(state, 'visible', false);
         Vue.set(state, 'message', null);
         Vue.set(state, 'type', null);
+        Vue.set(state, 'onDismiss', null);
       },
 
       setPosition(state: NotificationsState, position: NotificationPosition) {
@@ -97,6 +105,7 @@ function createStoreConfig() {
           type: MessageType;
           autoHide?: boolean;
           position?: NotificationPosition;
+          onDismiss?: () => void;
         },
       ) {
         // Clear any existing auto-hide timeout
@@ -111,6 +120,7 @@ function createStoreConfig() {
         commit('showNotification', {
           message: payload.message,
           type: payload.type,
+          onDismiss: payload.onDismiss || null,
         });
 
         // Auto-hide success messages after 5 seconds
@@ -122,6 +132,10 @@ function createStoreConfig() {
           const timeout = setTimeout(() => {
             // Only hide if no new notification has been shown
             if (state.counter === currentCounter && state.visible) {
+              // Also trigger dismissal callback on auto-hide
+              if (state.onDismiss) {
+                state.onDismiss();
+              }
               commit('hideNotification');
             }
           }, 5000);
@@ -131,7 +145,11 @@ function createStoreConfig() {
 
       dismissNotifications({
         commit,
+        state,
       }: ActionContext<NotificationsState, NotificationsState>) {
+        if (state.onDismiss) {
+          state.onDismiss();
+        }
         commit('clearAutoHideTimeout');
         commit('hideNotification');
       },

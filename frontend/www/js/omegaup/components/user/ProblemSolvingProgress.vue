@@ -398,6 +398,7 @@ export default class ProblemSolvingProgress extends Vue {
 .difficulty-label {
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .difficulty-count {
