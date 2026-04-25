@@ -10,7 +10,7 @@ class TranslationStringChecker implements
     /**
      * A list of messages that are present in the base exception classes.
      */
-    const EXCEPTION_MESSAGES = [
+    public const EXCEPTION_MESSAGES = [
         'apiTokenRateLimitExceeded',
         'csrfException',
         'emailNotVerified',
@@ -29,7 +29,7 @@ class TranslationStringChecker implements
     /**
      * A list of messages that are present in other scripts.
      */
-    const SCRIPTS_MESSAGES = [
+    public const SCRIPTS_MESSAGES = [
         'coderOfTheMonthNotice',
     ];
 

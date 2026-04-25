@@ -6,11 +6,11 @@ namespace OmegaUp;
  * Class to abstract interactions with omegaup-gitserver.
  */
 class ProblemDeployer {
-    const UPDATE_SETTINGS = 0;
-    const UPDATE_CASES = 1;
-    const UPDATE_STATEMENTS = 2;
-    const CREATE = 3;
-    const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
+    public const UPDATE_SETTINGS = 0;
+    public const UPDATE_CASES = 1;
+    public const UPDATE_STATEMENTS = 2;
+    public const CREATE = 3;
+    public const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
     /** @var \Monolog\Logger */
     private $log;
 
@@ -36,7 +36,7 @@ class ProblemDeployer {
     private $updatePublished = true;
 
     /** The mapping of gitserver errors to translation strings. */
-    const ERROR_MAPPING = [
+    public const ERROR_MAPPING = [
         'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
         'config-bad-layout' => 'problemDeployerConfigBadLayout',
         'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',

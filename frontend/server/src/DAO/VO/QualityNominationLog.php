@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class QualityNominationLog extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'qualitynomination_log_id' => true,
         'qualitynomination_id' => true,
         'time' => true,

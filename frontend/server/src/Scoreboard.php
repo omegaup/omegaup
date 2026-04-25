@@ -15,7 +15,7 @@ namespace OmegaUp;
  */
 class Scoreboard {
     // Column to return total score per user
-    const TOTAL_COLUMN = 'total';
+    public const TOTAL_COLUMN = 'total';
 
     /** @var \OmegaUp\ScoreboardParams */
     private $params;

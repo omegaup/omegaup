@@ -16,8 +16,8 @@
  */
 
 class TeamsGroup extends \OmegaUp\Controllers\Controller {
-    const NUMBER_OF_CONTESTANTS = 3;
-    const MAX_NUMBER_OF_CONTESTANTS = 10;
+    public const NUMBER_OF_CONTESTANTS = 3;
+    public const MAX_NUMBER_OF_CONTESTANTS = 10;
 
     /**
      * Validate team group param

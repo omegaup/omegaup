@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class SubmissionFeedbackThread extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'submission_feedback_thread_id' => true,
         'submission_feedback_id' => true,
         'identity_id' => true,

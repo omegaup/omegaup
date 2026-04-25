@@ -10,8 +10,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionsListPayload=array{includeUser: bool, username?: string, submissions: list<Submission>}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
-    const SUBMISSION_LIST_PAGE_SIZE_DEFAULT = 100;
-    const MAX_SUBMISSION_LIST_PAGE_SIZE = 500;
+    public const SUBMISSION_LIST_PAGE_SIZE_DEFAULT = 100;
+    public const MAX_SUBMISSION_LIST_PAGE_SIZE = 500;
     public static function getSource(string $guid): string {
         return \OmegaUp\Grader::GetInstance()->getSource($guid);
     }

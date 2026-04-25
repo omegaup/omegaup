@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class ProblemsetIdentityRequestHistory extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'history_id' => true,
         'identity_id' => true,
         'problemset_id' => true,

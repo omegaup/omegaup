@@ -4,51 +4,51 @@ namespace OmegaUp;
 
 class ProblemParams extends BaseParams {
     // Constants for problem visibility.
-    const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
-    const VISIBILITY_PRIVATE_BANNED = -3; // Problem that was private before it was banned
-    const VISIBILITY_PUBLIC_BANNED = -2; // Problem that was public before it was banned
-    const VISIBILITY_PRIVATE_WARNING = -1; // Problem that was private before it was warning
-    const VISIBILITY_PRIVATE = 0;
-    const VISIBILITY_PUBLIC_WARNING = 1; // Problem that was public before it was warning
-    const VISIBILITY_PUBLIC = 2;
-    const VISIBILITY_PROMOTED = 3;
+    public const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
+    public const VISIBILITY_PRIVATE_BANNED = -3; // Problem that was private before it was banned
+    public const VISIBILITY_PUBLIC_BANNED = -2; // Problem that was public before it was banned
+    public const VISIBILITY_PRIVATE_WARNING = -1; // Problem that was private before it was warning
+    public const VISIBILITY_PRIVATE = 0;
+    public const VISIBILITY_PUBLIC_WARNING = 1; // Problem that was public before it was warning
+    public const VISIBILITY_PUBLIC = 2;
+    public const VISIBILITY_PROMOTED = 3;
 
     // Do not update the published branch.
-    const UPDATE_PUBLISHED_NONE = 'none';
+    public const UPDATE_PUBLISHED_NONE = 'none';
     // Update only non-problemset runs.
-    const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
+    public const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
     // Update non-problemset runs and running problemsets that are owned by the
     // author.
-    const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
+    public const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
     // Update non-problemset runs and running problemsets that the author has
     // edit privileges.
-    const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
+    public const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
     // Token by token validator
-    const VALIDATOR_TOKEN = 'token';
+    public const VALIDATOR_TOKEN = 'token';
 
     // Token by token, ignoring uppercase/lowercase validator
-    const VALIDATOR_TOKEN_CASELESS = 'token-caseless';
+    public const VALIDATOR_TOKEN_CASELESS = 'token-caseless';
 
     // Numeric token with tolerance 1e-9 validator
-    const VALIDATOR_TOKEN_NUMERIC = 'token-numeric';
+    public const VALIDATOR_TOKEN_NUMERIC = 'token-numeric';
 
     // Interpret stdout as score validator
-    const VALIDATOR_LITERAL = 'literal';
+    public const VALIDATOR_LITERAL = 'literal';
 
     // Custom validator
-    const VALIDATOR_CUSTOM = 'custom';
+    public const VALIDATOR_CUSTOM = 'custom';
 
     // Diffs to show when problem is educational
-    const SHOW_DIFFS_NONE = 'none';
-    const SHOW_DIFFS_EXAMPLES = 'examples';
-    const SHOW_DIFFS_ALL = 'all';
+    public const SHOW_DIFFS_NONE = 'none';
+    public const SHOW_DIFFS_EXAMPLES = 'examples';
+    public const SHOW_DIFFS_ALL = 'all';
 
     // Group score policy
-    const GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO = 'sum-if-not-zero';
-    const GROUP_SCORE_POLICY_MIN = 'min';
+    public const GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO = 'sum-if-not-zero';
+    public const GROUP_SCORE_POLICY_MIN = 'min';
 
-    const VALID_GROUP_SCORE_POLICY_VALUES = [
+    public const VALID_GROUP_SCORE_POLICY_VALUES = [
         self::GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO,
         self::GROUP_SCORE_POLICY_MIN,
     ];
