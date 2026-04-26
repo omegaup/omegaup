@@ -12,7 +12,8 @@ module.exports = {
 
   entry: {
     omegaup: [
-      '@babel/polyfill',
+      'core-js/stable',
+      'regenerator-runtime/runtime',
       'unfetch/polyfill',
       './frontend/www/js/omegaup/polyfills.js',
       './frontend/www/js/omegaup/omegaup-legacy.js',
@@ -23,6 +24,7 @@ module.exports = {
     admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
+    arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
     arena_contest_listv2: './frontend/www/js/omegaup/arena/contest_listv2.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
@@ -38,7 +40,6 @@ module.exports = {
     certificate_validation:
       './frontend/www/js/omegaup/certificate/validation.ts',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
-    common_scroll_to_top: './frontend/www/js/omegaup/common/scroll_to_top.ts',
     common_docs: './frontend/www/js/omegaup/common/docs.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.ts',
     common_index: './frontend/www/js/omegaup/common/index.ts',

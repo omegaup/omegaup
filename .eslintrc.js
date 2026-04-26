@@ -13,8 +13,9 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:jest-dom/recommended',
+    // Vue 2 ruleset. Do NOT mix with vue3-* until we migrate.
     'plugin:vue/recommended',
-    'plugin:vue/vue3-recommended',
+    // TODO: when migrating to Vue 3, replace the line above with vue3-recommended
     'prettier',
     'prettier/@typescript-eslint',
     'prettier/vue',
@@ -41,6 +42,10 @@ module.exports = {
     // TODO: Remove when we migrate to Vue 3, beacause of
     // https://v3.vuejs.org/guide/migration/key-attribute.html#with-template-v-for
     'vue/no-v-for-template-key-on-child': 'off',
+
+    // Prevent debug console.log() from being left in production code.
+    // console.warn and console.error are allowed for legitimate logging.
+    'no-console': ['error', { allow: ['warn', 'error'] }],
 
     // TODO: Remove all these exceptions.
     '@typescript-eslint/explicit-module-boundary-types': 'off',

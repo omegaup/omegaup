@@ -27,6 +27,7 @@
         <img
           v-show="showFeedbackForm"
           src="/media/submission_feedback_demo.gif"
+          :alt="T.submissionFeedbackDemoAlt"
         />
       </div>
     </div>

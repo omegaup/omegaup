@@ -4,10 +4,15 @@
 
 import datetime
 import logging
-from typing import Dict, List, NamedTuple, Optional, TypedDict
+from typing import Dict, List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
+from utils import (
+    UserProblems,
+    UserRank,
+    get_first_day_of_next_month,
+)
 
 
 class Problem(NamedTuple):
@@ -15,40 +20,6 @@ class Problem(NamedTuple):
     problem_id: int
     alias: str
     score: float
-
-
-class UserRank(NamedTuple):
-    '''User information for coder of the month candidates'''
-    user_id: int
-    identity_id: int
-    username: str
-    country_id: str
-    school_id: Optional[int]
-    problems_solved: int
-    score: float
-    classname: str
-
-
-class UserProblems(TypedDict):
-    '''Problems solved by a user and their calculated score'''
-    solved: List[int]
-    score: float
-
-
-def get_first_day_of_next_month(
-    first_day_of_current_month: datetime.date
-) -> datetime.date:
-    '''Get the first day of the next month'''
-
-    if first_day_of_current_month.month == 12:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year + 1, 1, 1)
-    else:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year,
-            first_day_of_current_month.month + 1, 1)
-
-    return first_day_of_next_month
 
 
 def check_existing_coder_of_the_month(
@@ -346,7 +317,7 @@ def get_user_problems(
 
     problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
 
-    cur_readonly.execute(f'''
+    sql = '''
             WITH
                 ProblemsForfeitedByUser AS (
                     SELECT
@@ -381,8 +352,14 @@ def get_user_problems(
                 AND pfbu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
-    ''')
-
+    '''
+    logging.info('EXPLAIN get_user_problems result')
+    sql = sql.format(identity_ids_str=identity_ids_str,
+                     problem_ids_str=problem_ids_str)
+    cur_readonly.execute('EXPLAIN ' + sql)
+    for row in cur_readonly.fetchall():
+        logging.info("EXPLAIN result: %s", row)
+    cur_readonly.execute(sql)
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']

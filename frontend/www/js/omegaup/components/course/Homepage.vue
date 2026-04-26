@@ -18,6 +18,7 @@
           <img
             class="img-fluid"
             src="/media/course_homepage/teachers_section.svg"
+            :alt="T.courseHomepageTeachersSectionAlt"
           />
         </div>
         <div class="col-md-6 mt-2 mt-md-0">
@@ -33,6 +34,7 @@
           <img
             class="img-fluid"
             src="/media/course_homepage/students_section.svg"
+            :alt="T.courseHomepageStudentsSectionAlt"
           />
         </div>
         <div class="col-md-6 mt-2 mt-md-0">

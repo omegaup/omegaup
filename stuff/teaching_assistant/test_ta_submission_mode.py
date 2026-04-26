@@ -4,6 +4,7 @@ student feedback, runs the teaching assistant for
 that submission and then checks if the feedback is posted.
 """
 import logging
+import os
 from typing import Any
 import subprocess
 import pytest
@@ -14,7 +15,6 @@ from teaching_assistant import get_login_endpoint
 from teaching_assistant import (
     get_runs_from_course_endpoint,
     get_runs_submission_feedback_endpoint,
-    set_submission_feedback_endpoint
 )
 
 COURSE_NAME = "Course"
@@ -34,12 +34,9 @@ STUDENT_USERNAME = "student"
 STUDENT_PASSWORD = "student123"
 
 
-def get_signup_endpoint(username: str, password: str) -> str:
+def get_signup_endpoint() -> str:
     """endpoint for creating a teaching assistant user"""
-    return (
-        f"api/user/create/?username={username}&email={username}@mail.com"
-        f"&password={password}"
-    )
+    return "api/user/create/"
 
 
 def get_create_problem_endpoint() -> str:
@@ -61,18 +58,28 @@ def get_problem_details_endpoint(problem_alias: str) -> str:
 def setup_accounts() -> None:
     """setup accounts for testing"""
     try:
-        signup_endpoint = get_signup_endpoint(TEACHER_USERNAME,
-                                              TEACHER_PASSWORD)
-        url = f"{BASE_URL}/{signup_endpoint}"
+        url = f"{BASE_URL}/{get_signup_endpoint()}"
 
-        response = requests.get(url, timeout=30)
+        response = requests.post(
+            url,
+            data={
+                "username": TEACHER_USERNAME,
+                "email": f"{TEACHER_USERNAME}@mail.com",
+                "password": TEACHER_PASSWORD,
+            },
+            timeout=30,
+        )
         response.raise_for_status()
 
-        signup_endpoint = get_signup_endpoint(STUDENT_USERNAME,
-                                              STUDENT_PASSWORD)
-        url = f"{BASE_URL}/{signup_endpoint}"
-
-        response = requests.get(url, timeout=30)
+        response = requests.post(
+            url,
+            data={
+                "username": STUDENT_USERNAME,
+                "email": f"{STUDENT_USERNAME}@mail.com",
+                "password": STUDENT_PASSWORD,
+            },
+            timeout=30,
+        )
         response.raise_for_status()
     except requests.RequestException:
         logging.error("Account might already exist, Proceeding with tests.")
@@ -86,7 +93,14 @@ def extract_submission_id() -> Any:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -118,7 +132,14 @@ def extract_feedback_id(
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -155,24 +176,31 @@ def add_student_feedback(
     login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": STUDENT_USERNAME,
+            "password": STUDENT_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
-    submission_feedback_endpoint = set_submission_feedback_endpoint(
-        run_alias=guid,
-        course_alias=COURSE_ALIAS,
-        assignment_alias=ASSIGNMENT_ALIAS,
-        feedback="May you check again?",
-        line_number=1,
-        submission_feedback_id=feedback_id
-    )
-    submission_feedback_url = f"{BASE_URL}/{submission_feedback_endpoint}"
+    submission_feedback_url = f"{BASE_URL}/api/submission/setFeedback/"
 
-    response = requests.get(
+    response = requests.post(
         submission_feedback_url,
+        data={
+            "guid": guid,
+            "course_alias": COURSE_ALIAS,
+            "assignment_alias": ASSIGNMENT_ALIAS,
+            "feedback": "May you check again?",
+            "range_bytes_start": 1,
+            "submission_feedback_id": feedback_id,
+        },
         timeout=30,
-        cookies=COOKIES
+        cookies=COOKIES,
     )
     response.raise_for_status()
     yield guid
@@ -184,19 +212,19 @@ def run_teaching_assistant(
 ) -> None:
     """Fixture to run the teaching assistant"""
     guid = add_student_feedback
+    env = os.environ.copy()
+    env["OMEGAUP_PASSWORD"] = TEACHER_PASSWORD
+    env["OMEGAUP_LLM_KEY"] = "omegaup"
     command = [
         "python", "teaching_assistant.py",
         "--skip-confirm",
         "--username", TEACHER_USERNAME,
-        "--password", TEACHER_PASSWORD,
         "--student_name", STUDENT_USERNAME,
-        "--key", "sk-27343f1eb8f64d238a39bebdbcff8d03",
         "--language", "English",
         "--course_alias", COURSE_ALIAS,
         "--assignment_alias", ASSIGNMENT_ALIAS,
         "--test_mode",
         "--llm", "omegaup",
-        "--key", "omegaup",
         "--submission_id_mode", "true",
         "--submission_id", guid,
         "--ta_feedback_indicator", "AI generated "
@@ -208,7 +236,8 @@ def run_teaching_assistant(
             check=True,
             timeout=60,
             capture_output=True,
-            text=True
+            text=True,
+            env=env
         )
         logging.info("STDOUT: %s", result.stdout)
         logging.info("STDERR: %s", result.stderr)
@@ -234,7 +263,14 @@ def test_teaching_assistant_submission_mode(
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 

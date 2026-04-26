@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   const locationHash = window.location.hash.substring(1).split('/')[0];
   const selectedTab = getSelectedValidTab(locationHash);
   if (selectedTab !== locationHash) {
-    window.location.hash = selectedTab;
+    history.replaceState(null, '', `#${selectedTab}`);
   }
   const coderOfTheMonthList = new Vue({
     el: '#main-container',

@@ -33,6 +33,7 @@
         role="tabpanel"
       >
         <omegaup-login
+          :active-tab="activeTab"
           :facebook-url="facebookUrl"
           :github-client-id="githubClientId"
           :github-state="githubState"
@@ -50,6 +51,7 @@
       >
         <omegaup-signup
           :has-visited-section="hasVisitedSection"
+          :active-tab="activeTab"
           :validate-recaptcha="validateRecaptcha"
           :use-signup-form-with-birth-date="useSignupFormWithBirthDate"
           @register-and-login="
@@ -87,7 +89,7 @@ export default class Signin extends Vue {
   @Prop({ default: '' }) githubClientId!: string;
   @Prop({ default: null }) githubState!: string | null;
   @Prop() googleClientId!: string;
-  @Prop() hasVisitedSection!: string;
+  @Prop() hasVisitedSection!: boolean;
   @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
   @Prop({ default: AvailableTabs.Login }) initialActiveTab!: AvailableTabs;
 
