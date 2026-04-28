@@ -325,31 +325,25 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             }
         }
 
+        $selectArgs = [];
+
         if ($identityType === IDENTITY_ADMIN) {
-            $args[] = $identityId;
+            $selectArgs[] = $identityId;
             $select = "
                 SELECT
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points,
                     accepted / GREATEST(1, submissions) AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0.0)) AS score,
+                    ROUND(100 * IFNULL(
+                        (SELECT MAX(Runs.score)
+                         FROM Submissions
+                         INNER JOIN Runs ON Runs.run_id = Submissions.current_run_id
+                         WHERE Submissions.identity_id = ? AND Submissions.problem_id = p.problem_id),
+                        0.0)) AS score,
                     {$fields}
             ";
             $sql = '
                 FROM
-                    Problems p
-                LEFT JOIN (
-                    SELECT
-                        Submissions.problem_id,
-                        MAX(Runs.score) AS score
-                    FROM
-                        Submissions
-                    INNER JOIN
-                        Runs ON Runs.run_id = Submissions.current_run_id
-                    WHERE
-                        Submissions.identity_id = ?
-                    GROUP BY
-                        Submissions.problem_id
-                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
+                    Problems p ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility > ?',
@@ -367,11 +361,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $callback
             );
 
+            $selectArgs[] = $identityId;
             $select = "
                 SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions) AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0), 2) AS score,
+                    ROUND(100 * IFNULL(
+                        (SELECT MAX(r.score)
+                         FROM Submissions s
+                         INNER JOIN Runs r ON r.run_id = s.current_run_id
+                         WHERE s.identity_id = ? AND s.problem_id = p.problem_id),
+                        0), 2) AS score,
                     {$fields}
             ";
 
@@ -379,18 +379,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 FROM Problems p
                 INNER JOIN ACLs a ON a.acl_id = p.acl_id
                 LEFT JOIN Identities id ON id.identity_id = ? AND a.owner_id = id.user_id
-                LEFT JOIN (
-                    SELECT
-                        s.problem_id,
-                        MAX(r.score) AS score
-                    FROM Submissions s
-                    INNER JOIN Runs r ON r.run_id = s.current_run_id
-                    WHERE s.identity_id = ?
-                    GROUP BY s.problem_id
-                ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
+                ' . $languageJoin . $levelJoin;
 
-            $args[] = $identityId;
-            $args[] = $identityId;
+            $args[] = $identityId; // For LEFT JOIN (used in COUNT and GetAll)
 
             $visibilityThreshold = max(
                 \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
@@ -518,6 +509,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql .= ' LIMIT ?, ? ';
         $args[] = $offset;
         $args[] = $rowcount;
+
+        $args = array_merge($selectArgs, $args);
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
