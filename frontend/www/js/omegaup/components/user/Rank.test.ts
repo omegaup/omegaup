@@ -29,7 +29,7 @@ describe('Rank.vue', () => {
       propsData,
     });
 
-    expect(wrapper.find('table').exists()).toBeFalsy();
+    expect(wrapper.find('table').exists()).toBeFalsy;
     expect(wrapper.find('div.empty-category').text()).toBe(T.userRankEmptyList);
   });
 
