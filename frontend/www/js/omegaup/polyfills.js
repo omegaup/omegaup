@@ -3,6 +3,8 @@
 
 'use strict';
 
+/* eslint-disable @typescript-eslint/no-this-alias */
+
 // From https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach
 if (window.NodeList && !window.NodeList.prototype.forEach) {
   window.NodeList.prototype.forEach = function (callback, thisArg) {
