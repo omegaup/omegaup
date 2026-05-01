@@ -12,6 +12,7 @@ RUN apt-get update -y && \
         curl \
         git \
         gnupg2 \
+        php8.1-apcu \
         php8.1-cli \
         php8.1-curl \
         php8.1-gmp \
@@ -23,7 +24,7 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
@@ -37,7 +38,7 @@ RUN curl -sL https://getcomposer.org/download/2.1.14/composer.phar -o /usr/bin/c
     chmod +x /usr/bin/composer
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
-RUN mkdir -p /opt/omegaup /var/lib/omegaup && chown -R ubuntu /opt/omegaup /var/lib/omegaup
+RUN mkdir -p /opt/omegaup /var/lib/omegaup/templates /var/log/omegaup && chown -R ubuntu /opt/omegaup /var/lib/omegaup /var/log/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
 ARG BRANCH=release
@@ -50,12 +51,13 @@ RUN yarn install && yarn build
 RUN composer install --no-dev --classmap-authoritative
 RUN printf "<?php\n\
 define('OMEGAUP_ENVIRONMENT', 'production');\n\
+define('OMEGAUP_CACHE_IMPLEMENTATION', 'none');\n\
 define('TEMPLATE_CACHE_DIR', '/var/lib/omegaup/templates');\n" > frontend/server/config.php
 RUN php frontend/server/cmd/CompileTemplatesCmd.php
 
 FROM alpine:latest AS frontend
 RUN apk add rsync
-RUN mkdir -p /var/lib/omegaup /opt/omegaup
+RUN mkdir -p /var/lib/omegaup/templates /opt/omegaup
 COPY --from=build /opt/omegaup /opt/omegaup
 COPY --from=build /opt/omegaup/frontend/www/rekarel/. /opt/omegaup/frontend/www/rekarel/
 COPY --from=build /var/lib/omegaup /var/lib/omegaup

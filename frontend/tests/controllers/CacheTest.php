@@ -100,4 +100,41 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
     }
+
+    /**
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheGetOrSetOnlyComputesOnce(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('getorset-once-');
+        $lockGroup = 'test-lock-group-' . uniqid();
+        $invocations = 0;
+        $callback = function () use (&$invocations) {
+            $invocations++;
+            return 'computed';
+        };
+
+        $this->assertSame(false, $cache->fetch($key));
+
+        $this->assertSame(
+            'computed',
+            $cache->getOrSet(
+                $key,
+                $lockGroup,
+                $callback,
+                60
+            )
+        );
+        $this->assertSame(1, $invocations);
+
+        $this->assertSame(
+            'computed',
+            $cache->getOrSet(
+                $key,
+                $lockGroup,
+                $callback,
+                60
+            )
+        );
+        $this->assertSame(1, $invocations);
+    }
 }

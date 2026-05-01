@@ -838,7 +838,165 @@ class APIGenerator {
             new \PhpParser\Comment\Doc($docblock)
         );
     }
+    private function getTypeFields(string $type): array {
+        if (strpos($type, 'types.') !== 0) {
+            return [];
+        }
 
+        $typeName = substr($type, 6);
+        if (!isset($this->typeMapper->typeAliases[$typeName])) {
+            return [];
+        }
+
+        $typeDefinition = $this->typeMapper->typeAliases[$typeName]->typescriptExpansion;
+        if (
+            preg_match(
+                '/^\{\s*\[key:\s*(\w+)\]:\s*(.+?)\s*;?\s*\}$/s',
+                $typeDefinition,
+                $matches
+            )
+        ) {
+            return [
+                '_is_index_signature' => true,
+                '_key_type' => $matches[1],
+                '_value_type' => trim($matches[2], ';'),
+                '_definition' => $typeDefinition
+            ];
+        }
+        if (preg_match('/^\{\s*\[key:\s*\w+\]:\s*.+\{/s', $typeDefinition)) {
+            return ['_is_complex_dict' => true, '_definition' => $typeDefinition];
+        }
+
+        $cleaned = trim($typeDefinition, '{} ');
+
+        if (empty($cleaned)) {
+            return [];
+        }
+
+        $fields = explode(';', $cleaned);
+        $typeFields = [];
+        $hasNestedStructures = false;
+
+        foreach ($fields as $field) {
+            $field = trim($field);
+            if (empty($field)) {
+                continue;
+            }
+
+            if (strpos($field, ':') !== false) {
+                list($fieldName, $fieldType) = explode(':', $field, 2);
+                $fieldName = trim($fieldName);
+                $fieldType = trim($fieldType);
+
+                $isOptional = substr($fieldName, -1) === '?';
+                if ($isOptional) {
+                    $fieldName = substr($fieldName, 0, -1);
+                }
+                if (
+                    strpos($fieldType, '{') !== false ||
+                    (strpos(
+                        $fieldType,
+                        '['
+                    ) !== false && strpos(
+                        $fieldType,
+                        ']'
+                    ) !== false &&
+                    strpos(
+                        $fieldType,
+                        'types.'
+                    ) === false && strpos(
+                        $fieldType,
+                        'dao.'
+                    ) === false)
+                ) {
+                    $hasNestedStructures = true;
+                }
+                if (preg_match('/^(.+)\[\]$/', $fieldType, $matches)) {
+                    $fieldType = 'List[' . $matches[1] . ']';
+                }
+
+                $typeFields[] = [
+                    'name' => $fieldName,
+                    'type' => $fieldType,
+                    'required' => !$isOptional
+                ];
+            }
+        }
+
+        if ($hasNestedStructures) {
+            return ['_is_complex_dict' => true, '_definition' => $typeDefinition];
+        }
+
+        return $typeFields;
+    }
+
+    private function generateTypeFieldsTable(
+        string $typeName,
+        array $typeFields
+    ): void {
+        if (empty($typeFields)) {
+            return;
+        }
+        if (isset($typeFields['_is_index_signature'])) {
+            echo "\n**`{$typeName}` type:**\n\n";
+            echo "```typescript\n";
+            echo $typeFields['_definition'] . "\n";
+            echo "```\n\n";
+            echo "An object with `{$typeFields['_key_type']}` keys and `{$typeFields['_value_type']}` values.\n\n";
+            return;
+        }
+        if (isset($typeFields['_is_simple_dict'])) {
+            echo "\n**`{$typeName}` type:**\n\n";
+            echo "`Record<{$typeFields['_key_type']}, {$typeFields['_value_type']}>`\n\n";
+            echo "A dictionary/map where keys are `{$typeFields['_key_type']}` and values are `{$typeFields['_value_type']}`.\n\n";
+            return;
+        }
+        if (isset($typeFields['_is_complex_dict'])) {
+            echo "\n**`{$typeName}` structure:**\n\n";
+            echo "```typescript\n";
+
+            $definition = $typeFields['_definition'];
+
+            $definition = str_replace('{ ', "{\n  ", $definition);
+            $definition = str_replace('; }', ";\n}", $definition);
+            $definition = str_replace('; ', ";\n  ", $definition);
+            echo $definition . "\n";
+            echo "```\n\n";
+            return;
+        }
+
+        echo "\n**`{$typeName}` fields:**\n\n";
+
+        $nameWidth = 4;
+        $typeWidth = 4;
+        $requiredWidth = 8;
+
+        foreach ($typeFields as $field) {
+            $nameWidth = max($nameWidth, strlen($field['name']) + 2); // +2 for backticks
+            $typeWidth = max($typeWidth, strlen($field['type']) + 2); // +2 for backticks
+        }
+
+        $this->printTableRow(
+            ['Name', 'Type', 'Required'],
+            [$nameWidth, $typeWidth, $requiredWidth]
+        );
+
+        echo '|' . str_repeat('-', $nameWidth + 2);
+        echo '|' . str_repeat('-', $typeWidth + 2);
+        echo '|' . str_repeat('-', $requiredWidth + 2) . "|\n";
+
+        foreach ($typeFields as $field) {
+            $requiredMark = $field['required'] ? '✓' : '';
+            $escapedType = str_replace('|', '\\|', $field['type']);
+            $requiredCell = $requiredMark !== '' ? $requiredMark : ' ';
+
+            $this->printTableRow(
+                ["`{$field['name']}`", "`{$escapedType}`", $requiredCell],
+                [$nameWidth, $typeWidth, $requiredWidth]
+            );
+        }
+        echo "\n";
+    }
     public function addController(string $controllerClassBasename): void {
         /** @var class-string */
         $controllerClassName = "\\OmegaUp\\Controllers\\{$controllerClassBasename}";
@@ -1182,15 +1340,54 @@ EOD;
 
                 if (!empty($method->requestParams)) {
                     echo "### Parameters\n\n";
-                    echo "| Name | Type | Description |\n";
-                    echo "|------|------|-------------|\n";
+
+                    $nameWidth = 4;
+                    $typeWidth = 4;
+                    $descWidth = 11;
+                    $requiredWidth = 8;
+
                     foreach ($method->requestParams as $requestParam) {
-                        echo "| `{$requestParam->name}` | `" . str_replace(
+                        $nameWidth = max(
+                            $nameWidth,
+                            strlen(
+                                $requestParam->name
+                            ) + 2
+                        ); // +2 for backticks
+                        $typeWidth = max(
+                            $typeWidth,
+                            strlen(
+                                $requestParam->type
+                            ) + 2
+                        ); // +2 for backticks
+                        $description = $requestParam->description ?? '';
+                        $descWidth = max($descWidth, strlen($description));
+                    }
+
+                    $this->printTableRow(
+                        ['Name', 'Type', 'Description', 'Required'],
+                        [$nameWidth, $typeWidth, $descWidth, $requiredWidth]
+                    );
+
+                    echo '|' . str_repeat('-', $nameWidth + 2);
+                    echo '|' . str_repeat('-', $typeWidth + 2);
+                    echo '|' . str_repeat('-', $descWidth + 2);
+                    echo '|' . str_repeat('-', $requiredWidth + 2) . "|\n";
+
+                    foreach ($method->requestParams as $requestParam) {
+                        $requiredMark = !$requestParam->isOptional ? '✓' : '';
+                        $description = $requestParam->description ?? '';
+                        $escapedType = str_replace(
                             '|',
                             '\\|',
                             $requestParam->type
-                        ) . "` | {$requestParam->description} |\n";
+                        );
+
+                        $this->printTableRow(
+                            ["`{$requestParam->name}`", "`{$escapedType}`", $description, $requiredMark],
+                            [$nameWidth, $typeWidth, $descWidth, $requiredWidth]
+                        );
                     }
+                    echo "\n";
                 }
 
                 echo "### Returns\n\n";
@@ -1201,19 +1398,65 @@ EOD;
                     echo "{$method->returnType->typescriptExpansion}\n";
                     echo "```\n\n";
                 } else {
-                    echo "| Name | Type |\n";
-                    echo "|------|------|\n";
+                    $nameWidth = 4;
+                    $typeWidth = 4;
+
+                    foreach ($method->responseTypeMapping as $paramName => $paramType) {
+                        $displayType = $paramType;
+                        if (preg_match('/^(.+)\[\]$/', $paramType, $matches)) {
+                            $displayType = 'List[' . $matches[1] . ']';
+                        }
+                        $nameWidth = max($nameWidth, strlen($paramName) + 2); // +2 for backticks
+                        $typeWidth = max(
+                            $typeWidth,
+                            strlen(
+                                $displayType
+                            ) + 2
+                        ); // +2 for backticks
+                    }
+
+                    $this->printTableRow(
+                        ['Name', 'Type'],
+                        [$nameWidth, $typeWidth]
+                    );
+
+                    echo '|' . str_repeat('-', $nameWidth + 2);
+                    echo '|' . str_repeat('-', $typeWidth + 2) . "|\n";
+
                     ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
-                        echo "| `{$paramName}` | `" . str_replace(
-                            '|',
-                            '\\|',
-                            $paramType
-                        ) . "` |\n";
+                        $displayType = $paramType;
+                        if (preg_match('/^(.+)\[\]$/', $paramType, $matches)) {
+                            $displayType = 'List[' . $matches[1] . ']';
+                        }
+                        $escapedType = str_replace('|', '\\|', $displayType);
+
+                        $this->printTableRow(
+                            ["`{$paramName}`", "`{$escapedType}`"],
+                            [$nameWidth, $typeWidth]
+                        );
+
+                        $typeFields = $this->getTypeFields($paramType);
+                        if (!empty($typeFields)) {
+                            $this->generateTypeFieldsTable(
+                                $paramType,
+                                $typeFields
+                            );
+                        }
                     }
+                    echo "\n";
                 }
             }
         }
+    }
+    private function printTableRow(array $columns, array $widths): void {
+        echo '|';
+        foreach ($columns as $index => $value) {
+            $width = $widths[$index];
+            $paddedValue = str_pad($value, $width, ' ', STR_PAD_RIGHT);
+            echo " {$paddedValue} |";
+        }
+        echo "\n";
     }
 
     public function generateControllersDoc(): void {

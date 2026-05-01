@@ -81,7 +81,13 @@ class ProblemParams {
     public $validator;
 
     /**
-     * @param array{alias?: string, allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
+     * @readonly
+     * @var float|null
+     */
+    public $difficulty;
+
+    /**
+     * @param array{alias?: string, allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string, difficulty?: float} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -99,6 +105,7 @@ class ProblemParams {
             ],
         ]);
         $this->validator = $params['validator'] ?? 'token';
+        $this->difficulty = $params['difficulty'] ?? null;
 
         $problemAlias = substr(
             preg_replace(
@@ -278,6 +285,10 @@ class Problem {
         }
         if ($params->qualitySeal) {
             $problem->quality_seal = true;
+            \OmegaUp\DAO\Problems::update($problem);
+        }
+        if (!is_null($params->difficulty)) {
+            $problem->difficulty = $params->difficulty;
             \OmegaUp\DAO\Problems::update($problem);
         }
 

@@ -144,7 +144,7 @@ export default class AddPanel extends Vue {
 
       // Check if there is a group/case with the same name already
       if (caseGroup === NIL) {
-        // In this case we just need to check if there is a group with the same name. Since everytime a new ungrouped case is created, a coressponding group is created too
+        // In this case we just need to check if there is a group with the same name. Since every time a new ungrouped case is created, a corresponding group is created too
         const nameAlreadyExists = this.groups.find((g) => g.name === caseName);
         if (nameAlreadyExists) {
           this.invalidCaseName = true;
@@ -208,7 +208,7 @@ export default class AddPanel extends Vue {
       };
 
       if (multipleCasesGroup === NIL) {
-        // In this case we just need to check if there is a group with the same name. Since everytime a new ungrouped case is created, a corresponding group is created too
+        // In this case we just need to check if there is a group with the same name. Since every time a new ungrouped case is created, a corresponding group is created too
         const nameAlreadyExists = this.groups.find((g) =>
           multipleCaseNameArray.includes(g.name),
         );

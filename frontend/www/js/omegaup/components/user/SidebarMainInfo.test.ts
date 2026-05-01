@@ -32,6 +32,7 @@ const data: types.ExtraProfileDetails = {
   createdContests: [],
   createdCourses: [],
   ownedBadges: [],
+  bookmarkedProblems: [],
   solvedProblems: [
     {
       accepted: 1,

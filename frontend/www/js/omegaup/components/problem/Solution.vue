@@ -80,7 +80,7 @@ library.add(faUnlock);
 library.add(faQuestionCircle);
 library.add(faCogs);
 
-import omegaup_problemMarkdown from './Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 
 @Component({
   components: {

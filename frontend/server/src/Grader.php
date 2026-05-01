@@ -82,7 +82,7 @@ class Grader {
                     $runs
                 ),
                 'rejudge' => true,
-                'debug' => false, // TODO(lhchavez): Reenable with ACLs.
+                'debug' => false, // TODO(lhchavez): Re-enable with ACLs.
             ]
         );
     }
@@ -284,7 +284,7 @@ class Grader {
         ];
 
         foreach ($retryableErrors as $retryableError) {
-            if (strpos($errorMessage, $retryableError) !== false) {
+            if (str_contains($errorMessage, $retryableError)) {
                 return true;
             }
         }

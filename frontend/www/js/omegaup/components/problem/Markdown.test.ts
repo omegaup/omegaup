@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
-import ProblemMarkdown from './Markdown.vue';
+import ProblemMarkdown from './ProblemMarkdown.vue';
 
-describe('problem/Markdown.vue', () => {
+describe('problem/ProblemMarkdown.vue', () => {
   it('renders simple markdown with MathJax and template', async () => {
     const wrapper = mount(ProblemMarkdown, {
       propsData: {

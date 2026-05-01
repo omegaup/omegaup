@@ -12,6 +12,7 @@
     :hide-input-on-limit="true"
     :only-existing-tags="onlyExistingTags"
     :typeahead-hide-discard="typeaheadHideDiscard"
+    :class="{ 'is-invalid': isInvalid }"
     @change="updateExistingOptions"
     @tag-added="onTagAdded"
     @tag-removed="onTagRemoved"
@@ -41,13 +42,32 @@ export default class Typeahead extends Vue {
   @Prop({ default: false }) readonly!: boolean;
   @Prop({ default: true }) typeaheadHideDiscard!: boolean;
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
+  @Prop({ default: 300 }) debounceDelay!: number;
+  @Prop({ default: false }) isInvalid!: boolean;
 
   T = T;
   selectedOptions = this.options;
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
-    this.$emit('update-existing-options', query);
+
+    // Clear any existing debounce timer
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+
+    // Set new debounce timer
+    this.debounceTimer = setTimeout(() => {
+      this.$emit('update-existing-options', query);
+    }, this.debounceDelay);
+  }
+
+  beforeDestroy(): void {
+    // Clean up timer on component destruction
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
   }
 
   onTagAdded(): void {
@@ -83,12 +103,16 @@ export default class Typeahead extends Vue {
 }
 
 .tags-input-wrapper-default {
-  height: 38px;
+  min-height: 38px;
   padding: 0.375rem 0.75rem !important;
 }
 
 .tags-input.disabled {
   background-color: var(--typeahead-disabled);
   opacity: 1;
+}
+
+.tags-input.is-invalid .tags-input-wrapper-default {
+  border-color: var(--form-input-error-color);
 }
 </style>

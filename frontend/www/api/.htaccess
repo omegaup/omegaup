@@ -1,5 +1,0 @@
-RewriteEngine on
-
-Options +FollowSymlinks
-
-RewriteRule ^(.*)$               ApiEntryPoint.php [L]

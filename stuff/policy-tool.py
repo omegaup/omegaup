@@ -55,9 +55,9 @@ def _missing(
     for statement_type, git_object_id in _latest():
         if int(
                 database_utils.mysql(
-                    'SELECT COUNT(*) FROM `PrivacyStatements` WHERE '
-                    '`type` = "%s" AND `git_object_id` = "%s";' %
-                    (statement_type, git_object_id),
+                    f'SELECT COUNT(*) FROM `PrivacyStatements` WHERE '
+                    f'`type` = "{statement_type}" AND '
+                    f'`git_object_id` = "{git_object_id}";',
                     dbname=args.database,
                     auth=auth,
                     container_check=not args.skip_container_check,
@@ -71,8 +71,8 @@ def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
 
     valid = True
     for statement_type, git_object_id in _missing(args, auth):
-        print('Missing database entry for type %s and object id %s' %
-              (statement_type, git_object_id))
+        print(f'Missing database entry for type {statement_type} '
+              f'and object id {git_object_id}')
         valid = False
     if not valid:
         print('Run `./stuff/policy-tool.py upgrade` to generate '
@@ -89,7 +89,9 @@ def upgrade(args: argparse.Namespace, auth: Sequence[str]) -> None:
 
     print('-- PrivacyStatements')
     print('INSERT INTO `PrivacyStatements` (`type`, `git_object_id`) VALUES ')
-    print(','.join('  (\'%s\', \'%s\')' % entry for entry in missing) + ';')
+    values = ','.join(
+        f"  ('{entry[0]}', '{entry[1]}')" for entry in missing)
+    print(values + ';')
 
 
 def _main() -> None:

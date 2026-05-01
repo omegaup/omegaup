@@ -2,9 +2,21 @@ import Vue from 'vue';
 import Vuex, { Commit } from 'vuex';
 import * as api from '../api';
 import { messages, types } from '../api_types';
-import { UrlParams } from '../components/arena/ContestListv2.vue';
+import {
+  ContestTab,
+  ContestOrder,
+  ContestFilter,
+} from '../components/arena/ContestList.vue';
 
 Vue.use(Vuex);
+
+export interface UrlParams {
+  page: number;
+  tab_name: ContestTab;
+  query: string;
+  sort_order: ContestOrder;
+  filter: ContestFilter;
+}
 
 export interface ContestState {
   // The map of contest lists.
@@ -23,6 +35,7 @@ interface NamedContestListResponse {
   name: string;
   cacheKey: string;
   response: messages.ContestListResponse;
+  page?: number;
 }
 
 export const contestStoreConfig = {
@@ -48,10 +61,12 @@ export const contestStoreConfig = {
     },
     updateList(
       state: ContestState,
-      { name, cacheKey, response }: NamedContestListResponse,
+      { name, cacheKey, response, page }: NamedContestListResponse,
     ) {
       // Get the existing contests for this tab (or initialize as empty array)
-      const existingContests = state.contests[name] || [];
+      // If page is 1, we start fresh (replace), otherwise we append.
+      const existingContests =
+        (page || 1) === 1 ? [] : state.contests[name] || [];
 
       // Filter out duplicates by contest_id
       const newContests = response.results.filter(
@@ -83,6 +98,7 @@ export const contestStoreConfig = {
           name: payload.name,
           cacheKey,
           response: state.cache[cacheKey],
+          page: payload.requestParams.page,
         });
         return;
       }
@@ -93,6 +109,7 @@ export const contestStoreConfig = {
             name: payload.name,
             cacheKey,
             response,
+            page: payload.requestParams.page,
           });
         })
         .finally(() => {

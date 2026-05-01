@@ -76,7 +76,7 @@ class Authorization {
     // Certificate generator.
     const CERTIFICATE_GENERATOR_ROLE = 8;
 
-    // Teaching assitant.
+    // Teaching assistant.
     const TEACHING_ASSISTANT_ROLE = 9;
 
     // System-level ACL.
@@ -100,7 +100,7 @@ class Authorization {
     // Group for certificate generators.
     const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:certificate-generator';
 
-    // Group for teaching assitants.
+    // Group for teaching assistants.
     const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
 
     public static function canViewSubmission(
@@ -165,9 +165,12 @@ class Authorization {
             return false;
         }
 
-        // TODO Temporary until isAdmin function is fixed
-        $identity_id = $identity->identity_id;
-        if ($clarification->author_id === $identity_id) {
+        // Author and receiver (invited user) can always view their clarifications.
+        $identityId = $identity->identity_id;
+        if (
+            $clarification->author_id === $identityId ||
+            $clarification->receiver_id === $identityId
+        ) {
             return true;
         }
 

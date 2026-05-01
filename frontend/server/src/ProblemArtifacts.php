@@ -309,6 +309,39 @@ class ProblemArtifacts {
         }
         return $httpStatusCode == 200;
     }
+
+    public function getZip(): string {
+        $browser = new GitServerBrowser(
+            $this->alias,
+            GitServerBrowser::buildArchiveURL($this->alias, $this->revision)
+        );
+        $browser->headers[] = 'Accept: application/zip';
+
+        $zipContent = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if ($httpStatusCode !== 200 || !is_string($zipContent)) {
+            $this->log->error(
+                "Failed to get archive for {$this->alias}:{$this->revision}." .
+                "HTTP {$httpStatusCode}"
+            );
+            throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+        }
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'problem-');
+        if (
+            $tempFilePath === false || file_put_contents(
+                $tempFilePath,
+                $zipContent
+            ) === false
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'couldNotCreateTemporaryFile'
+            );
+        }
+
+        return $tempFilePath;
+    }
 }
 
 class GitServerBrowser {

@@ -246,7 +246,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             'email' => $email
         ]));
 
-        // Support can genearate token
+        // Support can generate token
         \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'usernameOrEmail' => $email
@@ -293,7 +293,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         $user->reset_sent_at = $reset_sent_at;
         \OmegaUp\DAO\Users::update($user);
 
-        // Support can not genearate token because it has expired
+        // Support can not generate token because it has expired
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'usernameOrEmail' => $email
