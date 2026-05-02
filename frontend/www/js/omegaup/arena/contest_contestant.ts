@@ -655,6 +655,10 @@ OmegaUp.on('ready', async () => {
     window.addEventListener('popstate', syncFromHash);
   });
 
+  contestContestant.$once('hook:beforeDestroy', () => {
+    window.removeEventListener('popstate', syncFromHash);
+  });
+
   setInterval(() => {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
