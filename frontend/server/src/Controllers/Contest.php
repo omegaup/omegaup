@@ -35,6 +35,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool, userBasicInformation: UserBasicInformation}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
+ * @psalm-type ContestListTabPayload=array{number_of_results: int, results: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: list<ContestListItem>, countContests: int, query: string | null}
  * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, pageSize: int, query: string | null}
@@ -143,19 +144,109 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *
-     * @return array{number_of_results: int, results: list<ContestListItem>}
+     * @return ContestListTabPayload
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
      * @omegaup-request-param int|null $participating
-     * @omegaup-request-param string $query
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param int|null $recommended
-     * @omegaup-request-param null|string $sort_order
-     * @omegaup-request-param string $tab_name
+     * @omegaup-request-param 'contestants'|'duration'|'ends'|'none'|'organizer'|'signedup'|'title'|null $sort_order
+     * @omegaup-request-param 'all'|'current'|'future'|'past'|null $tab_name
      */
     public static function apiList(\OmegaUp\Request $r): array {
+        [
+            'activeContests' => $activeContests,
+            'orderBy' => $orderBy,
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'participating' => $participating,
+            'public' => $public,
+            'query' => $query,
+            'recommended' => $recommended,
+        ] = self::getContestListRequestParams($r);
+
+        [
+            'contests' => $contests,
+            'count' => $count,
+        ] = self::getContestList(
+            $r->identity,
+            $query,
+            $page,
+            $pageSize,
+            $activeContests,
+            $recommended,
+            $public,
+            $participating,
+            $orderBy
+        );
+
+        return [
+            'number_of_results' => $count,
+            'results' => $contests,
+        ];
+    }
+
+    /**
+     * Returns paginated contest lists for current, past, and future in one API call.
+     *
+     * @return array{current: ContestListTabPayload, future: ContestListTabPayload, past: ContestListTabPayload}
+     *
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param int|null $participating
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param int|null $recommended
+     * @omegaup-request-param 'contestants'|'duration'|'ends'|'none'|'organizer'|'signedup'|'title'|null $sort_order
+     * @omegaup-request-param 'all'|'current'|'future'|'past'|null $tab_name
+     */
+    public static function apiListAllTabs(\OmegaUp\Request $r): array {
+        [
+            'orderBy' => $orderBy,
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'participating' => $participating,
+            'public' => $public,
+            'query' => $query,
+            'recommended' => $recommended,
+        ] = self::getContestListRequestParams(
+            $r,
+            \OmegaUp\DAO\Enum\ContestTabStatus::ALL
+        );
+
+        return self::getContestListAllTabs(
+            identity: $r->identity,
+            query: $query,
+            page: $page,
+            pageSize: $pageSize,
+            recommended: $recommended,
+            public: $public,
+            participating: $participating,
+            orderBy: $orderBy
+        );
+    }
+
+    /**
+     * @return array{activeContests: int, orderBy: int, page: int, pageSize: int, participating: int, public: bool, query: string | null, recommended: int}
+     *
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param int|null $participating
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param int|null $recommended
+     * @omegaup-request-param 'contestants'|'duration'|'ends'|'none'|'organizer'|'signedup'|'title'|null $sort_order
+     * @omegaup-request-param 'all'|'current'|'future'|'past'|null $tab_name
+     */
+    private static function getContestListRequestParams(
+        \OmegaUp\Request $r,
+        int $defaultTabStatus = \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
+    ): array {
         // Check who is visiting, but a not logged user can still view
         // the list of contests
         try {
@@ -165,8 +256,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /** @var null $r->identity */
         }
 
-        /** @var list<ContestListItem> */
-        $contests = [];
         $recommended = $r->ensureOptionalInt(
             'recommended'
         ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
@@ -187,9 +276,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } elseif ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
             $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
         }
+
         $tabName = $r->ensureOptionalEnum(
             'tab_name',
             \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
+        );
+        $activeContests = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
+            fieldName: 'tab_name',
+            field: $tabName,
+            defaultValue: $defaultTabStatus
         );
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt(
@@ -197,11 +292,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             lowerBound: 1,
             upperBound: 100
         ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
-        $activeContests = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
-            fieldName: 'tab_name',
-            field: $tabName,
-            defaultValue: \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
-        );
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
             $recommended
         ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
@@ -212,8 +302,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode',
             \OmegaUp\CourseParams::VALID_ADMISSION_MODES
         );
-
-        // admission mode status in contest is public
         $public = (!is_null($admissionMode) && self::isPublic($admissionMode));
 
         if (is_null($participating)) {
@@ -236,31 +324,77 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
             required: false
         );
-
         $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt(
             fieldName: 'order',
             field: $order,
             defaultValue: \OmegaUp\DAO\Enum\ContestOrderStatus::NONE
         );
 
-        [
-            'contests' => $contests,
-            'count' => $count,
-        ] = self::getContestList(
-            $r->identity,
+        return [
+            'activeContests' => $activeContests,
+            'orderBy' => $orderBy,
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'participating' => $participating,
+            'public' => $public,
+            'query' => $query,
+            'recommended' => $recommended,
+        ];
+    }
+
+    /**
+     * @return array{current: ContestListTabPayload, future: ContestListTabPayload, past: ContestListTabPayload}
+     */
+    private static function getContestListAllTabs(
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?string $query,
+        int $page,
+        int $pageSize,
+        int $recommended,
+        bool $public,
+        int $participating,
+        int $orderBy
+    ): array {
+        $getTabPayload = function (int $activeContests) use (
+            $identity,
             $query,
             $page,
             $pageSize,
-            $activeContests,
             $recommended,
             $public,
             $participating,
             $orderBy
-        );
+        ): array {
+            [
+                'contests' => $contests,
+                'count' => $count,
+            ] = self::getContestList(
+                $identity,
+                $query,
+                $page,
+                $pageSize,
+                $activeContests,
+                $recommended,
+                $public,
+                $participating,
+                $orderBy
+            );
+            return [
+                'number_of_results' => $count,
+                'results' => $contests,
+            ];
+        };
 
         return [
-            'number_of_results' => $count,
-            'results' => $contests,
+            'current' => $getTabPayload(
+                \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
+            ),
+            'future' => $getTabPayload(
+                \OmegaUp\DAO\Enum\ContestTabStatus::FUTURE
+            ),
+            'past' => $getTabPayload(
+                \OmegaUp\DAO\Enum\ContestTabStatus::PAST
+            ),
         ];
     }
 
@@ -327,6 +461,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id,
                 $page,
                 $pageSize,
+                $activeContests,
                 $query,
                 $orderBy
             );
