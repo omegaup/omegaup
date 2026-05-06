@@ -176,6 +176,9 @@ OmegaUp.on('ready', async () => {
       blockedMessage,
       logs: [] as types.ContestProblemChangeLog[],
     }),
+    beforeDestroy() {
+      window.removeEventListener('popstate', syncFromHash);
+    },
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
         props: {
@@ -641,22 +644,18 @@ OmegaUp.on('ready', async () => {
     }
   }
 
-  const syncFromHash = () => {
+  function syncFromHash(): void {
     const locationHash = window.location.hash.replace('#', '').split('/');
     const tab = getSelectedValidTab(locationHash[0], contestAdmin);
 
     if (contestContestant.activeTab !== tab) {
       contestContestant.activeTab = tab;
     }
-  };
+  }
 
   Vue.nextTick(() => {
     syncFromHash();
     window.addEventListener('popstate', syncFromHash);
-  });
-
-  contestContestant.$once('hook:beforeDestroy', () => {
-    window.removeEventListener('popstate', syncFromHash);
   });
 
   setInterval(() => {
