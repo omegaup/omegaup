@@ -120,6 +120,31 @@ const carouselConfig: {
       target: '_blank',
     },
   },
+  {
+    image: '/media/homepage/carousel_slide_UX_experience.png',
+    title: {
+      en: 'omegaUp UX experience',
+      es: 'omegaUp UX experience',
+      pt: 'omegaUp UX experience',
+    },
+    description: {
+      en:
+        'Your opinion builds our community!\nAt omegaUp, our priority is you. We want to know what you love and what we can improve so that your learning experience is amazing.\nIt will only take 3 minutes.\nThanks for helping us grow!',
+      es:
+        '¡Tu opinión construye nuestra comunidad!\nEn omegaUp, nuestra prioridad eres tú. Queremos saber qué te encanta y qué podemos mejorar para que tu experiencia de aprendizaje sea increíble.\nSolo te tomará 3 minutos.\n¡Gracias por ayudarnos a crecer!',
+      pt:
+        'Sua opinião constrói nossa comunidade!\nNa omegaUp, nossa prioridade é você. Queremos saber o que você ama e o que podemos melhorar para que sua experiência de aprendizado seja incrível.\nLevará apenas 3 minutos.\nObrigado por nos ajudar a crescer!',
+    },
+    button: {
+      text: {
+        en: 'Click here to answer',
+        es: 'Haz clic aquí para responder',
+        pt: 'Clique aqui para responder',
+      },
+      href: 'https://forms.gle/q8fi19Y2qtPU3uVt6',
+      target: '_blank',
+    },
+  },
 ];
 
 export default carouselConfig;
