@@ -4830,9 +4830,9 @@ Details of a team group
 
 ### Returns
 
-| Name         | Type                                                                         |
-| ------------ | ---------------------------------------------------------------------------- |
-| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+| Name         | Type                                                                                            |
+| ------------ | ----------------------------------------------------------------------------------------------- |
+| `team_group` | `{ alias: string; archived: boolean; create_time: number; description: string; name: string; }` |
 
 ## `/api/teamsGroup/list/`
 
