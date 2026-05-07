@@ -55,11 +55,12 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
     /**
      * Returns all teams groups that a user can manage.
      * @param int $userId
-     * @return list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
+     * @return list<array{alias: string, archived: bool, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
      */
     final public static function getAllTeamsGroupsAdminedByUser(int $userId) {
         $sql = 'SELECT
                     tg.alias,
+                    tg.archived,
                     tg.create_time,
                     tg.description,
                     tg.name
@@ -72,7 +73,7 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
                 ORDER BY
                     tg.create_time DESC;';
 
-        /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}> */
+        /** @var list<array{alias: string, archived: bool, create_time: \OmegaUp\Timestamp, description: null|string, name: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
     }
 
