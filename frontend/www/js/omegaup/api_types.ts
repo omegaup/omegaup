@@ -2701,6 +2701,17 @@ export namespace types {
     points: number;
   }
 
+  export interface AdminContestForProblem {
+    alias: string;
+    title: string;
+  }
+
+  export interface AdminCourseForProblem {
+    alias: string;
+    assignments: { alias: string; assignment_type: string; name: string }[];
+    name: string;
+  }
+
   export interface AdminCourses {
     admin: {
       accessMode: string;
@@ -4252,6 +4263,8 @@ export namespace types {
   }
 
   export interface ProblemDetailsPayload {
+    adminContests?: types.AdminContestForProblem[];
+    adminCourses?: types.AdminCourseForProblem[];
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
     allowedSolutionsToSee: number;
@@ -4403,6 +4416,8 @@ export namespace types {
   }
 
   export interface ProblemListPayload {
+    adminContests: types.AdminContestForProblem[];
+    adminCourses: types.AdminCourseForProblem[];
     attemptedProblemAliases: string[];
     column: string;
     columns: string[];

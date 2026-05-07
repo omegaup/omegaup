@@ -40,8 +40,15 @@
           :user-logged-in="user.loggedIn"
           :is-bookmarked="bookmarkedStatus"
           :in-contest-or-course="inContestOrCourse"
+          :show-add-action="
+            user.loggedIn &&
+            (adminCourses.length > 0 || adminContests.length > 0)
+          "
           @toggle-bookmark="
             (problemAlias) => $emit('toggle-bookmark', problemAlias)
+          "
+          @open-add-to-contest-or-course="
+            currentPopupDisplayed = PopupDisplayed.AddToContestOrCourse
           "
         ></omegaup-problem-settings-summary>
 
@@ -181,6 +188,16 @@
                 (request) => $emit('rate-problem-as-reviewer', request)
               "
             ></omegaup-quality-nomination-reviewer-popup>
+            <omegaup-problem-add-to-contest-or-course
+              v-show="
+                currentPopupDisplayed === PopupDisplayed.AddToContestOrCourse
+              "
+              :admin-courses="adminCourses"
+              :admin-contests="adminContests"
+              @close="currentPopupDisplayed = PopupDisplayed.None"
+              @add-to-course="(data) => $emit('add-to-course', data)"
+              @add-to-contest="(data) => $emit('add-to-contest', data)"
+            ></omegaup-problem-add-to-contest-or-course>
           </template>
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
@@ -412,6 +429,7 @@ import user_Username from '../user/Username.vue';
 import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_soltion from './Solution.vue';
+import problem_AddToContestOrCourse from './AddToContestOrCourse.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -444,6 +462,7 @@ export enum PopupDisplayed {
   Promotion,
   Demotion,
   Reviewer,
+  AddToContestOrCourse,
 }
 
 @Component({
@@ -465,6 +484,7 @@ export enum PopupDisplayed {
     'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
+    'omegaup-problem-add-to-contest-or-course': problem_AddToContestOrCourse,
   },
 })
 export default class ProblemDetails extends Vue {
@@ -516,6 +536,15 @@ export default class ProblemDetails extends Vue {
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: true }) useNewVerdictTable!: boolean;
   @Prop({ default: false }) bookmarkedStatus!: boolean;
+  @Prop({ default: () => [] }) adminCourses!: {
+    alias: string;
+    name: string;
+    assignments: { alias: string; name: string; assignment_type: string }[];
+  }[];
+  @Prop({ default: () => [] }) adminContests!: {
+    alias: string;
+    title: string;
+  }[];
 
   @Ref('statement-markdown')
   readonly statementMarkdown!: omegaup_problemMarkdown;
