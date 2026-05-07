@@ -37,8 +37,7 @@ abstract class TeamGroups {
                 `alias` = ?,
                 `name` = ?,
                 `description` = ?,
-                `number_of_contestants` = ?,
-                `archived` = ?
+                `number_of_contestants` = ?
             WHERE
                 (
                     `team_group_id` = ?
@@ -56,7 +55,6 @@ abstract class TeamGroups {
             $Team_Groups->name,
             $Team_Groups->description,
             intval($Team_Groups->number_of_contestants),
-            intval($Team_Groups->archived),
             intval($Team_Groups->team_group_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -84,8 +82,7 @@ abstract class TeamGroups {
                 `Team_Groups`.`alias`,
                 `Team_Groups`.`name`,
                 `Team_Groups`.`description`,
-                `Team_Groups`.`number_of_contestants`,
-                `Team_Groups`.`archived`
+                `Team_Groups`.`number_of_contestants`
             FROM
                 `Team_Groups`
             WHERE
@@ -232,8 +229,7 @@ abstract class TeamGroups {
                 `Team_Groups`.`alias`,
                 `Team_Groups`.`name`,
                 `Team_Groups`.`description`,
-                `Team_Groups`.`number_of_contestants`,
-                `Team_Groups`.`archived`
+                `Team_Groups`.`number_of_contestants`
             FROM
                 `Team_Groups`
             ORDER BY
@@ -283,10 +279,8 @@ abstract class TeamGroups {
                     `alias`,
                     `name`,
                     `description`,
-                    `number_of_contestants`,
-                    `archived`
+                    `number_of_contestants`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -307,7 +301,6 @@ abstract class TeamGroups {
             $Team_Groups->name,
             $Team_Groups->description,
             intval($Team_Groups->number_of_contestants),
-            intval($Team_Groups->archived),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

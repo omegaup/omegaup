@@ -23,7 +23,6 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
         'name' => true,
         'description' => true,
         'number_of_contestants' => true,
-        'archived' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -81,11 +80,6 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
                 $data['number_of_contestants']
             );
         }
-        if (isset($data['archived'])) {
-            $this->archived = boolval(
-                $data['archived']
-            );
-        }
     }
 
     /**
@@ -138,11 +132,4 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
      * @var int
      */
     public $number_of_contestants = 3;
-
-    /**
-     * Whether the team group has been archived.
-     *
-     * @var bool
-     */
-    public $archived = false;
 }
