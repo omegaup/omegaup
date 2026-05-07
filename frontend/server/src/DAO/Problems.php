@@ -512,7 +512,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $args = array_merge($selectArgs, $args);
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int|null, acl_id: int|null, alias: null|string, allow_user_add_tags: bool|null, commit: null|string, creation_date: \OmegaUp\Timestamp|null, current_version: null|string, deprecated: bool|null, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool|null, input_limit: int|null, languages: null|string, order: null|string, points: float|null, problem_id: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool|null, ratio: float|null, score: float, show_diff: null|string, source: null|string, submissions: int|null, title: null|string, visibility: int|null, visits: int|null}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql};",
             $args
