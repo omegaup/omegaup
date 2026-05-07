@@ -125,6 +125,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'name' => $teamGroup->name,
                 'description' => $teamGroup->description,
                 'numberOfContestants' => $teamGroup->number_of_contestants,
+                'archived' => false,
             ]
         );
     }
