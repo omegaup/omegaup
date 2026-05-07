@@ -52,6 +52,7 @@
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
+  - [`/api/contest/listAllTabs/`](#apicontestlistalltabs)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
@@ -1182,24 +1183,74 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type                                        | Description | Required |
-| ---------------- | ------------------------------------------- | ----------- | -------- |
-| `page`           | `int`                                       |             | ✓        |
-| `page_size`      | `int`                                       |             | ✓        |
-| `query`          | `string`                                    |             | ✓        |
-| `tab_name`       | `string`                                    |             | ✓        |
-| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |          |
-| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |          |
-| `participating`  | `int\|null`                                 |             |          |
-| `recommended`    | `int\|null`                                 |             |          |
-| `sort_order`     | `null\|string`                              |             |          |
+| Name             | Type                                                                                | Description | Required |
+| ---------------- | ----------------------------------------------------------------------------------- | ----------- | -------- |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null`                                         |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`                                            |             |          |
+| `page`           | `int\|null`                                                                         |             |          |
+| `page_size`      | `int\|null`                                                                         |             |          |
+| `participating`  | `int\|null`                                                                         |             |          |
+| `query`          | `null\|string`                                                                      |             |          |
+| `recommended`    | `int\|null`                                                                         |             |          |
+| `sort_order`     | `'contestants'\|'duration'\|'ends'\|'none'\|'organizer'\|'signedup'\|'title'\|null` |             |          |
+| `tab_name`       | `'all'\|'current'\|'future'\|'past'\|null`                                          |             |          |
 
 ### Returns
 
-| Name                | Type                          |
-| ------------------- | ----------------------------- |
-| `number_of_results` | `number`                      |
-| `results`           | `List[types.ContestListItem]` |
+```typescript
+types.ContestListTabPayload;
+```
+
+## `/api/contest/listAllTabs/`
+
+### Description
+
+Returns paginated contest lists for current, past, and future in one API call.
+
+### Parameters
+
+| Name             | Type                                                                                | Description | Required |
+| ---------------- | ----------------------------------------------------------------------------------- | ----------- | -------- |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null`                                         |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`                                            |             |          |
+| `page`           | `int\|null`                                                                         |             |          |
+| `page_size`      | `int\|null`                                                                         |             |          |
+| `participating`  | `int\|null`                                                                         |             |          |
+| `query`          | `null\|string`                                                                      |             |          |
+| `recommended`    | `int\|null`                                                                         |             |          |
+| `sort_order`     | `'contestants'\|'duration'\|'ends'\|'none'\|'organizer'\|'signedup'\|'title'\|null` |             |          |
+| `tab_name`       | `'all'\|'current'\|'future'\|'past'\|null`                                          |             |          |
+
+### Returns
+
+| Name      | Type                          |
+| --------- | ----------------------------- |
+| `current` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
+
+| `future` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
+
+| `past` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
 
 ## `/api/contest/listParticipating/`
 
