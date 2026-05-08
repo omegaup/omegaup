@@ -335,8 +335,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $selectArgs[] = $identityId;
             $select = "
                 SELECT
-                    COALESCE(ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2), 0.0) AS points,
-                    COALESCE(p.accepted / GREATEST(1, p.submissions), 0.0) AS ratio,
+                    ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
+                    p.accepted / GREATEST(1, p.submissions) AS ratio,
                     COALESCE(ROUND(100 * IFNULL(
                         (SELECT MAX(Runs.score)
                          FROM Submissions
@@ -368,8 +368,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $selectArgs[] = $identityId;
             $select = "
                 SELECT
-                    COALESCE(ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2), 0.0) AS points,
-                    COALESCE(p.accepted / GREATEST(1, p.submissions), 0.0) AS ratio,
+                    ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
+                    p.accepted / GREATEST(1, p.submissions) AS ratio,
                     COALESCE(ROUND(100 * IFNULL(
                         (SELECT MAX(r.score)
                          FROM Submissions s
@@ -415,8 +415,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $select = "
                     SELECT
                         0.0 AS score,
-                        COALESCE(ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2), 0.0) AS points,
-                        COALESCE(p.accepted / GREATEST(1, p.submissions), 0.0)  AS ratio,
+                        ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
+                        p.accepted / GREATEST(1, p.submissions) AS ratio,
                         {$fields}
                     ";
             $sql = '
