@@ -58,9 +58,9 @@ class CreateUserParams {
 
     /**
      * @readonly
-     * @var int|null
+     * @var int
      */
-    public $birthDate = null;
+    public $birthDate;
 
      /**
      * @readonly
@@ -70,6 +70,8 @@ class CreateUserParams {
 
     /**
      * @param array{birth_date?: int, email?: null|string, gender?: string, is_private?: string, name?: string, parent_email?: null|string, password?: string, recaptcha?: string, scholar_degree?: string, username?: string} $params
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public function __construct($params = []) {
         \OmegaUp\Validators::validateValidUsername(
@@ -116,8 +118,30 @@ class CreateUserParams {
 
         $this->recaptcha = $params['recaptcha'] ?? null;
 
-         // TODO: Assert that the birth date is always passed, and if and only if the user is U13,
-        // the parent email is passed.
-        $this->birthDate = $params['birth_date'] ?? null;
+        if (!isset($params['birth_date'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'birth_date'
+            );
+        }
+        $this->birthDate = $params['birth_date'];
+
+        // Enforce: U13 users must provide parent_email, and non-U13 users must not.
+        $isUnder13 = $this->birthDate >= strtotime(
+            '-13 year',
+            \OmegaUp\Time::get()
+        );
+        if ($isUnder13 && is_null($this->parentEmail)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'parent_email'
+            );
+        }
+        if (!$isUnder13 && !is_null($this->parentEmail)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'parent_email'
+            );
+        }
     }
 }
