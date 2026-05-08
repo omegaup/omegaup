@@ -4,6 +4,172 @@
  */
 
 class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
+    public function testQuickAddPayloadOnlyIncludesActiveContent() {
+        [
+            'user' => $adminUser,
+            'identity' => $adminIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($adminIdentity);
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+            ])
+        );
+
+        $activeCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $adminIdentity,
+            $adminLogin,
+            courseDuration: 3600,
+            assignmentDuration: 1800,
+        );
+
+        $expiredCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $adminIdentity,
+            $adminLogin,
+            courseDuration: 3600,
+            assignmentDuration: 1800,
+        );
+        if (is_null($expiredCourseData['assignment'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
+        $expiredCourseData['assignment']->finish_time = new \OmegaUp\Timestamp(
+            \OmegaUp\Time::get() - 10
+        );
+        \OmegaUp\DAO\Assignments::update($expiredCourseData['assignment']);
+
+        $activeContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestDirector' => $adminIdentity,
+                'contestDirectorUser' => $adminUser,
+            ])
+        );
+        \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestDirector' => $adminIdentity,
+                'contestDirectorUser' => $adminUser,
+                'startTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 7200
+                ),
+                'finishTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 3600
+                ),
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['templateProperties']['payload'];
+
+        $adminCourses = $response['adminCourses'] ?? [];
+        $adminContests = $response['adminContests'] ?? [];
+        $this->assertIsArray($adminCourses);
+        $this->assertIsArray($adminContests);
+
+        $this->assertCount(1, $adminCourses);
+        $this->assertSame(
+            $activeCourseData['course_alias'],
+            $adminCourses[0]['alias']
+        );
+        $this->assertArrayHasKey('assignments', $adminCourses[0]);
+        $this->assertIsArray($adminCourses[0]['assignments']);
+        $this->assertCount(1, $adminCourses[0]['assignments']);
+
+        $this->assertCount(1, $adminContests);
+        $this->assertSame(
+            $activeContestData['request']['alias'],
+            $adminContests[0]['alias']
+        );
+    }
+
+    public function testQuickAddPayloadInvalidatesAfterManagedContainersChange() {
+        [
+            'user' => $adminUser,
+            'identity' => $adminIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($adminIdentity);
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+            ])
+        );
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $adminIdentity,
+            $adminLogin,
+            courseDuration: 3600,
+            assignmentDuration: 1800,
+        );
+
+        $response = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['templateProperties']['payload'];
+
+        $adminCourses = $response['adminCourses'] ?? [];
+        $adminContests = $response['adminContests'] ?? [];
+        $this->assertIsArray($adminCourses);
+        $this->assertIsArray($adminContests);
+
+        $this->assertCount(1, $adminCourses);
+        $this->assertArrayHasKey('assignments', $adminCourses[0]);
+        $this->assertIsArray($adminCourses[0]['assignments']);
+        $this->assertCount(1, $adminCourses[0]['assignments']);
+        $this->assertSame([], $adminContests);
+
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'assignment_type' => 'lesson',
+            'start_time' => \OmegaUp\Time::get(),
+            'finish_time' => \OmegaUp\Time::get() + 1200,
+        ]));
+
+        \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestDirector' => $adminIdentity,
+                'contestDirectorUser' => $adminUser,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['templateProperties']['payload'];
+
+        $adminCourses = $response['adminCourses'] ?? [];
+        $adminContests = $response['adminContests'] ?? [];
+        $this->assertIsArray($adminCourses);
+        $this->assertIsArray($adminContests);
+
+        $this->assertCount(1, $adminCourses);
+        $this->assertArrayHasKey('assignments', $adminCourses[0]);
+        $this->assertIsArray($adminCourses[0]['assignments']);
+        $this->assertCount(2, $adminCourses[0]['assignments']);
+        $this->assertSame(
+            'homework',
+            $adminCourses[0]['assignments'][0]['assignment_type']
+        );
+        $this->assertSame(
+            'lesson',
+            $adminCourses[0]['assignments'][1]['assignment_type']
+        );
+        $this->assertCount(1, $adminContests);
+    }
+
     public function testViewProblemInAContestDetailsValid() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

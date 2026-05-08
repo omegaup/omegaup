@@ -13,6 +13,141 @@ namespace OmegaUp\DAO;
  */
 class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
     /**
+     * @return list<array{assignment_type: null|string, container_alias: string, container_id: int, container_name: string, entity_type: 'assignment'|'contest', finish_time: \OmegaUp\Timestamp|null, item_alias: string, item_name: string, item_order: int|null}>
+     */
+    public static function getAdminContainersForProblemQuickAdd(
+        int $identityId,
+        int $currentTimestamp
+    ): array {
+        $adminRole = \OmegaUp\Authorization::ADMIN_ROLE;
+        $taRole = \OmegaUp\Authorization::TEACHING_ASSISTANT_ROLE;
+
+        $sql = '
+            SELECT
+                admin_problemsets.entity_type,
+                admin_problemsets.container_alias,
+                admin_problemsets.container_name,
+                admin_problemsets.item_alias,
+                admin_problemsets.item_name,
+                admin_problemsets.assignment_type,
+                admin_problemsets.finish_time,
+                admin_problemsets.container_id,
+                admin_problemsets.item_order
+            FROM (
+                SELECT DISTINCT
+                    "assignment" AS entity_type,
+                    c.alias AS container_alias,
+                    c.name AS container_name,
+                    a.alias AS item_alias,
+                    a.name AS item_name,
+                    a.assignment_type,
+                    a.finish_time,
+                    c.course_id AS container_id,
+                    a.`order` AS item_order
+                FROM
+                    Courses c
+                INNER JOIN
+                    Assignments a ON a.course_id = c.course_id
+                INNER JOIN
+                    ACLs acl ON acl.acl_id = c.acl_id
+                INNER JOIN
+                    Identities owner ON owner.user_id = acl.owner_id
+                LEFT JOIN
+                    User_Roles ur ON ur.acl_id = c.acl_id
+                LEFT JOIN
+                    Identities uri
+                ON
+                    uri.user_id = ur.user_id
+                    AND uri.identity_id = ?
+                LEFT JOIN
+                    Group_Roles gr ON gr.acl_id = c.acl_id
+                LEFT JOIN
+                    Groups_Identities gi
+                ON
+                    gi.group_id = gr.group_id
+                    AND gi.identity_id = ?
+                WHERE
+                    c.archived = 0
+                    AND (
+                        owner.identity_id = ?
+                        OR (ur.role_id IN (?, ?) AND uri.identity_id IS NOT NULL)
+                        OR (gr.role_id IN (?, ?) AND gi.identity_id IS NOT NULL)
+                    )
+                    AND (
+                        a.finish_time IS NULL
+                        OR a.finish_time > FROM_UNIXTIME(?)
+                    )
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    "contest" AS entity_type,
+                    contest.alias AS container_alias,
+                    contest.title AS container_name,
+                    contest.alias AS item_alias,
+                    contest.title AS item_name,
+                    NULL AS assignment_type,
+                    contest.finish_time,
+                    contest.contest_id AS container_id,
+                    NULL AS item_order
+                FROM
+                    Contests contest
+                INNER JOIN
+                    ACLs acl ON acl.acl_id = contest.acl_id
+                INNER JOIN
+                    Identities owner ON owner.user_id = acl.owner_id
+                LEFT JOIN
+                    User_Roles ur ON ur.acl_id = contest.acl_id
+                LEFT JOIN
+                    Identities uri
+                ON
+                    uri.user_id = ur.user_id
+                    AND uri.identity_id = ?
+                LEFT JOIN
+                    Group_Roles gr ON gr.acl_id = contest.acl_id
+                LEFT JOIN
+                    Groups_Identities gi
+                ON
+                    gi.group_id = gr.group_id
+                    AND gi.identity_id = ?
+                WHERE
+                    contest.archived = 0
+                    AND contest.finish_time > FROM_UNIXTIME(?)
+                    AND (
+                        owner.identity_id = ?
+                        OR (ur.role_id = ? AND uri.identity_id IS NOT NULL)
+                        OR (gr.role_id = ? AND gi.identity_id IS NOT NULL)
+                    )
+            ) AS admin_problemsets
+            ORDER BY
+                admin_problemsets.entity_type ASC,
+                admin_problemsets.container_id DESC,
+                admin_problemsets.item_order ASC,
+                admin_problemsets.item_name ASC;';
+
+        /** @var list<array{assignment_type: null|string, container_alias: string, container_id: int, container_name: string, entity_type: 'assignment'|'contest', finish_time: \OmegaUp\Timestamp|null, item_alias: string, item_name: string, item_order: int|null}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                $identityId,
+                $identityId,
+                $identityId,
+                $adminRole,
+                $taRole,
+                $adminRole,
+                $taRole,
+                $currentTimestamp,
+                $identityId,
+                $identityId,
+                $currentTimestamp,
+                $identityId,
+                $adminRole,
+                $adminRole,
+            ]
+        );
+    }
+
+    /**
      * @return null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments
      */
     public static function getProblemsetContainer(?int $problemsetId) {

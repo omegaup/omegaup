@@ -3,6 +3,16 @@
 namespace OmegaUp\Controllers;
 
 class ACL extends \OmegaUp\Controllers\Controller {
+    private static function invalidateAdminProblemsetCacheIfNeeded(
+        int $aclId
+    ): void {
+        $aclType = \OmegaUp\DAO\ACLs::getTypeByAclId($aclId);
+        if ($aclType !== 'contest' && $aclType !== 'course') {
+            return;
+        }
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
+    }
+
     /**
      * Adds a user to an ACL with the specified role.
      */
@@ -16,6 +26,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
             'user_id' => $userId,
             'role_id' => $roleId,
         ]));
+        self::invalidateAdminProblemsetCacheIfNeeded($aclId);
     }
 
     /**
@@ -31,6 +42,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
             'user_id' => $userId,
             'role_id' => $roleId,
         ]));
+        self::invalidateAdminProblemsetCacheIfNeeded($aclId);
     }
 
     /**
@@ -46,6 +58,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
             'group_id' => $groupId,
             'role_id' => $roleId,
         ]));
+        self::invalidateAdminProblemsetCacheIfNeeded($aclId);
     }
 
     /**
@@ -61,6 +74,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
             'group_id' => $groupId,
             'role_id' => $roleId,
         ]));
+        self::invalidateAdminProblemsetCacheIfNeeded($aclId);
     }
 
     /**

@@ -50,4 +50,35 @@ class ACLs extends \OmegaUp\DAO\Base\ACLs {
             'users' => [],
         ], $rows);
     }
+
+    public static function getTypeByAclId(int $aclId): ?string {
+        $sql = '
+            SELECT
+                acl_type.type
+            FROM (
+                SELECT c.acl_id, "contest" AS type
+                FROM Contests c
+                UNION ALL
+                SELECT c.acl_id, "course" AS type
+                FROM Courses c
+                UNION ALL
+                SELECT p.acl_id, "problem" AS type
+                FROM Problems p
+                UNION ALL
+                SELECT g.acl_id, "group" AS type
+                FROM Groups_ g
+            ) AS acl_type
+            WHERE
+                acl_type.acl_id = ?
+            LIMIT
+                1;';
+
+        /** @var array{type: string}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$aclId]
+        );
+
+        return $row['type'] ?? null;
+    }
 }

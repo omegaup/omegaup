@@ -48,10 +48,12 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, groupScorePolicy: null|string, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>, cdp: CDP|null}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
- * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, isBookmarked?: bool, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, reviewedProblemLevel?: null|string, reviewedPublicTags?: list<string>, reviewedQualitySeal?: bool, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
+ * @psalm-type AdminCourseForProblem=array{alias: string, name: string, assignments: list<array{alias: string, name: string, assignment_type: string}>}
+ * @psalm-type AdminContestForProblem=array{alias: string, title: string}
+ * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, isBookmarked?: bool, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, reviewedProblemLevel?: null|string, reviewedPublicTags?: list<string>, reviewedQualitySeal?: bool, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int, adminCourses?: list<AdminCourseForProblem>, adminContests?: list<AdminContestForProblem>}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, hasVisitedSection?: bool, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
- * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, solvedProblemAliases: list<string>, attemptedProblemAliases: list<string>}
+ * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, solvedProblemAliases: list<string>, attemptedProblemAliases: list<string>, adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
@@ -124,6 +126,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
+
+    const ADMIN_CONTAINERS_CACHE_TTL = 3600;
 
     // quality values
     const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
@@ -4774,7 +4778,125 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        /** @var array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>} */
+        $adminContainers = self::getAdminCoursesAndContestsForProblem(
+            $r->identity
+        );
+        $adminCourses = $adminContainers['adminCourses'];
+        $adminContests = $adminContainers['adminContests'];
+        $response['templateProperties']['payload']['adminCourses'] = $adminCourses;
+        $response['templateProperties']['payload']['adminContests'] = $adminContests;
+
         return $response;
+    }
+
+    public static function invalidateAdminCoursesAndContestsForProblemCache(): void {
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::PROBLEM_ADMIN_CONTAINERS
+        );
+    }
+
+    private static function getAdminCoursesAndContestsForProblemCacheTimeout(
+        ?int $nextChangeAt,
+        int $now
+    ): int {
+        if (is_null($nextChangeAt)) {
+            return self::ADMIN_CONTAINERS_CACHE_TTL;
+        }
+
+        return max(
+            1,
+            min(
+                self::ADMIN_CONTAINERS_CACHE_TTL,
+                $nextChangeAt - $now + 1
+            )
+        );
+    }
+
+    /**
+     * Returns the list of courses (with pending assignments) and contests
+     * (still ongoing) that the current user administers, for the quick-add feature.
+     *
+     * @return array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}
+     */
+    private static function getAdminCoursesAndContestsForProblem(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        if (is_null($identity->identity_id)) {
+            return ['adminCourses' => [], 'adminContests' => []];
+        }
+
+        $now = \OmegaUp\Time::get();
+        $cache = new \OmegaUp\Cache(
+            \OmegaUp\Cache::PROBLEM_ADMIN_CONTAINERS,
+            strval($identity->identity_id)
+        );
+
+        /** @var array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}|null */
+        $cachedPayload = $cache->get();
+        if (is_array($cachedPayload)) {
+            return $cachedPayload;
+        }
+
+        $rows = \OmegaUp\DAO\Problemsets::getAdminContainersForProblemQuickAdd(
+            $identity->identity_id,
+            $now
+        );
+
+        /** @var array<string, AdminCourseForProblem> */
+        $adminCoursesByAlias = [];
+        /** @var list<AdminContestForProblem> */
+        $adminContests = [];
+        $nextChangeAt = null;
+
+        foreach ($rows as $row) {
+            if (
+                !is_null($row['finish_time']) && (
+                    is_null($nextChangeAt) ||
+                    $row['finish_time']->time < $nextChangeAt
+                )
+            ) {
+                $nextChangeAt = $row['finish_time']->time;
+            }
+
+            if ($row['entity_type'] === 'assignment') {
+                if (!isset($adminCoursesByAlias[$row['container_alias']])) {
+                    $adminCoursesByAlias[$row['container_alias']] = [
+                        'alias' => $row['container_alias'],
+                        'name' => $row['container_name'],
+                        'assignments' => [],
+                    ];
+                }
+                $adminCoursesByAlias[$row['container_alias']]['assignments'][] = [
+                    'alias' => $row['item_alias'],
+                    'name' => $row['item_name'],
+                    'assignment_type' => strval($row['assignment_type']),
+                ];
+                continue;
+            }
+
+            $adminContests[] = [
+                'alias' => $row['item_alias'],
+                'title' => $row['item_name'],
+            ];
+        }
+
+        /** @var list<AdminCourseForProblem> */
+        $adminCourses = array_values($adminCoursesByAlias);
+        $result = [
+            'adminCourses' => $adminCourses,
+            'adminContests' => $adminContests,
+        ];
+
+        $cache->set(
+            $result,
+            self::getAdminCoursesAndContestsForProblemCacheTimeout(
+                $nextChangeAt,
+                $now
+            )
+        );
+
+        return $result;
     }
 
     /**
@@ -5245,6 +5367,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        /** @var list<AdminCourseForProblem> */
+        $adminCourses = [];
+        /** @var list<AdminContestForProblem> */
+        $adminContests = [];
+        if (!is_null($r->identity)) {
+            /** @var array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>} */
+            $adminContainers = self::getAdminCoursesAndContestsForProblem(
+                $r->identity
+            );
+            $adminCourses = $adminContainers['adminCourses'];
+            $adminContests = $adminContainers['adminContests'];
+        }
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -5261,6 +5396,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'columns' => $result['columns'],
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
+                    'adminCourses' => $adminCourses,
+                    'adminContests' => $adminContests,
                     'solvedProblemAliases' => $solvedProblemAliases,
                     'attemptedProblemAliases' => $attemptedProblemAliases,
                 ],

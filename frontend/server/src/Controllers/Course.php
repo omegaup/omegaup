@@ -971,6 +971,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
             throw $e;
         }
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
         return $course;
     }
 
@@ -1053,6 +1054,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
             throw $e;
         }
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
         return $problemset;
     }
 
@@ -1249,6 +1251,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
         );
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         return [
             'status' => 'ok',
@@ -1410,6 +1413,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
         );
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         return [
             'status' => 'ok',
@@ -5611,6 +5615,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $archive = $r->ensureOptionalBool('archive') ?? true;
         $course->archived = $archive;
         \OmegaUp\DAO\Courses::update($course);
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         return [ 'status' => 'ok' ];
     }
@@ -6222,6 +6227,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
         );
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
