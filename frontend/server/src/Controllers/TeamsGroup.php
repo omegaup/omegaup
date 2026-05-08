@@ -264,6 +264,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $alias
+     * @omegaup-request-param bool|null $archived
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
      * @omegaup-request-param int|null $numberOfContestants
@@ -294,7 +295,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             lowerBound: 1,
             upperBound: self::MAX_NUMBER_OF_CONTESTANTS,
         );
-        $teamsGroup->archived = $r->ensureOptionalBool('archived') ?? $teamsGroup->archived;
+        $teamsGroup->archived = $r->ensureOptionalBool(
+            'archived'
+        ) ?? $teamsGroup->archived;
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(
             "Teams group {$teamsGroup->alias} updated successfully."

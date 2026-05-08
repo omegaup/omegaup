@@ -4935,12 +4935,13 @@ Update an existing teams group
 
 ### Parameters
 
-| Name                  | Type        | Description | Required |
-| --------------------- | ----------- | ----------- | -------- |
-| `alias`               | `string`    |             | ✓        |
-| `description`         | `string`    |             | ✓        |
-| `name`                | `string`    |             | ✓        |
-| `numberOfContestants` | `int\|null` |             |          |
+| Name                  | Type         | Description | Required |
+| --------------------- | ------------ | ----------- | -------- |
+| `alias`               | `string`     |             | ✓        |
+| `description`         | `string`     |             | ✓        |
+| `name`                | `string`     |             | ✓        |
+| `archived`            | `bool\|null` |             |          |
+| `numberOfContestants` | `int\|null`  |             |          |
 
 ### Returns
 
