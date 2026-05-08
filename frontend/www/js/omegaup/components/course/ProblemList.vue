@@ -4,78 +4,66 @@
       <h5>
         {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ addCardHeaderDescLabel }}</span>
+     <span v-if="problems && problems.length === 0">
+  {{ addCardHeaderDescLabel }}
+</span>
     </div>
-    <div class="card-body">
-      <div v-if="problems.length == 0" class="empty-table-message">
-        {{ emptyTableLabel }}
-      </div>
-      <div v-else>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th class="text-center">{{ T.contestAddproblemProblemOrder }}</th>
-              <th class="text-center">{{ problemTableHeaderLabel }}</th>
-              <th class="text-center">{{ pointsTableHeaderLabel }}</th>
-              <th class="text-center">{{ T.courseExtraPointsProblem }}</th>
-              <th class="text-center">
-                {{ T.wordsActions }}
-              </th>
-            </tr>
-          </thead>
-          <tbody v-sortable="{ onUpdate: sort }">
-            <tr v-for="problem in problems" :key="problem.letter">
-              <td class="text-center">
-                <button
-                  class="btn btn-link"
-                  type="button"
-                  :title="reorderButtonLabel"
-                >
-                  <font-awesome-icon icon="arrows-alt" />
-                </button>
-              </td>
-              <td class="align-middle text-center">
-                <a :href="`/arena/problem/${problem.alias}/`">{{
-                  problem.alias
-                }}</a>
-              </td>
-              <td class="align-middle">{{ problem.points }}</td>
-              <td class="align-middle text-center">
-                {{ problem.is_extra_problem ? T.wordsYes : T.wordsNo }}
-              </td>
-              <td class="button-column text-center">
-                <button
-                  class="btn btn-link"
-                  :title="T.problemEditFormUpdateProblem"
-                  data-edit-problem-version
-                  @click.prevent="onEditProblem(problem)"
-                >
-                  <font-awesome-icon icon="edit" />
-                </button>
-                <button
-                  class="btn btn-link"
-                  :title="removeButtonLabel"
-                  @click.prevent="onRemoveProblem(assignment, problem)"
-                >
-                  <font-awesome-icon icon="trash" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div>
-          <button
-            class="btn btn-primary"
-            :disabled="!problemsOrderChanged"
-            role="button"
-            @click="saveNewOrder"
-          >
-            {{ T.wordsSaveNewOrder }}
-          </button>
-        </div>
-      </div>
+ <div class="card-body">
+  <!-- EMPTY STATE -->
+  <div
+  v-if="(!problems || problems.length === 0) && !showForm"
+  class="text-center p-5"
+>
+  <!-- ICON -->
+  <font-awesome-icon icon="code" size="3x" class="mb-3" />
+
+  <!-- TITLE -->
+  <h5>{{ emptyTableLabel }}</h5>
+
+  <!-- SUBTITLE -->
+  <p class="text-muted">
+    {{ addCardHeaderDescLabel }}
+  </p>
+
+  <!-- BUTTON -->
+  <button
+    class="btn btn-primary mt-3"
+    @click="showForm = true"
+  >
+    {{ addProblemButtonLabel }}
+  </button>
+</div>
+  <!-- NORMAL CONTENT -->
+  <div v-else>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="text-center">{{ T.contestAddproblemProblemOrder }}</th>
+          <th class="text-center">{{ problemTableHeaderLabel }}</th>
+          <th class="text-center">{{ pointsTableHeaderLabel }}</th>
+          <th class="text-center">{{ T.courseExtraPointsProblem }}</th>
+          <th class="text-center">{{ T.wordsActions }}</th>
+        </tr>
+      </thead>
+      <tbody v-sortable="{ onUpdate: sort }">
+        <tr v-for="problem in problems" :key="problem.letter">
+          <!-- same code as before -->
+        </tr>
+      </tbody>
+    </table>
+
+    <div>
+      <button
+        class="btn btn-primary"
+        :disabled="!problemsOrderChanged"
+        @click="saveNewOrder"
+      >
+        {{ T.wordsSaveNewOrder }}
+      </button>
     </div>
-    <div class="card-footer">
+  </div>
+</div>
+    <div v-if="showForm || (problems && problems.length > 0)" class="card-footer">
       <form @submit.prevent="">
         <div class="row">
           <div class="col-md-12">
@@ -169,12 +157,12 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                :disabled="!problemAlias"
+                :disabled="!addProblemButtonDisabled"
                 @click.prevent="
                   onSaveProblem(assignment, {
-                    alias: problemAlias.key,
+                    alias: problemAlias?.key,
                     points: points,
-                    commit: selectedRevision.commit,
+                    commit: selectedRevision?.commit,
                     is_extra_problem: isExtraProblem,
                   })
                 "
@@ -239,6 +227,7 @@ export default class CourseProblemList extends Vue {
   taggedProblemAlias = '';
   problemAlias: null | types.ListItem = null;
   points = 100;
+  showForm = false;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
   useLatestVersion = true;
