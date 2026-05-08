@@ -301,4 +301,32 @@ describe('time', () => {
       }
     });
   });
+
+  describe('formatContestDurationHumanReadable', () => {
+    const minuteMs = 60 * 1000;
+    const hourMs = 60 * 60 * 1000;
+    const dayMs = 24 * 60 * 60 * 1000;
+    const start = new Date('2021-01-01 00:00:00+00:00');
+
+    it.each([
+      [minuteMs * 45, '45 minutos'],
+      [hourMs * 10, '10 horas'],
+      [hourMs * 10 + minuteMs * 10 + 10 * 1000, '~ 10 horas'],
+      [dayMs, '1 día'],
+      [dayMs * 15, '15 días'],
+      [dayMs * 15 + hourMs * 8, '~ 15 días'],
+      [dayMs * 30, '1 mes'],
+      [dayMs * 89, '~ 3 meses'],
+    ])(
+      'Should format %p ms with human-readable units',
+      (durationMs, expected) => {
+        expect(
+          time.formatContestDurationHumanReadable(
+            start,
+            new Date(start.getTime() + durationMs),
+          ),
+        ).toEqual(expected);
+      },
+    );
+  });
 });

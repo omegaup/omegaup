@@ -1,15 +1,16 @@
 <template>
   <div>
-    <div class="mb-3 text-right">
-      <a class="btn btn-primary mx-1" href="/teamsgroup/new/">{{
-        T.teamsGroupsCreateNew
-      }}</a>
+    <div v-if="hasTeamsGroups" class="mb-3 text-right">
+      <a class="btn btn-primary mx-1" href="/teamsgroup/new/">
+        {{ T.teamsGroupsCreateNew }}
+      </a>
     </div>
     <div class="card">
       <div class="card-header mb-3">
         <h3 class="card-title">{{ T.omegaupTitleTeamsGroups }}</h3>
       </div>
-      <table class="table" data-table-teams-groups>
+
+      <table v-if="hasTeamsGroups" class="table" data-table-teams-groups>
         <thead>
           <tr>
             <th>{{ T.teamsGroupTeamsGroupName }}</th>
@@ -23,7 +24,9 @@
           >
             <td>
               <strong>
-                <a :href="teamsGroupUrl(teamsGroup)">{{ teamsGroup.name }}</a>
+                <a :href="teamsGroupUrl(teamsGroup)">
+                  {{ teamsGroup.name }}
+                </a>
               </strong>
             </td>
             <td>
@@ -34,6 +37,26 @@
           </tr>
         </tbody>
       </table>
+
+      <div v-else class="text-center py-5">
+        <font-awesome-icon
+          :icon="['fas', 'users']"
+          size="3x"
+          class="mb-3 text-muted"
+        />
+
+        <h4 class="mb-2">
+          {{ T.teamsGroupEmptyTitle }}
+        </h4>
+
+        <p class="text-muted mb-4">
+          {{ T.teamsGroupEmptyDescription }}
+        </p>
+
+        <a class="btn btn-primary btn-lg" href="/teamsgroup/new/">
+          {{ T.createTeamsGroup }}
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -59,6 +82,9 @@ export default class TeamsGroupList extends Vue {
   }
   teamsGroupEditUrl(teamsGroup: types.TeamsGroup): string {
     return `/teamsgroup/${teamsGroup.alias}/edit/#edit`;
+  }
+  get hasTeamsGroups(): boolean {
+    return this.teamsGroups && this.teamsGroups.length > 0;
   }
 }
 </script>

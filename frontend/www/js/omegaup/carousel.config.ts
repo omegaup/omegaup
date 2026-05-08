@@ -95,6 +95,31 @@ const carouselConfig: {
       target: '_blank',
     },
   },
+  {
+    image: '/media/homepage/blog.svg',
+    title: {
+      en: 'Visit our blog',
+      es: 'Visita nuestro blog',
+      pt: 'Visite nosso blog',
+    },
+    description: {
+      en:
+        'Discover tutorials, articles, and the latest news from the omegaUp community.',
+      es:
+        'Descubre tutoriales, artículos y las últimas noticias de la comunidad de omegaUp.',
+      pt:
+        'Descubra tutoriais, artigos e as últimas notícias da comunidade omegaUp.',
+    },
+    button: {
+      text: {
+        en: 'Go to Blog',
+        es: 'Ir al blog',
+        pt: 'Ir para o blog',
+      },
+      href: 'https://blog.omegaup.com/',
+      target: '_blank',
+    },
+  },
 ];
 
 export default carouselConfig;

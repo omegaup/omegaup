@@ -54,7 +54,7 @@ import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 import ProblemMarkdown from '../../ProblemMarkdown.vue';
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 const markdownConverter = new markdown.Converter({
   preview: true,

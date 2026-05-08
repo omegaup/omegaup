@@ -140,6 +140,15 @@ def get_current_problems_solved_per_month(
         ORDER BY
             `time` ASC
     '''
+    cur_readonly.execute('EXPLAIN ' + sql, {'months': months})
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_current_problems_solved_per_month] EXPLAIN id=%s "
+            "table=%s type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+
     cur_readonly.execute(sql, {'months': months})
     problems: List[ProblemSolved] = []
     for row in cur_readonly.fetchall():
@@ -150,6 +159,9 @@ def get_current_problems_solved_per_month(
                 problems_solved=row['problems_solved'],
             )
         )
+    logging.info(
+        "Evaluated [get_current_problems_solved_per_month] "
+        "for %d problems", len(problems))
     return problems
 
 
@@ -261,6 +273,19 @@ def get_school_of_the_month_candidates(
             `score` DESC
         LIMIT 100;
     '''
+
+    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_current_month,
+                                            first_day_of_next_month,
+                                            first_day_of_next_month))
+
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_school_of_the_month_candidates] EXPLAIN "
+            "id=%s table=%s type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+
     cur_readonly.execute(
         sql, (first_day_of_current_month, first_day_of_next_month,
               first_day_of_next_month))
@@ -273,6 +298,9 @@ def get_school_of_the_month_candidates(
                 score=row['score'],
             )
         )
+    logging.info(
+        "Evaluated [get_school_of_the_month_candidates] "
+        "for %d schools", len(candidates))
     return candidates
 
 
