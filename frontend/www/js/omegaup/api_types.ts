@@ -439,6 +439,33 @@ export namespace types {
       );
     }
 
+    export function CarouselManagementPayload(
+      elementId: string = 'payload',
+    ): types.CarouselManagementPayload {
+      return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CertificateDetailsPayload(
       elementId: string = 'payload',
     ): types.CertificateDetailsPayload {
@@ -2992,12 +3019,16 @@ export namespace types {
     excerpt: string;
     expiration_date?: Date;
     image_url: string;
+    is_active: boolean;
     link: string;
-    status: boolean;
     title: string;
   }
 
   export interface CarouselItemListPayload {
+    carouselItems: types.CarouselItem[];
+  }
+
+  export interface CarouselManagementPayload {
     carouselItems: types.CarouselItem[];
   }
 
@@ -5398,9 +5429,6 @@ export namespace messages {
   export type CarouselItemsListRequest = { [key: string]: any };
   export type _CarouselItemsListServerResponse = any;
   export type CarouselItemsListResponse = types.CarouselItemListPayload;
-  export type CarouselItemsListActiveRequest = { [key: string]: any };
-  export type _CarouselItemsListActiveServerResponse = any;
-  export type CarouselItemsListActiveResponse = types.CarouselItemListPayload;
   export type CarouselItemsUpdateRequest = { [key: string]: any };
   export type CarouselItemsUpdateResponse = {};
 
@@ -6416,9 +6444,6 @@ export namespace controllers {
     list: (
       params?: messages.CarouselItemsListRequest,
     ) => Promise<messages.CarouselItemsListResponse>;
-    listActive: (
-      params?: messages.CarouselItemsListActiveRequest,
-    ) => Promise<messages.CarouselItemsListActiveResponse>;
     update: (
       params?: messages.CarouselItemsUpdateRequest,
     ) => Promise<messages.CarouselItemsUpdateResponse>;

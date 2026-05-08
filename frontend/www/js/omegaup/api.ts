@@ -276,28 +276,6 @@ export const CarouselItems = {
     })(x.carouselItems);
     return x;
   }),
-  listActive: apiCall<
-    messages.CarouselItemsListActiveRequest,
-    messages._CarouselItemsListActiveServerResponse,
-    messages.CarouselItemsListActiveResponse
-  >('/api/carouselItems/listActive/', (x) => {
-    x.carouselItems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.expiration_date !== 'undefined' &&
-          x.expiration_date !== null
-        )
-          x.expiration_date = ((x: number) => new Date(x * 1000))(
-            x.expiration_date,
-          );
-        return x;
-      });
-    })(x.carouselItems);
-    return x;
-  }),
   update: apiCall<
     messages.CarouselItemsUpdateRequest,
     messages.CarouselItemsUpdateResponse
