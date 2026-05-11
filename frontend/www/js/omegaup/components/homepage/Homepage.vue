@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1 class="sr-only">{{ T.homepageTitle }}</h1>
     <omegaup-carousel></omegaup-carousel>
     <div
       v-if="
