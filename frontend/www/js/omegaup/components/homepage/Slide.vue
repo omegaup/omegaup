@@ -21,6 +21,8 @@
           class="d-block img-fluid image-width"
           :src="imageSrc"
           :alt="title"
+          width="480"
+          height="480"
         />
       </div>
     </div>
@@ -66,6 +68,7 @@ export default class Slide extends Vue {
   p {
     font-size: 1.16rem;
     margin-bottom: 1.1em;
+    white-space: pre-line;
   }
 }
 a.slide-button {
