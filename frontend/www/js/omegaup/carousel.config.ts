@@ -21,31 +21,6 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/ofmi.png',
-    title: {
-      en: 'Registration is now open!',
-      es: '¡Ya está abierta la convocatoria!',
-      pt: 'Inscrições abertas!',
-    },
-    description: {
-      en:
-        'Discover, learn, and participate in the community that drives female talent in programming. 5th Mexican Female Informatics Olympiad (OFMI).',
-      es:
-        'Descubre, aprende y participa en la comunidad que impulsa el talento femenino en la programación. 5ª Olimpiada Femenil Mexicana de Informática (OFMI).',
-      pt:
-        'Descubra, aprenda e participe da comunidade que impulsiona o talento feminino na programação. 5ª Olimpíada Feminina Mexicana de Informática (OFMI).',
-    },
-    button: {
-      text: {
-        en: 'View call',
-        es: 'Ver convocatoria',
-        pt: 'Ver convocatória',
-      },
-      href: 'https://ofmi.omegaup.com/convocatoria',
-      target: '_blank',
-    },
-  },
-  {
     image: '/media/homepage/carousel_slide_4.svg',
     title: {
       en: 'Start preparing with Intro OFMI',
@@ -124,8 +99,8 @@ const carouselConfig: {
     image: '/media/homepage/carousel_slide_UX_experience.png',
     title: {
       en: 'omegaUp UX experience',
-      es: 'omegaUp UX experience',
-      pt: 'omegaUp UX experience',
+      es: 'Experiencia de usuario de omegaUp',
+      pt: 'Experiência de usuário de omegaUp',
     },
     description: {
       en:
