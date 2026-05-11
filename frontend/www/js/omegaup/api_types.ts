@@ -5081,6 +5081,7 @@ export namespace types {
     maxNumberOfContestants: number;
     teamGroup: {
       alias: string;
+      archived: boolean;
       description?: string;
       name?: string;
       numberOfContestants: number;
@@ -5104,6 +5105,7 @@ export namespace types {
 
   export interface TeamsGroup {
     alias: string;
+    archived: boolean;
     create_time: Date;
     description?: string;
     name: string;
@@ -6187,6 +6189,7 @@ export namespace messages {
   export type TeamsGroupDetailsResponse = {
     team_group: {
       alias?: string;
+      archived: boolean;
       create_time: number;
       description?: string;
       name?: string;
