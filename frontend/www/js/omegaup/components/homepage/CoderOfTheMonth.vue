@@ -4,11 +4,11 @@
       class="d-flex justify-content-between card-header"
       :class="`card-header-${category}`"
     >
-      <h3 class="m-0">
+      <h5 class="m-0">
         {{
           category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth
         }}
-      </h3>
+      </h5>
       <a class="card-header-help" :href="CoderOfTheMonthPolicyURL">
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
@@ -23,18 +23,17 @@
         <img
           :src="coderOfTheMonth.gravatar_92"
           height="80"
-          width="80"
           :alt="coderOfTheMonth.username"
         />
       </a>
-      <h4 class="card-title">
+      <h5 class="card-title">
         <omegaup-user-username
           :classname="coderOfTheMonth.classname"
           :linkify="true"
           :username="coderOfTheMonth.username"
           :country="coderOfTheMonth.country_id"
         ></omegaup-user-username>
-      </h4>
+      </h5>
       <template v-if="!coderOfTheMonth.is_private">
         <div class="card-text">
           {{ coderOfTheMonth.name }}

@@ -21,8 +21,6 @@
           class="d-block img-fluid image-width"
           :src="imageSrc"
           :alt="title"
-          width="480"
-          height="480"
         />
       </div>
     </div>

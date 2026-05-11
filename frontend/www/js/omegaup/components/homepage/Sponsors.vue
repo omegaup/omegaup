@@ -7,13 +7,7 @@
       class="p-3 mt-2 mt-md-0 sponsor-logo-container"
     >
       <a :href="logo.href" target="_blank">
-        <img
-          :class="logo.class"
-          :src="logo.src"
-          :alt="logo.alt"
-          width="280"
-          height="120"
-        />
+        <img :class="logo.class" :src="logo.src" :alt="logo.alt" />
       </a>
     </div>
   </div>
