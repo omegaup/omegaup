@@ -13,7 +13,7 @@
           :target="button.target"
           role="button"
         >
-          {{ button.text[T.locale] }}
+          {{ button.text[T.locale] || button.text['es'] }}
         </a>
       </div>
       <div class="image-container d-flex justify-content-center">
