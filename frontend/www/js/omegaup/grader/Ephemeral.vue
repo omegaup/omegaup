@@ -574,6 +574,7 @@ export default class Ephemeral extends Vue {
     zip
       .generateAsync({ type: 'blob' })
       .then((blob) => {
+        if (this.zipHref) URL.revokeObjectURL(this.zipHref);
         this.zipDownload = `${store.getters['moduleName']}.zip`;
         this.zipHref = window.URL.createObjectURL(blob);
 
