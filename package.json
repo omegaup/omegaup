@@ -164,5 +164,8 @@
     "test:e2e": "cypress run --browser chrome",
     "storybook": "storybook dev -p 6006",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "pinia": "^2.3.1"
   }
 }

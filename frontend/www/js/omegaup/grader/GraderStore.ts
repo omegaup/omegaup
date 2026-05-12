@@ -1,7 +1,9 @@
 // TODO: move logic from components inside this store
 
-import Vuex, { Commit, StoreOptions } from 'vuex';
+import './pinia';
+import Vuex, { Commit, Store, StoreOptions } from 'vuex';
 import Vue from 'vue';
+import { defineStore } from 'pinia';
 
 import * as Util from './util';
 import * as templates from './GraderTemplates';
@@ -103,6 +105,23 @@ Object.keys(Util.supportedLanguages).forEach((key) => {
   languageExtensionMapping[key] = Util.supportedLanguages[key].extension;
 });
 Vue.use(Vuex);
+
+/**
+ * Pinia store handle for incremental migration off Vuex (#7826).
+ * For now it only holds a reference to the legacy Vuex store; new code can use
+ * useGraderStore().legacy until the state is moved into Pinia proper.
+ */
+export const useGraderStore = defineStore('grader', {
+  state: () => ({
+    legacy: null as null | Store<GraderStore>,
+  }),
+  actions: {
+    attach(legacyStore: Store<GraderStore>) {
+      this.legacy = legacyStore;
+    },
+  },
+});
+
 const storeOptions: StoreOptions<GraderStore> = {
   state: {
     alias: '',
@@ -938,4 +957,5 @@ const storeOptions: StoreOptions<GraderStore> = {
   strict: true,
 };
 const store = new Vuex.Store<GraderStore>(storeOptions);
+useGraderStore().attach(store);
 export default store;
