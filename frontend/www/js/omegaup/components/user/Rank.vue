@@ -411,6 +411,7 @@ export default class UserRank extends Vue {
   justify-content: center;
   flex-shrink: 0;
 }
+
 .coder-username {
   width: 100px;
   flex-shrink: 0;
@@ -432,21 +433,8 @@ export default class UserRank extends Vue {
   vertical-align: middle !important;
 }
 
-.coder-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
 .coder-info {
   min-width: 0;
   flex: 1;
-}
-
-.coder-username {
-  display: block;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  white-space: normal;
 }
 </style>
