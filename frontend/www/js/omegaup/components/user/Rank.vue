@@ -171,13 +171,6 @@
                 <div class="coder-info d-flex flex-column ml-2">
                   <omegaup-user-username
                     class="coder-username"
-                <span class="coder-flag">
-                  <omegaup-countryflag
-                    :country="user.country"
-                  ></omegaup-countryflag>
-                </span>
-                <span class="coder-username">
-                  <omegaup-user-username
                     :classname="user.classname"
                     :linkify="true"
                     :username="user.username"
@@ -186,10 +179,6 @@
                     {{ user.name }}
                   </span>
                 </div>
-                </span>
-                <span v-if="user.name && length !== 5" class="coder-name">
-                  {{ user.name }}
-                </span>
               </div>
             </td>
             <td class="text-right">{{ user.score.toFixed(2) }}</td>
