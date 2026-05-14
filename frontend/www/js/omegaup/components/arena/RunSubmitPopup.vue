@@ -89,6 +89,7 @@ import {
   supportedExtensions,
   supportedLanguages,
 } from '../../grader/util';
+import { sourceTemplates } from '../../grader/GraderTemplates';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -105,12 +106,56 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   T = T;
   omegaup = omegaup;
-  selectedLanguage = this.preferredLanguage;
+  selectedLanguage: null | string = this.preferredLanguage;
   code = '';
   now: number = Date.now();
 
+  getLanguageExtension(language: string): string {
+    if (!language || language === 'cat') {
+      return '';
+    }
+    const languageInfo = supportedLanguages[language];
+    if (languageInfo) {
+      return languageInfo.extension;
+    }
+    // Fallback logic
+    if (language.startsWith('cpp')) {
+      return 'cpp';
+    }
+    if (language.startsWith('c11-')) {
+      return 'c';
+    }
+    if (language.startsWith('py')) {
+      return 'py';
+    }
+    return language;
+  }
+
+  loadBoilerplateForLanguage(language: string): void {
+    if (!language || language === 'cat') {
+      this.code = '';
+      return;
+    }
+    const extension = this.getLanguageExtension(language);
+    if (extension && sourceTemplates[extension]) {
+      this.code = sourceTemplates[extension];
+    } else {
+      // If no template found, keep current code or set empty
+      this.code = '';
+    }
+  }
+
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
+  }
+
+  @Watch('selectedLanguage', { immediate: true })
+  onSelectedLanguageChanged(
+    newLanguage: null | string,
+    oldLanguage: null | string | undefined,
+  ): void {
+    if (!newLanguage || newLanguage === oldLanguage) return;
+    this.loadBoilerplateForLanguage(newLanguage);
   }
 
   get canSubmit(): boolean {
@@ -160,13 +205,15 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 
   @Watch('preferredLanguage')
-  onPreferredLanguageChanged(newValue: string): void {
-    this.selectedLanguage = newValue;
+  onPreferredLanguageChanged(newValue: null | string): void {
+    if (newValue) {
+      this.selectedLanguage = newValue;
+    }
   }
 
   onSubmit(): void {
     if (!this.canSubmit) {
-      alert(
+      ui.warning(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(
             (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
@@ -177,7 +224,7 @@ export default class ArenaRunSubmitPopup extends Vue {
     }
 
     if (!this.selectedLanguage) {
-      alert(T.arenaRunSubmitMissingLanguage);
+      ui.error(T.arenaRunSubmitMissingLanguage);
       return;
     }
     const file = this.inputFile.files?.[0];
@@ -198,7 +245,7 @@ export default class ArenaRunSubmitPopup extends Vue {
         validExtensions.includes(this.extension)
       ) {
         if (this.inputLimit && file.size >= this.inputLimit) {
-          alert(
+          ui.error(
             ui.formatString(T.arenaRunSubmitFilesize, {
               limit: `${this.inputLimit / 1024} KiB`,
             }),
@@ -210,7 +257,9 @@ export default class ArenaRunSubmitPopup extends Vue {
       }
       // 512kiB _must_ be enough for anybody.
       if (file.size >= 512 * 1024) {
-        alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }));
+        ui.error(
+          ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }),
+        );
         return;
       }
       reader.readAsDataURL(file);
@@ -219,7 +268,7 @@ export default class ArenaRunSubmitPopup extends Vue {
     }
 
     if (!this.code) {
-      alert(T.arenaRunSubmitEmptyCode);
+      ui.error(T.arenaRunSubmitEmptyCode);
       return;
     }
 

@@ -931,6 +931,113 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check that getDemotionRationales returns rationales for problems with warning/banned status
+     * and that warningReasons is included in Problem API response for the problem owner.
+     * @dataProvider qualityNominationsDemotionStatusProvider
+     */
+    public function testDemotionRationalesDisplayedToOwner(
+        string $status,
+        int $visibility
+    ) {
+        // Create a problem with a known author
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'public',
+            'author' => $author,
+        ]));
+
+        ['identity' => $reporter] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Reporter creates a demotion nomination with a rationale
+        $reporterLogin = self::login($reporter);
+        $rationale1 = 'This problem contains offensive content';
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reporterLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'rationale' => $rationale1,
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        // Login as a reviewer and approve ban/warning
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $rationale2 = 'Verified: problem has inappropriate content';
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => $rationale2,
+            ])
+        );
+
+        // Verify getDemotionRationales returns the rationale
+        $rationales = \OmegaUp\DAO\QualityNominations::getDemotionRationales(
+            $problemData['problem']->problem_id
+        );
+        $this->assertNotEmpty(
+            $rationales,
+            'Should have at least one rationale'
+        );
+        $this->assertContains(
+            $rationale2,
+            $rationales,
+            'Should contain the reviewer rationale'
+        );
+
+        // Verify the author can see warningReasons in Problem API
+        $authorLogin = self::login($author);
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $authorLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $this->assertSame(
+            $visibility,
+            $problem['visibility'],
+            "Problem should have {$status} visibility"
+        );
+        $this->assertArrayHasKey(
+            'warningReasons',
+            $problem,
+            'warningReasons should be included for problem owner'
+        );
+        $this->assertNotEmpty(
+            $problem['warningReasons'],
+            'warningReasons should not be empty'
+        );
+        $this->assertContains(
+            $rationale2,
+            $problem['warningReasons'],
+            'warningReasons should contain the reviewer rationale'
+        );
+
+        // Verify a non-owner cannot see warningReasons
+        ['identity' => $otherUser] = \OmegaUp\Test\Factories\User::createUser();
+        $otherLogin = self::login($otherUser);
+        $problemForOther = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $otherLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $this->assertArrayNotHasKey(
+            'warningReasons',
+            $problemForOther,
+            'warningReasons should NOT be visible to non-owners'
+        );
+    }
+
+    /**
      * A PHPUnit data provider for all the tests that can accept a column for search nominations.
      *
      * @return list<array{0: string, 1:string, 2: int}>
@@ -2222,7 +2329,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $syntheticProblems[1]['problem']->problem_id,
             $problemOfTheWeek[0]->problem_id
         );
-        // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
+        // TODO(heduenas): Make assertion for hard problem of the week when that gets implemented.
     }
 
     public function setUpSyntheticSuggestionsForProblemOfTheWeek() {

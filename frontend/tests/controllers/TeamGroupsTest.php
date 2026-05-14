@@ -1661,7 +1661,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        // The number of identities per group reamin the same
+        // The number of identities per group remain the same
         $this->assertCount(5, $identities);
     }
 

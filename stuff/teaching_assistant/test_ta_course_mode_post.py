@@ -35,7 +35,14 @@ def get_runs() -> Any:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 

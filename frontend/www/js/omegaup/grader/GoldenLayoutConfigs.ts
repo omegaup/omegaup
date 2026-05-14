@@ -53,7 +53,7 @@ const createCaseSelectorComponent = (): GoldenLayout.ComponentConfig => ({
     id: 'cases',
   },
   title: 'cases/',
-  width: 15,
+  width: 19,
   isClosable: false,
 });
 

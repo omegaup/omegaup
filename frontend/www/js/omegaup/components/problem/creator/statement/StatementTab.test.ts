@@ -1,9 +1,10 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 
-import StatementTab from './StatementTab.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
+import * as ui from '../../../../ui';
+import StatementTab from './StatementTab.vue';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -41,5 +42,131 @@ describe('StatementTab.vue', () => {
     await markdownSaveButton.trigger('click');
 
     expect(wrapper.vm.$store.state.problemMarkdown).toBe('Hello omegaUp');
+  });
+
+  describe('Image size validation', () => {
+    it('Should allow pasting images under 256 KB', async () => {
+      const wrapper = shallowMount(StatementTab, {
+        localVue,
+        store,
+      });
+
+      const textArea = wrapper.find('textarea.wmd-input');
+      const smallFile = new File(['x'.repeat(100 * 1024)], 'small.png', {
+        type: 'image/png',
+      });
+
+      const pasteEvent = {
+        clipboardData: {
+          items: [
+            {
+              type: 'image/png',
+              getAsFile: () => smallFile,
+            },
+          ],
+        },
+        preventDefault: jest.fn(),
+      };
+
+      await textArea.trigger('paste', pasteEvent);
+
+      expect(pasteEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('Should reject pasting images over 256 KB and show error', async () => {
+      const wrapper = shallowMount(StatementTab, {
+        localVue,
+        store,
+      });
+
+      const errorSpy = jest.spyOn(ui, 'error').mockImplementation(() => {});
+
+      const textArea = wrapper.find('textarea.wmd-input');
+      // Create a file larger than 256 KB
+      const largeFile = new File(['x'.repeat(300 * 1024)], 'large.png', {
+        type: 'image/png',
+      });
+
+      const pasteEvent = new Event('paste', {
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(pasteEvent, 'clipboardData', {
+        value: {
+          items: [
+            {
+              type: 'image/png',
+              getAsFile: () => largeFile,
+            },
+          ],
+        },
+      });
+      jest.spyOn(pasteEvent, 'preventDefault');
+
+      textArea.element.dispatchEvent(pasteEvent);
+
+      expect(pasteEvent.preventDefault).toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalled();
+
+      errorSpy.mockRestore();
+    });
+
+    it('Should reject dropping images over 256 KB and show error', async () => {
+      const wrapper = shallowMount(StatementTab, {
+        localVue,
+        store,
+      });
+
+      const errorSpy = jest.spyOn(ui, 'error').mockImplementation(() => {});
+
+      const textArea = wrapper.find('textarea.wmd-input');
+      // Create a file larger than 256 KB
+      const largeFile = new File(['x'.repeat(300 * 1024)], 'large.png', {
+        type: 'image/png',
+      });
+
+      const dropEvent = new Event('drop', { bubbles: true, cancelable: true });
+      Object.defineProperty(dropEvent, 'dataTransfer', {
+        value: {
+          files: [largeFile],
+        },
+      });
+      jest.spyOn(dropEvent, 'preventDefault');
+
+      textArea.element.dispatchEvent(dropEvent);
+
+      expect(dropEvent.preventDefault).toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalled();
+
+      errorSpy.mockRestore();
+    });
+
+    it('Should allow non-image files without size validation', async () => {
+      const wrapper = shallowMount(StatementTab, {
+        localVue,
+        store,
+      });
+
+      const textArea = wrapper.find('textarea.wmd-input');
+      const textFile = new File(['x'.repeat(500 * 1024)], 'large.txt', {
+        type: 'text/plain',
+      });
+
+      const pasteEvent = {
+        clipboardData: {
+          items: [
+            {
+              type: 'text/plain',
+              getAsFile: () => textFile,
+            },
+          ],
+        },
+        preventDefault: jest.fn(),
+      };
+
+      await textArea.trigger('paste', pasteEvent);
+
+      expect(pasteEvent.preventDefault).not.toHaveBeenCalled();
+    });
   });
 });

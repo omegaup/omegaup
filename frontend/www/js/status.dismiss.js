@@ -1,4 +1,4 @@
-$('#alert-close').on('click', omegaup.UI.dismissNotifications);
+// Alert close is now handled by GlobalNotifications.vue
 
 function isBrowserSupported() {
   // From

@@ -6,9 +6,12 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model.lazy="currentMarkdown"
+            v-model="currentMarkdown"
             data-problem-creator-editor-markdown
             class="wmd-input"
+            @change="currentMarkdown = $event.target.value"
+            @paste="handlePaste"
+            @drop="handleDrop"
           ></textarea>
         </div>
         <div class="col-md-6 d-flex flex-column">
@@ -43,8 +46,7 @@ import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
 import * as ui from '../../../../ui';
-
-import omegaup_problemMarkdown from '../../Markdown.vue';
+import ProblemMarkdown from '../../ProblemMarkdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -52,7 +54,7 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_problemMarkdown,
+    'omegaup-markdown': ProblemMarkdown,
   },
 })
 export default class StatementTab extends Vue {
@@ -64,6 +66,9 @@ export default class StatementTab extends Vue {
   T = T;
   ui = ui;
   markdownEditor: Markdown.Editor | null = null;
+
+  // 256 KB limit for images
+  readonly MAX_IMAGE_SIZE = 256 * 1024;
 
   currentMarkdownInternal: string = T.problemCreatorEmpty;
 
@@ -93,6 +98,62 @@ export default class StatementTab extends Vue {
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
     this.$emit('show-update-success-message');
+  }
+
+  /**
+   * Validates image file size and shows error if too large.
+   * @param file The file to validate
+   * @returns true if valid, false if too large
+   */
+  private validateImageSize(file: File): boolean {
+    if (file.size > this.MAX_IMAGE_SIZE) {
+      ui.error(
+        ui.formatString(
+          T.problemCreatorMarkdownImageTooLarge ??
+            'The image is too large. The maximum allowed size is %(limit). Please use a smaller image.',
+          {
+            limit: '256 KB',
+          },
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Handles paste events to validate image sizes before insertion.
+   */
+  handlePaste(event: ClipboardEvent): void {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file && !this.validateImageSize(file)) {
+          event.preventDefault();
+          return;
+        }
+      }
+    }
+  }
+
+  /**
+   * Handles drop events to validate image sizes before insertion.
+   */
+  handleDrop(event: DragEvent): void {
+    const files = event.dataTransfer?.files;
+    if (!files) return;
+
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        if (!this.validateImageSize(file)) {
+          event.preventDefault();
+          return;
+        }
+      }
+    }
   }
 }
 </script>
@@ -124,6 +185,8 @@ export default class StatementTab extends Vue {
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
+    width: 100%;
+    margin-top: 35px;
   }
 }
 </style>

@@ -825,4 +825,28 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $response
         );
     }
+
+    /**
+     * Attempts to create a group with a name composed only of whitespace should fail.
+     */
+    public function testCreateGroupWithWhitespaceName() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            // Attempt to create a group with a name consisting only of spaces
+            \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => '   ',
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => 'Validation test for whitespace names'
+            ]));
+
+            $this->fail(
+                'Group creation should have failed for whitespace-only names'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+        }
+    }
 }

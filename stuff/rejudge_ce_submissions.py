@@ -25,9 +25,12 @@ BASE_URL = None
 COOKIES = None
 
 
-def get_login_endpoint(username: str, password: str) -> str:
-    """endpoint for logging in"""
-    return f"api/user/login?usernameOrEmail={username}&password={password}"
+def get_login_endpoint(  # pylint: disable=unused-argument
+    username: str,
+    password: str,
+) -> str:
+    """endpoint for logging in (use POST with usernameOrEmail and password)"""
+    return "api/user/login/"
 
 
 def rejudge_submission_endpoint(  # pylint: disable=R0913
@@ -60,9 +63,10 @@ def get_runs_list_endpoint(
 
 def get_contents_from_url(
     get_endpoint_fn: Callable[..., str],
-    args: dict[str, Any] | None = None
+    args: dict[str, Any] | None = None,
+    use_post: bool = False,
 ) -> Any:
-    """hit the endpoint with GET request"""
+    """hit the endpoint with a request (POST for mutating, GET otherwise)"""
     global COOKIES  # pylint: disable=W0603
 
     if args is None:
@@ -70,16 +74,35 @@ def get_contents_from_url(
     endpoint = get_endpoint_fn(**args)
     url = f"{BASE_URL}/{endpoint}"
 
-    if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
-        COOKIES = None
-
     try:
-        if COOKIES is None:
-            response = requests.get(url, timeout=10)
+        if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
+            COOKIES = None
+            response = requests.post(
+                url,
+                data={
+                    "usernameOrEmail": args["username"],
+                    "password": args["password"],
+                },
+                timeout=10,
+            )
+            response.raise_for_status()
+            COOKIES = response.cookies
+        elif COOKIES is None:
+            if use_post:
+                response = requests.post(url, timeout=10)
+            else:
+                response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies
         else:
-            response = requests.get(url, COOKIES, timeout=10)
+            if use_post:
+                response = requests.post(
+                    url, cookies=COOKIES, timeout=10
+                )
+            else:
+                response = requests.get(
+                    url, cookies=COOKIES, timeout=10
+                )
             response.raise_for_status()
         data = response.json()
         return data
@@ -128,7 +151,8 @@ def process_rejudge_for_single_run(run_id: str) -> None:
         rejudge_submission_endpoint,
         {
             "run_alias": run_id,
-        }
+        },
+        use_post=True,
     )
 
 
@@ -145,7 +169,7 @@ def regudge_all_ce_submissions() -> None:
     with logging_redirect_tqdm():
         for run_id in tqdm(run_ids_list):
             process_rejudge_for_single_run(run_id)
-        print("Total of rejudged submissions: %s" % len(run_ids_list))
+        print(f"Total of rejudged submissions: {len(run_ids_list)}")
 
 
 def handle_input() -> None:

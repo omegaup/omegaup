@@ -217,4 +217,8 @@ h5.intro-subtitle {
   width: 20rem;
   border-bottom: 4px solid $omegaup-primary--accent;
 }
+
+[data-markdown-statement] a {
+  overflow-wrap: anywhere;
+}
 </style>

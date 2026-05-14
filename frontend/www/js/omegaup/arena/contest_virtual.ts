@@ -31,11 +31,41 @@ import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
+import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
+
+  // Enforce single tab for virtual contests
+  let isBlocked = false;
+  let blockedMessage: string | null = null;
+  const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+  await new Promise<void>((resolve) => {
+    let settled = false;
+
+    const timeoutId = window.setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve();
+    }, TAB_ENFORCER_TIMEOUT_MS);
+
+    enforceSingleTab(payload.contest.alias, (message: string) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      isBlocked = true;
+      blockedMessage = message;
+      window.clearTimeout(timeoutId);
+      resolve();
+    });
+  });
+
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
@@ -157,6 +187,8 @@ OmegaUp.on('ready', async () => {
       nextSubmissionTimestamp,
       nextExecutionTimestamp,
       runDetailsData: runDetails,
+      isBlocked,
+      blockedMessage,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -184,6 +216,8 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
         },
         on: {
           'navigate-to-problem': ({

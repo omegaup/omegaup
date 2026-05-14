@@ -27,7 +27,11 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problems = [];
         for ($i = 0; $i < 6; $i++) {
-            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                ])
+            );
         }
 
         // Prepare setup:

@@ -21,52 +21,27 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/egoi25.png',
+    image: '/media/homepage/carousel_slide_4.svg',
     title: {
-      en: 'Mexico present at EGOI 2025',
-      es: 'México presente en la EGOI 2025',
-      pt: 'México presente na EGOI 2025',
+      en: 'Start preparing with Intro OFMI',
+      es: 'Empieza a prepararte con Intro OFMI',
+      pt: 'Comece a se preparar com o Intro OFMI',
     },
     description: {
       en:
-        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
+        'New to competitive programming? Take the Intro OFMI course and start building the skills needed to participate in the Olympiad.',
       es:
-        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
+        '¿Eres nueva en la programación competitiva? Toma el curso Intro OFMI y comienza a desarrollar las habilidades necesarias para participar en la olimpiada.',
       pt:
-        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
+        'Nova na programação competitiva? Faça o curso Intro OFMI e comece a desenvolver as habilidades necessárias para participar da olimpíada.',
     },
     button: {
       text: {
-        en: 'EGOI',
-        es: 'EGOI',
-        pt: 'EGOI',
+        en: 'Start course',
+        es: 'Comenzar curso',
+        pt: 'Começar curso',
       },
-      href: 'https://egoi.org/',
-      target: '_blank',
-    },
-  },
-  {
-    image: '/media/homepage/copa.png',
-    title: {
-      en: 'Copa de Comunidades de Programación',
-      es: 'Copa de Comunidades de Programación',
-      pt: 'Copa de Comunidades de Programação',
-    },
-    description: {
-      en:
-        'Congratulations to all the winners and thank you for participating! 💪 Keep practicing and get ready for the next edition! 🚀',
-      es:
-        '¡Felicitaciones a todos los ganadores y gracias por su participación! 💪 ¡Sigue practicando y prepárate para la próxima edición! 🚀',
-      pt:
-        'Parabéns a todos os vencedores e obrigado pela participação! 💪 Continue praticando e prepare-se para a próxima edição! 🚀',
-    },
-    button: {
-      text: {
-        en: 'Final Ranklist',
-        es: 'Ranklist final',
-        pt: 'Ranklist final',
-      },
-      href: 'https://omegaup.github.io/CCP/',
+      href: 'https://omegaup.com/course/Intro-OFMI/',
       target: '_blank',
     },
   },
@@ -92,6 +67,56 @@ const carouselConfig: {
         pt: 'Siga-nos',
       },
       href: 'https://www.instagram.com/omegaup_org/',
+      target: '_blank',
+    },
+  },
+  {
+    image: '/media/homepage/blog.svg',
+    title: {
+      en: 'Visit our blog',
+      es: 'Visita nuestro blog',
+      pt: 'Visite nosso blog',
+    },
+    description: {
+      en:
+        'Discover tutorials, articles, and the latest news from the omegaUp community.',
+      es:
+        'Descubre tutoriales, artículos y las últimas noticias de la comunidad de omegaUp.',
+      pt:
+        'Descubra tutoriais, artigos e as últimas notícias da comunidade omegaUp.',
+    },
+    button: {
+      text: {
+        en: 'Go to Blog',
+        es: 'Ir al blog',
+        pt: 'Ir para o blog',
+      },
+      href: 'https://blog.omegaup.com/',
+      target: '_blank',
+    },
+  },
+  {
+    image: '/media/homepage/carousel_slide_UX_experience.png',
+    title: {
+      en: 'omegaUp UX experience',
+      es: 'Experiencia de usuario de omegaUp',
+      pt: 'Experiência de usuário de omegaUp',
+    },
+    description: {
+      en:
+        'Your opinion builds our community!\nAt omegaUp, our priority is you. We want to know what you love and what we can improve so that your learning experience is amazing.\nIt will only take 3 minutes.\nThanks for helping us grow!',
+      es:
+        '¡Tu opinión construye nuestra comunidad!\nEn omegaUp, nuestra prioridad eres tú. Queremos saber qué te encanta y qué podemos mejorar para que tu experiencia de aprendizaje sea increíble.\nSolo te tomará 3 minutos.\n¡Gracias por ayudarnos a crecer!',
+      pt:
+        'Sua opinião constrói nossa comunidade!\nNa omegaUp, nossa prioridade é você. Queremos saber o que você ama e o que podemos melhorar para que sua experiência de aprendizado seja incrível.\nLevará apenas 3 minutos.\nObrigado por nos ajudar a crescer!',
+    },
+    button: {
+      text: {
+        en: 'Click here to answer',
+        es: 'Haz clic aquí para responder',
+        pt: 'Clique aqui para responder',
+      },
+      href: 'https://forms.gle/q8fi19Y2qtPU3uVt6',
       target: '_blank',
     },
   },

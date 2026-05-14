@@ -123,7 +123,7 @@ export interface CaseLineInfo extends Omit<CaseLine, 'lineID' | 'caseID'> {
  * @typedef {object}
  * @property {CaseID} caseID UUID of the case
  * @property {GroupID} groupID UUID referencing to the parent group
- * @property {stirng} name Name of the case
+ * @property {string} name Name of the case
  * @property {number | null} points Points of the case
  * @property {Array<CaseLine>} lines Lines containing .IN information of the cases
  * @property {string} output output of the case

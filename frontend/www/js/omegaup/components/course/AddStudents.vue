@@ -34,7 +34,7 @@
           <textarea
             v-model="participants"
             data-course-multiple-students-add
-            class="form-control pariticipants"
+            class="form-control participants"
             rows="4"
           ></textarea>
         </div>

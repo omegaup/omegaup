@@ -36,7 +36,7 @@ OmegaUp.on('ready', () => {
       initialTab: window.location.hash
         ? window.location.hash.substring(1)
         : 'course',
-      invalidParameterName: '',
+      invalidParameterName: null as null | string,
       token: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
@@ -329,7 +329,6 @@ OmegaUp.on('ready', () => {
                 if (assignment.assignment_type == 'lesson') {
                   ui.success(T.courseAssignmentLectureAdded);
                 } else {
-                  console.log(data.solutionStatus);
                   if (data.solutionStatus === 'not_found') {
                     ui.success(T.courseAssignmentProblemAdded);
                   } else {
@@ -567,7 +566,7 @@ OmegaUp.on('ready', () => {
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,
                   }),
-                  /*autoHide=*/ false,
+                  { autoHide: false },
                 );
               })
               .catch(ui.apiError);
@@ -631,10 +630,28 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'invalid-languages': () => {
+            ui.error(T.courseNewFormLanguagesRequired);
+            this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
+          },
         },
         ref: 'component',
       });
     },
   });
   const component = courseEdit.$refs.component as course_Edit;
+
+  // Handle browser back/forward navigation for hash-based tabs
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+    courseEdit.$data.initialTab = hash || 'course';
+  };
+
+  window.addEventListener('hashchange', onHashChange);
 });

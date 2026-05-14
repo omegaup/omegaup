@@ -40,6 +40,6 @@
 * Design a poster to promote the use of omegaUp in schools. Meant to be posted on bulletin boards.
 
 # Communications
-## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
+## If you have questions about the [development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
 
 Communication with our organization and fellow candidates is carried through our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'omegaUp2016'). We encourage you to join it :)

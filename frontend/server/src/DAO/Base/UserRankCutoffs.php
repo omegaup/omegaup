@@ -19,6 +19,216 @@ namespace OmegaUp\DAO\Base;
  */
 abstract class UserRankCutoffs {
     /**
+     * Guardar registros.
+     *
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * pasado en la base de datos. La llave primaria indicará qué instancia va
+     * a ser actualizada en base de datos. Si la llave primara o combinación de
+     * llaves primarias que describen una fila que no se encuentra en la base de
+     * datos, entonces replace() creará una nueva fila.
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
+     * llave primaria están vacías.
+     *
+     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRankCutoffs}.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     */
+    final public static function replace(
+        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+    ): int {
+        if (
+            empty($User_Rank_Cutoffs->classname)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+        $sql = '
+            REPLACE INTO
+                User_Rank_Cutoffs (
+                    `score`,
+                    `percentile`,
+                    `classname`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
+        $params = [
+            (
+                !is_null($User_Rank_Cutoffs->score) ?
+                floatval($User_Rank_Cutoffs->score) :
+                null
+            ),
+            (
+                !is_null($User_Rank_Cutoffs->percentile) ?
+                floatval($User_Rank_Cutoffs->percentile) :
+                null
+            ),
+            $User_Rank_Cutoffs->classname,
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Actualizar registros.
+     *
+     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El objeto de tipo UserRankCutoffs a actualizar.
+     *
+     * @return int Número de filas afectadas
+     */
+    final public static function update(
+        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+    ): int {
+        $sql = '
+            UPDATE
+                `User_Rank_Cutoffs`
+            SET
+                `score` = ?,
+                `percentile` = ?
+            WHERE
+                (
+                    `classname` = ?
+                );';
+        $params = [
+            (
+                is_null($User_Rank_Cutoffs->score) ?
+                null :
+                floatval($User_Rank_Cutoffs->score)
+            ),
+            (
+                is_null($User_Rank_Cutoffs->percentile) ?
+                null :
+                floatval($User_Rank_Cutoffs->percentile)
+            ),
+            $User_Rank_Cutoffs->classname,
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Obtener {@link \OmegaUp\DAO\VO\UserRankCutoffs} por llave primaria.
+     *
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * de la base de datos usando sus llaves primarias.
+     *
+     * @return ?\OmegaUp\DAO\VO\UserRankCutoffs Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\UserRankCutoffs} o NULL si no hay tal
+     * registro.
+     */
+    final public static function getByPK(
+        ?string $classname
+    ): ?\OmegaUp\DAO\VO\UserRankCutoffs {
+        $sql = '
+            SELECT
+                `User_Rank_Cutoffs`.`score`,
+                `User_Rank_Cutoffs`.`percentile`,
+                `User_Rank_Cutoffs`.`classname`
+            FROM
+                `User_Rank_Cutoffs`
+            WHERE
+                (
+                    `classname` = ?
+                )
+            LIMIT 1;';
+        $params = [$classname];
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\UserRankCutoffs($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\UserRankCutoffs} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?string $classname
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `User_Rank_Cutoffs`
+            WHERE
+                (
+                    `classname` = ?
+                );';
+        $params = [$classname];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
+     * Contar todos los registros en `User_Rank_Cutoffs`.
+     *
+     * Este método obtiene el número total de filas de la tabla **sin cargar campos**,
+     * útil para pruebas donde sólo se valida el conteo.
+     *
+     * @return int Número total de registros.
+     */
+    final public static function countAll(): int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `User_Rank_Cutoffs`;';
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, []);
+        return intval($count);
+    }
+
+    /**
+     * Eliminar registros.
+     *
+     * Este metodo eliminará el registro identificado por la llave primaria en
+     * el objeto {@link \OmegaUp\DAO\VO\UserRankCutoffs} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
+     *
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
+     *
+     * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El
+     * objeto de tipo \OmegaUp\DAO\VO\UserRankCutoffs a eliminar
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
+     */
+    final public static function delete(
+        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+    ): void {
+        $sql = '
+            DELETE FROM
+                `User_Rank_Cutoffs`
+            WHERE
+                (
+                    `classname` = ?
+                );';
+        $params = [
+            $User_Rank_Cutoffs->classname
+        ];
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+    }
+
+    /**
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos

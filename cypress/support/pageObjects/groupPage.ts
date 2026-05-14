@@ -1,6 +1,23 @@
 import { GroupOptions, TeamGroupOptions } from '../types';
 
 export class GroupPage {
+  /**
+   * Dismisses the global notification alert by clicking its close button.
+   * Asserts the alert is visible before clicking and verifies it disappears after.
+   * Uses a fresh DOM query after click to avoid flakiness from detached elements.
+   */
+  private dismissAlert(): void {
+    // First, locate and assert the alert is visible, then click its close button
+    // Uses role="alert" selector which works with both old jQuery and new Vue notifications
+    cy.get('.alert[role="alert"]')
+      .should('be.visible')
+      .find('[data-alert-close]')
+      .click();
+
+    // Perform a fresh root query to verify the alert was dismissed
+    cy.get('.alert[role="alert"]').should('not.exist');
+  }
+
   createGroup(groupOptions: GroupOptions): void {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-user-groups]').click();
@@ -36,9 +53,7 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    cy.waitUntil(() => {
-      return cy.get('#alert-close').should('not.be.visible');
-    });
+    this.dismissAlert();
 
     cy.get('[href="#members"]').click();
     cy.get('@userNamesList').then((textArray) => {
@@ -80,10 +95,7 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    cy.get('#alert-close').click();
-    cy.waitUntil(() => {
-      return cy.get('#alert-close').should('not.be.visible');
-    });
+    this.dismissAlert();
 
     cy.get('[href="#teams"]').click();
     cy.get('@teamNamesList').then((textArray) => {
