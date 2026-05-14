@@ -2488,6 +2488,14 @@ export namespace types {
       );
     }
 
+    export function UserHelpPayload(
+      elementId: string = 'payload',
+    ): types.UserHelpPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -3914,6 +3922,13 @@ export namespace types {
     scoreboardAlias: string;
   }
 
+  export interface HelpResource {
+    external: boolean;
+    icon: string;
+    name: string;
+    url: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
@@ -5167,6 +5182,10 @@ export namespace types {
     url: string;
   }
 
+  export interface UserHelpPayload {
+    helpResources: types.HelpResource[];
+  }
+
   export interface UserInfoForProblem {
     admin: boolean;
     loggedIn: boolean;
@@ -6305,8 +6324,6 @@ export namespace messages {
     solved: number;
     tags: { count: number; name: string }[];
   };
-  export type UserRecordCookieConsentRequest = { [key: string]: any };
-  export type UserRecordCookieConsentResponse = {};
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -7192,9 +7209,6 @@ export namespace controllers {
     profileStatistics: (
       params?: messages.UserProfileStatisticsRequest,
     ) => Promise<messages.UserProfileStatisticsResponse>;
-    recordCookieConsent: (
-      params?: messages.UserRecordCookieConsentRequest,
-    ) => Promise<messages.UserRecordCookieConsentResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;
