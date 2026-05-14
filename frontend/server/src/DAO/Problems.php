@@ -43,10 +43,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $tagIds = array_map(fn($row) => $row['tag_id'], $tagResults);
         $allTagsPublic = array_reduce(
             $tagResults,
-            /**
-             * @param bool $carry
-             * @param array{public: bool, tag_id: int} $row
-             */
             fn($carry, $row) => $carry && ($row['public'] === true),
             true
         );
@@ -401,7 +397,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
-        /** @var list<array{0: string, 1: list<float|int|string>}> */
+        /** @var list<array{0: string, 1: list<string>}> */
         foreach ($programmingLanguages as $programmingLanguage) {
             $clauses[] = [
                 'FIND_IN_SET(?, p.languages) > 0',
