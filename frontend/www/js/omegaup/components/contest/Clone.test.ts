@@ -39,6 +39,6 @@ describe('Clone.vue', () => {
     await wrapper.find('button[type="submit"]').trigger('click');
     expect(wrapper.emitted('clone')).toBeDefined();
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

@@ -78,7 +78,7 @@ const rankingMapping: { classname: string; rank: string }[] = [
 describe('SidebarMainInfo.vue', () => {
   it('Should display visible buttons', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: { profile, data },
+      props: { profile, data },
     });
     for (const url of urlMapping.filter(
       (url: { key: string; title: string; visible: boolean }) => url.visible,
@@ -97,14 +97,14 @@ describe('SidebarMainInfo.vue', () => {
 
   it('Should display number of solved problems', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: { profile, data },
+      props: { profile, data },
     });
     expect(wrapper.find('div[data-solved-problems]>h4').text()).toBe('3');
   });
 
   it('Should not display buttons for a different user profile', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: {
+      props: {
         profile: { ...profile, ...{ is_own_profile: false } },
         data,
       },
@@ -118,7 +118,7 @@ describe('SidebarMainInfo.vue', () => {
 
   it('Should display Add password button when user does not have password', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: {
+      props: {
         profile,
         data: { ...data, ...{ hasPassword: false } },
       },
@@ -136,7 +136,7 @@ describe('SidebarMainInfo.vue', () => {
 describe.each(rankingMapping)(`A user:`, (rank) => {
   it(`whose classname is ${rank.classname} should have rank ${rank.rank}`, () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: {
+      props: {
         profile: { ...profile, ...{ classname: rank.classname } },
         data,
       },

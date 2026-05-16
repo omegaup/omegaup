@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
       roles: payload.systemRoles,
       verified: payload.verified,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-admin-user', {
         props: {
           emails: payload.emails,

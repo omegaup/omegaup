@@ -30,7 +30,7 @@ describe('CaseInput.vue', () => {
 
     expect(inputElements.length).toBe(expectedTextInputText.length);
 
-    inputElements.wrappers.forEach((element, index) => {
+    inputElements.forEach((element, index) => {
       expect(element.attributes('label')).toBe(expectedTextInputText[index]); // We need to make it like this because that's how Vue-Bootstrap input element works
     });
   });

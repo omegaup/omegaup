@@ -7,7 +7,7 @@ import course_Clarifications from './Clarifications.vue';
 describe('CourseClarifications.vue', () => {
   it('Should display correct table headers', async () => {
     const wrapper = mount(course_Clarifications, {
-      propsData: {
+      props: {
         isAdmin: true,
         clarifications: [
           {

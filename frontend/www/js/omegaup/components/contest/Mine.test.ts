@@ -7,7 +7,7 @@ import contest_Mine from './Mine.vue';
 describe('Mine.vue', () => {
   it('Should handle empty list of contests', async () => {
     const wrapper = shallowMount(contest_Mine, {
-      propsData: {
+      props: {
         contests: [],
         privateContestsAlert: false,
       },

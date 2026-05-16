@@ -7,7 +7,7 @@ import problem_FilterDifficulty from './FilterDifficulty.vue';
 describe('FilterDifficulty.vue', () => {
   it('Should handle empty difficulty text', async () => {
     const wrapper = mount(problem_FilterDifficulty, {
-      propsData: {
+      props: {
         selectedDifficulty: null,
       },
     });

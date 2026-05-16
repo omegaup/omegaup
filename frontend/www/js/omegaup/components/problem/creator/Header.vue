@@ -83,14 +83,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch } from 'vue-facing-decorator';
 import JSZip from 'jszip';
-import { namespace } from 'vuex-class';
 import T from '../../../lang';
 import * as ui from '../../../ui';
 import { Group, CaseGroupID } from '@/js/omegaup/problem/creator/types';
-
-const casesStore = namespace('casesStore');
 
 @Component
 export default class Header extends Vue {
@@ -102,9 +100,15 @@ export default class Header extends Vue {
   nameInternal: string = T.problemCreatorEmpty;
   zip: JSZip = new JSZip();
 
-  @casesStore.State('groups') groups!: Group[];
-  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
-  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
+  get groups(): Group[] {
+    return this.$store.state.casesStore.groups;
+  }
+
+  get getStringifiedLinesFromCaseGroupID(): (
+    caseGroupID: CaseGroupID,
+  ) => string {
+    return this.$store.getters['casesStore/getStringifiedLinesFromCaseGroupID'];
+  }
 
   get name(): string {
     return this.nameInternal;

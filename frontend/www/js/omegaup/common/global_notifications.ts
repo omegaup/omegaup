@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-global-notifications': common_GlobalNotifications,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-global-notifications');
     },
   });

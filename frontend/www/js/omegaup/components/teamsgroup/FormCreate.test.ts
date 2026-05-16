@@ -44,7 +44,7 @@ describe('FormCreate.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle changes in name field', async () => {

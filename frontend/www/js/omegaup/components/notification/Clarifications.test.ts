@@ -27,7 +27,7 @@ describe('Clarifications.vue', () => {
   ] as types.Clarification[];
   it('Should handle empty notifications list for clarifications', () => {
     const wrapper = mount(notification_Clarifications, {
-      propsData: {
+      props: {
         clarifications: [],
       },
     });
@@ -37,7 +37,7 @@ describe('Clarifications.vue', () => {
 
   it('Should handle mark all as read button for clarifications', async () => {
     const wrapper = mount(notification_Clarifications, {
-      propsData: {
+      props: {
         clarifications,
       },
     });
@@ -51,7 +51,7 @@ describe('Clarifications.vue', () => {
 
   it('Should handle close button for a certain clarification', async () => {
     const wrapper = mount(notification_Clarifications, {
-      propsData: {
+      props: {
         clarifications,
       },
     });

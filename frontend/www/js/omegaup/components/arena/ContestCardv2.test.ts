@@ -75,7 +75,7 @@ describe('ContestCardv2.vue', () => {
 
   it('Should show the current contest card', async () => {
     const wrapper = mount(ContestCardv2, {
-      propsData: {
+      props: {
         contest: currentContest,
         contestTab: currentTab,
       },
@@ -105,7 +105,7 @@ describe('ContestCardv2.vue', () => {
 
   it('Should show the future contest card', async () => {
     const wrapper = mount(ContestCardv2, {
-      propsData: {
+      props: {
         contest: futureContest,
         contestTab: futureTab,
       },
@@ -132,7 +132,7 @@ describe('ContestCardv2.vue', () => {
 
   it('Should show the past contest card', async () => {
     const wrapper = mount(ContestCardv2, {
-      propsData: {
+      props: {
         contest: pastContest,
         contestTab: pastTab,
       },

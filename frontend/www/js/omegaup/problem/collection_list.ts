@@ -57,7 +57,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-problem-collection-list': problem_CollectionList,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-problem-collection-list', {
         props: {
           data: payload,

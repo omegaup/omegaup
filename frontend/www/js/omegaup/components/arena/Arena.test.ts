@@ -6,7 +6,7 @@ import arena_Arena from './Arena.vue';
 describe('Arena.vue', () => {
   it('Should handle details for a contest', () => {
     const wrapper = shallowMount(arena_Arena, {
-      propsData: {
+      props: {
         title: 'Hello omegaUp',
         activeTab: 'problems',
       },
@@ -21,7 +21,7 @@ describe('Arena.vue', () => {
 
   it('Should mark as read clarifications tab', async () => {
     const wrapper = shallowMount(arena_Arena, {
-      propsData: {
+      props: {
         title: 'Hello omegaUp',
         activeTab: 'problems',
         clarifications: [

@@ -311,7 +311,8 @@
 
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {

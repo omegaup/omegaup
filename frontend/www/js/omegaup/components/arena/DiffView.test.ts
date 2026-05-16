@@ -7,7 +7,7 @@ import arena_DiffView from './DiffView.vue';
 describe('DiffView.vue', () => {
   it('Should handle diffs', async () => {
     const wrapper = shallowMount(arena_DiffView, {
-      propsData: {
+      props: {
         left: 'hello',
         right: 'hello',
       },

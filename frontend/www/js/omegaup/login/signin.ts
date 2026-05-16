@@ -84,7 +84,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       initialActiveTab,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-login-signin', {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
@@ -192,5 +192,5 @@ OmegaUp.on('ready', () => {
     userSignin.initialActiveTab = tab;
     window.location.hash = `#${tab}`;
   };
-  EventBus.$on('update:activeTab', onActiveTab);
+  EventBus.on('update:activeTab', onActiveTab);
 });

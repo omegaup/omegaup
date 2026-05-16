@@ -6,7 +6,7 @@ import common_MultiTypeahead from './MultiTypeahead.vue';
 describe('MultiTypeahead.vue', () => {
   it('Should not call update-existing-options with a short query', async () => {
     const wrapper = mount(common_MultiTypeahead, {
-      propsData: {
+      props: {
         existingOptions: [],
       },
     });
@@ -18,7 +18,7 @@ describe('MultiTypeahead.vue', () => {
 
   it('Should call update-existing-options with a longer query', async () => {
     const wrapper = mount(common_MultiTypeahead, {
-      propsData: {
+      props: {
         existingOptions: [],
       },
     });
@@ -32,7 +32,7 @@ describe('MultiTypeahead.vue', () => {
 
   it('Should call update:value with a non-empty tag', async () => {
     const wrapper = mount(common_MultiTypeahead, {
-      propsData: {
+      props: {
         existingOptions: [],
       },
     });
@@ -51,7 +51,7 @@ describe('MultiTypeahead.vue', () => {
 
   it('Should call update:value with an empty tag', async () => {
     const wrapper = mount(common_MultiTypeahead, {
-      propsData: {
+      props: {
         existingOptions: [{ key: 'key', value: 'value' }],
       },
     });

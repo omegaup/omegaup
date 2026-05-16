@@ -26,8 +26,8 @@
       <table class="table table-striped mb-0">
         <thead>
           <tr>
-            <template v-for="column in columnNames">
-              <th :key="column.name" :class="column.style">
+            <template v-for="column in columnNames" :key="column.name">
+              <th :class="column.style">
                 {{ column.name }}
               </th>
             </template>
@@ -97,7 +97,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import { LinkableResource } from '../../linkable_resource';
 

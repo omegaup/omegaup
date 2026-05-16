@@ -30,7 +30,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Emit, Watch } from 'vue-facing-decorator';
 import T from '../lang';
 
 @Component
@@ -43,10 +44,14 @@ export default class RadioSwitch extends Vue {
   @Prop({ default: T.wordsYes }) textForTrue!: string;
   @Prop({ default: T.wordsNo }) textForFalse!: string;
 
-  radioValue = this.selectedValue ?? this.valueForFalse;
+  radioValue: any;
 
   @Watch('radioValue')
   @Emit('update:value')
+  created() {
+    this.radioValue = this.selectedValue ?? this.valueForFalse;
+  }
+
   onUpdateInput(newValue: any): any {
     return newValue;
   }

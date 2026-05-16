@@ -8,7 +8,7 @@ import teamsgroup_List from './List.vue';
 describe('List.vue', () => {
   it('Should handle an empty list of teams groups', () => {
     const wrapper = shallowMount(teamsgroup_List, {
-      propsData: {
+      props: {
         teamsGroups: [] as types.TeamsGroup[],
       },
     });
@@ -18,7 +18,7 @@ describe('List.vue', () => {
 
   it('Should handle a list of teams groups', () => {
     const wrapper = shallowMount(teamsgroup_List, {
-      propsData: {
+      props: {
         teamsGroups: [
           {
             alias: 'omegaUp',

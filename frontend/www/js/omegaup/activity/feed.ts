@@ -11,7 +11,7 @@ OmegaUp.on('ready', function () {
     components: {
       'omegaup-activity-feed': activity_Feed,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-activity-feed', {
         props: {
           page: payload.page,

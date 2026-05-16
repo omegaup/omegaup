@@ -11,7 +11,7 @@ import course_ViewStudent from './ViewStudent.vue';
 describe('ViewStudent.vue', () => {
   it('Should handle empty runs', () => {
     const wrapper = shallowMount(course_ViewStudent, {
-      propsData: {
+      props: {
         course: {
           alias: 'hello',
         },
@@ -104,7 +104,7 @@ describe('ViewStudent.vue', () => {
 
   it('Should handle runs', async () => {
     const wrapper = mount(course_ViewStudent, {
-      propsData: {
+      props: {
         course: {
           alias: 'hello',
         },

@@ -396,9 +396,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import problemCreator_LayoutSidebar from './LayoutSidebar.vue';
-import { namespace } from 'vuex-class';
 import T from '../../../../lang';
 import {
   Group,
@@ -407,8 +407,6 @@ import {
   CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
 import JSZip from 'jszip';
-
-const casesStore = namespace('casesStore');
 
 @Component({
   components: {
@@ -421,38 +419,63 @@ export default class Sidebar extends Vue {
 
   @Prop() showWindow!: boolean;
 
-  @casesStore.State('groups') groups!: Group[];
-  @casesStore.Getter('getUngroupedCases') ungroupedCases!: Group[];
-  @casesStore.Getter('getGroupsButUngroupedCases')
-  groupsButUngroupedCases!: Group[];
-  @casesStore.Getter('getTotalPointsForUngroupedCases')
-  getTotalPointsForUngroupedCases!: number;
-  @casesStore.Mutation('deleteGroup') deleteGroup!: (groupID: GroupID) => void;
-  @casesStore.Mutation('addLayoutFromSelectedCase')
-  addLayoutFromSelectedCase!: () => void;
-  @casesStore.Mutation('addNewLayout')
-  addNewLayout!: () => void;
-  @casesStore.Mutation('validateAndFixPoints')
-  validateAndFixPoints!: () => void;
-  @casesStore.Mutation('deleteCase') deleteCase!: ({
-    groupID,
-    caseID,
-  }: CaseGroupID) => void;
-  @casesStore.Mutation('deleteGroupCases') deleteGroupCases!: (
-    groupID: GroupID,
-  ) => void;
-  @casesStore.Mutation('deleteUngroupedCases')
-  deleteUngroupedCases!: () => void;
-  @casesStore.Mutation('setSelected') setSelected!: (
-    CaseGroupsIDToBeSelected: CaseGroupID,
-  ) => void;
-  @casesStore.Mutation('updateGroup') updateGroup!: ([
-    groupID,
-    newName,
-    newPoints,
-  ]: [GroupID, string, number]) => void;
-  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
-  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
+  get groups(): Group[] {
+    return this.$store.state.casesStore.groups;
+  }
+
+  get ungroupedCases(): Group[] {
+    return this.$store.getters['casesStore/getUngroupedCases'];
+  }
+
+  get groupsButUngroupedCases(): Group[] {
+    return this.$store.getters['casesStore/getGroupsButUngroupedCases'];
+  }
+
+  get getTotalPointsForUngroupedCases(): number {
+    return this.$store.getters['casesStore/getTotalPointsForUngroupedCases'];
+  }
+
+  deleteGroup(groupID: GroupID) {
+    this.$store.commit('casesStore/deleteGroup', groupID);
+  }
+
+  addLayoutFromSelectedCase() {
+    this.$store.commit('casesStore/addLayoutFromSelectedCase');
+  }
+
+  addNewLayout() {
+    this.$store.commit('casesStore/addNewLayout');
+  }
+
+  validateAndFixPoints() {
+    this.$store.commit('casesStore/validateAndFixPoints');
+  }
+
+  deleteCase({ groupID, caseID }: CaseGroupID) {
+    this.$store.commit('casesStore/deleteCase', { groupID, caseID });
+  }
+
+  deleteGroupCases(groupID: GroupID) {
+    this.$store.commit('casesStore/deleteGroupCases', groupID);
+  }
+
+  deleteUngroupedCases() {
+    this.$store.commit('casesStore/deleteUngroupedCases');
+  }
+
+  setSelected(CaseGroupsIDToBeSelected: CaseGroupID) {
+    this.$store.commit('casesStore/setSelected', CaseGroupsIDToBeSelected);
+  }
+
+  updateGroup([groupID, newName, newPoints]: [GroupID, string, number]) {
+    this.$store.commit('casesStore/updateGroup', [groupID, newName, newPoints]);
+  }
+
+  get getStringifiedLinesFromCaseGroupID(): (
+    caseGroupID: CaseGroupID,
+  ) => string {
+    return this.$store.getters['casesStore/getStringifiedLinesFromCaseGroupID'];
+  }
 
   validateAndFixPointsModal: boolean = false;
   showUngroupedCases = false;

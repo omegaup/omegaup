@@ -79,7 +79,7 @@ const baseScoreboardProps = {
 describe('Scoreboard.vue', () => {
   it('Should handle scoreboard in a contest', async () => {
     const wrapper = shallowMount(arena_Scoreboard, {
-      propsData: Object.assign(
+      props: Object.assign(
         {
           showInvitedUsersFilter: true,
         },
@@ -110,7 +110,7 @@ describe('Scoreboard.vue', () => {
 
   it('Should handle scoreboard in a course', () => {
     const wrapper = shallowMount(arena_Scoreboard, {
-      propsData: Object.assign(
+      props: Object.assign(
         {
           showInvitedUsersFilter: false,
         },
@@ -133,7 +133,7 @@ describe('Scoreboard.vue', () => {
 
   it('Should handle scoreboard with limited finishTime', () => {
     const wrapper = mount(arena_Scoreboard, {
-      propsData: baseScoreboardProps,
+      props: baseScoreboardProps,
     });
 
     expect(wrapper.find('.clock').text()).toBe('00:00:00');
@@ -141,7 +141,7 @@ describe('Scoreboard.vue', () => {
 
   it('Should handle scoreboard with unlimited finishTime', () => {
     const wrapper = mount(arena_Scoreboard, {
-      propsData: { ...baseScoreboardProps, ...{ finishTime: null } },
+      props: { ...baseScoreboardProps, ...{ finishTime: null } },
     });
 
     expect(wrapper.find('.clock').text()).toBe('∞');
@@ -149,7 +149,7 @@ describe('Scoreboard.vue', () => {
 
   it('Should handle scoreboard when socket status changes', async () => {
     const wrapper = mount(arena_Scoreboard, {
-      propsData: baseScoreboardProps,
+      props: baseScoreboardProps,
     });
 
     expect(wrapper.find('.omegaup-scoreboard>div>h2>span').text()).toBe(

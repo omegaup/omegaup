@@ -4,7 +4,7 @@ import ProblemMarkdown from './ProblemMarkdown.vue';
 describe('problem/ProblemMarkdown.vue', () => {
   it('renders simple markdown with MathJax and template', async () => {
     const wrapper = mount(ProblemMarkdown, {
-      propsData: {
+      props: {
         markdown: '$a^2 + b^2 = c^2$\n\n{{output-only:download}}',
       },
     });
@@ -20,7 +20,7 @@ describe('problem/ProblemMarkdown.vue', () => {
 
   it('renders libinteractive template properly', async () => {
     const wrapper = mount(ProblemMarkdown, {
-      propsData: {
+      props: {
         markdown: '{{libinteractive:download}}',
       },
     });
@@ -32,7 +32,7 @@ describe('problem/ProblemMarkdown.vue', () => {
 
   it('cleans up templates on markdown change', async () => {
     const wrapper = mount(ProblemMarkdown, {
-      propsData: {
+      props: {
         markdown: '{{output-only:download}}',
       },
     });

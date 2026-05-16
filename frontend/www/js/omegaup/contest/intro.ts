@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-contest-intro': contest_Intro,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-contest-intro', {
         props: {
           requestsUserInformation: payload.requestsUserInformation,

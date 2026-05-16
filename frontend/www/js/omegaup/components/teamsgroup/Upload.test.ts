@@ -10,7 +10,7 @@ import { CsvTeam } from '../../teamsgroup/edit';
 describe('Upload.vue', () => {
   it('Should handle upload teams view with identities', async () => {
     const wrapper = shallowMount(teamsgroup_Upload, {
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
       },
     });
@@ -49,7 +49,7 @@ describe('Upload.vue', () => {
 
   it('Should handle download identities to csv file', async () => {
     const wrapper = shallowMount(teamsgroup_Upload, {
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
       },
     });
@@ -107,7 +107,7 @@ describe('Upload.vue', () => {
 
   it('Should handle an invalid csv file', async () => {
     const wrapper = mount(teamsgroup_Upload, {
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
       },
     });
@@ -125,7 +125,7 @@ describe('Upload.vue', () => {
 
   it('Should handle a valid csv file', async () => {
     const wrapper = mount(teamsgroup_Upload, {
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
       },
     });
@@ -143,7 +143,7 @@ describe('Upload.vue', () => {
 
   it('Should emit the updated contestants limit when reading a csv file', async () => {
     const wrapper = mount(teamsgroup_Upload, {
-      propsData: {
+      props: {
         numberOfContestants: 3,
         searchResultUsers: [] as types.ListItem[],
       },

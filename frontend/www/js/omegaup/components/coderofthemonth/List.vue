@@ -46,7 +46,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import coderofthemonth_CodersList from './CodersList.vue';
@@ -75,7 +76,11 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() selectedTab!: string;
 
   T = T;
-  currentSelectedTab = this.selectedTab;
+  currentSelectedTab: string;
+
+  created() {
+    this.currentSelectedTab = this.selectedTab;
+  }
 
   get availableTabs(): { id: string; component: string; title: string }[] {
     const availableTabs = [

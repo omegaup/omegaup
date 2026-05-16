@@ -44,6 +44,6 @@ describe('FormBase.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

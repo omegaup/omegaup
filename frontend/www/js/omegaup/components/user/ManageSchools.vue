@@ -63,7 +63,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -87,8 +88,12 @@ export default class UserManageSchools extends Vue {
     ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
     : new Date('');
   school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
-  scholarDegree = this.profile.scholar_degree;
+  scholarDegree: any;
   isCurrentlyEnrolled = !this.profile.graduation_date;
+
+  created() {
+    this.scholarDegree = this.profile.scholar_degree;
+  }
 
   onUpdateUserSchools(): void {
     this.$emit('update-user-schools', {

@@ -62,7 +62,7 @@ OmegaUp.on('ready', () => {
           .catch(ui.apiError);
       },
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-teams-group-edit', {
         props: {
           alias: this.teamGroup.alias,

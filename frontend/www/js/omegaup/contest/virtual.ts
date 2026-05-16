@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-virtual': arena_Virtual },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-arena-virtual', {
         props: {
           title: payload.contest.title,

@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-homepage': Homepage,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-homepage', {
         props: {
           coderOfTheMonth: payload.coderOfTheMonthData

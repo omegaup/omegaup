@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import Vuex, { Commit } from 'vuex';
+import { createStore, Commit } from 'vuex';
 import * as api from '../api';
 import { messages, types } from '../api_types';
 import {
@@ -7,8 +6,6 @@ import {
   ContestOrder,
   ContestFilter,
 } from '../components/arena/ContestList.vue';
-
-Vue.use(Vuex);
 
 export interface UrlParams {
   page: number;
@@ -77,14 +74,23 @@ export const contestStoreConfig = {
       );
 
       // Append new contests to the existing list
-      Vue.set(state.contests, name, [...existingContests, ...newContests]);
-      Vue.set(state.countContests, name, response.number_of_results);
+      state.contests = {
+        ...state.contests,
+        [name]: [...existingContests, ...newContests],
+      };
+      state.countContests = {
+        ...state.countContests,
+        [name]: response.number_of_results,
+      };
 
       // Update cache with the full response
-      Vue.set(state.cache, cacheKey, {
-        results: response.results,
-        number_of_results: response.number_of_results,
-      });
+      state.cache = {
+        ...state.cache,
+        [cacheKey]: {
+          results: response.results,
+          number_of_results: response.number_of_results,
+        },
+      };
     },
   },
   actions: {
@@ -123,4 +129,4 @@ function generateCacheKey(params: UrlParams) {
   return `${params.tab_name}-${params.filter}-${params.sort_order}-${params.query}-${params.page}`;
 }
 
-export default new Vuex.Store<ContestState>(contestStoreConfig);
+export default createStore<ContestState>(contestStoreConfig);

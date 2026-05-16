@@ -20,8 +20,8 @@
           </tr>
         </thead>
         <tbody class="contest-list">
-          <template v-for="contest in page">
-            <tr :key="contest.alias">
+          <template v-for="contest in page" :key="contest.alias">
+            <tr>
               <td class="">
                 <a :href="ui.contestURL(contest)">
                   <span>{{ ui.contestTitle(contest) }}</span>
@@ -64,7 +64,7 @@
                 {{ contest.last_updated.long() }}
               </td>
             </tr>
-            <tr :key="`${contest.alias}-description`">
+            <tr>
               <td colspan="5">
                 {{ contest.description }}
               </td>
@@ -90,7 +90,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';

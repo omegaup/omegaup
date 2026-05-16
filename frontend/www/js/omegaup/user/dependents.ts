@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-user-dependents': user_Dependents,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-user-dependents', {
         props: {
           dependents: payload.dependents,

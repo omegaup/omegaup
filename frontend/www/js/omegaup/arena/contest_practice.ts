@@ -86,7 +86,7 @@ OmegaUp.on('ready', async () => {
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
           contest: payload.contest,

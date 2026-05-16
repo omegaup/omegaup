@@ -35,7 +35,7 @@ describe('Sidebar.vue', () => {
     const buttons = wrapper.findAllComponents(BButton);
     expect(buttons.length).toBe(initialButtonsCount);
     let shouldContainAddText = false;
-    buttons.wrappers.forEach((button) => {
+    buttons.forEach((button) => {
       if (button.text() === T.problemCreatorAdd) shouldContainAddText = true;
     });
     expect(shouldContainAddText).toBe(true);

@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-certificate-validation': certificate_Validation,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-certificate-validation', {
         props: {
           verificationCode: payload.verification_code,

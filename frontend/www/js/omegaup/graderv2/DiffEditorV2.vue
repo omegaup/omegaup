@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-facing-decorator';
 import store from '../grader/GraderStore';
 import * as monaco from 'monaco-editor';
 import T from '../lang';

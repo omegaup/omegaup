@@ -52,7 +52,7 @@ OmegaUp.on('ready', () => {
           .catch(ui.apiError);
       },
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-course-viewstudent', {
         props: {
           assignments: payload.course.assignments,

@@ -107,7 +107,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component
@@ -125,9 +126,13 @@ export default class Settings extends Vue {
 
   T = T;
 
-  currentOverallWallTimeLimit = this.overallWallTimeLimit;
+  currentOverallWallTimeLimit: number;
 
   @Watch('currentOverallWallTimeLimit')
+  created() {
+    this.currentOverallWallTimeLimit = this.overallWallTimeLimit;
+  }
+
   onOverallWallTimeLimitChanged(newVal: number) {
     if (newVal > 60000) {
       this.currentOverallWallTimeLimit = 60000;

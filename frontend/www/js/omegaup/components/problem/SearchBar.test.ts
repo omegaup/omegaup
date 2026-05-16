@@ -13,7 +13,7 @@ describe('SearchBar.vue', () => {
       pt: T.wordsPortuguese,
     };
     const wrapper = shallowMount(problem_SearchBar, {
-      propsData: {
+      props: {
         columns: ['title', 'quality', 'difficulty'],
         initialColumn: '',
         initialMode: '',
@@ -36,7 +36,7 @@ describe('SearchBar.vue', () => {
 
   it('Should handle the "only quality seal problems" checkbox', async () => {
     const wrapper = shallowMount(problem_SearchBar, {
-      propsData: {
+      props: {
         tags: [],
         keyword: '',
         language: '',

@@ -27,7 +27,7 @@ const profile: types.UserProfileInfo = {
 describe('ManageSchools.vue', () => {
   it('Should enable graduation date', async () => {
     const wrapper = mount(userManageSchools, {
-      propsData: {
+      props: {
         profile,
         searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
       },
@@ -43,7 +43,7 @@ describe('ManageSchools.vue', () => {
 
   it('Should emit user update schools', async () => {
     const wrapper = mount(userManageSchools, {
-      propsData: {
+      props: {
         profile,
         searchResultSchools: [{ key: 1, value: 'escuela' }],
       },

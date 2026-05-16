@@ -32,7 +32,7 @@ describe('SchoolRank.vue', () => {
 
   it('Should handle a rank with data', () => {
     const wrapper = shallowMount(schools_Rank, {
-      propsData: {
+      props: {
         ...propsData,
         ...{
           rank: [
@@ -63,7 +63,7 @@ describe('SchoolRank.vue', () => {
 
   it('Should hide search bar when showHeader is true', () => {
     const wrapper = shallowMount(schools_Rank, {
-      propsData: {
+      props: {
         ...propsData,
         showHeader: true,
       },

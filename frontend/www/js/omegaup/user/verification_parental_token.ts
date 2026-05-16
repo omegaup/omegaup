@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-verification-parental-token': user_VerificationParentalToken,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-verification-parental-token', {
         props: {
           hasParentalVerificationToken: payload.hasParentalVerificationToken,

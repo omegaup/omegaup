@@ -15,7 +15,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch, Prop } from 'vue-facing-decorator';
 import T from '../lang';
 import * as time from '../time';
 import '../../../third_party/js/bootstrap-datepicker.js';

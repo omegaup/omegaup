@@ -45,7 +45,7 @@ OmegaUp.on('ready', async () => {
       endOfResults: false,
       currentOffset: 0,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-arena-runs', {
         props: {
           contestAlias: 'admin',

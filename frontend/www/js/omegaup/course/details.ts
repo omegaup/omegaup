@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-course-details': course_Details,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-course-details', {
         props: {
           course: payload.details,

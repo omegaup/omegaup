@@ -62,7 +62,7 @@ describe('ScoreboardDetails.vue', () => {
       window_length: 0,
     };
     const wrapper = shallowMount(group_ScoreboardDetails, {
-      propsData: {
+      props: {
         groupAlias: 'groupAlias',
         scoreboardAlias: 'scoreboardAlias',
         ranking,

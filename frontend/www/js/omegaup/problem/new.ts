@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       errors: payload.parameter ? [payload.parameter] : [],
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-problem-new', {
         props: {
           data: payload,

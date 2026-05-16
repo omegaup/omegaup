@@ -8,7 +8,7 @@ import problem_CollectionList from './CollectionList.vue';
 describe('CollectionList.vue', () => {
   it('Should handle details of problem list collection by level', async () => {
     const wrapper = mount(problem_CollectionList, {
-      propsData: {
+      props: {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
           frequentTags: [
@@ -108,7 +108,7 @@ describe('CollectionList.vue', () => {
 
   it('Should toggle problem tags visibility', async () => {
     const wrapper = mount(problem_CollectionList, {
-      propsData: {
+      props: {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
           frequentTags: [] as types.TagWithProblemCount[],
@@ -185,7 +185,7 @@ describe('CollectionList.vue', () => {
 
   it('Should handle empty list of problems in collection by level', async () => {
     const wrapper = mount(problem_CollectionList, {
-      propsData: {
+      props: {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
           frequentTags: [{ alias: 'problemTagMatrices' }],

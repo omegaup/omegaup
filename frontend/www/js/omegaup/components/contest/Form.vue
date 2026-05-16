@@ -917,7 +917,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -1157,30 +1158,59 @@ export default class Form extends Vue {
   @Prop({ default: false }) canSetRecommended!: boolean;
   @Prop({ default: false }) initialRecommended!: boolean;
 
-  alias = this.initialAlias;
-  description = this.initialDescription;
-  feedback = this.initialFeedback;
-  finishTime = this.initialFinishTime;
-  languages = this.initialLanguages;
-  needsBasicInformation = this.initialNeedsBasicInformation;
-  penalty = this.initialPenalty;
-  penaltyType = this.initialPenaltyType;
-  pointsDecayFactor = this.initialPointsDecayFactor;
-  requestsUserInformation = this.initialRequestsUserInformation;
-  scoreboard = this.initialScoreboard;
-  showScoreboardAfter = this.initialShowScoreboardAfter;
-  currentScoreMode = this.scoreMode;
-  startTime = this.initialStartTime;
+  alias: string;
+  description: string;
+  feedback: string;
+  finishTime: Date;
+  languages: string[];
+
+  created() {
+    this.windowLengthEnabled = this.initialWindowLength !== null;
+    this.windowLength = this.initialWindowLength;
+    this.title = this.initialTitle;
+    this.startTime = this.initialStartTime;
+    this.currentScoreMode = this.scoreMode;
+    this.showScoreboardAfter = this.initialShowScoreboardAfter;
+    this.scoreboard = this.initialScoreboard;
+    this.pointsDecayFactor = this.initialPointsDecayFactor;
+    this.penaltyType = this.initialPenaltyType;
+    this.penalty = this.initialPenalty;
+    this.languages = this.initialLanguages;
+    this.finishTime = this.initialFinishTime;
+    this.feedback = this.initialFeedback;
+    this.description = this.initialDescription;
+    this.alias = this.initialAlias;
+  }
+
+  get needsBasicInformation(): boolean {
+    return this.initialNeedsBasicInformation;
+  }
+  penalty: number;
+  penaltyType: string;
+  pointsDecayFactor: number;
+  get requestsUserInformation(): string {
+    return this.initialRequestsUserInformation;
+  }
+  scoreboard: number;
+  showScoreboardAfter: boolean;
+  currentScoreMode: ScoreMode;
+  startTime: Date;
   submissionsGap = this.initialSubmissionsGap
     ? this.initialSubmissionsGap / 60
     : 1;
-  title = this.initialTitle;
-  windowLength = this.initialWindowLength;
-  windowLengthEnabled = this.initialWindowLength !== null;
-  currentContestForTeams = this.contestForTeams;
-  currentTeamsGroupAlias = this.teamsGroupAlias;
+  title: string;
+  windowLength: null | number;
+  windowLengthEnabled: any;
+  get currentContestForTeams(): boolean {
+    return this.contestForTeams;
+  }
+  get currentTeamsGroupAlias(): null | types.ListItem {
+    return this.teamsGroupAlias;
+  }
   titlePlaceHolder = '';
-  recommended = this.initialRecommended;
+  get recommended(): boolean {
+    return this.initialRecommended;
+  }
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;

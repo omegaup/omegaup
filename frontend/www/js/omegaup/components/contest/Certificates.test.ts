@@ -13,7 +13,7 @@ describe('Certificates.vue', () => {
       isCertificateGenerator: true,
     };
     const wrapper = shallowMount(contest_Certificates, {
-      propsData: {
+      props: {
         certificatesDetails,
       },
     });
@@ -34,7 +34,7 @@ describe('Certificates.vue', () => {
       isCertificateGenerator: true,
     };
     const wrapper = mount(contest_Certificates, {
-      propsData: {
+      props: {
         certificatesDetails,
       },
     });

@@ -48,7 +48,7 @@ describe('Mine.vue', () => {
 
   it('Should handle an empty table', () => {
     const wrapper = shallowMount(certificate_Mine, {
-      propsData: {
+      props: {
         certificates: [] as types.CertificateListItem[],
       },
     });

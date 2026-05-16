@@ -7,7 +7,7 @@ import group_Scoreboards from './Scoreboards.vue';
 describe('Scoreboards.vue', () => {
   it('Should handle edit scoreboard view with one scoreboard', () => {
     const wrapper = shallowMount(group_Scoreboards, {
-      propsData: {
+      props: {
         groupAlias: 'Hello',
         scoreboards: [
           {

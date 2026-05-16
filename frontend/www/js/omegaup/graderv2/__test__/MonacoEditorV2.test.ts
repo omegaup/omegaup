@@ -54,7 +54,7 @@ describe('MonacoEditor.vue', () => {
 
     wrapper = shallowMount(MonacoEditor, {
       localVue,
-      propsData: {
+      props: {
         storeMapping: {
           contents: 'mockMapping.contents',
           language: 'mockMapping.language',
@@ -66,7 +66,7 @@ describe('MonacoEditor.vue', () => {
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    wrapper.unmount();
     jest.clearAllMocks();
   });
 

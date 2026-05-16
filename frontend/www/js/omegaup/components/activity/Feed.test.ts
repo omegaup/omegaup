@@ -7,7 +7,7 @@ import activity_Feed from './Feed.vue';
 describe('Feed.vue', () => {
   it('Should handle contest activity report', async () => {
     const wrapper = shallowMount(activity_Feed, {
-      propsData: {
+      props: {
         alias: 'test_contest',
         type: 'contest',
         report: [
@@ -35,7 +35,7 @@ describe('Feed.vue', () => {
 
   it('Should handle course activity report', async () => {
     const wrapper = shallowMount(activity_Feed, {
-      propsData: {
+      props: {
         alias: 'test_course',
         type: 'course',
         report: [

@@ -127,7 +127,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -155,7 +156,9 @@ export default class CourseFilteredList extends Vue {
 
   T = T;
   time = time;
-  showTab = this.activeTab;
+  get showTab(): string {
+    return this.activeTab;
+  }
 
   getTabName(timeType: string): string {
     switch (timeType) {

@@ -49,11 +49,9 @@
 
 <script lang="ts">
 import { NIL } from 'uuid';
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import { namespace } from 'vuex-class';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../../../lang';
-
-const casesStore = namespace('casesStore');
 
 @Component
 export default class CaseInput extends Vue {
@@ -64,13 +62,21 @@ export default class CaseInput extends Vue {
   @Prop({ default: false }) editMode!: boolean;
 
   // This return the group name, and the group ID of all groups in the store. Matching the required type for the select component./
-  @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
+
+  created() {
+    this.caseGroup = this.group;
+    this.caseName = this.name;
+  }
+
+  get storedGroups(): {
     value: string;
     text: string;
-  }[];
+  }[] {
+    return this.$store.getters['casesStore/getGroupIdsAndNames'];
+  }
 
-  caseName = this.name;
-  caseGroup = this.group;
+  caseName: string;
+  caseGroup: string;
   casePoints: number = this.points;
   caseAutoPoints: boolean = this.autoPoints;
 

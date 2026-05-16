@@ -38,7 +38,7 @@ function mountComponent(
   username = 'testuser',
 ): Wrapper<Vue> {
   return shallowMount(Charts, {
-    propsData: { data, username },
+    props: { data, username },
   });
 }
 
@@ -353,8 +353,8 @@ describe('Charts.vue', () => {
       // B should have its own correct categories
       expect(countsB.month.categories).toEqual(['2025-06', '2025-07']);
 
-      wrapperA.destroy();
-      wrapperB.destroy();
+      wrapperA.unmount();
+      wrapperB.unmount();
     });
 
     // Known Bug 3: groupedPeriods only initializes {WA, PA, AC, TLE, RTE} at

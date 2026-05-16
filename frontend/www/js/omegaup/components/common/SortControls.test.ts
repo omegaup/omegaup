@@ -5,7 +5,7 @@ import common_SortControls from './SortControls.vue';
 describe('SortControls.vue', () => {
   it('Should handle the correct sort control', async () => {
     const wrapper = shallowMount(common_SortControls, {
-      propsData: {
+      props: {
         column: 'title',
         columnType: 'number',
         sortOrder: 'desc',
@@ -20,7 +20,7 @@ describe('SortControls.vue', () => {
 
   it('Should handle the correct sort icons', async () => {
     const wrapper = shallowMount(common_SortControls, {
-      propsData: {
+      props: {
         column: 'title',
         columnType: 'string',
         sortOrder: 'desc',

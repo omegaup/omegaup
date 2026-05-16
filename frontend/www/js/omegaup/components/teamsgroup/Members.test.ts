@@ -24,7 +24,7 @@ describe('Members.vue', () => {
     const teamUsername = 'teams:group_alias:team_1';
     const wrapper = shallowMount(teamsgroup_Members, {
       attachTo: '#root',
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
         teamUsername,
         teamsMembers: [] as types.TeamMember[],
@@ -57,14 +57,14 @@ describe('Members.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle a list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
     const wrapper = mount(teamsgroup_Members, {
       attachTo: '#root',
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
         teamUsername,
         teamsMembers: [
@@ -92,14 +92,14 @@ describe('Members.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle change password form', async () => {
     const teamUsername = 'teams:group_alias:team_1';
     const wrapper = mount(teamsgroup_Members, {
       attachTo: '#root',
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
         teamUsername,
         teamsMembers: [

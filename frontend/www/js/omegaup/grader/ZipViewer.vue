@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-facing-decorator';
 import * as Util from './util';
 import T from '../lang';
 import JSZip, { JSZipObject } from 'jszip';

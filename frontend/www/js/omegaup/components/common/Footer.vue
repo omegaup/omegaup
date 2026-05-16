@@ -163,7 +163,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';

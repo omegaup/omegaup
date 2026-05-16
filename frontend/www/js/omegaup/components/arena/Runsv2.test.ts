@@ -84,7 +84,7 @@ describe('Runsv2.vue', () => {
 
   it('Should handle empty runs', () => {
     const wrapper = mount(arena_Runs, {
-      propsData: {
+      props: {
         runs: [] as types.Run[],
         problemAlias: 'test-problem-1',
       },
@@ -99,7 +99,7 @@ describe('Runsv2.vue', () => {
 
   it('Should handle AC runs', () => {
     const wrapper = mount(arena_Runs, {
-      propsData: {
+      props: {
         runs,
         problemAlias: 'test-problem-1',
       },
@@ -142,7 +142,7 @@ describe('Runsv2.vue', () => {
       },
     ];
     const wrapper = mount(arena_Runs, {
-      propsData: {
+      props: {
         runs,
         problemAlias: 'test-problem-1',
       },
@@ -185,7 +185,7 @@ describe('Runsv2.vue', () => {
       },
     ];
     const wrapper = mount(arena_Runs, {
-      propsData: {
+      props: {
         runs,
         problemAlias: 'test-problem-1',
       },
@@ -203,7 +203,7 @@ describe('Runsv2.vue', () => {
 
   it('Should handle the run details button', async () => {
     const wrapper = mount(arena_Runs, {
-      propsData: {
+      props: {
         runs,
         problemAlias: 'test-problem-1',
         currentRunDetails: runDetails,

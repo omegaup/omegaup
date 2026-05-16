@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       contests: payload.contests,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-contest-mine', {
         props: {
           contests: this.contests,

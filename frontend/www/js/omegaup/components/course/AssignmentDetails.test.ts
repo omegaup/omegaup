@@ -65,13 +65,13 @@ describe('AssignmentDetails.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle submit action for an existing assignment', async () => {
     const wrapper = shallowMount(course_AssignmentDetails, {
       attachTo: '#root',
-      propsData: {
+      props: {
         ...propsData,
         ...{
           assignmentFormMode: omegaup.AssignmentFormMode.Edit,
@@ -104,13 +104,13 @@ describe('AssignmentDetails.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle submit action for an existing assignment with runs', async () => {
     const wrapper = shallowMount(course_AssignmentDetails, {
       attachTo: '#root',
-      propsData: {
+      props: {
         ...propsData,
         ...{
           assignmentFormMode: omegaup.AssignmentFormMode.Edit,
@@ -143,6 +143,6 @@ describe('AssignmentDetails.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

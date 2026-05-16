@@ -58,7 +58,7 @@ OmegaUp.on('ready', () => {
           .catch(ui.apiError);
       }
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-user-compare', {
         props: {
           user1: this.user1,

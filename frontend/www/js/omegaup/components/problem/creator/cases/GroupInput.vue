@@ -44,7 +44,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../../../lang';
 
 @Component
@@ -53,11 +54,15 @@ export default class GroupInput extends Vue {
   @Prop({ default: 100 }) points!: number;
   @Prop({ default: true }) autoPoints!: boolean;
 
-  groupName = this.name;
+  groupName: string;
   groupPoints: number = this.points;
   groupAutoPoints: boolean = this.autoPoints;
 
   T = T;
+
+  created() {
+    this.groupName = this.name;
+  }
 
   formatter(text: string) {
     return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');

@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
       coderIsSelected:
         payload.isMentor && payload.options && payload.options.coderIsSelected,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-coder-of-the-month-list', {
         props: {
           codersOfCurrentMonth: payload.codersOfCurrentMonth,

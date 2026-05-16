@@ -148,8 +148,8 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.find('table').exists()).toBeTruthy();
     const formInputs = wrapper.findAll('input');
 
-    formInputs.at(0).setValue('testLabel');
-    formInputs.at(1).setValue('testValue');
+    formInputs[0].setValue('testLabel');
+    formInputs[1].setValue('testValue');
     await wrapper.trigger('click');
 
     expect(wrapper.vm.getLinesFromSelectedCase[0].label).toBe('testLabel');
@@ -166,13 +166,13 @@ describe('CaseEdit.vue', () => {
     const dropdowns = wrapper.findAll('a.dropdown-item');
     expect(dropdowns.length).toBe(dropdownItemCount);
 
-    await dropdowns.at(1).trigger('click');
+    await dropdowns[1].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
 
-    await dropdowns.at(2).trigger('click');
+    await dropdowns[2].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
 
-    await dropdowns.at(3).trigger('click');
+    await dropdowns[3].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
     wrapper.vm.deleteLine(wrapper.vm.getLinesFromSelectedCase[0].lineID);
@@ -461,7 +461,7 @@ describe('CaseEdit.vue', () => {
 
     const dropdowns = wrapper.findAll('a.dropdown-item');
 
-    await dropdowns.at(2).trigger('click');
+    await dropdowns[2].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
 
     const editSVG = wrapper.find('svg.bi-pencil-square');
@@ -491,10 +491,10 @@ describe('CaseEdit.vue', () => {
     expect(mockGenerate).toHaveBeenCalledWith(5, 10, 20, true);
     mockGenerate.mockRestore();
 
-    await modalInputs.at(0).setValue(5);
-    await modalInputs.at(1).setValue(10);
-    await modalInputs.at(2).setValue(10);
-    await modalInputs.at(3).setChecked(false);
+    await modalInputs[0].setValue(5);
+    await modalInputs[1].setValue(10);
+    await modalInputs[2].setValue(10);
+    await modalInputs[3].setChecked(false);
 
     await modalButton.trigger('click');
 
@@ -535,7 +535,7 @@ describe('CaseEdit.vue', () => {
     const dropdowns = wrapper.findAll('a.dropdown-item');
     expect(dropdowns.length).toBe(4);
 
-    await dropdowns.at(3).trigger('click');
+    await dropdowns[3].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
     const editSVG = wrapper.find('svg.bi-pencil-square');
@@ -622,7 +622,7 @@ describe('CaseEdit.vue', () => {
         const dropdowns = wrapper.findAll('a.dropdown-item');
         expect(dropdowns.length).toBe(4);
 
-        await dropdowns.at(3).trigger('click');
+        await dropdowns[3].trigger('click');
         expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
         const editIcon = wrapper.find(`button[data-line-edit-button]`);
@@ -717,15 +717,15 @@ describe('CaseEdit.vue', () => {
     });
     expect(filteredDropdowns.length).toBe(2);
 
-    await filteredDropdowns.at(1).trigger('click');
+    await filteredDropdowns[1].trigger('click');
 
     const formInputs = wrapper.findAll('input');
     const formTextArea = wrapper.find('textarea');
 
-    await formInputs.at(0).setValue('testLabel');
-    await formInputs.at(1).setValue('ome g a');
+    await formInputs[0].setValue('testLabel');
+    await formInputs[1].setValue('ome g a');
 
-    await formInputs.at(2).setValue('testLabel');
+    await formInputs[2].setValue('testLabel');
     await formTextArea.setValue('u\np');
 
     expect(

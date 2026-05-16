@@ -75,7 +75,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Typeahead from '../common/Typeahead.vue';
@@ -102,8 +103,13 @@ export default class ProblemSearchBar extends Vue {
   T = T;
 
   currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
-  currentLanguage = this.language;
-  currentOnlyQualitySeal = this.onlyQualitySeal;
+  currentLanguage: string;
+  currentOnlyQualitySeal: boolean;
+
+  created() {
+    this.currentOnlyQualitySeal = this.onlyQualitySeal;
+    this.currentLanguage = this.language;
+  }
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;

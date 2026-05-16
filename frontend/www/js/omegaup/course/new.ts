@@ -23,7 +23,7 @@ OmegaUp.on('ready', () => {
       invalidParameterName: null as null | string,
       searchResultSchools: searchResultSchools,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-course-form', {
         props: {
           course: {

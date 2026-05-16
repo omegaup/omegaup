@@ -6,7 +6,7 @@ describe('Notification.vue', () => {
   it('Should handle empty url in contents body', () => {
     const courseName = 'Curso de prueba';
     const wrapper = mount(notification_Notification, {
-      propsData: {
+      props: {
         notification: {
           contents: {
             type: 'course-registration-rejected',

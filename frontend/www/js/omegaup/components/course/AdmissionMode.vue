@@ -95,7 +95,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
@@ -129,8 +130,15 @@ export default class CourseAdmissionMode extends Vue {
 
   T = T;
   AdmissionMode = AdmissionMode;
-  currentAdmissionMode = this.admissionMode;
-  currentShowInPublicCoursesList = this.showInPublicCoursesList;
+  currentAdmissionMode: AdmissionMode;
+
+  created() {
+    this.currentAdmissionMode = this.admissionMode;
+  }
+
+  get currentShowInPublicCoursesList(): boolean {
+    return this.showInPublicCoursesList;
+  }
   copiedToClipboard = false;
 
   onSubmit(): void {

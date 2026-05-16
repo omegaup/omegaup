@@ -153,7 +153,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import group_Identities from './Identities.vue';
 import group_Form from './Form.vue';
 import group_Members from './Members.vue';
@@ -196,11 +197,17 @@ export default class GroupEdit extends Vue {
   ui = ui;
   AvailableTabs = AvailableTabs;
   selectedTab: AvailableTabs = this.tab;
-  currentIdentities = this.identities;
-  currentIdentitiesCsv = this.identitiesCsv;
-  currentScoreboards = this.scoreboards;
+  currentIdentities: types.Identity[];
+  currentIdentitiesCsv: types.Identity[];
+  currentScoreboards: types.GroupScoreboard[];
 
   @Watch('tab')
+  created() {
+    this.currentScoreboards = this.scoreboards;
+    this.currentIdentitiesCsv = this.identitiesCsv;
+    this.currentIdentities = this.identities;
+  }
+
   onInitialTabChanged(newValue: AvailableTabs): void {
     if (!Object.values(AvailableTabs).includes(newValue)) {
       this.selectedTab = AvailableTabs.Members;

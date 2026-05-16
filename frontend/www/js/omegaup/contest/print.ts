@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-contest-print': omegaup_ContestPrint,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-contest-print', {
         props: {
           problems: payload.problems,

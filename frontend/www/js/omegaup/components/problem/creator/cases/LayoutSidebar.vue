@@ -219,8 +219,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { namespace } from 'vuex-class';
+import Vue from 'vue';
+import { Component, Watch } from 'vue-facing-decorator';
 import T from '../../../../lang';
 import {
   Layout,
@@ -231,36 +231,60 @@ import {
   CaseLineInfo,
 } from '@/js/omegaup/problem/creator/types';
 
-const casesStore = namespace('casesStore');
-
 @Component
 export default class Sidebar extends Vue {
   T = T;
 
-  @casesStore.State('groups') groups!: Group[];
-  @casesStore.Getter('getAllLayouts') getAllLayouts!: Layout[];
-  @casesStore.Mutation('enforceLayoutToTheSelectedCase')
-  enforceLayoutToTheSelectedCase!: (layoutID: LayoutID) => void;
-  @casesStore.Mutation('addNewLineInfoToLayout')
-  addNewLineInfoToLayout!: (layoutID: LayoutID) => void;
-  @casesStore.Mutation('editLineInfoKind') editLineInfoKind!: ([
-    layoutID,
-    lineInfoID,
-    kind,
-  ]: [LayoutID, LineInfoID, CaseLineKind]) => void;
-  @casesStore.Mutation('enforceLayoutToAllCases')
-  enforceLayoutToAllCases!: (layoutID: LayoutID) => void;
-  @casesStore.Mutation('copyLayout')
-  copyLayout!: (layoutID: LayoutID) => void;
-  @casesStore.Mutation('removeLayout')
-  removeLayout!: (layoutID: LayoutID) => void;
-  @casesStore.Mutation('removeLineInfoFromLayout')
-  removeLineInfoFromLayout!: ([layoutID, lineInfoID]: [
+  get groups(): Group[] {
+    return this.$store.state.casesStore.groups;
+  }
+
+  get getAllLayouts(): Layout[] {
+    return this.$store.getters['casesStore/getAllLayouts'];
+  }
+
+  enforceLayoutToTheSelectedCase(layoutID: LayoutID) {
+    this.$store.commit('casesStore/enforceLayoutToTheSelectedCase', layoutID);
+  }
+
+  addNewLineInfoToLayout(layoutID: LayoutID) {
+    this.$store.commit('casesStore/addNewLineInfoToLayout', layoutID);
+  }
+
+  editLineInfoKind([layoutID, lineInfoID, kind]: [
     LayoutID,
     LineInfoID,
-  ]) => void;
-  @casesStore.Mutation('editLayoutName')
-  editLayoutName!: ([layoutID, newValue]: [LayoutID, string]) => void;
+    CaseLineKind,
+  ]) {
+    this.$store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      kind,
+    ]);
+  }
+
+  enforceLayoutToAllCases(layoutID: LayoutID) {
+    this.$store.commit('casesStore/enforceLayoutToAllCases', layoutID);
+  }
+
+  copyLayout(layoutID: LayoutID) {
+    this.$store.commit('casesStore/copyLayout', layoutID);
+  }
+
+  removeLayout(layoutID: LayoutID) {
+    this.$store.commit('casesStore/removeLayout', layoutID);
+  }
+
+  removeLineInfoFromLayout([layoutID, lineInfoID]: [LayoutID, LineInfoID]) {
+    this.$store.commit('casesStore/removeLineInfoFromLayout', [
+      layoutID,
+      lineInfoID,
+    ]);
+  }
+
+  editLayoutName([layoutID, newValue]: [LayoutID, string]) {
+    this.$store.commit('casesStore/editLayoutName', [layoutID, newValue]);
+  }
 
   showLayout: { [key: LayoutID]: boolean } = {};
   showRenameModal: { [key: LayoutID]: boolean } = {};

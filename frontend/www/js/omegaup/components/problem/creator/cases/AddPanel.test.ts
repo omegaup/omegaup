@@ -176,7 +176,7 @@ describe('AddPanel.vue', () => {
 
     const tabs = wrapper.findAll('.nav-link');
     expect(tabs.length).toBe(expectedText.length);
-    tabs.wrappers.forEach((tab, index) => {
+    tabs.forEach((tab, index) => {
       expect(tab.text()).toBe(expectedText[index]);
     });
   });

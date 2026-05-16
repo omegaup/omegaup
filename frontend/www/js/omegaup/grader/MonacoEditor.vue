@@ -29,7 +29,7 @@
 
 <script lang="ts">
 // TODO: replace all instances of any with correct type
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-facing-decorator';
 import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';

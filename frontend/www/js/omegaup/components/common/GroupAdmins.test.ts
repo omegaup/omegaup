@@ -7,7 +7,7 @@ import common_GroupAdmins from './GroupAdmins.vue';
 describe('GroupAdmins.vue', () => {
   it('Should handle empty group admins list', () => {
     const wrapper = shallowMount(common_GroupAdmins, {
-      propsData: {
+      props: {
         groupAdmins: [],
       },
     });
@@ -19,7 +19,7 @@ describe('GroupAdmins.vue', () => {
 
   it('Should handle group admins list with data', async () => {
     const wrapper = shallowMount(common_GroupAdmins, {
-      propsData: {
+      props: {
         groupAdmins: [
           { role: 'admin', alias: 'group-admin', name: 'group-admin' },
         ],

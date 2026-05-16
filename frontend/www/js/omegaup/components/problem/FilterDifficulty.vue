@@ -23,7 +23,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Watch, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Emit, Watch, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component
@@ -31,7 +32,7 @@ export default class FilterDifficulty extends Vue {
   @Prop() selectedDifficulty!: string;
 
   T = T;
-  currentDifficulty = this.selectedDifficulty;
+  currentDifficulty: string;
 
   difficulties: { [key: string]: { name: string; id: string } } = {
     anyDifficulty: {
@@ -54,6 +55,10 @@ export default class FilterDifficulty extends Vue {
 
   @Emit('change')
   @Watch('currentDifficulty')
+  created() {
+    this.currentDifficulty = this.selectedDifficulty;
+  }
+
   onCurrentDifficultyChanged(val: string | null) {
     return val;
   }

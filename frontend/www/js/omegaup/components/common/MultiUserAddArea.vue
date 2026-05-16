@@ -46,7 +46,8 @@ const debounce = (fn: (event: Event) => void, waitTime: number) => {
 };
 
 const WAIT_TIME = 1000;
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component({})

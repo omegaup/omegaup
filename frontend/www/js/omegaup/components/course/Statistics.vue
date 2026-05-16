@@ -20,7 +20,8 @@
 
 <script lang="ts">
 import { Chart } from 'highcharts-vue';
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -50,7 +51,7 @@ export default class Statistics extends Vue {
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   // chart options
-  selected = this.completedScoreChartOptions;
+  selected: any;
   options = [
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
     {
@@ -72,6 +73,11 @@ export default class Statistics extends Vue {
     { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
   ];
   // get chart options
+
+  created() {
+    this.selected = this.completedScoreChartOptions;
+  }
+
   get varianceChartOptions() {
     return this.createChartOptions(
       T.courseStatisticsScoreVariance,

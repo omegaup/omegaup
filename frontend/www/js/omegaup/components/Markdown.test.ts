@@ -20,7 +20,7 @@ describe('Markdown.vue', () => {
 
   it('Should render markdown contents', () => {
     const wrapper = mount(omegaup_Markdown, {
-      propsData: {
+      props: {
         markdown: '_Hello_, **World**!',
       },
     });
@@ -36,7 +36,7 @@ describe('Markdown.vue', () => {
     const markdown = ui.formatString(template, { token });
 
     const wrapper = mount(omegaup_Markdown, {
-      propsData: {
+      props: {
         markdown,
       },
     });

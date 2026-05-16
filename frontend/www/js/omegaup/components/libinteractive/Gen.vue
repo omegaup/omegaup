@@ -71,7 +71,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-facing-decorator';
+import Vue from 'vue';
 import T from '../../lang';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -97,11 +98,21 @@ export default class LibinteractiveGen extends Vue {
   @Prop() idl!: string;
 
   T = T;
-  currentLanguage = this.language;
-  currentOs = this.os;
-  currentName = this.name;
-  currentIdl = this.idl;
-  currentError = this.error;
+  currentLanguage: string;
+  currentOs: string;
+  currentName: string;
+  currentIdl: string;
+
+  created() {
+    this.currentIdl = this.idl;
+    this.currentName = this.name;
+    this.currentOs = this.os;
+    this.currentLanguage = this.language;
+  }
+
+  get currentError(): null | types.LibinteractiveError {
+    return this.error;
+  }
 
   get errorDescription(): null | string {
     return this.currentError?.description ?? null;

@@ -101,7 +101,7 @@ describe('Detailsv2.vue', () => {
 
   it('Should show the tabs', () => {
     const wrapper = shallowMount(problem_Details, {
-      propsData: {
+      props: {
         allRuns: runs,
         problem,
         user: {
@@ -126,7 +126,7 @@ describe('Detailsv2.vue', () => {
   it('Should show the problem tab details', () => {
     const languages = ['py2', 'py3'];
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         allRuns: runs,
         problem,
         user: {
@@ -152,7 +152,7 @@ describe('Detailsv2.vue', () => {
 
   it('Should show the problem languages', () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         allRuns: runs,
         problem,
         user: {
@@ -172,7 +172,7 @@ describe('Detailsv2.vue', () => {
 
   it('Should show the problem languages', () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         allRuns: runs,
         problem,
         user: {
@@ -192,7 +192,7 @@ describe('Detailsv2.vue', () => {
 
   it('Should handle the user runs', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         allRuns: runs,
         problem,
         user: {
@@ -211,7 +211,7 @@ describe('Detailsv2.vue', () => {
 
   it('Should handle the runs tab', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         allRuns: runs,
         problem,
         user: {
@@ -225,7 +225,7 @@ describe('Detailsv2.vue', () => {
     });
 
     const tabsItems = wrapper.findAllComponents(BTab);
-    const runsTab = tabsItems.at(1);
+    const runsTab = tabsItems[1];
     expect(runsTab.text()).toContain(T.wordsSubmissions);
     expect(runsTab.text()).toContain(T.wordsVerdict);
     expect(runsTab.text()).toContain(T.wordsStatus);

@@ -19,7 +19,8 @@
 
 <script lang="ts">
 import teamsgroup_FormBase from './FormBase.vue';
-import { Vue, Component, Watch, Emit, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch, Emit, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import { generateAlias } from '../../alias';
 

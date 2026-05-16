@@ -100,7 +100,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_CompareCard from './CompareCard.vue';

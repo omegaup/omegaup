@@ -190,7 +190,7 @@ OmegaUp.on('ready', async () => {
       isBlocked,
       blockedMessage,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-arena-contest', {
         props: {
           contest: payload.contest,

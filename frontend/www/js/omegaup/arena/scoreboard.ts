@@ -63,7 +63,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problems: payload.problems,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-arena-scoreboard', {
         props: {
           problems: this.problems,

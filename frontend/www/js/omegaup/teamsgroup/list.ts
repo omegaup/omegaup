@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-teams-group-list': teamsgroup_List,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-teams-group-list', {
         props: { teamsGroups: payload.teamsGroups },
       });

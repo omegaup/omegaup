@@ -20,7 +20,7 @@ describe('Clarification.vue', () => {
 
   it('Should handle contest clarification', async () => {
     const wrapper = shallowMount(arena_Clarification, {
-      propsData: {
+      props: {
         clarification,
         isAdmin: true,
       },
@@ -32,7 +32,7 @@ describe('Clarification.vue', () => {
 
   it('Should handle contest clarification on behalf', async () => {
     const wrapper = shallowMount(arena_Clarification, {
-      propsData: {
+      props: {
         clarification: { ...clarification, ...{ receiver: 'user' } },
         isAdmin: true,
       },
@@ -48,7 +48,7 @@ describe('Clarification.vue', () => {
 
   it('Should handle course clarification', async () => {
     const wrapper = shallowMount(arena_Clarification, {
-      propsData: {
+      props: {
         clarification,
         isAdmin: true,
       },

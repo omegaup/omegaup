@@ -22,7 +22,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import problem_SettingsSummary from '../problem/SettingsSummary.vue';

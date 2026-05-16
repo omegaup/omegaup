@@ -159,9 +159,7 @@ describe('LayoutSidebar.vue', () => {
 
     store.commit('casesStore/addLayoutFromSelectedCase');
     await Vue.nextTick();
-    const layoutDropdownNew = wrapper
-      .findAll('div[data-layout-dropdown]')
-      .at(1);
+    const layoutDropdownNew = wrapper.findAll('div[data-layout-dropdown]')[1];
     expect(layoutDropdownNew.text()).toContain(
       newUngroupedCasegroup.name + '_' + newUngroupedCase.name,
     );

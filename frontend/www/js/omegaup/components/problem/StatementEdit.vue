@@ -103,7 +103,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Prop, Watch, Ref } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Emit, Prop, Watch, Ref } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -137,11 +138,16 @@ export default class ProblemStatementEdit extends Vue {
 
   T = T;
   commitMessage = T.updateStatementsCommitMessage;
-  currentLanguage = this.statement.language;
-  currentMarkdown = this.statement.markdown;
+  currentLanguage: any;
+  currentMarkdown: any;
   errors: string[] = [];
   statements: types.Statements = {};
   markdownEditor: Markdown.Editor | null = null;
+
+  created() {
+    this.currentMarkdown = this.statement.markdown;
+    this.currentLanguage = this.statement.language;
+  }
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {

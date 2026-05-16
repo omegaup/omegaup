@@ -65,12 +65,11 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="(user, userIndex) in ranking">
-            <tr
-              v-if="showUser(user.is_invited)"
-              :key="`${user.username}-${user.virtual}`"
-              :class="user.username"
-            >
+          <template
+            v-for="(user, userIndex) in ranking"
+            :key="`${user.username}-${user.virtual}`"
+          >
+            <tr v-if="showUser(user.is_invited)" :class="user.username">
               <td class="legend" :class="legendClass(userIndex)"></td>
               <td class="position" data-table-scoreboard-position>
                 {{ user.place || '—' }}
@@ -130,7 +129,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 
 import * as Highcharts from 'highcharts/highstock';
 import { Chart } from 'highcharts-vue';

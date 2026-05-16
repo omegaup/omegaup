@@ -503,7 +503,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { Component, Prop, Watch, Emit } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -651,12 +652,17 @@ export default class RunsForCourses extends Vue {
   filterExecution: string = '';
   filterOutput: string = '';
   filters: { name: string; value: string }[] = [];
-  currentRunDetailsData = this.runDetailsData;
-  currentPopupDisplayed = this.popupDisplayed;
+  currentRunDetailsData: types.RunDetails | null;
+  currentPopupDisplayed: PopupDisplayed;
   currentPage: number = 1;
   currentDataPage: number = 1;
   newFieldsLaunchDate: Date = new Date('2023-10-22');
   now: number = Date.now();
+
+  created() {
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentRunDetailsData = this.runDetailsData;
+  }
 
   get totalRows(): number {
     if (this.totalRuns === undefined) {

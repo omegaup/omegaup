@@ -23,7 +23,7 @@ describe('TeamsGroup.vue', () => {
 
   it('Should handle empty teams groups', () => {
     const wrapper = shallowMount(contest_TeamsGroup, {
-      propsData: {
+      props: {
         teamsGroup,
       },
     });
@@ -34,7 +34,7 @@ describe('TeamsGroup.vue', () => {
   it('Should submit a new teams group', async () => {
     const wrapper = mount(contest_TeamsGroup, {
       attachTo: '#root',
-      propsData: {
+      props: {
         teamsGroup,
         searchResultTeamsGroups: [
           { key: 'teams-group', value: 'teams group' },
@@ -49,6 +49,6 @@ describe('TeamsGroup.vue', () => {
       [{ alias: 'teams-group', name: 'teams group' }],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

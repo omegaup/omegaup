@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
       loading: false, // Flag to prevent multiple simultaneous requests
       endOfResults: false, // Flag to indicate if all results have been loaded
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-submissions-list', {
         props: {
           includeUser: payload.includeUser,

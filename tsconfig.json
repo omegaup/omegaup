@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "useDefineForClassFields": false,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "outDir": "./built/",
     "sourceMap": true,

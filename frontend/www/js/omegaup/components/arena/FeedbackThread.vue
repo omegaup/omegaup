@@ -70,7 +70,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import user_Username from '../user/Username.vue';
@@ -91,8 +92,15 @@ export default class FeedbackThread extends Vue {
   FeedbackStatus = FeedbackStatus;
   T = T;
   time = time;
-  currentSaved = this.saved;
-  currentFeedbackThread = this.feedbackThread;
+  currentSaved: boolean;
+
+  created() {
+    this.currentSaved = this.saved;
+  }
+
+  get currentFeedbackThread(): ArenaCourseFeedback {
+    return this.feedbackThread;
+  }
   isSelectedNewFeedback = false;
 
   get currentFeedbackThreadTimestamp(): string {

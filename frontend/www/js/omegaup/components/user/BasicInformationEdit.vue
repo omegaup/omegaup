@@ -83,7 +83,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -101,14 +102,22 @@ export default class UserBasicInformationEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
-  username = this.profile.username;
-  name = this.profile.name;
-  gender = this.profile.gender;
-  countryId = this.profile.country_id ?? null;
-  stateId = this.profile.state_id ?? null;
+  username: any;
+  name: any;
+  gender: any;
+  countryId: any;
+  stateId: any;
   birthDate = this.profile.birth_date
     ? time.convertLocalDateToGMTDate(this.profile.birth_date)
     : new Date('');
+
+  created() {
+    this.stateId = this.profile.state_id ?? null;
+    this.countryId = this.profile.country_id ?? null;
+    this.gender = this.profile.gender;
+    this.name = this.profile.name;
+    this.username = this.profile.username;
+  }
 
   get isCountrySelected(): boolean {
     return Boolean(this.countryId);

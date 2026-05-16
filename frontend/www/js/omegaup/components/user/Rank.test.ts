@@ -35,7 +35,7 @@ describe('Rank.vue', () => {
 
   it('Should handle a rank with data', () => {
     const wrapper = mount(user_Rank, {
-      propsData: {
+      props: {
         ...propsData,
         ...{
           ranking: [

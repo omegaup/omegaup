@@ -23,7 +23,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component } from 'vue-facing-decorator';
 import notificationsStore from '../../notificationsStore';
 import omegaup_Markdown from '../Markdown.vue';
 

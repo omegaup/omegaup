@@ -278,7 +278,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -315,8 +316,12 @@ export default class ProblemEdit extends Vue {
   @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  alias = this.data.alias;
-  showTab = this.initialTab;
+  get alias(): any {
+    return this.data.alias;
+  }
+  get showTab(): string {
+    return this.initialTab;
+  }
   currentStatement: types.ProblemStatement = this.statement;
   currentSolution: types.ProblemStatement =
     this.solution ||

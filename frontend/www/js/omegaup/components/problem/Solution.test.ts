@@ -8,7 +8,7 @@ import problem_Solution from './Solution.vue';
 describe('Solution.vue', () => {
   it('Should handle an empty/locked solution', () => {
     const wrapper = mount(problem_Solution, {
-      propsData: {
+      props: {
         solution: null as types.ProblemStatement | null,
         status: 'locked',
         availableTokens: 0,
@@ -22,7 +22,7 @@ describe('Solution.vue', () => {
 
   it('Should handle an empty/unlocked solution', () => {
     const wrapper = mount(problem_Solution, {
-      propsData: {
+      props: {
         solution: null as types.ProblemStatement | null,
         status: 'unlocked',
         availableTokens: 0,
@@ -36,7 +36,7 @@ describe('Solution.vue', () => {
 
   it('Should handle a non-empty, unlocked solution', () => {
     const wrapper = mount(problem_Solution, {
-      propsData: {
+      props: {
         solution: {
           markdown: 'Hello, World!',
           images: {},
@@ -53,7 +53,7 @@ describe('Solution.vue', () => {
 
   it('Should handle unrecognized source filename error', () => {
     const wrapper = mount(problem_Solution, {
-      propsData: {
+      props: {
         solution: {
           markdown: `# test with embed code in solution
 Here we can add code.
@@ -81,7 +81,7 @@ Here we can add code.
 
   it('Should handle a valid source filename with content', async () => {
     const wrapper = mount(problem_Solution, {
-      propsData: {
+      props: {
         solution: {
           markdown: `# test with embed code in solution
 Here we can add code.

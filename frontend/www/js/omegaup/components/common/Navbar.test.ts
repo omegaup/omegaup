@@ -42,7 +42,7 @@ describe('Navbar.vue', () => {
 
   it('Should handle common navbar to logged user', () => {
     const wrapper = mount(common_Navbar, {
-      propsData: {
+      props: {
         ...propsData,
         ...{ inContest: false, userTypes: ['student', 'teacher'] },
       },
@@ -57,7 +57,7 @@ describe('Navbar.vue', () => {
 
   it('Should handle common navbar to not-logged user', () => {
     const wrapper = mount(common_Navbar, {
-      propsData: { ...propsData, ...{ inContest: false, isLoggedIn: false } },
+      props: { ...propsData, ...{ inContest: false, isLoggedIn: false } },
     });
 
     expect(wrapper.find('.nav-problems').exists()).toBe(true);
@@ -70,7 +70,7 @@ describe('Navbar.vue', () => {
 
   it('Should show objectives modal only when a main user identity is logged', async () => {
     const wrapper = shallowMount(common_Navbar, {
-      propsData: { ...propsData, ...{ fromLogin: true } },
+      props: { ...propsData, ...{ fromLogin: true } },
     });
 
     expect(wrapper.findComponent(UserObjectivesQuestions).exists()).toBe(false);
@@ -88,7 +88,7 @@ describe('Navbar.vue', () => {
     finishTime.setHours(finishTime.getHours() + 2);
 
     const wrapper = mount(common_Navbar, {
-      propsData: {
+      props: {
         ...propsData,
         ...{
           fromLogin: true,
@@ -133,7 +133,7 @@ describe('Navbar.vue', () => {
 
   it('Should not show the information of a next registered contest when the user is not registered to a current or upcoming contest', () => {
     const wrapper = shallowMount(common_Navbar, {
-      propsData: { ...propsData, ...{ fromLogin: true } },
+      props: { ...propsData, ...{ fromLogin: true } },
     });
 
     expect(

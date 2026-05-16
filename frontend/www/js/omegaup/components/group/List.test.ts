@@ -8,7 +8,7 @@ import group_List from './List.vue';
 describe('List.vue', () => {
   it('Should handle an empty list of groups', () => {
     const wrapper = shallowMount(group_List, {
-      propsData: {
+      props: {
         groups: [] as types.Group[],
       },
     });
@@ -18,7 +18,7 @@ describe('List.vue', () => {
 
   it('Should handle a list of groups', () => {
     const wrapper = shallowMount(group_List, {
-      propsData: {
+      props: {
         groups: [
           {
             alias: 'omegaUp',

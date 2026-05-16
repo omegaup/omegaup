@@ -23,7 +23,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Watch, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Emit, Watch, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component
@@ -31,7 +32,7 @@ export default class FilterQuality extends Vue {
   @Prop({ default: 'onlyQualityProblems' }) quality!: string;
 
   T = T;
-  currentQuality = this.quality;
+  currentQuality: string;
 
   qualityValues: { [key: string]: { name: string; id: string } } = {
     allProblems: {
@@ -46,6 +47,10 @@ export default class FilterQuality extends Vue {
 
   @Emit('change')
   @Watch('currentQuality')
+  created() {
+    this.currentQuality = this.quality;
+  }
+
   onCurrentQualityChanged(val: string | null) {
     return val;
   }

@@ -11,7 +11,7 @@ import { DisqualificationType } from './Runs.vue';
 describe('RunsForCourses.vue', () => {
   it('Should handle empty runs', () => {
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'admin',
         runs: [],
       },
@@ -121,7 +121,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle order runs', async () => {
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'admin',
         runs,
         showContest: true,
@@ -137,7 +137,7 @@ describe('RunsForCourses.vue', () => {
       },
     });
     expect(
-      wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
+      wrapper.findAll('acronym[data-run-guid]').map((e) => e.text()),
     ).toEqual([
       '124500',
       '124000',
@@ -161,7 +161,7 @@ describe('RunsForCourses.vue', () => {
   describe.each(filtersMapping)(`A filter:`, (filter) => {
     it(`whose name is ${filter.filter} should have gotten the value ${filter.value}`, async () => {
       const wrapper = shallowMount(arena_RunsForCourses, {
-        propsData: {
+        props: {
           contestAlias: 'admin',
           runs,
           showFilters: true,
@@ -178,14 +178,14 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle run percentage color', async () => {
     const wrapper = mount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         runs,
         itemsPerPage: 100,
       },
     });
 
     expect(
-      wrapper.findAll('td[data-run-percentage]').wrappers.map((e) =>
+      wrapper.findAll('td[data-run-percentage]').map((e) =>
         e
           .classes()
           .filter((c) => c !== 'numeric')
@@ -207,7 +207,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle paginator in user view', async () => {
     const wrapper = mount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         runs,
         itemsPerPage: 2,
       },
@@ -221,7 +221,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle paginator in admin view', async () => {
     const wrapper = mount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'contest',
         runs,
         showFilters: true,
@@ -244,7 +244,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle paginator in admin view with no runs', async () => {
     const wrapper = mount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'contest',
         showFilters: true,
         showUser: true,
@@ -258,7 +258,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle execution filter', async () => {
     const wrapper = mount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'contest',
         runs,
         showFilters: true,
@@ -286,7 +286,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle output filter', async () => {
     const wrapper = mount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'contest',
         runs,
         showFilters: true,
@@ -314,7 +314,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle username filter', async () => {
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'contest',
         runs,
         showFilters: true,
@@ -332,7 +332,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle problem filter', async () => {
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'contest',
         runs,
         showFilters: true,
@@ -350,7 +350,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle the new submission button', async () => {
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         problemAlias: 'alias',
         runs,
         showDetails: true,
@@ -370,7 +370,7 @@ describe('RunsForCourses.vue', () => {
       type: 'disqualified',
     });
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'admin',
         problemAlias: 'alias',
         runs,
@@ -426,7 +426,7 @@ describe('RunsForCourses.vue', () => {
 
   it('Should handle filterUsername when username changes', async () => {
     const wrapper = shallowMount(arena_RunsForCourses, {
-      propsData: {
+      props: {
         contestAlias: 'admin',
         runs,
         showContest: true,
@@ -452,7 +452,7 @@ describe('RunsForCourses.vue', () => {
   describe.each(usernamesToBeFiltered)(`A user:`, (username) => {
     it(`whose username is ${username} should be filtered when they are selected.`, async () => {
       const wrapper = mount(arena_RunsForCourses, {
-        propsData: {
+        props: {
           contestAlias: 'admin',
           runs,
           showContest: true,
@@ -471,8 +471,7 @@ describe('RunsForCourses.vue', () => {
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
 
       await wrapper
-        .findAll(`td[data-username="${username}"]`)
-        .at(1)
+        .findAll(`td[data-username="${username}"]`)[1]
         .find(`a[title="${username}"]`)
         .trigger('click');
 
@@ -488,8 +487,7 @@ describe('RunsForCourses.vue', () => {
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
 
       await wrapper
-        .findAll(`td[data-username="${username}"]`)
-        .at(1)
+        .findAll(`td[data-username="${username}"]`)[1]
         .find(`a[title="${username}"]`)
         .trigger('click');
 

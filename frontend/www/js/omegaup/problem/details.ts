@@ -93,7 +93,7 @@ OmegaUp.on('ready', async () => {
       isBookmarked: payload.isBookmarked,
       isLoadingBookmark: false,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-problem-details', {
         props: {
           activeTab: this.activeTab,

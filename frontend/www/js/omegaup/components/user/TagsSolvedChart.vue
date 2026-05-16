@@ -13,7 +13,8 @@
 <script lang="ts">
 import { Chart } from 'highcharts-vue';
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 
 interface TagStats {

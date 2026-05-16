@@ -25,7 +25,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store: store,
       provide: { problemAlias: 'problem-alias' },
-      propsData: { isCaseEdit: true },
+      props: { isCaseEdit: true },
     });
 
     await Vue.nextTick();
@@ -60,7 +60,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store: store,
       provide: { problemAlias: 'alias' },
-      propsData: { isTruncatedInput: true, isTruncatedOutput: true },
+      props: { isTruncatedInput: true, isTruncatedOutput: true },
     });
 
     await Vue.nextTick();
@@ -86,7 +86,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store,
       provide: { problemAlias: 'alias' },
-      propsData: { isCaseEdit: true },
+      props: { isCaseEdit: true },
     });
     await Vue.nextTick();
 
@@ -111,7 +111,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store,
       provide: { problemAlias: 'alias' },
-      propsData: { isCaseEdit: false, editGroup: editGroup },
+      props: { isCaseEdit: false, editGroup: editGroup },
     });
     await Vue.nextTick();
 
@@ -134,7 +134,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store: store,
       provide: { problemAlias: 'alias' },
-      propsData: { isCaseEdit: false },
+      props: { isCaseEdit: false },
     });
 
     wrapper.setData({ commitMessage: '     ' });
@@ -156,7 +156,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store: store,
       provide: { problemAlias: 'alias' },
-      propsData: { isEmbedded: true },
+      props: { isEmbedded: true },
     });
 
     const submitBtn = wrapper.find('button[type="submit"]');
@@ -168,7 +168,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store,
       provide: { problemAlias: 'alias' },
-      propsData: { isCaseEdit: true },
+      props: { isCaseEdit: true },
     });
     expect((wrapper.vm as any).commitMessage).toBe(T.problemEditUpdatingCase);
   });
@@ -178,7 +178,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store,
       provide: { problemAlias: 'alias' },
-      propsData: { isCaseEdit: false },
+      props: { isCaseEdit: false },
     });
     expect((wrapper.vm as any).commitMessage).toBe(T.problemEditUpdatingGroup);
   });
@@ -188,7 +188,7 @@ describe('CasesForm.vue', () => {
       localVue,
       store,
       provide: { problemAlias: 'alias' },
-      propsData: { isCaseEdit: true },
+      props: { isCaseEdit: true },
     });
 
     const submitBtn = wrapper.find('button[type="submit"]');

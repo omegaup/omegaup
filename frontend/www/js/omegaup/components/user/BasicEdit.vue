@@ -58,7 +58,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';

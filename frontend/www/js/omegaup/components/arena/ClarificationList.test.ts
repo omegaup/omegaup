@@ -33,7 +33,7 @@ describe('ClarificationList.vue', () => {
 
   it('Should handle contest clarifications', async () => {
     const wrapper = mount(arena_ClarificationList, {
-      propsData: {
+      props: {
         clarifications,
       },
     });
@@ -42,7 +42,7 @@ describe('ClarificationList.vue', () => {
 
   it('Should handle course clarifications', async () => {
     const wrapper = mount(arena_ClarificationList, {
-      propsData: {
+      props: {
         clarifications,
       },
     });
@@ -51,7 +51,7 @@ describe('ClarificationList.vue', () => {
 
   it('Should handle empty clarifications', async () => {
     const wrapper = mount(arena_ClarificationList, {
-      propsData: {
+      props: {
         clarifications: [],
       },
     });

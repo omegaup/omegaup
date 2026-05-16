@@ -47,7 +47,7 @@ describe('Header.vue', () => {
     const buttonsList = wrapper.findAll('button');
     expect(buttonsList.length).toBe(3);
 
-    const resetButton = buttonsList.at(2);
+    const resetButton = buttonsList[2];
     expect(resetButton.exists()).toBe(true);
 
     const testText = 'Hello';

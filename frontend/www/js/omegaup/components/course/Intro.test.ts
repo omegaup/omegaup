@@ -57,7 +57,7 @@ const statements: {
 describe('Intro.vue', () => {
   it('Should show the intro for a student in course', () => {
     const wrapper = mount(course_Intro, {
-      propsData: {
+      props: {
         course: courseDetails,
         needsBasicInformation: true,
         shouldShowAcceptTeacher: true,

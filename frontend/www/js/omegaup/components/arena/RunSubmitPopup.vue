@@ -77,7 +77,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';

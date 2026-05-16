@@ -7,7 +7,7 @@ describe('BasicInfov2.vue', () => {
   it('Should display user email', () => {
     const email = 'test@omegaup.com';
     const wrapper = shallowMount(user_BasicInfo, {
-      propsData: {
+      props: {
         profile: {
           email: email,
           is_own_profile: true,

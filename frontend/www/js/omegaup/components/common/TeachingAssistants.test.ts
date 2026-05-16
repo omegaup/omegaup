@@ -21,7 +21,7 @@ describe('TeachingAssistants.vue', () => {
 
   it('Should handle empty teaching assistants list', () => {
     const wrapper = shallowMount(common_TeachingAssistants, {
-      propsData: {
+      props: {
         teachingAssistants: [],
         searchResultUsers: [],
       },
@@ -34,7 +34,7 @@ describe('TeachingAssistants.vue', () => {
 
   it('Should handle teaching assistants list', async () => {
     const wrapper = shallowMount(common_TeachingAssistants, {
-      propsData: {
+      props: {
         teachingAssistants: [
           { role: 'teaching_assistant', user_id: 1, username: 'test_user_1' },
           { role: 'teaching_assistant', user_id: 2, username: 'test_user_2' },
@@ -47,7 +47,7 @@ describe('TeachingAssistants.vue', () => {
 
   it('Should handle teaching assistants list when is updated', async () => {
     const wrapper = mount(common_TeachingAssistants, {
-      propsData: {
+      props: {
         teachingAssistants: [
           { role: 'teaching_assistant', user_id: 1, username: 'test_user_1' },
           { role: 'teaching_assistant', user_id: 2, username: 'test_user_2' },
@@ -71,7 +71,7 @@ describe('TeachingAssistants.vue', () => {
 
   it('Should handle onSubmit event', async () => {
     const wrapper = mount(common_TeachingAssistants, {
-      propsData: {
+      props: {
         attachTo: '#root',
         teachingAssistants: [
           { role: 'teaching_assistant', user_id: 1, username: 'test_user_1' },
@@ -89,12 +89,12 @@ describe('TeachingAssistants.vue', () => {
     expect(wrapper.emitted('add-teaching-assistant')).toEqual([
       ['test_user_1'],
     ]);
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle onRemove event', async () => {
     const wrapper = shallowMount(common_TeachingAssistants, {
-      propsData: {
+      props: {
         teachingAssistants: [
           { role: 'teaching_assistant', user_id: 1, username: 'test_user_1' },
         ],

@@ -66,7 +66,7 @@ describe('Edit.vue', () => {
 
   it('Should keep the updated contestants count across tabs', async () => {
     const wrapper = shallowMount(teamsgroup_Edit, {
-      propsData: {
+      props: {
         ...propsData,
         numberOfContestants: 3,
         tab: AvailableTabs.Edit,

@@ -96,7 +96,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -135,7 +136,11 @@ export default class AddContestant extends Vue {
   time = time;
   bulkContestants = '';
   typeaheadContestants: types.ListItem[] = [];
-  currentUsers = this.users;
+  currentUsers: types.ContestUser[];
+
+  created() {
+    this.currentUsers = this.users;
+  }
 
   onSubmit(): void {
     let users: string[] = [];

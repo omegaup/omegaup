@@ -17,7 +17,7 @@ OmegaUp.on('ready', () => {
       schoolIsSelected:
         payload.isMentor && payload.options && payload.options.schoolIsSelected,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('school-of-the-month-list', {
         props: {
           schoolsOfPreviousMonth: payload.schoolsOfPreviousMonth,

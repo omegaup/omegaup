@@ -21,7 +21,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch, Emit } from 'vue-facing-decorator';
 
 export enum ToggleSwitchSize {
   Small = 'small',
@@ -35,10 +36,14 @@ export default class ToggleSwitch extends Vue {
   @Prop({ default: ToggleSwitchSize.Large }) size!: ToggleSwitchSize;
   @Prop({ default: false }) disabled!: boolean;
 
-  currentCheckedValue = this.checkedValue;
+  currentCheckedValue: boolean;
 
   @Watch('currentCheckedValue')
   @Emit('update:value')
+  created() {
+    this.currentCheckedValue = this.checkedValue;
+  }
+
   onUpdateInput(newValue: boolean): boolean {
     return newValue;
   }

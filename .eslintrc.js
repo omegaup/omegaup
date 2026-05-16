@@ -13,9 +13,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:jest-dom/recommended',
-    // Vue 2 ruleset. Do NOT mix with vue3-* until we migrate.
-    'plugin:vue/recommended',
-    // TODO: when migrating to Vue 3, replace the line above with vue3-recommended
+    'plugin:vue/vue3-recommended',
     'prettier',
     'prettier/@typescript-eslint',
     'prettier/vue',
@@ -39,9 +37,14 @@ module.exports = {
     // TODO(#4778): Add key to ALL v-for.
     'vue/require-v-for-key': 'off',
 
-    // TODO: Remove when we migrate to Vue 3, beacause of
-    // https://v3.vuejs.org/guide/migration/key-attribute.html#with-template-v-for
-    'vue/no-v-for-template-key-on-child': 'off',
+    'vue/no-v-for-template-key-on-child': 'error',
+
+    'vue/require-toggle-inside-transition': 'off',
+
+    'vue/multi-word-component-names': 'off',
+
+    // In @vue/compat MODE:2, both beforeDestroy and beforeUnmount work.
+    'vue/no-deprecated-destroyed-lifecycle': 'off',
 
     // Prevent debug console.log() from being left in production code.
     // console.warn and console.error are allowed for legitimate logging.

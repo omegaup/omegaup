@@ -8,7 +8,7 @@ import group_ScoreboardContests from './ScoreboardContests.vue';
 describe('ScoreboardContests.vue', () => {
   it('Should handle empty scoreboard contest view', () => {
     const wrapper = shallowMount(group_ScoreboardContests, {
-      propsData: {
+      props: {
         scoreboard: 'Hello',
         availableContests: [] as types.ContestListItem[],
         contests: [] as types.ScoreboardContest[],
@@ -20,7 +20,7 @@ describe('ScoreboardContests.vue', () => {
 
   it('Should handle scoreboard contest view with one contest', () => {
     const wrapper = shallowMount(group_ScoreboardContests, {
-      propsData: {
+      props: {
         scoreboard: 'Hello',
         availableContests: [] as types.ContestListItem[],
         contests: [

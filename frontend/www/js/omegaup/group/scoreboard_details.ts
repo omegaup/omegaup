@@ -10,7 +10,7 @@ OmegaUp.on('ready', function () {
     components: {
       'omegaup-group-scoreboard-details': group_ScoreboardDetails,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-group-scoreboard-details', {
         props: {
           groupAlias: payload.groupAlias,

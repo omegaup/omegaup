@@ -4,7 +4,7 @@
     :title="currentAssignment.name"
     :should-show-runs="isAdmin"
     :should-show-ranking="showRanking"
-    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
+    @update:active-tab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
       <sup :class="socketClass" :title="socketStatusTitle">{{
@@ -84,7 +84,7 @@
               :feedback-map="feedbackMap"
               :feedback-thread-map="feedbackThreadMap"
               @request-feedback="(guid) => $emit('request-feedback', guid)"
-              @update:activeTab="
+              @update:active-tab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })
               "
@@ -223,7 +223,7 @@
           @clarification-response="
             (request) => $emit('clarification-response', request)
           "
-          @update:activeTab="
+          @update:active-tab="
             (selectedTab) => $emit('update:activeTab', selectedTab)
           "
         >
@@ -238,7 +238,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
@@ -317,12 +318,22 @@ export default class ArenaCourse extends Vue {
     this.course.is_admin ||
     this.course.is_curator ||
     this.course.is_teaching_assistant;
-  currentClarifications = this.clarifications;
+
+  created() {
+    this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+    this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentRunDetailsData = this.runDetailsData;
+  }
+
+  get currentClarifications(): any {
+    return this.clarifications;
+  }
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentRunDetailsData = this.runDetailsData;
-  currentPopupDisplayed = this.popupDisplayed;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+  currentRunDetailsData: types.RunDetails | null;
+  currentPopupDisplayed: PopupDisplayed;
+  currentNextSubmissionTimestamp: Date | null;
+  currentNextExecutionTimestamp: Date | null;
   now = new Date();
   INF = '∞';
 

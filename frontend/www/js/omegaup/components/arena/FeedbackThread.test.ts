@@ -16,7 +16,7 @@ const feedbackThread: ArenaCourseFeedback = {
 describe('FeedbackThread.vue', () => {
   it('Should handle feedback thread component when form is sumbitted', async () => {
     const wrapper = mount(arena_FeedbackThread, {
-      propsData: {
+      props: {
         feedbackThread,
       },
     });
@@ -63,7 +63,7 @@ describe('FeedbackThread.vue', () => {
 
   it('Should handle feedback component when form is cancelled', async () => {
     const wrapper = shallowMount(arena_FeedbackThread, {
-      propsData: {
+      props: {
         feedbackThread,
       },
     });

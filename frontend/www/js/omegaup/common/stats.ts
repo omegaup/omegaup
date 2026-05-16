@@ -186,7 +186,7 @@ OmegaUp.on('ready', () => {
         },
       },
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-common-stats', {
         props: {
           stats: this.stats,

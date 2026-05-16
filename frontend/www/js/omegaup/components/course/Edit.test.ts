@@ -11,7 +11,7 @@ describe('Edit.vue', () => {
   it('Should handle assignments', async () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Edit, {
-      propsData: {
+      props: {
         data: {
           course: {
             admission_mode: 'registration',

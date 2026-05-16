@@ -18,7 +18,7 @@ describe('NewClarification.vue', () => {
 
   it('Should handle empty list of users', () => {
     const wrapper = shallowMount(arena_NewClarificationPopup, {
-      propsData: {
+      props: {
         problems: [
           {
             acceptsSubmissions: true,
@@ -53,7 +53,7 @@ describe('NewClarification.vue', () => {
 
   it('Should handle list of users', () => {
     const wrapper = shallowMount(arena_NewClarificationPopup, {
-      propsData: {
+      props: {
         problems: [
           {
             acceptsSubmissions: true,
@@ -98,7 +98,7 @@ describe('NewClarification.vue', () => {
   it('Should create new clarification', async () => {
     const wrapper = shallowMount(arena_NewClarificationPopup, {
       attachTo: '#root',
-      propsData: {
+      props: {
         problems: [
           {
             acceptsSubmissions: true,
@@ -123,6 +123,6 @@ describe('NewClarification.vue', () => {
     await wrapper.find('form button[type="submit"]').trigger('click');
     expect(wrapper.emitted('new-clarification')).toBeDefined();
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

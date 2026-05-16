@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
       searchResultTeamsGroups: [] as types.ListItem[],
       canSetRecommended: payload.canSetRecommended,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-contest-new', {
         props: {
           allLanguages: payload.languages,

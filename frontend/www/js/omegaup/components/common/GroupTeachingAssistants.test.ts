@@ -20,7 +20,7 @@ describe('GroupTeachingAssistants.vue', () => {
 
   it('Should handle empty group teachig assistants list', () => {
     const wrapper = shallowMount(common_GroupTeachingAssistants, {
-      propsData: {
+      props: {
         groupTeachingAssistants: [],
         searchResultGroups: [],
       },
@@ -33,7 +33,7 @@ describe('GroupTeachingAssistants.vue', () => {
 
   it('Should handle group teaching assistants list', async () => {
     const wrapper = shallowMount(common_GroupTeachingAssistants, {
-      propsData: {
+      props: {
         groupTeachingAssistants: [
           {
             role: 'teaching_assistant',
@@ -52,7 +52,7 @@ describe('GroupTeachingAssistants.vue', () => {
 
   it('Should handle group teaching assistants list when is updated', async () => {
     const wrapper = mount(common_GroupTeachingAssistants, {
-      propsData: {
+      props: {
         groupTeachingAssistants: [
           {
             role: 'teaching_assistant',
@@ -104,7 +104,7 @@ describe('GroupTeachingAssistants.vue', () => {
 
   it('Should handle onRemove event', async () => {
     const wrapper = shallowMount(common_GroupTeachingAssistants, {
-      propsData: {
+      props: {
         groupTeachingAssistants: [
           {
             role: 'teaching_assistant',

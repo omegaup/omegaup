@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-user-roles': user_Roles,
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-user-roles', {
         props: {
           roles: payload.userSystemRoles,

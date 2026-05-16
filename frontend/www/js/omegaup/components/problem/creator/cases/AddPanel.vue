@@ -89,12 +89,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Ref, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Ref } from 'vue-facing-decorator';
 import T from '../../../../lang';
 import problemCreator_Cases_CaseInput from './CaseInput.vue';
 import problemCreator_Cases_MultipleCasesInput from './MultipleCasesInput.vue';
 import problemCreator_Cases_GroupInput from './GroupInput.vue';
-import { namespace } from 'vuex-class';
 import {
   Group,
   CaseRequest,
@@ -102,8 +102,6 @@ import {
   AddTabTypes,
 } from '@/js/omegaup/problem/creator/types';
 import { NIL, v4 as uuid } from 'uuid';
-
-const casesStore = namespace('casesStore');
 
 @Component({
   components: {
@@ -124,12 +122,21 @@ export default class AddPanel extends Vue {
   @Ref('case-input') caseInputRef!: problemCreator_Cases_CaseInput;
   @Ref('group-input') groupInputRef!: problemCreator_Cases_GroupInput;
 
-  @casesStore.Mutation('addCase') addCase!: (caseRequest: CaseRequest) => void;
-  @casesStore.Mutation('addGroup') addGroup!: (groupRequest: Group) => void;
-  @casesStore.Action('addMultipleCases') addMultipleCases!: (
-    multipleCaseRequest: MultipleCaseAddRequest,
-  ) => void;
-  @casesStore.State('groups') groups!: Group[];
+  addCase(caseRequest: CaseRequest) {
+    this.$store.commit('casesStore/addCase', caseRequest);
+  }
+
+  addGroup(groupRequest: Group) {
+    this.$store.commit('casesStore/addGroup', groupRequest);
+  }
+
+  addMultipleCases(multipleCaseRequest: MultipleCaseAddRequest) {
+    this.$store.dispatch('casesStore/addMultipleCases', multipleCaseRequest);
+  }
+
+  get groups(): Group[] {
+    return this.$store.state.casesStore.groups;
+  }
 
   addItemToStore() {
     this.invalidCaseName = false;

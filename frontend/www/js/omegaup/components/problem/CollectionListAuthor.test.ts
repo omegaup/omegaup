@@ -8,7 +8,7 @@ import problem_CollectionListAuthor from './CollectionListAuthor.vue';
 describe('CollectionListAuthor.vue', () => {
   it('Should handle details of problem list by author collection', async () => {
     const wrapper = mount(problem_CollectionListAuthor, {
-      propsData: {
+      props: {
         data: {
           authorsRanking: {
             total: 3,
@@ -102,7 +102,7 @@ describe('CollectionListAuthor.vue', () => {
 
   it('Should handle empty list of problems in author collection', async () => {
     const wrapper = mount(problem_CollectionListAuthor, {
-      propsData: {
+      props: {
         data: {
           authorsRanking: {
             total: 1,

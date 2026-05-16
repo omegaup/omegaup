@@ -37,7 +37,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import DatePicker from '../DatePicker.vue';
 
@@ -63,9 +64,14 @@ export default class CourseClone extends Vue {
   @Prop() initialName!: string;
 
   T = T;
-  alias = this.initialAlias;
+  alias: string;
   startTime = new Date();
-  name = this.initialName;
+  name: string;
+
+  created() {
+    this.name = this.initialName;
+    this.alias = this.initialAlias;
+  }
 }
 </script>
 

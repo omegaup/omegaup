@@ -137,7 +137,8 @@
 <script lang="ts">
 import * as monaco from 'monaco-editor';
 (window as any).monaco = monaco;
-import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
+import * as VueCtor from 'vue';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
 import Clipboard from 'v-clipboard';
@@ -178,7 +179,7 @@ import {
   faCopy,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faCopy);
-Vue.use(Clipboard);
+VueCtor.use(Clipboard);
 import T from '../lang';
 
 interface GraderComponent extends Vue {

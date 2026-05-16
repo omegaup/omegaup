@@ -76,7 +76,7 @@ describe('SingleTabEnforcer', () => {
       'omegaup-contest-test-contest',
     );
 
-    enforcer.destroy();
+    enforcer.unmount();
   });
 
   it('should not be blocked when first tab opens', () => {
@@ -91,7 +91,7 @@ describe('SingleTabEnforcer', () => {
     expect(enforcer.blocked).toBe(false);
     expect(onBlocked).not.toHaveBeenCalled();
 
-    enforcer.destroy();
+    enforcer.unmount();
   });
 
   it('should block second tab when first tab is open', async () => {
@@ -120,8 +120,8 @@ describe('SingleTabEnforcer', () => {
     expect(onBlocked1).not.toHaveBeenCalled();
     expect(onBlocked2).toHaveBeenCalled();
 
-    enforcer1.destroy();
-    enforcer2.destroy();
+    enforcer1.unmount();
+    enforcer2.unmount();
   });
 
   it('should allow tabs for different contests', () => {
@@ -149,8 +149,8 @@ describe('SingleTabEnforcer', () => {
     expect(onBlocked1).not.toHaveBeenCalled();
     expect(onBlocked2).not.toHaveBeenCalled();
 
-    enforcer1.destroy();
-    enforcer2.destroy();
+    enforcer1.unmount();
+    enforcer2.unmount();
   });
 
   it('should clean up on destroy', () => {
@@ -162,7 +162,7 @@ describe('SingleTabEnforcer', () => {
     enforcer.init();
     expect(MockBroadcastChannel.instances).toHaveLength(1);
 
-    enforcer.destroy();
+    enforcer.unmount();
     expect(MockBroadcastChannel.instances).toHaveLength(0);
   });
 });
@@ -179,6 +179,6 @@ describe('enforceSingleTab', () => {
     expect(enforcer).not.toBeNull();
     expect(MockBroadcastChannel.instances).toHaveLength(1);
 
-    enforcer.destroy();
+    enforcer.unmount();
   });
 });

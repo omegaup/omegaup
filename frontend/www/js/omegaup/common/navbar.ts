@@ -35,7 +35,7 @@ OmegaUp.on('ready', () => {
       graderQueueLength: -1,
       errorMessage: null as string | null,
     }),
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-common-navbar', {
         props: {
           omegaUpLockDown: payload.omegaUpLockDown,

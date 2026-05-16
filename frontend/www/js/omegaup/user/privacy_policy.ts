@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
         saved: payload.has_accepted,
       };
     },
-    render: function (createElement) {
+    render: function (createElement: any) {
       return createElement('omegaup-privacy-policy', {
         props: {
           policyMarkdown: payload.policy_markdown,

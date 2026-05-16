@@ -7,7 +7,7 @@ import problem_StatementEdit from './StatementEdit.vue';
 describe('StatementEdit.vue', () => {
   it('Should handle unrecognized source filename error', () => {
     const wrapper = mount(problem_StatementEdit, {
-      propsData: {
+      props: {
         statement: {
           markdown: `# test with embed code in statement
 Here we can add code.
@@ -34,7 +34,7 @@ Here we can add code.
 
   it('Should handle a valid source filename with content', async () => {
     const wrapper = mount(problem_StatementEdit, {
-      propsData: {
+      props: {
         statement: {
           markdown: `# test with embed code in statement
 Here we can add code.

@@ -126,7 +126,7 @@ describe('Stats.vue', () => {
 
   it('Should handle contest or problem stats', async () => {
     const wrapper = shallowMount(common_Stats, {
-      propsData: sampleStats,
+      props: sampleStats,
     });
 
     expect(wrapper.find('.copy h1').text()).toBe(T.liveStatistics);

@@ -6,7 +6,7 @@ import type { types } from '../../api_types';
 describe('Mine.vue', () => {
   it('Should display course admin list', () => {
     const wrapper = mount(course_Mine, {
-      propsData: {
+      props: {
         courses: {
           admin: {
             accessMode: 'admin',
