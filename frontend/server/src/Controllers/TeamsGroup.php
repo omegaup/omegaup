@@ -73,15 +73,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         ]);
 
         return [
-            'team_group' => [
-                'alias' => $filteredTeamGroup['alias'],
-                'archived' => $filteredTeamGroup['archived'],
-                'create_time' => new \OmegaUp\Timestamp(
-                    $filteredTeamGroup['create_time']
-                ),
-                'description' => $filteredTeamGroup['description'],
-                'name' => $filteredTeamGroup['name'],
-            ],
+            'team_group' => $filteredTeamGroup,
         ];
     }
 
