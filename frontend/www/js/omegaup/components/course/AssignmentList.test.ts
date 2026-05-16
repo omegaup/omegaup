@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import Sortable from 'sortablejs';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
@@ -17,10 +16,6 @@ describe('AssignmentList.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.courseContentEmpty);
-  });
-    inserted: (el: HTMLElement, binding) => {
-      new Sortable(el, binding.value || {});
-    },
   });
 
   it('Should handle content list', async () => {

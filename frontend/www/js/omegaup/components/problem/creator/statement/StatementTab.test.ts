@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
 import store from '@/js/omegaup/problem/creator/store';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import * as ui from '../../../../ui';
 import StatementTab from './StatementTab.vue';

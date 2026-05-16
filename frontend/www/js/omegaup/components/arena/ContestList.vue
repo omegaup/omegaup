@@ -570,10 +570,6 @@ class ArenaContestList extends Vue {
   scrollPositions: { [key: string]: number } = {};
   maxScrollPositions: { [key: string]: number } = {};
 
-  $refs!: {
-    [key: string]: HTMLElement | HTMLElement[];
-  };
-
   created() {
     this.currentPage = this.page;
     this.currentFilter = this.filter;

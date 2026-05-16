@@ -37,10 +37,12 @@ module.exports = {
       '<rootDir>/frontend/www/third_party/js/__mocks__/monacoEditor.js',
     sugar: '<rootDir>/frontend/www/js/omegaup/__mocks__/sugar.js',
     'vue-codemirror-lite':
-      '<rootDir>/node_modules/vue-codemirror-lite/dist/vuecodemirror.min.js',
+      '<rootDir>/frontend/www/js/omegaup/__mocks__/vue-codemirror-lite.ts',
     '@voerro/vue-tagsinput':
       '<rootDir>/node_modules/@voerro/vue-tagsinput/dist/voerro-vue-tagsinput.js',
     '^bootstrap-vue$': '<rootDir>/frontend/www/js/omegaup/__mocks__/bootstrap-vue.ts',
+    'vue-typeahead-bootstrap':
+      '<rootDir>/frontend/www/js/omegaup/__mocks__/vue-typeahead-bootstrap.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
   transform: {
@@ -53,7 +55,7 @@ module.exports = {
     '.*\\.[jt]sx?$': ['babel-jest', babelConfig],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(vue-.*|@vue/.*|@voerro/vue-tagsinput|monaco-editor|monaco-editor-core|vue-facing-decorator)/)',
+    'node_modules/(?!(vue-.*|@vue/.*|@voerro/vue-tagsinput|monaco-editor|monaco-editor-core|vue-facing-decorator|vue-typeahead-bootstrap)/)',
   ],
   globals: {
     'vue-jest': {
@@ -65,4 +67,8 @@ module.exports = {
   testEnvironmentOptions: {
     url: 'http://localhost:8001/',
   },
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/frontend/www/karel.js/',
+  ],
 };

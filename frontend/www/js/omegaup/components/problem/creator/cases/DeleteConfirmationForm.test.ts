@@ -1,5 +1,4 @@
 import { shallowMount, mount } from '@vue/test-utils';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import Vue from 'vue';
 import DeleteConfirmationForm from './DeleteConfirmationForm.vue';
 import T from '../../../../lang';

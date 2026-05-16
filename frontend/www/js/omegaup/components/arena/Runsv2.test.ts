@@ -2,13 +2,13 @@ import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Runs from './Runsv2.vue';
-
-import BootstrapVue, {
+import {
   BTable,
   BIconQuestionCircleFill,
   BIconChevronRight,
   BIconChevronDown,
 } from 'bootstrap-vue';
+
 describe('Runsv2.vue', () => {
   const baseRunData: types.Run = {
     alias: 'alias',

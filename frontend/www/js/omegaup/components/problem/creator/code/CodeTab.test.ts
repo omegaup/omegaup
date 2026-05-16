@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
 import CodeTab from './CodeTab.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 
 describe('CodeTab.vue', () => {

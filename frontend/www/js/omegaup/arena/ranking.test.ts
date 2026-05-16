@@ -1,6 +1,5 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
-import { mount, shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import { types } from '../api_types';
 import T from '../lang';

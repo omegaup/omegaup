@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils';
 
 import LayoutSidebar from './LayoutSidebar.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 import store from '@/js/omegaup/problem/creator/store';
@@ -50,9 +49,7 @@ describe('LayoutSidebar.vue', () => {
     caseID: ungroupedCaseCaseID,
   });
   it('Should show layouts and methods', async () => {
-    const wrapper = mount(LayoutSidebar, {
-      store,
-    });
+    const wrapper = mount(LayoutSidebar, { global: { plugins: [store] } });
 
     expect(wrapper.vm.getAllLayouts.length).toBe(1);
     expect(
@@ -163,9 +160,7 @@ describe('LayoutSidebar.vue', () => {
   it('Should rename layouts', async () => {
     store.commit('casesStore/resetStore');
     store.commit('casesStore/addNewLayout');
-    const wrapper = mount(LayoutSidebar, {
-      store,
-    });
+    const wrapper = mount(LayoutSidebar, { global: { plugins: [store] } });
 
     expect(wrapper.vm.getAllLayouts.length).toBe(1);
     expect(

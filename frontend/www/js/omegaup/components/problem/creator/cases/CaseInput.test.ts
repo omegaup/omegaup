@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
 import CaseInput from './CaseInput.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 import store from '@/js/omegaup/problem/creator/store';

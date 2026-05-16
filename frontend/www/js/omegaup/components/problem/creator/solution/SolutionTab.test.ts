@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
 import SolutionTab from './SolutionTab.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import T from '../../../../lang';
 

@@ -1,7 +1,6 @@
 import { shallowMount, mount } from '@vue/test-utils';
 
 import CasesForm from './CasesForm.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
 import T from '../../../../lang';
@@ -18,7 +17,7 @@ describe('CasesForm.vue', () => {
 
   it('Should render commit message input and hidden fields', async () => {
     const wrapper = shallowMount(CasesForm, {
-      store: store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'problem-alias' },
       props: { isCaseEdit: true },
     });
@@ -52,7 +51,7 @@ describe('CasesForm.vue', () => {
 
   it('Should show input and output file fields when truncated', async () => {
     const wrapper = shallowMount(CasesForm, {
-      store: store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isTruncatedInput: true, isTruncatedOutput: true },
     });
@@ -123,7 +122,7 @@ describe('CasesForm.vue', () => {
     const errorSpy = jest.spyOn(ui, 'error').mockImplementation(() => {});
 
     const wrapper = mount(CasesForm, {
-      store: store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isCaseEdit: false },
     });
@@ -144,7 +143,7 @@ describe('CasesForm.vue', () => {
 
   it('Should hide submit button when isEmbedded is true', async () => {
     const wrapper = mount(CasesForm, {
-      store: store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isEmbedded: true },
     });

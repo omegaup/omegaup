@@ -3,7 +3,6 @@ import { shallowMount } from '@vue/test-utils';
 import CasesTab from './CasesTab.vue';
 import Sidebar from './Sidebar.vue';
 import AddPanel from './AddPanel.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import Vue from 'vue';
 
 describe('Tabs.vue', () => {

@@ -15,7 +15,6 @@ import {
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
-import { mount, shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import fetchMock from 'jest-fetch-mock';
 import { OmegaUp } from '../omegaup';

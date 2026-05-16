@@ -52,7 +52,7 @@ export interface SingleTabEnforcerOptions {
  * enforcer.init();
  *
  * // Clean up when leaving the page
- * window.addEventListener('beforeunload', () => enforcer.destroy());
+ * window.addEventListener('beforeunload', () => enforcer.unmount());
  * ```
  */
 export class SingleTabEnforcer {
@@ -178,7 +178,7 @@ export class SingleTabEnforcer {
    * Cleans up resources. Should be called when leaving the page.
    * Removes the beforeunload listener if one was registered.
    */
-  public destroy(): void {
+  public unmount(): void {
     if (this.channel) {
       this.channel.close();
       this.channel = null;
@@ -191,7 +191,7 @@ export class SingleTabEnforcer {
 
   /**
    * Registers a beforeunload handler for automatic cleanup.
-   * The handler will be removed when destroy() is called.
+   * The handler will be removed when unmount() is called.
    */
   public registerBeforeUnloadHandler(): void {
     // Prevent orphaning previous listeners by returning early if already registered
@@ -199,7 +199,7 @@ export class SingleTabEnforcer {
       return;
     }
     this.beforeUnloadHandler = () => {
-      this.destroy();
+      this.unmount();
     };
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
   }
