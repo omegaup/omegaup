@@ -80,9 +80,15 @@ export default class GroupForm extends Vue {
   @Prop({ default: false }) isUpdate!: boolean;
 
   T = T;
-  alias: string = this.groupAlias;
-  description: string = this.groupDescription;
-  name: string = this.groupName;
+  alias: string;
+  description: string;
+  name: string;
+
+  created() {
+    this.name = this.groupName;
+    this.description = this.groupDescription;
+    this.alias = this.groupAlias;
+  }
 
   onSubmit(): void {
     if (this.isUpdate) {

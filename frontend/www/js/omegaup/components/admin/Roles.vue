@@ -53,8 +53,12 @@ export default class AdminRoles extends Vue {
   @Prop() groups!: types.Group[];
 
   T = T;
-  currentRoles: types.UserRole[] = this.roles;
-  currentGroups: types.Group[] = this.groups;
+  get currentRoles(): types.UserRole[] {
+    return this.roles;
+  }
+  get currentGroups(): types.Group[] {
+    return this.groups;
+  }
 
   @Emit()
   changeRole(

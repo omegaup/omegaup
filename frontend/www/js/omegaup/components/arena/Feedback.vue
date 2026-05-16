@@ -96,7 +96,12 @@ export default class Feedback extends Vue {
   FeedbackStatus = FeedbackStatus;
   T = T;
   time = time;
-  saved: boolean = this.feedback.status == FeedbackStatus.Saved;
+  saved: boolean;
+
+  created() {
+    this.saved = this.feedback.status == FeedbackStatus.Saved;
+  }
+
   get currentFeedback(): ArenaCourseFeedback {
     return this.feedback;
   }

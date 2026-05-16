@@ -389,6 +389,10 @@ export default class ViewProfile extends Vue {
     };
     tags: Array<{ name: string; count: number }>;
   } | null;
+  created() {
+    this.currentReadme = this.profile.readme ?? null;
+  }
+
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -400,14 +404,16 @@ export default class ViewProfile extends Vue {
       return new ContestResult(contest);
     })
     .filter((contest) => Boolean(contest));
-  charts: types.UserProfileStats[] = this.data?.stats ?? [];
+  get charts(): types.UserProfileStats[] {
+    return this.data?.stats ?? [];
+  }
   ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null = this.profile.readme ?? null;
+  currentReadme: string | null;
   isEditingReadme = false;
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;

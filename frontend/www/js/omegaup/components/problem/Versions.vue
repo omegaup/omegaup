@@ -177,10 +177,14 @@ export default class ProblemVersions extends Vue {
   T = T;
   time = time;
   diffMode = 'files';
-  selectedRevision: null | types.ProblemVersion = this.value;
+  selectedRevision: null | types.ProblemVersion;
   runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';
+
+  created() {
+    this.selectedRevision = this.value;
+  }
 
   get diffFiles(): string[][] {
     if (!this.selectedRevision || !this.publishedRevision) {

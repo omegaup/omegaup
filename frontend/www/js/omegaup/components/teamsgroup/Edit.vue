@@ -158,11 +158,12 @@ export default class TeamsGroupEdit extends Vue {
   T = T;
   ui = ui;
   AvailableTabs = AvailableTabs;
-  selectedTab: AvailableTabs = this.tab;
+  selectedTab: AvailableTabs;
   currentTeamsIdentities: any;
 
   @Watch('tab')
   created() {
+    this.selectedTab = this.tab;
     this.currentTeamsIdentities = this.teamsIdentities;
   }
 

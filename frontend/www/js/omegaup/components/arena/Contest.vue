@@ -319,7 +319,7 @@ export default class ArenaContest extends Vue {
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
   currentClarifications: any;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
+  activeProblem: types.NavbarProblemsetProblem | null;
   currentNextSubmissionTimestamp: Date | null;
   currentNextExecutionTimestamp: Date | null;
   currentRunDetailsData: null | types.RunDetails;
@@ -377,6 +377,7 @@ export default class ArenaContest extends Vue {
   }
 
   created() {
+    this.activeProblem = this.problem;
     this.currentPopupDisplayed = this.popupDisplayed;
     this.currentRunDetailsData = this.runDetailsData;
     this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;

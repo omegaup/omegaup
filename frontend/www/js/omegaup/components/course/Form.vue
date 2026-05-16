@@ -399,7 +399,7 @@ export default class CourseDetails extends Vue {
   name: any;
   level: any;
   objective: any;
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
+  school: null | types.SchoolListItem;
   needsBasicInformation: any;
   requestsUserInformation: any;
   unlimitedDuration: any;
@@ -410,6 +410,7 @@ export default class CourseDetails extends Vue {
   // Computed properties to track if required fields are complete
 
   created() {
+    this.school = this.searchResultSchools[0] ?? null;
     this.selectedLanguages = this.course.languages;
     this.unlimitedDuration = this.course.finish_time === null;
     this.requestsUserInformation = this.course.requests_user_information;

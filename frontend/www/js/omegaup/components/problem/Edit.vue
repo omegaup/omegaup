@@ -316,13 +316,18 @@ export default class ProblemEdit extends Vue {
   @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
+
+  created() {
+    this.currentStatement = this.statement;
+  }
+
   get alias(): any {
     return this.data.alias;
   }
   get showTab(): string {
     return this.initialTab;
   }
-  currentStatement: types.ProblemStatement = this.statement;
+  currentStatement: types.ProblemStatement;
   currentSolution: types.ProblemStatement =
     this.solution ||
     ({

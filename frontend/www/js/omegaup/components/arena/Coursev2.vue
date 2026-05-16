@@ -167,12 +167,16 @@ export default class ArenaCourse extends Vue {
   T = T;
   ui = ui;
   Tabs = Tabs;
-  currentSelectedTab: string | null = this.selectedTab;
+  currentSelectedTab: string | null;
 
   private get currentAssignmentIndex(): number {
     return this.course.assignments.findIndex(
       (assignment) => assignment.alias === this.assignment.alias,
     );
+  }
+
+  created() {
+    this.currentSelectedTab = this.selectedTab;
   }
 
   get previousAssignment(): types.CourseAssignment | null {

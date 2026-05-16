@@ -55,12 +55,14 @@ export default class GroupInput extends Vue {
   @Prop({ default: true }) autoPoints!: boolean;
 
   groupName: string;
-  groupPoints: number = this.points;
-  groupAutoPoints: boolean = this.autoPoints;
+  groupPoints: number;
+  groupAutoPoints: boolean;
 
   T = T;
 
   created() {
+    this.groupAutoPoints = this.autoPoints;
+    this.groupPoints = this.points;
     this.groupName = this.name;
   }
 

@@ -131,7 +131,9 @@ export default class IdentityEdit extends Vue {
     } as types.Identity,
     this.identity,
   );
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
+  get school(): null | types.SchoolListItem {
+    return this.searchResultSchools[0] ?? null;
+  }
 
   get groupName(): string {
     const teamUsername = this.selectedIdentity.username.split(':');

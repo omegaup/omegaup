@@ -233,8 +233,8 @@ export default class CourseProblemList extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
-  problems: types.AddedProblem[] = this.assignmentProblems;
+  assignment: Partial<types.CourseAssignment>;
+  problems: types.AddedProblem[];
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
@@ -247,6 +247,11 @@ export default class CourseProblemList extends Vue {
   versionLog: types.ProblemVersion[] = [];
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
+
+  created() {
+    this.problems = this.assignmentProblems;
+    this.assignment = this.selectedAssignment;
+  }
 
   get tags(): string[] {
     let t = this.topics.slice();

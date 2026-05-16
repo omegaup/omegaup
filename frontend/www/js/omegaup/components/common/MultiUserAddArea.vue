@@ -59,9 +59,13 @@ export default class MultiUserAddArea extends Vue {
   bulkContestants: string | null = null;
 
   // if the users prop is not empty, we need to keep track of those users in the usersList
-  usersList: string[] = this.users || [];
+  usersList: string[];
 
   onBulkContestantsChanged = debounce(this.onTextAreaChange, WAIT_TIME);
+
+  created() {
+    this.usersList = this.users || [];
+  }
 
   onTextAreaChange(event: Event) {
     const target = event.target as HTMLTextAreaElement;

@@ -64,6 +64,8 @@ export default class CaseInput extends Vue {
   // This return the group name, and the group ID of all groups in the store. Matching the required type for the select component./
 
   created() {
+    this.caseAutoPoints = this.autoPoints;
+    this.casePoints = this.points;
     this.caseGroup = this.group;
     this.caseName = this.name;
   }
@@ -77,8 +79,8 @@ export default class CaseInput extends Vue {
 
   caseName: string;
   caseGroup: string;
-  casePoints: number = this.points;
-  caseAutoPoints: boolean = this.autoPoints;
+  casePoints: number;
+  caseAutoPoints: boolean;
 
   T = T;
 

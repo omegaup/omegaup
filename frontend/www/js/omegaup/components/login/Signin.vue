@@ -96,7 +96,11 @@ export default class Signin extends Vue {
 
   T = T;
   AvailableTabs = AvailableTabs;
-  activeTab: AvailableTabs = this.initialActiveTab;
+  activeTab = AvailableTabs.Login;
+
+  created() {
+    this.activeTab = this.initialActiveTab;
+  }
 
   @Watch('initialActiveTab')
   onInitialActiveTabChanged(newValue: AvailableTabs): void {

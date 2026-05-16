@@ -196,13 +196,14 @@ export default class GroupEdit extends Vue {
   T = T;
   ui = ui;
   AvailableTabs = AvailableTabs;
-  selectedTab: AvailableTabs = this.tab;
+  selectedTab: AvailableTabs;
   currentIdentities: types.Identity[];
   currentIdentitiesCsv: types.Identity[];
   currentScoreboards: types.GroupScoreboard[];
 
   @Watch('tab')
   created() {
+    this.selectedTab = this.tab;
     this.currentScoreboards = this.scoreboards;
     this.currentIdentitiesCsv = this.identitiesCsv;
     this.currentIdentities = this.identities;

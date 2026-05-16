@@ -199,10 +199,15 @@ export default class ProblemTags extends Vue {
   @Prop() isLecture!: boolean;
 
   T = T;
+
+  created() {
+    this.problemLevelTag = this.problemLevel;
+  }
+
   get allowTags(): boolean {
     return this.initialAllowTags;
   }
-  problemLevelTag: string | null = this.problemLevel;
+  problemLevelTag: string | null;
   newPrivateTag = '';
   newPublicTag = '';
 

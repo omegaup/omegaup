@@ -320,6 +320,7 @@ export default class ArenaCourse extends Vue {
     this.course.is_teaching_assistant;
 
   created() {
+    this.activeProblem = this.problem;
     this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
     this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
     this.currentPopupDisplayed = this.popupDisplayed;
@@ -329,7 +330,7 @@ export default class ArenaCourse extends Vue {
   get currentClarifications(): any {
     return this.clarifications;
   }
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
+  activeProblem: types.NavbarProblemsetProblem | null;
   currentRunDetailsData: types.RunDetails | null;
   currentPopupDisplayed: PopupDisplayed;
   currentNextSubmissionTimestamp: Date | null;

@@ -124,12 +124,17 @@ export default class CourseScheduledProblemList extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
-  problems: types.AddedProblem[] = this.assignmentProblems;
+  assignment: Partial<types.CourseAssignment>;
+  problems: types.AddedProblem[];
   taggedProblemAlias = '';
   problemAlias: null | types.ListItem = null;
   points = 100;
   showTopicsAndDifficulty = false;
+
+  created() {
+    this.problems = this.assignmentProblems;
+    this.assignment = this.selectedAssignment;
+  }
 
   get addCardHeaderTitleLabel(): string {
     return this.assignment.assignment_type === 'lesson'
