@@ -79,8 +79,9 @@ OmegaUp.on('ready', async () => {
 
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
-    window.location.hash = activeTab;
+    history.replaceState(null, '', `#${activeTab}`);
   }
+
   const {
     guid,
     popupDisplayed,
@@ -164,6 +165,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      activeTab: getSelectedValidTab(locationHash[0], contestAdmin),
       searchResultUsers: [] as types.ListItem[],
       nextSubmissionTimestamp,
       nextExecutionTimestamp,
@@ -174,6 +176,9 @@ OmegaUp.on('ready', async () => {
       blockedMessage,
       logs: [] as types.ContestProblemChangeLog[],
     }),
+    beforeDestroy() {
+      window.removeEventListener('popstate', syncFromHash);
+    },
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
         props: {
@@ -187,7 +192,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
-          activeTab,
+          activeTab: this.activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
           miniRankingUsers: rankingStore.state.miniRankingUsers,
@@ -251,7 +256,8 @@ OmegaUp.on('ready', async () => {
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
                 if (request.hash) {
-                  window.location.hash = request.hash;
+                  history.pushState(null, '', `#${request.hash}`);
+                  syncFromHash();
                 }
               })
               .catch((run) => {
@@ -430,7 +436,8 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
           'update:activeTab': (tabName: string) => {
-            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
+            contestContestant.activeTab = tabName;
+            history.pushState(null, '', `#${tabName}`);
           },
           'reset-hash': ({
             selectedTab,
@@ -440,18 +447,12 @@ OmegaUp.on('ready', async () => {
             alias: string;
           }) => {
             if (!alias) {
-              history.replaceState(
-                { selectedTab },
-                'resetHash',
-                `#${selectedTab}`,
-              );
+              history.pushState(null, '', `#${selectedTab}`);
+              syncFromHash();
               return;
             }
-            history.replaceState(
-              { selectedTab, alias },
-              'resetHash',
-              `#${selectedTab}/${alias}`,
-            );
+            history.pushState(null, '', `#${selectedTab}/${alias}`);
+            syncFromHash();
           },
           'new-submission-popup-displayed': () => {
             if (this.shouldShowFirstAssociatedIdentityRunWarning) {
@@ -642,6 +643,20 @@ OmegaUp.on('ready', async () => {
       trackRun({ run });
     }
   }
+
+  function syncFromHash(): void {
+    const locationHash = window.location.hash.replace('#', '').split('/');
+    const tab = getSelectedValidTab(locationHash[0], contestAdmin);
+
+    if (contestContestant.activeTab !== tab) {
+      contestContestant.activeTab = tab;
+    }
+  }
+
+  Vue.nextTick(() => {
+    syncFromHash();
+    window.addEventListener('popstate', syncFromHash);
+  });
 
   setInterval(() => {
     refreshContestClarifications({

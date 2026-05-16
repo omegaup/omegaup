@@ -67,7 +67,6 @@ from utils import (
     get_first_day_of_next_month,
 )
 
-
 sys.path.insert(
     0,
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
