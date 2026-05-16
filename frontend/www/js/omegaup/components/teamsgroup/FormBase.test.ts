@@ -17,7 +17,7 @@ describe('FormBase.vue', () => {
     }
   });
 
-  const propsData = {
+  const props = {
     alias: 'Hello',
     name: 'Hello omegaUp',
     description: 'Hello omegaUp Description',
@@ -26,7 +26,7 @@ describe('FormBase.vue', () => {
   it('Should handle form base', async () => {
     const wrapper = shallowMount(teamsgroup_FormBase, {
       attachTo: '#root',
-      propsData,
+      props,
     });
 
     expect(wrapper.find('div[class="card"]').text()).not.toContain(

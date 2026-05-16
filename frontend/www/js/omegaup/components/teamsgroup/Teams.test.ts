@@ -52,7 +52,7 @@ describe('Teams.vue', () => {
 
   it('Should handle a list of teams as identities', () => {
     const wrapper = mount(teamsgroup_Teams, {
-      propsData: props,
+      props: props,
     });
 
     expect(wrapper.find('table[data-table-identities]').text()).toContain(
@@ -63,7 +63,7 @@ describe('Teams.vue', () => {
   it('Should handle edit identity form', async () => {
     const wrapper = mount(teamsgroup_Teams, {
       attachTo: '#root',
-      propsData: props,
+      props: props,
     });
 
     await wrapper

@@ -1,16 +1,12 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
-import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import problem_Details from './Detailsv2.vue';
 
 import BootstrapVue, { BTab } from 'bootstrap-vue';
-
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-
 describe('Detailsv2.vue', () => {
   const problem: types.ProblemDetails = {
     accepted: 4,
@@ -112,7 +108,6 @@ describe('Detailsv2.vue', () => {
         languages: ['py2', 'py3'],
         userRuns: runs,
       },
-      localVue,
     });
 
     const tabs = wrapper.findAllComponents(BTab);
@@ -137,7 +132,6 @@ describe('Detailsv2.vue', () => {
         languages,
         userRuns: runs,
       },
-      localVue,
     });
 
     const problemTab = wrapper.findComponent(BTab);
@@ -162,7 +156,6 @@ describe('Detailsv2.vue', () => {
         },
         userRuns: runs,
       },
-      localVue,
     });
 
     const problemTab = wrapper.findComponent(BTab);
@@ -182,7 +175,6 @@ describe('Detailsv2.vue', () => {
         },
         userRuns: runs,
       },
-      localVue,
     });
 
     const problemTab = wrapper.findComponent(BTab);
@@ -202,7 +194,6 @@ describe('Detailsv2.vue', () => {
         },
         userRuns: runs,
       },
-      localVue,
     });
 
     expect(wrapper.find('table.runs tbody').text()).toContain(runs[0].guid);
@@ -221,7 +212,6 @@ describe('Detailsv2.vue', () => {
         },
         userRuns: runs,
       },
-      localVue,
     });
 
     const tabsItems = wrapper.findAllComponents(BTab);

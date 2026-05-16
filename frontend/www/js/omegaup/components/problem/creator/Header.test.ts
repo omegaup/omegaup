@@ -11,13 +11,9 @@ import {
   generateGroup,
 } from '@/js/omegaup/problem/creator/modules/cases';
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
-
 describe('Header.vue', () => {
   it('Should contain the header buttons and problem name input', async () => {
-    const wrapper = shallowMount(Header, { localVue, store });
+    const wrapper = shallowMount(Header, { store });
 
     const buttons = wrapper.findAllComponents(BButton);
     const expectedText = [
@@ -42,7 +38,7 @@ describe('Header.vue', () => {
       value: { reload: jest.fn() },
     });
 
-    const wrapper = mount(Header, { localVue, store });
+    const wrapper = mount(Header, { store });
 
     const buttonsList = wrapper.findAll('button');
     expect(buttonsList.length).toBe(3);
@@ -81,7 +77,7 @@ describe('Header.vue', () => {
   });
 
   it('Should download the zip file', async () => {
-    const wrapper = mount(Header, { localVue, store });
+    const wrapper = mount(Header, { store });
 
     const generateProblemSpy = jest.spyOn(wrapper.vm, 'generateProblem');
 
@@ -96,7 +92,7 @@ describe('Header.vue', () => {
   });
 
   it('Should have correct file/folder structure', async () => {
-    const wrapper = mount(Header, { localVue, store });
+    const wrapper = mount(Header, { store });
 
     const newUngroupedCasegroup = generateGroup({
       name: 'New Ungrouped Case Group',
@@ -147,7 +143,6 @@ describe('Header.vue', () => {
 
   it('Should process the zip after it is uploaded', async () => {
     const wrapper = mount(Header, {
-      localVue,
       store,
     });
 

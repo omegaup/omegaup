@@ -1,4 +1,4 @@
-import { createLocalVue, mount, shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Clipboard from 'v-clipboard';
 
@@ -8,12 +8,10 @@ import course_AdmissionMode from './AdmissionMode.vue';
 import { AdmissionMode } from '../common/Publish.vue';
 
 describe('AdmissionMode.vue', () => {
-  const localVue = createLocalVue();
   Vue.use(Clipboard);
 
   it('Should handle admission mode as curator', () => {
     const wrapper = mount(course_AdmissionMode, {
-      localVue,
       props: {
         admissionModeDescription: T.contestNewFormAdmissionModeDescription,
         courseAlias: 'DP',
@@ -33,7 +31,6 @@ describe('AdmissionMode.vue', () => {
 
   it('Should handle admission mode as normal user', () => {
     const wrapper = shallowMount(course_AdmissionMode, {
-      localVue,
       props: {
         admissionModeDescription: T.contestNewFormAdmissionModeDescription,
         courseAlias: 'DP',

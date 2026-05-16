@@ -7,7 +7,7 @@ import UserObjectivesQuestions from '../user/ObjectivesQuestions.vue';
 import user_NextRegisteredContest from '../user/NextRegisteredContest.vue';
 
 describe('Navbar.vue', () => {
-  const propsData = {
+  const props = {
     currentUsername: 'user',
     errorMessage: null,
     graderInfo: null,
@@ -32,7 +32,7 @@ describe('Navbar.vue', () => {
 
   it('Should handle empty navbar (in contest only)', () => {
     const wrapper = mount(common_Navbar, {
-      propsData,
+      props,
     });
     expect(wrapper.find('.nav-contests').exists()).toBe(false);
     expect(wrapper.find('.nav-courses').exists()).toBe(false);
@@ -43,7 +43,7 @@ describe('Navbar.vue', () => {
   it('Should handle common navbar to logged user', () => {
     const wrapper = mount(common_Navbar, {
       props: {
-        ...propsData,
+        ...props,
         ...{ inContest: false, userTypes: ['student', 'teacher'] },
       },
     });
@@ -57,7 +57,7 @@ describe('Navbar.vue', () => {
 
   it('Should handle common navbar to not-logged user', () => {
     const wrapper = mount(common_Navbar, {
-      props: { ...propsData, ...{ inContest: false, isLoggedIn: false } },
+      props: { ...props, ...{ inContest: false, isLoggedIn: false } },
     });
 
     expect(wrapper.find('.nav-problems').exists()).toBe(true);
@@ -70,7 +70,7 @@ describe('Navbar.vue', () => {
 
   it('Should show objectives modal only when a main user identity is logged', async () => {
     const wrapper = shallowMount(common_Navbar, {
-      props: { ...propsData, ...{ fromLogin: true } },
+      props: { ...props, ...{ fromLogin: true } },
     });
 
     expect(wrapper.findComponent(UserObjectivesQuestions).exists()).toBe(false);
@@ -89,7 +89,7 @@ describe('Navbar.vue', () => {
 
     const wrapper = mount(common_Navbar, {
       props: {
-        ...propsData,
+        ...props,
         ...{
           fromLogin: true,
           nextRegisteredContest: {
@@ -133,7 +133,7 @@ describe('Navbar.vue', () => {
 
   it('Should not show the information of a next registered contest when the user is not registered to a current or upcoming contest', () => {
     const wrapper = shallowMount(common_Navbar, {
-      props: { ...propsData, ...{ fromLogin: true } },
+      props: { ...props, ...{ fromLogin: true } },
     });
 
     expect(

@@ -1,17 +1,12 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import CodeTab from './CodeTab.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
-
 describe('CodeTab.vue', () => {
   it('Should change code and extension in both wrapper and store after the file is uploaded', async () => {
     const wrapper = shallowMount(CodeTab, {
-      localVue,
       store,
     });
 

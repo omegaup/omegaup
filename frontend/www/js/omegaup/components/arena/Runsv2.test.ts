@@ -1,4 +1,4 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Runs from './Runsv2.vue';
@@ -9,9 +9,6 @@ import BootstrapVue, {
   BIconChevronRight,
   BIconChevronDown,
 } from 'bootstrap-vue';
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-
 describe('Runsv2.vue', () => {
   const baseRunData: types.Run = {
     alias: 'alias',
@@ -88,7 +85,6 @@ describe('Runsv2.vue', () => {
         runs: [] as types.Run[],
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
     expect(wrapper.find('h5').text()).toBe(T.wordsSubmissions);
@@ -103,7 +99,6 @@ describe('Runsv2.vue', () => {
         runs,
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
     const tableComponent = wrapper.findComponent(BTable);
@@ -146,7 +141,6 @@ describe('Runsv2.vue', () => {
         runs,
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
     const tableComponent = wrapper.findComponent(BTable);
@@ -189,7 +183,6 @@ describe('Runsv2.vue', () => {
         runs,
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
     const tableComponent = wrapper.findComponent(BTable);
@@ -208,7 +201,6 @@ describe('Runsv2.vue', () => {
         problemAlias: 'test-problem-1',
         currentRunDetails: runDetails,
       },
-      localVue,
     });
 
     const tableComponent = wrapper.findComponent(BTable);

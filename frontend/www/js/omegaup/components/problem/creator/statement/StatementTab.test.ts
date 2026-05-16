@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import store from '@/js/omegaup/problem/creator/store';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
@@ -6,14 +6,9 @@ import T from '../../../../lang';
 import * as ui from '../../../../ui';
 import StatementTab from './StatementTab.vue';
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
-
 describe('StatementTab.vue', () => {
   it('Should contain markdown buttons and contents and update the store accordingly', async () => {
     const wrapper = shallowMount(StatementTab, {
-      localVue,
       store,
     });
 
@@ -47,7 +42,6 @@ describe('StatementTab.vue', () => {
   describe('Image size validation', () => {
     it('Should allow pasting images under 256 KB', async () => {
       const wrapper = shallowMount(StatementTab, {
-        localVue,
         store,
       });
 
@@ -75,7 +69,6 @@ describe('StatementTab.vue', () => {
 
     it('Should reject pasting images over 256 KB and show error', async () => {
       const wrapper = shallowMount(StatementTab, {
-        localVue,
         store,
       });
 
@@ -113,7 +106,6 @@ describe('StatementTab.vue', () => {
 
     it('Should reject dropping images over 256 KB and show error', async () => {
       const wrapper = shallowMount(StatementTab, {
-        localVue,
         store,
       });
 
@@ -143,7 +135,6 @@ describe('StatementTab.vue', () => {
 
     it('Should allow non-image files without size validation', async () => {
       const wrapper = shallowMount(StatementTab, {
-        localVue,
         store,
       });
 

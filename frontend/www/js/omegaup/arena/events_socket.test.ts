@@ -12,7 +12,7 @@ import { SocketOptions, SocketStatus, EventsSocket } from './events_socket';
 import WS from 'jest-websocket-mock';
 import { runsStoreConfig } from './runsStore';
 import { clarificationStoreConfig } from './clarificationsStore';
-import { createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import fetchMock from 'jest-fetch-mock';
 import { onRankingChanged, onRankingEvents } from './ranking';
@@ -287,9 +287,6 @@ describe('EventsSocket', () => {
     socket.connect();
     jest.runOnlyPendingTimers();
     await server?.connected;
-
-    const localVue = createLocalVue();
-    localVue.use(Vuex);
     const store = createStore(runsStoreConfig);
 
     server?.send({
@@ -324,9 +321,6 @@ describe('EventsSocket', () => {
     socket.connect();
     jest.runOnlyPendingTimers();
     await server?.connected;
-
-    const localVue = createLocalVue();
-    localVue.use(Vuex);
     const clarificationStore = createStore(clarificationStoreConfig);
 
     server?.send({

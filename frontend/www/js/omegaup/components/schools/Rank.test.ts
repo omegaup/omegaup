@@ -5,7 +5,7 @@ import T from '../../lang';
 import schools_Rank from './Rank.vue';
 
 describe('SchoolRank.vue', () => {
-  const propsData = {
+  const props = {
     page: 1,
     length: 10,
     showHeader: false,
@@ -23,7 +23,7 @@ describe('SchoolRank.vue', () => {
 
   it('Should handle an empty rank', () => {
     const wrapper = shallowMount(schools_Rank, {
-      propsData,
+      props,
     });
 
     expect(wrapper.find('table').exists()).toBe(true);
@@ -33,7 +33,7 @@ describe('SchoolRank.vue', () => {
   it('Should handle a rank with data', () => {
     const wrapper = shallowMount(schools_Rank, {
       props: {
-        ...propsData,
+        ...props,
         ...{
           rank: [
             {
@@ -54,7 +54,7 @@ describe('SchoolRank.vue', () => {
 
   it('Should show search bar when showHeader is false', () => {
     const wrapper = shallowMount(schools_Rank, {
-      propsData,
+      props,
     });
 
     expect(wrapper.find('.form-row').exists()).toBe(true);
@@ -64,7 +64,7 @@ describe('SchoolRank.vue', () => {
   it('Should hide search bar when showHeader is true', () => {
     const wrapper = shallowMount(schools_Rank, {
       props: {
-        ...propsData,
+        ...props,
         showHeader: true,
       },
     });

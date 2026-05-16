@@ -5,7 +5,7 @@ import T from '../../lang';
 import user_Rank from './Rank.vue';
 
 describe('Rank.vue', () => {
-  const propsData = {
+  const props = {
     page: 1,
     length: 10,
     isIndex: true,
@@ -26,7 +26,7 @@ describe('Rank.vue', () => {
 
   it('Should handle an empty rank', () => {
     const wrapper = shallowMount(user_Rank, {
-      propsData,
+      props,
     });
 
     expect(wrapper.find('table').exists()).toBeFalsy;
@@ -36,7 +36,7 @@ describe('Rank.vue', () => {
   it('Should handle a rank with data', () => {
     const wrapper = mount(user_Rank, {
       props: {
-        ...propsData,
+        ...props,
         ...{
           ranking: [
             {
