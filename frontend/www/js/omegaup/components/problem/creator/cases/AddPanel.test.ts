@@ -152,7 +152,7 @@ describe('AddPanel.vue', () => {
 
   it('Should contain 3 tabs', async () => {
     const wrapper = mount(AddPanel, {
-      store: vuexStore,
+      global: { plugins: [vuexStore] },
       stubs: { transition: false },
     });
 
