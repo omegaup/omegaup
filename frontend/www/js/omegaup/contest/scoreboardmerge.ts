@@ -48,7 +48,7 @@ OmegaUp.on('ready', () => {
                   for (const index in ranking) {
                     if (!Object.prototype.hasOwnProperty.call(ranking, index))
                       continue;
-                    const place = parseInt(index) + 1;
+                    const place = parseInt(index, 10) + 1;
                     const entry = ranking[index];
                     scoreboard.push({ ...entry, place });
                   }

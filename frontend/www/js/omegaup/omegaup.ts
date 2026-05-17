@@ -477,6 +477,12 @@ export namespace omegaup {
           }
         })
         .catch(ui.apiError);
+
+      document.addEventListener('dragstart', (e: DragEvent) => {
+        if (e.target instanceof HTMLImageElement) {
+          e.preventDefault();
+        }
+      });
     }
 
     _notify(eventName: string): void {

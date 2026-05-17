@@ -1,12 +1,15 @@
 name: daily-release
 
-# Run every day at 3:00 UTC. This translates to 20:00 PT.
+# Run every Sunday at 3:00 UTC. This translates to 20:00 PT.
 # TODO(#1624): Make this daily once we have better coverage of the frontend.
 on:
   repository_dispatch:
     types: daily-release
   schedule:
     - cron: '0 3 * * 0'
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
@@ -22,20 +25,56 @@ jobs:
       - name: Check for database modifications
         run: |
           if ! git diff --quiet origin/release:frontend/database origin/main:frontend/database; then
-            echo '::warning::Skipping release since there are database modifications'
+            echo '::notice::Skipping release since there are database modifications'
             exit 1
           fi
 
       - name: Check for presence of .pause-release
         run: |
           if git cat-file -e origin/main:.pause-release 2>/dev/null; then
-            echo '::warning::Skipping release since there is a `.pause-release` file.'
+            echo '::notice::Skipping release since there is a `.pause-release` file.'
             exit 1
           fi
 
       - name: Merge main into release
         run: |
-          curl --request POST \
-            --url https://api.github.com/repos/${{ github.repository }}/merges \
-            --header "Authorization: Bearer ${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}" \
-            --data "{\"base\":\"release\",\"head\":\"main\",\"commit_message\":\"Merge branch 'main' of github.com:omegaup/omegaup into release\"}"
+          response_file="$(mktemp)"
+          http_code="$(
+            curl --request POST \
+              --silent --show-error --location \
+              --output "${response_file}" \
+              --write-out '%{http_code}' \
+              --url "https://api.github.com/repos/${{ github.repository }}/merges" \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}" \
+              --data "{\"base\":\"release\",\"head\":\"main\",\"commit_message\":\"Merge branch 'main' of github.com:omegaup/omegaup into release\"}"
+          )"
+
+          if [[ "${http_code}" -lt 200 || "${http_code}" -ge 300 ]]; then
+            echo "::error::Merge API request failed with HTTP ${http_code}"
+            cat "${response_file}"
+            rm -f "${response_file}"
+            exit 1
+          fi
+
+          python3 - "${response_file}" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding='utf-8') as f:
+              response = json.load(f)
+
+          if not response.get('sha'):
+              print('::error::Merge API response did not include a commit SHA.')
+              print(json.dumps(response))
+              raise SystemExit(1)
+
+          if response.get('merged') is False:
+              print('::error::Merge API response indicates merge=false.')
+              print(json.dumps(response))
+              raise SystemExit(1)
+
+          print(f"Merge successful: {response['sha']}")
+          PY
+
+          rm -f "${response_file}"
