@@ -9,8 +9,8 @@
       <div class="card-header mb-3">
         <div class="mb-2 text-right">
           <label>
-            <input type="checkbox" v-model="showArchived" />
-            Show archived
+            <input v-model="showArchived" type="checkbox" />
+            {{ T.teamsGroupShowArchived }}
           </label>
         </div>
         <h3 class="card-title">{{ T.omegaupTitleTeamsGroups }}</h3>
@@ -42,10 +42,16 @@
 
               <button
                 class="btn btn-link text-danger p-0 ml-2"
+                :title="teamsGroup.archived ? 'Unarchive' : 'Archive'"
                 @click="archiveGroup(teamsGroup)"
-                title="Archive"
               >
-                <font-awesome-icon :icon="['fas', 'archive']" />
+                <font-awesome-icon
+                  :icon="
+                    teamsGroup.archived
+                      ? ['fas', 'box-open']
+                      : ['fas', 'archive']
+                  "
+                />
               </button>
             </td>
           </tr>
@@ -81,8 +87,12 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit, faArchive } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faArchive);
+import {
+  faEdit,
+  faArchive,
+  faBoxOpen,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faArchive, faBoxOpen);
 @Component({
   components: {
     FontAwesomeIcon,
@@ -103,21 +113,17 @@ export default class TeamsGroupList extends Vue {
   showArchived: boolean = false;
   get visibleTeamsGroups(): types.TeamsGroup[] {
     if (this.showArchived) return this.teamsGroups;
-    return this.teamsGroups.filter(g => !g.is_archived);
+    return this.teamsGroups.filter((g) => !g.archived);
   }
-  async archiveGroup(teamsGroup: types.TeamsGroup) {
-  if (!confirm('Are you sure you want to archive this team group?')) return;
 
-  try {
-    await this.$api.TeamsGroup.update({
-      team_group_alias: teamsGroup.alias,
-      is_archived: true,
-    });
-
-    teamsGroup.is_archived = true;
-  } catch (e) {
-    console.error(e);
+  archiveGroup(teamsGroup: types.TeamsGroup) {
+    if (teamsGroup.archived) {
+      if (!confirm(T.teamsGroupUnarchiveConfirmText)) return;
+      this.$emit('archive-group', teamsGroup, false);
+    } else {
+      if (!confirm(T.teamsGroupArchiveConfirmText)) return;
+      this.$emit('archive-group', teamsGroup, true);
+    }
   }
-}
 }
 </script>
