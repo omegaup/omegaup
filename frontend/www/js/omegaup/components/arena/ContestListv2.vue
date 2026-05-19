@@ -571,7 +571,7 @@ class ArenaContestList extends Vue {
   }
 
   beforeDestroy() {
-    // Placeholder for cleanup when infinite scroll is re-implemented
+    this.onSearchQueryDebounced.cancel();
   }
   async loadMoreContests() {
     if (this.isScrollLoading || !this.hasMore || this.loading) return;

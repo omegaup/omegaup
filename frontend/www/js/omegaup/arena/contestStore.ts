@@ -135,6 +135,18 @@ const pendingAllTabsRequests: Partial<
   Record<string, Promise<ContestListAllTabsResponse>>
 > = {};
 
+function isAllTabsResponse(
+  cached: messages.ContestListResponse | ContestListAllTabsResponse,
+): cached is ContestListAllTabsResponse {
+  return (
+    cached !== null &&
+    typeof cached === 'object' &&
+    'current' in cached &&
+    'past' in cached &&
+    'future' in cached
+  );
+}
+
 export const contestStoreConfig = {
   state: {
     contests: {},
@@ -241,9 +253,9 @@ export const contestStoreConfig = {
         return pendingAllTabsRequests[cacheKey];
       }
       const cached = state.cache[cacheKey];
-      if (cached && 'current' in cached) {
+      if (cached && isAllTabsResponse(cached)) {
         commit('applyAllTabsResponse', {
-          response: cached as ContestListAllTabsResponse,
+          response: cached,
           page: payload.requestParams.page,
         });
         return Promise.resolve();
@@ -298,11 +310,11 @@ export const contestStoreConfig = {
       }
       const cacheKey = generateCacheKey(payload.requestParams);
       const cachedList = state.cache[cacheKey];
-      if (cachedList && !('current' in cachedList)) {
+      if (cachedList && !isAllTabsResponse(cachedList)) {
         commit('updateList', {
           name: payload.name,
           cacheKey,
-          response: cachedList as messages.ContestListResponse,
+          response: cachedList,
           page: payload.requestParams.page,
         });
         return;
