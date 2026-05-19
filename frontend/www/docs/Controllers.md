@@ -58,6 +58,7 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/contest/details/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestdetails)
   - [`/api/contest/getNumberOfContestants/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestlist)
+  - [`/api/contest/listAllTabs/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestlistalltabs)
   - [`/api/contest/listParticipating/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestlistparticipating)
   - [`/api/contest/myList/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestmylist)
   - [`/api/contest/open/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicontestopen)
