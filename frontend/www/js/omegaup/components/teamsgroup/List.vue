@@ -6,14 +6,14 @@
       </a>
     </div>
     <div class="card">
-      <div class="card-header mb-3">
-        <div class="mb-2 text-right">
-          <label>
-            <input v-model="showArchived" type="checkbox" />
-            {{ T.teamsGroupShowArchived }}
-          </label>
-        </div>
-        <h3 class="card-title">{{ T.omegaupTitleTeamsGroups }}</h3>
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h3 class="card-title mb-0">{{ T.omegaupTitleTeamsGroups }}</h3>
+        <label class="mb-0">
+          <input v-model="showArchived" type="checkbox" />
+          {{ T.teamsGroupShowArchived }}
+        </label>
       </div>
 
       <table v-if="hasTeamsGroups" class="table" data-table-teams-groups>
