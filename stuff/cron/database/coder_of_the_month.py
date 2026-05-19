@@ -317,7 +317,7 @@ def get_user_problems(
 
     problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
 
-    cur_readonly.execute(f'''
+    sql = '''
             WITH
                 ProblemsForfeitedByUser AS (
                     SELECT
@@ -352,8 +352,23 @@ def get_user_problems(
                 AND pfbu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
-    ''')
+    '''
+    sql = sql.format(identity_ids_str=identity_ids_str,
+                     problem_ids_str=problem_ids_str)
+    cur_readonly.execute('EXPLAIN ' + sql)
 
+    logging.info("Evaluating [get_user_problems] for %d "
+                 "users and %d problems",
+                 len(eligible_users), len(problems_admins))
+
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_user_problems] EXPLAIN id=%s table=%s "
+            "type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+    cur_readonly.execute(sql)
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']

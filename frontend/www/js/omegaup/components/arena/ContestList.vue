@@ -223,32 +223,29 @@
                   <template #text-contest-date>
                     <b-card-text v-if="tab === ContestTab.Current">
                       <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.finish_time)">
-                        {{
-                          ui.formatString(T.contestEndTime, {
-                            endDate: finishContestDate(contestItem),
-                          })
-                        }}
+                      <a
+                        :href="getTimeLink(contestItem.finish_time)"
+                        :title="exactContestDateTime(contestItem.finish_time)"
+                      >
+                        {{ currentContestDate(contestItem) }}
                       </a>
                     </b-card-text>
                     <b-card-text v-else-if="tab === ContestTab.Future">
                       <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{
-                          ui.formatString(T.contestStartTime, {
-                            startDate: startContestDate(contestItem),
-                          })
-                        }}
+                      <a
+                        :href="getTimeLink(contestItem.start_time)"
+                        :title="exactContestDateTime(contestItem.start_time)"
+                      >
+                        {{ futureContestDate(contestItem) }}
                       </a>
                     </b-card-text>
                     <b-card-text v-else-if="tab === ContestTab.Past">
                       <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{
-                          ui.formatString(T.contestStartedTime, {
-                            startedDate: startContestDate(contestItem),
-                          })
-                        }}
+                      <a
+                        :href="getTimeLink(contestItem.finish_time)"
+                        :title="exactContestDateTime(contestItem.finish_time)"
+                      >
+                        {{ pastContestDate(contestItem) }}
                       </a>
                     </b-card-text>
                   </template>
@@ -364,32 +361,29 @@
               <template #text-contest-date>
                 <b-card-text v-if="viewAllCategory === ContestTab.Current">
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{
-                      ui.formatString(T.contestEndTime, {
-                        endDate: finishContestDate(contestItem),
-                      })
-                    }}
+                  <a
+                    :href="getTimeLink(contestItem.finish_time)"
+                    :title="exactContestDateTime(contestItem.finish_time)"
+                  >
+                    {{ currentContestDate(contestItem) }}
                   </a>
                 </b-card-text>
                 <b-card-text v-else-if="viewAllCategory === ContestTab.Future">
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartTime, {
-                        startDate: startContestDate(contestItem),
-                      })
-                    }}
+                  <a
+                    :href="getTimeLink(contestItem.start_time)"
+                    :title="exactContestDateTime(contestItem.start_time)"
+                  >
+                    {{ futureContestDate(contestItem) }}
                   </a>
                 </b-card-text>
                 <b-card-text v-else-if="viewAllCategory === ContestTab.Past">
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartedTime, {
-                        startedDate: startContestDate(contestItem),
-                      })
-                    }}
+                  <a
+                    :href="getTimeLink(contestItem.finish_time)"
+                    :title="exactContestDateTime(contestItem.finish_time)"
+                  >
+                    {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
               </template>
@@ -478,6 +472,7 @@ const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
 
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
@@ -785,12 +780,20 @@ class ArenaContestList extends Vue {
     }, 1000);
   }
 
-  finishContestDate(contest: types.ContestListItem): string {
-    return contest.finish_time.toLocaleDateString();
+  currentContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForCurrentContest(contest.finish_time);
   }
 
-  startContestDate(contest: types.ContestListItem): string {
-    return contest.start_time.toLocaleDateString();
+  futureContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForFutureContest(contest.start_time);
+  }
+
+  pastContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForPastContest(contest.finish_time);
+  }
+
+  exactContestDateTime(date: Date): string {
+    return `${time.formatDateForContest(date)}, ${date.toLocaleTimeString()}`;
   }
 
   getTimeLink(time: Date): string {
