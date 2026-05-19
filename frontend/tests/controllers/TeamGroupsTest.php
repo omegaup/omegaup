@@ -294,7 +294,6 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($teamsGroup->archived);
     }
 
-
     /**
      * A PHPUnit data provider for the test with different number of contestants.
      *
