@@ -63,7 +63,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
-        /** @var array{create_time: int, archived: bool, alias: string, name: string, description: null|string} */
+        /** @var TeamsGroup */
         $filteredTeamGroup = $teamGroup->asFilteredArray([
             'create_time',
             'archived',
