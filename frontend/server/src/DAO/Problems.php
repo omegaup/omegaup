@@ -58,7 +58,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     ? AS public
                 FROM
                     Problems_Tags pt
-                STRAIGHT_JOIN
+                INNER JOIN
                     Problems pp
                 ON
                     pp.problem_id = pt.problem_id
