@@ -42,7 +42,7 @@
 
               <button
                 class="btn btn-link p-0 ml-2"
-                style="color:#8BB0D3"
+                style="color: #8bb0d3"
                 :title="teamsGroup.archived ? 'Unarchive' : 'Archive'"
                 @click="archiveGroup(teamsGroup)"
               >
@@ -88,7 +88,11 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit, faArchive, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEdit,
+  faArchive,
+  faBoxOpen,
+} from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faArchive, faBoxOpen);
 @Component({
   components: {
