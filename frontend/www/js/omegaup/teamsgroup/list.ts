@@ -13,9 +13,12 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-teams-group-list': teamsgroup_List,
     },
+    data: () => ({
+      teamsGroups: payload.teamsGroups,
+    }),
     render: function (createElement) {
       return createElement('omegaup-teams-group-list', {
-        props: { teamsGroups: payload.teamsGroups },
+        props: { teamsGroups: this.teamsGroups },
         on: {
           'archive-group': (
             teamsGroup: types.TeamsGroup,

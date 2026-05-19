@@ -41,7 +41,8 @@
               </a>
 
               <button
-                class="btn btn-link text-danger p-0 ml-2"
+                class="btn btn-link p-0 ml-2"
+                style="color:#8BB0D3"
                 :title="teamsGroup.archived ? 'Unarchive' : 'Archive'"
                 @click="archiveGroup(teamsGroup)"
               >
@@ -87,11 +88,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faEdit,
-  faArchive,
-  faBoxOpen,
-} from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faArchive, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faArchive, faBoxOpen);
 @Component({
   components: {
@@ -112,7 +109,9 @@ export default class TeamsGroupList extends Vue {
   }
   showArchived: boolean = false;
   get visibleTeamsGroups(): types.TeamsGroup[] {
-    if (this.showArchived) return this.teamsGroups;
+    if (this.showArchived) {
+      return this.teamsGroups.filter((g) => g.archived);
+    }
     return this.teamsGroups.filter((g) => !g.archived);
   }
 
