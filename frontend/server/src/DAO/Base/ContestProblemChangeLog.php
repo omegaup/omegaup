@@ -9,102 +9,104 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** TeamGroups Data Access Object (DAO) Base.
+/** ContestProblemChangeLog Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\TeamGroups}.
+ * {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}.
  * @access public
  * @abstract
  */
-abstract class TeamGroups {
+abstract class ContestProblemChangeLog {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\TeamGroups $Team_Groups El objeto de tipo TeamGroups a actualizar.
+     * @param \OmegaUp\DAO\VO\ContestProblemChangeLog $Contest_Problem_Change_Log El objeto de tipo ContestProblemChangeLog a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\TeamGroups $Team_Groups
+        \OmegaUp\DAO\VO\ContestProblemChangeLog $Contest_Problem_Change_Log
     ): int {
         $sql = '
             UPDATE
-                `Team_Groups`
+                `Contest_Problem_Change_Log`
             SET
-                `acl_id` = ?,
-                `create_time` = ?,
-                `alias` = ?,
-                `name` = ?,
-                `description` = ?,
-                `number_of_contestants` = ?,
-                `archived` = ?
+                `contest_id` = ?,
+                `problem_id` = ?,
+                `user_id` = ?,
+                `change_type` = ?,
+                `timestamp` = ?
             WHERE
                 (
-                    `team_group_id` = ?
+                    `change_id` = ?
                 );';
         $params = [
             (
-                is_null($Team_Groups->acl_id) ?
+                is_null($Contest_Problem_Change_Log->contest_id) ?
                 null :
-                intval($Team_Groups->acl_id)
+                intval($Contest_Problem_Change_Log->contest_id)
             ),
+            (
+                is_null($Contest_Problem_Change_Log->problem_id) ?
+                null :
+                intval($Contest_Problem_Change_Log->problem_id)
+            ),
+            (
+                is_null($Contest_Problem_Change_Log->user_id) ?
+                null :
+                intval($Contest_Problem_Change_Log->user_id)
+            ),
+            $Contest_Problem_Change_Log->change_type,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Team_Groups->create_time
+                $Contest_Problem_Change_Log->timestamp
             ),
-            $Team_Groups->alias,
-            $Team_Groups->name,
-            $Team_Groups->description,
-            intval($Team_Groups->number_of_contestants),
-            intval($Team_Groups->archived),
-            intval($Team_Groups->team_group_id),
+            intval($Contest_Problem_Change_Log->change_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\TeamGroups} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\ContestProblemChangeLog} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\TeamGroups}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\TeamGroups Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\TeamGroups} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\ContestProblemChangeLog Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\ContestProblemChangeLog} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        int $team_group_id
-    ): ?\OmegaUp\DAO\VO\TeamGroups {
+        int $change_id
+    ): ?\OmegaUp\DAO\VO\ContestProblemChangeLog {
         $sql = '
             SELECT
-                `Team_Groups`.`team_group_id`,
-                `Team_Groups`.`acl_id`,
-                `Team_Groups`.`create_time`,
-                `Team_Groups`.`alias`,
-                `Team_Groups`.`name`,
-                `Team_Groups`.`description`,
-                `Team_Groups`.`number_of_contestants`,
-                `Team_Groups`.`archived`
+                `Contest_Problem_Change_Log`.`change_id`,
+                `Contest_Problem_Change_Log`.`contest_id`,
+                `Contest_Problem_Change_Log`.`problem_id`,
+                `Contest_Problem_Change_Log`.`user_id`,
+                `Contest_Problem_Change_Log`.`change_type`,
+                `Contest_Problem_Change_Log`.`timestamp`
             FROM
-                `Team_Groups`
+                `Contest_Problem_Change_Log`
             WHERE
                 (
-                    `team_group_id` = ?
+                    `change_id` = ?
                 )
             LIMIT 1;';
-        $params = [$team_group_id];
+        $params = [$change_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\TeamGroups($row);
+        return new \OmegaUp\DAO\VO\ContestProblemChangeLog($row);
     }
 
     /**
-     * Verificar si existe un {@link \OmegaUp\DAO\VO\TeamGroups} por llave primaria.
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\ContestProblemChangeLog} por llave primaria.
      *
-     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\TeamGroups}
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}
      * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
      *
      * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
@@ -113,25 +115,25 @@ abstract class TeamGroups {
      * @return bool Si existe o no tal registro.
      */
     final public static function existsByPK(
-        int $team_group_id
+        int $change_id
     ): bool {
         $sql = '
             SELECT
                 COUNT(*)
             FROM
-                `Team_Groups`
+                `Contest_Problem_Change_Log`
             WHERE
                 (
-                    `team_group_id` = ?
+                    `change_id` = ?
                 );';
-        $params = [$team_group_id];
+        $params = [$change_id];
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }
 
     /**
-     * Contar todos los registros en `Team_Groups`.
+     * Contar todos los registros en `Contest_Problem_Change_Log`.
      *
      * Este método obtiene el número total de filas de la tabla **sin cargar campos**,
      * útil para pruebas donde sólo se valida el conteo.
@@ -143,7 +145,7 @@ abstract class TeamGroups {
             SELECT
                 COUNT(*)
             FROM
-                `Team_Groups`;';
+                `Contest_Problem_Change_Log`;';
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, []);
         return intval($count);
@@ -153,7 +155,7 @@ abstract class TeamGroups {
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\TeamGroups} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\ContestProblemChangeLog} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -162,24 +164,24 @@ abstract class TeamGroups {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\TeamGroups $Team_Groups El
-     * objeto de tipo \OmegaUp\DAO\VO\TeamGroups a eliminar
+     * @param \OmegaUp\DAO\VO\ContestProblemChangeLog $Contest_Problem_Change_Log El
+     * objeto de tipo \OmegaUp\DAO\VO\ContestProblemChangeLog a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\TeamGroups $Team_Groups
+        \OmegaUp\DAO\VO\ContestProblemChangeLog $Contest_Problem_Change_Log
     ): void {
         $sql = '
             DELETE FROM
-                `Team_Groups`
+                `Contest_Problem_Change_Log`
             WHERE
                 (
-                    `team_group_id` = ?
+                    `change_id` = ?
                 );';
         $params = [
-            $Team_Groups->team_group_id
+            $Contest_Problem_Change_Log->change_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -193,7 +195,7 @@ abstract class TeamGroups {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\TeamGroups}.
+     * {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -204,13 +206,13 @@ abstract class TeamGroups {
      * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\TeamGroups> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\TeamGroups}.
+     * @return list<\OmegaUp\DAO\VO\ContestProblemChangeLog> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}.
      */
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = 'team_group_id',
+        string $orden = 'change_id',
         string $tipoDeOrden = 'ASC'
     ): array {
         $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
@@ -226,16 +228,14 @@ abstract class TeamGroups {
         );
         $sql = "
             SELECT
-                `Team_Groups`.`team_group_id`,
-                `Team_Groups`.`acl_id`,
-                `Team_Groups`.`create_time`,
-                `Team_Groups`.`alias`,
-                `Team_Groups`.`name`,
-                `Team_Groups`.`description`,
-                `Team_Groups`.`number_of_contestants`,
-                `Team_Groups`.`archived`
+                `Contest_Problem_Change_Log`.`change_id`,
+                `Contest_Problem_Change_Log`.`contest_id`,
+                `Contest_Problem_Change_Log`.`problem_id`,
+                `Contest_Problem_Change_Log`.`user_id`,
+                `Contest_Problem_Change_Log`.`change_type`,
+                `Contest_Problem_Change_Log`.`timestamp`
             FROM
-                `Team_Groups`
+                `Contest_Problem_Change_Log`
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
@@ -251,7 +251,7 @@ abstract class TeamGroups {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\TeamGroups(
+            $allData[] = new \OmegaUp\DAO\VO\ContestProblemChangeLog(
                 $row
             );
         }
@@ -262,32 +262,28 @@ abstract class TeamGroups {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\TeamGroups}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\TeamGroups $Team_Groups El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\TeamGroups}
+     * @param \OmegaUp\DAO\VO\ContestProblemChangeLog $Contest_Problem_Change_Log El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ContestProblemChangeLog}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\TeamGroups $Team_Groups
+        \OmegaUp\DAO\VO\ContestProblemChangeLog $Contest_Problem_Change_Log
     ): int {
         $sql = '
             INSERT INTO
-                `Team_Groups` (
-                    `acl_id`,
-                    `create_time`,
-                    `alias`,
-                    `name`,
-                    `description`,
-                    `number_of_contestants`,
-                    `archived`
+                `Contest_Problem_Change_Log` (
+                    `contest_id`,
+                    `problem_id`,
+                    `user_id`,
+                    `change_type`,
+                    `timestamp`
                 ) VALUES (
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -296,25 +292,31 @@ abstract class TeamGroups {
                 );';
         $params = [
             (
-                is_null($Team_Groups->acl_id) ?
+                is_null($Contest_Problem_Change_Log->contest_id) ?
                 null :
-                intval($Team_Groups->acl_id)
+                intval($Contest_Problem_Change_Log->contest_id)
             ),
+            (
+                is_null($Contest_Problem_Change_Log->problem_id) ?
+                null :
+                intval($Contest_Problem_Change_Log->problem_id)
+            ),
+            (
+                is_null($Contest_Problem_Change_Log->user_id) ?
+                null :
+                intval($Contest_Problem_Change_Log->user_id)
+            ),
+            $Contest_Problem_Change_Log->change_type,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Team_Groups->create_time
+                $Contest_Problem_Change_Log->timestamp
             ),
-            $Team_Groups->alias,
-            $Team_Groups->name,
-            $Team_Groups->description,
-            intval($Team_Groups->number_of_contestants),
-            intval($Team_Groups->archived),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Team_Groups->team_group_id = (
+        $Contest_Problem_Change_Log->change_id = (
             \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
         );
 
