@@ -1179,6 +1179,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $contests = [];
         foreach ($rs as $row) {
             $row['participating'] = boolval($row['participating']);
+            $row['contestants'] = $row['contestants'] ?? 0;
             $contests[] = $row;
         }
         return [
