@@ -76,7 +76,7 @@ describe('CasesForm.vue', () => {
     });
 
     const wrapper = shallowMount(CasesForm, {
-      store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isCaseEdit: true },
     });
@@ -100,7 +100,7 @@ describe('CasesForm.vue', () => {
     });
 
     const wrapper = shallowMount(CasesForm, {
-      store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isCaseEdit: false, editGroup: editGroup },
     });
@@ -154,7 +154,7 @@ describe('CasesForm.vue', () => {
 
   it('Should initialize commitMessage for Case edit', () => {
     const wrapper = shallowMount(CasesForm, {
-      store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isCaseEdit: true },
     });
@@ -163,7 +163,7 @@ describe('CasesForm.vue', () => {
 
   it('Should initialize commitMessage for Group edit', () => {
     const wrapper = shallowMount(CasesForm, {
-      store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isCaseEdit: false },
     });
@@ -172,7 +172,7 @@ describe('CasesForm.vue', () => {
 
   it('Should render submit button with correct text', async () => {
     const wrapper = shallowMount(CasesForm, {
-      store,
+      global: { plugins: [store] },
       provide: { problemAlias: 'alias' },
       props: { isCaseEdit: true },
     });

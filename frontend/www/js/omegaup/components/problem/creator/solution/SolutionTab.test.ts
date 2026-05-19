@@ -7,7 +7,7 @@ import T from '../../../../lang';
 describe('SolutionTab.vue', () => {
   it('Should contain markdown buttons and contents and update the store accordingly', async () => {
     const wrapper = shallowMount(SolutionTab, {
-      store,
+      global: { plugins: [store] },
     });
 
     const markdownButtons = wrapper.find('div.wmd-button-bar');

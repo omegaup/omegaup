@@ -317,10 +317,11 @@ export default class CourseAssignmentDetails extends Vue {
   name: any;
   startTime: any;
   finishTime: any;
-  unlimitedDuration = !this.assignment.finish_time;
+  unlimitedDuration = false;
 
   @Watch('assignment')
   created() {
+    this.unlimitedDuration = !this.assignment.finish_time;
     this.finishTime = this.assignment.finish_time || new Date();
     this.startTime = this.assignment.start_time || new Date();
     this.name = this.assignment.name || '';

@@ -314,12 +314,13 @@ export default class ArenaCourse extends Vue {
   T = T;
   omegaup = omegaup;
   PopupDisplayed = PopupDisplayed;
-  isAdmin =
-    this.course.is_admin ||
-    this.course.is_curator ||
-    this.course.is_teaching_assistant;
+  isAdmin = false;
 
   created() {
+    this.isAdmin =
+      this.course.is_admin ||
+      this.course.is_curator ||
+      this.course.is_teaching_assistant;
     this.activeProblem = this.problem;
     this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
     this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;

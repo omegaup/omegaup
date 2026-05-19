@@ -165,10 +165,14 @@ export default class ArenaScoreboard extends Vue {
   T = T;
   ui = ui;
   INF = '∞';
-  onlyShowExplicitlyInvited =
-    !this.showAllContestants && this.showInvitedUsersFilter;
+  onlyShowExplicitlyInvited = false;
   nameDisplayOptions: ui.NameDisplayOptions =
     ui.NameDisplayOptions.NameAndUsername;
+
+  created() {
+    this.onlyShowExplicitlyInvited =
+      !this.showAllContestants && this.showInvitedUsersFilter;
+  }
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;

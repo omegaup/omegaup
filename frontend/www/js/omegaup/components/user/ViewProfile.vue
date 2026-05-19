@@ -391,19 +391,19 @@ export default class ViewProfile extends Vue {
   } | null;
   created() {
     this.currentReadme = this.profile.readme ?? null;
+    this.contests = Object.values(
+      this.data?.contests ?? ({} as types.UserProfileContests),
+    )
+      .map((contest) => {
+        const now = new Date();
+        if (contest.place === null || now <= contest.data.finish_time) {
+          return null;
+        }
+        return new ContestResult(contest);
+      })
+      .filter((contest) => Boolean(contest));
   }
 
-  contests = Object.values(
-    this.data?.contests ?? ({} as types.UserProfileContests),
-  )
-    .map((contest) => {
-      const now = new Date();
-      if (contest.place === null || now <= contest.data.finish_time) {
-        return null;
-      }
-      return new ContestResult(contest);
-    })
-    .filter((contest) => Boolean(contest));
   get charts(): types.UserProfileStats[] {
     return this.data?.stats ?? [];
   }
@@ -411,13 +411,14 @@ export default class ViewProfile extends Vue {
   T = T;
   ui = ui;
   columns = 3;
-  currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
+  currentSelectedTab = ViewProfileTabs.Badges;
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null;
+  currentReadme: string | null = null;
   isEditingReadme = false;
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
+  contests: Contest[] = [];
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];

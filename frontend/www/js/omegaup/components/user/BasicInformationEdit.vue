@@ -107,9 +107,7 @@ export default class UserBasicInformationEdit extends Vue {
   gender: any;
   countryId: any;
   stateId: any;
-  birthDate = this.profile.birth_date
-    ? time.convertLocalDateToGMTDate(this.profile.birth_date)
-    : new Date('');
+  birthDate = new Date('');
 
   created() {
     this.stateId = this.profile.state_id ?? null;
@@ -117,6 +115,9 @@ export default class UserBasicInformationEdit extends Vue {
     this.gender = this.profile.gender;
     this.name = this.profile.name;
     this.username = this.profile.username;
+    this.birthDate = this.profile.birth_date
+      ? time.convertLocalDateToGMTDate(this.profile.birth_date)
+      : new Date('');
   }
 
   get isCountrySelected(): boolean {

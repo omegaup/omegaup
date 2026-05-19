@@ -3,7 +3,8 @@
     <h2 class="text-center mt-5">
       {{ T.wordsProblems }}
     </h2>
-    <div class="d-flex justify-content-end">
+    <!-- FIXME: The Finder Wizard is deprecated in Vue 3. A replacement is needed -->
+    <!-- <div class="d-flex justify-content-end">
       <button
         class="btn btn-primary mb-2"
         type="button"
@@ -11,7 +12,7 @@
       >
         {{ T.wizardLinkText }}
       </button>
-    </div>
+    </div> -->
     <div class="d-flex align-items-center search-header-sticky-top">
       <omegaup-problem-search-bar
         class="searchbar-width"
@@ -26,13 +27,13 @@
         "
       ></omegaup-problem-search-bar>
     </div>
-    <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-    <omegaup-problem-finder
+    <!-- FIXME: The Finder Wizard is deprecated in Vue 3. A replacement is needed -->
+    <!-- <omegaup-problem-finder
       v-show="showFinderWizard"
       :possible-tags="wizardTags"
       @close="showFinderWizard = false"
       @search-problems="wizardSearch"
-    ></omegaup-problem-finder>
+    ></omegaup-problem-finder> -->
     <omegaup-problem-base-list
       :problems="problems"
       :logged-in="loggedIn"
@@ -102,9 +103,10 @@ export default class List extends Vue {
   omegaup = omegaup;
   showFinderWizard = false;
 
-  wizardSearch(queryParameters: omegaup.QueryParameters): void {
-    this.$emit('wizard-search', queryParameters);
-  }
+  // FIXME: The Finder Wizard is deprecated in Vue 3. A replacement is needed
+  // wizardSearch(queryParameters: omegaup.QueryParameters): void {
+  //   this.$emit('wizard-search', queryParameters);
+  // }
 }
 </script>
 

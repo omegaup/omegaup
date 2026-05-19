@@ -13,7 +13,7 @@ describe('EphemeralGrader.vue', () => {
   afterEach(() => {
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
-      document.removeChild(rootDiv);
+      document.body.removeChild(rootDiv);
     }
   });
 

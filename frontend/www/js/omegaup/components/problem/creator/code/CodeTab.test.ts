@@ -6,7 +6,7 @@ import store from '@/js/omegaup/problem/creator/store';
 describe('CodeTab.vue', () => {
   it('Should change code and extension in both wrapper and store after the file is uploaded', async () => {
     const wrapper = shallowMount(CodeTab, {
-      store,
+      global: { plugins: [store] },
     });
 
     const testFile = new File(['print("Hello World")'], 'testfile.py', {

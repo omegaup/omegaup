@@ -1195,9 +1195,7 @@ export default class Form extends Vue {
   showScoreboardAfter: boolean;
   currentScoreMode: ScoreMode;
   startTime: Date;
-  submissionsGap = this.initialSubmissionsGap
-    ? this.initialSubmissionsGap / 60
-    : 1;
+  submissionsGap = 1;
   title: string;
   windowLength: null | number;
   windowLengthEnabled: any;

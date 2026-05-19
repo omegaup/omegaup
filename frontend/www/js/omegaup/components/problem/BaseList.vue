@@ -286,7 +286,6 @@ export default class BaseList extends Vue {
   T = T;
   ui = ui;
   omegaup = omegaup;
-  showFinderWizard = false;
 
   get solvedProblemAliasesSet(): Set<string> {
     return new Set(this.solvedProblemAliases);

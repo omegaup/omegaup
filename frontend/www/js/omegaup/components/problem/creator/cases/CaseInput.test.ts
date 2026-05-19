@@ -8,7 +8,7 @@ import store from '@/js/omegaup/problem/creator/store';
 describe('CaseInput.vue', () => {
   it('Should contain all 4 inputs', async () => {
     const wrapper = shallowMount(CaseInput, {
-      store,
+      global: { plugins: [store] },
     });
 
     const expectedTextInputText = [
@@ -30,7 +30,7 @@ describe('CaseInput.vue', () => {
   });
   it('Should handle autoformatting', () => {
     const wrapper = shallowMount(CaseInput, {
-      store,
+      global: { plugins: [store] },
     });
 
     // These any are necessary since wrapper.vm doesn't load the component's methods to typescript, even if they exist

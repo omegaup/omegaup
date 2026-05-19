@@ -65,9 +65,13 @@ export default class CasesForm extends Vue {
   @Prop({ default: null }) readonly editGroup!: Group;
 
   T = T;
-  commitMessage = this.isCaseEdit
-    ? T.problemEditUpdatingCase
-    : T.problemEditUpdatingGroup;
+  commitMessage = T.problemEditUpdatingGroup;
+
+  created() {
+    this.commitMessage = this.isCaseEdit
+      ? T.problemEditUpdatingCase
+      : T.problemEditUpdatingGroup;
+  }
 
   get getSelectedCase(): Case {
     return this.$store.getters['casesStore/getSelectedCase'];
