@@ -13,7 +13,7 @@
           :target="button.target"
           role="button"
         >
-          {{ button.text[T.locale] }}
+          {{ button.text[T.locale] || button.text['es'] }}
         </a>
       </div>
       <div class="image-container d-flex justify-content-center">
@@ -68,6 +68,7 @@ export default class Slide extends Vue {
   p {
     font-size: 1.16rem;
     margin-bottom: 1.1em;
+    white-space: pre-line;
   }
 }
 a.slide-button {
