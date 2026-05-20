@@ -391,19 +391,19 @@ export default class CourseDetails extends Vue {
   @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
-  alias: any;
-  description: any;
-  finishTime: any;
-  showScoreboard: any;
-  startTime: any;
-  name: any;
-  level: any;
-  objective: any;
-  school: null | types.SchoolListItem;
-  needsBasicInformation: any;
-  requestsUserInformation: any;
-  unlimitedDuration: any;
-  selectedLanguages: any;
+  alias = '';
+  description = '';
+  finishTime = new Date();
+  showScoreboard = false;
+  startTime = new Date();
+  name = '';
+  level = '';
+  objective = '';
+  school: null | types.SchoolListItem = null;
+  needsBasicInformation = false;
+  requestsUserInformation = '';
+  unlimitedDuration = false;
+  selectedLanguages: any = [];
   levelOptions = levelOptions;
   MAX_LENGTH = MAX_LENGTH;
 

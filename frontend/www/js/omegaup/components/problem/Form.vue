@@ -487,8 +487,8 @@ export default class ProblemForm extends Vue {
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
-  title: any;
-  alias: any;
+  title: any = '';
+  alias: any = '';
 
   created() {
     this.selectedTags = this.data.selectedTags || [];
@@ -523,11 +523,11 @@ export default class ProblemForm extends Vue {
   get emailClarifications(): any {
     return this.data.emailClarifications;
   }
-  visibility: any;
+  visibility: any = null;
   get allowUserAddTags(): any {
     return this.data.allowUserAddTags;
   }
-  source: any;
+  source: any = '';
   get validator(): any {
     return this.data.validator;
   }
@@ -537,14 +537,14 @@ export default class ProblemForm extends Vue {
   get tags(): any {
     return this.data.tags;
   }
-  problemLevel: any;
+  problemLevel: any = '';
   get showDiff(): any {
     return this.data.showDiff;
   }
   get groupScorePolicy(): any {
     return this.data.groupScorePolicy || 'sum-if-not-zero';
   }
-  selectedTags: any;
+  selectedTags: any = [];
   message = '';
   hasFile = false;
   public = false;

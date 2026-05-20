@@ -1158,11 +1158,11 @@ export default class Form extends Vue {
   @Prop({ default: false }) canSetRecommended!: boolean;
   @Prop({ default: false }) initialRecommended!: boolean;
 
-  alias: string;
-  description: string;
-  feedback: string;
-  finishTime: Date;
-  languages: string[];
+  alias = '';
+  description = '';
+  feedback = '';
+  finishTime = new Date();
+  languages: string[] = [];
 
   created() {
     this.windowLengthEnabled = this.initialWindowLength !== null;
@@ -1185,20 +1185,20 @@ export default class Form extends Vue {
   get needsBasicInformation(): boolean {
     return this.initialNeedsBasicInformation;
   }
-  penalty: number;
-  penaltyType: string;
-  pointsDecayFactor: number;
+  penalty = 0;
+  penaltyType = '';
+  pointsDecayFactor = 0;
   get requestsUserInformation(): string {
     return this.initialRequestsUserInformation;
   }
-  scoreboard: number;
-  showScoreboardAfter: boolean;
-  currentScoreMode: ScoreMode;
-  startTime: Date;
+  scoreboard = 0;
+  showScoreboardAfter = false;
+  currentScoreMode = ScoreMode.Partial;
+  startTime = new Date();
   submissionsGap = 1;
-  title: string;
-  windowLength: null | number;
-  windowLengthEnabled: any;
+  title = '';
+  windowLength: null | number = null;
+  windowLengthEnabled: any = false;
   get currentContestForTeams(): boolean {
     return this.contestForTeams;
   }
