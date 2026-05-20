@@ -45,6 +45,7 @@ class Experiments {
 
     private const KNOWN_EXPERIMENTS = [
         self::USER_README,
+        'problem_creation_method_selector',
     ];
 
     /**

@@ -1162,6 +1162,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleUsersRank: "Ranking de coders",
   onlyDemotionsSupported: "Resolu\u00e7\u00e3o suportada apenas para demotions para agora.",
   openInKarelJs: "Voc\u00ea pode usar karel.js para resolver este problema",
+  openProblemCreator: "Criar problema",
   originalContestHasNotEnded: "O concurso original ainda n\u00e3o terminou",
   outputOnly: "Somente sa\u00edda",
   outputOnlyDownloadInput: "Baixar .zip com casos de entrada",

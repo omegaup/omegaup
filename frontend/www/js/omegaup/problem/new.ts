@@ -8,6 +8,8 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemFormPayload();
+  const showCreationMethodSelector =
+    OmegaUp.experiments?.isEnabled('problem_creation_method_selector') ?? false;
   if (payload.statusError) {
     ui.error(payload.statusError);
   }
@@ -25,6 +27,7 @@ OmegaUp.on('ready', () => {
           data: payload,
           errors: this.errors,
           hasVisitedSection: payload.hasVisitedSection,
+          showCreationMethodSelector,
         },
         on: {
           'alias-changed': (alias: string): void => {

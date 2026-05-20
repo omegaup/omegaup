@@ -81,4 +81,81 @@ describe('Settings.vue', () => {
     });
     expect(props.validLanguages).toEqual(optionsObject);
   });
+
+  it('Should show creation method selector when feature flag is enabled', () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    expect(wrapper.find('.introjs-creation-method').exists()).toBe(true);
+  });
+
+  it('Should hide creation method selector on update mode', () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        isUpdate: true,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    expect(wrapper.find('.introjs-creation-method').exists()).toBe(false);
+  });
+
+  it('Should show open creator button when creator method is selected', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ creationMethod: 'creator' });
+
+    expect(wrapper.find('.introjs-open-creator button').exists()).toBe(true);
+  });
+
+  it('Should hide open creator button when zip method is selected', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ creationMethod: 'zip' });
+
+    expect(wrapper.find('.introjs-open-creator button').exists()).toBe(false);
+  });
+
+  it('Should hide separate file input when feature flag is enabled', () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    expect(wrapper.find('.form-group.col-md-6.introjs-file').exists()).toBe(
+      false,
+    );
+  });
+
+  it('Should show zip file input in selector area when zip method is selected', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ creationMethod: 'zip' });
+
+    expect(
+      wrapper.find('.introjs-creation-method .introjs-file').exists(),
+    ).toBe(true);
+  });
 });
