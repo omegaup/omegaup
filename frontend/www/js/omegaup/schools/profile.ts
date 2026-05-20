@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-school-profile': school_Profile,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-school-profile', {
         props: {
           codersOfTheMonth: payload.coders_of_the_month.map(

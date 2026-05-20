@@ -16,7 +16,7 @@ OmegaUp.on('ready', function () {
     data: () => ({
       contests: payload.contests,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-group-scoreboard-contests', {
         props: {
           contests: this.contests,

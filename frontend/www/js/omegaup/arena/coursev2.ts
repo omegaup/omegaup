@@ -33,7 +33,7 @@ OmegaUp.on('ready', async () => {
         currentRunDetails: null as types.RunDetails | null,
       };
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-arena-course', {
         props: {
           allRuns: runsStore.state.runs,

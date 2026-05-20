@@ -32,7 +32,7 @@ OmegaUp.on('ready', () => {
         isContestRecommended: false,
       };
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-admin-support', {
         props: {
           username: this.username,

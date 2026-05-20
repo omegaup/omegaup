@@ -26,7 +26,7 @@ OmegaUp.on('ready', function () {
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-qualitynomination-list', {
         props: {
           pages: this.pages,

@@ -343,7 +343,7 @@ OmegaUp.on('ready', () => {
           });
       },
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
           data: payload.extraProfileDetails,

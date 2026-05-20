@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-common-docs': common_Docs,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-common-docs', {
         props: {
           docs,

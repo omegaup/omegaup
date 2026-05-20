@@ -71,7 +71,7 @@ OmegaUp.on('ready', () => {
       solvedProblemAliases: payload.solvedProblemAliases ?? [],
       attemptedProblemAliases: payload.attemptedProblemAliases ?? [],
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-problem-list', {
         props: {
           problems: payload.problems,

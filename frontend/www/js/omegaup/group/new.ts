@@ -11,7 +11,7 @@ OmegaUp.on('ready', function () {
     components: {
       'omegaup-group-new': group_New,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-group-new', {
         props: {
           T: T,

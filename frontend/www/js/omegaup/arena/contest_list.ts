@@ -101,7 +101,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       query: payload.query,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
           contests: contestStore.state.contests,

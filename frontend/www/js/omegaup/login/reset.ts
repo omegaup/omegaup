@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-login-password-reset': login_PasswordReset,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-login-password-reset', {
         props: {
           email: payload.email,

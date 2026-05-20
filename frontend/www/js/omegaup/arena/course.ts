@@ -118,7 +118,7 @@ OmegaUp.on('ready', async () => {
       feedbackMap,
       feedbackThreadMap,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-arena-course', {
         props: {
           clarifications: clarificationStore.state.clarifications,

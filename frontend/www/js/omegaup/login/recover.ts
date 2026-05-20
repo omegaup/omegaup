@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-login-password-recover': login_PasswordRecover,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-login-password-recover', {
         on: {
           'forgot-password': function (email: string) {

@@ -17,7 +17,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       searchResultSchools: [] as types.SchoolListItem[],
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-schools-rank', {
         props: {
           page: payload.page,

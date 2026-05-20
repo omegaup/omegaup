@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-course-submissions-list': course_SubmissionsList,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-course-submissions-list', {
         props: {
           solvedProblems: payload.solvedProblems,

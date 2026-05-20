@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       searchResultUsers: [] as types.ListItem[],
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-author-rank', {
         props: {
           page: payload.page,

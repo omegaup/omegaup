@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-problem-collection': problem_Collection,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-problem-collection', {
         props: {
           levelTags: payload.levelTags,

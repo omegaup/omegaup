@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       nextExecutionTimestamp: null as null | Date,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement(grader_EphemeralIDE, {
         props: {
           acceptedLanguages,

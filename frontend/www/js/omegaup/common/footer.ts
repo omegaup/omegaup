@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-common-footer': omegaup_Footer,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-common-footer', {
         props: {
           isLoggedIn: (payload && payload.isLoggedIn) || false,

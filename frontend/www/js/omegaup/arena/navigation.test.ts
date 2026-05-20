@@ -127,7 +127,7 @@ const vueInstance: Vue & {
   components: {
     'omegaup-arena-contest-practice': arena_ContestPractice,
   },
-  render: function (createElement: any) {
+  render: function (createElement) {
     return createElement('omegaup-badge-details', {
       props: {
         problemInfo: problemDetails,

@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-libinteractive-gen': libinteractive_Gen,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-libinteractive-gen', {
         props: {
           error: payload.error,

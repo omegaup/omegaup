@@ -13,7 +13,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-teams-group-create': teamsgroup_Create,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-teams-group-create', {
         props: {
           numberOfContestants: payload.numberOfContestants,

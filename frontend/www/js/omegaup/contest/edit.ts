@@ -179,7 +179,7 @@ OmegaUp.on('ready', () => {
         hiddenElement.click();
       },
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-contest-edit', {
         props: {
           admins: this.admins,

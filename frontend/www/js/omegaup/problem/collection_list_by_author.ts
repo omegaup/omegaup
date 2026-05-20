@@ -57,7 +57,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-problem-collection-list-author': problem_CollectionListAuthor,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-problem-collection-list-author', {
         props: {
           data: payload,

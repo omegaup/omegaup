@@ -51,7 +51,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-problem-statementedit': problem_StatementEdit,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-problem-statementedit', {
         props: {
           alias: 'problema',

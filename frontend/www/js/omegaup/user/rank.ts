@@ -35,7 +35,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       searchResultUsers: [] as types.ListItem[],
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-user-rank', {
         props: {
           page: payload.page,

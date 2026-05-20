@@ -18,7 +18,7 @@ OmegaUp.on('ready', () => {
       showPenalty: false,
       aliases: [] as string[],
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-contest-scoreboardmerge', {
         props: {
           availableContests: this.contests,

@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-user-email-edit': user_EmailEdit,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-user-email-edit', {
         props: {
           email: payload.email,

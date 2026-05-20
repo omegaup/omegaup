@@ -12,7 +12,7 @@ OmegaUp.on('ready', function () {
     components: {
       'omegaup-course-statistics': course_Statistics,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-course-statistics', {
         props: {
           T: T,

@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-badge-details': badge_Details,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-badge-details', {
         props: {
           badge: payload.badge,

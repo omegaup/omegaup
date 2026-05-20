@@ -11,7 +11,7 @@ OmegaUp.on('ready', function () {
     components: {
       'omegaup-badge-list': badge_List,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-badge-list', {
         props: {
           allBadges: new Set(payload.badges) as Set<string>,

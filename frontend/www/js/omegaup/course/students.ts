@@ -16,7 +16,7 @@ OmegaUp.on('ready', function () {
     data: () => ({
       completeStudentsProgress: null as types.StudentProgressInCourse[] | null,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-course-viewprogress', {
         props: {
           course: payload.course,

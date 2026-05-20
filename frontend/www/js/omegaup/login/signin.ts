@@ -84,7 +84,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       initialActiveTab,
     }),
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-login-signin', {
         props: {
           validateRecaptcha: payload.validateRecaptcha,

@@ -179,7 +179,7 @@ OmegaUp.on('ready', async () => {
     beforeDestroy() {
       window.removeEventListener('popstate', syncFromHash);
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-arena-contest', {
         props: {
           lockdown: commonPayload.omegaUpLockDown,

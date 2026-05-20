@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-certificate-mine': certificate_Mine,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-certificate-mine', {
         props: {
           certificates: payload.certificates,

@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-certificate-details': certificate_Details,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-certificate-details', {
         props: {
           uuid: payload.uuid,

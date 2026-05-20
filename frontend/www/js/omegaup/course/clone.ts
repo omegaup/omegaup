@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-course-clone': course_Clone,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('omegaup-course-clone', {
         props: {
           username: payload.creator.username,

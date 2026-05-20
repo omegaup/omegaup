@@ -20,7 +20,7 @@ OmegaUp.on('ready', () => {
     components: {
       'creator-main': problem_creator,
     },
-    render: function (createElement: any) {
+    render: function (createElement) {
       return createElement('creator-main', {
         on: {
           'show-update-success-message': () => {
