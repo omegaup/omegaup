@@ -8,6 +8,7 @@ import sys
 import os
 import csv
 from typing import Any, Iterable, Tuple, Optional, List, Dict
+import configparser
 import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
@@ -38,24 +39,37 @@ def create_connection(
     """
     Open a MySQL Connection
     """
+    defaults: Dict[str, str] = {}
+    config_file = os.getenv('OMEGAUP_MYSQL_CONFIG_FILE')
+    if not config_file:
+        config_file = os.path.join(os.path.expanduser('~'), '.my.cnf')
+    if os.path.isfile(config_file):
+        parser = configparser.ConfigParser()
+        parser.read(config_file)
+        if parser.has_section('client'):
+            defaults = dict(parser['client'])
+
     host = os.getenv(
         'OMEGAUP_MYSQL_HOST',
-        os.getenv('MYSQL_HOST', host_name),
+        os.getenv('MYSQL_HOST', defaults.get('host', host_name)),
     )
     port = int(
         os.getenv(
             'OMEGAUP_MYSQL_PORT',
-            os.getenv('MYSQL_TCP_PORT', port),
+            os.getenv('MYSQL_TCP_PORT', defaults.get('port', port)),
         )
     )
-    user = os.getenv('OMEGAUP_MYSQL_USER', user_name)
+    user = os.getenv('OMEGAUP_MYSQL_USER', defaults.get('user', user_name))
     db = os.getenv(
         'OMEGAUP_MYSQL_DB',
         os.getenv('MYSQL_DATABASE', db_name),
     )
     pw_env = os.getenv(
         'OMEGAUP_MYSQL_PASSWORD',
-        os.getenv('MYSQL_ROOT_PASSWORD', user_password),
+        os.getenv(
+            'MYSQL_ROOT_PASSWORD',
+            defaults.get('password', user_password)
+        ),
     )
 
     try:
