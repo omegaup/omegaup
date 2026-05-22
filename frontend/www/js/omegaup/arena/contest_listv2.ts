@@ -178,10 +178,16 @@ OmegaUp.on('ready', () => {
             } else {
               window.history.pushState({}, '', urlObj);
             }
-            await contestStore.dispatch('fetchContestList', {
-              requestParams: params,
-              name: params.tab_name,
-            });
+            if (params.page === 1) {
+              await contestStore.dispatch('fetchContestListAllTabs', {
+                requestParams: params,
+              });
+            } else {
+              await contestStore.dispatch('fetchContestList', {
+                requestParams: params,
+                name: params.tab_name,
+              });
+            }
           },
         },
       });
