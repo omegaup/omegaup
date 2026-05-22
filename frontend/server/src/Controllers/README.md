@@ -4830,9 +4830,19 @@ Details of a team group
 
 ### Returns
 
-| Name         | Type                                                                         |
-| ------------ | ---------------------------------------------------------------------------- |
-| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+| Name         | Type               |
+| ------------ | ------------------ |
+| `team_group` | `types.TeamsGroup` |
+
+**`types.TeamsGroup` fields:**
+
+| Name          | Type      | Required |
+| ------------- | --------- | -------- |
+| `alias`       | `string`  | ✓        |
+| `archived`    | `boolean` | ✓        |
+| `create_time` | `Date`    | ✓        |
+| `description` | `string`  |          |
+| `name`        | `string`  | ✓        |
 
 ## `/api/teamsGroup/list/`
 
@@ -4935,12 +4945,13 @@ Update an existing teams group
 
 ### Parameters
 
-| Name                  | Type        | Description | Required |
-| --------------------- | ----------- | ----------- | -------- |
-| `alias`               | `string`    |             | ✓        |
-| `description`         | `string`    |             | ✓        |
-| `name`                | `string`    |             | ✓        |
-| `numberOfContestants` | `int\|null` |             |          |
+| Name                  | Type         | Description | Required |
+| --------------------- | ------------ | ----------- | -------- |
+| `alias`               | `string`     |             | ✓        |
+| `description`         | `string`     |             | ✓        |
+| `name`                | `string`     |             | ✓        |
+| `archived`            | `bool\|null` |             |          |
+| `numberOfContestants` | `int\|null`  |             |          |
 
 ### Returns
 
