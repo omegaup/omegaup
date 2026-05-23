@@ -41,6 +41,9 @@ OmegaUp.on('ready', () => {
       isLoading: false,
       searchResultSchools: searchResultSchools,
     }),
+    beforeDestroy() {
+      window.removeEventListener('hashchange', onHashChange);
+    },
     methods: {
       refreshTeamsList: (): void => {
         api.TeamsGroup.teams({ team_group_alias: payload.teamGroup.alias })
@@ -398,7 +401,7 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-  const onHashChange = () => {
+  function onHashChange(): void {
     const hash = window.location.hash.substring(1).split('#')[0];
 
     if (!Object.values(AvailableTabs).includes(hash as AvailableTabs)) {
@@ -407,12 +410,8 @@ OmegaUp.on('ready', () => {
     }
 
     teamsGroupEdit.tab = hash as AvailableTabs;
-  };
+  }
 
   window.addEventListener('hashchange', onHashChange);
   onHashChange();
-
-  teamsGroupEdit.$once('hook:beforeDestroy', () => {
-    window.removeEventListener('hashchange', onHashChange);
-  });
 });

@@ -2057,8 +2057,15 @@ export const TeamsGroup = {
   >('/api/teamsGroup/create/'),
   details: apiCall<
     messages.TeamsGroupDetailsRequest,
+    messages._TeamsGroupDetailsServerResponse,
     messages.TeamsGroupDetailsResponse
-  >('/api/teamsGroup/details/'),
+  >('/api/teamsGroup/details/', (x) => {
+    x.team_group = ((x) => {
+      x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+      return x;
+    })(x.team_group);
+    return x;
+  }),
   list: apiCall<
     messages.TeamsGroupListRequest,
     messages.TeamsGroupListResponse
