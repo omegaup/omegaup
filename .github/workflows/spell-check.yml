@@ -1,5 +1,4 @@
-# This workfow checks spellig mistaces in documentaiton and coments
-# TODO: Remove this test commet after verificaton
+# This workflow checks spelling mistakes in documentation and comments
 name: Spell Check
 
 on:
@@ -32,14 +31,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install cspell with dictionaries
         run: |
