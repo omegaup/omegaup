@@ -5081,8 +5081,9 @@ export namespace types {
     maxNumberOfContestants: number;
     teamGroup: {
       alias: string;
+      archived: boolean;
       description?: string;
-      name?: string;
+      name: string;
       numberOfContestants: number;
     };
     teamsMembers: types.TeamMember[];
@@ -5104,6 +5105,7 @@ export namespace types {
 
   export interface TeamsGroup {
     alias: string;
+    archived: boolean;
     create_time: Date;
     description?: string;
     name: string;
@@ -6184,14 +6186,8 @@ export namespace messages {
   export type TeamsGroupCreateRequest = { [key: string]: any };
   export type TeamsGroupCreateResponse = {};
   export type TeamsGroupDetailsRequest = { [key: string]: any };
-  export type TeamsGroupDetailsResponse = {
-    team_group: {
-      alias?: string;
-      create_time: number;
-      description?: string;
-      name?: string;
-    };
-  };
+  export type _TeamsGroupDetailsServerResponse = any;
+  export type TeamsGroupDetailsResponse = { team_group: types.TeamsGroup };
   export type TeamsGroupListRequest = { [key: string]: any };
   export type TeamsGroupListResponse = types.ListItem[];
   export type TeamsGroupRemoveMemberRequest = { [key: string]: any };

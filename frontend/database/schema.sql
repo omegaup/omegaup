@@ -281,6 +281,7 @@ CREATE TABLE `Contests` (
   KEY `idx_contests_title_archived` (`title`,`archived`),
   KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
   KEY `idx_acl_archived` (`acl_id`,`archived`),
+  KEY `idx_archived_admission` (`archived`,`admission_mode`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -1064,6 +1065,7 @@ CREATE TABLE `Runs` (
   UNIQUE KEY `runs_versions` (`submission_id`,`version`),
   KEY `submission_id` (`submission_id`),
   KEY `status_submission_id` (`status`,`submission_id`),
+  KEY `idx_runs_run_id_verdict` (`run_id`,`verdict`),
   CONSTRAINT `fk_r_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1221,6 +1223,7 @@ CREATE TABLE `Submissions` (
   KEY `idx_submissions_identity_problem_problemset_time` (`identity_id`,`problem_id`,`problemset_id`,`time` DESC),
   KEY `idx_submissions_identity_problemset_problem` (`identity_id`,`problemset_id`,`problem_id`),
   KEY `idx_submissions_identity_type_problemset` (`identity_id`,`type`,`problemset_id`),
+  KEY `idx_submissions_time_verdict` (`time`,`verdict`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1261,6 +1264,7 @@ CREATE TABLE `Team_Groups` (
   `name` varchar(50) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   `number_of_contestants` int NOT NULL DEFAULT '3' COMMENT 'Número de concursantes para los equipos del grupo',
+  `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el grupo de equipos ha sido archivado.',
   PRIMARY KEY (`team_group_id`),
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
