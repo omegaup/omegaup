@@ -1482,6 +1482,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 $user->hide_problem_tags
             ) ? false : $user->hide_problem_tags,
             'is_own_profile' => false,
+            'x_url' => $user->x_url,
+            'linkedin_url' => $user->linkedin_url,
+            'github_url' => $user->github_url,
         ];
 
         $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
@@ -2733,9 +2736,42 @@ class User extends \OmegaUp\Controllers\Controller {
             'gender',
         ];
 
+        // Social media fields
+        $xUrl = $r->ensureOptionalString('x_url', required: false);
+        $linkedinUrl = $r->ensureOptionalString(
+            'linkedin_url',
+            required: false
+        );
+        $githubUrl = $r->ensureOptionalString('github_url', required: false);
+
+        foreach (
+            [
+            'x_url' => $xUrl,
+            'linkedin_url' => $linkedinUrl,
+            'github_url' => $githubUrl,
+            ] as $field => $value
+        ) {
+            if (!is_null($value) && !\OmegaUp\Validators::isValidURL($value)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    $field
+                );
+            }
+        }
         self::updateValueProperties($r, $r->user, $userValueProperties);
         self::updateValueProperties($r, $r->identity, $identityValueProperties);
 
+        if ($r->hasParameter('x_url')) {
+            $r->user->x_url = $xUrl;
+        }
+
+        if ($r->hasParameter('linkedin_url')) {
+            $r->user->linkedin_url = $linkedinUrl;
+        }
+
+        if ($r->hasParameter('github_url')) {
+            $r->user->github_url = $githubUrl;
+        }
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
