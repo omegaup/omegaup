@@ -42,10 +42,11 @@ class Experiments {
      * An array with all the known experiments.
      */
     const USER_README = 'user_readme';
+    const PROBLEM_CREATION_METHOD_SELECTOR = 'problem_creation_method_selector';
 
     private const KNOWN_EXPERIMENTS = [
         self::USER_README,
-        'problem_creation_method_selector',
+        self::PROBLEM_CREATION_METHOD_SELECTOR,
     ];
 
     /**

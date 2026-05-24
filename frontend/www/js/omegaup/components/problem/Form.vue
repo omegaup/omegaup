@@ -85,10 +85,12 @@
                       type="button"
                       class="btn flex-fill"
                       :class="{
-                        'btn-primary': creationMethod === 'creator',
-                        'btn-outline-primary': creationMethod !== 'creator',
+                        'btn-primary':
+                          creationMethod === CreationMethods.Creator,
+                        'btn-outline-primary':
+                          creationMethod !== CreationMethods.Creator,
                       }"
-                      @click="setCreationMethod('creator')"
+                      @click="setCreationMethod(CreationMethods.Creator)"
                     >
                       {{ T.problemCreatorTitle }}
                     </button>
@@ -96,16 +98,17 @@
                       type="button"
                       class="btn flex-fill"
                       :class="{
-                        'btn-primary': creationMethod === 'zip',
-                        'btn-outline-primary': creationMethod !== 'zip',
+                        'btn-primary': creationMethod === CreationMethods.Zip,
+                        'btn-outline-primary':
+                          creationMethod !== CreationMethods.Zip,
                       }"
-                      @click="setCreationMethod('zip')"
+                      @click="setCreationMethod(CreationMethods.Zip)"
                     >
                       {{ T.myproblemsListCreateProblemWithExistingZipFile }}
                     </button>
                   </div>
                   <div
-                    v-if="creationMethod === 'creator'"
+                    v-if="creationMethod === CreationMethods.Creator"
                     class="mt-2 introjs-open-creator"
                   >
                     <button type="button" class="btn btn-info">
@@ -113,7 +116,7 @@
                     </button>
                   </div>
                   <div
-                    v-if="creationMethod === 'zip'"
+                    v-if="creationMethod === CreationMethods.Zip"
                     class="mt-2 introjs-file"
                   >
                     <input
@@ -129,10 +132,7 @@
                     />
                   </div>
                 </div>
-                <div
-                  v-if="isUpdate || !showCreationMethodSelector"
-                  class="form-group col-md-6 introjs-file"
-                >
+                <div v-else class="form-group col-md-6 introjs-file">
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
@@ -522,6 +522,11 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expires: -1 });
 
+export enum CreationMethods {
+  Creator = 'creator',
+  Zip = 'zip',
+}
+
 @Component({
   components: {
     'omegaup-problem-settings': problem_Settings,
@@ -535,6 +540,7 @@ export default class ProblemForm extends Vue {
   @Prop({ default: 0 }) originalVisibility!: number;
   @Prop({ default: true }) hasVisitedSection!: boolean;
   @Prop({ default: false }) showCreationMethodSelector!: boolean;
+  @Prop({ default: 'creator' }) initialCreationMethod!: string;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
@@ -569,109 +575,71 @@ export default class ProblemForm extends Vue {
   validLanguages = this.data.validLanguages;
   validatorTypes = this.data.validatorTypes;
   currentLanguages = this.data.languages;
-  creationMethod: 'creator' | 'zip' = 'creator';
+  CreationMethods = CreationMethods;
+  creationMethod: CreationMethods =
+    (this.initialCreationMethod as CreationMethods) || CreationMethods.Creator;
 
   mounted() {
-    if (!this.isUpdate && this.showCreationMethodSelector) {
-      const savedMethod = window.sessionStorage.getItem(
-        'problemCreationMethod',
-      );
-      if (savedMethod === 'creator' || savedMethod === 'zip') {
-        this.creationMethod = savedMethod;
-      }
-    }
-
     const title = T.createProblemInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
-      const steps = [
-        {
-          title,
-          intro: T.createProblemInteractiveGuideWelcome,
-        },
-        {
-          element: document.querySelector('.introjs-title') as Element,
-          title,
-          intro: T.createProblemInteractiveGuideProblemTitle,
-        },
-        {
-          element: document.querySelector('.introjs-short-title') as Element,
-          title,
-          intro: T.createProblemInteractiveGuideShortTitle,
-        },
-        {
-          element: document.querySelector('.introjs-origin') as Element,
-          title,
-          intro: T.createProblemInteractiveGuideOrigin,
-        },
-      ];
-
-      if (!this.isUpdate && this.showCreationMethodSelector) {
-        steps.push({
-          element: document.querySelector(
-            '.introjs-creation-method',
-          ) as Element,
-          title,
-          intro: T.myproblemsListCreateProblem,
-        });
-      }
-
-      const openCreatorElement = document.querySelector(
-        '.introjs-open-creator',
-      ) as Element | null;
-      if (openCreatorElement) {
-        steps.push({
-          element: openCreatorElement,
-          title,
-          intro: T.openProblemCreator,
-        });
-      }
-
-      const fileElement = document.querySelector(
-        '.introjs-file',
-      ) as Element | null;
-      if (fileElement) {
-        steps.push({
-          element: fileElement,
-          title,
-          intro: T.createProblemInteractiveGuideFile,
-        });
-      }
-
-      steps.push(
-        {
-          element: document.querySelector('.introjs-tags-and-level') as Element,
-          title,
-          intro: T.createProblemInteractiveGuideTagsAndLevel,
-        },
-        {
-          element: document.querySelector('.introjs-type') as Element,
-          title,
-          intro: T.createProblemInteractiveGuideType,
-        },
-        {
-          element: document.querySelector('.introjs-validator') as Element,
-          title,
-          intro: T.createProblemInteractiveGuideValidator,
-        },
-      );
-
       introJs()
         .setOptions({
           nextLabel: T.interactiveGuideNextButton,
           prevLabel: T.interactiveGuidePreviousButton,
           doneLabel: T.interactiveGuideDoneButton,
-          steps,
+          steps: [
+            {
+              title,
+              intro: T.createProblemInteractiveGuideWelcome,
+            },
+            {
+              element: document.querySelector('.introjs-title') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideProblemTitle,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-short-title',
+              ) as Element,
+              title,
+              intro: T.createProblemInteractiveGuideShortTitle,
+            },
+            {
+              element: document.querySelector('.introjs-origin') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideOrigin,
+            },
+            {
+              element: document.querySelector('.introjs-file') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideFile,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-tags-and-level',
+              ) as Element,
+              title,
+              intro: T.createProblemInteractiveGuideTagsAndLevel,
+            },
+            {
+              element: document.querySelector('.introjs-type') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideType,
+            },
+            {
+              element: document.querySelector('.introjs-validator') as Element,
+              title,
+              intro: T.createProblemInteractiveGuideValidator,
+            },
+          ],
         })
         .start();
       this.$cookies.set('has-visited-create-problem', true, -1);
     }
   }
 
-  setCreationMethod(method: 'creator' | 'zip'): void {
+  setCreationMethod(method: CreationMethods): void {
     this.creationMethod = method;
-    if (!this.isUpdate && this.showCreationMethodSelector) {
-      window.sessionStorage.setItem('problemCreationMethod', method);
-    }
   }
 
   get howToWriteProblemLink(): string {

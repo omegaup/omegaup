@@ -3,6 +3,7 @@ import { types } from '../api_types';
 import T from '../lang';
 import Vue from 'vue';
 import problem_New from '../components/problem/Form.vue';
+import { CreationMethods } from '../components/problem/Form.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -10,6 +11,12 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemFormPayload();
   const showCreationMethodSelector =
     OmegaUp.experiments?.isEnabled('problem_creation_method_selector') ?? false;
+
+  let initialCreationMethod: CreationMethods = CreationMethods.Creator;
+  if (showCreationMethodSelector) {
+    initialCreationMethod = CreationMethods.Creator;
+  }
+
   if (payload.statusError) {
     ui.error(payload.statusError);
   }
@@ -28,6 +35,7 @@ OmegaUp.on('ready', () => {
           errors: this.errors,
           hasVisitedSection: payload.hasVisitedSection,
           showCreationMethodSelector,
+          initialCreationMethod,
         },
         on: {
           'alias-changed': (alias: string): void => {

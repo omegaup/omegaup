@@ -4,6 +4,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 
 import Form from './Form.vue';
+import { CreationMethods } from './Form.vue';
 
 const props: types.ProblemFormPayload = {
   title: 'title',
@@ -113,7 +114,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    await wrapper.setData({ creationMethod: 'creator' });
+    await wrapper.setData({ creationMethod: CreationMethods.Creator });
 
     expect(wrapper.find('.introjs-open-creator button').exists()).toBe(true);
   });
@@ -126,7 +127,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    await wrapper.setData({ creationMethod: 'zip' });
+    await wrapper.setData({ creationMethod: CreationMethods.Zip });
 
     expect(wrapper.find('.introjs-open-creator button').exists()).toBe(false);
   });
@@ -152,7 +153,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    await wrapper.setData({ creationMethod: 'zip' });
+    await wrapper.setData({ creationMethod: CreationMethods.Zip });
 
     expect(
       wrapper.find('.introjs-creation-method .introjs-file').exists(),
