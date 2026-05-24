@@ -38,6 +38,9 @@ OmegaUp.on('ready', () => {
           initialCreationMethod,
         },
         on: {
+          'open-problem-creator': (): void => {
+            ui.info(T.openProblemCreator);
+          },
           'alias-changed': (alias: string): void => {
             if (!alias) {
               problemNew.errors.push('problem_alias');

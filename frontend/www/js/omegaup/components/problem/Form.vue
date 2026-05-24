@@ -111,7 +111,11 @@
                     v-if="creationMethod === CreationMethods.Creator"
                     class="mt-2 introjs-open-creator"
                   >
-                    <button type="button" class="btn btn-info">
+                    <button
+                      type="button"
+                      class="btn btn-info"
+                      @click="$emit('open-problem-creator')"
+                    >
                       {{ T.openProblemCreator }}
                     </button>
                   </div>
