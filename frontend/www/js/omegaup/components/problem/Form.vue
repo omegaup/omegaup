@@ -45,7 +45,7 @@
                     type="text"
                     class="form-control"
                     :class="{ 'is-invalid': errors.includes('title') }"
-                    @blur="onGenerateAlias"
+                    @blur="onGenerateAlias($event)"
                   />
                 </div>
                 <div class="form-group col-md-6 introjs-short-title">
@@ -468,6 +468,7 @@ import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expires: -1 });
 
 @Component({
+  emits: ['alias-changed'],
   components: {
     'omegaup-problem-settings': problem_Settings,
     'omegaup-problem-tags': problem_Tags,
@@ -703,13 +704,17 @@ export default class ProblemForm extends Vue {
     this.hasFile = uploadedFile.files !== null;
   }
 
-  onGenerateAlias(): void {
+  onGenerateAlias(event: FocusEvent): void {
     if (this.isUpdate) {
       return;
     }
 
+    // In Vue 3, v-model updates may be batched. Read the DOM value directly
+    // to ensure we get the latest input value.
+    const titleValue = (event.target as HTMLInputElement).value;
+
     // Remove accents
-    let generatedAlias = latinize(this.title);
+    let generatedAlias = latinize(titleValue);
 
     // Replace whitespace
     generatedAlias = generatedAlias.replace(/\s+/g, '-');

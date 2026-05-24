@@ -371,6 +371,13 @@ const MAX_LENGTH = {
 const DANGER_THRESHOLD_PERCENTAGE = 0.9;
 
 @Component({
+  emits: [
+    'submit',
+    'cancel',
+    'update-search-result-schools',
+    'invalid-languages',
+    'clear-language-error',
+  ],
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datepicker': DatePicker,

@@ -44,6 +44,7 @@ module.exports = {
     'vue-typeahead-bootstrap':
       '<rootDir>/frontend/www/js/omegaup/__mocks__/vue-typeahead-bootstrap.ts',
   },
+  setupFiles: ['<rootDir>/frontend/www/js/omegaup/test.setup.before.ts'],
   setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
   transform: {
     '.*\\.vue$': [

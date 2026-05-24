@@ -1103,6 +1103,12 @@ const DANGER_THRESHOLD_PERCENTAGE = 0.8;
 const markdownConverter = new markdownModule.Converter({ preview: true });
 
 @Component({
+  emits: [
+    'update-contest',
+    'create-contest',
+    'language-remove-blocked',
+    'update-search-result-teams-groups',
+  ],
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,

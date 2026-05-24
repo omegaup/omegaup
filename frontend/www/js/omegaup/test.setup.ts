@@ -1,6 +1,20 @@
 import * as util from 'util';
 import 'process';
 
+// Suppress Vue 3 warnings BEFORE importing Vue, since Vue caches console.warn
+// at module initialization time.
+const originalConsoleWarn = console.warn;
+console.warn = function (...args: any[]) {
+  const msg = String(args[0] || '');
+  if (
+    msg.includes('Failed to resolve component') ||
+    msg.includes('provide() can only be used inside setup()')
+  ) {
+    return;
+  }
+  originalConsoleWarn(...args);
+};
+
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/extend-expect';
 

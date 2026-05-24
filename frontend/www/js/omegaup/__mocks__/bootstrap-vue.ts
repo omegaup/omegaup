@@ -70,6 +70,26 @@ const BIconPrinter = makeComponent('i');
 const BIconQuestionCircleFill = makeComponent('i');
 const BIconXCircleFill = makeComponent('i');
 
+// Additional icon components used in the codebase
+const BIconUpload = makeComponent('i');
+const BIconDownload = makeComponent('i');
+const BIconThreeDotsVertical = makeComponent('i');
+const BIconTrash = makeComponent('i');
+const BIconBoxArrowDown = makeComponent('i');
+const BIconTextLeft = makeComponent('i');
+const BIconPencilSquare = makeComponent('i');
+const BIconPlusSquare = makeComponent('i');
+const BIconLayoutSidebar = makeComponent('i');
+const BIconPlusCircle = makeComponent('i');
+const BIconBroadcast = makeComponent('i');
+const BIconPencil = makeComponent('i');
+const BIconArrowLeftRight = makeComponent('i');
+const BIconArrowRepeat = makeComponent('i');
+const BIconBoxArrowInDown = makeComponent('i');
+const BIconFileCode = makeComponent('i');
+const BIconCheckCircle = makeComponent('i');
+const BIconFileEarmarkCheck = makeComponent('i');
+
 const BNav = makeComponent('nav');
 const BNavItem = makeComponent('li');
 const BPagination = makeComponent('ul');
@@ -137,6 +157,24 @@ module.exports = {
   BIconPrinter,
   BIconQuestionCircleFill,
   BIconXCircleFill,
+  BIconUpload,
+  BIconDownload,
+  BIconThreeDotsVertical,
+  BIconTrash,
+  BIconBoxArrowDown,
+  BIconTextLeft,
+  BIconPencilSquare,
+  BIconPlusSquare,
+  BIconLayoutSidebar,
+  BIconPlusCircle,
+  BIconBroadcast,
+  BIconPencil,
+  BIconArrowLeftRight,
+  BIconArrowRepeat,
+  BIconBoxArrowInDown,
+  BIconFileCode,
+  BIconCheckCircle,
+  BIconFileEarmarkCheck,
   BNav,
   BNavItem,
   BPagination,
