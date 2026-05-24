@@ -26,7 +26,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
@@ -41,7 +42,11 @@ export default class FilterTags extends Vue {
   @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
-  currentSelectedTags = this.selectedTags;
+  currentSelectedTags: any;
+
+  created() {
+    this.currentSelectedTags = this.selectedTags;
+  }
 
   get publicQualityTagNames(): string[] {
     return this.publicQualityTags.map((x) => x.name);

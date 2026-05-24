@@ -13,7 +13,7 @@ describe('EphemeralGrader.vue', () => {
   afterEach(() => {
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
-      document.removeChild(rootDiv);
+      document.body.removeChild(rootDiv);
     }
   });
 
@@ -85,7 +85,7 @@ Here we can add code.
   it('Should handle showing the ephemeral grader for a problem upon load', async () => {
     const wrapper = mount(arena_EphemeralGrader, {
       attachTo: '#root',
-      propsData: {
+      props: {
         problem,
         acceptedLanguages: ['py3'],
         preferredLanguage: 'py3',
@@ -99,13 +99,13 @@ Here we can add code.
     expect(wrapper.get('[data-run-button]').exists()).toBe(true);
     expect(wrapper.get('option[value="py3"]').exists()).toBe(true);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle showing the ephemeral grader for a problem after changing settings', async () => {
     const wrapper = mount(arena_EphemeralGrader, {
       attachTo: '#root',
-      propsData: {
+      props: {
         problem,
         acceptedLanguages: ['py3'],
         preferredLanguage: 'py3',
@@ -133,6 +133,6 @@ Here we can add code.
     expect(wrapper.get('[data-submit-button]').exists()).toBe(true);
     expect(wrapper.get('option[value="cpp17-gcc"]').exists()).toBe(true);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

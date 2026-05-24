@@ -54,7 +54,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
@@ -67,9 +68,13 @@ export default class UserPasswordAdd extends Vue {
   @Prop() username!: string;
 
   T = T;
-  newUsername = this.username;
+  newUsername: string;
   newPassword = '';
   newPassword2 = '';
+
+  created() {
+    this.newUsername = this.username;
+  }
 
   get passwordMismatch(): boolean {
     return this.newPassword != this.newPassword2;

@@ -65,7 +65,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import VueRecaptcha from 'vue-recaptcha';
 import omegaup_Login from './Login.vue';
@@ -95,7 +96,11 @@ export default class Signin extends Vue {
 
   T = T;
   AvailableTabs = AvailableTabs;
-  activeTab: AvailableTabs = this.initialActiveTab;
+  activeTab = AvailableTabs.Login;
+
+  created() {
+    this.activeTab = this.initialActiveTab;
+  }
 
   @Watch('initialActiveTab')
   onInitialActiveTabChanged(newValue: AvailableTabs): void {

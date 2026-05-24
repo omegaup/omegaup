@@ -1,7 +1,7 @@
-import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 
 import CaseEdit from './CaseEdit.vue';
-import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
+import { BButton } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
 import { NIL as UUID_NIL } from 'uuid';
@@ -12,10 +12,6 @@ import {
 
 import T from '../../../../lang';
 import { MatrixDistinctType } from '@/js/omegaup/problem/creator/types';
-
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('CaseEdit.vue', () => {
   const newUngroupedCasegroup = generateGroup({
@@ -43,7 +39,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should show an ungrouped case', async () => {
-    const wrapper = shallowMount(CaseEdit, { localVue, store: store });
+    const wrapper = shallowMount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newUngroupedCasegroup.groupID;
     const caseID = newUngroupedCase.caseID;
@@ -79,7 +75,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should show a grouped case', async () => {
-    const wrapper = shallowMount(CaseEdit, { localVue, store: store });
+    const wrapper = shallowMount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -102,7 +98,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should delete a case', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -129,7 +125,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should add, modify and delete a line', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store: store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -148,8 +144,8 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.find('table').exists()).toBeTruthy();
     const formInputs = wrapper.findAll('input');
 
-    formInputs.at(0).setValue('testLabel');
-    formInputs.at(1).setValue('testValue');
+    formInputs[0].setValue('testLabel');
+    formInputs[1].setValue('testValue');
     await wrapper.trigger('click');
 
     expect(wrapper.vm.getLinesFromSelectedCase[0].label).toBe('testLabel');
@@ -166,13 +162,13 @@ describe('CaseEdit.vue', () => {
     const dropdowns = wrapper.findAll('a.dropdown-item');
     expect(dropdowns.length).toBe(dropdownItemCount);
 
-    await dropdowns.at(1).trigger('click');
+    await dropdowns[1].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
 
-    await dropdowns.at(2).trigger('click');
+    await dropdowns[2].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
 
-    await dropdowns.at(3).trigger('click');
+    await dropdowns[3].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
     wrapper.vm.deleteLine(wrapper.vm.getLinesFromSelectedCase[0].lineID);
@@ -185,7 +181,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should write and erase outputs', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store: store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -231,7 +227,7 @@ describe('CaseEdit.vue', () => {
     store.commit('casesStore/addCase', newUngroupedCase);
     store.commit('casesStore/addGroup', newGroup);
 
-    const wrapper = mount(CaseEdit, { localVue, store: store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newUngroupedCasegroup.groupID;
     const caseID = newUngroupedCase.caseID;
@@ -306,7 +302,7 @@ describe('CaseEdit.vue', () => {
 
   describe.each(arrayInputMapping)(`An array with:`, (arrayInput) => {
     it(`size ${arrayInput.arrSize}, minimum ${arrayInput.arrLow}, maximum ${arrayInput.arrHigh}, distinct ${arrayInput.distinct}, should have uniqueConstraint ${arrayInput.emptyConstraint} and emptyConstraint ${arrayInput.emptyConstraint}`, async () => {
-      const wrapper = mount(CaseEdit, { localVue, store });
+      const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
       const array = wrapper.vm
         .getArrayContent(
@@ -399,7 +395,7 @@ describe('CaseEdit.vue', () => {
 
   describe.each(matrixInputMapping)(`A matrix with:`, (matrixInput) => {
     it(`${matrixInput.matrixRows} rows, ${matrixInput.matrixCols} columns, minimum ${matrixInput.matrixLow}, maximum ${matrixInput.matrixHigh}, distinct type ${matrixInput.distinct}, should have emptyConstraint ${matrixInput.emptyConstraint}, rowUniqueConstraint ${matrixInput.rowUniqueConstraint}, colUniqueConstraint ${matrixInput.colUniqueConstraint}`, async () => {
-      const wrapper = mount(CaseEdit, { localVue, store });
+      const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
       const matrix = wrapper.vm
         .getMatrixContent(
           matrixInput.matrixRows,
@@ -443,7 +439,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should generate and render arrays', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -461,7 +457,7 @@ describe('CaseEdit.vue', () => {
 
     const dropdowns = wrapper.findAll('a.dropdown-item');
 
-    await dropdowns.at(2).trigger('click');
+    await dropdowns[2].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
 
     const editSVG = wrapper.find('svg.bi-pencil-square');
@@ -491,10 +487,10 @@ describe('CaseEdit.vue', () => {
     expect(mockGenerate).toHaveBeenCalledWith(5, 10, 20, true);
     mockGenerate.mockRestore();
 
-    await modalInputs.at(0).setValue(5);
-    await modalInputs.at(1).setValue(10);
-    await modalInputs.at(2).setValue(10);
-    await modalInputs.at(3).setChecked(false);
+    await modalInputs[0].setValue(5);
+    await modalInputs[1].setValue(10);
+    await modalInputs[2].setValue(10);
+    await modalInputs[3].setChecked(false);
 
     await modalButton.trigger('click');
 
@@ -519,7 +515,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should generate and render matrices', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -535,7 +531,7 @@ describe('CaseEdit.vue', () => {
     const dropdowns = wrapper.findAll('a.dropdown-item');
     expect(dropdowns.length).toBe(4);
 
-    await dropdowns.at(3).trigger('click');
+    await dropdowns[3].trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
     const editSVG = wrapper.find('svg.bi-pencil-square');
@@ -610,7 +606,7 @@ describe('CaseEdit.vue', () => {
     `When dropdown:`,
     ({ matrixDistinctType, matrixDistinctEnum }) => {
       it(`${matrixDistinctType} is selected, function should be called with ${matrixDistinctEnum}`, async () => {
-        const wrapper = mount(CaseEdit, { localVue, store });
+        const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
         const groupID = newGroup.groupID;
         const caseID = newCase.caseID;
@@ -622,7 +618,7 @@ describe('CaseEdit.vue', () => {
         const dropdowns = wrapper.findAll('a.dropdown-item');
         expect(dropdowns.length).toBe(4);
 
-        await dropdowns.at(3).trigger('click');
+        await dropdowns[3].trigger('click');
         expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
         const editIcon = wrapper.find(`button[data-line-edit-button]`);
@@ -654,7 +650,7 @@ describe('CaseEdit.vue', () => {
   );
 
   it('deletes line, downloads .in and downloads .txt, when corresponding buttons are clicked', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store });
+    const wrapper = mount(CaseEdit, { global: { plugins: [store] } });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -717,15 +713,15 @@ describe('CaseEdit.vue', () => {
     });
     expect(filteredDropdowns.length).toBe(2);
 
-    await filteredDropdowns.at(1).trigger('click');
+    await filteredDropdowns[1].trigger('click');
 
     const formInputs = wrapper.findAll('input');
     const formTextArea = wrapper.find('textarea');
 
-    await formInputs.at(0).setValue('testLabel');
-    await formInputs.at(1).setValue('ome g a');
+    await formInputs[0].setValue('testLabel');
+    await formInputs[1].setValue('ome g a');
 
-    await formInputs.at(2).setValue('testLabel');
+    await formInputs[2].setValue('testLabel');
     await formTextArea.setValue('u\np');
 
     expect(

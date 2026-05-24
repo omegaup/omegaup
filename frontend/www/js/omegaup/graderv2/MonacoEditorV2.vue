@@ -111,7 +111,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-facing-decorator';
+import * as VueCtor from 'vue';
 import store from '../grader/GraderStore';
 import * as Util from '../grader/util';
 import * as monaco from 'monaco-editor';
@@ -122,7 +123,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faClipboard, faCheck } from '@fortawesome/free-solid-svg-icons';
 library.add(faClipboard, faCheck);
-Vue.use(Clipboard);
+VueCtor.use(Clipboard);
 
 // ─── Sourced from constants.ts ────────────────────────────────────────────────
 import { EDITOR, TIMING } from '../grader/constants';

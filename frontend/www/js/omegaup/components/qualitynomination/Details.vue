@@ -125,7 +125,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import confirmation from '../common/Confirmation.vue';
@@ -153,9 +154,13 @@ export default class QualityNominationDetails extends Vue {
   @Prop() votes!: omegaup.NominationVote[];
 
   T = T;
-  rationale = this.initialRationale;
+  rationale: string;
   showConfirmation = false;
   status = 'banned';
+
+  created() {
+    this.rationale = this.initialRationale;
+  }
 
   userUrl(alias: string): string {
     return `/profile/${alias}/`;

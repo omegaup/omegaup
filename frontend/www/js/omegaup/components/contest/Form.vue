@@ -917,7 +917,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -1102,6 +1103,12 @@ const DANGER_THRESHOLD_PERCENTAGE = 0.8;
 const markdownConverter = new markdownModule.Converter({ preview: true });
 
 @Component({
+  emits: [
+    'update-contest',
+    'create-contest',
+    'language-remove-blocked',
+    'update-search-result-teams-groups',
+  ],
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,
@@ -1157,30 +1164,57 @@ export default class Form extends Vue {
   @Prop({ default: false }) canSetRecommended!: boolean;
   @Prop({ default: false }) initialRecommended!: boolean;
 
-  alias = this.initialAlias;
-  description = this.initialDescription;
-  feedback = this.initialFeedback;
-  finishTime = this.initialFinishTime;
-  languages = this.initialLanguages;
-  needsBasicInformation = this.initialNeedsBasicInformation;
-  penalty = this.initialPenalty;
-  penaltyType = this.initialPenaltyType;
-  pointsDecayFactor = this.initialPointsDecayFactor;
-  requestsUserInformation = this.initialRequestsUserInformation;
-  scoreboard = this.initialScoreboard;
-  showScoreboardAfter = this.initialShowScoreboardAfter;
-  currentScoreMode = this.scoreMode;
-  startTime = this.initialStartTime;
-  submissionsGap = this.initialSubmissionsGap
-    ? this.initialSubmissionsGap / 60
-    : 1;
-  title = this.initialTitle;
-  windowLength = this.initialWindowLength;
-  windowLengthEnabled = this.initialWindowLength !== null;
-  currentContestForTeams = this.contestForTeams;
-  currentTeamsGroupAlias = this.teamsGroupAlias;
+  alias = '';
+  description = '';
+  feedback = '';
+  finishTime = new Date();
+  languages: string[] = [];
+
+  created() {
+    this.windowLengthEnabled = this.initialWindowLength !== null;
+    this.windowLength = this.initialWindowLength;
+    this.title = this.initialTitle;
+    this.startTime = this.initialStartTime;
+    this.currentScoreMode = this.scoreMode;
+    this.showScoreboardAfter = this.initialShowScoreboardAfter;
+    this.scoreboard = this.initialScoreboard;
+    this.pointsDecayFactor = this.initialPointsDecayFactor;
+    this.penaltyType = this.initialPenaltyType;
+    this.penalty = this.initialPenalty;
+    this.languages = this.initialLanguages;
+    this.finishTime = this.initialFinishTime;
+    this.feedback = this.initialFeedback;
+    this.description = this.initialDescription;
+    this.alias = this.initialAlias;
+  }
+
+  get needsBasicInformation(): boolean {
+    return this.initialNeedsBasicInformation;
+  }
+  penalty = 0;
+  penaltyType = '';
+  pointsDecayFactor = 0;
+  get requestsUserInformation(): string {
+    return this.initialRequestsUserInformation;
+  }
+  scoreboard = 0;
+  showScoreboardAfter = false;
+  currentScoreMode = ScoreMode.Partial;
+  startTime = new Date();
+  submissionsGap = 1;
+  title = '';
+  windowLength: null | number = null;
+  windowLengthEnabled: any = false;
+  get currentContestForTeams(): boolean {
+    return this.contestForTeams;
+  }
+  get currentTeamsGroupAlias(): null | types.ListItem {
+    return this.teamsGroupAlias;
+  }
   titlePlaceHolder = '';
-  recommended = this.initialRecommended;
+  get recommended(): boolean {
+    return this.initialRecommended;
+  }
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;

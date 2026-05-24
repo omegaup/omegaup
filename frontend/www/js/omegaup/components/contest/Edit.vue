@@ -308,7 +308,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -365,13 +366,18 @@ export default class Edit extends Vue {
   T = T;
   ui = ui;
   virtual = ui.isVirtual(this.details);
-  showTab = this.selectedTab();
+  showTab: any;
 
   @Watch('initialTab')
+  created() {
+    this.alreadyArchived = this.details.archived;
+    this.showTab = this.selectedTab();
+  }
+
   onInitialTabChanged(newValue: string) {
     this.showTab = newValue !== '' ? newValue : this.selectedTab();
   }
-  alreadyArchived = this.details.archived;
+  alreadyArchived: any;
 
   selectedTab(): string {
     if (this.initialTab != '') {

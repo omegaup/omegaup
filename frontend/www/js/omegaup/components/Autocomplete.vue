@@ -11,7 +11,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch, Prop, Emit, Ref } from 'vue-facing-decorator';
 
 @Component
 export default class Autocomplete extends Vue {

@@ -55,7 +55,7 @@ Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 describe('FilteredList.vue', () => {
   it('Should handle filtered courses for student', () => {
     const wrapper = shallowMount(course_FilteredList, {
-      propsData: baseFilteredCoursesListProps,
+      props: baseFilteredCoursesListProps,
     });
 
     expect(wrapper.text()).toContain(T.courseListPastCourses);
@@ -64,7 +64,7 @@ describe('FilteredList.vue', () => {
 
   it('Should handle filtered courses for admin', () => {
     const wrapper = shallowMount(course_FilteredList, {
-      propsData: Object.assign({}, baseFilteredCoursesListProps, {
+      props: Object.assign({}, baseFilteredCoursesListProps, {
         showPercentage: false,
       }),
     });

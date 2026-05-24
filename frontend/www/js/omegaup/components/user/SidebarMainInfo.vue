@@ -91,7 +91,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
 import user_Username from './Username.vue';
@@ -129,10 +130,14 @@ export default class UserSidebarMainInfo extends Vue {
 
   T = T;
   urlMapping = urlMapping;
-  currentSelectedTab = this.getSelectedValidTab(
-    this.selectedTab,
-    this.currentUrlMapping,
-  );
+  currentSelectedTab = 'view-profile';
+
+  created() {
+    this.currentSelectedTab = this.getSelectedValidTab(
+      this.selectedTab,
+      this.currentUrlMapping,
+    );
+  }
 
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];

@@ -229,7 +229,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
@@ -285,7 +286,6 @@ export default class BaseList extends Vue {
   T = T;
   ui = ui;
   omegaup = omegaup;
-  showFinderWizard = false;
 
   get solvedProblemAliasesSet(): Set<string> {
     return new Set(this.solvedProblemAliases);

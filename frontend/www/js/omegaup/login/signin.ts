@@ -192,5 +192,5 @@ OmegaUp.on('ready', () => {
     userSignin.initialActiveTab = tab;
     window.location.hash = `#${tab}`;
   };
-  EventBus.$on('update:activeTab', onActiveTab);
+  EventBus.on('update:activeTab', onActiveTab);
 });

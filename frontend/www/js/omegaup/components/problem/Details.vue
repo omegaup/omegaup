@@ -391,7 +391,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Emit, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref, Emit, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -524,12 +525,19 @@ export default class ProblemDetails extends Vue {
   T = T;
   ui = ui;
   time = time;
-  selectedTab = this.activeTab;
-  currentClarifications = this.clarifications;
-  currentPopupDisplayed = this.popupDisplayed;
+  selectedTab: string;
+  currentClarifications: any;
+  currentPopupDisplayed: PopupDisplayed;
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
-  currentRunDetailsData = this.runDetailsData;
+  currentRunDetailsData: types.RunDetails | null;
+
+  created() {
+    this.currentRunDetailsData = this.runDetailsData;
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentClarifications = this.clarifications;
+    this.selectedTab = this.activeTab;
+  }
 
   get availableTabs(): Tab[] {
     const tabs = [

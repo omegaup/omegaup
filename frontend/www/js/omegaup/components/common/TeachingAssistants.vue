@@ -68,7 +68,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
@@ -100,9 +101,13 @@ export default class TeachingAssistants extends Vue {
   T = T;
   username: null | types.ListItem = null;
   selected = {};
-  currentTeachingAssistants = this.teachingAssistants;
+  currentTeachingAssistants: omegaup.UserRole[];
 
   @Watch('teachingAssistants')
+  created() {
+    this.currentTeachingAssistants = this.teachingAssistants;
+  }
+
   onTeachingAssistantsChanged(newValue: omegaup.UserRole[]): void {
     this.currentTeachingAssistants = newValue;
   }

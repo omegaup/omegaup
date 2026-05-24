@@ -118,7 +118,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -166,12 +167,16 @@ export default class ArenaCourse extends Vue {
   T = T;
   ui = ui;
   Tabs = Tabs;
-  currentSelectedTab: string | null = this.selectedTab;
+  currentSelectedTab: string | null;
 
   private get currentAssignmentIndex(): number {
     return this.course.assignments.findIndex(
       (assignment) => assignment.alias === this.assignment.alias,
     );
+  }
+
+  created() {
+    this.currentSelectedTab = this.selectedTab;
   }
 
   get previousAssignment(): types.CourseAssignment | null {

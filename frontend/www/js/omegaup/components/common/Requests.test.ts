@@ -29,36 +29,36 @@ describe('Requests.vue', () => {
     },
   ];
 
-  const propsData = {
+  const props = {
     data,
     textAddParticipant: T.contestAdduserAddContestant,
   };
 
   it('Should handle initial props', () => {
-    const wrapper = shallowMount(common_Requests, { propsData });
+    const wrapper = shallowMount(common_Requests, { props });
 
     expect(wrapper.text()).toContain(T.contestAdduserAddContestant);
   });
 
   it('Should handle deny request event', async () => {
-    const wrapper = shallowMount(common_Requests, { propsData });
+    const wrapper = shallowMount(common_Requests, { props });
 
     const buttons = wrapper.findAll('button.text-danger');
     const feedbackModals = wrapper.findAll('b-modal-stub');
 
     expect('test_user_1' in wrapper.vm.modalStates).toBe(false);
-    await buttons.at(0).trigger('click');
+    await buttons[0].trigger('click');
     expect(wrapper.vm.modalStates['test_user_1']).toBe(true);
 
     expect('test_user_2' in wrapper.vm.modalStates).toBe(false);
-    await buttons.at(1).trigger('click');
+    await buttons[1].trigger('click');
     expect(wrapper.vm.modalStates['test_user_2']).toBe(true);
 
     wrapper.vm.resolutionText = 'Hello';
-    feedbackModals.at(0).vm.$emit('ok');
+    feedbackModals[0].vm.$emit('ok');
 
     wrapper.vm.resolutionText = 'There';
-    feedbackModals.at(1).vm.$emit('ok');
+    feedbackModals[1].vm.$emit('ok');
 
     expect(wrapper.emitted('deny-request')).toBeDefined();
     expect(wrapper.emitted('deny-request')).toEqual([
@@ -68,7 +68,7 @@ describe('Requests.vue', () => {
   });
 
   it('Should handle accept request event', async () => {
-    const wrapper = shallowMount(common_Requests, { propsData });
+    const wrapper = shallowMount(common_Requests, { props });
 
     await wrapper.find('button.text-success').trigger('click');
     expect(wrapper.emitted('accept-request')).toBeDefined();
@@ -79,7 +79,7 @@ describe('Requests.vue', () => {
 
   it('Should handle the whole list of requests', async () => {
     const wrapper = mount(common_Requests, {
-      propsData: {
+      props: {
         data: [
           {
             accepted: false,

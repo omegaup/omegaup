@@ -90,7 +90,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch, Emit } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component
@@ -103,10 +104,19 @@ export default class TeamsGroupFormBase extends Vue {
   @Prop({ default: 1 }) minNumberOfContestants!: number;
 
   T = T;
-  currentAlias: null | string = this.alias;
-  currentDescription: null | string = this.description;
-  currentName: null | string = this.name;
-  currentNumberOfContestants: number = this.numberOfContestants;
+
+  created() {
+    this.currentNumberOfContestants = this.numberOfContestants;
+    this.currentName = this.name;
+    this.currentDescription = this.description;
+  }
+
+  get currentAlias(): null | string {
+    return this.alias;
+  }
+  currentDescription: null | string;
+  currentName: null | string;
+  currentNumberOfContestants: number;
 
   @Watch('currentAlias')
   @Emit('update:alias')

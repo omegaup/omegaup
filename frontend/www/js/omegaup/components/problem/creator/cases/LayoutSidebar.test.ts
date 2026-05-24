@@ -1,7 +1,6 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import LayoutSidebar from './LayoutSidebar.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 import store from '@/js/omegaup/problem/creator/store';
@@ -9,10 +8,6 @@ import {
   generateCase,
   generateGroup,
 } from '@/js/omegaup/problem/creator/modules/cases';
-
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('LayoutSidebar.vue', () => {
   store.commit('casesStore/addNewLayout');
@@ -54,10 +49,7 @@ describe('LayoutSidebar.vue', () => {
     caseID: ungroupedCaseCaseID,
   });
   it('Should show layouts and methods', async () => {
-    const wrapper = mount(LayoutSidebar, {
-      localVue,
-      store,
-    });
+    const wrapper = mount(LayoutSidebar, { global: { plugins: [store] } });
 
     expect(wrapper.vm.getAllLayouts.length).toBe(1);
     expect(
@@ -159,9 +151,7 @@ describe('LayoutSidebar.vue', () => {
 
     store.commit('casesStore/addLayoutFromSelectedCase');
     await Vue.nextTick();
-    const layoutDropdownNew = wrapper
-      .findAll('div[data-layout-dropdown]')
-      .at(1);
+    const layoutDropdownNew = wrapper.findAll('div[data-layout-dropdown]')[1];
     expect(layoutDropdownNew.text()).toContain(
       newUngroupedCasegroup.name + '_' + newUngroupedCase.name,
     );
@@ -170,10 +160,7 @@ describe('LayoutSidebar.vue', () => {
   it('Should rename layouts', async () => {
     store.commit('casesStore/resetStore');
     store.commit('casesStore/addNewLayout');
-    const wrapper = mount(LayoutSidebar, {
-      localVue,
-      store,
-    });
+    const wrapper = mount(LayoutSidebar, { global: { plugins: [store] } });
 
     expect(wrapper.vm.getAllLayouts.length).toBe(1);
     expect(

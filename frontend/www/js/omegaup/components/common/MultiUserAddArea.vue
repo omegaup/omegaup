@@ -46,7 +46,8 @@ const debounce = (fn: (event: Event) => void, waitTime: number) => {
 };
 
 const WAIT_TIME = 1000;
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component({})
@@ -58,9 +59,13 @@ export default class MultiUserAddArea extends Vue {
   bulkContestants: string | null = null;
 
   // if the users prop is not empty, we need to keep track of those users in the usersList
-  usersList: string[] = this.users || [];
+  usersList: string[] = [];
+  onBulkContestantsChanged: ((event: Event) => void) | null = null;
 
-  onBulkContestantsChanged = debounce(this.onTextAreaChange, WAIT_TIME);
+  created() {
+    this.usersList = this.users || [];
+    this.onBulkContestantsChanged = debounce(this.onTextAreaChange, WAIT_TIME);
+  }
 
   onTextAreaChange(event: Event) {
     const target = event.target as HTMLTextAreaElement;

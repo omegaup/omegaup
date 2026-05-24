@@ -104,7 +104,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -164,10 +165,15 @@ export default class Profile extends Vue {
 
   T = T;
   ui = ui;
-  currentSelectedTab = this.selectedTab;
-  currentViewProfileSelectedTab = this.viewProfileSelectedTab;
+  currentSelectedTab: string;
+  currentViewProfileSelectedTab: string | null;
 
   @Watch('viewProfileSelectedTab')
+  created() {
+    this.currentViewProfileSelectedTab = this.viewProfileSelectedTab;
+    this.currentSelectedTab = this.selectedTab;
+  }
+
   onViewProfileSelectedTabChanged(newValue: string | null) {
     this.currentViewProfileSelectedTab = newValue;
   }

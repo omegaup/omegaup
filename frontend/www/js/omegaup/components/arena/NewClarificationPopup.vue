@@ -73,7 +73,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
@@ -91,8 +92,13 @@ export default class ArenaNewClarificationPopup extends Vue {
 
   T = T;
   message: null | string = null;
-  currentProblemAlias = this.problemAlias;
-  currentUsername = this.username;
+  currentProblemAlias: null | string;
+  currentUsername: null | string;
+
+  created() {
+    this.currentUsername = this.username;
+    this.currentProblemAlias = this.problemAlias;
+  }
 
   get filteredUsers(): { username: string; name: string }[] {
     return this.users.map((user) => {

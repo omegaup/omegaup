@@ -323,7 +323,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Component, Prop, Emit } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { types, messages } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
@@ -370,6 +371,13 @@ const MAX_LENGTH = {
 const DANGER_THRESHOLD_PERCENTAGE = 0.9;
 
 @Component({
+  emits: [
+    'submit',
+    'cancel',
+    'update-search-result-schools',
+    'invalid-languages',
+    'clear-language-error',
+  ],
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datepicker': DatePicker,
@@ -390,23 +398,40 @@ export default class CourseDetails extends Vue {
   @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
-  alias = this.course.alias;
-  description = this.course.description;
-  finishTime = this.course.finish_time || new Date();
-  showScoreboard = this.course.show_scoreboard;
-  startTime = this.course.start_time;
-  name = this.course.name;
-  level = this.course.level ?? '';
-  objective = this.course.objective;
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
-  needsBasicInformation = this.course.needs_basic_information;
-  requestsUserInformation = this.course.requests_user_information;
-  unlimitedDuration = this.course.finish_time === null;
-  selectedLanguages = this.course.languages;
+  alias = '';
+  description = '';
+  finishTime = new Date();
+  showScoreboard = false;
+  startTime = new Date();
+  name = '';
+  level = '';
+  objective = '';
+  school: null | types.SchoolListItem = null;
+  needsBasicInformation = false;
+  requestsUserInformation = '';
+  unlimitedDuration = false;
+  selectedLanguages: any = [];
   levelOptions = levelOptions;
   MAX_LENGTH = MAX_LENGTH;
 
   // Computed properties to track if required fields are complete
+
+  created() {
+    this.school = this.searchResultSchools[0] ?? null;
+    this.selectedLanguages = this.course.languages;
+    this.unlimitedDuration = this.course.finish_time === null;
+    this.requestsUserInformation = this.course.requests_user_information;
+    this.needsBasicInformation = this.course.needs_basic_information;
+    this.objective = this.course.objective;
+    this.level = this.course.level ?? '';
+    this.name = this.course.name;
+    this.startTime = this.course.start_time;
+    this.showScoreboard = this.course.show_scoreboard;
+    this.finishTime = this.course.finish_time || new Date();
+    this.description = this.course.description;
+    this.alias = this.course.alias;
+  }
+
   get isNameComplete(): boolean {
     return this.name !== null && this.name.trim().length > 0;
   }

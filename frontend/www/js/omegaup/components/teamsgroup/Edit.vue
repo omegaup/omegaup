@@ -118,7 +118,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import teamsgroup_FormUpdate from './FormUpdate.vue';
 import teamsgroup_Upload from './Upload.vue';
 import teamsgroup_Teams from './Teams.vue';
@@ -157,10 +158,15 @@ export default class TeamsGroupEdit extends Vue {
   T = T;
   ui = ui;
   AvailableTabs = AvailableTabs;
-  selectedTab: AvailableTabs = this.tab;
-  currentTeamsIdentities = this.teamsIdentities;
+  selectedTab: AvailableTabs;
+  currentTeamsIdentities: any;
 
   @Watch('tab')
+  created() {
+    this.selectedTab = this.tab;
+    this.currentTeamsIdentities = this.teamsIdentities;
+  }
+
   onTabChanged(newValue: AvailableTabs): void {
     if (!Object.values(AvailableTabs).includes(newValue)) {
       this.selectedTab = AvailableTabs.Teams;

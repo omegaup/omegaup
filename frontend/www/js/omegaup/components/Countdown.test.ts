@@ -23,7 +23,7 @@ describe('Countdown.vue', () => {
 
   it('Should handle a countdown with 5 seconds left to finish', async () => {
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now + 10000),
       },
     });
@@ -38,7 +38,7 @@ describe('Countdown.vue', () => {
   it('Should handle countdown in mode ContestHasNotStarted', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now + 1000 * seconds),
         countdownFormat: omegaup.CountdownFormat.ContestHasNotStarted,
       },
@@ -51,7 +51,7 @@ describe('Countdown.vue', () => {
   it('Should handle countdown in mode ContestHasNotStarted when contest has started', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now - 1000 * seconds),
         countdownFormat: omegaup.CountdownFormat.ContestHasNotStarted,
       },
@@ -62,7 +62,7 @@ describe('Countdown.vue', () => {
   it('Should handle countdown in mode AssignmentHasNotStarted', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now + 1000 * seconds),
         countdownFormat: omegaup.CountdownFormat.AssignmentHasNotStarted,
       },
@@ -75,7 +75,7 @@ describe('Countdown.vue', () => {
   it('Should handle countdown in mode AssignmentHasNotStarted when assignment has started', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now - 1000 * seconds),
         countdownFormat: omegaup.CountdownFormat.AssignmentHasNotStarted,
       },
@@ -88,7 +88,7 @@ describe('Countdown.vue', () => {
   it('Should handle countdown in mode WaitBetweenUploadsSeconds', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now + 1000 * seconds),
         countdownFormat: omegaup.CountdownFormat.WaitBetweenUploadsSeconds,
       },
@@ -102,7 +102,7 @@ describe('Countdown.vue', () => {
 
   it('Should emit finish method', async () => {
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now + 1000),
       },
     });
@@ -117,13 +117,13 @@ describe('Countdown.vue', () => {
   it('Should clear interval when component is destroyed before countdown finishes', () => {
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now + 60000),
       },
     });
 
     expect((wrapper.vm as any).timerInterval).not.toBe(0);
-    wrapper.destroy();
+    wrapper.unmount();
     expect(clearIntervalSpy).toHaveBeenCalled();
     expect((wrapper.vm as any).timerInterval).toBe(0);
     clearIntervalSpy.mockRestore();
@@ -132,14 +132,14 @@ describe('Countdown.vue', () => {
   it('Should handle destroy gracefully when countdown has already finished', () => {
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     const wrapper = shallowMount(omegaup_Countdown, {
-      propsData: {
+      props: {
         targetTime: new Date(now - 5000),
       },
     });
 
     // With fake timers, the watcher hasn't fired yet, so the interval
     // is still active. beforeDestroy should clean it up.
-    wrapper.destroy();
+    wrapper.unmount();
     expect(clearIntervalSpy).toHaveBeenCalled();
     expect((wrapper.vm as any).timerInterval).toBe(0);
     clearIntervalSpy.mockRestore();

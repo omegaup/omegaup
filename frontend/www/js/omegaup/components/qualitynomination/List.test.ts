@@ -31,7 +31,7 @@ const nominations: types.NominationListItem[] = [1, 2, 3].map((x) => ({
 describe('List.vue', () => {
   it('Should handle list of nominations', async () => {
     const wrapper = shallowMount(qualitynomination_List, {
-      propsData: {
+      props: {
         nominations: [
           {
             author: {
@@ -79,7 +79,7 @@ describe('List.vue', () => {
 
   it('Should handle my list of nominations', async () => {
     const wrapper = shallowMount(qualitynomination_List, {
-      propsData: {
+      props: {
         nominations: [
           {
             author: {
@@ -126,7 +126,7 @@ describe('List.vue', () => {
   describe('Sort controls', () => {
     it('Should sort by problem title by default', async () => {
       const wrapper = shallowMount(qualitynomination_List, {
-        propsData: {
+        props: {
           nominations,
           pagerItems: [
             {
@@ -147,7 +147,7 @@ describe('List.vue', () => {
 
     it('Should sort by problem title in descending order', async () => {
       const wrapper = mount(qualitynomination_List, {
-        propsData: {
+        props: {
           nominations,
           pagerItems: [
             {
@@ -180,7 +180,7 @@ describe('List.vue', () => {
 
     it('Should sort by time', async () => {
       const wrapper = mount(qualitynomination_List, {
-        propsData: {
+        props: {
           nominations,
           pagerItems: [
             {

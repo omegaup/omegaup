@@ -7,7 +7,7 @@ import problem_Mine from './Mine.vue';
 describe('Mine.vue', () => {
   it('Should handle empty list of problems', async () => {
     const wrapper = shallowMount(problem_Mine, {
-      propsData: {
+      props: {
         isSysadmin: false,
         problems: [],
         pagerItems: [

@@ -32,7 +32,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component } from 'vue-facing-decorator';
 import creator_Header from './Header.vue';
 import creator_Tabs from './Tabs.vue';
 import T from '../../../lang';

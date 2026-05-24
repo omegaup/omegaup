@@ -27,7 +27,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
@@ -44,9 +45,13 @@ export default class FilterAuthors extends Vue {
   @Prop({ default: () => [] }) selectedAuthors!: string[];
 
   T = T;
-  currentSelectedAuthors = this.selectedAuthors;
+  currentSelectedAuthors: any;
 
   @Watch('currentSelectedAuthors')
+  created() {
+    this.currentSelectedAuthors = this.selectedAuthors;
+  }
+
   onNewAuthorSelected(): void {
     this.$emit('new-selected-author', this.currentSelectedAuthors);
   }

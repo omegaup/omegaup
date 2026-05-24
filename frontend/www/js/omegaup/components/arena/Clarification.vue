@@ -108,7 +108,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -123,7 +124,9 @@ export default class ArenaClarification extends Vue {
   T = T;
   time = time;
 
-  isPublic = this.clarification.public;
+  get isPublic(): any {
+    return this.clarification.public;
+  }
   message = '';
   selectedResponse = 'yes';
   showUpdateAnswer = false;

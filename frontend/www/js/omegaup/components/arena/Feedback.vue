@@ -58,7 +58,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref } from 'vue-facing-decorator';
 import T from '../../lang';
 import * as time from '../../time';
 import user_Username from '../user/Username.vue';
@@ -95,8 +96,15 @@ export default class Feedback extends Vue {
   FeedbackStatus = FeedbackStatus;
   T = T;
   time = time;
-  saved: boolean = this.feedback.status == FeedbackStatus.Saved;
-  currentFeedback = this.feedback;
+  saved: boolean;
+
+  created() {
+    this.saved = this.feedback.status == FeedbackStatus.Saved;
+  }
+
+  get currentFeedback(): ArenaCourseFeedback {
+    return this.feedback;
+  }
 
   get currentFeedbackTimestamp(): string {
     return time.formatDateTimeLocal(this.feedback.timestamp ?? new Date());

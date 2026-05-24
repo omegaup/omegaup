@@ -119,7 +119,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -160,9 +161,13 @@ export default class ArenaClarificationList extends Vue {
   T = T;
   ui = ui;
   PopupDisplayed = PopupDisplayed;
-  currentPopupDisplayed = this.popupDisplayed;
+  currentPopupDisplayed: PopupDisplayed;
   selectedAssignment: string | null = null;
   selectedProblem: string | null = null;
+
+  created() {
+    this.currentPopupDisplayed = this.popupDisplayed;
+  }
 
   onNewClarification(): void {
     this.currentPopupDisplayed = PopupDisplayed.NewClarification;

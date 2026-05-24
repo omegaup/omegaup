@@ -15,7 +15,8 @@
 
 <script lang="ts">
 import teamsgroup_FormBase from './FormBase.vue';
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 
 @Component({
@@ -31,8 +32,14 @@ export default class TeamsGroupForm extends Vue {
   @Prop({ default: 10 }) maxNumberOfContestants!: number;
 
   T = T;
-  currentDescription: null | string = this.description;
-  currentName: null | string = this.name;
-  currentNumberOfContestants: number = this.numberOfContestants;
+  get currentDescription(): null | string {
+    return this.description;
+  }
+  get currentName(): null | string {
+    return this.name;
+  }
+  get currentNumberOfContestants(): number {
+    return this.numberOfContestants;
+  }
 }
 </script>

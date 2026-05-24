@@ -190,13 +190,13 @@ describe('ContestList.vue', () => {
 
   it('Should show the current contest list', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
     });
 
-    const currentContestTab = wrapper.findAll('.section-container').at(0);
+    const currentContestTab = wrapper.findAll('.section-container')[0];
 
     expect(currentContestTab.exists()).toBe(true);
     expect(currentContestTab.text()).toContain('Current Contest 1');
@@ -204,13 +204,13 @@ describe('ContestList.vue', () => {
 
   it('Should show the future contest list', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Future,
       },
     });
 
-    const futureContestTab = wrapper.findAll('.section-container').at(1);
+    const futureContestTab = wrapper.findAll('.section-container')[1];
 
     expect(futureContestTab.exists()).toBe(true);
     expect(futureContestTab.text()).toContain('Future Contest 1');
@@ -218,13 +218,13 @@ describe('ContestList.vue', () => {
 
   it('Should show the past contest list', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Past,
       },
     });
 
-    const pastContestTab = wrapper.findAll('.section-container').at(2);
+    const pastContestTab = wrapper.findAll('.section-container')[2];
 
     expect(pastContestTab.exists()).toBe(true);
     expect(pastContestTab.text()).toContain('Past Contest 1');
@@ -232,33 +232,33 @@ describe('ContestList.vue', () => {
 
   it('Should not render Virtual/Practice in Current contests', () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
     });
 
-    const currentContestTab = wrapper.findAll('.section-container').at(0);
+    const currentContestTab = wrapper.findAll('.section-container')[0];
     expect(currentContestTab.text()).not.toContain(T.contestVirtualMode);
     expect(currentContestTab.text()).not.toContain(T.contestPracticeMode);
   });
 
   it('Should not render Virtual/Practice in Future contests', () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Future,
       },
     });
 
-    const futureContestTab = wrapper.findAll('.section-container').at(1);
+    const futureContestTab = wrapper.findAll('.section-container')[1];
     expect(futureContestTab.text()).not.toContain(T.contestVirtualMode);
     expect(futureContestTab.text()).not.toContain(T.contestPracticeMode);
   });
 
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
@@ -289,7 +289,7 @@ describe('ContestList.vue', () => {
     'Should show dropdown when "%s" field is selected',
     async (value) => {
       const wrapper = mount(arena_ContestList, {
-        propsData: {
+        props: {
           contests,
         },
       });
@@ -354,7 +354,7 @@ describe('ContestList.vue', () => {
     ({ field, name }) => {
       each(tabMapping).it('When selected tab equal to %s', async ({ tab }) => {
         const wrapper = mount(arena_ContestList, {
-          propsData: {
+          props: {
             contests,
             tab,
           },

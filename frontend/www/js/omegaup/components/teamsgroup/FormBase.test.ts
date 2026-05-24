@@ -13,11 +13,11 @@ describe('FormBase.vue', () => {
   afterAll(() => {
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
-      document.removeChild(rootDiv);
+      document.body.removeChild(rootDiv);
     }
   });
 
-  const propsData = {
+  const props = {
     alias: 'Hello',
     name: 'Hello omegaUp',
     description: 'Hello omegaUp Description',
@@ -26,7 +26,7 @@ describe('FormBase.vue', () => {
   it('Should handle form base', async () => {
     const wrapper = shallowMount(teamsgroup_FormBase, {
       attachTo: '#root',
-      propsData,
+      props,
     });
 
     expect(wrapper.find('div[class="card"]').text()).not.toContain(
@@ -44,6 +44,6 @@ describe('FormBase.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

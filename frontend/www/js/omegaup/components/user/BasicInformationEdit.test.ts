@@ -63,14 +63,14 @@ const basicInformationEditProps: {
 describe('BasicInformationEdit.vue', () => {
   it('Should disable states select when no country is selected', () => {
     const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
+      props: basicInformationEditProps,
     });
     expect(wrapper.find('select[data-states]').element).toBeDisabled();
   });
 
   it('Should enable states select when country is selected', async () => {
     const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
+      props: basicInformationEditProps,
     });
     await wrapper
       .find('select[data-countries]')
@@ -81,7 +81,7 @@ describe('BasicInformationEdit.vue', () => {
 
   it('Should emit user update basic information', async () => {
     const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
+      props: basicInformationEditProps,
     });
 
     await wrapper.find('input[data-username]').setValue('omegaup_modified');
@@ -118,7 +118,7 @@ describe('BasicInformationEdit.vue', () => {
 
   it('Should show message error when a long name is given', async () => {
     const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
+      props: basicInformationEditProps,
     });
 
     await wrapper
@@ -143,7 +143,7 @@ describe('BasicInformationEdit.vue', () => {
 
   it('Should show error when username is invalid', async () => {
     const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
+      props: basicInformationEditProps,
     });
 
     // Test invalid characters

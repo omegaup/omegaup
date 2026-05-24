@@ -7,7 +7,7 @@ describe('List.vue', () => {
   it('Should display badges link', () => {
     const badgeAlias = 'contestManager';
     const wrapper = shallowMount(badge_List, {
-      propsData: {
+      props: {
         showAllBadgesLink: true,
         allBadges: new Set([badgeAlias]) as Set<string>,
         visitorBadges: new Set([badgeAlias]) as Set<string>,

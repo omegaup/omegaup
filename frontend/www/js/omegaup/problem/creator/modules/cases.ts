@@ -20,7 +20,6 @@ import {
 import T from '../../../lang';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
-import Vue from 'vue';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;
@@ -186,10 +185,10 @@ export const casesStore: Module<CasesState, RootState> = {
             groupTarget.points = editedCase.points;
             groupTarget.autoPoints = editedCase.autoPoints;
           }
-          Vue.set(groupTarget.cases, caseIndex, {
+          groupTarget.cases[caseIndex] = {
             ...caseTarget,
             ...editedCase,
-          });
+          };
         }
       }
       state = assignMissingPoints(state);

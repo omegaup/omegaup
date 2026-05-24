@@ -16,7 +16,7 @@ interface Mine {
 }
 
 describe('Mine.vue', () => {
-  const propsData = {
+  const props = {
     certificates: [
       {
         certificate_type: 'contest',
@@ -48,7 +48,7 @@ describe('Mine.vue', () => {
 
   it('Should handle an empty table', () => {
     const wrapper = shallowMount(certificate_Mine, {
-      propsData: {
+      props: {
         certificates: [] as types.CertificateListItem[],
       },
     });
@@ -60,7 +60,7 @@ describe('Mine.vue', () => {
 
   it('Should handle a table with data', () => {
     const wrapper = mount(certificate_Mine, {
-      propsData,
+      props,
     });
 
     expect(wrapper.text()).toContain(T.certificateListMineTitle);
@@ -90,13 +90,11 @@ describe('Mine.vue', () => {
     );
 
     shallowMount(certificate_Mine, {
-      propsData,
+      props,
     });
 
-    expect(defineSpy).toHaveBeenCalledTimes(
-      propsData['certificates'].length * 2,
-    );
-    propsData['certificates'].forEach((certificate) => {
+    expect(defineSpy).toHaveBeenCalledTimes(props['certificates'].length * 2);
+    props['certificates'].forEach((certificate) => {
       expect(defineSpy).toHaveBeenCalledWith(certificate.verification_code);
     });
 
@@ -110,15 +108,15 @@ describe('Mine.vue', () => {
     );
 
     const wrapper = mount(certificate_Mine, {
-      propsData,
+      props,
     });
 
     await wrapper.findAll('a[download-file]').trigger('click');
 
     await wrapper.vm.$nextTick();
 
-    expect(clickSpy).toHaveBeenCalledTimes(propsData['certificates'].length);
-    propsData['certificates'].forEach((certificate) => {
+    expect(clickSpy).toHaveBeenCalledTimes(props['certificates'].length);
+    props['certificates'].forEach((certificate) => {
       expect(clickSpy).toHaveBeenCalledWith(certificate.verification_code);
     });
 

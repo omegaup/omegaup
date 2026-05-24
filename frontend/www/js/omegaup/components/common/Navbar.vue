@@ -361,7 +361,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -375,13 +376,14 @@ import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
 import { AvailableTabs } from '../login/Signin.vue';
 
+import mitt from 'mitt';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import LogoutConfirmation from './LogoutConfirmation.vue';
 library.add(faSignOutAlt, faUser);
 
-export const EventBus = new Vue();
+export const EventBus = mitt();
 
 @Component({
   components: {
@@ -431,9 +433,12 @@ export default class Navbar extends Vue {
   logoutModalVisible = false;
   scrollY: number = 0;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
-  hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
-    this.userTypes.includes(teachingType),
-  );
+
+  get hasTeachingObjective(): boolean {
+    return this.teachingUserTypes.some((teachingType) =>
+      this.userTypes?.includes(teachingType),
+    );
+  }
 
   get formattedLoginURL(): string {
     let path = window.location.pathname;
@@ -483,7 +488,7 @@ export default class Navbar extends Vue {
   }
 
   emitActiveTab(tab: AvailableTabs): void {
-    EventBus.$emit('update:activeTab', tab);
+    EventBus.emit('update:activeTab', tab);
     if (
       window.location.pathname === '/login' ||
       window.location.pathname === '/login/'

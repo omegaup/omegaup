@@ -36,16 +36,14 @@ describe('Signup.vue', () => {
   });
 
   // Shared factory for mounting the component
-  function createWrapper(
-    propsData: Record<string, unknown> = {},
-  ): Wrapper<Vue> {
+  function createWrapper(props: Record<string, unknown> = {}): Wrapper<Vue> {
     return shallowMount(login_Signup, {
-      propsData: {
+      props: {
         validateRecaptcha: false,
         hasVisitedSection: true, // suppress intro by default
         useSignupFormWithBirthDate: false,
         activeTab: 'login',
-        ...propsData,
+        ...props,
       },
       stubs: {
         'vue-recaptcha': {
@@ -431,17 +429,17 @@ describe('Signup.vue', () => {
     let introWrapper: Wrapper<Vue> | null = null;
 
     function createMountedWrapper(
-      propsData: Record<string, unknown> = {},
+      props: Record<string, unknown> = {},
     ): Wrapper<Vue> {
       const container = document.createElement('div');
       document.body.appendChild(container);
       introWrapper = mount(login_Signup, {
-        propsData: {
+        props: {
           validateRecaptcha: false,
           hasVisitedSection: true,
           useSignupFormWithBirthDate: false,
           activeTab: 'login',
-          ...propsData,
+          ...props,
         },
         stubs: {
           'vue-recaptcha': {
@@ -462,7 +460,7 @@ describe('Signup.vue', () => {
 
     afterEach(() => {
       if (introWrapper) {
-        introWrapper.destroy();
+        introWrapper.unmount();
         introWrapper = null;
       }
     });

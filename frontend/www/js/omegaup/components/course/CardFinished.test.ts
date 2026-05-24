@@ -11,7 +11,7 @@ describe('CardFinished.vue', () => {
 
   it('Should render information for finished course', () => {
     const wrapper = mount(course_CardFinished, {
-      propsData: {
+      props: {
         course: finishedCourse,
       },
     });

@@ -18,7 +18,7 @@ describe('CardPublic.vue', () => {
 
   it('Should render information for public course', () => {
     const wrapper = shallowMount(course_CardPublic, {
-      propsData: {
+      props: {
         course: publicCourse,
       },
     });
@@ -35,7 +35,7 @@ describe('CardPublic.vue', () => {
 
   it('Should click on the course name even when a user is not logged in', async () => {
     const wrapper = shallowMount(course_CardPublic, {
-      propsData: {
+      props: {
         course: publicCourse,
       },
     });

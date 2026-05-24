@@ -296,7 +296,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as ui from '../../ui';

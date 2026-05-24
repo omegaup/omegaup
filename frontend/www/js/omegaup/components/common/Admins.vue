@@ -81,7 +81,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';

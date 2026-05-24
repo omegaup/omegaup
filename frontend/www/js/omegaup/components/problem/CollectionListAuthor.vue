@@ -101,7 +101,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import problem_FilterAuthors from './FilterAuthors.vue';
 import problem_BaseList from './BaseList.vue';
@@ -140,7 +141,9 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) selectedAuthors!: string;
 
   T = T;
-  authors = this.data.authorsRanking;
+  get authors(): any {
+    return this.data.authorsRanking;
+  }
 }
 </script>
 

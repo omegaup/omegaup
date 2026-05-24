@@ -136,7 +136,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { ObjectivesAnswers } from './ObjectivesQuestions.vue';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -163,16 +164,34 @@ export default class UserPreferencesEdit extends Vue {
   show: boolean = false;
   T = T;
   ObjectivesAnswers = ObjectivesAnswers;
-  email = this.profile.email;
-  locale = this.profile.locale;
-  preferredLanguage = this.profile.preferred_language;
-  programmingLanguages = this.profile.programming_languages;
-  isPrivate = this.profile.is_private;
-  hideProblemTags = this.profile.hide_problem_tags;
-  hasCompetitiveObjective = this.profile.has_competitive_objective ?? false;
-  hasLearningObjective = this.profile.has_learning_objective ?? true;
-  hasScholarObjective = this.profile.has_scholar_objective ?? true;
-  hasTeachingObjective = this.profile.has_teaching_objective ?? false;
+
+  created() {
+    this.hasTeachingObjective = this.profile.has_teaching_objective ?? false;
+    this.hasScholarObjective = this.profile.has_scholar_objective ?? true;
+    this.hasLearningObjective = this.profile.has_learning_objective ?? true;
+    this.hasCompetitiveObjective =
+      this.profile.has_competitive_objective ?? false;
+    this.isPrivate = this.profile.is_private;
+    this.preferredLanguage = this.profile.preferred_language;
+    this.locale = this.profile.locale;
+  }
+
+  get email(): any {
+    return this.profile.email;
+  }
+  locale: any;
+  preferredLanguage: any;
+  get programmingLanguages(): any {
+    return this.profile.programming_languages;
+  }
+  isPrivate: any;
+  get hideProblemTags(): any {
+    return this.profile.hide_problem_tags;
+  }
+  hasCompetitiveObjective: any;
+  hasLearningObjective: any;
+  hasScholarObjective: any;
+  hasTeachingObjective: any;
 
   get scholarCompetitiveObjectiveQuestion(): string {
     if (this.hasLearningObjective && this.hasTeachingObjective) {

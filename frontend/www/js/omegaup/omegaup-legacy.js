@@ -1,3 +1,4 @@
+import './compat';
 import { Experiments, EventListenerList, OmegaUp } from './omegaup.ts';
 import * as API from './api';
 import * as Markdown from './markdown';

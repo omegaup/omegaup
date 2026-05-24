@@ -311,7 +311,8 @@
 
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
@@ -388,29 +389,36 @@ export default class ViewProfile extends Vue {
     };
     tags: Array<{ name: string; count: number }>;
   } | null;
-  contests = Object.values(
-    this.data?.contests ?? ({} as types.UserProfileContests),
-  )
-    .map((contest) => {
-      const now = new Date();
-      if (contest.place === null || now <= contest.data.finish_time) {
-        return null;
-      }
-      return new ContestResult(contest);
-    })
-    .filter((contest) => Boolean(contest));
-  charts: types.UserProfileStats[] = this.data?.stats ?? [];
+  created() {
+    this.currentReadme = this.profile.readme ?? null;
+    this.contests = Object.values(
+      this.data?.contests ?? ({} as types.UserProfileContests),
+    )
+      .map((contest) => {
+        const now = new Date();
+        if (contest.place === null || now <= contest.data.finish_time) {
+          return null;
+        }
+        return new ContestResult(contest);
+      })
+      .filter((contest) => Boolean(contest));
+  }
+
+  get charts(): types.UserProfileStats[] {
+    return this.data?.stats ?? [];
+  }
   ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
   columns = 3;
-  currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
+  currentSelectedTab = ViewProfileTabs.Badges;
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null = this.profile.readme ?? null;
+  currentReadme: string | null = null;
   isEditingReadme = false;
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
+  contests: Contest[] = [];
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];

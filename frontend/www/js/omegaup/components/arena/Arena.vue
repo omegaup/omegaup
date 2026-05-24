@@ -66,7 +66,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Emit, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { Tab } from '../problem/Details.vue';
@@ -81,8 +82,12 @@ export default class Arena extends Vue {
   @Prop() backgroundClass!: string;
 
   T = T;
-  selectedTab = this.activeTab;
+  selectedTab: string;
   clarificationsHaveBeenRead = false;
+
+  created() {
+    this.selectedTab = this.activeTab;
+  }
 
   get unreadClarifications() {
     return (

@@ -108,22 +108,23 @@
                   :icon="['fas', 'search']"
                 ></font-awesome-icon>
               </template>
-              <template #button>
+              <!-- FIXME: The Finder Wizard is deprecated in Vue 3. A replacement is needed -->
+              <!-- <template #button>
                 <button
                   class="btn btn-primary"
                   @click="showFinderWizard = true"
                 >
                   {{ T.wordsSearch }}
                 </button>
-              </template>
+              </template> -->
             </omegaup-problem-collection>
-            <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-            <omegaup-problem-finder-wizard
+            <!-- FIXME: The Finder Wizard is deprecated in Vue 3. A replacement is needed -->
+            <!-- <omegaup-problem-finder-wizard
               v-show="showFinderWizard"
               :possible-tags="allTags"
               @close="showFinderWizard = false"
               @search-problems="$emit('search-problems', $event)"
-            ></omegaup-problem-finder-wizard>
+            ></omegaup-problem-finder-wizard> -->
           </div>
         </div>
       </div>
@@ -132,7 +133,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -192,7 +194,8 @@ export default class Collection extends Vue {
   @Prop() allTags!: types.Tag[];
   T = T;
   ui = ui;
-  showFinderWizard = false;
+  // FIXME: The Finder Wizard is deprecated in Vue 3. A replacement is needed
+  // showFinderWizard = false;
 
   getProblemLevelIcon(problemLevel: string): string {
     if (Object.prototype.hasOwnProperty.call(problemLevelIcons, problemLevel))

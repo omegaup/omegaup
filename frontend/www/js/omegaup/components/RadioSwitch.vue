@@ -3,26 +3,26 @@
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
-          v-model="radioValue"
+          :checked="currentValue === valueForTrue"
           :disabled="readonly"
           class="form-check-input"
           type="radio"
           :name="name"
           :value="valueForTrue"
-          @change.prevent="onUpdateInput"
+          @change="onChange(valueForTrue)"
         />{{ textForTrue }}
       </label>
     </div>
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
-          v-model="radioValue"
+          :checked="currentValue === valueForFalse"
           :disabled="readonly"
           class="form-check-input"
           type="radio"
           :name="name"
           :value="valueForFalse"
-          @change.prevent="onUpdateInput"
+          @change="onChange(valueForFalse)"
         />{{ textForFalse }}
       </label>
     </div>
@@ -30,7 +30,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../lang';
 
 @Component
@@ -43,12 +44,12 @@ export default class RadioSwitch extends Vue {
   @Prop({ default: T.wordsYes }) textForTrue!: string;
   @Prop({ default: T.wordsNo }) textForFalse!: string;
 
-  radioValue = this.selectedValue ?? this.valueForFalse;
+  get currentValue(): any {
+    return this.selectedValue ?? this.valueForFalse;
+  }
 
-  @Watch('radioValue')
-  @Emit('update:value')
-  onUpdateInput(newValue: any): any {
-    return newValue;
+  onChange(newValue: any): void {
+    this.$emit('update:value', newValue);
   }
 }
 </script>

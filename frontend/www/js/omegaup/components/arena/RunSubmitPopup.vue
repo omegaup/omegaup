@@ -77,7 +77,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -106,9 +107,13 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   T = T;
   omegaup = omegaup;
-  selectedLanguage: null | string = this.preferredLanguage;
+  selectedLanguage: null | string;
   code = '';
   now: number = Date.now();
+
+  created() {
+    this.selectedLanguage = this.preferredLanguage;
+  }
 
   getLanguageExtension(language: string): string {
     if (!language || language === 'cat') {

@@ -27,7 +27,7 @@ const baseProblemTagsPropsData = {
 describe('Tags.vue', () => {
   it('Should handle problem tags form when problem is created', () => {
     const wrapper = mount(problem_Tags, {
-      propsData: baseProblemTagsPropsData,
+      props: baseProblemTagsPropsData,
     });
 
     expect(wrapper.text()).not.toContain(T.updateProblemLevel);
@@ -35,7 +35,7 @@ describe('Tags.vue', () => {
 
   it('Should handle problem tags form when problem is edited', () => {
     const wrapper = mount(problem_Tags, {
-      propsData: Object.assign({}, baseProblemTagsPropsData, {
+      props: Object.assign({}, baseProblemTagsPropsData, {
         isCreate: false,
       }),
     });

@@ -119,7 +119,7 @@
 
 <script lang="ts">
 // TODO: use mapGetters, mapMutations and mapActions to get auto complete
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-facing-decorator';
 import RadioSwitch from '../components/RadioSwitch.vue';
 import store from './GraderStore';
 import * as Util from './util';

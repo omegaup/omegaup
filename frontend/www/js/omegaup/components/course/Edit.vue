@@ -320,7 +320,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch, Ref } from 'vue-facing-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import common_Archive from '../common/Archive.vue';
@@ -400,12 +401,21 @@ export default class CourseEdit extends Vue {
   @Prop() readOnly!: boolean;
 
   T = T;
-  showTab = this.initialTab;
+  showTab: string;
   admissionMode = AdmissionMode.Private;
-  alreadyArchived = this.data.course.archived;
+  alreadyArchived: any;
 
-  assignmentProblems = this.data.assignmentProblems;
-  assignments = this.data.course.assignments;
+  assignmentProblems: any;
+
+  created() {
+    this.assignmentProblems = this.data.assignmentProblems;
+    this.alreadyArchived = this.data.course.archived;
+    this.showTab = this.initialTab;
+  }
+
+  get assignments(): any {
+    return this.data.course.assignments;
+  }
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
   assignment = emptyAssignment;

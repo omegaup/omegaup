@@ -129,7 +129,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -179,7 +180,9 @@ export default class CourseTabs extends Vue {
   ui = ui;
   Tab = Tab;
   Level = Level;
-  currentSelectedTab = this.selectedTab;
+  get currentSelectedTab(): Tab {
+    return this.selectedTab;
+  }
   searchText = '';
   levelFilter = Level.All;
 

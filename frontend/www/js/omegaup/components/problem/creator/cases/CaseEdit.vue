@@ -469,10 +469,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref } from 'vue-property-decorator';
+import { Component, Ref } from 'vue-facing-decorator';
+import Vue from 'vue';
 import T from '../../../../lang';
 import problemCreator_Cases_CaseInput from './CaseInput.vue';
-import { namespace } from 'vuex-class';
 import {
   Case,
   Group,
@@ -499,8 +499,6 @@ library.add(fas);
 Vue.use(FormInputPlugin);
 Vue.use(ModalPlugin);
 
-const casesStore = namespace('casesStore');
-
 @Component({
   components: {
     'omegaup-problem-creator-case-input': problemCreator_Cases_CaseInput,
@@ -522,36 +520,62 @@ export default class CaseEdit extends Vue {
   arrayModalEditArray: string = '';
   matrixModalEditArray: string = '';
 
-  @casesStore.State('groups') groups!: Group[];
-  @casesStore.Getter('getSelectedCase') getSelectedCase!: Case;
-  @casesStore.Getter('getLinesFromSelectedCase')
-  getLinesFromSelectedCase!: CaseLine[];
-  @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
+  get groups(): Group[] {
+    return this.$store.state.casesStore.groups;
+  }
 
-  @casesStore.Action('editLineKind') editLineKind!: ([lineID, kind]: [
-    LineID,
-    CaseLineKind,
-  ]) => void;
-  @casesStore.Action('editLineValue') editLineValue!: ([lineID, value]: [
-    LineID,
-    string,
-  ]) => void;
-  @casesStore.Mutation('deleteCase') deleteCase!: ({
-    groupID,
-    caseID,
-  }: CaseGroupID) => void;
-  @casesStore.Mutation('updateCase') updateCase!: ([
-    oldGroupID,
-    updateCaseRequest,
-  ]: [GroupID, CaseRequest]) => void;
-  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
-  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
+  get getSelectedCase(): Case {
+    return this.$store.getters['casesStore/getSelectedCase'];
+  }
 
-  @casesStore.Action('addNewLine') addNewLine!: () => void;
-  @casesStore.Action('setLines') setLines!: (lines: CaseLine[]) => void;
-  @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
-  @casesStore.Action('deleteLinesForSelectedCase')
-  deleteLinesForSelectedCase!: () => void;
+  get getLinesFromSelectedCase(): CaseLine[] {
+    return this.$store.getters['casesStore/getLinesFromSelectedCase'];
+  }
+
+  get getSelectedGroup(): Group {
+    return this.$store.getters['casesStore/getSelectedGroup'];
+  }
+
+  editLineKind([lineID, kind]: [LineID, CaseLineKind]) {
+    this.$store.dispatch('casesStore/editLineKind', [lineID, kind]);
+  }
+
+  editLineValue([lineID, value]: [LineID, string]) {
+    this.$store.dispatch('casesStore/editLineValue', [lineID, value]);
+  }
+
+  deleteCase({ groupID, caseID }: CaseGroupID) {
+    this.$store.commit('casesStore/deleteCase', { groupID, caseID });
+  }
+
+  updateCase([oldGroupID, updateCaseRequest]: [GroupID, CaseRequest]) {
+    this.$store.commit('casesStore/updateCase', [
+      oldGroupID,
+      updateCaseRequest,
+    ]);
+  }
+
+  get getStringifiedLinesFromCaseGroupID(): (
+    caseGroupID: CaseGroupID,
+  ) => string {
+    return this.$store.getters['casesStore/getStringifiedLinesFromCaseGroupID'];
+  }
+
+  addNewLine() {
+    this.$store.dispatch('casesStore/addNewLine');
+  }
+
+  setLines(lines: CaseLine[]) {
+    this.$store.dispatch('casesStore/setLines', lines);
+  }
+
+  deleteLine(line: LineID) {
+    this.$store.dispatch('casesStore/deleteLine', line);
+  }
+
+  deleteLinesForSelectedCase() {
+    this.$store.dispatch('casesStore/deleteLinesForSelectedCase');
+  }
 
   deleteLines() {
     this.deleteLinesForSelectedCase();

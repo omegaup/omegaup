@@ -162,7 +162,7 @@ Here we can add code.
 
   it('Should handle details for a problem', () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem,
         runDetailsData,
@@ -184,7 +184,7 @@ Here we can add code.
 
   it('Should handle run details for a problem', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem,
         runDetailsData,
@@ -211,7 +211,7 @@ Here we can add code.
 
   it('Should handle run actions for a run in a given problem', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem,
         problemAlias: problem.alias,
@@ -329,7 +329,7 @@ Here we can add code.
       },
     ];
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem,
         runDetailsData,
@@ -353,7 +353,7 @@ Here we can add code.
 
   it('Should handle unrecognized source filename error', () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem,
         runDetailsData,
@@ -377,7 +377,7 @@ Here we can add code.
 
   it('Should handle a valid source filename with content', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem: {
           ...problem,
@@ -420,7 +420,7 @@ int main() {
 
   it('Should show the ephemeral grader for regular problems', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem,
         runDetailsData,
@@ -442,7 +442,7 @@ int main() {
 
   it('Should hide the ephemeral grader for Karel problems', async () => {
     const wrapper = mount(problem_Details, {
-      propsData: {
+      props: {
         initialTab: 'problems',
         problem: {
           ...problem,

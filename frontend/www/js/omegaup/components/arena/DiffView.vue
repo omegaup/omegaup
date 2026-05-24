@@ -3,7 +3,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref } from 'vue-facing-decorator';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/merge/merge.css';

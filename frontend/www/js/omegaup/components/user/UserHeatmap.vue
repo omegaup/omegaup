@@ -44,7 +44,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
 import * as Highcharts from 'highcharts/highstock';
 import HighchartsHeatmap from 'highcharts/modules/heatmap';
 import T from '../../lang';

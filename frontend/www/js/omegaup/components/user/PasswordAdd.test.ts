@@ -6,7 +6,7 @@ describe('PasswordAdd.vue', () => {
   it('Should emit password add', async () => {
     const username = 'username';
     const wrapper = mount(user_Password_Add, {
-      propsData: { username },
+      props: { username },
     });
     const newPassword = 'newPassword';
     const newPassword2 = 'newPassword';
@@ -27,7 +27,7 @@ describe('PasswordAdd.vue', () => {
 
   it('Should not emit password add when there is new password mismatch', async () => {
     const wrapper = mount(user_Password_Add, {
-      propsData: { username: 'username' },
+      props: { username: 'username' },
     });
 
     const newPassword = 'newPassword';
@@ -43,7 +43,7 @@ describe('PasswordAdd.vue', () => {
 
   it('Should enable submit button when there is no new password mismatch nor empty passwords', async () => {
     const wrapper = mount(user_Password_Add, {
-      propsData: { username: 'username' },
+      props: { username: 'username' },
     });
 
     const newPassword = 'newPassword';
@@ -57,7 +57,7 @@ describe('PasswordAdd.vue', () => {
   it('Should disable submit button when there is new password mismatch or empty inputs', async () => {
     let username = 'username';
     const wrapper = mount(user_Password_Add, {
-      propsData: { username },
+      props: { username },
     });
 
     const newPassword = 'newPassword';

@@ -202,7 +202,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -269,9 +270,13 @@ export default class UserRank extends Vue {
   ui = ui;
   searchedUsername: null | types.ListItem = null;
   showPopover: boolean = false;
-  currentFilter = this.filter;
+  currentFilter: string | null;
   isSelectionMode: boolean = false;
   selectedUsers: string[] = [];
+
+  created() {
+    this.currentFilter = this.filter;
+  }
 
   get UserRankingFeatureGuideURL(): string {
     // Use the key defined in blog.json

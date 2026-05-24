@@ -441,7 +441,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch, Emit } from 'vue-facing-decorator';
 import infiniteScroll from 'vue-infinite-scroll';
 import T from '../../lang';
 import { types } from '../../api_types';
@@ -550,8 +551,13 @@ export default class Runs extends Vue {
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
-  currentRunDetailsData = this.runDetailsData;
-  currentPopupDisplayed = this.popupDisplayed;
+  currentRunDetailsData: types.RunDetails | null;
+  currentPopupDisplayed: PopupDisplayed;
+
+  created() {
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentRunDetailsData = this.runDetailsData;
+  }
 
   get currentPage(): number {
     return this.filterOffset + 1;

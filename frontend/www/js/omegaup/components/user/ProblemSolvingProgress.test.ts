@@ -13,7 +13,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should render the component with chart title', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -23,7 +23,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should render circular chart and difficulty breakdown', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -35,7 +35,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should calculate total correctly from difficulty breakdown', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -46,7 +46,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should display total in center when not hovering', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -57,7 +57,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should display attempting count when provided and not hovering', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
         attempting: 7,
       },
@@ -69,7 +69,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should not display attempting label when attempting is 0', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
         attempting: 0,
       },
@@ -80,7 +80,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should compute correct stroke dash arrays for easy segment', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -93,7 +93,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should compute correct stroke dash offset for medium segment', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -106,7 +106,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should compute correct stroke dash offset for hard segment', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -119,7 +119,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should compute correct stroke dash offset for unlabelled segment', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -139,7 +139,7 @@ describe('ProblemSolvingProgress.vue', () => {
     };
 
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: zeroDifficulty,
       },
     });
@@ -155,7 +155,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should update display count on hover', async () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -188,7 +188,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should apply correct color styles on hover', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -225,7 +225,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should display hover label with correct text', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });
@@ -245,7 +245,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should hide attempting label when hovering', async () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
         attempting: 7,
       },
@@ -263,7 +263,7 @@ describe('ProblemSolvingProgress.vue', () => {
 
   it('should render all four circle segments', () => {
     const wrapper = shallowMount(ProblemSolvingProgress, {
-      propsData: {
+      props: {
         difficulty: defaultDifficulty,
       },
     });

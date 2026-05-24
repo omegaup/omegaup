@@ -8,7 +8,7 @@ describe('CloneWithToken.vue', () => {
   it('Should handle empty assignments and progress as admin', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_CloneWithToken, {
-      propsData: {
+      props: {
         course: {
           admission_mode: 'private',
           alias: 'test-course',

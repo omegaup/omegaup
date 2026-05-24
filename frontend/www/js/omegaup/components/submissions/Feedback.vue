@@ -35,7 +35,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -58,7 +59,9 @@ export default class SubmissionFeedback extends Vue {
   time = time;
 
   showFeedbackForm = false;
-  feedback = this.generalFeedback?.feedback ?? null;
+  get feedback(): any {
+    return this.generalFeedback?.feedback ?? null;
+  }
 
   get generalFeedback(): null | types.SubmissionFeedback {
     if (!this.feedbackOptions.length) return null;

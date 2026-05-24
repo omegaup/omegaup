@@ -4,7 +4,7 @@
     :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
-    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
+    @update:active-tab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #arena-problems>
       <div data-contest-practice>
@@ -44,7 +44,7 @@
               :contest-alias="contest.alias"
               :in-contest-or-course="true"
               :run-details-data="currentRunDetailsData"
-              @update:activeTab="
+              @update:active-tab="
                 (selectedTab) =>
                   $emit('reset-hash', {
                     selectedTab,
@@ -111,7 +111,7 @@
             })
         "
         @clarification-response="onClarificationResponse"
-        @update:activeTab="
+        @update:active-tab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
         "
       ></omegaup-arena-clarification-list>
@@ -120,7 +120,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -166,12 +167,20 @@ export default class ArenaContestPractice extends Vue {
 
   T = T;
   ui = ui;
-  currentClarifications = this.clarifications;
+  currentClarifications: any;
   ContestClarificationType = ContestClarificationType;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
-  currentRunDetailsData = this.runDetailsData;
+  activeProblem: types.NavbarProblemsetProblem | null;
+  currentNextSubmissionTimestamp: Date | null;
+  currentNextExecutionTimestamp: Date | null;
+  currentRunDetailsData: null | types.RunDetails;
+
+  created() {
+    this.activeProblem = this.problem;
+    this.currentRunDetailsData = this.runDetailsData;
+    this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+    this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+    this.currentClarifications = this.clarifications;
+  }
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;

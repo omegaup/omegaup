@@ -42,7 +42,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import user_MainInfo from './MainInfo.vue';
@@ -56,6 +57,10 @@ export default class UserEmailEdit extends Vue {
   @Prop() email!: string;
   @Prop() profile!: types.UserProfileInfo;
   T = T;
-  currentEmail: string = this.email;
+  currentEmail: string;
+
+  created() {
+    this.currentEmail = this.email;
+  }
 }
 </script>

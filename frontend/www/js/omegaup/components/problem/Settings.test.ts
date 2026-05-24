@@ -16,7 +16,7 @@ const baseSettingsProps = {
 describe('Settings.vue', () => {
   it('Should handle problem settings with disabled elements', async () => {
     const wrapper = shallowMount(problem_Settings, {
-      propsData: baseSettingsProps,
+      props: baseSettingsProps,
     });
 
     expect(

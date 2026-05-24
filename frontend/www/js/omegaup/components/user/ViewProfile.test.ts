@@ -140,7 +140,7 @@ describe('Profilev2.vue', () => {
   it('Should display navtab', () => {
     const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
-      propsData: {
+      props: {
         profile,
         data,
         profileBadges: new Set([badgeAlias]),
@@ -153,7 +153,7 @@ describe('Profilev2.vue', () => {
   it('Should display all contests', async () => {
     const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
-      propsData: {
+      props: {
         profile,
         data,
         profileBadges: new Set([badgeAlias]),
@@ -169,7 +169,7 @@ describe('Profilev2.vue', () => {
   it('Should only display public contests', async () => {
     const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
-      propsData: {
+      props: {
         profile: { ...profile, is_own_profile: false },
         data,
         profileBadges: new Set([badgeAlias]),
@@ -194,7 +194,7 @@ describe('Profilev2.vue', () => {
   it('Should display all Courses', async () => {
     const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
-      propsData: {
+      props: {
         profile,
         data,
         profileBadges: new Set([badgeAlias]),
@@ -210,7 +210,7 @@ describe('Profilev2.vue', () => {
   it('Should only display public Courses', async () => {
     const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
-      propsData: {
+      props: {
         profile: { ...profile, is_own_profile: false },
         data,
         profileBadges: new Set([badgeAlias]),

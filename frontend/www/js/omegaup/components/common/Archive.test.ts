@@ -6,7 +6,7 @@ import course_Archive from './Archive.vue';
 describe('Archive.vue', () => {
   it('Should show the correct message for course', () => {
     const wrapper = shallowMount(course_Archive, {
-      propsData: {
+      props: {
         alreadyArchived: false,
         archiveHelpText: T.courseArchiveHelpText,
         archiveHeaderTitle: T.wordsArchiveCourse,
@@ -20,7 +20,7 @@ describe('Archive.vue', () => {
 
   it('Should show the correct message for contest', () => {
     const wrapper = shallowMount(course_Archive, {
-      propsData: {
+      props: {
         alreadyArchived: false,
         archiveHelpText: T.contestEditArchiveHelpText,
         archiveHeaderTitle: T.contestEditArchiveContest,

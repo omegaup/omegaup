@@ -59,21 +59,21 @@ describe('Settings.vue', () => {
       (Form as any).options.methods,
       'openCollapsedIfRequired',
     );
-    const wrapper = shallowMount(Form, { propsData: { data: props } });
+    const wrapper = shallowMount(Form, { props: { data: props } });
     wrapper.find('[type="submit"]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(openCollapsed).toBeCalled();
   });
 
   it('Should handle problem settings', () => {
-    const wrapper = shallowMount(Form, { propsData: { data: props } });
+    const wrapper = shallowMount(Form, { props: { data: props } });
 
     const optionsWrapper = wrapper
       .find('select[name="languages"]')
       .findAll('option');
 
     const optionsObject: { [key: string]: string } = {};
-    optionsWrapper.wrappers.forEach((option) => {
+    optionsWrapper.forEach((option) => {
       const value = option.attributes('value');
       if (typeof value === 'string') {
         optionsObject[value] = option.text();

@@ -72,7 +72,7 @@ Here we can add code.
 
   it('Should handle details for a problem in print mode', () => {
     const wrapper = mount(problem_Print, {
-      propsData: {
+      props: {
         problem,
       },
     });

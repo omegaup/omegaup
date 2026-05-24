@@ -63,7 +63,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
@@ -102,9 +103,13 @@ export default class ContestEditPublish extends Vue {
 
   T = T;
   AdmissionMode = AdmissionMode;
-  currentAdmissionMode = this.admissionMode;
+  currentAdmissionMode: AdmissionMode;
   currentDefaultShowAllContestantsInScoreboard = this
     .defaultShowAllContestantsInScoreboard;
+
+  created() {
+    this.currentAdmissionMode = this.admissionMode;
+  }
 
   get contestURL(): string {
     return `${window.location.origin}/arena/${this.alias}/startfresh/`;

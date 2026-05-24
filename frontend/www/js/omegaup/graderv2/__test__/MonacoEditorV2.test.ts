@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import MonacoEditor from '../MonacoEditorV2.vue';
 import store from '../../grader/GraderStore';
 
@@ -38,9 +38,6 @@ jest.mock('../../grader/util', () => ({
   },
   supportedLanguages: require('../../../../../data/languages.json'),
 }));
-
-const localVue = createLocalVue();
-
 describe('MonacoEditor.vue', () => {
   let wrapper: any;
 
@@ -53,8 +50,7 @@ describe('MonacoEditor.vue', () => {
     } as any;
 
     wrapper = shallowMount(MonacoEditor, {
-      localVue,
-      propsData: {
+      props: {
         storeMapping: {
           contents: 'mockMapping.contents',
           language: 'mockMapping.language',
@@ -66,7 +62,7 @@ describe('MonacoEditor.vue', () => {
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    wrapper.unmount();
     jest.clearAllMocks();
   });
 

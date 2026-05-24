@@ -29,7 +29,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import badge_Badge from '../badge/Badge.vue';
@@ -45,7 +46,9 @@ export default class BadgeList extends Vue {
   @Prop() showAllBadgesLink!: boolean;
 
   T = T;
-  isProfile = this.showAllBadgesLink;
+  get isProfile(): boolean {
+    return this.showAllBadgesLink;
+  }
 
   get badges(): types.Badge[] {
     return Array.from(this.allBadges)

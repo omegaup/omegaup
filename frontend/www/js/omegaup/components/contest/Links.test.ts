@@ -7,7 +7,7 @@ import contest_Links from './Links.vue';
 describe('Links.vue', () => {
   it('Should display the links', async () => {
     const wrapper = shallowMount(contest_Links, {
-      propsData: {
+      props: {
         data: {
           admission_mode: 'registration',
           alias: 'testalias',

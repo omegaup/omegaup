@@ -145,7 +145,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
 import problem_BaseList from './BaseList.vue';
@@ -198,7 +199,9 @@ export default class CollectionList extends Vue {
 
   T = T;
   ToggleSwitchSize = ToggleSwitchSize;
-  level = this.data.level;
+  get level(): any {
+    return this.data.level;
+  }
   filtersVisible =
     typeof window === 'undefined'
       ? true

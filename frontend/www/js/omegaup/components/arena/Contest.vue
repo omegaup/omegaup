@@ -15,7 +15,7 @@
       :title="ui.contestTitle(contest)"
       :clarifications="currentClarifications"
       :should-show-runs="contestAdmin"
-      @update:activeTab="
+      @update:active-tab="
         (selectedTab) => $emit('update:activeTab', selectedTab)
       "
     >
@@ -99,7 +99,7 @@
                 :is-contest-finished="isContestFinished"
                 :in-contest-or-course="true"
                 :use-new-verdict-table="false"
-                @update:activeTab="
+                @update:active-tab="
                   (selectedTab) =>
                     $emit('reset-hash', {
                       selectedTab,
@@ -218,7 +218,7 @@
                 },
               })
           "
-          @update:activeTab="
+          @update:active-tab="
             (selectedTab) => $emit('update:activeTab', selectedTab)
           "
         ></omegaup-arena-clarification-list>
@@ -232,7 +232,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
@@ -317,13 +318,13 @@ export default class ArenaContest extends Vue {
   AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
-  currentClarifications = this.clarifications;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
-  currentRunDetailsData = this.runDetailsData;
+  currentClarifications: any;
+  activeProblem: types.NavbarProblemsetProblem | null;
+  currentNextSubmissionTimestamp: Date | null;
+  currentNextExecutionTimestamp: Date | null;
+  currentRunDetailsData: null | types.RunDetails;
   now = new Date();
-  currentPopupDisplayed = this.popupDisplayed;
+  currentPopupDisplayed: PopupDisplayed;
 
   get socketClass(): string {
     if (this.socketStatus === SocketStatus.Connected) {
@@ -376,6 +377,12 @@ export default class ArenaContest extends Vue {
   }
 
   created() {
+    this.activeProblem = this.problem;
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentRunDetailsData = this.runDetailsData;
+    this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+    this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+    this.currentClarifications = this.clarifications;
     if (this.lockdown) {
       window.addEventListener('beforeunload', this.beforeWindowUnload);
     }

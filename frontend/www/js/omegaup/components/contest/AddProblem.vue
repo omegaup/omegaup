@@ -166,7 +166,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -221,9 +222,9 @@ export default class AddProblem extends Vue {
   T = T;
   alias: null | types.ListItem = null;
   title: null | string = null;
-  points = this.initialPoints;
-  order = this.initialProblems.length + 1;
-  problems = this.initialProblems;
+  points: number;
+  order: any;
+  problems: types.ProblemsetProblemWithVersions[];
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
   publishedRevision: null | types.ProblemVersion = null;
@@ -235,6 +236,12 @@ export default class AddProblem extends Vue {
     { key: SearchTypes.TITLE, value: T.contestEditAddProblemSearchByTitle },
     { key: SearchTypes.ID, value: T.contestEditAddProblemSearchById },
   ];
+
+  created() {
+    this.problems = this.initialProblems;
+    this.order = this.initialProblems.length + 1;
+    this.points = this.initialPoints;
+  }
 
   get problemMapping(): MappedProblems {
     let problemMapping: MappedProblems = {};

@@ -1,8 +1,8 @@
-import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import JSZip from 'jszip';
 
 import Header from './Header.vue';
-import BootstrapVue, { IconsPlugin, BButton, BFormInput } from 'bootstrap-vue';
+import { BButton, BFormInput } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import T from '../../../lang';
 import Vue from 'vue';
@@ -11,13 +11,9 @@ import {
   generateGroup,
 } from '@/js/omegaup/problem/creator/modules/cases';
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
-
 describe('Header.vue', () => {
   it('Should contain the header buttons and problem name input', async () => {
-    const wrapper = shallowMount(Header, { localVue, store });
+    const wrapper = shallowMount(Header, { global: { plugins: [store] } });
 
     const buttons = wrapper.findAllComponents(BButton);
     const expectedText = [
@@ -42,12 +38,12 @@ describe('Header.vue', () => {
       value: { reload: jest.fn() },
     });
 
-    const wrapper = mount(Header, { localVue, store });
+    const wrapper = mount(Header, { global: { plugins: [store] } });
 
     const buttonsList = wrapper.findAll('button');
     expect(buttonsList.length).toBe(3);
 
-    const resetButton = buttonsList.at(2);
+    const resetButton = buttonsList[2];
     expect(resetButton.exists()).toBe(true);
 
     const testText = 'Hello';
@@ -81,7 +77,7 @@ describe('Header.vue', () => {
   });
 
   it('Should download the zip file', async () => {
-    const wrapper = mount(Header, { localVue, store });
+    const wrapper = mount(Header, { global: { plugins: [store] } });
 
     const generateProblemSpy = jest.spyOn(wrapper.vm, 'generateProblem');
 
@@ -96,7 +92,7 @@ describe('Header.vue', () => {
   });
 
   it('Should have correct file/folder structure', async () => {
-    const wrapper = mount(Header, { localVue, store });
+    const wrapper = mount(Header, { global: { plugins: [store] } });
 
     const newUngroupedCasegroup = generateGroup({
       name: 'New Ungrouped Case Group',
@@ -146,10 +142,7 @@ describe('Header.vue', () => {
   });
 
   it('Should process the zip after it is uploaded', async () => {
-    const wrapper = mount(Header, {
-      localVue,
-      store,
-    });
+    const wrapper = mount(Header, { global: { plugins: [store] } });
 
     const cdpDataText = `{"problemName":"Hello","problemMarkdown":"Hello Statement!","problemCodeContent":"print('Hello world')","problemCodeExtension":"py","problemSolutionMarkdown":"Hello Solution!","casesStore":{"groups":[{"groupID":"26fdf593-d0c5-49f0-80b0-09bf0673c974","name":"hellogroup","points":100,"autoPoints":false,"ungroupedCase":false,"cases":[{"caseID":"8dda8030-60b9-4daf-b484-c4254525be6e","groupID":"26fdf593-d0c5-49f0-80b0-09bf0673c974","lines":[{"lineID":"c54c349e-b56e-426e-b4e1-032c62b05e8e","caseID":"8dda8030-60b9-4daf-b484-c4254525be6e","label":"Line1","data":{"kind":"line","value":"Hello line"}},{"lineID":"9768961e-27fc-4cdc-a4ca-c2de43fc15b1","caseID":"8dda8030-60b9-4daf-b484-c4254525be6e","label":"Line2","data":{"kind":"multiline","value":"Hello multiline"}}],"points":100,"output":"","name":"hellocase"}]}],"selected":{"groupID":"26fdf593-d0c5-49f0-80b0-09bf0673c974","caseID":"8dda8030-60b9-4daf-b484-c4254525be6e"},"layouts":[{"layoutID":"2b741bd6-6f20-46bd-9a0f-d3fbfc4ad03f","name":"hellogroup_hellocase","caseLineInfos":[{"lineInfoID":"d8942896-0c67-42ce-8f4b-581eade8840f","label":"Line1","data":{"kind":"line","value":""}},{"lineInfoID":"416ce979-62c7-4e9c-b282-d4734a7b556e","label":"Line2","data":{"kind":"multiline","value":""}}]}],"hide":false}}`;
 

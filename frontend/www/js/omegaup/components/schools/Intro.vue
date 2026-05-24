@@ -41,7 +41,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component } from 'vue-facing-decorator';
 
 import T from '../../lang';
 

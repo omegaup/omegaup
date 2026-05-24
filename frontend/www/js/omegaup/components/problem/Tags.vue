@@ -166,7 +166,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
@@ -198,8 +199,15 @@ export default class ProblemTags extends Vue {
   @Prop() isLecture!: boolean;
 
   T = T;
-  allowTags = this.initialAllowTags;
-  problemLevelTag: string | null = this.problemLevel;
+
+  created() {
+    this.problemLevelTag = this.problemLevel;
+  }
+
+  get allowTags(): boolean {
+    return this.initialAllowTags;
+  }
+  problemLevelTag: string | null;
   newPrivateTag = '';
   newPublicTag = '';
 

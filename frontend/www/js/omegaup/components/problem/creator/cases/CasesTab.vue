@@ -28,7 +28,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { Component, Watch, Prop } from 'vue-facing-decorator';
+import Vue from 'vue';
 import problemCreator_Cases_CaseEdit from './CaseEdit.vue';
 import problemCreator_Cases_Sidebar from './Sidebar.vue';
 import probleCreator_Cases_AddPanel from './AddPanel.vue';

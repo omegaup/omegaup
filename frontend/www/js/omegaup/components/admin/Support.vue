@@ -372,7 +372,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Component, Prop, Emit, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -434,13 +435,13 @@ export default class AdminSupport extends Vue {
 
   selectedTemplateId: string = '';
 
-  currentContestAlias = this.contestAlias;
-  currentIsContestRecommended = this.isContestRecommended;
-  currentMaintenanceEnabled = this.maintenanceEnabled;
-  currentMaintenanceMessageEs = this.maintenanceMessageEs;
-  currentMaintenanceMessageEn = this.maintenanceMessageEn;
-  currentMaintenanceMessagePt = this.maintenanceMessagePt;
-  currentMaintenanceType = this.maintenanceType || 'info';
+  currentContestAlias: string;
+  currentIsContestRecommended: boolean;
+  currentMaintenanceEnabled: boolean;
+  currentMaintenanceMessageEs: string;
+  currentMaintenanceMessageEn: string;
+  currentMaintenanceMessagePt: string;
+  currentMaintenanceType: any;
 
   T = T;
   ui = ui;
@@ -457,6 +458,16 @@ export default class AdminSupport extends Vue {
     },
     { value: MaintenanceType.Error, label: this.T.maintenanceModeTypeError },
   ];
+
+  created() {
+    this.currentMaintenanceType = this.maintenanceType || 'info';
+    this.currentMaintenanceMessagePt = this.maintenanceMessagePt;
+    this.currentMaintenanceMessageEn = this.maintenanceMessageEn;
+    this.currentMaintenanceMessageEs = this.maintenanceMessageEs;
+    this.currentMaintenanceEnabled = this.maintenanceEnabled;
+    this.currentIsContestRecommended = this.isContestRecommended;
+    this.currentContestAlias = this.contestAlias;
+  }
 
   badgeClass(type: string) {
     switch (type) {

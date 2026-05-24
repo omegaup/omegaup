@@ -44,7 +44,7 @@
         >
           <em>{{ T.wordsEmpty }}</em>
         </button>
-        <template v-for="group in groups" v-else :title="name">
+        <template v-for="group in groups" v-else>
           <div
             v-if="group.explicit"
             :key="group.name"
@@ -102,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-facing-decorator';
 import store from './GraderStore';
 import { types } from '../api_types';
 import { GraderResults, CaseSelectorGroup } from './GraderStore';

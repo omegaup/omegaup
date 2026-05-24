@@ -111,7 +111,7 @@ describe('ViewProgress.vue', () => {
 
   it('Should handle scores', async () => {
     const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
+      props: baseViewProgressProps,
     });
     expect(wrapper.text()).toContain(
       T.courseStudentsProgressExportToSpreadsheet,
@@ -125,7 +125,7 @@ describe('ViewProgress.vue', () => {
 
   it('Should handle ods content', () => {
     const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
+      props: baseViewProgressProps,
     });
     const odsContent = toOds(courseName, wrapper.vm.progressTable);
     expect(odsContent).toBe(`<table:table table:name="${courseName}">

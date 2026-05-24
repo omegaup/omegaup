@@ -1,17 +1,22 @@
 <template>
   <div v-if="isOverlayShown" data-overlay @click="onOverlayClicked">
-    <slot name="popup" :isOverlayShown="isOverlayShown"></slot>
+    <slot name="popup" :is-overlay-shown="isOverlayShown"></slot>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 
 @Component
 export default class Overlay extends Vue {
   @Prop({ default: false }) showOverlay!: boolean;
 
-  isOverlayShown = this.showOverlay;
+  isOverlayShown: boolean;
+
+  created() {
+    this.isOverlayShown = this.showOverlay;
+  }
 
   onOverlayClicked(evt: Event) {
     if (typeof $(evt.composedPath()[0]).attr('data-overlay') !== 'undefined') {

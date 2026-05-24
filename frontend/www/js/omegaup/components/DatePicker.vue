@@ -15,7 +15,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Watch, Prop } from 'vue-facing-decorator';
 import T from '../lang';
 import * as time from '../time';
 import '../../../third_party/js/bootstrap-datepicker.js';
@@ -33,7 +34,13 @@ export default class DatePicker extends Vue {
   @Prop({ default: null }) max!: Date | null;
 
   private usedFallback: boolean = false;
-  private stringValue: string = time.formatDateLocal(this.value);
+  private stringValue = '';
+
+  created() {
+    if (this.value) {
+      this.stringValue = time.formatDateLocal(this.value);
+    }
+  }
 
   get minDateStr() {
     return this.min?.toISOString()?.split('T')?.[0];

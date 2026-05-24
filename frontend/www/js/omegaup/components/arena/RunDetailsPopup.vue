@@ -75,8 +75,11 @@
                 </template>
               </tr>
               <template v-if="groupVisible[element.group]">
-                <template v-for="problemCase in element.cases">
-                  <tr :key="problemCase.name">
+                <template
+                  v-for="problemCase in element.cases"
+                  :key="problemCase.name"
+                >
+                  <tr>
                     <td></td>
                     <td class="text-center">{{ problemCase.name }}</td>
                     <td class="text-center">{{ problemCase.verdict }}</td>
@@ -91,10 +94,10 @@
                     </td>
                   </tr>
                   <template v-if="shouldShowDiffs(problemCase.name)">
-                    <tr :key="`input-title-${problemCase.name}`">
+                    <tr>
                       <td colspan="6">{{ T.wordsInput }}</td>
                     </tr>
-                    <tr :key="`input-${problemCase.name}`">
+                    <tr>
                       <td colspan="6">
                         <pre>
                           <code>{{
@@ -103,10 +106,10 @@
                         </pre>
                       </td>
                     </tr>
-                    <tr :key="`diffs-title-${problemCase.name}`">
+                    <tr>
                       <td colspan="6">{{ T.wordsDifference }}</td>
                     </tr>
-                    <tr :key="`diffs-${problemCase.name}`">
+                    <tr>
                       <td v-if="data.cases" colspan="6">
                         <omegaup-arena-diff-view
                           :left="data.cases[problemCase.name].out"
@@ -189,7 +192,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_DiffView from './DiffView.vue';

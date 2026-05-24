@@ -9,13 +9,14 @@
     :initial-theme="initialTheme"
     :next-submission-timestamp="nextSubmissionTimestamp"
     :next-execution-timestamp="nextExecutionTimestamp"
-    @execute-run="() => this.$emit('execute-run')"
+    @execute-run="() => $emit('execute-run')"
   >
   </ephemeral-ide>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import * as Util from '../../grader/util';
 import Ephemeral from '../../grader/Ephemeral.vue';

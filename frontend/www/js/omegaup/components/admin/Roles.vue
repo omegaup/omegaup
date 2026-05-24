@@ -41,7 +41,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Emit } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -52,8 +53,12 @@ export default class AdminRoles extends Vue {
   @Prop() groups!: types.Group[];
 
   T = T;
-  currentRoles: types.UserRole[] = this.roles;
-  currentGroups: types.Group[] = this.groups;
+  get currentRoles(): types.UserRole[] {
+    return this.roles;
+  }
+  get currentGroups(): types.Group[] {
+    return this.groups;
+  }
 
   @Emit()
   changeRole(

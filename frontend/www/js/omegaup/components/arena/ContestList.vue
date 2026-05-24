@@ -470,7 +470,8 @@ const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
   };
 };
 
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
@@ -556,11 +557,11 @@ class ArenaContestList extends Vue {
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   ContestFilter = ContestFilter;
-  currentTab: ContestTab = this.tab;
-  currentQuery: string = this.query;
-  currentOrder: ContestOrder = this.sortOrder;
-  currentFilter: ContestFilter = this.filter;
-  currentPage: number = this.page;
+  currentTab: ContestTab;
+  currentQuery: string;
+  currentOrder: ContestOrder;
+  currentFilter: ContestFilter;
+  currentPage: number;
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
@@ -569,9 +570,13 @@ class ArenaContestList extends Vue {
   scrollPositions: { [key: string]: number } = {};
   maxScrollPositions: { [key: string]: number } = {};
 
-  $refs!: {
-    [key: string]: HTMLElement | HTMLElement[];
-  };
+  created() {
+    this.currentPage = this.page;
+    this.currentFilter = this.filter;
+    this.currentOrder = this.sortOrder;
+    this.currentQuery = this.query;
+    this.currentTab = this.tab;
+  }
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {

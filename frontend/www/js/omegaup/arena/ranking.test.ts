@@ -1,7 +1,6 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
-import { createLocalVue } from '@vue/test-utils';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 import { types } from '../api_types';
 import T from '../lang';
 import { ScoreMode } from './navigation';
@@ -257,9 +256,7 @@ describe('ranking', () => {
     });
 
     it('Should handle onVirtualRankingChanged function', () => {
-      const localVue = createLocalVue();
-      localVue.use(Vuex);
-      const store = new Vuex.Store(rankingStoreConfig);
+      const store = createStore(rankingStoreConfig);
 
       onVirtualRankingChanged({
         scoreboard,

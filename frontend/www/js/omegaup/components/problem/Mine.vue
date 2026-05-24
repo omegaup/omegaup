@@ -245,7 +245,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-facing-decorator';
+import Vue from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
@@ -288,12 +289,16 @@ export default class ProblemMine extends Vue {
 
   T = T;
   ui = ui;
-  currentQuery = this.query ?? '';
+  currentQuery: string | null;
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;
   confirmationModal: Record<string, boolean> = {};
   showConfirmationModalDeleteAll = false;
+
+  created() {
+    this.currentQuery = this.query ?? '';
+  }
 
   get statementShowAllProblems(): string {
     return this.isSysadmin

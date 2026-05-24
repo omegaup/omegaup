@@ -48,13 +48,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Inject, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Inject, Watch } from 'vue-facing-decorator';
 import T from '../../../../lang';
-import { namespace } from 'vuex-class';
 import { Case, Group, CaseLine } from '@/js/omegaup/problem/creator/types';
 import * as ui from '@/js/omegaup/ui';
-
-const casesStore = namespace('casesStore');
 
 @Component
 export default class CasesForm extends Vue {
@@ -67,14 +65,25 @@ export default class CasesForm extends Vue {
   @Prop({ default: null }) readonly editGroup!: Group;
 
   T = T;
-  commitMessage = this.isCaseEdit
-    ? T.problemEditUpdatingCase
-    : T.problemEditUpdatingGroup;
+  commitMessage = T.problemEditUpdatingGroup;
 
-  @casesStore.Getter('getSelectedCase') getSelectedCase!: Case;
-  @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
-  @casesStore.Getter('getLinesFromSelectedCase')
-  getLinesFromSelectedCase!: CaseLine[];
+  created() {
+    this.commitMessage = this.isCaseEdit
+      ? T.problemEditUpdatingCase
+      : T.problemEditUpdatingGroup;
+  }
+
+  get getSelectedCase(): Case {
+    return this.$store.getters['casesStore/getSelectedCase'];
+  }
+
+  get getSelectedGroup(): Group {
+    return this.$store.getters['casesStore/getSelectedGroup'];
+  }
+
+  get getLinesFromSelectedCase(): CaseLine[] {
+    return this.$store.getters['casesStore/getLinesFromSelectedCase'];
+  }
 
   get inputText(): string {
     return (this.getLinesFromSelectedCase || [])

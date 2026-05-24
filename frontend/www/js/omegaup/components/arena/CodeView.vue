@@ -11,7 +11,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Ref, Watch } from 'vue-facing-decorator';
 import T from '../../lang';
 import { codemirror } from 'vue-codemirror-lite';
 

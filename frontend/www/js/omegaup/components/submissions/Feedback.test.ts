@@ -17,7 +17,7 @@ describe('Feedback.vue', () => {
 
   it('Should handle existing feedback for admin', async () => {
     const wrapper = shallowMount(omegaup_SubmissionFeedback, {
-      propsData: { feedbackOptions, guid: 'afa569', isAdmin: true },
+      props: { feedbackOptions, guid: 'afa569', isAdmin: true },
     });
 
     expect(
@@ -27,7 +27,7 @@ describe('Feedback.vue', () => {
 
   it('Should handle existing feedback for user', async () => {
     const wrapper = shallowMount(omegaup_SubmissionFeedback, {
-      propsData: { feedbackOptions, guid: 'afa569', isAdmin: false },
+      props: { feedbackOptions, guid: 'afa569', isAdmin: false },
     });
 
     expect(

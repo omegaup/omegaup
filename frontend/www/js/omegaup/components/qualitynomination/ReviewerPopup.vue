@@ -81,7 +81,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Prop, Component } from 'vue-facing-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
@@ -132,7 +133,9 @@ export default class ReviewerPopup extends Vue {
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
   qualitySeal = true;
-  publicTagsList = this.selectedPublicTags ?? [];
+  get publicTagsList(): string[] {
+    return this.selectedPublicTags ?? [];
+  }
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags

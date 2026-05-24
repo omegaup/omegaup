@@ -81,7 +81,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -105,12 +106,16 @@ export default class Requests extends Vue {
 
   T = T;
   time = time;
-  requests: types.IdentityRequest[] = this.data;
+  requests: types.IdentityRequest[];
   showAllRequests = false;
   resolutionText: null | string = null;
   modalStates: { [key: string]: boolean } = {};
 
   @Watch('data')
+  created() {
+    this.requests = this.data;
+  }
+
   onDataChange(): void {
     this.requests = this.data;
   }

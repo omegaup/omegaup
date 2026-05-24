@@ -14,14 +14,14 @@ describe('FormUpdate.vue', () => {
   afterAll(() => {
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
-      document.removeChild(rootDiv);
+      document.body.removeChild(rootDiv);
     }
   });
 
   it('Should handle form update', async () => {
     const wrapper = mount(teamsgroup_FormUpdate, {
       attachTo: '#root',
-      propsData: {
+      props: {
         alias: 'Hello',
         name: 'Hello omegaUp',
         description: 'Hello omegaUp Description',
@@ -53,6 +53,6 @@ describe('FormUpdate.vue', () => {
       ],
     ]);
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });

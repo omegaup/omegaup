@@ -26,7 +26,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-facing-decorator';
 import user_SidebarMainInfo from './SidebarMainInfo.vue';
 import { types } from '../../api_types';
 
@@ -41,7 +42,9 @@ export default class ProfileWrapper extends Vue {
   @Prop({ default: null }) selectedTab!: null | string;
   @Prop() hasPassword!: boolean;
 
-  currentSelectedTab = this.selectedTab;
+  get currentSelectedTab(): null | string {
+    return this.selectedTab;
+  }
 
   @Watch('currentSelectedTab')
   onCurrentSelectedTabChanged(newValue: string) {

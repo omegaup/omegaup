@@ -13,14 +13,14 @@ describe('Gen.vue', () => {
   afterAll(() => {
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
-      document.removeChild(rootDiv);
+      document.body.removeChild(rootDiv);
     }
   });
 
   it('Should handle empty form to be filled', async () => {
     const wrapper = shallowMount(course_LibinteractiveGen, {
       attachTo: '#root',
-      propsData: {
+      props: {
         language: null,
         os: null,
         name: null,
@@ -57,7 +57,7 @@ describe('Gen.vue', () => {
     idl = wrapper.find('textarea[name="idl"]').element as HTMLInputElement;
     expect(idl.value).toEqual('any text');
 
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('Should handle form with initial error', async () => {
@@ -67,7 +67,7 @@ describe('Gen.vue', () => {
     };
 
     const wrapper = shallowMount(course_LibinteractiveGen, {
-      propsData: {
+      props: {
         language: null,
         os: null,
         name: null,

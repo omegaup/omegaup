@@ -64,11 +64,9 @@
 <script lang="ts">
 import { GroupID } from '../../../../problem/creator/types';
 import { NIL } from 'uuid';
-import { Component, Vue } from 'vue-property-decorator';
-import { namespace } from 'vuex-class';
+import Vue from 'vue';
+import { Component } from 'vue-facing-decorator';
 import T from '../../../../lang';
-
-const casesStore = namespace('casesStore');
 
 @Component
 export default class MultipleCasesInput extends Vue {
@@ -79,10 +77,12 @@ export default class MultipleCasesInput extends Vue {
 
   T = T;
 
-  @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
+  get storedGroups(): {
     value: string;
     text: string;
-  }[];
+  }[] {
+    return this.$store.getters['casesStore/getGroupIdsAndNames'];
+  }
 
   get options() {
     const noGroup = { value: NIL, text: T.problemCreatorNoGroup };

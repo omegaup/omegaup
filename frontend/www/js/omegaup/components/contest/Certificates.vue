@@ -64,7 +64,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -73,6 +74,10 @@ export default class Certificates extends Vue {
   @Prop() certificatesDetails!: types.ContestCertificatesAdminDetails;
 
   T = T;
-  certificateCutoff = this.certificatesDetails.certificateCutoff;
+  certificateCutoff: any;
+
+  created() {
+    this.certificateCutoff = this.certificatesDetails.certificateCutoff;
+  }
 }
 </script>

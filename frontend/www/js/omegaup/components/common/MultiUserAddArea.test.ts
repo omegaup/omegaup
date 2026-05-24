@@ -4,7 +4,7 @@ import MultiUserAddArea from './MultiUserAddArea.vue';
 describe('MultiUserAddArea.vue', () => {
   it('should display textarea when no users are added', async () => {
     const wrapper = mount(MultiUserAddArea, {
-      propsData: {
+      props: {
         users: [],
       },
     });
@@ -15,7 +15,7 @@ describe('MultiUserAddArea.vue', () => {
   it('should display a list of users if an array of users is passed', async () => {
     const usersList = ['test_user_1', 'test_user_2'];
     const wrapper = mount(MultiUserAddArea, {
-      propsData: {
+      props: {
         users: usersList,
       },
     });
@@ -26,7 +26,7 @@ describe('MultiUserAddArea.vue', () => {
 
   it('should enable the textarea when user clicks on the edit button', async () => {
     const wrapper = mount(MultiUserAddArea, {
-      propsData: {
+      props: {
         users: ['test_user_1'],
       },
     });
@@ -42,7 +42,7 @@ describe('MultiUserAddArea.vue', () => {
 
   it('should call removeUser when user clicks on the remove button', async () => {
     const wrapper = mount(MultiUserAddArea, {
-      propsData: {
+      props: {
         users: ['test_user_1'],
       },
     });
@@ -63,7 +63,7 @@ describe('MultiUserAddArea.vue', () => {
   it('should parse users when user paste them in the textarea', async () => {
     // Given: A textarea without users
     const wrapper = mount(MultiUserAddArea, {
-      propsData: {
+      props: {
         users: [],
       },
     });
@@ -82,7 +82,7 @@ describe('MultiUserAddArea.vue', () => {
 
   it('should emit update-users when the usersList changes', async () => {
     const wrapper = mount(MultiUserAddArea, {
-      propsData: {
+      props: {
         users: ['test_user_1'],
       },
     });

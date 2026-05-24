@@ -239,7 +239,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit, Ref } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch, Emit, Ref } from 'vue-facing-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -310,15 +311,25 @@ export default class CourseAssignmentDetails extends Vue {
 
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
-  alias = this.assignment.alias || '';
-  assignmentType = this.assignment.assignment_type || 'homework';
-  description = this.assignment.description || '';
-  name = this.assignment.name || '';
-  startTime = this.assignment.start_time || new Date();
-  finishTime = this.assignment.finish_time || new Date();
-  unlimitedDuration = !this.assignment.finish_time;
+  alias: any;
+  assignmentType: any;
+  description: any;
+  name: any;
+  startTime: any;
+  finishTime: any;
+  unlimitedDuration = false;
 
   @Watch('assignment')
+  created() {
+    this.unlimitedDuration = !this.assignment.finish_time;
+    this.finishTime = this.assignment.finish_time || new Date();
+    this.startTime = this.assignment.start_time || new Date();
+    this.name = this.assignment.name || '';
+    this.description = this.assignment.description || '';
+    this.assignmentType = this.assignment.assignment_type || 'homework';
+    this.alias = this.assignment.alias || '';
+  }
+
   onAssignmentChange() {
     this.reset();
   }

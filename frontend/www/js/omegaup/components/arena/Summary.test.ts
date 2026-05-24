@@ -6,7 +6,7 @@ describe('Summary.vue', () => {
   it('Should handle summary', () => {
     const eventTitle = 'Event title';
     const wrapper = shallowMount(arena_Summary, {
-      propsData: {
+      props: {
         title: eventTitle,
         description: 'Event description',
         startTime: new Date(),
@@ -24,7 +24,7 @@ describe('Summary.vue', () => {
   it("Shouldn't show the summary of a course with unlimited duration", () => {
     const eventTitle = 'Event title';
     const wrapper = shallowMount(arena_Summary, {
-      propsData: {
+      props: {
         title: eventTitle,
         description: 'Event description',
         startTime: new Date(),

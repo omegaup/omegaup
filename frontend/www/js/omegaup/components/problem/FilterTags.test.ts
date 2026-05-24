@@ -8,7 +8,7 @@ import problem_FilterTags from './FilterTags.vue';
 describe('Filter.vue', () => {
   it('Should handle list of tags', async () => {
     const wrapper = mount(problem_FilterTags, {
-      propsData: {
+      props: {
         tags: [
           { name: 'problemTagMatrices', problemCount: 5 },
           { name: 'problemTagDiophantineEquations', problemCount: 4 },

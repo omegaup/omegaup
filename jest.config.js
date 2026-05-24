@@ -14,9 +14,10 @@ const babelConfig = {
     ],
   ],
   plugins: [
+    ['@babel/plugin-proposal-decorators', { legacy: true }],
     '@babel/plugin-transform-async-to-generator',
     '@babel/plugin-transform-modules-commonjs',
-    '@babel/plugin-proposal-class-properties',
+    ['@babel/plugin-proposal-class-properties', { loose: true }],
     ['@babel/plugin-transform-typescript', { allowNamespaces: true }],
   ],
 };
@@ -26,6 +27,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts', 'vue'],
   moduleDirectories: ['node_modules'],
   moduleNameMapper: {
+    '^vue$': '@vue/compat',
     'vue-async-computed-decorator':
       '<rootDir>/node_modules/vue-async-computed-decorator/dist/index.js',
     '^@/(.*)$': '<rootDir>/frontend/www/$1',
@@ -34,16 +36,19 @@ module.exports = {
     'monaco-editor':
       '<rootDir>/frontend/www/third_party/js/__mocks__/monacoEditor.js',
     sugar: '<rootDir>/frontend/www/js/omegaup/__mocks__/sugar.js',
+    'vue-codemirror-lite':
+      '<rootDir>/frontend/www/js/omegaup/__mocks__/vue-codemirror-lite.ts',
+    '@voerro/vue-tagsinput':
+      '<rootDir>/node_modules/@voerro/vue-tagsinput/dist/voerro-vue-tagsinput.js',
+    '^bootstrap-vue$': '<rootDir>/frontend/www/js/omegaup/__mocks__/bootstrap-vue.ts',
+    'vue-typeahead-bootstrap':
+      '<rootDir>/frontend/www/js/omegaup/__mocks__/vue-typeahead-bootstrap.ts',
   },
+  setupFiles: ['<rootDir>/frontend/www/js/omegaup/test.setup.before.ts'],
   setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
-  globals: {
-    'vue-jest': {
-      babelConfig,
-    },
-  },
   transform: {
     '.*\\.vue$': [
-      'vue-jest',
+      '<rootDir>/frontend/www/js/omegaup/__mocks__/vue3-jest-wrapper.js',
       {
         babelConfig,
       },
@@ -51,7 +56,20 @@ module.exports = {
     '.*\\.[jt]sx?$': ['babel-jest', babelConfig],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(vue-.*|@voerro/vue-tagsinput|monaco-editor|monaco-editor-core)/)',
+    'node_modules/(?!(vue-.*|@vue/.*|@voerro/vue-tagsinput|monaco-editor|monaco-editor-core|vue-facing-decorator|vue-typeahead-bootstrap)/)',
   ],
-  testURL: 'http://localhost:8001/',
+  globals: {
+    'vue-jest': {
+      transform: {
+        ts: './frontend/www/js/omegaup/__mocks__/vue-ts-transformer.js',
+      },
+    },
+  },
+  testEnvironmentOptions: {
+    url: 'http://localhost:8001/',
+  },
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/frontend/www/karel.js/',
+  ],
 };

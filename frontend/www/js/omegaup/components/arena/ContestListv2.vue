@@ -416,8 +416,9 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Watch } from 'vue-facing-decorator';
+import Vue from 'vue';
 import debounce from 'lodash/debounce';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import T from '../../lang';
@@ -502,11 +503,11 @@ class ArenaContestList extends Vue {
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   ContestFilter = ContestFilter;
-  currentTab: ContestTab = this.tab;
-  currentQuery: string = this.query;
-  currentOrder: ContestOrder = this.sortOrder;
-  currentFilter: ContestFilter = this.filter;
-  currentPage: number = this.page;
+  currentTab: ContestTab;
+  currentQuery: string;
+  currentOrder: ContestOrder;
+  currentFilter: ContestFilter;
+  currentPage: number;
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
@@ -519,6 +520,14 @@ class ArenaContestList extends Vue {
   onSearchQueryDebounced = debounce(() => {
     this.onSearchQuery();
   }, 300);
+
+  created() {
+    this.currentPage = this.page;
+    this.currentFilter = this.filter;
+    this.currentOrder = this.sortOrder;
+    this.currentQuery = this.query;
+    this.currentTab = this.tab;
+  }
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {

@@ -45,7 +45,7 @@
                     type="text"
                     class="form-control"
                     :class="{ 'is-invalid': errors.includes('title') }"
-                    @blur="onGenerateAlias"
+                    @blur="onGenerateAlias($event)"
                   />
                 </div>
                 <div class="form-group col-md-6 introjs-short-title">
@@ -455,7 +455,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Component, Prop, Watch, Ref } from 'vue-facing-decorator';
+import Vue from 'vue';
 import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import T from '../../lang';
@@ -467,6 +468,7 @@ import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expires: -1 });
 
 @Component({
+  emits: ['alias-changed'],
   components: {
     'omegaup-problem-settings': problem_Settings,
     'omegaup-problem-tags': problem_Tags,
@@ -486,32 +488,76 @@ export default class ProblemForm extends Vue {
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
-  title = this.data.title;
-  alias = this.data.alias;
-  timeLimit = this.data.timeLimit;
-  extraWallTime = this.data.extraWallTime;
-  memoryLimit = this.data.memoryLimit;
-  outputLimit = this.data.outputLimit;
-  inputLimit = this.data.inputLimit;
-  overallWallTimeLimit = this.data.overallWallTimeLimit;
-  validatorTimeLimit = this.data.validatorTimeLimit;
-  emailClarifications = this.data.emailClarifications;
-  visibility = this.data.visibility;
-  allowUserAddTags = this.data.allowUserAddTags;
-  source = this.data.source;
-  validator = this.data.validator;
-  languages = this.data.languages;
-  tags = this.data.tags;
-  problemLevel = this.data.problem_level || '';
-  showDiff = this.data.showDiff;
-  groupScorePolicy = this.data.groupScorePolicy || 'sum-if-not-zero';
-  selectedTags = this.data.selectedTags || [];
+  title: any = '';
+  alias: any = '';
+
+  created() {
+    this.selectedTags = this.data.selectedTags || [];
+    this.problemLevel = this.data.problem_level || '';
+    this.source = this.data.source;
+    this.visibility = this.data.visibility;
+    this.alias = this.data.alias;
+    this.title = this.data.title;
+  }
+
+  get timeLimit(): any {
+    return this.data.timeLimit;
+  }
+  get extraWallTime(): any {
+    return this.data.extraWallTime;
+  }
+  get memoryLimit(): any {
+    return this.data.memoryLimit;
+  }
+  get outputLimit(): any {
+    return this.data.outputLimit;
+  }
+  get inputLimit(): any {
+    return this.data.inputLimit;
+  }
+  get overallWallTimeLimit(): any {
+    return this.data.overallWallTimeLimit;
+  }
+  get validatorTimeLimit(): any {
+    return this.data.validatorTimeLimit;
+  }
+  get emailClarifications(): any {
+    return this.data.emailClarifications;
+  }
+  visibility: any = null;
+  get allowUserAddTags(): any {
+    return this.data.allowUserAddTags;
+  }
+  source: any = '';
+  get validator(): any {
+    return this.data.validator;
+  }
+  get languages(): any {
+    return this.data.languages;
+  }
+  get tags(): any {
+    return this.data.tags;
+  }
+  problemLevel: any = '';
+  get showDiff(): any {
+    return this.data.showDiff;
+  }
+  get groupScorePolicy(): any {
+    return this.data.groupScorePolicy || 'sum-if-not-zero';
+  }
+  selectedTags: any = [];
   message = '';
   hasFile = false;
   public = false;
-  validLanguages = this.data.validLanguages;
-  validatorTypes = this.data.validatorTypes;
-  currentLanguages = this.data.languages;
+  get validLanguages(): any {
+    return this.data.validLanguages;
+  }
+  get validatorTypes(): any {
+    return this.data.validatorTypes;
+  }
+  get currentLanguages(): any {
+    return this.data.languages;
+  }
 
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
@@ -658,13 +704,17 @@ export default class ProblemForm extends Vue {
     this.hasFile = uploadedFile.files !== null;
   }
 
-  onGenerateAlias(): void {
+  onGenerateAlias(event: FocusEvent): void {
     if (this.isUpdate) {
       return;
     }
 
+    // In Vue 3, v-model updates may be batched. Read the DOM value directly
+    // to ensure we get the latest input value.
+    const titleValue = (event.target as HTMLInputElement).value;
+
     // Remove accents
-    let generatedAlias = latinize(this.title);
+    let generatedAlias = latinize(titleValue);
 
     // Replace whitespace
     generatedAlias = generatedAlias.replace(/\s+/g, '-');

@@ -4,7 +4,7 @@
       <form data-promotion-popup class="h-auto w-auto" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
-            <slot name="popup-content" :onSubmit="onSubmit" :onHide="onHide">
+            <slot name="popup-content" :on-submit="onSubmit" :on-hide="onHide">
               <p class="h4 font-weight-bold pb-4 text-center w-100">
                 {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAc }}
               </p>
@@ -79,7 +79,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-facing-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import T from '../../lang';

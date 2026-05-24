@@ -8,7 +8,7 @@ import arena_NavbarProblems from './NavbarProblems.vue';
 describe('NavbarProblems.vue', () => {
   it('Should handle breadcrumbs in course', () => {
     const wrapper = shallowMount(arena_NavbarProblems, {
-      propsData: {
+      props: {
         activeProblem: null,
         courseAlias: 'curso-prueba',
         courseName: 'Curso de prueba',
@@ -50,7 +50,7 @@ describe('NavbarProblems.vue', () => {
 
   it('Should handle empty breadcrumbs in contest', async () => {
     const wrapper = shallowMount(arena_NavbarProblems, {
-      propsData: {
+      props: {
         activeProblem: null,
         contestAlias: 'concurso-prueba',
         courseName: 'Concurso de prueba',

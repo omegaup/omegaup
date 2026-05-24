@@ -35,14 +35,14 @@ const profile: types.UserProfileInfo = {
 describe('PreferencesEdit.vue', () => {
   it('Should display user email', () => {
     const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
+      props: { profile },
     });
     expect(wrapper.find('[data-email]').text()).toContain('admin@omegaup.com');
   });
 
   it('Should emit user update preferences', async () => {
     const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
+      props: { profile },
     });
 
     await wrapper
@@ -79,7 +79,7 @@ describe('PreferencesEdit.vue', () => {
 
   it('Should disable ScholarCompetitive objective select when "none" option is selected', async () => {
     const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
+      props: { profile },
     });
     await wrapper
       .find('select[data-learning-teaching-objective]')
@@ -118,7 +118,7 @@ describe('PreferencesEdit.vue', () => {
       objectiveScholarCompetitiveQuestion,
     }) => {
       const wrapper = shallowMount(user_Preferences_Edit, {
-        propsData: { profile },
+        props: { profile },
       });
       await wrapper
         .find('select[data-learning-teaching-objective]')
@@ -238,7 +238,7 @@ describe('PreferencesEdit.vue', () => {
       valueTeaching,
     }) => {
       const wrapper = shallowMount(user_Preferences_Edit, {
-        propsData: { profile },
+        props: { profile },
       });
       await wrapper
         .find('select[data-learning-teaching-objective]')
@@ -272,7 +272,7 @@ describe('PreferencesEdit.vue', () => {
 
   it('Should emit correct objectives values when "none" option is selected', async () => {
     const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
+      props: { profile },
     });
     await wrapper
       .find('select[data-learning-teaching-objective]')
