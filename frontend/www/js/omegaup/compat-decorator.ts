@@ -12,13 +12,7 @@
  */
 
 export { default as Vue } from 'vue';
-export {
-  Component,
-  Prop,
-  Watch,
-  Emit,
-  Ref,
-} from 'vue-facing-decorator';
+export { Component, Prop, Watch, Emit, Ref } from 'vue-facing-decorator';
 
 /**
  * Minimal @Inject shim for the few components that still use it.

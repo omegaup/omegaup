@@ -406,7 +406,8 @@ OmegaUp.on('ready', () => {
               version: selectedCommit.version,
             })
               .then((response) => {
-                versionsComponent.runsDiff[selectedCommit.version] = response.diff;
+                versionsComponent.runsDiff[selectedCommit.version] =
+                  response.diff;
               })
               .catch(ui.apiError);
           },

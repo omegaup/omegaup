@@ -37,3 +37,23 @@ Node.prototype.insertBefore = function <T extends Node>(
   }
   return this.appendChild(newChild);
 };
+
+// Suppress NotFoundError thrown during Vue 3 teardown in jsdom
+process.on('uncaughtException', (err: Error) => {
+  if (
+    err.name === 'NotFoundError' &&
+    err.message === 'The node to be removed is not a child of this node.'
+  ) {
+    return;
+  }
+  throw err;
+});
+process.on('unhandledRejection', (reason: any) => {
+  if (
+    reason?.name === 'NotFoundError' &&
+    reason?.message === 'The node to be removed is not a child of this node.'
+  ) {
+    return;
+  }
+  throw reason;
+});

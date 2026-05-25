@@ -448,7 +448,11 @@ currentMaintenanceMessageEn: any;
     this.currentMaintenanceMessagePt = this.maintenanceMessagePt;
   }
 currentMaintenanceMessagePt: any;
-  currentMaintenanceType = this.maintenanceType || 'info';
+  currentMaintenanceType!: string;
+
+  created() {
+    this.currentMaintenanceType = this.maintenanceType || 'info';
+  }
 
   T = T;
   ui = ui;

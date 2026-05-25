@@ -121,8 +121,12 @@ export default class TablePaginator extends Vue {
 
   private T = T;
   private currentPageNumber = 0;
-  private currentSortOption =
-    this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
+  private currentSortOption!: string;
+
+  created() {
+    this.currentSortOption =
+      this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
+  }
 
   private nextPage(): void {
     this.currentPageNumber++;

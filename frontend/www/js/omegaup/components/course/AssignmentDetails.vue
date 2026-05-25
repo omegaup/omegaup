@@ -310,12 +310,16 @@ export default class CourseAssignmentDetails extends Vue {
 
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
-  alias = this.assignment.alias || '';
-  assignmentType = this.assignment.assignment_type || 'homework';
-  description = this.assignment.description || '';
-  name = this.assignment.name || '';
+  alias!: string;
+  assignmentType!: string;
+  description!: string;
+  name!: string;
 
   created() {
+    this.alias = this.assignment.alias || '';
+    this.assignmentType = this.assignment.assignment_type || 'homework';
+    this.description = this.assignment.description || '';
+    this.name = this.assignment.name || '';
     this.startTime = this.assignment.start_time || new Date();
     this.finishTime = this.assignment.finish_time || new Date();
   }

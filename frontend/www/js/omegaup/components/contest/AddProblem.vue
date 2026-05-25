@@ -222,9 +222,10 @@ export default class AddProblem extends Vue {
   alias: null | types.ListItem = null;
   title: null | string = null;
 points: any;
-  order = this.initialProblems.length + 1;
+  order!: number;
 
   created() {
+    this.order = this.initialProblems.length + 1;
     this.points = this.initialPoints;
     this.problems = this.initialProblems;
   }

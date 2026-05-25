@@ -396,14 +396,16 @@ finishTime: any;
 showScoreboard: any;
 startTime: any;
 name: any;
-  level = this.course.level ?? '';
+  level!: string;
 objective: any;
 school: null | types.SchoolListItem;
 needsBasicInformation: any;
 requestsUserInformation: any;
-  unlimitedDuration = this.course.finish_time === null;
+  unlimitedDuration!: boolean;
 
   created() {
+    this.level = this.course.level ?? '';
+    this.unlimitedDuration = this.course.finish_time === null;
     this.alias = this.course.alias;
     this.description = this.course.description;
     this.finishTime = this.course.finish_time || new Date();

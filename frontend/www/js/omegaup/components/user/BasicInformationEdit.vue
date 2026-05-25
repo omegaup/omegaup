@@ -114,9 +114,13 @@ gender: any;
   }
 countryId: any;
 stateId: any;
-  birthDate = this.profile.birth_date
-    ? time.convertLocalDateToGMTDate(this.profile.birth_date)
-    : new Date('');
+  birthDate!: Date;
+
+  created() {
+    this.birthDate = this.profile.birth_date
+      ? time.convertLocalDateToGMTDate(this.profile.birth_date)
+      : new Date('');
+  }
 
   get isCountrySelected(): boolean {
     return Boolean(this.countryId);

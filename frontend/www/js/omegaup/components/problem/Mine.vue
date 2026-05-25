@@ -288,7 +288,11 @@ export default class ProblemMine extends Vue {
 
   T = T;
   ui = ui;
-  currentQuery = this.query ?? '';
+  currentQuery!: string;
+
+  created() {
+    this.currentQuery = this.query ?? '';
+  }
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;
