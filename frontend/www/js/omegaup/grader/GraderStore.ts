@@ -1,7 +1,6 @@
 // TODO: move logic from components inside this store
 
-import Vuex, { Commit, StoreOptions } from 'vuex';
-import Vue from 'vue';
+import { createStore, Commit, StoreOptions } from 'vuex';
 
 import * as Util from './util';
 import * as templates from './GraderTemplates';
@@ -102,7 +101,7 @@ const languageExtensionMapping: Record<string, string> = {};
 Object.keys(Util.supportedLanguages).forEach((key) => {
   languageExtensionMapping[key] = Util.supportedLanguages[key].extension;
 });
-Vue.use(Vuex);
+
 const storeOptions: StoreOptions<GraderStore> = {
   state: {
     alias: '',
@@ -431,7 +430,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       state.logs = value;
     },
     request(state: GraderStore, value: GraderRequest) {
-      Vue.set(state, 'request', value);
+      state.request = value;
     },
     'request.language'(state: GraderStore, language: string) {
       state.request.language = language;
@@ -492,14 +491,14 @@ const storeOptions: StoreOptions<GraderStore> = {
       state.dirty = true;
     },
     results(state: GraderStore, value: GraderResults) {
-      Vue.set(state, 'results', value);
+      state.results = value;
       state.dirty = true;
     },
     clearOutputs(state: GraderStore) {
-      Vue.set(state, 'outputs', {});
+      state.outputs = {};
     },
     output(state: GraderStore, payload: { name: CaseKey; contents: string }) {
-      Vue.set(state.outputs, payload.name, payload.contents);
+      state.outputs[payload.name] = payload.contents;
     },
     'request.input.validator.custom_validator.source'(
       state: GraderStore,
@@ -547,9 +546,9 @@ const storeOptions: StoreOptions<GraderStore> = {
             'tolerance',
           )
         )
-          Vue.set(state.request.input.validator, 'tolerance', 1e-9);
+          state.request.input.validator.tolerance = 1e-9;
       } else {
-        Vue.delete(state.request.input.validator, 'tolerance');
+        delete state.request.input.validator.tolerance;
       }
       if (value == 'custom') {
         if (
@@ -558,16 +557,16 @@ const storeOptions: StoreOptions<GraderStore> = {
             'custom_validator',
           )
         ) {
-          Vue.set(state.request.input.validator, 'custom_validator', {
+          state.request.input.validator.custom_validator = {
             source: defaultValidatorSource,
             language: 'py3',
-          });
+          };
         }
       } else {
-        Vue.delete(state.request.input.validator, 'custom_validator');
+        delete state.request.input.validator.custom_validator;
       }
 
-      Vue.set(state.request.input.validator, 'name', value);
+      state.request.input.validator.name = value;
       state.dirty = true;
     },
     Tolerance(state: GraderStore, value: number) {
@@ -579,11 +578,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       value: string,
     ) {
       if (!state.request.input.validator.custom_validator) return;
-      Vue.set(
-        state.request.input.validator.custom_validator,
-        'language',
-        value,
-      );
+      state.request.input.validator.custom_validator.language = value;
       state.dirty = true;
     },
     Interactive(
@@ -595,7 +590,7 @@ const storeOptions: StoreOptions<GraderStore> = {
         if (!state.request.input.interactive) {
           return;
         }
-        Vue.delete(state.request.input, 'interactive');
+        delete (state.request.input as any).interactive;
         state.dirty = true;
         return;
       }
@@ -607,7 +602,7 @@ const storeOptions: StoreOptions<GraderStore> = {
           'interactive',
         )
       ) {
-        Vue.set(state.request.input, 'interactive', {});
+        (state.request.input as any).interactive = {};
       }
 
       // update interactive problem data
@@ -647,17 +642,13 @@ const storeOptions: StoreOptions<GraderStore> = {
       if (value == 'cpp') value = 'cpp17-gcc';
       if (!state.request.input.interactive) return;
 
-      Vue.set(state.request.input.interactive, 'language', value);
+      state.request.input.interactive.language = value;
       state.dirty = true;
     },
     moduleName(state: GraderStore, value: string) {
       if (!state.request.input.interactive) return;
 
-      // this statement is not reactive
-      // state.request.input.interactive.module_name = value;
-
-      // this one is reactive
-      Vue.set(state.request.input.interactive, 'module_name', value);
+      state.request.input.interactive.module_name = value;
       state.dirty = true;
     },
     updatingSettings(state: GraderStore, value: boolean) {
@@ -671,11 +662,11 @@ const storeOptions: StoreOptions<GraderStore> = {
       // no! always create a case
       // 2 cases can be of same name and different data
 
-      Vue.set(state.request.input.cases, caseData.name, {
+      state.request.input.cases[caseData.name] = {
         in: caseData.in || '',
         out: caseData.out || '',
         weight: caseData.weight || 1,
-      });
+      };
       // if we call this function, we must set current case
       // or it could cause errors
       store.commit('currentCase', caseData.name);
@@ -698,7 +689,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       const caseName = keys[0] === name ? keys[1] : keys[0];
       store.commit('currentCase', caseName);
 
-      Vue.delete(state.request.input.cases, name);
+      delete state.request.input.cases[name];
       state.dirty = true;
     },
     limits(_state: GraderStore, limits: types.LimitsSettings) {
@@ -937,5 +928,5 @@ const storeOptions: StoreOptions<GraderStore> = {
   },
   strict: true,
 };
-const store = new Vuex.Store<GraderStore>(storeOptions);
+const store = createStore<GraderStore>(storeOptions);
 export default store;

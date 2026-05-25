@@ -3,8 +3,9 @@ const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const { DefinePlugin } = require('webpack');
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 module.exports = {
@@ -158,15 +159,24 @@ module.exports = {
       ],
     }),
     new VueLoaderPlugin(),
-    new ForkTsCheckerWebpackPlugin({
-      typescript: {
-        extensions: {
-          vue: true,
-        },
-      },
-      formatter: 'codeframe',
-      async: false,
+    new DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
     }),
+    // Temporarily disabled while migrating to Vue 3 compat types
+    // new ForkTsCheckerWebpackPlugin({
+    //   typescript: {
+    //     extensions: {
+    //       vue: {
+    //         enabled: true,
+    //         compiler: '@vue/compiler-sfc',
+    //       },
+    //     },
+    //   },
+    //   formatter: 'codeframe',
+    //   async: false,
+    // }),
   ],
 
   optimization: {
@@ -216,7 +226,7 @@ module.exports = {
   },
 
   module: {
-    noParse: /^(vue|vue-router|vuex|vuex-router-sync)$/,
+    noParse: /^(vuex|vuex-router-sync)$/,
     rules: [
       {
         test: /\.vue$/,
@@ -242,10 +252,17 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
-          presets: ['@babel/env'],
+          presets: [
+            ['@babel/env', { modules: 'commonjs' }],
+          ],
           cacheDirectory: true,
         },
-        exclude: /node_modules/,
+        exclude: function (modulePath) {
+          return (
+            /node_modules/.test(modulePath) &&
+            !/vue-facing-decorator/.test(modulePath)
+          );
+        },
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
@@ -274,11 +291,31 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
-      vue$: 'vue/dist/vue.common.js',
+      vue$: '@vue/compat/dist/vue.esm-bundler.js',
       'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
       jszip: 'jszip/dist/jszip.js',
       pako: 'pako/dist/pako.min.js',
       '@': path.resolve(__dirname, './frontend/www/'),
+      'vue-property-decorator': path.resolve(
+        __dirname,
+        'frontend/www/js/omegaup/compat-decorator.ts',
+      ),
+      'vue-facing-decorator/dist/esm/class': path.resolve(
+        __dirname,
+        'frontend/www/js/omegaup/vfd-class-shim.ts',
+      ),
+      'vue-facing-decorator/dist/esm/class.js': path.resolve(
+        __dirname,
+        'frontend/www/js/omegaup/vfd-class-shim.ts',
+      ),
+      'vue-facing-decorator/dist/cjs/class': path.resolve(
+        __dirname,
+        'frontend/www/js/omegaup/vfd-class-shim.ts',
+      ),
+      'vue-facing-decorator/dist/cjs/class.js': path.resolve(
+        __dirname,
+        'frontend/www/js/omegaup/vfd-class-shim.ts',
+      ),
     },
   },
 };

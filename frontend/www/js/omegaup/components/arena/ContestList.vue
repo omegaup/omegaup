@@ -638,7 +638,7 @@ class ArenaContestList extends Vue {
         sort_order: this.currentOrder,
         filter: this.currentFilter,
       };
-      Vue.set(this.contests, this.viewAllCategory, []);
+          this.contests[this.viewAllCategory] = [];
       this.currentPage = 1;
       this.hasMore = true;
       this.fetchPage(params, urlObj);

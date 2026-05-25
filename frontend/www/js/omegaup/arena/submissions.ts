@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
@@ -259,10 +258,10 @@ export function onSetNominationStatus({
   nominationStatus: types.NominationStatus;
 }): void {
   if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-    Vue.set(nominationStatus, 'tried', true);
+    nominationStatus.tried = true;
   }
   if (run.verdict === 'AC') {
-    Vue.set(nominationStatus, 'solved', true);
+    nominationStatus.solved = true;
   }
 }
 

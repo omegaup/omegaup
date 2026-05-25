@@ -42,11 +42,11 @@
               })
             }}
           </h3>
-          <template v-for="group in getGroups(item)">
-            <table
-              :key="`${contestantData.username}_${item.alias}_${group.group}_case`"
-              class="table table-stripped table-responsive"
-            >
+          <div
+            v-for="group in getGroups(item)"
+            :key="`${contestantData.username}_${item.alias}_${group.group}_case`"
+          >
+            <table class="table table-stripped table-responsive">
               <thead>
                 <tr class="text-center">
                   <th scope="col">{{ T.wordsCase }}</th>
@@ -84,10 +84,7 @@
               </tbody>
             </table>
 
-            <table
-              :key="`${contestantData.username}_${item.alias}_${group.group}_detail`"
-              class="table table-stripped table-responsive pb-2"
-            >
+            <table class="table table-stripped table-responsive pb-2">
               <thead>
                 <tr class="text-center">
                   <th scope="col">{{ T.wordsGroup }}</th>
@@ -104,7 +101,7 @@
                 </tr>
               </tbody>
             </table>
-          </template>
+          </div>
         </div>
         <hr />
       </div>

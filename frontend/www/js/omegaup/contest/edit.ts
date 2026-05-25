@@ -406,11 +406,7 @@ OmegaUp.on('ready', () => {
               version: selectedCommit.version,
             })
               .then((response) => {
-                Vue.set(
-                  versionsComponent.runsDiff,
-                  selectedCommit.version,
-                  response.diff,
-                );
+                versionsComponent.runsDiff[selectedCommit.version] = response.diff;
               })
               .catch(ui.apiError);
           },

@@ -533,7 +533,7 @@ class ArenaContestList extends Vue {
       filter: this.currentFilter,
     };
     // Reset the contest list for this tab to avoid stale data
-    Vue.set(this.contests, this.currentTab, []);
+    this.contests[this.currentTab] = [];
     this.currentPage = 1;
     this.hasMore = true;
     this.fetchPage(params, urlObj);
@@ -553,7 +553,7 @@ class ArenaContestList extends Vue {
       replaceState: this.isFromBrowserNavigation || this.isInitialLoad,
     };
     // Reset the contest list for this tab to avoid stale data
-    Vue.set(this.contests, this.currentTab, []);
+    this.contests[this.currentTab] = [];
     this.currentPage = 1;
     this.hasMore = true;
     // Reset the navigation and initial load flags after using them

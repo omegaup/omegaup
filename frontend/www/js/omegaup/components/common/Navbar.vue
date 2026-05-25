@@ -379,9 +379,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import LogoutConfirmation from './LogoutConfirmation.vue';
+import mitt from 'mitt';
 library.add(faSignOutAlt, faUser);
 
-export const EventBus = new Vue();
+export const EventBus = mitt();
 
 @Component({
   components: {
@@ -483,7 +484,7 @@ export default class Navbar extends Vue {
   }
 
   emitActiveTab(tab: AvailableTabs): void {
-    EventBus.$emit('update:activeTab', tab);
+    EventBus.emit('update:activeTab', tab);
     if (
       window.location.pathname === '/login' ||
       window.location.pathname === '/login/'

@@ -26,8 +26,8 @@
       <table class="table table-striped mb-0">
         <thead>
           <tr>
-            <template v-for="column in columnNames">
-              <th :key="column.name" :class="column.style">
+            <template v-for="column in columnNames" :key="column.name">
+              <th :class="column.style">
                 {{ column.name }}
               </th>
             </template>

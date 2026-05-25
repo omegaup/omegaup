@@ -75,8 +75,11 @@
                 </template>
               </tr>
               <template v-if="groupVisible[element.group]">
-                <template v-for="problemCase in element.cases">
-                  <tr :key="problemCase.name">
+                <template
+                  v-for="problemCase in element.cases"
+                  :key="problemCase.name"
+                >
+                  <tr>
                     <td></td>
                     <td class="text-center">{{ problemCase.name }}</td>
                     <td class="text-center">{{ problemCase.verdict }}</td>

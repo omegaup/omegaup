@@ -1,7 +1,4 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-
-Vue.use(Vuex);
+import { createStore } from 'vuex';
 
 export interface MainStoreState {
   username: string | null;
@@ -13,9 +10,9 @@ export const mainStoreConfig = {
   },
   mutations: {
     updateUsername(state: MainStoreState, username: string | null) {
-      Vue.set(state, 'username', username);
+      state.username = username;
     },
   },
 };
 
-export default new Vuex.Store<MainStoreState>(mainStoreConfig);
+export default createStore<MainStoreState>(mainStoreConfig);

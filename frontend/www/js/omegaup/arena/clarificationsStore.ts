@@ -1,8 +1,5 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 import { types } from '../api_types';
-
-Vue.use(Vuex);
 
 export interface ClarificationState {
   // The list of clarifications
@@ -32,22 +29,16 @@ export const clarificationStoreConfig = {
           clarification.clarification_id,
         )
       ) {
-        Vue.set(
-          state.clarifications,
-          state.index[clarification.clarification_id],
-          Object.assign(
-            {},
-            state.clarifications[state.index[clarification.clarification_id]],
-            clarification,
-          ),
+        state.clarifications[
+          state.index[clarification.clarification_id]
+        ] = Object.assign(
+          {},
+          state.clarifications[state.index[clarification.clarification_id]],
+          clarification,
         );
         return;
       }
-      Vue.set(
-        state.index,
-        clarification.clarification_id,
-        state.clarifications.length,
-      );
+      state.index[clarification.clarification_id] = state.clarifications.length;
       state.clarifications.push(clarification);
     },
     selectClarificationId(
@@ -64,4 +55,4 @@ export const clarificationStoreConfig = {
   },
 };
 
-export default new Vuex.Store<ClarificationState>(clarificationStoreConfig);
+export default createStore<ClarificationState>(clarificationStoreConfig);
