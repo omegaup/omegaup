@@ -24,7 +24,7 @@ describe('Paginator.vue', () => {
 
   it('Should handle pager items', async () => {
     const wrapper = shallowMount(common_Paginator, {
-      propsData: {
+      props: {
         pagerItems,
       },
     });

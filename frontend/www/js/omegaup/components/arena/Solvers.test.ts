@@ -8,7 +8,7 @@ import type { types } from '../../api_types';
 describe('Solvers.vue', () => {
   it('Should handle empty solvers list', () => {
     const wrapper = shallowMount(arena_Solvers, {
-      propsData: {
+      props: {
         solvers: [] as types.BestSolvers[],
       },
     });
@@ -18,7 +18,7 @@ describe('Solvers.vue', () => {
 
   it('Should handle solvers list', async () => {
     const wrapper = shallowMount(arena_Solvers, {
-      propsData: {
+      props: {
         solvers: [
           {
             classname: 'user-rank-unranked',

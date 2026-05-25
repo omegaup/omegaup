@@ -6,7 +6,7 @@ import omegaup_RadioSwitch from './RadioSwitch.vue';
 describe('RadioSwitch.vue', () => {
   it('Should render a simple radio switch with default descriptions', () => {
     const wrapper = shallowMount(omegaup_RadioSwitch, {
-      propsData: {
+      props: {
         selectedValue: true,
       },
     });
@@ -16,7 +16,7 @@ describe('RadioSwitch.vue', () => {
 
   it('Should render a simple radio switch with custom descriptions', () => {
     const wrapper = shallowMount(omegaup_RadioSwitch, {
-      propsData: {
+      props: {
         selectedValue: true,
         textForTrue: 'Red',
         textForFalse: 'Yellow',

@@ -29,19 +29,19 @@ describe('Requests.vue', () => {
     },
   ];
 
-  const propsData = {
+  const props = {
     data,
     textAddParticipant: T.contestAdduserAddContestant,
   };
 
   it('Should handle initial props', () => {
-    const wrapper = shallowMount(common_Requests, { propsData });
+    const wrapper = shallowMount(common_Requests, { props });
 
     expect(wrapper.text()).toContain(T.contestAdduserAddContestant);
   });
 
   it('Should handle deny request event', async () => {
-    const wrapper = shallowMount(common_Requests, { propsData });
+    const wrapper = shallowMount(common_Requests, { props });
 
     const buttons = wrapper.findAll('button.text-danger');
     const feedbackModals = wrapper.findAll('b-modal-stub');
@@ -68,7 +68,7 @@ describe('Requests.vue', () => {
   });
 
   it('Should handle accept request event', async () => {
-    const wrapper = shallowMount(common_Requests, { propsData });
+    const wrapper = shallowMount(common_Requests, { props });
 
     await wrapper.find('button.text-success').trigger('click');
     expect(wrapper.emitted('accept-request')).toBeDefined();
@@ -79,7 +79,7 @@ describe('Requests.vue', () => {
 
   it('Should handle the whole list of requests', async () => {
     const wrapper = mount(common_Requests, {
-      propsData: {
+      props: {
         data: [
           {
             accepted: false,

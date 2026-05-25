@@ -7,7 +7,7 @@ import certificate_Validation from './Validation.vue';
 describe('Validation.vue', () => {
   it('Should handle an invalid certificate', () => {
     const wrapper = shallowMount(certificate_Validation, {
-      propsData: {
+      props: {
         verificationCode: 'ps9Atr691a',
         isValid: false,
       },
@@ -26,7 +26,7 @@ describe('Validation.vue', () => {
 
   it('Should handle a valid certificate', () => {
     const wrapper = shallowMount(certificate_Validation, {
-      propsData: {
+      props: {
         verificationCode: 'ps9Atr691a',
         isValid: true,
         certificate: '',

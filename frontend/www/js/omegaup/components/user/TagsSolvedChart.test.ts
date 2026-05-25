@@ -25,7 +25,7 @@ describe('TagsSolvedChart.vue', () => {
 
   it('should render the component with chart title', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
+      props: {
         tags: defaultTags,
       },
     });
@@ -35,7 +35,7 @@ describe('TagsSolvedChart.vue', () => {
 
   it('should render chart container when tags are provided', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
+      props: {
         tags: defaultTags,
       },
     });
@@ -46,7 +46,7 @@ describe('TagsSolvedChart.vue', () => {
 
   it('should show no-data message when tags array is empty', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
+      props: {
         tags: [],
       },
     });
@@ -57,7 +57,7 @@ describe('TagsSolvedChart.vue', () => {
 
   it('should compute correct chart options', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
+      props: {
         tags: defaultTags,
       },
     });
@@ -77,7 +77,7 @@ describe('TagsSolvedChart.vue', () => {
     }));
 
     const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
+      props: {
         tags: manyTags,
       },
     });
@@ -90,7 +90,7 @@ describe('TagsSolvedChart.vue', () => {
 
   it('should have correct data structure for chart', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
+      props: {
         tags: defaultTags,
       },
     });

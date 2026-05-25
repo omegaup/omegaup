@@ -99,7 +99,7 @@ Here we can add code.
   it('Should handle details for a contest in print mode', () => {
     const contestTitle = 'hello contest';
     const wrapper = mount(contest_Print, {
-      propsData: { contestTitle, problems },
+      props: { contestTitle, problems },
     });
 
     const printIcon = wrapper.find('svg[data-prefix="fas"]');

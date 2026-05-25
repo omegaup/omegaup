@@ -68,7 +68,7 @@ describe('AddProblem.vue', () => {
 
   it('Should handle empty props', () => {
     const wrapper = shallowMount(contest_AddProblem, {
-      propsData: {
+      props: {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems: [],
@@ -80,7 +80,7 @@ describe('AddProblem.vue', () => {
 
   it('Should enable the delete button when a problem has no submissions', async () => {
     const wrapper = shallowMount(contest_AddProblem, {
-      propsData: {
+      props: {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems: [{ ...problem, has_submissions: false }],
@@ -100,7 +100,7 @@ describe('AddProblem.vue', () => {
 
   it('Should disable the delete button when a problem has submissions', () => {
     const wrapper = shallowMount(contest_AddProblem, {
-      propsData: {
+      props: {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems: [{ ...problem, has_submissions: true }],
@@ -123,7 +123,7 @@ describe('AddProblem.vue', () => {
     initialProblems[0].version = alternativeCommit;
     initialProblems[0].versions.published = alternativeCommit;
     const wrapper = shallowMount(contest_AddProblem, {
-      propsData: {
+      props: {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems,
@@ -179,7 +179,7 @@ describe('AddProblem.vue', () => {
 
   it('Should update non-latest version for a problem in the list', async () => {
     const wrapper = mount(contest_AddProblem, {
-      propsData: {
+      props: {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems: [
@@ -226,7 +226,7 @@ describe('AddProblem.vue', () => {
 
   it('Should update latest version for a problem in the list', async () => {
     const wrapper = mount(contest_AddProblem, {
-      propsData: {
+      props: {
         attachTo: '#root',
         contestAlias: 'testContestAlias',
         initialPoints: 100,
@@ -263,7 +263,7 @@ describe('AddProblem.vue', () => {
 
   it('Should update latest version for a problem in the list when it is explicitly selected', async () => {
     const wrapper = mount(contest_AddProblem, {
-      propsData: {
+      props: {
         attachTo: '#root',
         contestAlias: 'testContestAlias',
         initialPoints: 100,

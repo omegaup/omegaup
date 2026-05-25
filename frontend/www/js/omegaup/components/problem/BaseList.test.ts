@@ -5,7 +5,7 @@ import problem_BaseList from './BaseList.vue';
 describe('BaseList.vue', () => {
   it('Should handle empty list of problems', async () => {
     const wrapper = shallowMount(problem_BaseList, {
-      propsData: {
+      props: {
         isSysadmin: false,
         problems: [],
         pagerItems: [

@@ -38,7 +38,7 @@ function mountComponent(
   username = 'testuser',
 ): Wrapper<Vue> {
   return shallowMount(Charts, {
-    propsData: { data, username },
+    props: { data, username },
   });
 }
 

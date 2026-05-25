@@ -36,7 +36,7 @@ describe('GridPaginator.vue', () => {
 
   it('Should handle an empty grid', () => {
     const wrapper = shallowMount(common_GridPaginator, {
-      propsData: {
+      props: {
         items: [],
         itemsPerPage,
         columns,
@@ -51,7 +51,7 @@ describe('GridPaginator.vue', () => {
   it('Should handle a grid with information', async () => {
     const title = 'Coder of the month';
     const wrapper = shallowMount(common_GridPaginator, {
-      propsData: {
+      props: {
         items,
         itemsPerPage: 4,
         columns,
@@ -72,7 +72,7 @@ describe('GridPaginator.vue', () => {
   it('Should handle a grid with information divided in multiple pages', async () => {
     const title = 'Coder of the month';
     const wrapper = shallowMount(common_GridPaginator, {
-      propsData: {
+      props: {
         items,
         itemsPerPage,
         columns,

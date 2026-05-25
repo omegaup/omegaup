@@ -24,7 +24,7 @@ jest.mock('monaco-editor', () => ({
 describe('DiffEditorV2.vue', () => {
   it('Should mount without crashing', () => {
     const wrapper = shallowMount(DiffEditorV2, {
-      propsData: {
+      props: {
         storeMapping: {
           originalContents: 'original',
           modifiedContents: 'modified',

@@ -190,7 +190,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should show the current contest list', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
@@ -206,7 +206,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should show the future contest list', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Future,
       },
@@ -222,7 +222,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should show the past contest list', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Past,
       },
@@ -238,7 +238,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should not render Virtual/Practice dropdown in Current contests', () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
@@ -252,7 +252,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should not render Virtual/Practice dropdown in Future contests', () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Future,
       },
@@ -266,7 +266,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
@@ -297,7 +297,7 @@ describe('ContestListv2.vue', () => {
     'Should show dropdown when "%s" field is selected',
     async (value) => {
       const wrapper = mount(arena_ContestList, {
-        propsData: {
+        props: {
           contests,
         },
       });
@@ -362,7 +362,7 @@ describe('ContestListv2.vue', () => {
     ({ field, name }) => {
       each(tabMapping).it('When selected tab equal to %s', async ({ tab }) => {
         const wrapper = mount(arena_ContestList, {
-          propsData: {
+          props: {
             contests,
             tab,
           },
@@ -390,7 +390,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should use replaceState on initial mount to avoid extra history entry', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },
@@ -410,7 +410,7 @@ describe('ContestListv2.vue', () => {
 
   it('Should use pushState (replaceState: false) for subsequent user interactions', async () => {
     const wrapper = mount(arena_ContestList, {
-      propsData: {
+      props: {
         contests,
         tab: ContestTab.Current,
       },

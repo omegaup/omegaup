@@ -8,7 +8,7 @@ import course_AddStudents from './AddStudents.vue';
 describe('AddStudents.vue', () => {
   it('Should handle empty students list', () => {
     const wrapper = shallowMount(course_AddStudents, {
-      propsData: {
+      props: {
         courseAlias: 'course_alias',
         students: [] as types.CourseStudent[],
         identityRequests: [] as types.IdentityRequest[],
@@ -21,7 +21,7 @@ describe('AddStudents.vue', () => {
 
   it('Should handle students list and requests list', () => {
     const wrapper = shallowMount(course_AddStudents, {
-      propsData: {
+      props: {
         courseAlias: 'course_alias',
         students: [
           {

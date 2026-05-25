@@ -47,7 +47,7 @@ const baseSettingsSummaryProps = {
 describe('SettingsSummary.vue', () => {
   it('Should handle problem settings summary in contest', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: baseSettingsSummaryProps,
+      props: baseSettingsSummaryProps,
     });
 
     expect(wrapper.text()).toContain(T.wordsInOut);
@@ -55,7 +55,7 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle problem settings summary out of contest', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: {
+      props: {
         ...baseSettingsSummaryProps,
         showVisibilityIndicators: true,
       },
@@ -67,7 +67,7 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle problem settings summary with memory limit as string', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: {
+      props: {
         ...baseSettingsSummaryProps,
         problem: {
           settings: { limits: { MemoryLimit: '32 MiB' } },
@@ -82,7 +82,7 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle empty problem settings summary in lectures', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: {
+      props: {
         ...baseSettingsSummaryProps,
         problem: { languages: [], accepts_submissions: false },
       },
@@ -93,7 +93,7 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle empty problem settings summary in problem', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: {
+      props: {
         ...baseSettingsSummaryProps,
         problem: { languages: [], accepts_submissions: true },
       },

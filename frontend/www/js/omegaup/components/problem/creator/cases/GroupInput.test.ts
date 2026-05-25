@@ -1,19 +1,12 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import GroupInput from './GroupInput.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
-
 describe('GroupInput.vue', () => {
   it('Should contain all 3 inputs', async () => {
-    const wrapper = shallowMount(GroupInput, {
-      localVue,
-    });
+    const wrapper = shallowMount(GroupInput);
 
     const expectedTextInputText = [
       T.problemCreatorGroupName,
@@ -33,9 +26,7 @@ describe('GroupInput.vue', () => {
   });
 
   it('Should handle autoformatting', () => {
-    const wrapper = shallowMount(GroupInput, {
-      localVue,
-    });
+    const wrapper = shallowMount(GroupInput);
 
     // These any are necessary since wrapper.vm doesn't load the component's methods to typescript, even if they exist
     const invalidString = 'INVALID STRING234 !@#!@#';

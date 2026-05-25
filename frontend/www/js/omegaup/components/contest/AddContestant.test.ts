@@ -21,7 +21,7 @@ describe('AddContestant.vue', () => {
 
   it('Should handle empty user list', async () => {
     const wrapper = shallowMount(contest_AddContestant, {
-      propsData: {
+      props: {
         contest: {
           admission_mode: 'public',
           alias: 'Test contest',
@@ -37,7 +37,7 @@ describe('AddContestant.vue', () => {
   it('Should handle user list in bulk and in typeahead', async () => {
     const wrapper = shallowMount(contest_AddContestant, {
       attachTo: '#root',
-      propsData: {
+      props: {
         contest: {
           admission_mode: 'public',
           alias: 'Test contest',

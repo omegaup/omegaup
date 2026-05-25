@@ -35,7 +35,7 @@ describe('TablePaginator.vue', () => {
 
   it('Should handle an empty table', () => {
     const wrapper = shallowMount(common_TablePaginator, {
-      propsData: {
+      props: {
         items: [],
         itemsPerPage: 5,
         columnNames,
@@ -50,7 +50,7 @@ describe('TablePaginator.vue', () => {
   it('Should handle a table with rows', async () => {
     const title = 'Coder of the month';
     const wrapper = shallowMount(common_TablePaginator, {
-      propsData: {
+      props: {
         items,
         itemsPerPage: 5,
         columnNames,
@@ -71,7 +71,7 @@ describe('TablePaginator.vue', () => {
   it('Should handle a table with rows and several pages', async () => {
     const title = 'Coder of the month';
     const wrapper = shallowMount(common_TablePaginator, {
-      propsData: {
+      props: {
         items,
         itemsPerPage: 1,
         columnNames,

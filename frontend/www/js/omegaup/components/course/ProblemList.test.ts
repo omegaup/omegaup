@@ -41,7 +41,7 @@ describe('ProblemLists.vue', () => {
 
   it('Should handle empty assignments and problems', () => {
     const wrapper = shallowMount(course_ProblemLists, {
-      propsData: {
+      props: {
         assignmentProblems: [] as types.ProblemsetProblem[],
         assignments: [] as omegaup.Assignment[],
         selectedAssignment: {} as omegaup.Assignment,
@@ -58,7 +58,7 @@ describe('ProblemLists.vue', () => {
 
   it('Should handle assignment extra problem', () => {
     const wrapper = shallowMount(course_ProblemLists, {
-      propsData: {
+      props: {
         assignmentProblems: [problem],
         selectedAssignment,
         taggedProblems: [problem] as omegaup.Problem[],
@@ -72,7 +72,7 @@ describe('ProblemLists.vue', () => {
 
   it('Should show the current version of a problem', async () => {
     const wrapper = shallowMount(course_ProblemLists, {
-      propsData: {
+      props: {
         assignmentProblems: [problem],
         selectedAssignment,
         taggedProblems: [problem] as omegaup.Problem[],
@@ -91,7 +91,7 @@ describe('ProblemLists.vue', () => {
 
   it('Should update the version of a problem', async () => {
     const wrapper = shallowMount(course_ProblemLists, {
-      propsData: {
+      props: {
         assignmentProblems: [problem],
         selectedAssignment,
         taggedProblems: [problem] as omegaup.Problem[],

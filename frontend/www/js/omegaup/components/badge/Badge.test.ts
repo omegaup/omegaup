@@ -5,7 +5,7 @@ describe('Badge.vue', () => {
   it('Should display badge name', () => {
     const badgeAlias = 'contestManager';
     const wrapper = shallowMount(badge_Badge, {
-      propsData: {
+      props: {
         badge: { badge_alias: badgeAlias },
       },
     });

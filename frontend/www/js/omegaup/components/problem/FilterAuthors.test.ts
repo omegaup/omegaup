@@ -8,7 +8,7 @@ import problem_FilterAuthors from './FilterAuthors.vue';
 describe('FilterAuthors.vue', () => {
   it('Should handle list of authors', async () => {
     const wrapper = mount(problem_FilterAuthors, {
-      propsData: {
+      props: {
         authors: {
           total: 1,
           ranking: [

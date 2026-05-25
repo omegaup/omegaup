@@ -125,7 +125,7 @@ describe('Contest.vue', () => {
 
   it('Should handle a finished contest', async () => {
     const wrapper = mount(arena_Contest, {
-      propsData: {
+      props: {
         contest: Object.assign({}, contest, { finish_time: currentDate }),
         problems,
         problemInfo,
@@ -139,7 +139,7 @@ describe('Contest.vue', () => {
 
   it('Should handle details for a problem in a contest', async () => {
     const wrapper = mount(arena_Contest, {
-      propsData: {
+      props: {
         contest,
         problems,
         problemInfo,
@@ -163,7 +163,7 @@ describe('Contest.vue', () => {
   it('Should handle a submission', async () => {
     const wrapper = mount(arena_Contest, {
       attachTo: '#root',
-      propsData: {
+      props: {
         contest,
         problems,
         problemInfo,
@@ -218,7 +218,7 @@ describe('Contest.vue', () => {
   };
   it('Should handle details for a run in a contest', async () => {
     const wrapper = mount(arena_Contest, {
-      propsData: {
+      props: {
         contest,
         problems,
         problem: problems[0],
@@ -244,7 +244,7 @@ describe('Contest.vue', () => {
 
   it('Should handle details for a run in a contest as admin', async () => {
     const wrapper = mount(arena_Contest, {
-      propsData: {
+      props: {
         activeTab: 'runs',
         contestAdmin: true,
         contest,
@@ -273,7 +273,7 @@ describe('Contest.vue', () => {
 
   it('Should display the edit button when current user is admin', () => {
     const wrapper = mount(arena_Contest, {
-      propsData: {
+      props: {
         activeTab: 'runs',
         contestAdmin: true,
         contest,
@@ -287,7 +287,7 @@ describe('Contest.vue', () => {
 
   it('Should hide the edit button when current user is not an admin', () => {
     const wrapper = mount(arena_Contest, {
-      propsData: {
+      props: {
         activeTab: 'runs',
         contestAdmin: false,
         contest,

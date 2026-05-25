@@ -24,7 +24,7 @@ describe('Members.vue', () => {
     const teamUsername = 'teams:group_alias:team_1';
     const wrapper = shallowMount(teamsgroup_Members, {
       attachTo: '#root',
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
         teamUsername,
         teamsMembers: [] as types.TeamMember[],
@@ -64,7 +64,7 @@ describe('Members.vue', () => {
     const teamUsername = 'teams:group_alias:team_1';
     const wrapper = mount(teamsgroup_Members, {
       attachTo: '#root',
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
         teamUsername,
         teamsMembers: [
@@ -99,7 +99,7 @@ describe('Members.vue', () => {
     const teamUsername = 'teams:group_alias:team_1';
     const wrapper = mount(teamsgroup_Members, {
       attachTo: '#root',
-      propsData: {
+      props: {
         searchResultUsers: [] as types.ListItem[],
         teamUsername,
         teamsMembers: [

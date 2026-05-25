@@ -1,7 +1,6 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import LayoutSidebar from './LayoutSidebar.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 import store from '@/js/omegaup/problem/creator/store';
@@ -9,10 +8,6 @@ import {
   generateCase,
   generateGroup,
 } from '@/js/omegaup/problem/creator/modules/cases';
-
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('LayoutSidebar.vue', () => {
   store.commit('casesStore/addNewLayout');
@@ -55,7 +50,6 @@ describe('LayoutSidebar.vue', () => {
   });
   it('Should show layouts and methods', async () => {
     const wrapper = mount(LayoutSidebar, {
-      localVue,
       store,
     });
 
@@ -171,7 +165,6 @@ describe('LayoutSidebar.vue', () => {
     store.commit('casesStore/resetStore');
     store.commit('casesStore/addNewLayout');
     const wrapper = mount(LayoutSidebar, {
-      localVue,
       store,
     });
 

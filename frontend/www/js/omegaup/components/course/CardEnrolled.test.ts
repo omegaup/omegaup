@@ -13,7 +13,7 @@ describe('CardEnrolled.vue', () => {
 
   it('Should render information for enrolled course', () => {
     const wrapper = mount(course_CardEnrolled, {
-      propsData: {
+      props: {
         course: enrolledCourse,
       },
     });

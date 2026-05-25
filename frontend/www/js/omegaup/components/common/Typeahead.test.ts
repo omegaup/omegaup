@@ -6,7 +6,7 @@ import Vue from 'vue';
 describe('Typeahead.vue', () => {
   it('Should not call update-existing-options with a short query', async () => {
     const wrapper = mount(common_Typeahead, {
-      propsData: {
+      props: {
         existingOptions: [],
       },
     });
@@ -19,7 +19,7 @@ describe('Typeahead.vue', () => {
   it('Should call update-existing-options with a longer query', async () => {
     jest.useFakeTimers();
     const wrapper = mount(common_Typeahead, {
-      propsData: {
+      props: {
         existingOptions: [],
         debounceDelay: 300,
       },
@@ -40,7 +40,7 @@ describe('Typeahead.vue', () => {
 
   it('Should call update:value with a non-empty tag', () => {
     const wrapper = mount(common_Typeahead, {
-      propsData: {
+      props: {
         existingOptions: [],
       },
     });
@@ -55,7 +55,7 @@ describe('Typeahead.vue', () => {
 
   it('Should call update:value with an empty tag', async () => {
     const wrapper = mount(common_Typeahead, {
-      propsData: {
+      props: {
         existingOptions: [{ key: 'key', value: 'value' }],
       },
     });

@@ -15,7 +15,7 @@ const feedback: ArenaCourseFeedback = {
 describe('Feedback.vue', () => {
   it('Should handle feedback component when form is sumbitted', async () => {
     const wrapper = shallowMount(arena_Feedback, {
-      propsData: {
+      props: {
         feedback,
       },
     });
@@ -51,7 +51,7 @@ describe('Feedback.vue', () => {
 
   it('Should handle feedback component when form is cancelled', async () => {
     const wrapper = shallowMount(arena_Feedback, {
-      propsData: {
+      props: {
         feedback,
       },
     });

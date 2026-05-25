@@ -7,7 +7,7 @@ import T from '../../lang';
 describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
     const wrapper = shallowMount(course_StudentProgress, {
-      propsData: {
+      props: {
         assignmentsProblems: [
           {
             alias: 'test-assignment-a',

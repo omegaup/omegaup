@@ -26,7 +26,7 @@ describe('AssignmentCard.vue', () => {
   it('Should handle assignment details', () => {
     const studentProgress = 50;
     const wrapper = mount(course_AssignmentCard, {
-      propsData: {
+      props: {
         courseAlias: 'test-course',
         assignment,
         studentProgress,
@@ -46,7 +46,7 @@ describe('AssignmentCard.vue', () => {
     };
     const studentProgress = 50;
     const wrapper = mount(course_AssignmentCard, {
-      propsData: {
+      props: {
         courseAlias: 'test-course',
         assignment: lecture,
         studentProgress,
@@ -66,7 +66,7 @@ describe('AssignmentCard.vue', () => {
       finish_time: futureDate,
     };
     const wrapper = mount(course_AssignmentCard, {
-      propsData: {
+      props: {
         courseAlias: 'test-course',
         assignment: assignmentWithDeadline,
         studentProgress: 50,
@@ -79,7 +79,7 @@ describe('AssignmentCard.vue', () => {
 
   it('Should not display due date when finish_time is undefined', () => {
     const wrapper = mount(course_AssignmentCard, {
-      propsData: {
+      props: {
         courseAlias: 'test-course',
         assignment,
         studentProgress: 50,
@@ -96,7 +96,7 @@ describe('AssignmentCard.vue', () => {
       finish_time: pastDate,
     };
     const wrapper = mount(course_AssignmentCard, {
-      propsData: {
+      props: {
         courseAlias: 'test-course',
         assignment: overdueAssignment,
         studentProgress: 50,

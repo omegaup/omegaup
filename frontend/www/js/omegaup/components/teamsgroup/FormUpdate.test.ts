@@ -21,7 +21,7 @@ describe('FormUpdate.vue', () => {
   it('Should handle form update', async () => {
     const wrapper = mount(teamsgroup_FormUpdate, {
       attachTo: '#root',
-      propsData: {
+      props: {
         alias: 'Hello',
         name: 'Hello omegaUp',
         description: 'Hello omegaUp Description',

@@ -7,7 +7,7 @@ import contest_Groups from './Groups.vue';
 describe('Groups.vue', () => {
   it('Should handle empty groups', async () => {
     const wrapper = shallowMount(contest_Groups, {
-      propsData: {
+      props: {
         groups: [],
       },
     });

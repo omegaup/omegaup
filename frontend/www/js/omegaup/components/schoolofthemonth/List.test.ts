@@ -7,7 +7,7 @@ import schoolOfTheMonth_List from './List.vue';
 describe('List.vue', () => {
   it('Should handle empty lists', () => {
     const wrapper = shallowMount(schoolOfTheMonth_List, {
-      propsData: {
+      props: {
         schoolsOfPreviousMonth: [],
         schoolsOfPreviousMonths: [],
         candidatesToSchoolOfTheMonth: [],

@@ -45,7 +45,7 @@ describe('Edit.vue', () => {
     isCertificateGenerator: true,
   };
 
-  const propsData: {
+  const props: {
     admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
     initialTab: string;
@@ -70,7 +70,7 @@ describe('Edit.vue', () => {
   };
   it('Should handle a normal contest', () => {
     const wrapper = shallowMount(contest_Edit, {
-      propsData,
+      props,
     });
 
     expect(wrapper.text()).toContain(T.contestDetailsGoToContest);
@@ -79,21 +79,21 @@ describe('Edit.vue', () => {
   });
 
   it('Should handle a virtual contest', () => {
-    propsData.details.rerun_id = 2;
-    propsData.initialTab = '';
+    props.details.rerun_id = 2;
+    props.initialTab = '';
     const wrapper = shallowMount(contest_Edit, {
-      propsData,
+      props,
     });
 
     expect(wrapper.vm.showTab).toBe('contestants');
   });
 
   it('Should handle a virtual contest from an original private contest', () => {
-    propsData.details.rerun_id = 2;
-    propsData.initialTab = '';
-    propsData.originalContestAdmissionMode = 'private';
+    props.details.rerun_id = 2;
+    props.initialTab = '';
+    props.originalContestAdmissionMode = 'private';
     const wrapper = shallowMount(contest_Edit, {
-      propsData,
+      props,
     });
 
     expect(wrapper.vm.showTab).toBe('links');

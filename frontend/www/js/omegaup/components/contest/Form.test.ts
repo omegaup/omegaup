@@ -26,7 +26,7 @@ describe('Form.vue', () => {
     const startTime = new Date();
     const finishTime = new Date(startTime.getTime() + 60 * 60 * 1000);
     const wrapper = shallowMount(contest_Form, {
-      propsData: {
+      props: {
         update: false,
         allLanguages: [{ py2: 'Python 2' }, { py3: 'Python 3' }],
         initialLanguages: [],
@@ -57,7 +57,7 @@ describe('Form.vue', () => {
     const finishTime = new Date(startTime.getTime() + 60 * 60 * 1000);
     const wrapper = shallowMount(contest_Form, {
       attachTo: '#root',
-      propsData: {
+      props: {
         update: true,
         allLanguages: [{ py2: 'Python 2' }, { py3: 'Python 3' }],
         initialLanguages: ['py2'],
@@ -104,7 +104,7 @@ describe('Form.vue', () => {
     const startTime = new Date();
     const finishTime = new Date(startTime.getTime() + 60 * 60 * 1000);
     const wrapper = shallowMount(contest_Form, {
-      propsData: {
+      props: {
         update: true,
         allLanguages: [
           { py2: 'Python 2' },
@@ -129,7 +129,7 @@ describe('Form.vue', () => {
     const startTime = new Date();
     const finishTime = new Date(startTime.getTime() + 60 * 60 * 1000);
     const wrapper = shallowMount(contest_Form, {
-      propsData: {
+      props: {
         update: true,
         allLanguages: [
           { py2: 'Python 2' },

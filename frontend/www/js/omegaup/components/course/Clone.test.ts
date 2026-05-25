@@ -5,7 +5,7 @@ import course_Clone from './Clone.vue';
 describe('Clone.vue', () => {
   it('Should handle clone course view', () => {
     const wrapper = mount(course_Clone, {
-      propsData: {
+      props: {
         initialAlias: 'CA',
         initialName: 'initial name',
       },

@@ -133,7 +133,7 @@ describe('Coursev2.vue', () => {
 
   it('Should show the assignment navigation buttons', () => {
     let wrapper = shallowMount(arena_Course, {
-      propsData: {
+      props: {
         allRuns: runs,
         course,
         assignment,
@@ -146,7 +146,7 @@ describe('Coursev2.vue', () => {
     expect(wrapper.text()).toContain(course.assignments[1].name);
 
     wrapper = shallowMount(arena_Course, {
-      propsData: {
+      props: {
         allRuns: runs,
         course,
         assignment: course.assignments[1],
@@ -161,7 +161,7 @@ describe('Coursev2.vue', () => {
 
   it('Should show the course summary', () => {
     const wrapper = shallowMount(arena_Course, {
-      propsData: {
+      props: {
         allRuns: runs,
         course,
         assignment,
@@ -181,7 +181,7 @@ describe('Coursev2.vue', () => {
 
   it('Should show the course scoreboard', () => {
     const wrapper = mount(arena_Course, {
-      propsData: {
+      props: {
         allRuns: runs,
         course,
         assignment,
@@ -199,7 +199,7 @@ describe('Coursev2.vue', () => {
 
   it('Should hide the course scoreboard tab when scoreboard is null', () => {
     const wrapper = mount(arena_Course, {
-      propsData: {
+      props: {
         allRuns: runs,
         course,
         assignment,

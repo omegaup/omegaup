@@ -6,7 +6,7 @@ import { SchoolCoderOfTheMonth } from '../../linkable_resource';
 describe('Profile.vue', () => {
   it('Should handle profile view', () => {
     const wrapper = shallowMount(schools_Profile, {
-      propsData: {
+      props: {
         name: 'omegaUp School',
         rank: 3,
         country: { id: 'mx', name: 'México' },

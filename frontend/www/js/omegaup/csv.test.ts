@@ -115,7 +115,7 @@ describe('csv_utils', () => {
 
   it('Should handle csv content', () => {
     const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
+      props: baseViewProgressProps,
     });
     const globalScore = `${student.courseProgress.toFixed(2)}%`;
 

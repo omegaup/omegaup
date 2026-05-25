@@ -7,7 +7,7 @@ import group_Identities from './Identities.vue';
 describe('Identities.vue', () => {
   it('Should handle identities view', () => {
     const wrapper = shallowMount(group_Identities, {
-      propsData: {
+      props: {
         groupAlias: 'Hello',
         isOrganizer: true,
       },
@@ -18,7 +18,7 @@ describe('Identities.vue', () => {
 
   it('Should handle an invalid csv file', async () => {
     const wrapper = mount(group_Identities, {
-      propsData: {
+      props: {
         groupAlias: 'Hello',
         isOrganizer: true,
       },
@@ -37,7 +37,7 @@ describe('Identities.vue', () => {
 
   it('Should handle a valid csv file', async () => {
     const wrapper = mount(group_Identities, {
-      propsData: {
+      props: {
         groupAlias: 'Hello',
         isOrganizer: true,
       },
@@ -56,7 +56,7 @@ describe('Identities.vue', () => {
 
   it('Should handle the view for restricted users', () => {
     const wrapper = mount(group_Identities, {
-      propsData: {
+      props: {
         groupAlias: 'Hello',
         isOrganizer: false,
       },

@@ -1,19 +1,13 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import CaseInput from './CaseInput.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 import store from '@/js/omegaup/problem/creator/store';
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
-
 describe('CaseInput.vue', () => {
   it('Should contain all 4 inputs', async () => {
     const wrapper = shallowMount(CaseInput, {
-      localVue,
       store,
     });
 
@@ -36,7 +30,6 @@ describe('CaseInput.vue', () => {
   });
   it('Should handle autoformatting', () => {
     const wrapper = shallowMount(CaseInput, {
-      localVue,
       store,
     });
 

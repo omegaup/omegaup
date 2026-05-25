@@ -7,7 +7,7 @@ import identity_Edit from './Edit.vue';
 describe('Edit.vue', () => {
   it('Should handle edit identity view with an identity given', () => {
     const wrapper = shallowMount(identity_Edit, {
-      propsData: {
+      props: {
         identity: {
           username: 'hello',
           name: 'hello',
@@ -25,7 +25,7 @@ describe('Edit.vue', () => {
 
   it('Should handle correct username for a normal identity', () => {
     const wrapper = shallowMount(identity_Edit, {
-      propsData: {
+      props: {
         identity: {
           username: 'group:hello',
           name: 'hello',
@@ -43,7 +43,7 @@ describe('Edit.vue', () => {
 
   it('Should handle correct username for an identity as team', async () => {
     const wrapper = shallowMount(identity_Edit, {
-      propsData: {
+      props: {
         identity: {
           username: 'teams:group:hello',
           name: 'hello',

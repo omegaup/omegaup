@@ -9,7 +9,7 @@ import course_ScheduledProblemLists from './ScheduledProblemList.vue';
 describe('ScheduledProblemLists.vue', () => {
   it('Should handle empty assignments and problems', () => {
     const wrapper = shallowMount(course_ScheduledProblemLists, {
-      propsData: {
+      props: {
         assignments: [] as types.CourseAssignment[],
         assignmentProblems: [] as types.ProblemsetProblem[],
         selectedAssignment: {

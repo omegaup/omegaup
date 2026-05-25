@@ -107,7 +107,7 @@ describe('ContestPractice.vue', () => {
 
   it('Should handle details for a problem in a contest, practice mode', async () => {
     const wrapper = mount(arena_ContestPractice, {
-      propsData: {
+      props: {
         contest,
         problems,
         problemInfo,
@@ -154,7 +154,7 @@ describe('ContestPractice.vue', () => {
     };
 
     const wrapper = mount(arena_ContestPractice, {
-      propsData: {
+      props: {
         contest,
         problems,
         problem: problems[0],

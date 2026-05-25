@@ -85,7 +85,7 @@ Here we can add code.
   it('Should handle showing the ephemeral grader for a problem upon load', async () => {
     const wrapper = mount(arena_EphemeralGrader, {
       attachTo: '#root',
-      propsData: {
+      props: {
         problem,
         acceptedLanguages: ['py3'],
         preferredLanguage: 'py3',
@@ -105,7 +105,7 @@ Here we can add code.
   it('Should handle showing the ephemeral grader for a problem after changing settings', async () => {
     const wrapper = mount(arena_EphemeralGrader, {
       attachTo: '#root',
-      propsData: {
+      props: {
         problem,
         acceptedLanguages: ['py3'],
         preferredLanguage: 'py3',

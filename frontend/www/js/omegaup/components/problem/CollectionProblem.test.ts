@@ -6,7 +6,7 @@ describe('CollectionProblem.vue', () => {
   it('Should display collection', async () => {
     const title = 'Nivel Básico: Introducción a la programación';
     const wrapper = shallowMount(collection_problem, {
-      propsData: {
+      props: {
         title: title,
       },
     });

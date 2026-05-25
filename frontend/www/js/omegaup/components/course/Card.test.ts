@@ -19,7 +19,7 @@ describe('Card.vue', () => {
 
   it('Should render information for public course', () => {
     const wrapper = shallowMount(course_Card, {
-      propsData: {
+      props: {
         course,
         type: 'public',
       },
@@ -30,7 +30,7 @@ describe('Card.vue', () => {
 
   it('Should render information for finished course', () => {
     const wrapper = shallowMount(course_Card, {
-      propsData: {
+      props: {
         course,
         type: 'finished',
       },
@@ -42,7 +42,7 @@ describe('Card.vue', () => {
 
   it('Should render information for student course', () => {
     const wrapper = shallowMount(course_Card, {
-      propsData: {
+      props: {
         course,
         type: 'student',
       },

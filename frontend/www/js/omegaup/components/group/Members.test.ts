@@ -8,7 +8,7 @@ import group_Members from './Members.vue';
 describe('Members.vue', () => {
   it('Should handle an empty list of members and identities', () => {
     const wrapper = shallowMount(group_Members, {
-      propsData: {
+      props: {
         groupAlias: 'omegaUp',
         identities: [] as types.Identity[],
         identitiesCsv: [] as types.Identity[],
@@ -21,7 +21,7 @@ describe('Members.vue', () => {
 
   it('Should handle a list of members and identities', () => {
     const wrapper = mount(group_Members, {
-      propsData: {
+      props: {
         groupAlias: 'omegaUp',
         identities: [
           {
