@@ -157,7 +157,7 @@ export default class QualityNominationDetails extends Vue {
   }
 
   T = T;
-rationale: any;
+  rationale: any;
   showConfirmation = false;
   status = 'banned';
 

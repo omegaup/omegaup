@@ -48,7 +48,7 @@ export default class FilterAuthors extends Vue {
   }
 
   T = T;
-currentSelectedAuthors: any;
+  currentSelectedAuthors: any;
   @Watch('currentSelectedAuthors')
   onNewAuthorSelected(): void {
     this.$emit('new-selected-author', this.currentSelectedAuthors);

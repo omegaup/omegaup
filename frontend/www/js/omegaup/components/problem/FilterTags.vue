@@ -45,7 +45,7 @@ export default class FilterTags extends Vue {
   }
 
   T = T;
-currentSelectedTags: any;
+  currentSelectedTags: any;
   get publicQualityTagNames(): string[] {
     return this.publicQualityTags.map((x) => x.name);
   }

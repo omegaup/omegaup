@@ -91,13 +91,13 @@ export default class FeedbackThread extends Vue {
   FeedbackStatus = FeedbackStatus;
   T = T;
   time = time;
-currentSaved: any;
+  currentSaved: any;
 
   created() {
     this.currentSaved = this.saved;
     this.currentFeedbackThread = this.feedbackThread;
   }
-currentFeedbackThread: any;
+  currentFeedbackThread: any;
   isSelectedNewFeedback = false;
 
   get currentFeedbackThreadTimestamp(): string {

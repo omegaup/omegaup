@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import Vuex, { Store } from 'vuex';
+import { Store } from 'vuex';
 import {
   createNotificationsStore,
   MessageType,

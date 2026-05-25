@@ -144,7 +144,7 @@ export default class CollectionList extends Vue {
   }
 
   T = T;
-authors: any;
+  authors: any;
 }
 </script>
 

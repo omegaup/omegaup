@@ -399,7 +399,7 @@ export default class ViewProfile extends Vue {
       return new ContestResult(contest);
     })
     .filter((contest) => Boolean(contest));
-charts: types.UserProfileStats[];
+  charts: types.UserProfileStats[];
   ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
@@ -411,7 +411,7 @@ charts: types.UserProfileStats[];
     this.charts = this.data?.stats ?? [];
     this.currentReadme = this.profile.readme ?? null;
   }
-currentReadme: string | null;
+  currentReadme: string | null;
   isEditingReadme = false;
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;

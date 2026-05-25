@@ -232,13 +232,13 @@ export default class CourseProblemList extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-assignment: Partial<types.CourseAssignment>;
+  assignment: Partial<types.CourseAssignment>;
 
   created() {
     this.assignment = this.selectedAssignment;
     this.problems = this.assignmentProblems;
   }
-problems: types.AddedProblem[];
+  problems: types.AddedProblem[];
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';

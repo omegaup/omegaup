@@ -1,6 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import Sortable from 'sortablejs';
-
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
 import type { types } from '../../api_types';

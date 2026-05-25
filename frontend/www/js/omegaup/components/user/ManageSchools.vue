@@ -84,7 +84,7 @@ export default class UserManageSchools extends Vue {
 
   T = T;
   graduationDate!: Date;
-school: null | types.SchoolListItem;
+  school: null | types.SchoolListItem;
 
   created() {
     this.graduationDate = this.profile.graduation_date
@@ -93,7 +93,7 @@ school: null | types.SchoolListItem;
     this.school = this.searchResultSchools[0] ?? null;
     this.scholarDegree = this.profile.scholar_degree;
   }
-scholarDegree: any;
+  scholarDegree: any;
   isCurrentlyEnrolled = !this.profile.graduation_date;
 
   onUpdateUserSchools(): void {

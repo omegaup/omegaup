@@ -71,7 +71,7 @@ export default class UserPasswordAdd extends Vue {
   }
 
   T = T;
-newUsername: any;
+  newUsername: any;
   newPassword = '';
   newPassword2 = '';
 

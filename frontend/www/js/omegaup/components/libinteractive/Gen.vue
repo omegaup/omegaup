@@ -97,10 +97,10 @@ export default class LibinteractiveGen extends Vue {
   @Prop() idl!: string;
 
   T = T;
-currentLanguage: any;
-currentOs: any;
-currentName: any;
-currentIdl: any;
+  currentLanguage: any;
+  currentOs: any;
+  currentName: any;
+  currentIdl: any;
 
   created() {
     this.currentLanguage = this.language;
@@ -109,7 +109,7 @@ currentIdl: any;
     this.currentIdl = this.idl;
     this.currentError = this.error;
   }
-currentError: any;
+  currentError: any;
   get errorDescription(): null | string {
     return this.currentError?.description ?? null;
   }

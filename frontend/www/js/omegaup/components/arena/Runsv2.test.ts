@@ -3,7 +3,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Runs from './Runsv2.vue';
 
-import BootstrapVue, {
+import {
   BTable,
   BIconQuestionCircleFill,
   BIconChevronRight,

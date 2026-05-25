@@ -128,7 +128,7 @@ export default class Settings extends Vue {
   }
 
   T = T;
-currentOverallWallTimeLimit: any;
+  currentOverallWallTimeLimit: any;
   @Watch('currentOverallWallTimeLimit')
   onOverallWallTimeLimitChanged(newVal: number) {
     if (newVal > 60000) {

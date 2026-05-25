@@ -126,7 +126,7 @@ export default class ArenaClarification extends Vue {
 
   T = T;
   time = time;
-isPublic: any;
+  isPublic: any;
   message = '';
   selectedResponse = 'yes';
   showUpdateAnswer = false;

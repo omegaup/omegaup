@@ -35,7 +35,7 @@ export default class FilterQuality extends Vue {
   }
 
   T = T;
-currentQuality: any;
+  currentQuality: any;
   qualityValues: { [key: string]: { name: string; id: string } } = {
     allProblems: {
       name: T.qualityFormQualityAny,

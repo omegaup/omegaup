@@ -183,7 +183,7 @@ export default class CourseTabs extends Vue {
   created() {
     this.currentSelectedTab = this.selectedTab;
   }
-currentSelectedTab: any;
+  currentSelectedTab: any;
   searchText = '';
   levelFilter = Level.All;
 

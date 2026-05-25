@@ -163,14 +163,14 @@ export default class UserPreferencesEdit extends Vue {
   show: boolean = false;
   T = T;
   ObjectivesAnswers = ObjectivesAnswers;
-email: any;
-locale: any;
-preferredLanguage: any;
-programmingLanguages: any;
-isPrivate: any;
-hideProblemTags: any;
-hasCompetitiveObjective: any;
-hasLearningObjective: any;
+  email: any;
+  locale: any;
+  preferredLanguage: any;
+  programmingLanguages: any;
+  isPrivate: any;
+  hideProblemTags: any;
+  hasCompetitiveObjective: any;
+  hasLearningObjective: any;
 
   created() {
     this.email = this.profile.email;
@@ -179,13 +179,14 @@ hasLearningObjective: any;
     this.programmingLanguages = this.profile.programming_languages;
     this.isPrivate = this.profile.is_private;
     this.hideProblemTags = this.profile.hide_problem_tags;
-    this.hasCompetitiveObjective = this.profile.has_competitive_objective ?? false;
+    this.hasCompetitiveObjective =
+      this.profile.has_competitive_objective ?? false;
     this.hasLearningObjective = this.profile.has_learning_objective ?? true;
     this.hasScholarObjective = this.profile.has_scholar_objective ?? true;
     this.hasTeachingObjective = this.profile.has_teaching_objective ?? false;
   }
-hasScholarObjective: any;
-hasTeachingObjective: any;
+  hasScholarObjective: any;
+  hasTeachingObjective: any;
   get scholarCompetitiveObjectiveQuestion(): string {
     if (this.hasLearningObjective && this.hasTeachingObjective) {
       return this.T.userObjectivesModalDescriptionLearningAndTeaching;

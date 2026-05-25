@@ -323,8 +323,8 @@ export default class CourseAssignmentDetails extends Vue {
     this.startTime = this.assignment.start_time || new Date();
     this.finishTime = this.assignment.finish_time || new Date();
   }
-startTime: any;
-finishTime: any;
+  startTime: any;
+  finishTime: any;
   unlimitedDuration = !this.assignment.finish_time;
 
   @Watch('assignment')

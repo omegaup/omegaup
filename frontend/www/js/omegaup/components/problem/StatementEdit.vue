@@ -142,8 +142,8 @@ export default class ProblemStatementEdit extends Vue {
     this.currentLanguage = this.statement.language;
     this.currentMarkdown = this.statement.markdown;
   }
-currentLanguage: any;
-currentMarkdown: any;
+  currentLanguage: any;
+  currentMarkdown: any;
   errors: string[] = [];
   statements: types.Statements = {};
   markdownEditor: Markdown.Editor | null = null;

@@ -44,7 +44,7 @@ export default class ProfileWrapper extends Vue {
   created() {
     this.currentSelectedTab = this.selectedTab;
   }
-currentSelectedTab: any;
+  currentSelectedTab: any;
   @Watch('currentSelectedTab')
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);

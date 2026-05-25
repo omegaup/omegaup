@@ -31,14 +31,14 @@ export default class TeamsGroupForm extends Vue {
   @Prop({ default: 10 }) maxNumberOfContestants!: number;
 
   T = T;
-currentDescription: null | string;
+  currentDescription: null | string;
 
   created() {
     this.currentDescription = this.description;
     this.currentName = this.name;
     this.currentNumberOfContestants = this.numberOfContestants;
   }
-currentName: null | string;
-currentNumberOfContestants: number;
+  currentName: null | string;
+  currentNumberOfContestants: number;
 }
 </script>

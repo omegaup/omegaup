@@ -15,7 +15,7 @@
       :title="ui.contestTitle(contest)"
       :clarifications="currentClarifications"
       :should-show-runs="contestAdmin"
-      @update:activeTab="
+      @update:active-tab="
         (selectedTab) => $emit('update:activeTab', selectedTab)
       "
     >
@@ -99,7 +99,7 @@
                 :is-contest-finished="isContestFinished"
                 :in-contest-or-course="true"
                 :use-new-verdict-table="false"
-                @update:activeTab="
+                @update:active-tab="
                   (selectedTab) =>
                     $emit('reset-hash', {
                       selectedTab,
@@ -218,7 +218,7 @@
                 },
               })
           "
-          @update:activeTab="
+          @update:active-tab="
             (selectedTab) => $emit('update:activeTab', selectedTab)
           "
         ></omegaup-arena-clarification-list>
@@ -317,13 +317,13 @@ export default class ArenaContest extends Vue {
   AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
-currentClarifications: any;
-activeProblem: types.NavbarProblemsetProblem | null;
-currentNextSubmissionTimestamp: any;
-currentNextExecutionTimestamp: any;
-currentRunDetailsData: any;
+  currentClarifications: any;
+  activeProblem: types.NavbarProblemsetProblem | null;
+  currentNextSubmissionTimestamp: any;
+  currentNextExecutionTimestamp: any;
+  currentRunDetailsData: any;
   now = new Date();
-currentPopupDisplayed: any;
+  currentPopupDisplayed: any;
   get socketClass(): string {
     if (this.socketStatus === SocketStatus.Connected) {
       return 'socket-status socket-status-ok';

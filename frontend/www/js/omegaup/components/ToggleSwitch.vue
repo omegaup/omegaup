@@ -38,7 +38,7 @@ export default class ToggleSwitch extends Vue {
   created() {
     this.currentCheckedValue = this.checkedValue;
   }
-currentCheckedValue: any;
+  currentCheckedValue: any;
   @Watch('currentCheckedValue')
   @Emit('update:value')
   onUpdateInput(newValue: boolean): boolean {

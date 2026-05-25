@@ -524,9 +524,9 @@ export default class ProblemDetails extends Vue {
   T = T;
   ui = ui;
   time = time;
-selectedTab: any;
-currentClarifications: any;
-currentPopupDisplayed: any;
+  selectedTab: any;
+  currentClarifications: any;
+  currentPopupDisplayed: any;
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
 
@@ -536,7 +536,7 @@ currentPopupDisplayed: any;
     this.currentPopupDisplayed = this.popupDisplayed;
     this.currentRunDetailsData = this.runDetailsData;
   }
-currentRunDetailsData: any;
+  currentRunDetailsData: any;
   get availableTabs(): Tab[] {
     const tabs = [
       {

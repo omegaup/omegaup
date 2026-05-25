@@ -486,31 +486,31 @@ export default class ProblemForm extends Vue {
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
-title: any;
-alias: any;
-timeLimit: any;
-extraWallTime: any;
-memoryLimit: any;
-outputLimit: any;
-inputLimit: any;
-overallWallTimeLimit: any;
-validatorTimeLimit: any;
-emailClarifications: any;
-visibility: any;
-allowUserAddTags: any;
-source: any;
-validator: any;
-languages: any;
-tags: any;
+  title: any;
+  alias: any;
+  timeLimit: any;
+  extraWallTime: any;
+  memoryLimit: any;
+  outputLimit: any;
+  inputLimit: any;
+  overallWallTimeLimit: any;
+  validatorTimeLimit: any;
+  emailClarifications: any;
+  visibility: any;
+  allowUserAddTags: any;
+  source: any;
+  validator: any;
+  languages: any;
+  tags: any;
   problemLevel!: string;
-showDiff: any;
+  showDiff: any;
   groupScorePolicy!: string;
-selectedTags: any;
+  selectedTags: any;
   message = '';
   hasFile = false;
   public = false;
-validLanguages: any;
-validatorTypes: any;
+  validLanguages: any;
+  validatorTypes: any;
 
   created() {
     this.title = this.data.title;
@@ -537,7 +537,7 @@ validatorTypes: any;
     this.validatorTypes = this.data.validatorTypes;
     this.currentLanguages = this.data.languages;
   }
-currentLanguages: any;
+  currentLanguages: any;
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
     if (!this.hasVisitedSection) {

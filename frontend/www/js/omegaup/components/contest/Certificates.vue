@@ -77,6 +77,6 @@ export default class Certificates extends Vue {
   }
 
   T = T;
-certificateCutoff: any;
+  certificateCutoff: any;
 }
 </script>

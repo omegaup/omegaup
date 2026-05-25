@@ -90,7 +90,7 @@ export default class Clarifications extends Vue {
   created() {
     this.unreadClarifications = this.clarifications;
   }
-unreadClarifications: any;
+  unreadClarifications: any;
   beforeDestroy() {
     if (this.flashInterval) {
       clearInterval(this.flashInterval);

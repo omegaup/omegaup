@@ -390,17 +390,17 @@ export default class CourseDetails extends Vue {
   @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
-alias: any;
-description: any;
-finishTime: any;
-showScoreboard: any;
-startTime: any;
-name: any;
+  alias: any;
+  description: any;
+  finishTime: any;
+  showScoreboard: any;
+  startTime: any;
+  name: any;
   level!: string;
-objective: any;
-school: null | types.SchoolListItem;
-needsBasicInformation: any;
-requestsUserInformation: any;
+  objective: any;
+  school: null | types.SchoolListItem;
+  needsBasicInformation: any;
+  requestsUserInformation: any;
   unlimitedDuration!: boolean;
 
   created() {
@@ -418,7 +418,7 @@ requestsUserInformation: any;
     this.requestsUserInformation = this.course.requests_user_information;
     this.selectedLanguages = this.course.languages;
   }
-selectedLanguages: any;
+  selectedLanguages: any;
   levelOptions = levelOptions;
   MAX_LENGTH = MAX_LENGTH;
 

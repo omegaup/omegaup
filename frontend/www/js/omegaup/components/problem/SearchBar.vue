@@ -102,13 +102,13 @@ export default class ProblemSearchBar extends Vue {
   T = T;
 
   currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
-currentLanguage: any;
+  currentLanguage: any;
 
   created() {
     this.currentLanguage = this.language;
     this.currentOnlyQualitySeal = this.onlyQualitySeal;
   }
-currentOnlyQualitySeal: any;
+  currentOnlyQualitySeal: any;
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;
     if (language === 'en') return T.wordsEnglish;

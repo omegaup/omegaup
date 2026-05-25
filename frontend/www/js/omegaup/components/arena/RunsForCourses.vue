@@ -651,13 +651,13 @@ export default class RunsForCourses extends Vue {
   filterExecution: string = '';
   filterOutput: string = '';
   filters: { name: string; value: string }[] = [];
-currentRunDetailsData: any;
+  currentRunDetailsData: any;
 
   created() {
     this.currentRunDetailsData = this.runDetailsData;
     this.currentPopupDisplayed = this.popupDisplayed;
   }
-currentPopupDisplayed: any;
+  currentPopupDisplayed: any;
   currentPage: number = 1;
   currentDataPage: number = 1;
   newFieldsLaunchDate: Date = new Date('2023-10-22');

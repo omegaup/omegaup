@@ -221,7 +221,7 @@ export default class AddProblem extends Vue {
   T = T;
   alias: null | types.ListItem = null;
   title: null | string = null;
-points: any;
+  points: any;
   order!: number;
 
   created() {
@@ -229,7 +229,7 @@ points: any;
     this.points = this.initialPoints;
     this.problems = this.initialProblems;
   }
-problems: any;
+  problems: any;
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
   publishedRevision: null | types.ProblemVersion = null;

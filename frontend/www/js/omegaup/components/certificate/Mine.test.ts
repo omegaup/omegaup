@@ -93,9 +93,7 @@ describe('Mine.vue', () => {
       props,
     });
 
-    expect(defineSpy).toHaveBeenCalledTimes(
-      props['certificates'].length * 2,
-    );
+    expect(defineSpy).toHaveBeenCalledTimes(props['certificates'].length * 2);
     props['certificates'].forEach((certificate) => {
       expect(defineSpy).toHaveBeenCalledWith(certificate.verification_code);
     });

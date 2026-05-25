@@ -155,7 +155,7 @@ export default class CourseAssignmentList extends Vue {
   created() {
     this.currentContent = this.content;
   }
-currentContent: types.CourseAssignment[];
+  currentContent: types.CourseAssignment[];
   assignmentUrl(assignment: omegaup.Assignment): string {
     return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
   }

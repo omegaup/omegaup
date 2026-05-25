@@ -169,8 +169,8 @@ export default class Profile extends Vue {
     this.currentSelectedTab = this.selectedTab;
     this.currentViewProfileSelectedTab = this.viewProfileSelectedTab;
   }
-currentSelectedTab: any;
-currentViewProfileSelectedTab: any;
+  currentSelectedTab: any;
+  currentViewProfileSelectedTab: any;
   @Watch('viewProfileSelectedTab')
   onViewProfileSelectedTabChanged(newValue: string | null) {
     this.currentViewProfileSelectedTab = newValue;

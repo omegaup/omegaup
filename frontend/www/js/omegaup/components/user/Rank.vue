@@ -273,7 +273,7 @@ export default class UserRank extends Vue {
   created() {
     this.currentFilter = this.filter;
   }
-currentFilter: any;
+  currentFilter: any;
   isSelectionMode: boolean = false;
   selectedUsers: string[] = [];
 

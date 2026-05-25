@@ -139,7 +139,7 @@ export default class AddContestant extends Vue {
   created() {
     this.currentUsers = this.users;
   }
-currentUsers: any;
+  currentUsers: any;
   onSubmit(): void {
     let users: string[] = [];
     // Add each token as a new username chip component

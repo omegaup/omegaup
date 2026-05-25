@@ -202,7 +202,7 @@ export default class CollectionList extends Vue {
   created() {
     this.level = this.data.level;
   }
-level: any;
+  level: any;
   filtersVisible =
     typeof window === 'undefined'
       ? true

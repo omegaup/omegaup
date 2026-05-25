@@ -432,9 +432,14 @@ export default class Navbar extends Vue {
   logoutModalVisible = false;
   scrollY: number = 0;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
-  hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
-    this.userTypes.includes(teachingType),
-  );
+  hasTeachingObjective!: boolean;
+
+  created() {
+    this.hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
+      this.userTypes?.includes(teachingType),
+    );
+  }
+  }
 
   get formattedLoginURL(): string {
     let path = window.location.pathname;

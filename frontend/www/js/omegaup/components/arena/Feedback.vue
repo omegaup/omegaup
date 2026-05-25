@@ -101,7 +101,7 @@ export default class Feedback extends Vue {
     this.saved = this.feedback.status == FeedbackStatus.Saved;
     this.currentFeedback = this.feedback;
   }
-currentFeedback: any;
+  currentFeedback: any;
   get currentFeedbackTimestamp(): string {
     return time.formatDateTimeLocal(this.feedback.timestamp ?? new Date());
   }

@@ -195,9 +195,9 @@ export default class GroupEdit extends Vue {
   T = T;
   ui = ui;
   AvailableTabs = AvailableTabs;
-selectedTab: AvailableTabs;
-currentIdentities: any;
-currentIdentitiesCsv: any;
+  selectedTab: AvailableTabs;
+  currentIdentities: any;
+  currentIdentitiesCsv: any;
 
   created() {
     this.selectedTab = this.tab;
@@ -205,7 +205,7 @@ currentIdentitiesCsv: any;
     this.currentIdentitiesCsv = this.identitiesCsv;
     this.currentScoreboards = this.scoreboards;
   }
-currentScoreboards: any;
+  currentScoreboards: any;
   @Watch('tab')
   onInitialTabChanged(newValue: AvailableTabs): void {
     if (!Object.values(AvailableTabs).includes(newValue)) {

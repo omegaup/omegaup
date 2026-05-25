@@ -203,8 +203,8 @@ export default class ProblemTags extends Vue {
     this.allowTags = this.initialAllowTags;
     this.problemLevelTag = this.problemLevel;
   }
-allowTags: any;
-problemLevelTag: string | null;
+  allowTags: any;
+  problemLevelTag: string | null;
   newPrivateTag = '';
   newPublicTag = '';
 

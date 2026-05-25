@@ -162,7 +162,7 @@ describe('Sidebar.vue', () => {
   });
 
   it('Should modify a group', async () => {
-    const wrapper = mount(Sidebar, {       store: store });
+    const wrapper = mount(Sidebar, { store: store });
 
     const newGroup = generateGroup({
       name: 'group',
@@ -208,7 +208,7 @@ describe('Sidebar.vue', () => {
   });
 
   it('Should download a group', async () => {
-    const wrapper = mount(Sidebar, {       store: store });
+    const wrapper = mount(Sidebar, { store: store });
 
     const newGroup = generateGroup({
       name: 'group',
@@ -235,7 +235,7 @@ describe('Sidebar.vue', () => {
   });
 
   it('Should validate and fix points', async () => {
-    const wrapper = mount(Sidebar, {       store });
+    const wrapper = mount(Sidebar, { store });
 
     const fixedPointsGroup1 = generateGroup({
       name: 'fixedPointsGroup',

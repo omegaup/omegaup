@@ -91,13 +91,13 @@ export default class ArenaNewClarificationPopup extends Vue {
 
   T = T;
   message: null | string = null;
-currentProblemAlias: any;
+  currentProblemAlias: any;
 
   created() {
     this.currentProblemAlias = this.problemAlias;
     this.currentUsername = this.username;
   }
-currentUsername: any;
+  currentUsername: any;
   get filteredUsers(): { username: string; name: string }[] {
     return this.users.map((user) => {
       return {

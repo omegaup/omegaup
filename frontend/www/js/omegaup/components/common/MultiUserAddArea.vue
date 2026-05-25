@@ -62,7 +62,7 @@ export default class MultiUserAddArea extends Vue {
   created() {
     this.usersList = this.users || [];
   }
-usersList: string[];
+  usersList: string[];
   onBulkContestantsChanged = debounce(this.onTextAreaChange, WAIT_TIME);
 
   onTextAreaChange(event: Event) {

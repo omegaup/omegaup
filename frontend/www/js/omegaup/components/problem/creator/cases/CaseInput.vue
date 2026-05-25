@@ -68,8 +68,8 @@ export default class CaseInput extends Vue {
     value: string;
     text: string;
   }[];
-caseName: any;
-caseGroup: any;
+  caseName: any;
+  caseGroup: any;
 
   created() {
     this.caseName = this.name;
@@ -77,8 +77,8 @@ caseGroup: any;
     this.casePoints = this.points;
     this.caseAutoPoints = this.autoPoints;
   }
-casePoints: number;
-caseAutoPoints: boolean;
+  casePoints: number;
+  caseAutoPoints: boolean;
   T = T;
 
   toggleAutoPoints() {

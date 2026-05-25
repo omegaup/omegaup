@@ -118,14 +118,15 @@ export default class GridPaginator extends Vue {
 
   private T = T;
   private currentPageNumber = 0;
-  private currentSortOption =
-    this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
+  private currentSortOption!: string;
   filter: null | string = null;
+  filteredItems!: LinkableResource[];
 
   created() {
+    this.currentSortOption =
+      this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
     this.filteredItems = this.items;
   }
-filteredItems: LinkableResource[];
   private nextPage(): void {
     this.currentPageNumber++;
   }

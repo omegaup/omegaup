@@ -49,7 +49,7 @@ export default class BadgeList extends Vue {
   }
 
   T = T;
-isProfile: any;
+  isProfile: any;
   get badges(): types.Badge[] {
     return Array.from(this.allBadges)
       .map((badge: string) => ({

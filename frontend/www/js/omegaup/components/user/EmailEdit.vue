@@ -60,6 +60,6 @@ export default class UserEmailEdit extends Vue {
     this.currentEmail = this.email;
   }
   T = T;
-currentEmail: string;
+  currentEmail: string;
 }
 </script>

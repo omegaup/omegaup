@@ -433,11 +433,11 @@ export default class AdminSupport extends Vue {
   @Prop() maintenancePredefinedTemplates!: types.PredefinedTemplate[];
 
   selectedTemplateId: string = '';
-currentContestAlias: any;
-currentIsContestRecommended: any;
-currentMaintenanceEnabled: any;
-currentMaintenanceMessageEs: any;
-currentMaintenanceMessageEn: any;
+  currentContestAlias: any;
+  currentIsContestRecommended: any;
+  currentMaintenanceEnabled: any;
+  currentMaintenanceMessageEs: any;
+  currentMaintenanceMessageEn: any;
 
   created() {
     this.currentContestAlias = this.contestAlias;
@@ -446,13 +446,10 @@ currentMaintenanceMessageEn: any;
     this.currentMaintenanceMessageEs = this.maintenanceMessageEs;
     this.currentMaintenanceMessageEn = this.maintenanceMessageEn;
     this.currentMaintenanceMessagePt = this.maintenanceMessagePt;
-  }
-currentMaintenanceMessagePt: any;
-  currentMaintenanceType!: string;
-
-  created() {
     this.currentMaintenanceType = this.maintenanceType || 'info';
   }
+  currentMaintenanceMessagePt: any;
+  currentMaintenanceType!: string;
 
   T = T;
   ui = ui;

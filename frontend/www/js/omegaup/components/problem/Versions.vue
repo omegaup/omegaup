@@ -180,7 +180,7 @@ export default class ProblemVersions extends Vue {
   created() {
     this.selectedRevision = this.value;
   }
-selectedRevision: null | types.ProblemVersion;
+  selectedRevision: null | types.ProblemVersion;
   runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';

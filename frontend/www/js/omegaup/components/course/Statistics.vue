@@ -54,7 +54,7 @@ export default class Statistics extends Vue {
   }
   T = T;
   // chart options
-selected: any;
+  selected: any;
   options = [
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
     {

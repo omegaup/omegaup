@@ -4,7 +4,7 @@
     :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
-    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
+    @update:active-tab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #arena-problems>
       <div data-contest-practice>
@@ -44,7 +44,7 @@
               :contest-alias="contest.alias"
               :in-contest-or-course="true"
               :run-details-data="currentRunDetailsData"
-              @update:activeTab="
+              @update:active-tab="
                 (selectedTab) =>
                   $emit('reset-hash', {
                     selectedTab,
@@ -111,7 +111,7 @@
             })
         "
         @clarification-response="onClarificationResponse"
-        @update:activeTab="
+        @update:active-tab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
         "
       ></omegaup-arena-clarification-list>
@@ -166,11 +166,11 @@ export default class ArenaContestPractice extends Vue {
 
   T = T;
   ui = ui;
-currentClarifications: any;
+  currentClarifications: any;
   ContestClarificationType = ContestClarificationType;
-activeProblem: types.NavbarProblemsetProblem | null;
-currentNextSubmissionTimestamp: any;
-currentNextExecutionTimestamp: any;
+  activeProblem: types.NavbarProblemsetProblem | null;
+  currentNextSubmissionTimestamp: any;
+  currentNextExecutionTimestamp: any;
 
   created() {
     this.currentClarifications = this.clarifications;
@@ -179,7 +179,7 @@ currentNextExecutionTimestamp: any;
     this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
     this.currentRunDetailsData = this.runDetailsData;
   }
-currentRunDetailsData: any;
+  currentRunDetailsData: any;
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
   }

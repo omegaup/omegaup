@@ -44,6 +44,6 @@ export default class UserPrivacyPolicy extends Vue {
   }
 
   T = T;
-currentAgreed: any;
+  currentAgreed: any;
 }
 </script>

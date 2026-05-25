@@ -85,7 +85,7 @@ export default class Arena extends Vue {
   }
 
   T = T;
-selectedTab: any;
+  selectedTab: any;
   clarificationsHaveBeenRead = false;
 
   get unreadClarifications() {
