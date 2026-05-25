@@ -41,8 +41,10 @@ export default class ProfileWrapper extends Vue {
   @Prop({ default: null }) selectedTab!: null | string;
   @Prop() hasPassword!: boolean;
 
-  currentSelectedTab = this.selectedTab;
-
+  created() {
+    this.currentSelectedTab = this.selectedTab;
+  }
+currentSelectedTab: any;
   @Watch('currentSelectedTab')
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);

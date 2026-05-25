@@ -390,19 +390,33 @@ export default class CourseDetails extends Vue {
   @Prop({ default: true }) hasVisitedSection!: boolean;
 
   T = T;
-  alias = this.course.alias;
-  description = this.course.description;
-  finishTime = this.course.finish_time || new Date();
-  showScoreboard = this.course.show_scoreboard;
-  startTime = this.course.start_time;
-  name = this.course.name;
+alias: any;
+description: any;
+finishTime: any;
+showScoreboard: any;
+startTime: any;
+name: any;
   level = this.course.level ?? '';
-  objective = this.course.objective;
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
-  needsBasicInformation = this.course.needs_basic_information;
-  requestsUserInformation = this.course.requests_user_information;
+objective: any;
+school: null | types.SchoolListItem;
+needsBasicInformation: any;
+requestsUserInformation: any;
   unlimitedDuration = this.course.finish_time === null;
-  selectedLanguages = this.course.languages;
+
+  created() {
+    this.alias = this.course.alias;
+    this.description = this.course.description;
+    this.finishTime = this.course.finish_time || new Date();
+    this.showScoreboard = this.course.show_scoreboard;
+    this.startTime = this.course.start_time;
+    this.name = this.course.name;
+    this.objective = this.course.objective;
+    this.school = this.searchResultSchools[0] ?? null;
+    this.needsBasicInformation = this.course.needs_basic_information;
+    this.requestsUserInformation = this.course.requests_user_information;
+    this.selectedLanguages = this.course.languages;
+  }
+selectedLanguages: any;
   levelOptions = levelOptions;
   MAX_LENGTH = MAX_LENGTH;
 

@@ -35,8 +35,10 @@ export default class ToggleSwitch extends Vue {
   @Prop({ default: ToggleSwitchSize.Large }) size!: ToggleSwitchSize;
   @Prop({ default: false }) disabled!: boolean;
 
-  currentCheckedValue = this.checkedValue;
-
+  created() {
+    this.currentCheckedValue = this.checkedValue;
+  }
+currentCheckedValue: any;
   @Watch('currentCheckedValue')
   @Emit('update:value')
   onUpdateInput(newValue: boolean): boolean {

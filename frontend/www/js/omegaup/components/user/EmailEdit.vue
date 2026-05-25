@@ -55,7 +55,11 @@ import user_MainInfo from './MainInfo.vue';
 export default class UserEmailEdit extends Vue {
   @Prop() email!: string;
   @Prop() profile!: types.UserProfileInfo;
+
+  created() {
+    this.currentEmail = this.email;
+  }
   T = T;
-  currentEmail: string = this.email;
+currentEmail: string;
 }
 </script>

@@ -101,11 +101,19 @@ export default class UserBasicInformationEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
-  username = this.profile.username;
-  name = this.profile.name;
-  gender = this.profile.gender;
-  countryId = this.profile.country_id ?? null;
-  stateId = this.profile.state_id ?? null;
+username: any;
+name: any;
+gender: any;
+
+  created() {
+    this.username = this.profile.username;
+    this.name = this.profile.name;
+    this.gender = this.profile.gender;
+    this.countryId = this.profile.country_id ?? null;
+    this.stateId = this.profile.state_id ?? null;
+  }
+countryId: any;
+stateId: any;
   birthDate = this.profile.birth_date
     ? time.convertLocalDateToGMTDate(this.profile.birth_date)
     : new Date('');

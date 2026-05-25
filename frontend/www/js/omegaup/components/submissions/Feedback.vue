@@ -57,9 +57,12 @@ export default class SubmissionFeedback extends Vue {
   ui = ui;
   time = time;
 
-  showFeedbackForm = false;
-  feedback = this.generalFeedback?.feedback ?? null;
+  created() {
+    this.feedback = this.generalFeedback?.feedback ?? null;
+  }
 
+  showFeedbackForm = false;
+feedback: any;
   get generalFeedback(): null | types.SubmissionFeedback {
     if (!this.feedbackOptions.length) return null;
     const [feedback] = this.feedbackOptions.filter(

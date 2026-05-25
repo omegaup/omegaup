@@ -155,8 +155,11 @@ export default class CourseFilteredList extends Vue {
 
   T = T;
   time = time;
-  showTab = this.activeTab;
 
+  created() {
+    this.showTab = this.activeTab;
+  }
+showTab: any;
   getTabName(timeType: string): string {
     switch (timeType) {
       case 'current':

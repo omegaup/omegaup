@@ -399,14 +399,19 @@ export default class ViewProfile extends Vue {
       return new ContestResult(contest);
     })
     .filter((contest) => Boolean(contest));
-  charts: types.UserProfileStats[] = this.data?.stats ?? [];
+charts: types.UserProfileStats[];
   ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null = this.profile.readme ?? null;
+
+  created() {
+    this.charts = this.data?.stats ?? [];
+    this.currentReadme = this.profile.readme ?? null;
+  }
+currentReadme: string | null;
   isEditingReadme = false;
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;

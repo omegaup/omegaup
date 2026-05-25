@@ -118,19 +118,24 @@ export default class IdentityEdit extends Vue {
   @Prop() searchResultSchools!: types.SchoolListItem[];
 
   T = T;
-  selectedIdentity = Object.assign(
-    {
-      username: '',
-      classname: '',
-      name: '',
-      gender: '',
-      school: '',
-      country_id: 'MX',
-      state_id: '',
-    } as types.Identity,
-    this.identity,
-  );
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
+  selectedIdentity!: types.Identity;
+  school!: null | types.SchoolListItem;
+
+  created() {
+    this.selectedIdentity = Object.assign(
+      {
+        username: '',
+        classname: '',
+        name: '',
+        gender: '',
+        school: '',
+        country_id: 'MX',
+        state_id: '',
+      } as types.Identity,
+      this.identity,
+    );
+    this.school = this.searchResultSchools[0] ?? null;
+  }
 
   get groupName(): string {
     const teamUsername = this.selectedIdentity.username.split(':');

@@ -63,9 +63,14 @@ export default class CourseClone extends Vue {
   @Prop() initialName!: string;
 
   T = T;
-  alias = this.initialAlias;
+alias: any;
   startTime = new Date();
-  name = this.initialName;
+
+  created() {
+    this.alias = this.initialAlias;
+    this.name = this.initialName;
+  }
+name: any;
 }
 </script>
 

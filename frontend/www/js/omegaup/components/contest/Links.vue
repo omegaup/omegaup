@@ -47,9 +47,12 @@ import T from '../../lang';
 export default class Links extends Vue {
   @Prop() data!: types.Contest;
 
-  T = T;
-  contest = this.data;
 
+  created() {
+    this.contest = this.data;
+  }
+  T = T;
+contest: any;
   @Emit('download-csv-scoreboard')
   onDownloadCsv(contestAlias: string): string {
     return contestAlias;

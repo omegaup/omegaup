@@ -11,8 +11,10 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 export default class Overlay extends Vue {
   @Prop({ default: false }) showOverlay!: boolean;
 
-  isOverlayShown = this.showOverlay;
-
+  created() {
+    this.isOverlayShown = this.showOverlay;
+  }
+isOverlayShown: any;
   onOverlayClicked(evt: Event) {
     if (typeof $(evt.composedPath()[0]).attr('data-overlay') !== 'undefined') {
       this.isOverlayShown = false;

@@ -129,10 +129,14 @@ export default class UserSidebarMainInfo extends Vue {
 
   T = T;
   urlMapping = urlMapping;
-  currentSelectedTab = this.getSelectedValidTab(
-    this.selectedTab,
-    this.currentUrlMapping,
-  );
+  currentSelectedTab!: string;
+
+  created() {
+    this.currentSelectedTab = this.getSelectedValidTab(
+      this.selectedTab,
+      this.currentUrlMapping,
+    );
+  }
 
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];

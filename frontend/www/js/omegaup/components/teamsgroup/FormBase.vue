@@ -103,11 +103,17 @@ export default class TeamsGroupFormBase extends Vue {
   @Prop({ default: 1 }) minNumberOfContestants!: number;
 
   T = T;
-  currentAlias: null | string = this.alias;
-  currentDescription: null | string = this.description;
-  currentName: null | string = this.name;
-  currentNumberOfContestants: number = this.numberOfContestants;
+currentAlias: null | string;
+currentDescription: null | string;
 
+  created() {
+    this.currentAlias = this.alias;
+    this.currentDescription = this.description;
+    this.currentName = this.name;
+    this.currentNumberOfContestants = this.numberOfContestants;
+  }
+currentName: null | string;
+currentNumberOfContestants: number;
   @Watch('currentAlias')
   @Emit('update:alias')
   onAliasUpdated(newValue: string): string {

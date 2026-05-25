@@ -99,9 +99,12 @@ export default class TeachingAssistants extends Vue {
 
   T = T;
   username: null | types.ListItem = null;
-  selected = {};
-  currentTeachingAssistants = this.teachingAssistants;
 
+  created() {
+    this.currentTeachingAssistants = this.teachingAssistants;
+  }
+  selected = {};
+currentTeachingAssistants: any;
   @Watch('teachingAssistants')
   onTeachingAssistantsChanged(newValue: omegaup.UserRole[]): void {
     this.currentTeachingAssistants = newValue;

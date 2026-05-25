@@ -45,8 +45,12 @@ export default class Typeahead extends Vue {
   @Prop({ default: 300 }) debounceDelay!: number;
   @Prop({ default: false }) isInvalid!: boolean;
 
+  created() {
+    this.selectedOptions = this.options;
+  }
+
   T = T;
-  selectedOptions = this.options;
+selectedOptions: any;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   updateExistingOptions(query: string): void {

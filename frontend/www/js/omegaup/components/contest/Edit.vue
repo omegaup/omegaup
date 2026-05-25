@@ -364,14 +364,20 @@ export default class Edit extends Vue {
 
   T = T;
   ui = ui;
-  virtual = ui.isVirtual(this.details);
-  showTab = this.selectedTab();
+  virtual: boolean;
+  showTab: string;
+  alreadyArchived: boolean;
+
+  created() {
+    this.virtual = ui.isVirtual(this.details);
+    this.showTab = this.selectedTab();
+    this.alreadyArchived = this.details.archived;
+  }
 
   @Watch('initialTab')
   onInitialTabChanged(newValue: string) {
     this.showTab = newValue !== '' ? newValue : this.selectedTab();
   }
-  alreadyArchived = this.details.archived;
 
   selectedTab(): string {
     if (this.initialTab != '') {

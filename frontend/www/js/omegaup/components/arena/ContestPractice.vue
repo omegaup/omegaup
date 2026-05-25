@@ -166,13 +166,20 @@ export default class ArenaContestPractice extends Vue {
 
   T = T;
   ui = ui;
-  currentClarifications = this.clarifications;
+currentClarifications: any;
   ContestClarificationType = ContestClarificationType;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
-  currentRunDetailsData = this.runDetailsData;
+activeProblem: types.NavbarProblemsetProblem | null;
+currentNextSubmissionTimestamp: any;
+currentNextExecutionTimestamp: any;
 
+  created() {
+    this.currentClarifications = this.clarifications;
+    this.activeProblem = this.problem;
+    this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+    this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+    this.currentRunDetailsData = this.runDetailsData;
+  }
+currentRunDetailsData: any;
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
   }

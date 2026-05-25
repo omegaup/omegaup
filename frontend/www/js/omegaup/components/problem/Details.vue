@@ -524,13 +524,19 @@ export default class ProblemDetails extends Vue {
   T = T;
   ui = ui;
   time = time;
-  selectedTab = this.activeTab;
-  currentClarifications = this.clarifications;
-  currentPopupDisplayed = this.popupDisplayed;
+selectedTab: any;
+currentClarifications: any;
+currentPopupDisplayed: any;
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
-  currentRunDetailsData = this.runDetailsData;
 
+  created() {
+    this.selectedTab = this.activeTab;
+    this.currentClarifications = this.clarifications;
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentRunDetailsData = this.runDetailsData;
+  }
+currentRunDetailsData: any;
   get availableTabs(): Tab[] {
     const tabs = [
       {

@@ -400,12 +400,17 @@ export default class CourseEdit extends Vue {
   @Prop() readOnly!: boolean;
 
   T = T;
-  showTab = this.initialTab;
+showTab: any;
   admissionMode = AdmissionMode.Private;
-  alreadyArchived = this.data.course.archived;
+alreadyArchived: any;assignmentProblems: any;
 
-  assignmentProblems = this.data.assignmentProblems;
-  assignments = this.data.course.assignments;
+  created() {
+    this.showTab = this.initialTab;
+    this.alreadyArchived = this.data.course.archived;
+    this.assignmentProblems = this.data.assignmentProblems;
+    this.assignments = this.data.course.assignments;
+  }
+assignments: any;
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
   assignment = emptyAssignment;

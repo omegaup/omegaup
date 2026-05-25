@@ -486,33 +486,56 @@ export default class ProblemForm extends Vue {
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
-  title = this.data.title;
-  alias = this.data.alias;
-  timeLimit = this.data.timeLimit;
-  extraWallTime = this.data.extraWallTime;
-  memoryLimit = this.data.memoryLimit;
-  outputLimit = this.data.outputLimit;
-  inputLimit = this.data.inputLimit;
-  overallWallTimeLimit = this.data.overallWallTimeLimit;
-  validatorTimeLimit = this.data.validatorTimeLimit;
-  emailClarifications = this.data.emailClarifications;
-  visibility = this.data.visibility;
-  allowUserAddTags = this.data.allowUserAddTags;
-  source = this.data.source;
-  validator = this.data.validator;
-  languages = this.data.languages;
-  tags = this.data.tags;
+title: any;
+alias: any;
+timeLimit: any;
+extraWallTime: any;
+memoryLimit: any;
+outputLimit: any;
+inputLimit: any;
+overallWallTimeLimit: any;
+validatorTimeLimit: any;
+emailClarifications: any;
+visibility: any;
+allowUserAddTags: any;
+source: any;
+validator: any;
+languages: any;
+tags: any;
   problemLevel = this.data.problem_level || '';
-  showDiff = this.data.showDiff;
+showDiff: any;
   groupScorePolicy = this.data.groupScorePolicy || 'sum-if-not-zero';
-  selectedTags = this.data.selectedTags || [];
+selectedTags: any;
   message = '';
   hasFile = false;
   public = false;
-  validLanguages = this.data.validLanguages;
-  validatorTypes = this.data.validatorTypes;
-  currentLanguages = this.data.languages;
+validLanguages: any;
+validatorTypes: any;
 
+  created() {
+    this.title = this.data.title;
+    this.alias = this.data.alias;
+    this.timeLimit = this.data.timeLimit;
+    this.extraWallTime = this.data.extraWallTime;
+    this.memoryLimit = this.data.memoryLimit;
+    this.outputLimit = this.data.outputLimit;
+    this.inputLimit = this.data.inputLimit;
+    this.overallWallTimeLimit = this.data.overallWallTimeLimit;
+    this.validatorTimeLimit = this.data.validatorTimeLimit;
+    this.emailClarifications = this.data.emailClarifications;
+    this.visibility = this.data.visibility;
+    this.allowUserAddTags = this.data.allowUserAddTags;
+    this.source = this.data.source;
+    this.validator = this.data.validator;
+    this.languages = this.data.languages;
+    this.tags = this.data.tags;
+    this.showDiff = this.data.showDiff;
+    this.selectedTags = this.data.selectedTags || [];
+    this.validLanguages = this.data.validLanguages;
+    this.validatorTypes = this.data.validatorTypes;
+    this.currentLanguages = this.data.languages;
+  }
+currentLanguages: any;
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
     if (!this.hasVisitedSection) {

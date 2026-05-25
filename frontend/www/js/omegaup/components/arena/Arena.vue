@@ -80,8 +80,12 @@ export default class Arena extends Vue {
   @Prop() activeTab!: string;
   @Prop() backgroundClass!: string;
 
+  created() {
+    this.selectedTab = this.activeTab;
+  }
+
   T = T;
-  selectedTab = this.activeTab;
+selectedTab: any;
   clarificationsHaveBeenRead = false;
 
   get unreadClarifications() {

@@ -74,9 +74,12 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() category!: string;
   @Prop() selectedTab!: string;
 
-  T = T;
-  currentSelectedTab = this.selectedTab;
+  created() {
+    this.currentSelectedTab = this.selectedTab;
+  }
 
+  T = T;
+currentSelectedTab: any;
   get availableTabs(): { id: string; component: string; title: string }[] {
     const availableTabs = [
       {

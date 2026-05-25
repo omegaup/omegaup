@@ -44,9 +44,12 @@ export default class BadgeList extends Vue {
   @Prop() visitorBadges!: Set<string>;
   @Prop() showAllBadgesLink!: boolean;
 
-  T = T;
-  isProfile = this.showAllBadgesLink;
+  created() {
+    this.isProfile = this.showAllBadgesLink;
+  }
 
+  T = T;
+isProfile: any;
   get badges(): types.Badge[] {
     return Array.from(this.allBadges)
       .map((badge: string) => ({

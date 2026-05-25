@@ -43,9 +43,12 @@ export default class FilterAuthors extends Vue {
   @Prop() authors!: types.AuthorsRank;
   @Prop({ default: () => [] }) selectedAuthors!: string[];
 
-  T = T;
-  currentSelectedAuthors = this.selectedAuthors;
+  created() {
+    this.currentSelectedAuthors = this.selectedAuthors;
+  }
 
+  T = T;
+currentSelectedAuthors: any;
   @Watch('currentSelectedAuthors')
   onNewAuthorSelected(): void {
     this.$emit('new-selected-author', this.currentSelectedAuthors);

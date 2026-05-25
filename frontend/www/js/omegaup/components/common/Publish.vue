@@ -102,7 +102,11 @@ export default class ContestEditPublish extends Vue {
 
   T = T;
   AdmissionMode = AdmissionMode;
-  currentAdmissionMode = this.admissionMode;
+
+  created() {
+    this.currentAdmissionMode = this.admissionMode;
+  }
+currentAdmissionMode: any;
   currentDefaultShowAllContestantsInScoreboard = this
     .defaultShowAllContestantsInScoreboard;
 

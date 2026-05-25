@@ -160,7 +160,11 @@ export default class ArenaClarificationList extends Vue {
   T = T;
   ui = ui;
   PopupDisplayed = PopupDisplayed;
-  currentPopupDisplayed = this.popupDisplayed;
+
+  created() {
+    this.currentPopupDisplayed = this.popupDisplayed;
+  }
+currentPopupDisplayed: any;
   selectedAssignment: string | null = null;
   selectedProblem: string | null = null;
 

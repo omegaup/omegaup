@@ -66,8 +66,12 @@ import omegaup_PasswordInput from '../common/PasswordInput.vue';
 export default class UserPasswordAdd extends Vue {
   @Prop() username!: string;
 
+  created() {
+    this.newUsername = this.username;
+  }
+
   T = T;
-  newUsername = this.username;
+newUsername: any;
   newPassword = '';
   newPassword2 = '';
 

@@ -30,9 +30,12 @@ import T from '../../lang';
 export default class FilterDifficulty extends Vue {
   @Prop() selectedDifficulty!: string;
 
-  T = T;
-  currentDifficulty = this.selectedDifficulty;
+  created() {
+    this.currentDifficulty = this.selectedDifficulty;
+  }
 
+  T = T;
+currentDifficulty: any;
   difficulties: { [key: string]: { name: string; id: string } } = {
     anyDifficulty: {
       name: T.qualityFormDifficultyAny,

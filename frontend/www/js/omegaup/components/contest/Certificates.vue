@@ -72,7 +72,11 @@ import T from '../../lang';
 export default class Certificates extends Vue {
   @Prop() certificatesDetails!: types.ContestCertificatesAdminDetails;
 
+  created() {
+    this.certificateCutoff = this.certificatesDetails.certificateCutoff;
+  }
+
   T = T;
-  certificateCutoff = this.certificatesDetails.certificateCutoff;
+certificateCutoff: any;
 }
 </script>

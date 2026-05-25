@@ -137,8 +137,13 @@ export default class ProblemStatementEdit extends Vue {
 
   T = T;
   commitMessage = T.updateStatementsCommitMessage;
-  currentLanguage = this.statement.language;
-  currentMarkdown = this.statement.markdown;
+
+  created() {
+    this.currentLanguage = this.statement.language;
+    this.currentMarkdown = this.statement.markdown;
+  }
+currentLanguage: any;
+currentMarkdown: any;
   errors: string[] = [];
   statements: types.Statements = {};
   markdownEditor: Markdown.Editor | null = null;

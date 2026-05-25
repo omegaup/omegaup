@@ -39,7 +39,11 @@ export default class UserPrivacyPolicy extends Vue {
   @Prop({ default: false }) agreed!: boolean;
   @Prop() saved!: boolean;
 
+  created() {
+    this.currentAgreed = this.agreed;
+  }
+
   T = T;
-  currentAgreed = this.agreed;
+currentAgreed: any;
 }
 </script>

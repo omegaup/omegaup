@@ -198,7 +198,11 @@ export default class CollectionList extends Vue {
 
   T = T;
   ToggleSwitchSize = ToggleSwitchSize;
-  level = this.data.level;
+
+  created() {
+    this.level = this.data.level;
+  }
+level: any;
   filtersVisible =
     typeof window === 'undefined'
       ? true

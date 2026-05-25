@@ -129,8 +129,13 @@ export default class CourseAdmissionMode extends Vue {
 
   T = T;
   AdmissionMode = AdmissionMode;
-  currentAdmissionMode = this.admissionMode;
-  currentShowInPublicCoursesList = this.showInPublicCoursesList;
+
+  created() {
+    this.currentAdmissionMode = this.admissionMode;
+    this.currentShowInPublicCoursesList = this.showInPublicCoursesList;
+  }
+currentAdmissionMode: any;
+currentShowInPublicCoursesList: any;
   copiedToClipboard = false;
 
   onSubmit(): void {

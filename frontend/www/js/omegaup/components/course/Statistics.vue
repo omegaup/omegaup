@@ -48,9 +48,13 @@ export default class Statistics extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() problemStats!: types.CourseProblemStatistics[];
   @Prop() verdicts!: types.CourseProblemVerdict[];
+
+  created() {
+    this.selected = this.completedScoreChartOptions;
+  }
   T = T;
   // chart options
-  selected = this.completedScoreChartOptions;
+selected: any;
   options = [
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
     {

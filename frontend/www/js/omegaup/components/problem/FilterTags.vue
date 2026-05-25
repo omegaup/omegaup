@@ -40,9 +40,12 @@ export default class FilterTags extends Vue {
   @Prop({ default: () => [] }) tags!: types.TagWithProblemCount[];
   @Prop({ default: () => [] }) selectedTags!: string[];
 
-  T = T;
-  currentSelectedTags = this.selectedTags;
+  created() {
+    this.currentSelectedTags = this.selectedTags;
+  }
 
+  T = T;
+currentSelectedTags: any;
   get publicQualityTagNames(): string[] {
     return this.publicQualityTags.map((x) => x.name);
   }

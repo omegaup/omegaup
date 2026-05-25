@@ -123,10 +123,12 @@ export default class Settings extends Vue {
   @Prop() currentLanguages!: string;
   @Prop() validator!: string;
 
+  created() {
+    this.currentOverallWallTimeLimit = this.overallWallTimeLimit;
+  }
+
   T = T;
-
-  currentOverallWallTimeLimit = this.overallWallTimeLimit;
-
+currentOverallWallTimeLimit: any;
   @Watch('currentOverallWallTimeLimit')
   onOverallWallTimeLimitChanged(newVal: number) {
     if (newVal > 60000) {

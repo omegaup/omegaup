@@ -221,9 +221,14 @@ export default class AddProblem extends Vue {
   T = T;
   alias: null | types.ListItem = null;
   title: null | string = null;
-  points = this.initialPoints;
+points: any;
   order = this.initialProblems.length + 1;
-  problems = this.initialProblems;
+
+  created() {
+    this.points = this.initialPoints;
+    this.problems = this.initialProblems;
+  }
+problems: any;
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
   publishedRevision: null | types.ProblemVersion = null;

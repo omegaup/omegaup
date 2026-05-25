@@ -139,8 +139,12 @@ export default class CollectionList extends Vue {
   @Prop() quality!: string;
   @Prop({ default: () => [] }) selectedAuthors!: string;
 
+  created() {
+    this.authors = this.data.authorsRanking;
+  }
+
   T = T;
-  authors = this.data.authorsRanking;
+authors: any;
 }
 </script>
 

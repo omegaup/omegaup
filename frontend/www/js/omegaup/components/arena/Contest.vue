@@ -317,14 +317,13 @@ export default class ArenaContest extends Vue {
   AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
-  currentClarifications = this.clarifications;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
-  currentRunDetailsData = this.runDetailsData;
+currentClarifications: any;
+activeProblem: types.NavbarProblemsetProblem | null;
+currentNextSubmissionTimestamp: any;
+currentNextExecutionTimestamp: any;
+currentRunDetailsData: any;
   now = new Date();
-  currentPopupDisplayed = this.popupDisplayed;
-
+currentPopupDisplayed: any;
   get socketClass(): string {
     if (this.socketStatus === SocketStatus.Connected) {
       return 'socket-status socket-status-ok';
@@ -376,6 +375,12 @@ export default class ArenaContest extends Vue {
   }
 
   created() {
+    this.currentClarifications = this.clarifications;
+    this.activeProblem = this.problem;
+    this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+    this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+    this.currentRunDetailsData = this.runDetailsData;
+    this.currentPopupDisplayed = this.popupDisplayed;
     if (this.lockdown) {
       window.addEventListener('beforeunload', this.beforeWindowUnload);
     }

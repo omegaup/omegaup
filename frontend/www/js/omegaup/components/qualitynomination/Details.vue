@@ -152,8 +152,12 @@ export default class QualityNominationDetails extends Vue {
   @Prop() reviewer!: boolean;
   @Prop() votes!: omegaup.NominationVote[];
 
+  created() {
+    this.rationale = this.initialRationale;
+  }
+
   T = T;
-  rationale = this.initialRationale;
+rationale: any;
   showConfirmation = false;
   status = 'banned';
 

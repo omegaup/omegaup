@@ -135,8 +135,11 @@ export default class AddContestant extends Vue {
   time = time;
   bulkContestants = '';
   typeaheadContestants: types.ListItem[] = [];
-  currentUsers = this.users;
 
+  created() {
+    this.currentUsers = this.users;
+  }
+currentUsers: any;
   onSubmit(): void {
     let users: string[] = [];
     // Add each token as a new username chip component

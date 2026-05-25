@@ -30,9 +30,12 @@ import T from '../../lang';
 export default class FilterQuality extends Vue {
   @Prop({ default: 'onlyQualityProblems' }) quality!: string;
 
-  T = T;
-  currentQuality = this.quality;
+  created() {
+    this.currentQuality = this.quality;
+  }
 
+  T = T;
+currentQuality: any;
   qualityValues: { [key: string]: { name: string; id: string } } = {
     allProblems: {
       name: T.qualityFormQualityAny,

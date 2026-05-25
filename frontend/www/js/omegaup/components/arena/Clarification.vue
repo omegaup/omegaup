@@ -120,10 +120,13 @@ export default class ArenaClarification extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) selected!: boolean;
 
+  created() {
+    this.isPublic = this.clarification.public;
+  }
+
   T = T;
   time = time;
-
-  isPublic = this.clarification.public;
+isPublic: any;
   message = '';
   selectedResponse = 'yes';
   showUpdateAnswer = false;

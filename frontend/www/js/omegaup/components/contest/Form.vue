@@ -1157,30 +1157,28 @@ export default class Form extends Vue {
   @Prop({ default: false }) canSetRecommended!: boolean;
   @Prop({ default: false }) initialRecommended!: boolean;
 
-  alias = this.initialAlias;
-  description = this.initialDescription;
-  feedback = this.initialFeedback;
-  finishTime = this.initialFinishTime;
-  languages = this.initialLanguages;
-  needsBasicInformation = this.initialNeedsBasicInformation;
-  penalty = this.initialPenalty;
-  penaltyType = this.initialPenaltyType;
-  pointsDecayFactor = this.initialPointsDecayFactor;
-  requestsUserInformation = this.initialRequestsUserInformation;
-  scoreboard = this.initialScoreboard;
-  showScoreboardAfter = this.initialShowScoreboardAfter;
-  currentScoreMode = this.scoreMode;
-  startTime = this.initialStartTime;
-  submissionsGap = this.initialSubmissionsGap
-    ? this.initialSubmissionsGap / 60
-    : 1;
-  title = this.initialTitle;
-  windowLength = this.initialWindowLength;
-  windowLengthEnabled = this.initialWindowLength !== null;
-  currentContestForTeams = this.contestForTeams;
-  currentTeamsGroupAlias = this.teamsGroupAlias;
+  alias!: string;
+  description!: string;
+  feedback!: string;
+  finishTime!: Date;
+  languages!: string[];
+  needsBasicInformation!: boolean;
+  penalty!: number;
+  penaltyType!: string;
+  pointsDecayFactor!: number;
+  requestsUserInformation!: string;
+  scoreboard!: number;
+  showScoreboardAfter!: boolean;
+  currentScoreMode!: ScoreMode;
+  startTime!: Date;
+  submissionsGap!: number;
+  title!: string;
+  windowLength!: number | null;
+  windowLengthEnabled!: boolean;
+  currentContestForTeams!: boolean;
+  currentTeamsGroupAlias!: null | types.ListItem;
   titlePlaceHolder = '';
-  recommended = this.initialRecommended;
+  recommended!: boolean;
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;
@@ -1188,6 +1186,32 @@ export default class Form extends Vue {
   showModal: boolean = false;
   changePresetTo: PresetType | null = null;
   currentPreset: PresetType | null = null;
+
+  created() {
+    this.alias = this.initialAlias;
+    this.description = this.initialDescription;
+    this.feedback = this.initialFeedback;
+    this.finishTime = this.initialFinishTime;
+    this.languages = this.initialLanguages;
+    this.needsBasicInformation = this.initialNeedsBasicInformation;
+    this.penalty = this.initialPenalty;
+    this.penaltyType = this.initialPenaltyType;
+    this.pointsDecayFactor = this.initialPointsDecayFactor;
+    this.requestsUserInformation = this.initialRequestsUserInformation;
+    this.scoreboard = this.initialScoreboard;
+    this.showScoreboardAfter = this.initialShowScoreboardAfter;
+    this.currentScoreMode = this.scoreMode;
+    this.startTime = this.initialStartTime;
+    this.submissionsGap = this.initialSubmissionsGap
+      ? this.initialSubmissionsGap / 60
+      : 1;
+    this.title = this.initialTitle;
+    this.windowLength = this.initialWindowLength;
+    this.windowLengthEnabled = this.initialWindowLength !== null;
+    this.currentContestForTeams = this.contestForTeams;
+    this.currentTeamsGroupAlias = this.teamsGroupAlias;
+    this.recommended = this.initialRecommended;
+  }
 
   mounted() {
     this.markdownEditor = new Markdown.Editor(

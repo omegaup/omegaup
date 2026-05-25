@@ -313,16 +313,25 @@ export default class ArenaCourse extends Vue {
   T = T;
   omegaup = omegaup;
   PopupDisplayed = PopupDisplayed;
-  isAdmin =
-    this.course.is_admin ||
+isAdmin: any;
+currentClarifications: any;
+activeProblem: types.NavbarProblemsetProblem | null;
+currentRunDetailsData: any;
+currentPopupDisplayed: any;
+currentNextSubmissionTimestamp: any;
+
+  created() {
+    this.isAdmin = this.course.is_admin ||
     this.course.is_curator ||
     this.course.is_teaching_assistant;
-  currentClarifications = this.clarifications;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentRunDetailsData = this.runDetailsData;
-  currentPopupDisplayed = this.popupDisplayed;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+    this.currentClarifications = this.clarifications;
+    this.activeProblem = this.problem;
+    this.currentRunDetailsData = this.runDetailsData;
+    this.currentPopupDisplayed = this.popupDisplayed;
+    this.currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+    this.currentNextExecutionTimestamp = this.nextExecutionTimestamp;
+  }
+currentNextExecutionTimestamp: any;
   now = new Date();
   INF = '∞';
 

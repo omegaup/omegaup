@@ -214,13 +214,19 @@ export default class CourseViewStudent extends Vue {
   T = T;
   time = time;
   ui = ui;
-  selectedAssignment: string | null = this.assignment?.alias ?? null;
-  selectedProblem: Partial<types.CourseProblem> | null = this.problem;
-  selectedStudent: string | null = this.student?.username ?? null;
+selectedAssignment: string | null;
+selectedProblem: Partial<types.CourseProblem> | null;
+selectedStudent: string | null;
   selectedRun: Partial<types.CourseRun> | null = null;
   showFeedbackForm = false;
-  updatedFeedback: null | string = this.feedback;
 
+  created() {
+    this.selectedAssignment = this.assignment?.alias ?? null;
+    this.selectedProblem = this.problem;
+    this.selectedStudent = this.student?.username ?? null;
+    this.updatedFeedback = this.feedback;
+  }
+updatedFeedback: null | string;
   get problemsWithPoints(): types.CourseProblem[] {
     return this.problems.filter(
       (problem: types.CourseProblem) => problem.points !== 0,

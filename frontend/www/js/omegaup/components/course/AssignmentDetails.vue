@@ -314,8 +314,13 @@ export default class CourseAssignmentDetails extends Vue {
   assignmentType = this.assignment.assignment_type || 'homework';
   description = this.assignment.description || '';
   name = this.assignment.name || '';
-  startTime = this.assignment.start_time || new Date();
-  finishTime = this.assignment.finish_time || new Date();
+
+  created() {
+    this.startTime = this.assignment.start_time || new Date();
+    this.finishTime = this.assignment.finish_time || new Date();
+  }
+startTime: any;
+finishTime: any;
   unlimitedDuration = !this.assignment.finish_time;
 
   @Watch('assignment')

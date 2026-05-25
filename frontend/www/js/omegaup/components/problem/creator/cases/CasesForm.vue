@@ -64,13 +64,16 @@ export default class CasesForm extends Vue {
   @Prop({ default: false }) readonly isCaseEdit!: boolean;
   @Prop({ default: false }) readonly isEmbedded!: boolean;
   @Prop({ default: false }) readonly triggerSubmit!: boolean;
+
+  created() {
+    this.commitMessage = this.isCaseEdit
+    ? T.problemEditUpdatingCase
+    : T.problemEditUpdatingGroup;
+  }
   @Prop({ default: null }) readonly editGroup!: Group;
 
   T = T;
-  commitMessage = this.isCaseEdit
-    ? T.problemEditUpdatingCase
-    : T.problemEditUpdatingGroup;
-
+commitMessage: any;
   @casesStore.Getter('getSelectedCase') getSelectedCase!: Case;
   @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
   @casesStore.Getter('getLinesFromSelectedCase')
