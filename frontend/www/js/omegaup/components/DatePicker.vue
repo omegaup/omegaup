@@ -33,7 +33,11 @@ export default class DatePicker extends Vue {
   @Prop({ default: null }) max!: Date | null;
 
   private usedFallback: boolean = false;
-  private stringValue: string = time.formatDateLocal(this.value);
+  private stringValue!: string;
+
+  created() {
+    this.stringValue = time.formatDateLocal(this.value);
+  }
 
   get minDateStr() {
     return this.min?.toISOString()?.split('T')?.[0];

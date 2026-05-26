@@ -17,7 +17,9 @@ function makeComponent(tag, defaultAttrs) {
           children.push(...slotFn());
         }
       }
-      return h(tag, { ...defaultAttrs, ...this.$attrs }, children);
+      // Return a fragment (array) so that ref on this component points to
+      // the component instance rather than the native element (VTU v2 behavior).
+      return [h(tag, { ...defaultAttrs, ...this.$attrs }, children)];
     },
   };
 }

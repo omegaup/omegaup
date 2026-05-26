@@ -27,6 +27,17 @@ if (!(Node.prototype as any).__originalRemoveChild) {
   Node.prototype.removeChild = safeRemoveChild;
 }
 
+const originalReplaceChild = Node.prototype.replaceChild;
+Node.prototype.replaceChild = function <T extends Node>(
+  newChild: Node,
+  oldChild: T,
+): T {
+  if (this.contains(oldChild)) {
+    return originalReplaceChild.call(this, newChild, oldChild);
+  }
+  return oldChild;
+};
+
 const originalInsertBefore = Node.prototype.insertBefore;
 Node.prototype.insertBefore = function <T extends Node>(
   newChild: T,
