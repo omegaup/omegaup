@@ -94,6 +94,7 @@ def get_modified_files(root: str) -> Set[str]:
         cwd=root,
     )
     merge_base = merge_base_process.stdout.strip()
+    diff_target = f'{merge_base}...HEAD'
     if merge_base_process.returncode != 0 or not merge_base:
         upstream_ref = subprocess.run(
             [
@@ -119,11 +120,11 @@ def get_modified_files(root: str) -> Set[str]:
         print(
             (f'{git_tools.COLORS.HEADER}Warning: could not determine '
              f'merge-base with upstream {upstream_branch!r}; falling back '
-             f'to direct diff against {upstream_branch!r}.'
+             f'to direct diff target {diff_target!r}.'
              f'{git_tools.COLORS.NORMAL}'),
             file=sys.stderr,
         )
-        merge_base = upstream_branch
+        diff_target = f'{upstream_branch}..HEAD'
 
     return set(
         filename.decode('utf-8') for filename in subprocess.run(
@@ -134,7 +135,7 @@ def get_modified_files(root: str) -> Set[str]:
                 '-z',
                 '--name-only',
                 '--diff-filter=d',
-                f'{merge_base}...HEAD',
+                diff_target,
             ],
             check=True,
             stdout=subprocess.PIPE,
