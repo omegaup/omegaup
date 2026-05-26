@@ -89,18 +89,18 @@
           class="mr-2"
           @change="handlePrivateProfileCheckboxChange"
         />{{ T.userEditPrivateProfile }}
+        <!-- id-lint off -->
+        <b-button
+          id="popover-private-profile"
+          class="ml-1"
+          size="sm"
+          variant="none"
+          @click.stop.prevent="show = !show"
+        >
+          <font-awesome-icon :icon="['fas', 'question-circle']" />
+        </b-button>
+        <!-- id-lint on -->
       </label>
-      <!-- id-lint off -->
-      <b-button
-        id="popover-private-profile"
-        class="ml-1"
-        size="sm"
-        variant="none"
-        @click="show = !show"
-      >
-        <font-awesome-icon :icon="['fas', 'question-circle']" />
-      </b-button>
-      <!-- id-lint on -->
       <b-popover
         :show.sync="show"
         target="popover-private-profile"
