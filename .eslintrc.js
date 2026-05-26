@@ -43,6 +43,10 @@ module.exports = {
     // https://v3.vuejs.org/guide/migration/key-attribute.html#with-template-v-for
     'vue/no-v-for-template-key-on-child': 'off',
 
+    // Prevent debug console.log() from being left in production code.
+    // console.warn and console.error are allowed for legitimate logging.
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+
     // TODO: Remove all these exceptions.
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',

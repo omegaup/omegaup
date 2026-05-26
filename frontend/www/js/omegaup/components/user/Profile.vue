@@ -28,6 +28,8 @@
             @heatmap-year-changed="
               (year) => $emit('heatmap-year-changed', year)
             "
+            @save-readme="(payload) => $emit('save-readme', payload)"
+            @report-readme="(payload) => $emit('report-readme', payload)"
           ></omegaup-user-view-profile>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-basic-information'">
@@ -164,6 +166,11 @@ export default class Profile extends Vue {
   ui = ui;
   currentSelectedTab = this.selectedTab;
   currentViewProfileSelectedTab = this.viewProfileSelectedTab;
+
+  @Watch('viewProfileSelectedTab')
+  onViewProfileSelectedTabChanged(newValue: string | null) {
+    this.currentViewProfileSelectedTab = newValue;
+  }
 
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {

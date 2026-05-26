@@ -7,6 +7,7 @@
       <!-- Style Presets -->
       <div class="btn-group d-block mb-3 text-center introjs-style">
         <button
+          :class="{ selected: currentPreset === PresetType.OMI }"
           class="btn btn-secondary"
           data-contest-omi
           type="button"
@@ -15,6 +16,7 @@
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.PreIOI }"
           class="btn btn-secondary"
           data-contest-preioi
           type="button"
@@ -23,6 +25,7 @@
           {{ T.contestNewForm }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.Conacup }"
           class="btn btn-secondary"
           data-contest-conacup
           type="button"
@@ -31,6 +34,7 @@
           {{ T.contestNewFormConacupStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.ICPC }"
           class="btn btn-secondary"
           data-contest-icpc
           type="button"
@@ -227,35 +231,75 @@
               </div>
               <div class="row">
                 <div class="form-group col-md-6 introjs-description">
-                  <label>
-                    {{ T.contestNewFormDescription }}
-                    <span
-                      class="required-asterisk"
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="mb-0 mr-2">
+                      {{ T.contestNewFormDescription }}
+                      <span
+                        class="required-asterisk"
+                        :class="{
+                          'text-danger':
+                            localErrors[FieldName.Description] ||
+                            invalidParameterName === FieldName.Description,
+                        }"
+                        >*</span
+                      >
+                    </label>
+                    <div class="btn-group btn-group-sm ml-auto">
+                      <button
+                        type="button"
+                        class="btn"
+                        :class="
+                          descriptionEditMode
+                            ? 'btn-primary'
+                            : 'btn-outline-secondary'
+                        "
+                        @click="descriptionEditMode = true"
+                      >
+                        {{ T.wordsEdit }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn"
+                        :class="
+                          !descriptionEditMode
+                            ? 'btn-primary'
+                            : 'btn-outline-secondary'
+                        "
+                        @click="descriptionEditMode = false"
+                      >
+                        {{ T.wordsPreview }}
+                      </button>
+                    </div>
+                  </div>
+                  <template v-if="descriptionEditMode">
+                    <div
+                      ref="descriptionButtonBar"
+                      class="wmd-button-bar"
+                    ></div>
+                    <textarea
+                      ref="descriptionInput"
+                      v-model="description"
+                      class="form-control wmd-input"
                       :class="{
-                        'text-danger':
-                          localErrors[FieldName.Description] ||
-                          invalidParameterName === FieldName.Description,
+                        'is-invalid':
+                          invalidParameterName === FieldName.Description ||
+                          localErrors[FieldName.Description],
                       }"
-                      >*</span
-                    >
-                  </label>
-                  <textarea
-                    v-model="description"
-                    class="form-control"
-                    :class="{
-                      'is-invalid':
-                        invalidParameterName === FieldName.Description ||
-                        localErrors[FieldName.Description],
-                    }"
-                    data-description
-                    name="description"
-                    rows="10"
-                    required
-                    :disabled="isSubmitting"
-                    :maxlength="MAX_LENGTH.description"
-                    @blur="validateField(FieldName.Description)"
-                    @input="clearFieldError(FieldName.Description)"
-                  ></textarea>
+                      data-description
+                      name="description"
+                      rows="5"
+                      required
+                      :disabled="isSubmitting"
+                      :maxlength="MAX_LENGTH.description"
+                      @blur="validateField(FieldName.Description)"
+                      @input="clearFieldError(FieldName.Description)"
+                    ></textarea>
+                  </template>
+                  <omegaup-markdown
+                    v-else
+                    :markdown="description"
+                    class="wmd-preview border rounded p-2"
+                  ></omegaup-markdown>
                   <small
                     class="character-counter"
                     :class="{ 'text-danger': isExceedingDescription }"
@@ -857,11 +901,23 @@
         </div>
       </form>
     </div>
+    <b-modal
+      v-model="showModal"
+      :title="T.contestNewFormPresetOverwriteWarningModalTitle"
+      :ok-title="T.wordsConfirm"
+      ok-only
+      @ok="
+        applyPreset(changePresetTo);
+        hasFormChanged = true;
+      "
+    >
+      {{ T.contestNewFormPresetOverwriteWarning }}
+    </b-modal>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -873,6 +929,8 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 import {
   FontAwesomeIcon,
@@ -882,9 +940,12 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { isValidAlias } from '../../validators';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdownModule from '../../markdown';
+import omegaup_Markdown from '../Markdown.vue';
 library.add(fas);
 
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 export enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -1038,6 +1099,8 @@ const MAX_LENGTH = {
 
 const DANGER_THRESHOLD_PERCENTAGE = 0.8;
 
+const markdownConverter = new markdownModule.Converter({ preview: true });
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -1045,6 +1108,7 @@ const DANGER_THRESHOLD_PERCENTAGE = 0.8;
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-markdown': omegaup_Markdown,
     Multiselect,
   },
   directives: {
@@ -1052,6 +1116,9 @@ const DANGER_THRESHOLD_PERCENTAGE = 0.8;
   },
 })
 export default class Form extends Vue {
+  @Ref() readonly descriptionButtonBar!: HTMLDivElement;
+  @Ref() readonly descriptionInput!: HTMLTextAreaElement;
+  markdownEditor: Markdown.Editor | null = null;
   T = T;
   ScoreMode = ScoreMode;
   PresetType = PresetType;
@@ -1117,8 +1184,26 @@ export default class Form extends Vue {
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;
+  descriptionEditMode = true;
+  showModal: boolean = false;
+  changePresetTo: PresetType | null = null;
+  currentPreset: PresetType | null = null;
 
   mounted() {
+    this.markdownEditor = new Markdown.Editor(
+      markdownConverter.converter,
+      '-description',
+      {
+        panels: {
+          buttonBar: this.descriptionButtonBar,
+          preview: null,
+          input: this.descriptionInput,
+        },
+      },
+    );
+    this.markdownEditor.run();
+    this.removeImageButton();
+
     const title = T.createContestInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
       introJs()
@@ -1175,6 +1260,49 @@ export default class Form extends Vue {
       this.windowLength = null;
       this.clearFieldError(FieldName.WindowLength);
     }
+  }
+
+  @Watch('descriptionEditMode')
+  onDescriptionEditModeChange(newValue: boolean): void {
+    if (newValue) {
+      this.$nextTick(() => {
+        this.markdownEditor = new Markdown.Editor(
+          markdownConverter.converter,
+          '-description',
+          {
+            panels: {
+              buttonBar: this.descriptionButtonBar,
+              preview: null,
+              input: this.descriptionInput,
+            },
+          },
+        );
+        this.markdownEditor.run();
+        this.removeImageButton();
+      });
+    }
+  }
+
+  removeImageButton(): void {
+    const imageButton = this.descriptionButtonBar.querySelector(
+      '[id^="wmd-image-button"]',
+    );
+    if (imageButton) {
+      imageButton.remove();
+    }
+    this.descriptionInput.addEventListener(
+      'keydown',
+      (event: KeyboardEvent) => {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key.toLowerCase() === 'g'
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
   }
 
   @Watch('invalidParameterName')
@@ -1307,17 +1435,17 @@ export default class Form extends Vue {
 
   confirmPresetChange(presetType: PresetType): void {
     if (this.hasFormChanged && !this.update) {
-      if (!confirm(T.contestNewFormPresetOverwriteWarning)) {
-        return;
-      }
+      this.changePresetTo = presetType;
+      this.showModal = true;
+      return;
     }
-
     this.applyPreset(presetType);
     this.hasFormChanged = true;
   }
 
   applyPreset(presetType: PresetType): void {
     const preset = CONTEST_PRESETS[presetType];
+    this.currentPreset = presetType;
 
     if (preset.languages) {
       const allLangs = Object.keys(this.allLanguages);
@@ -1480,6 +1608,24 @@ export default class Form extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+
+.wmd-button-bar {
+  background-color: var(--wmd-button-bar-background-color);
+}
+
+.wmd-input {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.wmd-preview {
+  background-color: var(--wmd-button-bar-background-color, #f8f9fa);
+  min-height: 120px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
 
 .multiselect__tag {
   background: var(--multiselect-tag-background-color);
@@ -1525,5 +1671,32 @@ export default class Form extends Vue {
   color: var(--form-character-counter-color, #6c757d);
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .modal-footer .btn {
+  background-color: var(--btn-ok-background-color);
+  border-color: var(--btn-ok-background-color);
+  color: var(--btn-ok-font-color);
+
+  &:hover {
+    color: var(--btn-ok-font-color--hover);
+  }
+}
+
+.btn-group .btn.selected {
+  outline: 3px solid var(--btn-contest-preset-outline-color) !important;
+  z-index: 1 !important;
+}
+
+// Overwrite default bootstrap focus styles
+.btn-group .btn:focus {
+  box-shadow: none !important;
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  z-index: 0;
+}
+.btn-group .btn:hover {
+  z-index: 0;
 }
 </style>
