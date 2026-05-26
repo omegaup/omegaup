@@ -1,7 +1,17 @@
 const CHANNEL_NAME = 'omegaup-logout-sync';
+const EPHEMERAL_SOURCES_PREFIX = 'ephemeral-sources-';
 interface LogoutSyncMessage {
   type: 'logout';
   timestamp: number;
+}
+
+export function clearSessionStorageForLogout(): void {
+  for (const key of Object.keys(sessionStorage)) {
+    if (key.startsWith(EPHEMERAL_SOURCES_PREFIX)) {
+      continue;
+    }
+    sessionStorage.removeItem(key);
+  }
 }
 
 export function broadcastLogout(): void {

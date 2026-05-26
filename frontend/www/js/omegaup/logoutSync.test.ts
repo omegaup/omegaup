@@ -1,4 +1,8 @@
-import { broadcastLogout, initLogoutListener } from './logoutSync';
+import {
+  broadcastLogout,
+  clearSessionStorageForLogout,
+  initLogoutListener,
+} from './logoutSync';
 
 class MockBroadcastChannel {
   static instances: MockBroadcastChannel[] = [];
@@ -48,6 +52,39 @@ class MockBroadcastChannel {
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
+
+describe('clearSessionStorageForLogout', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  afterEach(() => {
+    sessionStorage.clear();
+  });
+
+  it('removes non-ephemeral keys and preserves ephemeral sources', () => {
+    sessionStorage.setItem('ephemeral-sources-foo', 'keep');
+    sessionStorage.setItem('auth-token', 'remove');
+    sessionStorage.setItem('last-visited', '/problem');
+
+    clearSessionStorageForLogout();
+
+    expect(sessionStorage.getItem('ephemeral-sources-foo')).toBe('keep');
+    expect(sessionStorage.getItem('auth-token')).toBeNull();
+    expect(sessionStorage.getItem('last-visited')).toBeNull();
+  });
+
+  it('preserves multiple ephemeral sources', () => {
+    sessionStorage.setItem('ephemeral-sources-foo', 'keep1');
+    sessionStorage.setItem('ephemeral-sources-bar', 'keep2');
+
+    clearSessionStorageForLogout();
+
+    expect(sessionStorage.getItem('ephemeral-sources-foo')).toBe('keep1');
+    expect(sessionStorage.getItem('ephemeral-sources-bar')).toBe('keep2');
+    expect(sessionStorage.length).toBe(2);
+  });
+});
 
 describe('broadcastLogout', () => {
   beforeEach(() => {

@@ -3,7 +3,7 @@ import * as api from './api';
 import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
-import { initLogoutListener } from './logoutSync';
+import { clearSessionStorageForLogout, initLogoutListener } from './logoutSync';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -476,6 +476,7 @@ export namespace omegaup {
               this._cleanupLogoutListener = null;
             }
             this._cleanupLogoutListener = initLogoutListener(() => {
+              clearSessionStorageForLogout();
               window.location.href = '/';
             });
           }

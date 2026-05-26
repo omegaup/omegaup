@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import { broadcastLogout } from '../logoutSync';
+import { broadcastLogout, clearSessionStorageForLogout } from '../logoutSync';
 
 OmegaUp.on('ready', () => {
   if (OmegaUp._cleanupLogoutListener) {
@@ -7,11 +7,8 @@ OmegaUp.on('ready', () => {
     OmegaUp._cleanupLogoutListener = null;
   }
 
-  // Remove ephemeral sources
-  for (const key of Object.keys(sessionStorage)) {
-    if (key.startsWith('ephemeral-sources-')) continue;
-    sessionStorage.removeItem(key);
-  }
+  // Clear sessionStorage while preserving ephemeral sources.
+  clearSessionStorageForLogout();
 
   // Notify all other open tabs after the local cleanup has finished so they
   // observe the cleared state before redirecting.
