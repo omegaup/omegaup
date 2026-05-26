@@ -1,9 +1,9 @@
 <template>
   <div class="card h-100">
     <div class="d-flex justify-content-center card-header">
-      <h5 class="m-0 mr-1">
+      <h3 class="m-0 mr-1">
         {{ T.schoolOfTheMonth }}
-      </h5>
+      </h3>
       <a class="card-header-help" :href="NewSchoolofTheMonthFeatureURL">
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
@@ -11,7 +11,7 @@
     <div
       class="card-body text-center d-flex flex-column justify-content-center"
     >
-      <h5 class="card-title">
+      <h4 class="card-title">
         <omegaup-countryflag
           v-if="schoolOfTheMonth.country_id !== null"
           :country="schoolOfTheMonth.country_id"
@@ -20,7 +20,7 @@
         <a :href="`/schools/profile/${schoolOfTheMonth.school_id}/`">{{
           schoolOfTheMonth.name
         }}</a>
-      </h5>
+      </h4>
       <!-- TODO: agregar más información (logo, total de usuarios...) -->
       <div
         v-if="schoolOfTheMonth.state && schoolOfTheMonth.country"
