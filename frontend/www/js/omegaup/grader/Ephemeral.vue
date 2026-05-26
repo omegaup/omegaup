@@ -5,6 +5,7 @@
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
       </span>
+
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
         <template v-if="!isEmbedded">
           <label>
@@ -48,6 +49,20 @@
                 :icon="isDark ? ['fas', 'sun'] : ['fas', 'moon']"
                 aria-hidden="true"
               />
+            </button>
+            <button
+              v-clipboard="getCopySource"
+              v-clipboard:success="handleCopyFeedback"
+              v-clipboard:error="handleCopyError"
+              type="button"
+              class="btn btn-sm mr-2 my-sm-0"
+              :class="isCopySuccess ? 'btn-success' : 'btn-secondary'"
+              data-copy-button
+              :title="T.wordsCopyToClipboard"
+              :aria-label="T.wordsCopyToClipboard"
+              copy-to-clipboard
+            >
+              <font-awesome-icon :icon="['fas', 'copy']" aria-hidden="true" />
             </button>
           </label>
         </template>
@@ -159,6 +174,7 @@ import * as monaco from 'monaco-editor';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
+import Clipboard from 'v-clipboard';
 import omegaup_Countdown from '../components/Countdown.vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
@@ -171,6 +187,7 @@ import DiffEditor from './DiffEditor.vue';
 import IDESettings from './IDESettings.vue';
 import MonacoEditor from './MonacoEditor.vue';
 import TextEditor from './TextEditor.vue';
+
 import ZipViewer from './ZipViewer.vue';
 import store, { GraderResults } from './GraderStore';
 import * as Util from './util';
@@ -193,8 +210,10 @@ import {
   faSun,
   faMoon,
   faUndo,
+  faCopy,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faUndo);
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faUndo, faCopy);
+Vue.use(Clipboard);
 
 import T from '../lang';
 
@@ -230,9 +249,9 @@ export default class Ephemeral extends Vue {
 
   readonly themeToRef: { [key: string]: string } = {
     [Util.MonacoThemes
-      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+      .VSLight]: `/third_party/css/golden-layout/goldenlayout-light-theme.css`,
     [Util.MonacoThemes
-      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+      .VSDark]: `/third_party/css/golden-layout/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -246,6 +265,8 @@ export default class Ephemeral extends Vue {
   detectedLanguage: string | null = null;
   detectedDisplayName: string = '';
   showDetectedLabel: boolean = false;
+  isCopySuccess = false;
+  copySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -580,6 +601,25 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
+  handleCopyFeedback() {
+    this.isCopySuccess = true;
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.copySuccessTimer = setTimeout(() => {
+      this.isCopySuccess = false;
+    }, 2000);
+  }
+  getCopySource(): string {
+    return store.getters['request.source'] || '';
+  }
+  handleCopyError() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.isCopySuccess = false;
+  }
+
+  beforeDestroy() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+  }
+
   handleDownload(e: Event) {
     // the state is dirty when we need to re-configure zip file
     // if not, download the url (continue default behavior)
@@ -877,10 +917,24 @@ export default class Ephemeral extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
+@import '../../../third_party/css/golden-layout/goldenlayout-base.css';
 
 div > section {
   min-height: 60em;
 }
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .lm_item_container {
+  background-color: var(--vs-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .lm_item_container .vs-dark {
+  background-color: var(--vs-dark-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 div {
   &.vs-dark {
     background: var(--vs-dark-background-color);
@@ -893,6 +947,7 @@ div {
       color: var(--vs-dark-font-color);
     }
   }
+
   &.vs {
     background: var(--vs-background-color);
     border-bottom: 1px solid var(--vs-background-color);
@@ -910,8 +965,8 @@ div {
   font-size: 12px;
   line-height: 1.2;
 }
+
 a:hover {
   color: var(--zip-button-color--hover);
 }
-@import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 </style>

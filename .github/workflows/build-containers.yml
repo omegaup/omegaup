@@ -41,11 +41,11 @@ jobs:
       - name: Push containers to GitHub registry
         run: |
           echo "${{ github.token }}" | \
-            docker login https://docker.pkg.github.com "--username=${{ github.actor }}" --password-stdin
+            docker login ghcr.io "--username=${{ github.actor }}" --password-stdin
 
           for container in frontend frontend-sidecar nginx php ai-editorial-worker; do
             for tag in "latest-${{ steps.extract_branch.outputs.branch }}" "${{ github.sha }}"; do
-              container_name="docker.pkg.github.com/${{ github.repository }}/${container}:${tag}"
+              container_name="ghcr.io/${{ github.repository_owner }}/${container}:${tag}"
               docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
               docker push "${container_name}"
             done

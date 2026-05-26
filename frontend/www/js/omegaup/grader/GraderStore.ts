@@ -1,4 +1,3 @@
-// TODO: add return types to each of the getters
 // TODO: move logic from components inside this store
 
 import Vuex, { Commit, StoreOptions } from 'vuex';
@@ -61,16 +60,7 @@ export interface GraderStore {
   showRunButton: boolean;
   theme: Util.MonacoThemes;
 }
-export interface SettingsCase {
-  Name: string;
-  Weight: number;
-}
-// this type does not exist in types
-export interface SettingsCasesGroup {
-  Name: string;
-  Cases: SettingsCase[];
-  Weight: number;
-}
+
 // TODO: combine case selector group and settings cases group
 export interface CaseSelectorGroup {
   explicit: boolean;
@@ -160,24 +150,26 @@ const storeOptions: StoreOptions<GraderStore> = {
     theme: Util.MonacoThemes.VSLight,
   },
   getters: {
-    alias(state: GraderStore) {
+    alias(state: GraderStore): string {
       return state.alias;
     },
-    showSubmitButton(state: GraderStore) {
+    showSubmitButton(state: GraderStore): boolean {
       return state.showSubmitButton;
     },
-    languages(state: GraderStore) {
+    languages(state: GraderStore): string[] {
       return state.languages;
     },
-    sessionStorageSources(state: GraderStore) {
+    sessionStorageSources(
+      state: GraderStore,
+    ): GraderSessionStorageSources | null {
       return state.sessionStorageSources;
     },
-    moduleName(state: GraderStore) {
+    moduleName(state: GraderStore): string {
       return (
         state.request.input.interactive?.module_name || state.alias || 'Main'
       );
     },
-    flatCaseResults(state: GraderStore) {
+    flatCaseResults(state: GraderStore): { [key: string]: types.CaseResult } {
       const result: { [key: string]: types.CaseResult } = {};
       if (!state.results || !state.results.groups) return result;
       for (const group of state.results.groups) {
@@ -187,27 +179,26 @@ const storeOptions: StoreOptions<GraderStore> = {
       }
       return result;
     },
-    currentCase(state: GraderStore) {
+    currentCase(state: GraderStore): string {
       return state.currentCase;
     },
-    inputIn(state: GraderStore) {
+    inputIn(state: GraderStore): string {
       return state.request.input.cases[state.currentCase]['in'];
     },
-    inputOut(state: GraderStore) {
+    inputOut(state: GraderStore): string {
       return state.request.input.cases[state.currentCase]['out'];
     },
-    outputStdout(state: GraderStore) {
+    outputStdout(state: GraderStore): string {
       const filename: CaseKey = `${state.currentCase}.out`;
       return state.outputs[filename] || '';
     },
-    outputStderr(state: GraderStore) {
+    outputStderr(state: GraderStore): string {
       const filename: CaseKey = `${state.currentCase}.err`;
       return state.outputs[filename] || '';
     },
-    settingsCases(state: GraderStore) {
-      // resultMap type is not present in types
+    settingsCases(state: GraderStore): types.SettingsCaseGroup[] {
       const resultMap: {
-        [key: string]: SettingsCasesGroup;
+        [key: string]: types.SettingsCaseGroup;
       } = {};
       for (const caseName in state.request.input.cases) {
         if (
@@ -222,25 +213,24 @@ const storeOptions: StoreOptions<GraderStore> = {
           resultMap[tokens[0]] = {
             Name: tokens[0],
             Cases: [],
-            Weight: 0,
           };
         }
         resultMap[tokens[0]].Cases.push({
           Name: caseName,
           Weight: state.request.input.cases[caseName].weight || 0,
         });
-        resultMap[tokens[0]].Weight +=
-          state.request.input.cases[caseName].weight || 0;
       }
-      const result: SettingsCasesGroup[] = [];
+      const result: types.SettingsCaseGroup[] = [];
       for (const groupName in resultMap) {
         if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
           continue;
-        resultMap[groupName].Cases.sort((a: SettingsCase, b: SettingsCase) => {
-          if (a.Name < b.Name) return -1;
-          if (a.Name > b.Name) return 1;
-          return 0;
-        });
+        resultMap[groupName].Cases.sort(
+          (a: types.SettingsCase, b: types.SettingsCase) => {
+            if (a.Name < b.Name) return -1;
+            if (a.Name > b.Name) return 1;
+            return 0;
+          },
+        );
         result.push(resultMap[groupName]);
       }
       result.sort((a, b) => {
@@ -250,53 +240,57 @@ const storeOptions: StoreOptions<GraderStore> = {
       });
       return result;
     },
-    'request.source'(state: GraderStore) {
+    'request.source'(state: GraderStore): string {
       return state.request.source;
     },
-    'request.language'(state: GraderStore) {
+    'request.language'(state: GraderStore): string {
       return state.request.language;
     },
-    'request.input.validator.custom_validator.language'(state: GraderStore) {
+    'request.input.validator.custom_validator.language'(
+      state: GraderStore,
+    ): string {
       return state.request.input.validator.custom_validator?.language || '';
     },
-    'request.input.validator.custom_validator.source'(state: GraderStore) {
+    'request.input.validator.custom_validator.source'(
+      state: GraderStore,
+    ): string {
       return state.request.input.validator.custom_validator?.source || '';
     },
-    'request.input.interactive.idl'(state: GraderStore) {
+    'request.input.interactive.idl'(state: GraderStore): string {
       return state.request.input.interactive?.idl || '';
     },
-    'request.input.interactive.main_source'(state: GraderStore) {
+    'request.input.interactive.main_source'(state: GraderStore): string {
       return state.request.input.interactive?.main_source || '';
     },
-    'request.input.interactive.language'(state: GraderStore) {
+    'request.input.interactive.language'(state: GraderStore): string {
       return state.request.input.interactive?.language || '';
     },
-    Tolerance(state: GraderStore) {
+    Tolerance(state: GraderStore): number {
       return state.request.input.validator?.tolerance || 0;
     },
-    isCustomValidator(state: GraderStore) {
+    isCustomValidator(state: GraderStore): boolean {
       return !!state.request.input.validator.custom_validator;
     },
-    isInteractive(state: GraderStore) {
+    isInteractive(state: GraderStore): boolean {
       return !!state.request.input.interactive;
     },
-    isUpdatingSettings(state: GraderStore) {
+    isUpdatingSettings(state: GraderStore): boolean {
       return state.updatingSettings;
     },
-    isDirty(state: GraderStore) {
+    isDirty(state: GraderStore): boolean {
       return state.dirty;
     },
     // new getters separate from refactored code
-    zipContent(state: GraderStore) {
+    zipContent(state: GraderStore): string {
       return state.zipContent;
     },
-    compilerOutput(state: GraderStore) {
+    compilerOutput(state: GraderStore): string {
       return state.compilerOutput;
     },
-    logs(state: GraderStore) {
+    logs(state: GraderStore): string {
       return state.logs;
     },
-    Validator(state: GraderStore) {
+    Validator(state: GraderStore): string {
       return state.request.input.validator.name;
     },
     caseSelectorGroups(state: GraderStore): CaseSelectorGroup[] {
@@ -347,25 +341,35 @@ const storeOptions: StoreOptions<GraderStore> = {
       );
       return result;
     },
-    showRunButton(state: GraderStore) {
+    showRunButton(state: GraderStore): boolean {
       return state.showRunButton;
     },
-    request(state: GraderStore) {
+    request(state: GraderStore): GraderRequest {
       return state.request;
     },
-    customValidator(state: GraderStore) {
+    customValidator(
+      state: GraderStore,
+    ):
+      | { language: string; limits?: types.LimitsSettings; source: string }
+      | undefined {
       return state.request.input.validator.custom_validator;
     },
-    inputCases(state: GraderStore) {
+    inputCases(
+      state: GraderStore,
+    ): {
+      [key: string]: { in: string; out: string; weight?: number };
+    } {
       return state.request.input.cases;
     },
-    Interactive(state: GraderStore) {
+    Interactive(
+      state: GraderStore,
+    ): types.InteractiveSettingsDistrib | undefined {
       return state.request.input.interactive;
     },
-    limits(state: GraderStore) {
+    limits(state: GraderStore): types.LimitsSettings {
       return state.request.input.limits;
     },
-    theme(state: GraderStore) {
+    theme(state: GraderStore): Util.MonacoThemes {
       return state.theme;
     },
   },

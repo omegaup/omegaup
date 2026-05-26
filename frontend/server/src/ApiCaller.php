@@ -198,6 +198,9 @@ class ApiCaller {
         $lower = strtolower($methodName);
 
         $readOnlyAllowlist = [
+            'execute',
+            'executeforide',
+            'lastprivacypolicyaccepted',
             'listassociatedidentities',
             'statusverified',
         ];
@@ -206,12 +209,13 @@ class ApiCaller {
         }
 
         $mutatingPatterns = [
-            'add', 'arbitrate', 'archive', 'associate', 'bulkcreate',
-            'change', 'confirm', 'create', 'delete', 'disqualify',
-            'execute', 'expire', 'forfeit', 'generate', 'invalidate',
-            'login', 'logout', 'read', 'refresh', 'register',
-            'rejudge', 'remove', 'requalify', 'resolve', 'revoke',
-            'select', 'set', 'toggle', 'update', 'verify',
+            'accept', 'add', 'arbitrate', 'archive', 'associate',
+            'bulkcreate', 'change', 'clone', 'confirm', 'create',
+            'delete', 'disqualify', 'execute', 'expire', 'forfeit',
+            'generate', 'invalidate', 'login', 'logout', 'open',
+            'read', 'refresh', 'register', 'rejudge', 'remove',
+            'requalify', 'resolve', 'revoke', 'select', 'set',
+            'toggle', 'update', 'verify',
         ];
         foreach ($mutatingPatterns as $pattern) {
             if (str_contains($lower, $pattern)) {

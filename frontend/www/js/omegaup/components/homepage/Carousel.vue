@@ -19,8 +19,8 @@
         :class="{ active: !index }"
       >
         <omegaup-homepage-slide
-          :title="slide.title[T.locale]"
-          :description="slide.description[T.locale]"
+          :title="slide.title[T.locale] || slide.title['es']"
+          :description="slide.description[T.locale] || slide.description['es']"
           :image-src="slide.image"
           :button="slide.button"
         ></omegaup-homepage-slide>
@@ -61,7 +61,7 @@ import carouselConfig from '../../carousel.config';
 export default class Carousel extends Vue {
   T = T;
   // Reverse the entries so that newer ones appear first.
-  slides = carouselConfig.reverse();
+  slides = [...carouselConfig].reverse();
 }
 </script>
 
