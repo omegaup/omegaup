@@ -14,6 +14,12 @@ OmegaUp.on('ready', () => {
     new URL(document.location.toString()).searchParams.get('fromLogin') !==
     null;
 
+  if (fromLogin) {
+    const url = new URL(window.location.toString());
+    url.searchParams.delete('fromLogin');
+    window.history.replaceState({}, document.title, url.toString());
+  }
+
   const commonNavbarExists = document.getElementById('common-navbar');
   if (!commonNavbarExists) {
     return;

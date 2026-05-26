@@ -1,7 +1,7 @@
 <template>
-  <div class="container-lg p-5 w-50">
-    <div class="card">
-      <h2 class="card-header">{{ T.passwordResetRequestTitle }}</h2>
+  <div class="container-fluid px-3 px-md-5 py-4 py-md-5">
+    <div class="card mx-auto">
+      <h5 class="card-header h2-md">{{ T.passwordResetRequestTitle }}</h5>
       <form class="card-body">
         <div class="form-group">
           <h5 class="card-title">{{ T.profileEmail }}</h5>
@@ -33,3 +33,19 @@ export default class PasswordRecover extends Vue {
   email: string = '';
 }
 </script>
+
+<style scoped>
+.card {
+  max-width: 500px;
+}
+
+.card-header {
+  font-size: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .card-header {
+    font-size: 1.5rem;
+  }
+}
+</style>

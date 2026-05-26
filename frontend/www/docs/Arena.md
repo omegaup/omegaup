@@ -12,7 +12,7 @@ Arena is a web service that the Frontend must call for everything related to con
 
 * All responses have a field called `status`.
 when calls are successful, the value will be literal `ok`.
-When there is error, the value of `status` will be `error` and there will be field called `error` containig a human-readable description of the error (in the account's configured language), an `errorcode` field, and an `errorname` field containing both a numeric and a text identifier for the error.
+When there is error, the value of `status` will be `error` and there will be field called `error` containing a human-readable description of the error (in the account's configured language), an `errorcode` field, and an `errorname` field containing both a numeric and a text identifier for the error.
 
 * Additionally, the server will set the HTTP status to the appropriate value in the following cases:
 

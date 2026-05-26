@@ -132,6 +132,7 @@ const data: types.ExtraProfileDetails = {
   stats: [],
   unsolvedProblems: [],
   ownedBadges: [],
+  bookmarkedProblems: [],
   hasPassword: true,
 };
 

@@ -3,12 +3,16 @@
     v-tooltip="description"
     class="col-6 col-sm-3 badge-container text-center d-flex flex-column align-items-center"
   >
-    <a class="badge-icon d-block w-100" :href="`/badge/${badge.badge_alias}/`"
-      ><img
-        :class="{ 'badge-gray': !badge.unlocked }"
-        :src="iconUrl"
-        class="img-fluid badge-img"
-    /></a>
+    <a class="badge-icon d-block w-100" :href="`/badge/${badge.badge_alias}/`">
+      <badge-3d>
+        <img
+          :class="{ 'badge-gray': !badge.unlocked }"
+          :src="iconUrl"
+          class="img-fluid badge-img"
+          :alt="name"
+        />
+      </badge-3d>
+    </a>
 
     <figcaption class="badge-name pt-2">
       {{ name }}
@@ -22,10 +26,14 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import Badge3D from './Badge3D.vue';
 
 @Component({
   directives: {
     tooltip: VTooltip,
+  },
+  components: {
+    'badge-3d': Badge3D,
   },
 })
 export default class Badge extends Vue {
@@ -52,5 +60,10 @@ export default class Badge extends Vue {
 
 .badge-img {
   max-height: 10rem;
+}
+
+.badge-icon {
+  position: relative;
+  height: 10rem;
 }
 </style>

@@ -10,7 +10,7 @@ class SubmissionsListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testSubmissionsList() {
         $usersCount = 4;
-        $numSubmissions = 2; // number of submisisons for each problem
+        $numSubmissions = 2; // number of submissions for each problem
         foreach (range(0, $usersCount - 1) as $_) {
             [
                 'identity' => $identity,

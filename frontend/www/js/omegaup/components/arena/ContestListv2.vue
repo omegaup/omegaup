@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container fluid class="p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -18,7 +18,7 @@
                 <form @submit.prevent="onSearchQuery">
                   <div class="input-group">
                     <input
-                      v-model.lazy="currentQuery"
+                      v-model="currentQuery"
                       class="form-control nav-link"
                       type="text"
                       name="query"
@@ -27,6 +27,7 @@
                       autocapitalize="off"
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
+                      @input="onSearchQueryDebounced"
                       @keyup.enter="onSearchQuery"
                     />
                     <button
@@ -47,11 +48,25 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown ref="dropdownOrderBy" no-caret data-dropdown-order>
+                <b-dropdown
+                  ref="dropdownOrderBy"
+                  no-caret
+                  data-dropdown-order
+                  :variant="isNonDefaultOrder ? 'primary' : 'light'"
+                >
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />
-                      {{ T.contestOrderBy }}
+                      <span v-if="isNonDefaultOrder">
+                        {{ activeOrderLabel }}
+                        <font-awesome-icon
+                          icon="times-circle"
+                          class="ml-1 reset-icon"
+                          :title="T.contestOrderBy"
+                          @click.stop="orderByEnds"
+                        />
+                      </span>
+                      <span v-else>{{ T.contestOrderBy }}</span>
                     </div>
                   </template>
                   <b-dropdown-item
@@ -126,10 +141,20 @@
                   class="mr-0"
                   no-caret
                   data-dropdown-filter
+                  :variant="isNonDefaultFilter ? 'primary' : 'light'"
                 >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
-                    {{ T.contestFilterBy }}
+                    <span v-if="isNonDefaultFilter">
+                      {{ activeFilterLabel }}
+                      <font-awesome-icon
+                        icon="times-circle"
+                        class="ml-1 reset-icon"
+                        :title="T.contestFilterBy"
+                        @click.stop="filterByAll"
+                      />
+                    </span>
+                    <span v-else>{{ T.contestFilterBy }}</span>
                   </template>
                   <b-dropdown-item
                     href="#"
@@ -202,11 +227,7 @@
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
                   <a :href="getTimeLink(contestItem.finish_time)">
-                    {{
-                      ui.formatString(T.contestEndTime, {
-                        endDate: finishContestDate(contestItem),
-                      })
-                    }}
+                    {{ currentContestDate(contestItem) }}
                   </a>
                 </b-card-text>
               </template>
@@ -276,11 +297,7 @@
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
                   <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartTime, {
-                        startDate: startContestDate(contestItem),
-                      })
-                    }}
+                    {{ futureContestDate(contestItem) }}
                   </a>
                 </b-card-text>
               </template>
@@ -352,12 +369,8 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartedTime, {
-                        startedDate: startContestDate(contestItem),
-                      })
-                    }}
+                  <a :href="getTimeLink(contestItem.finish_time)">
+                    {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
               </template>
@@ -399,32 +412,34 @@
         </b-tab>
       </b-tabs>
     </b-card>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import debounce from 'lodash/debounce';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
+import * as time from '../../time';
 import T from '../../lang';
+import { getExternalUrl } from '../../urlHelper';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // Import Only Required Plugins
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
+  TabsPlugin,
 } from 'bootstrap-vue';
+import infiniteScroll from 'vue-infinite-scroll';
 import ContestCard from './ContestCard.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
-import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
@@ -459,6 +474,7 @@ export interface UrlParams {
   query: string;
   sort_order: ContestOrder;
   filter: ContestFilter;
+  replaceState?: boolean; // When true, use replaceState instead of pushState (for browser navigation)
 }
 
 @Component({
@@ -483,7 +499,6 @@ class ArenaContestList extends Vue {
   @Prop({ default: false }) loading!: boolean;
 
   T = T;
-  ui = ui;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   ContestFilter = ContestFilter;
@@ -495,6 +510,15 @@ class ArenaContestList extends Vue {
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
+  // Flag to track if state change came from browser navigation (back/forward button)
+  // When true, we should use replaceState instead of pushState to avoid corrupting history
+  isFromBrowserNavigation: boolean = false;
+  // Flag to track the very first load — initial URL normalization should use
+  // replaceState to avoid creating an extra history entry (see issue #9161)
+  isInitialLoad: boolean = true;
+  onSearchQueryDebounced = debounce(() => {
+    this.onSearchQuery();
+  }, 300);
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -505,28 +529,6 @@ class ArenaContestList extends Vue {
   }
 
   onSearchQuery() {
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
-      tab_name:
-        (urlObj.searchParams.get('tab_name') as ContestTab) ||
-        ContestTab.Current,
-      query: this.currentQuery,
-      sort_order:
-        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-        ContestOrder.None,
-      filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) ||
-        ContestFilter.All,
-    };
-    this.currentPage = 1;
-    this.hasMore = true;
-    this.fetchPage(params, urlObj);
-  }
-  onReset() {
-    this.currentQuery = '';
-  }
-  fetchInitialContests() {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -541,12 +543,35 @@ class ArenaContestList extends Vue {
     this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
+  onReset() {
+    this.currentQuery = '';
+    this.onSearchQuery();
+  }
+  fetchInitialContests() {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
+      replaceState: this.isFromBrowserNavigation || this.isInitialLoad,
+    };
+    // Reset the contest list for this tab to avoid stale data
+    Vue.set(this.contests, this.currentTab, []);
+    this.currentPage = 1;
+    this.hasMore = true;
+    // Reset the navigation and initial load flags after using them
+    this.isFromBrowserNavigation = false;
+    this.isInitialLoad = false;
+    this.fetchPage(params, urlObj);
+  }
   mounted() {
     this.fetchInitialContests();
   }
 
   beforeDestroy() {
-    // Placeholder for cleanup when infinite scroll is re-implemented
+    this.onSearchQueryDebounced.cancel();
   }
   async loadMoreContests() {
     if (this.isScrollLoading || !this.hasMore || this.loading) return;
@@ -588,16 +613,20 @@ class ArenaContestList extends Vue {
     }, 1000);
   }
 
-  finishContestDate(contest: types.ContestListItem): string {
-    return contest.finish_time.toLocaleDateString();
+  currentContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForCurrentContest(contest.finish_time);
   }
 
-  startContestDate(contest: types.ContestListItem): string {
-    return contest.start_time.toLocaleDateString();
+  futureContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForFutureContest(contest.start_time);
+  }
+
+  pastContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForPastContest(contest.finish_time);
   }
 
   getTimeLink(time: Date): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
+    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${time.toISOString()}`;
   }
 
   orderByTitle() {
@@ -660,6 +689,67 @@ class ArenaContestList extends Vue {
     if (!this.contestList) return true;
     return this.contestList.length === 0;
   }
+
+  get isNonDefaultOrder(): boolean {
+    return (
+      this.currentOrder !== ContestOrder.Ends &&
+      this.currentOrder !== ContestOrder.None
+    );
+  }
+
+  get isNonDefaultFilter(): boolean {
+    return this.currentFilter !== ContestFilter.All;
+  }
+
+  get activeOrderLabel(): string {
+    const orderLabels: Record<ContestOrder, string> = {
+      [ContestOrder.Ends]: T.contestOrderByEnds,
+      [ContestOrder.Title]: T.contestOrderByTitle,
+      [ContestOrder.Duration]: T.contestOrderByDuration,
+      [ContestOrder.Organizer]: T.contestOrderByOrganizer,
+      [ContestOrder.Contestants]: T.contestOrderByContestants,
+      [ContestOrder.SignedUp]: T.contestOrderBySignedUp,
+      [ContestOrder.None]: T.contestOrderBy,
+    };
+    return orderLabels[this.currentOrder] ?? T.contestOrderBy;
+  }
+
+  get activeFilterLabel(): string {
+    const filterLabels: Record<ContestFilter, string> = {
+      [ContestFilter.All]: T.contestFilterBy,
+      [ContestFilter.SignedUp]: T.contestFilterBySignedUp,
+      [ContestFilter.OnlyRecommended]: T.contestFilterByRecommended,
+    };
+    return filterLabels[this.currentFilter] ?? T.contestFilterBy;
+  }
+
+  // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
+  // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
+  @Watch('tab')
+  onTabPropChanged(newValue: ContestTab) {
+    this.isFromBrowserNavigation = true;
+    this.currentTab = newValue;
+  }
+
+  @Watch('sortOrder')
+  onSortOrderPropChanged(newValue: ContestOrder) {
+    this.isFromBrowserNavigation = true;
+    this.currentOrder = newValue;
+  }
+
+  @Watch('filter')
+  onFilterPropChanged(newValue: ContestFilter) {
+    this.isFromBrowserNavigation = true;
+    this.currentFilter = newValue;
+  }
+
+  @Watch('page')
+  onPagePropChanged(newValue: number) {
+    this.isFromBrowserNavigation = true;
+    this.currentPage = newValue;
+  }
+
+  // Watchers for internal state - fetch data when user interacts with UI
   @Watch('currentTab', { immediate: true, deep: true })
   onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
     if (typeof oldValue === 'undefined') return;
@@ -739,7 +829,8 @@ export default ArenaContestList;
 }
 
 .contest-card {
-  height: 150px;
+  min-height: 150px;
+  height: auto;
   padding: 1rem;
 }
 
@@ -784,6 +875,15 @@ export default ArenaContestList;
 
   .dropdown {
     margin-right: 1rem;
+
+    .reset-icon {
+      cursor: pointer;
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
   }
 }
 

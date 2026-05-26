@@ -24,45 +24,63 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         array &$args,
         array &$clauses
     ): void {
+        // Pre-fetch tag IDs to avoid subquery
+        $placeholders = implode(',', array_fill(0, count($tags), '?'));
+        $tagIdSql = "SELECT tag_id, public FROM Tags WHERE name IN ({$placeholders})";
+
+        /** @var list<array{public: bool, tag_id: int}> */
+        $tagResults = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $tagIdSql,
+            $tags
+        );
+
+        if (empty($tagResults)) {
+            // No matching tags found, add impossible condition
+            $clauses[] = ['1 = 0', []];
+            return;
+        }
+
+        $tagIds = array_map(fn($row) => $row['tag_id'], $tagResults);
+        $allTagsPublic = array_reduce(
+            $tagResults,
+            fn($carry, $row) => $carry && ($row['public'] === true),
+            true
+        );
+
         // Look for problems matching ALL tags or not
-        $havingClause = $requireAllTags ? 'HAVING (COUNT(pt.tag_id) = ?)' : '';
-        $placeholders = array_fill(0, count($tags), '?');
-        $placeholders = join(',', $placeholders);
+        $havingClause = $requireAllTags ? 'HAVING (COUNT(DISTINCT pt.tag_id) = ?)' : '';
+        $tagPlaceholders = implode(',', array_fill(0, count($tagIds), '?'));
+
         $sql .= "
             INNER JOIN (
                 SELECT
                     pt.problem_id,
-                    BIT_AND(t.public) as public
+                    ? AS public
                 FROM
                     Problems_Tags pt
                 INNER JOIN
                     Problems pp
                 ON
                     pp.problem_id = pt.problem_id
-                INNER JOIN
-                    Tags t
-                ON
-                    pt.tag_id = t.tag_id
-                WHERE pt.tag_id IN (
-                    SELECT t.tag_id
-                    FROM Tags t
-                    WHERE t.name in ($placeholders)
-                )
-                AND (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
+                WHERE
+                    pt.tag_id IN ({$tagPlaceholders})
+                    AND (pp.allow_user_add_tags = 1 OR pt.source <> 'voted')
                 GROUP BY
                     pt.problem_id
                 {$havingClause}
             ) ptp ON ptp.problem_id = p.problem_id";
-        $args = array_merge($args, $tags);
+
+        $args[] = $allTagsPublic ? 1 : 0;
+        $args = array_merge($args, $tagIds);
         if ($requireAllTags) {
-            $args[] = count($tags);
+            $args[] = count($tagIds);
         }
 
         if ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
             array_push(
                 $clauses,
                 [
-                    '(ptp.public OR id.identity_id = ?)',
+                    '(ptp.public = 1 OR id.identity_id = ?)',
                     [$identityId],
                 ]
             );
@@ -70,7 +88,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             array_push(
                 $clauses,
                 [
-                    'ptp.public',
+                    'ptp.public = 1',
                     [],
                 ]
             );
@@ -137,6 +155,179 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * @return array{args: list<float|int|string>, clauses: list<array{0: string, 1: list<float|int|string>}>, sql: string}
+     */
+    private static function buildIdentityAdminQuery(
+        string $languageJoin,
+        string $levelJoin
+    ): array {
+        return [
+            'sql' => '
+                FROM
+                    Problems p ' . $languageJoin . $levelJoin,
+            'args' => [],
+            'clauses' => [[
+                'p.visibility > ?',
+                [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
+            ]],
+        ];
+    }
+
+    /**
+     * @return array{args: list<float|int|string>, clauses: list<array{0: string, 1: list<float|int|string>}>, sql: string}
+     */
+    private static function buildIdentityNormalQuery(
+        int $identityId,
+        ?int $userId,
+        int $minVisibility,
+        string $languageJoin,
+        string $levelJoin
+    ): array {
+        $userKey = is_null($userId) ? 'null' : $userId;
+        $callback = /** @return list<int> */ fn (): array =>
+            self::getAccessibleAclIds($identityId, $userId);
+        $cacheKey = "{$identityId}-{$userKey}";
+        $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
+            $cacheKey,
+            $callback
+        );
+
+        $visibilityThreshold = max(
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            $minVisibility
+        );
+        $clause = '(p.visibility >= ? OR id.identity_id IS NOT NULL)';
+        $argsForClause = [$visibilityThreshold];
+        if (!empty($accessibleAclIds)) {
+            $aclIdPlaceholders = array_fill(0, count($accessibleAclIds), '?');
+            $placeholders = implode(',', $aclIdPlaceholders);
+            $clause .= ' OR p.acl_id IN (' . $placeholders . ')';
+            $argsForClause = array_merge($argsForClause, $accessibleAclIds);
+        }
+
+        return [
+            'sql' => '
+                FROM Problems p
+                INNER JOIN ACLs a ON a.acl_id = p.acl_id
+                LEFT JOIN Identities id ON id.identity_id = ? AND a.owner_id = id.user_id
+                ' . $languageJoin . $levelJoin,
+            'args' => [$identityId],
+            'clauses' => [[
+                '(' . $clause . ') AND p.visibility > ?',
+                array_merge(
+                    $argsForClause,
+                    [\OmegaUp\ProblemParams::VISIBILITY_DELETED]
+                ),
+            ]],
+        ];
+    }
+
+    /**
+     * @return array{args: list<float|int|string>, clauses: list<array{0: string, 1: list<float|int|string>}>, sql: string}
+     */
+    private static function buildIdentityAnonymousQuery(
+        int $minVisibility,
+        string $languageJoin,
+        string $levelJoin
+    ): array {
+        return [
+            'sql' => '
+                FROM
+                    Problems p ' . $languageJoin . $levelJoin,
+            'args' => [],
+            'clauses' => [[
+                'p.visibility >= ?',
+                [max(
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                    $minVisibility
+                )],
+            ]],
+        ];
+    }
+
+    /**
+     * @param list<float|int|string> $args
+     * @return list<array{accepted: int|null, acl_id: int|null, alias: null|string, allow_user_add_tags: bool|null, commit: null|string, creation_date: \OmegaUp\Timestamp|null, current_version: null|string, deprecated: bool|null, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool|null, input_limit: int|null, languages: null|string, order: null|string, points: float|null, problem_id: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool|null, ratio: float|null, score: float, show_diff: null|string, source: null|string, submissions: int|null, title: null|string, visibility: int|null, visits: int|null}>
+     */
+    private static function executeAdminIdentityQuery(
+        int $identityId,
+        string $fields,
+        string $sql,
+        array $args
+    ): array {
+        $select = "
+            SELECT
+                ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
+                p.accepted / GREATEST(1, p.submissions) AS ratio,
+                COALESCE(ROUND(100 * IFNULL(
+                    (SELECT MAX(Runs.score)
+                     FROM Submissions
+                     INNER JOIN Runs ON Runs.run_id = Submissions.current_run_id
+                     WHERE Submissions.identity_id = ? AND Submissions.problem_id = p.problem_id),
+                    0.0)), 0.0) AS score,
+                {$fields}
+        ";
+        /** @var list<array{accepted: int|null, acl_id: int|null, alias: null|string, allow_user_add_tags: bool|null, commit: null|string, creation_date: \OmegaUp\Timestamp|null, current_version: null|string, deprecated: bool|null, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool|null, input_limit: int|null, languages: null|string, order: null|string, points: float|null, problem_id: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool|null, ratio: float|null, score: float, show_diff: null|string, source: null|string, submissions: int|null, title: null|string, visibility: int|null, visits: int|null}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql};",
+            array_merge([$identityId], $args)
+        );
+    }
+
+    /**
+     * @param list<float|int|string> $args
+     * @return list<array{accepted: int|null, acl_id: int|null, alias: null|string, allow_user_add_tags: bool|null, commit: null|string, creation_date: \OmegaUp\Timestamp|null, current_version: null|string, deprecated: bool|null, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool|null, input_limit: int|null, languages: null|string, order: null|string, points: float|null, problem_id: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool|null, ratio: float|null, score: float, show_diff: null|string, source: null|string, submissions: int|null, title: null|string, visibility: int|null, visits: int|null}>
+     */
+    private static function executeNormalIdentityQuery(
+        int $identityId,
+        string $fields,
+        string $sql,
+        array $args
+    ): array {
+        $select = "
+            SELECT
+                ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
+                p.accepted / GREATEST(1, p.submissions) AS ratio,
+                COALESCE(ROUND(100 * IFNULL(
+                    (SELECT MAX(r.score)
+                     FROM Submissions s
+                     INNER JOIN Runs r ON r.run_id = s.current_run_id
+                     WHERE s.identity_id = ? AND s.problem_id = p.problem_id),
+                    0), 2), 0.0) AS score,
+                {$fields}
+        ";
+        /** @var list<array{accepted: int|null, acl_id: int|null, alias: null|string, allow_user_add_tags: bool|null, commit: null|string, creation_date: \OmegaUp\Timestamp|null, current_version: null|string, deprecated: bool|null, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool|null, input_limit: int|null, languages: null|string, order: null|string, points: float|null, problem_id: int|null, quality: float|null, quality_histogram: null|string, quality_seal: bool|null, ratio: float|null, score: float, show_diff: null|string, source: null|string, submissions: int|null, title: null|string, visibility: int|null, visits: int|null}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql};",
+            array_merge([$identityId], $args)
+        );
+    }
+
+    /**
+     * @param list<float|int|string> $args
+     * @return list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}>
+     */
+    private static function executeAnonymousIdentityQuery(
+        string $fields,
+        string $sql,
+        array $args
+    ): array {
+        $select = "
+            SELECT
+                0.0 AS score,
+                ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
+                p.accepted / GREATEST(1, p.submissions) AS ratio,
+                {$fields}
+        ";
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql};",
+            $args
+        );
+    }
+
+    /**
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
@@ -200,8 +391,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
         $collation = ($orderBy === 'title') ? 'COLLATE utf8mb4_bin' : '';
-        $select = '';
         $sql = '';
+        /** @var list<float|int|string> */
         $args = [];
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
@@ -307,117 +498,34 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             }
         }
 
-        if ($identityType === IDENTITY_ADMIN) {
-            $args[] = $identityId;
-            $select = "
-                SELECT
-                    ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2) AS points,
-                    accepted / GREATEST(1, submissions) AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0.0)) AS score,
-                    {$fields}
-            ";
-            $sql = '
-                FROM
-                    Problems p
-                LEFT JOIN (
-                    SELECT
-                        Submissions.problem_id,
-                        MAX(Runs.score) AS score
-                    FROM
-                        Submissions
-                    INNER JOIN
-                        Runs ON Runs.run_id = Submissions.current_run_id
-                    WHERE
-                        Submissions.identity_id = ?
-                    GROUP BY
-                        Submissions.problem_id
-                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
-
-            $clauses[] = [
-                'p.visibility > ?',
-                [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
-            ];
+        if ($identityType === IDENTITY_ADMIN && !is_null($identityId)) {
+            $queryParts = self::buildIdentityAdminQuery(
+                $languageJoin,
+                $levelJoin
+            );
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
-            $userKey = is_null($userId) ? 'null' : $userId;
-            $callback = /** @return list<int> */ fn (): array =>
-                self::getAccessibleAclIds($identityId, $userId);
-            $cacheKey = "{$identityId}-{$userKey}";
-
-            $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
-                $cacheKey,
-                $callback
+            $queryParts = self::buildIdentityNormalQuery(
+                $identityId,
+                $userId,
+                $minVisibility,
+                $languageJoin,
+                $levelJoin
             );
-
-            $select = "
-                SELECT
-                    ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
-                    p.accepted / GREATEST(1, p.submissions) AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0), 2) AS score,
-                    {$fields}
-            ";
-
-            $sql = '
-                FROM Problems p
-                INNER JOIN ACLs a ON a.acl_id = p.acl_id
-                LEFT JOIN Identities id ON id.identity_id = ? AND a.owner_id = id.user_id
-                LEFT JOIN (
-                    SELECT
-                        s.problem_id,
-                        MAX(r.score) AS score
-                    FROM Submissions s
-                    INNER JOIN Runs r ON r.run_id = s.current_run_id
-                    WHERE s.identity_id = ?
-                    GROUP BY s.problem_id
-                ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
-
-            $args[] = $identityId;
-            $args[] = $identityId;
-
-            $visibilityThreshold = max(
-                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                $minVisibility
-            );
-
-            $clause = '(p.visibility >= ? OR id.identity_id IS NOT NULL)';
-            $argsForClause = [$visibilityThreshold];
-
-            if (!empty($accessibleAclIds)) {
-                $placeholders = implode(
-                    ',',
-                    array_fill(0, count($accessibleAclIds), '?')
-                );
-                $clause .= ' OR p.acl_id IN (' . $placeholders . ')';
-                $argsForClause = array_merge($argsForClause, $accessibleAclIds);
-            }
-
-            $clauses[] = [
-                '(' . $clause . ') AND p.visibility > ?',
-                array_merge(
-                    $argsForClause,
-                    [\OmegaUp\ProblemParams::VISIBILITY_DELETED]
-                ),
-            ];
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
-            $select = "
-                    SELECT
-                        0.0 AS score,
-                        ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
-                        accepted / GREATEST(1, p.submissions)  AS ratio,
-                        {$fields}
-                    ";
-            $sql = '
-                    FROM
-                        Problems p ' . $languageJoin . $levelJoin;
-
-            $clauses[] = [
-                'p.visibility >= ?',
-                [max(
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                    $minVisibility
-                )],
-            ];
+            $queryParts = self::buildIdentityAnonymousQuery(
+                $minVisibility,
+                $languageJoin,
+                $levelJoin
+            );
+        } else {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identityType'
+            );
         }
+        $sql = $queryParts['sql'];
+        $args = array_merge($args, $queryParts['args']);
+        $clauses = array_merge($clauses, $queryParts['clauses']);
 
         if (!empty($tags)) {
             self::addTagFilter(
@@ -466,12 +574,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $sql .= "\nWHERE\n" . implode(
                 ' AND ',
                 array_map(
-                    /** @param array{0: string, 1: list<string>} $clause */
+                    /** @param array{0: string, 1: list<float|int|string>} $clause */
                     fn (array $clause) => $clause[0],
                     $clauses
                 )
             );
-            /** @var array{0: string, 1: list<string>} $clause */
+            /** @var array{0: string, 1: list<float|int|string>} $clause */
             foreach ($clauses as $clause) {
                 $args = array_merge($args, $clause[1]);
             }
@@ -501,11 +609,27 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $args[] = $offset;
         $args[] = $rowcount;
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$select} {$sql};",
-            $args
-        );
+        if ($identityType === IDENTITY_ADMIN && !is_null($identityId)) {
+            $result = self::executeAdminIdentityQuery(
+                $identityId,
+                $fields,
+                $sql,
+                $args
+            );
+        } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
+            $result = self::executeNormalIdentityQuery(
+                $identityId,
+                $fields,
+                $sql,
+                $args
+            );
+        } else {
+            $result = self::executeAnonymousIdentityQuery(
+                $fields,
+                $sql,
+                $args
+            );
+        }
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
@@ -533,7 +657,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problem['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problemObject,
                 public: true,
-                showUserTags: $row['allow_user_add_tags']
+                showUserTags: boolval($row['allow_user_add_tags'])
             );
             $difficultyHistogram = [];
             if (!is_null($row['difficulty_histogram'])) {
@@ -588,6 +712,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         return new \OmegaUp\DAO\VO\Problems($rs);
+    }
+
+    /**
+     * Gets multiple problems based on a list of aliases in a single query.
+     *
+     * @param list<string> $aliases
+     * @return array<string, \OmegaUp\DAO\VO\Problems> Map of alias => Problems
+     */
+    final public static function getByAliases(
+        array $aliases
+    ): array {
+        if (empty($aliases)) {
+            return [];
+        }
+
+        // Deduplicate aliases to avoid redundant parameter binding and DB work
+        $aliases = array_values(array_unique($aliases));
+        $placeholders = join(',', array_fill(0, count($aliases), '?'));
+        $sql = 'SELECT ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . " FROM Problems WHERE alias IN ({$placeholders});";
+
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $aliases);
+
+        $problems = [];
+        foreach ($rs as $row) {
+            $problem = new \OmegaUp\DAO\VO\Problems($row);
+            if (is_null($problem->alias)) {
+                continue;
+            }
+            $problems[$problem->alias] = $problem;
+        }
+
+        return $problems;
     }
 
     /**
@@ -711,28 +871,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
             WHERE
                 s.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
-                AND NOT EXISTS (
-                    SELECT
-                        `pf`.`problem_id`, `pf`.`user_id`
-                    FROM
-                        `Problems_Forfeited` AS `pf`
-                    WHERE
-                        `pf`.`problem_id` = `p`.`problem_id` AND
-                        `pf`.`user_id` = `i`.`user_id` AND
-                        `i`.`user_id` IS NOT NULL
-                )
-                AND NOT EXISTS (
-                    SELECT
-                        `a`.`acl_id`
-                    FROM
-                        `ACLs` AS `a`
-                    WHERE
-                        `a`.`acl_id` = `p`.`acl_id` AND
-                        `a`.`owner_id` = `i`.`user_id` AND
-                        `i`.`user_id` IS NOT NULL
-                )
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
             GROUP BY
                 p.problem_id
             ORDER BY
@@ -791,6 +941,98 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
         return $problems;
+    }
+
+    /**
+     * Get count of solved problems grouped by difficulty level for a user.
+     * Difficulty mapping: Easy(0-1.5), Medium(1.5-2.5), Hard(2.5-4), Unlabelled(NULL)
+     *
+     * @return array{easy: int, medium: int, hard: int, unlabelled: int, total: int}
+     */
+    public static function getSolvedCountByDifficulty(int $identityId): array {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 1.5 THEN p.problem_id END) AS easy,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 1.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN p.problem_id END) AS hard,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled,
+                COUNT(DISTINCT p.problem_id) AS total
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            WHERE
+                s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
+        ";
+
+        /** @var array{easy: int, hard: int, medium: int, total: int, unlabelled: int}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identityId]
+        );
+
+        return [
+            'easy' => intval($row['easy'] ?? 0),
+            'medium' => intval($row['medium'] ?? 0),
+            'hard' => intval($row['hard'] ?? 0),
+            'unlabelled' => intval($row['unlabelled'] ?? 0),
+            'total' => intval($row['total'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get count of problems where the user has submissions but no AC verdict.
+     * These are problems the user is "attempting" but hasn't solved yet.
+     *
+     * @return int
+     */
+    public static function getAttemptingCount(int $identityId): int {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT p.problem_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                Submissions s2 ON s2.problem_id = p.problem_id
+                    AND s2.identity_id = s.identity_id
+                    AND s2.verdict = 'AC'
+            WHERE
+                s.identity_id = ?
+                AND s.type = 'normal'
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
+                AND s2.submission_id IS NULL;
+        ";
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$identityId]
+        );
     }
 
     /**
@@ -1665,5 +1907,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return [
             'results' => $problems,
         ];
+    }
+
+    /**
+     * Atomically increment the submissions counter for a problem.
+     */
+    final public static function incrementSubmissions(int $problemId): void {
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE `Problems` SET `submissions` = `submissions` + 1 WHERE `problem_id` = ?;',
+            [$problemId]
+        );
     }
 }

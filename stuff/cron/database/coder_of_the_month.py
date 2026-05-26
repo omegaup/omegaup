@@ -4,10 +4,15 @@
 
 import datetime
 import logging
-from typing import Dict, List, NamedTuple, Optional, TypedDict
+from typing import Dict, List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
+from utils import (
+    UserProblems,
+    UserRank,
+    get_first_day_of_next_month,
+)
 
 
 class Problem(NamedTuple):
@@ -15,40 +20,6 @@ class Problem(NamedTuple):
     problem_id: int
     alias: str
     score: float
-
-
-class UserRank(NamedTuple):
-    '''User information for coder of the month candidates'''
-    user_id: int
-    identity_id: int
-    username: str
-    country_id: str
-    school_id: Optional[int]
-    problems_solved: int
-    score: float
-    classname: str
-
-
-class UserProblems(TypedDict):
-    '''Problems solved by a user and their calculated score'''
-    solved: List[int]
-    score: float
-
-
-def get_first_day_of_next_month(
-    first_day_of_current_month: datetime.date
-) -> datetime.date:
-    '''Get the first day of the next month'''
-
-    if first_day_of_current_month.month == 12:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year + 1, 1, 1)
-    else:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year,
-            first_day_of_current_month.month + 1, 1)
-
-    return first_day_of_next_month
 
 
 def check_existing_coder_of_the_month(
@@ -211,8 +182,7 @@ def get_cotm_eligible_users(
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
-        last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
-            last_12_coders_str)
+        last_12_coders_clause = f'AND i.username NOT IN ({last_12_coders_str})'
     logging.info(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category
@@ -347,18 +317,7 @@ def get_user_problems(
 
     problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
 
-    cur_readonly.execute(f'''
-            WITH
-                ProblemsForfeitedByUser AS (
-                    SELECT
-                        pf.user_id,
-                        pf.problem_id,
-                        pf.forfeited_date
-                    FROM
-                        Problems_Forfeited pf
-                    WHERE
-                        forfeited_date IS NULL
-                )
+    sql = '''
             SELECT
                 s.identity_id,
                 s.problem_id,
@@ -366,24 +325,37 @@ def get_user_problems(
             FROM
                 Submissions s
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = s.identity_id
+                Identities i ON i.identity_id = s.identity_id
             LEFT JOIN
-                ProblemsForfeitedByUser pfbu
-            ON
-                pfbu.user_id = i.user_id
-                AND pfbu.problem_id = s.problem_id
+                Problems_Forfeited pf
+                ON  pf.user_id    = i.user_id
+                AND pf.problem_id = s.problem_id
             WHERE
                 s.identity_id IN ({identity_ids_str})
-                AND s.problem_id IN ({problem_ids_str})
-                AND s.verdict = 'AC'
-                AND s.type = 'normal'
-                AND pfbu.forfeited_date IS NULL
+                AND s.problem_id  IN ({problem_ids_str})
+                AND s.verdict     = 'AC'
+                AND s.type        = 'normal'
+                AND pf.problem_id IS NULL
             GROUP BY
-                s.identity_id, s.problem_id;
-    ''')
+                s.identity_id,
+                s.problem_id;
+    '''
+    sql = sql.format(identity_ids_str=identity_ids_str,
+                     problem_ids_str=problem_ids_str)
+    cur_readonly.execute('EXPLAIN ' + sql)
 
+    logging.info("Evaluating [get_user_problems] for %d "
+                 "users and %d problems",
+                 len(eligible_users), len(problems_admins))
+
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_user_problems] EXPLAIN id=%s table=%s "
+            "type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+    cur_readonly.execute(sql)
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']

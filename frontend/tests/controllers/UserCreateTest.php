@@ -187,7 +187,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Tests Create User API happy path excercising the httpEntryPoint
+     * Tests Create User API happy path exercising the httpEntryPoint
      */
     public function testCreateUserPositiveViahttpEntryPoint() {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();

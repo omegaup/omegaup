@@ -128,7 +128,7 @@ class MySQLConnection {
             $this->CompleteTrans();
         }
         // Even if there was no transaction, given that we disable autocommit,
-        // there is an implicit transaction per connection that neeeds to be
+        // there is an implicit transaction per connection that needs to be
         // explicitly committed. But we only do so if there have been any calls
         // to Execute().
         if (!$this->_needsFlushing) {

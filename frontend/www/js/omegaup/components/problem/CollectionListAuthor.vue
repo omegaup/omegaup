@@ -72,7 +72,7 @@
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
-          :languges="languages"
+          :languages="languages"
           :keyword="keyword"
           :modes="modes"
           :columns="columns"

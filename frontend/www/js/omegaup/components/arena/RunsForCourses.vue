@@ -132,14 +132,6 @@
                   "
                 ></omegaup-common-typeahead>
               </label>
-              <button
-                type="button"
-                class="close"
-                style="float: none"
-                @click="filterProblem = null"
-              >
-                &times;
-              </button>
             </template>
 
             <template v-if="showUser">
@@ -1106,7 +1098,7 @@ export default class RunsForCourses extends Vue {
 
   onSubmit(): void {
     if (!this.canSubmit && this.nextSubmissionTimestamp) {
-      alert(
+      ui.warning(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(
             (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,

@@ -107,32 +107,21 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
     private static function getMonthName(int $month): string {
         $translator = \OmegaUp\Translations::getInstance();
-        switch ($month) {
-            case 1:
-                return $translator->get('certificatePdfMonth1');
-            case 2:
-                return $translator->get('certificatePdfMonth2');
-            case 3:
-                return $translator->get('certificatePdfMonth3');
-            case 4:
-                return $translator->get('certificatePdfMonth4');
-            case 5:
-                return $translator->get('certificatePdfMonth5');
-            case 6:
-                return $translator->get('certificatePdfMonth6');
-            case 7:
-                return $translator->get('certificatePdfMonth7');
-            case 8:
-                return $translator->get('certificatePdfMonth8');
-            case 9:
-                return $translator->get('certificatePdfMonth9');
-            case 10:
-                return $translator->get('certificatePdfMonth10');
-            case 11:
-                return $translator->get('certificatePdfMonth11');
-            default:
-                return $translator->get('certificatePdfMonth12');
-        }
+
+        return match ($month) {
+            1 => $translator->get('certificatePdfMonth1'),
+            2 => $translator->get('certificatePdfMonth2'),
+            3 => $translator->get('certificatePdfMonth3'),
+            4 => $translator->get('certificatePdfMonth4'),
+            5 => $translator->get('certificatePdfMonth5'),
+            6 => $translator->get('certificatePdfMonth6'),
+            7 => $translator->get('certificatePdfMonth7'),
+            8 => $translator->get('certificatePdfMonth8'),
+            9 => $translator->get('certificatePdfMonth9'),
+            10 => $translator->get('certificatePdfMonth10'),
+            11 => $translator->get('certificatePdfMonth11'),
+            default => $translator->get('certificatePdfMonth12'),
+        };
     }
 
     private static function printCertificateHeader(FPDI $pdf): void {
@@ -391,19 +380,17 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
     public static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
+
         if ($n >= 11 && $n <= 13) {
             return $translator->get('certificatePdfContestPlaceTh');
         }
-        if (($n % 10) == 1) {
-            return $translator->get('certificatePdfContestPlaceSt');
-        }
-        if (($n % 10) == 2) {
-            return $translator->get('certificatePdfContestPlaceNd');
-        }
-        if (($n % 10) == 3) {
-            return $translator->get('certificatePdfContestPlaceRd');
-        }
-        return $translator->get('certificatePdfContestPlaceTh');
+
+        return match ($n % 10) {
+            1 => $translator->get('certificatePdfContestPlaceSt'),
+            2 => $translator->get('certificatePdfContestPlaceNd'),
+            3 => $translator->get('certificatePdfContestPlaceRd'),
+            default => $translator->get('certificatePdfContestPlaceTh'),
+        };
     }
 
     private static function getContestCertificate(string $verificationCode): ?string {
@@ -531,19 +518,20 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $verificationCode
         );
 
+        $certificate = null;
+
         if ($type === 'contest') {
-            return self::getContestCertificate($verificationCode);
-        }
-        if ($type === 'course') {
-            return self::getCourseCertificate($verificationCode);
-        }
-        if ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
-            return self::getCoderOfTheMonthCertificate(
+            $certificate = self::getContestCertificate($verificationCode);
+        } elseif ($type === 'course') {
+            $certificate = self::getCourseCertificate($verificationCode);
+        } elseif ($type === 'coder_of_the_month' || $type === 'coder_of_the_month_female') {
+            $certificate = self::getCoderOfTheMonthCertificate(
                 $verificationCode,
                 isFemaleCategory: $type === 'coder_of_the_month_female'
             );
         }
-        return null;
+
+        return $certificate;
     }
 
     /**
