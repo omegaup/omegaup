@@ -39,20 +39,39 @@
           </div>
         </div>
       </div>
-      <div class="form-group row mt-3 align-items-center">
-        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
+      <div
+        class="form-group d-flex flex-nowrap overflow-auto mt-3 align-items-center"
+      >
+        <label class="col-form-label mb-0 mr-2 text-nowrap">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div
-          class="col-12 col-sm-auto pl-sm-0 d-flex align-items-center overflow-hidden"
-        >
+        <div class="d-flex align-items-center flex-grow-1">
           <input
+            ref="fileInput"
             data-problem-creator-code-input
-            class="text-truncate mw-100"
+            class="d-none"
             type="file"
             name="file"
             @change="handleInputFile"
           />
+          <button
+            class="btn btn-secondary btn-sm text-nowrap"
+            type="button"
+            @click="fileInput.click()"
+          >
+            {{ T.problemCreatorCodeChooseFile }}
+          </button>
+          <div class="mx-2 text-nowrap">
+            {{ selectedFileName || T.problemCreatorCodeNoFileChosen }}
+          </div>
+          <button
+            v-if="selectedFileName"
+            class="btn btn-sm text-danger p-0 flex-shrink-0"
+            type="button"
+            @click="clearFile"
+          >
+            <font-awesome-icon :icon="['fas', 'trash']" size="xs" />
+          </button>
         </div>
       </div>
       <div class="row">
@@ -72,7 +91,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../../../omegaup';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
@@ -82,26 +101,34 @@ import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 import { TabIndex } from '../Tabs.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+library.add(fas);
 
 Vue.use(VueCookies, { expires: -1 });
 
 @Component({
   components: {
     'omegaup-creator-code-view': creator_CodeView,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class CodeTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
   @Prop() activeTabIndex!: TabIndex;
+  @Ref('fileInput') fileInput!: HTMLInputElement;
 
-  inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
+  inputLimit = 512 * 1024;
   T = T;
   ui = ui;
   omegaup = omegaup;
   selectedLanguage = '';
   codeInternal = T.problemCreatorEmpty;
   extensionInternal = T.problemCreatorEmpty;
+  selectedFileName = '';
 
   get code(): string {
     return this.codeInternal;
@@ -178,8 +205,9 @@ export default class CodeTab extends Vue {
     const file = this.readFile(ev.target as HTMLInputElement);
 
     if (file) {
+      this.selectedFileName = file.name;
       if (this.inputLimit && file.size >= this.inputLimit) {
-        alert(
+        ui.error(
           ui.formatString(T.problemCreatorCodeUploadFilesize, {
             limit: `${this.inputLimit / 1024} KiB`,
           }),
@@ -208,6 +236,13 @@ export default class CodeTab extends Vue {
 
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
+  }
+
+  clearFile(): void {
+    this.selectedFileName = '';
+    this.fileInput.value = '';
+    this.code = T.problemCreatorEmpty;
+    this.extension = T.problemCreatorEmpty;
   }
 
   updateCode() {
