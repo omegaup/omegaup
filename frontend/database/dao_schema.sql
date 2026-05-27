@@ -1261,6 +1261,7 @@ CREATE TABLE `Team_Groups` (
   `name` varchar(50) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   `number_of_contestants` int NOT NULL DEFAULT '3' COMMENT 'Número de concursantes para los equipos del grupo',
+  `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el grupo de equipos ha sido archivado.',
   PRIMARY KEY (`team_group_id`),
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
