@@ -17,6 +17,8 @@
   --header-navbar-primary-link-color: #dbe2f3;
   --header-navbar-brand-background-color: #f2f2f2;
   --header-navbar-dropdown-item-font-color: #000;
+  --header-help-dropdown-icon-background-color: #f1f3f5;
+  --header-help-dropdown-icon-color: #6c757d;
   --header-active-color: #5f87d4;
   --header-accent-color: #577dc7;
   --header-problem-card-color: #00000020;
@@ -284,6 +286,14 @@
   --user-rank-international-master-font-color: #cb000a;
   --user-basic-info-form-group-border-color: #e9e9e9;
   --user-basic-info-field-data-font-color: #808080;
+
+  // USER API TOKENS
+  --user-api-token-card-border-color: #dee2e6;
+  --user-api-token-card-background-color: #fff;
+  --user-api-token-card-box-shadow-color: rgba(0, 0, 0, 0.08);
+  --user-api-token-card-row-border-color: #f0f0f0;
+  --user-api-token-card-label-color: #495057;
+  --user-api-token-card-value-color: #212529;
 
   // USER COMPARE
   --user-compare-stat-item-background-color: #f8f9fa;
