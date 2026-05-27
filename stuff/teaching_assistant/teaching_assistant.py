@@ -138,7 +138,6 @@ def get_runs_from_course_endpoint(
     """
     endpoint = (
         f"api/course/runs?"
-        f"api/course/runs/?"
         f"course_alias={course_alias}&"
         f"assignment_alias={assignment_alias}"
     )
