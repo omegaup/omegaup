@@ -79,9 +79,6 @@ library.add(
 export default class CommonHelp extends Vue {
   T = T;
   helpConfig = helpConfig;
-  mounted() {
-    document.title = `${this.T.omegaupTitleHelp} \u2013 omegaUp`;
-  }
 
   localized(dict: { en: string; es: string; pt: string }): string {
     return dict[this.T.locale as 'en' | 'es' | 'pt'] || dict.en;

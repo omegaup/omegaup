@@ -57,8 +57,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  * @psalm-type UserDocument=array{name: string, url: string}
  * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
- * @psalm-type HelpResource=array{name: string, url: string, icon: string, external: bool}
- * @psalm-type UserHelpPayload=array{helpResources: list<HelpResource>}
  * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int|null, contestsCount: int|null}
  * @psalm-type UserComparePayload=array{user1: UserCompareData|null, user2: UserCompareData|null, username1: string|null, username2: string|null}
  */

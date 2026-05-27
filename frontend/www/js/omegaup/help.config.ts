@@ -115,7 +115,7 @@ const helpConfig: {
       en:
         'Contribute to omegaUp by exploring the source code on GitHub. Report issues, submit pull requests, and help improve the platform.',
       es:
-        'Contribuya a omegaUp explorando el código fuente en GitHub. Reporte problemas, envíe solicitudes de extracción y ayude a mejorar la plataforma.',
+        'Contribuye a omegaUp explorando el código fuente en GitHub. Reporta problemas, envía Pull Requests y ayuda a mejorar la plataforma.',
       pt:
         'Contribua para omegaUp explorando o código-fonte no GitHub. Reporte problemas, envie solicitações de pull e ajude a melhorar a plataforma.',
     },
