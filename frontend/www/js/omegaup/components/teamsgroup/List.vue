@@ -41,9 +41,8 @@
               </a>
 
               <button
-                class="btn btn-link p-0 ml-2"
-                style="color: #8bb0d3"
-                :title="teamsGroup.archived ? 'Unarchive' : 'Archive'"
+                class="btn btn-link p-0 ml-2 btn-archive"
+                :title="teamsGroup.archived ? T.wordsUnarchive : T.wordsArchive"
                 @click="archiveGroup(teamsGroup)"
               >
                 <font-awesome-icon
@@ -79,6 +78,18 @@
         </a>
       </div>
     </div>
+
+    <b-modal
+      v-model="showArchiveModal"
+      :title="archiveModalTitle"
+      :ok-title="T.wordsYes"
+      :cancel-title="T.wordsNo"
+      ok-variant="primary"
+      cancel-variant="secondary"
+      @ok="confirmArchive"
+    >
+      <p>{{ archiveModalBody }}</p>
+    </b-modal>
   </div>
 </template>
 
@@ -102,6 +113,9 @@ library.add(faEdit, faArchive, faBoxOpen);
 export default class TeamsGroupList extends Vue {
   @Prop() teamsGroups!: types.TeamsGroup[];
   T = T;
+  showArchiveModal = false;
+  selectedTeamsGroup: types.TeamsGroup | null = null;
+
   teamsGroupUrl(teamsGroup: types.TeamsGroup): string {
     return `/teamsgroup/${teamsGroup.alias}/edit/#teams`;
   }
@@ -119,14 +133,38 @@ export default class TeamsGroupList extends Vue {
     return this.teamsGroups.filter((g) => !g.archived);
   }
 
+  get archiveModalTitle(): string {
+    if (!this.selectedTeamsGroup) return '';
+    return this.selectedTeamsGroup.archived ? T.wordsUnarchive : T.wordsArchive;
+  }
+
+  get archiveModalBody(): string {
+    if (!this.selectedTeamsGroup) return '';
+    return this.selectedTeamsGroup.archived
+      ? T.teamsGroupUnarchiveConfirmText
+      : T.teamsGroupArchiveConfirmText;
+  }
+
   archiveGroup(teamsGroup: types.TeamsGroup) {
-    if (teamsGroup.archived) {
-      if (!confirm(T.teamsGroupUnarchiveConfirmText)) return;
-      this.$emit('archive-group', teamsGroup, false);
-    } else {
-      if (!confirm(T.teamsGroupArchiveConfirmText)) return;
-      this.$emit('archive-group', teamsGroup, true);
-    }
+    this.selectedTeamsGroup = teamsGroup;
+    this.showArchiveModal = true;
+  }
+
+  confirmArchive() {
+    if (!this.selectedTeamsGroup) return;
+    this.$emit('archive-group', {
+      teamsGroup: this.selectedTeamsGroup,
+      archived: !this.selectedTeamsGroup.archived,
+    });
+    this.selectedTeamsGroup = null;
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.btn-archive {
+  color: var(--teams-group-archive-btn-color);
+}
+</style>

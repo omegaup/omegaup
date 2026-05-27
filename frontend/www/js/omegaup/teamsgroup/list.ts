@@ -20,10 +20,13 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-teams-group-list', {
         props: { teamsGroups: this.teamsGroups },
         on: {
-          'archive-group': (
-            teamsGroup: types.TeamsGroup,
-            archived: boolean,
-          ) => {
+          'archive-group': ({
+            teamsGroup,
+            archived,
+          }: {
+            teamsGroup: types.TeamsGroup;
+            archived: boolean;
+          }) => {
             api.TeamsGroup.update({
               alias: teamsGroup.alias,
               name: teamsGroup.name,
