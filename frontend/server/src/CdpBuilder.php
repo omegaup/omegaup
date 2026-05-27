@@ -385,7 +385,7 @@ class CdpBuilder {
             $pattern,
             // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
             /** @psalm-suppress UndefinedVariable */
-            function ($matches) use (&$zip, &$processedImages, &$imageCounter) {
+            function (array $matches) use (&$zip, &$processedImages, &$imageCounter) {
                 $description = $matches[1];
                 $filePathInZip = $matches[2];
 
