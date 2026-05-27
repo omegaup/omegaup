@@ -286,14 +286,14 @@ export default class Login extends Vue {
 
 <style scoped>
 .login-section {
-  border: 2px solid #dee2e6;
+  border: 2px solid var(--signin-nav-tabs-border-color);
   border-radius: 8px;
   padding: 24px;
   margin-bottom: 16px;
 }
 
 .login-section:hover {
-  border-color: #adb5bd;
+  border-color: var(--btn-github-border-color--hover);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
@@ -302,7 +302,7 @@ h4 {
   color: #212529;
   font-weight: 600;
   margin-bottom: 20px;
-  border-bottom: 2px solid #007bff;
+  border-bottom: 2px solid var(--btn-ok-background-color);
   padding-bottom: 10px;
 }
 
