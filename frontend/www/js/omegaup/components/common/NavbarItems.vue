@@ -46,6 +46,7 @@
           T.wordsContests
         }}</a>
       </li>
+
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-courses nav-item-align"
@@ -86,6 +87,7 @@
       >
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
+
       <li
         class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
@@ -115,42 +117,45 @@
             <a class="dropdown-item" href="/profile/#problems">{{
               T.bookmarkedProblems
             }}</a>
-            <hr
-              style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
-            />
+            <hr class="menu-divider" />
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
+
             <template v-if="!isLoggedIn">
               <a class="dropdown-item" href="/problem/creator/">{{
                 T.createZipFileForProblem
               }}</a>
             </template>
+
             <template v-else>
-              <form class="collapse-submenu">
+              <div class="collapse-submenu">
                 <button
                   type="button"
                   class="dropdown-item dropdown-toggle"
-                  data-toggle="collapse"
-                  data-target=".collapse-links"
                   data-nav-problems-create-options
-                  aria-expanded="false"
-                  aria-controls="collapse-links"
+                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
+                  @click.stop.prevent="onCreateProblemClick"
                 >
                   {{ T.myproblemsListCreateProblem }}
                 </button>
-                <div class="collapse collapse-links pl-3">
-                  <a class="dropdown-item" href="/problem/creator/">{{
-                    T.myproblemsListCreateZipFileProblem
-                  }}</a>
+
+                <div v-show="isCreateProblemSubmenuOpen" class="pl-3">
+                  <a
+                    class="dropdown-item"
+                    href="/problem/creator/"
+                    @click.stop
+                    >{{ T.myproblemsListCreateZipFileProblem }}</a
+                  >
                   <a
                     class="dropdown-item"
                     href="/problem/new/"
                     data-nav-problems-create
+                    @click.stop
                     >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
                   >
                 </div>
-              </form>
+              </div>
             </template>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
@@ -158,6 +163,7 @@
           </slot>
         </div>
       </li>
+
       <li
         class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
@@ -194,6 +200,7 @@
           }}</a>
         </div>
       </li>
+
       <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
@@ -207,30 +214,136 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
-            class="dropdown-item"
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
             :href="YouTubeTutorialsURL"
             target="_blank"
-            >{{ T.navTutorials }}</a
           >
-          <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
-            T.navDiscord
-          }}</a>
-          <a class="dropdown-item" :href="OmegaUpBlogURL" target="_blank">{{
-            T.navBlog
-          }}</a>
+            <font-awesome-icon
+              :icon="['fas', 'video']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navTutorials }}</span>
+              <small class="text-muted">{{ T.navTutorialsDesc }}</small>
+            </span>
+          </a>
           <a
-            class="dropdown-item text-wrap"
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
+            :href="DiscordInviteURL"
+            target="_blank"
+          >
+            <font-awesome-icon
+              :icon="['fas', 'comments']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navDiscord }}</span>
+              <small class="text-muted">{{ T.navDiscordDesc }}</small>
+            </span>
+          </a>
+          <a
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
+            :href="OmegaUpBlogURL"
+            target="_blank"
+          >
+            <font-awesome-icon
+              :icon="['fas', 'newspaper']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navBlog }}</span>
+              <small class="text-muted">{{ T.navBlogDesc }}</small>
+            </span>
+          </a>
+          <hr class="menu-divider" />
+          <a
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
+            href="/problem/statement/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <font-awesome-icon
+              :icon="['fas', 'pen']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navProblemStatementEditor }}</span>
+              <small class="text-muted">{{
+                T.navProblemStatementEditorDesc
+              }}</small>
+            </span>
+          </a>
+          <a
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
+            href="/grader/ephemeral/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <font-awesome-icon
+              :icon="['fas', 'code']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navOmegaUpIDE }}</span>
+              <small class="text-muted">{{ T.navOmegaUpIDEDesc }}</small>
+            </span>
+          </a>
+          <a
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
+            href="/karel.js/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <font-awesome-icon
+              :icon="['fas', 'robot']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navKarel }}</span>
+              <small class="text-muted">{{ T.navKarelDesc }}</small>
+            </span>
+          </a>
+          <hr class="menu-divider" />
+          <a
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
             :href="AlgorithmsBookURL"
             target="_blank"
-            >{{ T.navAlgorithmsBook }}</a
           >
+            <font-awesome-icon
+              :icon="['fas', 'book']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{ T.navAlgorithmsBook }}</span>
+              <small class="text-muted">{{ T.navAlgorithmsBookDesc }}</small>
+            </span>
+          </a>
           <a
-            class="dropdown-item text-wrap"
+            class="dropdown-item d-flex align-items-center help-dropdown-item"
             :href="CompetitiveProgrammingBookURL"
             target="_blank"
             rel="noopener noreferrer"
           >
-            {{ T.navCompetitiveProgrammingDataStructuresBook }}
+            <font-awesome-icon
+              :icon="['fas', 'database']"
+              class="help-item-icon flex-shrink-0"
+              fixed-width
+            />
+            <span>
+              <span class="d-block">{{
+                T.navCompetitiveProgrammingDataStructuresBook
+              }}</span>
+              <small class="text-muted">{{
+                T.navCompetitiveProgrammingDataStructuresBookDesc
+              }}</small>
+            </span>
           </a>
         </div>
       </li>
@@ -243,8 +356,35 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faBook,
+  faCode,
+  faComments,
+  faDatabase,
+  faNewspaper,
+  faPen,
+  faRobot,
+  faVideo,
+} from '@fortawesome/free-solid-svg-icons';
 
-@Component
+library.add(
+  faBook,
+  faCode,
+  faComments,
+  faDatabase,
+  faNewspaper,
+  faPen,
+  faRobot,
+  faVideo,
+);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class NavbarItems extends Vue {
   @Prop() omegaUpLockDown!: boolean;
   @Prop() inContest!: boolean;
@@ -256,6 +396,9 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
+
+  // Used by Cypress selector + click toggle
+  isCreateProblemSubmenuOpen = false;
 
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
@@ -275,6 +418,10 @@ export default class NavbarItems extends Vue {
 
   get CompetitiveProgrammingBookURL(): string {
     return getExternalUrl('CompetitiveProgrammingBookURL');
+  }
+
+  onCreateProblemClick(): void {
+    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
   }
 }
 </script>
@@ -299,5 +446,29 @@ export default class NavbarItems extends Vue {
       display: block !important;
     }
   }
+}
+
+.menu-divider {
+  margin-top: 0em;
+  margin-bottom: 0em;
+  border-width: 2px;
+}
+
+.help-dropdown-item {
+  white-space: normal;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.help-item-icon {
+  box-sizing: content-box;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0.55rem;
+  margin-right: 0.85rem;
+  background-color: var(--header-help-dropdown-icon-background-color);
+  border-radius: 4px;
+  color: var(--header-help-dropdown-icon-color);
+  font-size: 1.25rem;
 }
 </style>

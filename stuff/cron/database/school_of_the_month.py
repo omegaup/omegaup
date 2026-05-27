@@ -77,14 +77,9 @@ def get_current_problems_solved_per_month(
     logging.info("Getting current problems solved per month")
     sql = '''
         SELECT
-            `sc`.`school_id`,
-            STR_TO_DATE(
-                CONCAT(
-                    YEAR(`su`.`time`), '-', MONTH(`su`.`time`), '-01'
-                ),
-                "%Y-%m-%d"
-            ) AS `time`,
-            COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
+        `sc`.`school_id`,
+        DATE_FORMAT(`su`.`time`, '%Y-%m-01') AS `time`,
+        COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
         FROM
             `Submissions` AS `su`
         INNER JOIN
@@ -102,26 +97,10 @@ def get_current_problems_solved_per_month(
                 FROM
                     `Submissions` AS `s2`
                 INNER JOIN
-                    (
-                        SELECT DISTINCT
-                            `s3`.`identity_id`,
-                            `s3`.`problem_id`
-                        FROM
-                            `Submissions` AS `s3`
-                        INNER JOIN
-                            `Runs` AS `r3`
-                            ON `r3`.`run_id` = `s3`.`current_run_id`
-                        WHERE
-                            `s3`.`time` >= (
-                                CURDATE() - INTERVAL %(months)s MONTH
-                            )
-                            AND `r3`.`verdict` = "AC"
-                    ) AS `pairs`
-                ON
-                    `pairs`.`identity_id` = `s2`.`identity_id`
-                    AND `pairs`.`problem_id` = `s2`.`problem_id`
+                    `Runs` AS `r2` ON `r2`.`run_id` = `s2`.`current_run_id`
                 WHERE
-                    `s2`.`verdict` = "AC"
+                    `s2`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
+                    AND `r2`.`verdict` = 'AC'
                 GROUP BY
                     `s2`.`identity_id`,
                     `s2`.`problem_id`
@@ -132,7 +111,7 @@ def get_current_problems_solved_per_month(
             AND `first_ac`.`first_ac_time` = `su`.`time`
         WHERE
             `su`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
-            AND `r`.`verdict` = "AC"
+            AND `r`.`verdict` = 'AC'
             AND `p`.`visibility` >= 1
         GROUP BY
             `sc`.`school_id`,
@@ -140,6 +119,15 @@ def get_current_problems_solved_per_month(
         ORDER BY
             `time` ASC
     '''
+    cur_readonly.execute('EXPLAIN ' + sql, {'months': months})
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_current_problems_solved_per_month] EXPLAIN id=%s "
+            "table=%s type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+
     cur_readonly.execute(sql, {'months': months})
     problems: List[ProblemSolved] = []
     for row in cur_readonly.fetchall():
@@ -150,6 +138,9 @@ def get_current_problems_solved_per_month(
                 problems_solved=row['problems_solved'],
             )
         )
+    logging.info(
+        "Evaluated [get_current_problems_solved_per_month] "
+        "for %d problems", len(problems))
     return problems
 
 
@@ -261,6 +252,19 @@ def get_school_of_the_month_candidates(
             `score` DESC
         LIMIT 100;
     '''
+
+    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_current_month,
+                                            first_day_of_next_month,
+                                            first_day_of_next_month))
+
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_school_of_the_month_candidates] EXPLAIN "
+            "id=%s table=%s type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+
     cur_readonly.execute(
         sql, (first_day_of_current_month, first_day_of_next_month,
               first_day_of_next_month))
@@ -273,6 +277,9 @@ def get_school_of_the_month_candidates(
                 score=row['score'],
             )
         )
+    logging.info(
+        "Evaluated [get_school_of_the_month_candidates] "
+        "for %d schools", len(candidates))
     return candidates
 
 
@@ -301,3 +308,109 @@ def insert_school_of_the_month_candidates(
             );
             ''', (row.school_id, first_day_of_next_month,
                   index + 1, row.score))
+
+
+def get_last_12_schools_of_the_month(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date) -> List[School]:
+    '''Get last 12 school of the month winners'''
+    logging.info("Getting last 12 school of the month winners")
+    sql = '''
+        SELECT
+            `sotm`.`school_id`,
+            `sch`.`name`,
+            `sotm`.`score`
+        FROM
+            `School_Of_The_Month` AS `sotm`
+        INNER JOIN
+            `Schools` AS `sch` ON `sch`.`school_id` = `sotm`.`school_id`
+        WHERE
+            (
+                `sotm`.`selected_by` IS NOT NULL
+                OR (
+                    `sotm`.`ranking` = 1 AND
+                    NOT EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            `School_Of_The_Month`
+                        WHERE
+                            `time` = `sotm`.`time` AND
+                            `selected_by` IS NOT NULL
+                    )
+                )
+            )
+            AND `sotm`.`time` <= %s
+            AND `sotm`.`time` > DATE_SUB(%s, INTERVAL 12 MONTH)
+        ORDER BY
+            `sotm`.`time` DESC
+        LIMIT
+            0, 12;
+    '''
+    cur_readonly.execute(sql, (first_day_of_current_month,
+                               first_day_of_current_month))
+    schools: List[School] = []
+    for row in cur_readonly.fetchall():
+        schools.append(
+            School(
+                school_id=row['school_id'],
+                name=row['name'],
+                score=row['score'],
+            )
+        )
+    return schools
+
+
+def get_candidate_schools_list(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date
+) -> List[School]:
+    '''
+    Returns a list of candidate schools before calculating scores and
+    filtering out the last 12 recent winners.
+    '''
+    logging.info("Getting candidate schools list")
+    sql = '''
+        SELECT
+            `s`.`school_id`,
+            `s`.`name`
+        FROM
+            `Schools` AS `s`
+        INNER JOIN (
+            SELECT DISTINCT
+                `su`.`school_id`
+            FROM
+                `Submissions` AS `su`
+            INNER JOIN
+                `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+            INNER JOIN
+                `Identities` AS `i`
+                ON `i`.`identity_id` = `su`.`identity_id`
+            INNER JOIN
+                `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
+            WHERE
+                `su`.`verdict` = "AC"
+                AND `p`.`visibility` >= 1
+                AND `p`.`quality_seal` = 1
+                AND `su`.`school_id` IS NOT NULL
+                AND `u`.`main_email_id` IS NOT NULL
+                AND `i`.`user_id` IS NOT NULL
+                AND `su`.`time` BETWEEN %s AND %s
+        ) AS `eligible_schools`
+            ON `eligible_schools`.`school_id` = `s`.`school_id`
+        ORDER BY
+            `s`.`school_id`;
+    '''
+    cur_readonly.execute(
+        sql, (first_day_of_current_month, first_day_of_next_month))
+    candidates: List[School] = []
+    for row in cur_readonly.fetchall():
+        candidates.append(
+            School(
+                school_id=row['school_id'],
+                name=row['name'],
+                score=0.0,  # Score will be calculated in python
+            )
+        )
+    return candidates
