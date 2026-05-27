@@ -381,11 +381,14 @@ class CdpBuilder {
          * @var int $imageCounter
          */
 
+        // phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
         $newMarkdown = preg_replace_callback(
             $pattern,
-            // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
-            /** @psalm-suppress UndefinedVariable */
-            function (array $matches) use (&$zip, &$processedImages, &$imageCounter) {
+            function (array $matches) use (
+                &$zip,
+                &$processedImages,
+                &$imageCounter
+            ) {
                 $description = $matches[1];
                 $filePathInZip = $matches[2];
 
@@ -418,6 +421,7 @@ class CdpBuilder {
             },
             $markdownContent
         );
+        // phpcs:enable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
 
         $base64References = [];
         foreach ($processedImages as $data) {
