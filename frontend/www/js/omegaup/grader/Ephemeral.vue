@@ -98,7 +98,9 @@
           class="language-detected d-flex align-items-center mr-2"
         >
           <span class="language-detected-text mr-2">
-            {{ T.languageDetected.replace('%(lang)', detectedDisplayName) }}
+            {{
+              ui.formatString(T.languageDetected, { lang: detectedDisplayName })
+            }}
           </span>
           <button
             class="btn btn-sm btn-success mr-1"
@@ -110,7 +112,7 @@
             class="btn btn-sm btn-secondary"
             @click.prevent="rejectDetectedLanguage"
           >
-            {{ T.keepLanguage.replace('%(lang)', currentLanguageName) }}
+            {{ ui.formatString(T.keepLanguage, { lang: currentLanguageName }) }}
           </button>
         </div>
 
@@ -216,6 +218,7 @@ library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faUndo, faCopy);
 Vue.use(Clipboard);
 
 import T from '../lang';
+import * as ui from '../ui';
 
 interface GraderComponent extends Vue {
   title?: string;
@@ -256,6 +259,7 @@ export default class Ephemeral extends Vue {
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
+  ui = ui;
   omegaup = omegaup;
   isRunLoading = false;
   isSubmitLoading = false;
@@ -330,17 +334,6 @@ export default class Ephemeral extends Vue {
       this.onLanguageDetected as any,
     );
     window.addEventListener(
-      'grader:language-detect-clear',
-      this.clearDetectedLabel as any,
-    );
-  }
-
-  unmounted(): void {
-    window.removeEventListener(
-      'grader:language-detected',
-      this.onLanguageDetected as any,
-    );
-    window.removeEventListener(
       'grader:language-detect-clear',
       this.clearDetectedLabel as any,
     );
@@ -618,6 +611,14 @@ export default class Ephemeral extends Vue {
 
   beforeDestroy() {
     if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    window.removeEventListener(
+      'grader:language-detected',
+      this.onLanguageDetected as any,
+    );
+    window.removeEventListener(
+      'grader:language-detect-clear',
+      this.clearDetectedLabel as any,
+    );
   }
 
   handleDownload(e: Event) {
