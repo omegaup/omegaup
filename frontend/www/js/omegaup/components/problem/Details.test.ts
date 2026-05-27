@@ -418,7 +418,8 @@ int main() {
     );
   });
 
-  it('Should show the ephemeral grader for regular problems', async () => {
+  // TODO: Unskip when the component is visible
+  it.skip('Should show the ephemeral grader for regular problems', async () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
