@@ -1,6 +1,7 @@
 import * as time from '../time';
 import * as ui from '../ui';
 import * as api from '../api';
+import T from '../lang';
 import {
   ContestClarificationType,
   refreshContestClarifications,
@@ -41,6 +42,7 @@ export interface SocketOptions {
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
   scoreMode: ScoreMode;
+  onProblemListChanged?: () => void;
 }
 
 export class EventsSocket {
@@ -67,6 +69,7 @@ export class EventsSocket {
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
   private readonly scoreMode: ScoreMode;
+  private readonly onProblemListChanged?: () => void;
 
   constructor({
     disableSockets = false,
@@ -85,6 +88,7 @@ export class EventsSocket {
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
     scoreMode = ScoreMode.Partial,
+    onProblemListChanged,
   }: SocketOptions) {
     this.socket = null;
 
@@ -105,6 +109,7 @@ export class EventsSocket {
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
     this.scoreMode = scoreMode;
+    this.onProblemListChanged = onProblemListChanged;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -134,6 +139,43 @@ export class EventsSocket {
         startTime: data.scoreboard.start_time,
         finishTime: data.scoreboard.finish_time,
       });
+    } else if (data.message == '/contest/problem/update/') {
+      this.onContestProblemUpdate(data);
+    }
+  }
+
+  private onContestProblemUpdate(data: {
+    type: 'added' | 'modified' | 'removed';
+    problem_alias: string;
+  }) {
+    switch (data.type) {
+      case 'added':
+        ui.info(
+          ui.formatString(T.arenaContestProblemUpdateAdded, {
+            problemAlias: data.problem_alias,
+          }),
+        );
+        break;
+      case 'modified':
+        ui.info(
+          ui.formatString(T.arenaContestProblemModifiedRefresh, {
+            problemAlias: data.problem_alias,
+          }),
+        );
+        break;
+      case 'removed':
+        ui.info(
+          ui.formatString(T.arenaContestProblemUpdateRemoved, {
+            problemAlias: data.problem_alias,
+          }),
+        );
+        break;
+      default:
+        return;
+    }
+
+    if (this.onProblemListChanged) {
+      this.onProblemListChanged();
     }
   }
 

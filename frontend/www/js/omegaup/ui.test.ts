@@ -1,5 +1,6 @@
 import * as ui from './ui';
 import * as time from './time';
+import T from './lang';
 import notificationsStore from './notificationsStore';
 
 describe('ui', () => {
@@ -87,6 +88,17 @@ describe('ui', () => {
 
       consoleSpy.mockRestore();
       expect(notificationsStore.state.onDismiss).toBe(callback);
+    });
+
+    it('ui.apiError should show friendly message when error is an Error object', () => {
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      ui.apiError({ error: new Error('SyntaxError') });
+
+      consoleSpy.mockRestore();
+      expect(notificationsStore.state.message).toBe(T.apiUnexpectedError);
     });
 
     it('onDismiss should be called when notification is dismissed', () => {
