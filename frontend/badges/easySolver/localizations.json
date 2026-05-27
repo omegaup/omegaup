@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Resolutor Fácil",
+      "description": "Otorgado a personas que resolvieron al menos 10 problemas fáciles durante una racha de 7 días consecutivos."
+    },
+    "en": {
+      "name": "Easy Solver",
+      "description": "Awarded to users who solved at least 10 easy problems during a 7-day streak."
+    },
+    "pt": {
+      "name": "Solucionador Fácil",
+      "description": "Concedido a pessoas que resolveram pelo menos 10 problemas fáceis durante uma sequência de 7 dias consecutivos."
+    }
+  }
+  
