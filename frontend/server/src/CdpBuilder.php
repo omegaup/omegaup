@@ -373,8 +373,18 @@ class CdpBuilder {
         $imageCounter = 0;
         $pattern = '/!\[([^\]]+)\]\(([^)]+)\)/';
 
+        /**
+         * Help static analyzers understand variables captured by the closure.
+         *
+         * @var \ZipArchive $zip
+         * @var array<string,array{id:int,data:string}> $processedImages
+         * @var int $imageCounter
+         */
+
         $newMarkdown = preg_replace_callback(
             $pattern,
+            // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+            /** @psalm-suppress UndefinedVariable */
             function ($matches) use (&$zip, &$processedImages, &$imageCounter) {
                 $description = $matches[1];
                 $filePathInZip = $matches[2];
