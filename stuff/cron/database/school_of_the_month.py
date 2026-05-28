@@ -187,7 +187,8 @@ def get_school_of_the_month_candidates(
             SELECT
                 s.school_id,
                 s.name,
-                IFNULL(SUM(ROUND(100 / LOG(2, p.accepted + 1), 0)), 0.0) AS score
+                IFNULL(SUM(ROUND(100 / LOG(2, p.accepted + 1), 0)), 0.0)
+                AS score
             FROM Submissions AS su
             STRAIGHT_JOIN Problems AS p
                 ON p.problem_id = su.problem_id
@@ -214,7 +215,8 @@ def get_school_of_the_month_candidates(
                         AND su_prev.verdict = 'AC'
                         AND (
                             su_prev.time < su.time OR
-                            (su_prev.time = su.time AND su_prev.submission_id < su.submission_id)
+                            (su_prev.time = su.time AND
+                            su_prev.submission_id < su.submission_id)
                         )
                 )
                 AND NOT EXISTS (
