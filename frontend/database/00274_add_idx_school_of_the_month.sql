@@ -1,5 +1,5 @@
 
--- Speeds up filtering by verdict and time range while covering key join columns for candidate selection. 
+-- Speeds up filtering by verdict and time range while covering key join columns for candidate selection.
 ALTER TABLE `Submissions`
     ADD INDEX `idx_submissions_verdict_time_identity_problem_school`
         (`verdict`, `time`, `identity_id`, `problem_id`, `school_id`, `submission_id`);
