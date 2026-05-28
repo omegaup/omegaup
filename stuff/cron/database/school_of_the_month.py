@@ -190,7 +190,7 @@ def get_school_of_the_month_candidates(
             IFNULL(
                 SUM(
                     ROUND(
-                        100 / LOG(2, `distinct_school_problems`.`accepted` 
+                        100 / LOG(2, `distinct_school_problems`.`accepted`
                         + 1),
                         0
                     )
@@ -207,10 +207,11 @@ def get_school_of_the_month_candidates(
                 FROM
                     `Submissions` AS `su`
                 INNER JOIN
-                    `Problems` AS `p` 
+                    `Problems` AS `p`
                     ON `p`.`problem_id` = `su`.`problem_id`
                 INNER JOIN
-                    `Identities` AS `i` ON `i`.`identity_id` = `su`.`identity_id`
+                    `Identities` AS `i` ON
+                    `i`.`identity_id` = `su`.`identity_id`
                 INNER JOIN
                     `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
                 WHERE
