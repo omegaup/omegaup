@@ -114,7 +114,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    await wrapper.setData({ creationMethod: CreationMethods.Creator });
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Creator });
 
     expect(wrapper.find('.introjs-open-creator button').exists()).toBe(true);
   });
@@ -127,7 +127,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    await wrapper.setData({ creationMethod: CreationMethods.Zip });
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Zip });
 
     expect(wrapper.find('.introjs-open-creator button').exists()).toBe(false);
   });
@@ -153,7 +153,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    await wrapper.setData({ creationMethod: CreationMethods.Zip });
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Zip });
 
     expect(
       wrapper.find('.introjs-creation-method .introjs-file').exists(),

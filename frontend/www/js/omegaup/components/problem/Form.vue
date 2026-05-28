@@ -86,11 +86,11 @@
                       class="btn flex-fill"
                       :class="{
                         'btn-primary':
-                          creationMethod === CreationMethods.Creator,
+                          currentCreationMethod === CreationMethods.Creator,
                         'btn-outline-primary':
-                          creationMethod !== CreationMethods.Creator,
+                          currentCreationMethod !== CreationMethods.Creator,
                       }"
-                      @click="setCreationMethod(CreationMethods.Creator)"
+                      @click="setCurrentCreationMethod(CreationMethods.Creator)"
                     >
                       {{ T.problemCreatorTitle }}
                     </button>
@@ -98,17 +98,17 @@
                       type="button"
                       class="btn flex-fill"
                       :class="{
-                        'btn-primary': creationMethod === CreationMethods.Zip,
+                        'btn-primary': currentCreationMethod === CreationMethods.Zip,
                         'btn-outline-primary':
-                          creationMethod !== CreationMethods.Zip,
+                          currentCreationMethod !== CreationMethods.Zip,
                       }"
-                      @click="setCreationMethod(CreationMethods.Zip)"
+                      @click="setCurrentCreationMethod(CreationMethods.Zip)"
                     >
                       {{ T.myproblemsListCreateProblemWithExistingZipFile }}
                     </button>
                   </div>
                   <div
-                    v-if="creationMethod === CreationMethods.Creator"
+                    v-if="currentCreationMethod === CreationMethods.Creator"
                     class="mt-2 introjs-open-creator"
                   >
                     <button
@@ -120,7 +120,7 @@
                     </button>
                   </div>
                   <div
-                    v-if="creationMethod === CreationMethods.Zip"
+                    v-if="currentCreationMethod === CreationMethods.Zip"
                     class="mt-2 introjs-file"
                   >
                     <input
@@ -544,7 +544,7 @@ export default class ProblemForm extends Vue {
   @Prop({ default: 0 }) originalVisibility!: number;
   @Prop({ default: true }) hasVisitedSection!: boolean;
   @Prop({ default: false }) showCreationMethodSelector!: boolean;
-  @Prop({ default: 'creator' }) initialCreationMethod!: string;
+  @Prop({ default: CreationMethods.Creator }) creationMethod!: CreationMethods;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
@@ -580,8 +580,7 @@ export default class ProblemForm extends Vue {
   validatorTypes = this.data.validatorTypes;
   currentLanguages = this.data.languages;
   CreationMethods = CreationMethods;
-  creationMethod: CreationMethods =
-    (this.initialCreationMethod as CreationMethods) || CreationMethods.Creator;
+  currentCreationMethod: CreationMethods = this.creationMethod;
 
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
@@ -642,8 +641,8 @@ export default class ProblemForm extends Vue {
     }
   }
 
-  setCreationMethod(method: CreationMethods): void {
-    this.creationMethod = method;
+  setCurrentCreationMethod(method: CreationMethods): void {
+    this.currentCreationMethod = method;
   }
 
   get howToWriteProblemLink(): string {

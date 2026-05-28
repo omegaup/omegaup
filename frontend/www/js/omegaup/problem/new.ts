@@ -12,10 +12,9 @@ OmegaUp.on('ready', () => {
   const showCreationMethodSelector =
     OmegaUp.experiments?.isEnabled('problem_creation_method_selector') ?? false;
 
-  let initialCreationMethod: CreationMethods = CreationMethods.Creator;
-  if (showCreationMethodSelector) {
-    initialCreationMethod = CreationMethods.Creator;
-  }
+  const creationMethod = showCreationMethodSelector
+    ? CreationMethods.Creator
+    : CreationMethods.Zip;
 
   if (payload.statusError) {
     ui.error(payload.statusError);
@@ -35,7 +34,7 @@ OmegaUp.on('ready', () => {
           errors: this.errors,
           hasVisitedSection: payload.hasVisitedSection,
           showCreationMethodSelector,
-          initialCreationMethod,
+          creationMethod,
         },
         on: {
           'open-problem-creator': (): void => {
