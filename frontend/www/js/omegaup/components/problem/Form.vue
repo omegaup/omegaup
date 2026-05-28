@@ -98,7 +98,8 @@
                       type="button"
                       class="btn flex-fill"
                       :class="{
-                        'btn-primary': currentCreationMethod === CreationMethods.Zip,
+                        'btn-primary':
+                          currentCreationMethod === CreationMethods.Zip,
                         'btn-outline-primary':
                           currentCreationMethod !== CreationMethods.Zip,
                       }"
