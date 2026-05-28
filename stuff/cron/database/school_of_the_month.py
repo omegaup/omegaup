@@ -259,8 +259,6 @@ def get_school_of_the_month_candidates(
     logging.info(
         "Evaluated [get_school_of_the_month_candidates] "
         "for %d schools", len(candidates))
-    logging.info("Evaluated for schools: %s", [
-                 candidate.name for candidate in candidates])
     return candidates
 
 
