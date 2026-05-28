@@ -184,75 +184,50 @@ def get_school_of_the_month_candidates(
     '''Returns a list of elegible schools of the month candidates'''
     logging.info("Getting school of the month candidates")
     sql = '''
-        SELECT
-            `s`.`school_id`,
-            `s`.`name`,
-            IFNULL(
-                SUM(
-                    ROUND(
-                        100 / LOG(2, `distinct_school_problems`.`accepted`
-                        + 1),
-                        0
-                    )
-                ),
-                0.0
-            ) AS `score`
-        FROM
-            `Schools` AS `s`
-        INNER JOIN
-            (
-                SELECT
-                    `su`.`school_id`,
-                    `p`.`accepted`
-                FROM
-                    `Submissions` AS `su`
-                INNER JOIN
-                    `Problems` AS `p`
-                    ON `p`.`problem_id` = `su`.`problem_id`
-                INNER JOIN
-                    `Identities` AS `i` ON
-                    `i`.`identity_id` = `su`.`identity_id`
-                INNER JOIN
-                    `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
-                WHERE
-                    `su`.`verdict` = 'AC'
-                    AND `su`.`time` BETWEEN %s AND %s
-                    AND `p`.`visibility` >= 1
-                    AND `p`.`quality_seal` = 1
-                    AND `su`.`school_id` IS NOT NULL
-                    AND `u`.`main_email_id` IS NOT NULL
-                    AND `i`.`user_id` IS NOT NULL
-                    AND NOT EXISTS (
-                        SELECT 1
-                        FROM `Submissions` AS `su_prev`
-                        WHERE `su_prev`.`identity_id` = `su`.`identity_id`
-                        AND `su_prev`.`problem_id`  = `su`.`problem_id`
-                        AND `su_prev`.`verdict`     = 'AC'
-                        AND `su_prev`.`time`        < `su`.`time`
-                    )
-                GROUP BY
-                    `su`.`school_id`,
-                    `su`.`problem_id`
-            ) AS `distinct_school_problems`
-        ON
-            `distinct_school_problems`.`school_id` = `s`.`school_id`
-        WHERE
-            NOT EXISTS (
-                SELECT 1
-                FROM `School_Of_The_Month` AS `sotm`
-                WHERE
-                    `sotm`.`school_id` = `s`.`school_id`
-                    AND (
-                        `sotm`.`selected_by` IS NOT NULL
-                        OR `sotm`.`ranking` = 1
-                    )
-                    AND DATE_ADD(`sotm`.`time`, INTERVAL 1 YEAR) >= %s
-            )
-        GROUP BY
-            `s`.`school_id`
-        ORDER BY
-            `score` DESC
-        LIMIT 100;
+            SELECT
+                s.school_id,
+                s.name,
+                IFNULL(SUM(ROUND(100 / LOG(2, p.accepted + 1), 0)), 0.0) AS score
+            FROM Submissions AS su
+            STRAIGHT_JOIN Problems AS p
+                ON p.problem_id = su.problem_id
+            STRAIGHT_JOIN Schools AS s
+                ON s.school_id = su.school_id
+            STRAIGHT_JOIN Identities AS i
+                ON i.identity_id = su.identity_id
+            STRAIGHT_JOIN Users AS u
+                ON u.user_id = i.user_id
+            WHERE
+                su.verdict = 'AC'
+                AND su.time BETWEEN %s AND %s
+                AND p.visibility >= 1
+                AND p.quality_seal = 1
+                AND su.school_id IS NOT NULL
+                AND u.main_email_id IS NOT NULL
+                AND i.user_id IS NOT NULL
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Submissions AS su_prev
+                    WHERE
+                        su_prev.identity_id = su.identity_id
+                        AND su_prev.problem_id = su.problem_id
+                        AND su_prev.verdict = 'AC'
+                        AND (
+                            su_prev.time < su.time OR
+                            (su_prev.time = su.time AND su_prev.submission_id < su.submission_id)
+                        )
+                )
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM School_Of_The_Month AS sotm
+                    WHERE
+                        sotm.school_id = su.school_id
+                        AND (sotm.selected_by IS NOT NULL OR sotm.ranking = 1)
+                        AND sotm.time >= DATE_SUB(%s, INTERVAL 1 YEAR)
+                )
+            GROUP BY s.school_id
+            ORDER BY score DESC
+            LIMIT 100;
     '''
 
     cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_current_month,
