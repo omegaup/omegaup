@@ -10,18 +10,10 @@
     <p v-if="description" class="text-muted mb-4">{{ description }}</p>
     <slot name="action">
       <template v-if="buttonText">
-        <a
-          v-if="buttonLink"
-          class="btn btn-primary btn-lg"
-          :href="buttonLink"
-        >
+        <a v-if="buttonLink" class="btn btn-primary btn-lg" :href="buttonLink">
           {{ buttonText }}
         </a>
-        <button
-          v-else
-          class="btn btn-primary btn-lg"
-          @click="$emit('action')"
-        >
+        <button v-else class="btn btn-primary btn-lg" @click="$emit('action')">
           {{ buttonText }}
         </button>
       </template>
