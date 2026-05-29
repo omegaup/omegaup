@@ -328,7 +328,7 @@ import common_TablePaginator from '../common/TablePaginator.vue';
 import country_Flag from '../CountryFlag.vue';
 import common_Markdown from '../Markdown.vue';
 import user_BasicInfo from './BasicInfov2.vue';
-import user_Charts from './Chartsv2.vue';
+import user_Charts from './Charts.vue';
 import user_MainInfo from './MainInfo.vue';
 import problem_SolvingProgress from './ProblemSolvingProgress.vue';
 import tags_SolvedChart from './TagsSolvedChart.vue';

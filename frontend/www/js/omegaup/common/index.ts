@@ -1,8 +1,6 @@
 import Homepage from '../components/homepage/Homepage.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import * as ui from '../ui';
-import * as api from '../api';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -18,21 +16,12 @@ OmegaUp.on('ready', () => {
     problems_solved: user.problems_solved,
   }));
 
-  const vueInstance: any = new Vue({
+  new Vue({
     el: '#main-container',
     components: {
       'omegaup-homepage': Homepage,
     },
-    methods: {
-      recordCookieConsent(data: { accepted: boolean }) {
-        api.User.recordCookieConsent({ accepted: data.accepted })
-          .then(() => {
-            // Consent decision recorded successfully
-          })
-          .catch(ui.apiError);
-      },
-    },
-    render: function (createElement): any {
+    render: function (createElement) {
       return createElement('omegaup-homepage', {
         props: {
           coderOfTheMonth: payload.coderOfTheMonthData
@@ -61,9 +50,6 @@ OmegaUp.on('ready', () => {
           },
           schoolOfTheMonth: payload.schoolOfTheMonthData,
           isUnder13User: commonPayload.isUnder13User,
-        },
-        on: {
-          'record-cookie-consent': vueInstance.recordCookieConsent,
         },
       });
     },

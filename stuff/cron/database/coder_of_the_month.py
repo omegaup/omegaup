@@ -317,18 +317,7 @@ def get_user_problems(
 
     problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
 
-    cur_readonly.execute(f'''
-            WITH
-                ProblemsForfeitedByUser AS (
-                    SELECT
-                        pf.user_id,
-                        pf.problem_id,
-                        pf.forfeited_date
-                    FROM
-                        Problems_Forfeited pf
-                    WHERE
-                        forfeited_date IS NULL
-                )
+    sql = '''
             SELECT
                 s.identity_id,
                 s.problem_id,
@@ -336,24 +325,37 @@ def get_user_problems(
             FROM
                 Submissions s
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = s.identity_id
+                Identities i ON i.identity_id = s.identity_id
             LEFT JOIN
-                ProblemsForfeitedByUser pfbu
-            ON
-                pfbu.user_id = i.user_id
-                AND pfbu.problem_id = s.problem_id
+                Problems_Forfeited pf
+                ON  pf.user_id    = i.user_id
+                AND pf.problem_id = s.problem_id
             WHERE
                 s.identity_id IN ({identity_ids_str})
-                AND s.problem_id IN ({problem_ids_str})
-                AND s.verdict = 'AC'
-                AND s.type = 'normal'
-                AND pfbu.forfeited_date IS NULL
+                AND s.problem_id  IN ({problem_ids_str})
+                AND s.verdict     = 'AC'
+                AND s.type        = 'normal'
+                AND pf.problem_id IS NULL
             GROUP BY
-                s.identity_id, s.problem_id;
-    ''')
+                s.identity_id,
+                s.problem_id;
+    '''
+    sql = sql.format(identity_ids_str=identity_ids_str,
+                     problem_ids_str=problem_ids_str)
+    cur_readonly.execute('EXPLAIN ' + sql)
 
+    logging.info("Evaluating [get_user_problems] for %d "
+                 "users and %d problems",
+                 len(eligible_users), len(problems_admins))
+
+    for row in cur_readonly.fetchall():
+        logging.info(
+            "[get_user_problems] EXPLAIN id=%s table=%s "
+            "type=%s key=%s rows=%s Extra=%s",
+            row.get('id'), row.get('table'), row.get('type'), row.get(
+                'key'), row.get('rows'), row.get('Extra')
+        )
+    cur_readonly.execute(sql)
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']

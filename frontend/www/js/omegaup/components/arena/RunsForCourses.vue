@@ -1098,7 +1098,7 @@ export default class RunsForCourses extends Vue {
 
   onSubmit(): void {
     if (!this.canSubmit && this.nextSubmissionTimestamp) {
-      alert(
+      ui.warning(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(
             (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,

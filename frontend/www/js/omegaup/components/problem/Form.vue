@@ -157,6 +157,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
+                  ref="validation"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -177,7 +178,7 @@
                     name="languages"
                     class="form-control"
                     :class="{ 'is-invalid': errors.includes('languages') }"
-                    required
+                    :required="!isUpdate"
                   >
                     <option
                       v-for="(languageText, languageName) in validLanguages"
@@ -481,6 +482,7 @@ export default class ProblemForm extends Vue {
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
   @Ref('limits') limitsRef!: HTMLDivElement;
+  @Ref('validation') validationRef!: HTMLButtonElement;
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
@@ -683,6 +685,9 @@ export default class ProblemForm extends Vue {
     let tagsCollapsed = !this.isUpdate
       ? this.tagsRef.classList.contains('collapsed')
       : false;
+    let validationCollapsed = this.validationRef
+      ? this.validationRef.classList.contains('collapsed')
+      : false;
 
     for (const [key, value] of formData.entries()) {
       const isEmpty = value === '';
@@ -707,6 +712,13 @@ export default class ProblemForm extends Vue {
           tagsCollapsed = false;
           continue;
         }
+
+        if (validationCollapsed && key === 'languages') {
+          this.validationRef.click();
+          validationCollapsed = false;
+          continue;
+        }
+
         if (
           limitsCollapsed &&
           (key === 'time_limit' ||

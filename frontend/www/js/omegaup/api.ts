@@ -520,6 +520,64 @@ export const Contest = {
     })(x.results);
     return x;
   }),
+  listAllTabs: apiCall<
+    messages.ContestListAllTabsRequest,
+    messages._ContestListAllTabsServerResponse,
+    messages.ContestListAllTabsResponse
+  >('/api/contest/listAllTabs/', (x) => {
+    x.current = ((x) => {
+      x.results = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.results);
+      return x;
+    })(x.current);
+    x.future = ((x) => {
+      x.results = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.results);
+      return x;
+    })(x.future);
+    x.past = ((x) => {
+      x.results = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.results);
+      return x;
+    })(x.past);
+    return x;
+  }),
   listParticipating: apiCall<
     messages.ContestListParticipatingRequest,
     messages._ContestListParticipatingServerResponse,
@@ -573,6 +631,22 @@ export const Contest = {
   open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
     '/api/contest/open/',
   ),
+  problemChangeLogs: apiCall<
+    messages.ContestProblemChangeLogsRequest,
+    messages._ContestProblemChangeLogsServerResponse,
+    messages.ContestProblemChangeLogsResponse
+  >('/api/contest/problemChangeLogs/', (x) => {
+    x.logs = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.logs);
+    return x;
+  }),
   problemClarifications: apiCall<
     messages.ContestProblemClarificationsRequest,
     messages._ContestProblemClarificationsServerResponse,
@@ -1983,8 +2057,15 @@ export const TeamsGroup = {
   >('/api/teamsGroup/create/'),
   details: apiCall<
     messages.TeamsGroupDetailsRequest,
+    messages._TeamsGroupDetailsServerResponse,
     messages.TeamsGroupDetailsResponse
-  >('/api/teamsGroup/details/'),
+  >('/api/teamsGroup/details/', (x) => {
+    x.team_group = ((x) => {
+      x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+      return x;
+    })(x.team_group);
+    return x;
+  }),
   list: apiCall<
     messages.TeamsGroupListRequest,
     messages.TeamsGroupListResponse
@@ -2236,10 +2317,6 @@ export const User = {
     messages.UserProfileStatisticsRequest,
     messages.UserProfileStatisticsResponse
   >('/api/user/profileStatistics/'),
-  recordCookieConsent: apiCall<
-    messages.UserRecordCookieConsentRequest,
-    messages.UserRecordCookieConsentResponse
-  >('/api/user/recordCookieConsent/'),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse

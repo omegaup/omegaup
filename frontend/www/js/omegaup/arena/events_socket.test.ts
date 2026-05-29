@@ -1,8 +1,13 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 jest.mock('./ranking');
+jest.mock('../ui', () => ({
+  ...jest.requireActual('../ui'),
+  info: jest.fn(),
+}));
 
 import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
+import * as ui from '../ui';
 import { SocketOptions, SocketStatus, EventsSocket } from './events_socket';
 import WS from 'jest-websocket-mock';
 import { runsStoreConfig } from './runsStore';
@@ -512,5 +517,146 @@ describe('EventsSocket', () => {
       },
     });
     expect(onRankingChanged).toHaveBeenCalled();
+  });
+
+  it('should handle a socket when server sends /contest/problem/update/ with type added', async () => {
+    const uiInfoSpy = jest.spyOn(ui, 'info');
+    const onProblemListChangedMock = jest.fn();
+    const socket = new EventsSocket({
+      ...options,
+      disableSockets: false,
+      onProblemListChanged: onProblemListChangedMock,
+    });
+
+    socket.connect();
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    server?.send({
+      message: '/contest/problem/update/',
+      type: 'added',
+      contest_alias: 'hello',
+      problem_alias: 'problem_alias',
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(uiInfoSpy).toHaveBeenCalledWith(
+      'Actualización del concurso: El problema "problem_alias" fue agregado a este concurso.',
+    );
+    expect(onProblemListChangedMock).toHaveBeenCalledTimes(1);
+
+    uiInfoSpy.mockRestore();
+  });
+
+  it('should handle a socket when server sends /contest/problem/update/ with type modified', async () => {
+    const uiInfoSpy = jest.spyOn(ui, 'info');
+    const onProblemListChangedMock = jest.fn();
+    const socket = new EventsSocket({
+      ...options,
+      disableSockets: false,
+      onProblemListChanged: onProblemListChangedMock,
+    });
+
+    socket.connect();
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    server?.send({
+      message: '/contest/problem/update/',
+      type: 'modified',
+      contest_alias: 'hello',
+      problem_alias: 'problem_alias',
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(uiInfoSpy).toHaveBeenCalledWith(
+      'Actualización del concurso: El problema "problem_alias" fue actualizado. Por favor recarga la página.',
+    );
+    expect(onProblemListChangedMock).toHaveBeenCalledTimes(1);
+
+    uiInfoSpy.mockRestore();
+  });
+
+  it('should handle a socket when server sends /contest/problem/update/ with type removed', async () => {
+    const uiInfoSpy = jest.spyOn(ui, 'info');
+    const onProblemListChangedMock = jest.fn();
+    const socket = new EventsSocket({
+      ...options,
+      disableSockets: false,
+      onProblemListChanged: onProblemListChangedMock,
+    });
+
+    socket.connect();
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    server?.send({
+      message: '/contest/problem/update/',
+      type: 'removed',
+      contest_alias: 'hello',
+      problem_alias: 'problem_alias',
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(uiInfoSpy).toHaveBeenCalledWith(
+      'Actualización del concurso: El problema "problem_alias" fue eliminado de este concurso.',
+    );
+    expect(onProblemListChangedMock).toHaveBeenCalledTimes(1);
+
+    uiInfoSpy.mockRestore();
+  });
+
+  it('should not call callback for /contest/problem/update/ when onProblemListChanged is not provided', async () => {
+    const uiInfoSpy = jest.spyOn(ui, 'info');
+    const socket = new EventsSocket({
+      ...options,
+      disableSockets: false,
+      // onProblemListChanged is intentionally not provided
+    });
+
+    socket.connect();
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    server?.send({
+      message: '/contest/problem/update/',
+      type: 'added',
+      contest_alias: 'hello',
+      problem_alias: 'problem_alias',
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(uiInfoSpy).toHaveBeenCalledWith(
+      'Actualización del concurso: El problema "problem_alias" fue agregado a este concurso.',
+    );
+
+    uiInfoSpy.mockRestore();
+  });
+
+  it('should ignore /contest/problem/update/ with unknown type', async () => {
+    const uiInfoSpy = jest.spyOn(ui, 'info');
+    const onProblemListChangedMock = jest.fn();
+    const socket = new EventsSocket({
+      ...options,
+      disableSockets: false,
+      onProblemListChanged: onProblemListChangedMock,
+    });
+
+    socket.connect();
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    server?.send({
+      message: '/contest/problem/update/',
+      type: 'unknown_type',
+      contest_alias: 'hello',
+      problem_alias: 'problem_alias',
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(uiInfoSpy).not.toHaveBeenCalled();
+    expect(onProblemListChangedMock).not.toHaveBeenCalled();
+
+    uiInfoSpy.mockRestore();
   });
 });
