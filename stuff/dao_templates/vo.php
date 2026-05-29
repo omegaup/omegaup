@@ -88,37 +88,24 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
 {%- if table.name == 'Team_Groups' %}
      * @var {{ column.php_type }}
      */
-    public {{ column.php_type }} ${{ column.name }}
-{%- if column.default %}
-  {%- if column.default == 'CURRENT_TIMESTAMP' %}
-; // CURRENT_TIMESTAMP
-  {%- elif 'timestamp' in column.type %}
-; // {{ column.default }}
-  {%- elif column.php_primitive_type == 'bool' %}
- = {{ 'true' if column.default == '1' else 'false' }};
-  {%- elif column.php_primitive_type == 'int' %}
- = {{ '%d'|format(column.default|int) }};
-  {%- elif column.php_primitive_type == 'float' %}
- = {{ '%.2f'|format(column.default|float) }};
-  {%- else %}
- = '{{ column.default }}';
-  {%- endif %}
-{%- elif column.auto_increment %}
- = 0;
-{%- elif not column.not_null %}
- = null;
-{%- else %}
-  {%- if column.php_primitive_type == 'bool' %}
- = false;
-  {%- elif column.php_primitive_type == 'int' %}
- = 0;
-  {%- elif column.php_primitive_type == 'float' %}
- = 0.0;
-  {%- elif column.php_primitive_type == 'string' %}
- = '';
-  {%- else %}
-;
-  {%- endif %}
+    public {{ column.php_type }} ${{ column.name -}}
+{%- if column.default -%}
+  {%- if column.default == 'CURRENT_TIMESTAMP' -%}{{ "; // CURRENT_TIMESTAMP" }}
+  {%- elif 'timestamp' in column.type -%}{{ "; // " }}{{ column.default }}
+  {%- elif column.php_primitive_type == 'bool' -%}{{ " = " }}{{ 'true' if column.default == '1' else 'false' }}{{ ";" }}
+  {%- elif column.php_primitive_type == 'int' -%}{{ " = " }}{{ '%d'|format(column.default|int) }}{{ ";" }}
+  {%- elif column.php_primitive_type == 'float' -%}{{ " = " }}{{ '%.2f'|format(column.default|float) }}{{ ";" }}
+  {%- else -%}{{ " = '" }}{{ column.default }}{{ "';" }}
+  {%- endif -%}
+{%- elif column.auto_increment -%}{{ " = 0;" }}
+{%- elif not column.not_null -%}{{ " = null;" }}
+{%- else -%}
+  {%- if column.php_primitive_type == 'bool' -%}{{ " = false;" }}
+  {%- elif column.php_primitive_type == 'int' -%}{{ " = 0;" }}
+  {%- elif column.php_primitive_type == 'float' -%}{{ " = 0.0;" }}
+  {%- elif column.php_primitive_type == 'string' -%}{{ " = '';" }}
+  {%- else -%}{{ ";" }}
+  {%- endif -%}
 {%- endif %}
 {%- else %}
      * @var {{ column.php_primitive_type }}{% if not column.default %}|null{% endif %}

@@ -95,62 +95,54 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
      *
      * @var int
      */
-    public int $team_group_id
- = 0;
+    public int $team_group_id = 0;
 
     /**
      * [Campo no documentado]
      *
      * @var int
      */
-    public int $acl_id
- = 0;
+    public int $acl_id = 0;
 
     /**
      * [Campo no documentado]
      *
      * @var \OmegaUp\Timestamp
      */
-    public \OmegaUp\Timestamp $create_time
-; // CURRENT_TIMESTAMP
+    public \OmegaUp\Timestamp $create_time; // CURRENT_TIMESTAMP
 
     /**
      * [Campo no documentado]
      *
      * @var string
      */
-    public string $alias
- = '';
+    public string $alias = '';
 
     /**
      * [Campo no documentado]
      *
      * @var string
      */
-    public string $name
- = '';
+    public string $name = '';
 
     /**
      * [Campo no documentado]
      *
      * @var ?string
      */
-    public ?string $description
- = null;
+    public ?string $description = null;
 
     /**
      * Número de concursantes para los equipos del grupo
      *
      * @var int
      */
-    public int $number_of_contestants
- = 3;
+    public int $number_of_contestants = 3;
 
     /**
      * Indica si el grupo de equipos ha sido archivado.
      *
      * @var bool
      */
-    public bool $archived
- = false;
+    public bool $archived = false;
 }
