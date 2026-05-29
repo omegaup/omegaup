@@ -267,7 +267,8 @@ export default class UserPreferencesEdit extends Vue {
     this.$emit('update-user-preferences', {
       userPreferences: {
         locale: this.locale,
-        preferred_language: this.preferredLanguage ?? null,
+        preferred_language:
+          this.preferredLanguage === '' ? null : this.preferredLanguage,
         is_private: this.isPrivate,
         hide_problem_tags: this.hideProblemTags,
         has_competitive_objective: this.hasCompetitiveObjective,
