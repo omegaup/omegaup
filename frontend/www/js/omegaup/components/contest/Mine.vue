@@ -60,7 +60,7 @@
           </select>
         </div>
       </div>
-      <div class="table-responsive">
+      <div v-if="contests && contests.length > 0" class="table-responsive">
         <table class="table mb-0">
           <thead>
             <tr>
@@ -176,6 +176,14 @@
           </tbody>
         </table>
       </div>
+      <omegaup-common-empty-state
+        v-else
+        icon="clipboard-list"
+        :title="T.contestListEmptyTitle"
+        :description="T.contestListEmptyDescription"
+        :button-text="T.contestNew"
+        button-link="/contest/new/"
+      />
     </div>
   </div>
 </template>
@@ -186,6 +194,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import common_EmptyState from '../common/EmptyState.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -211,6 +220,7 @@ library.add(
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class List extends Vue {
