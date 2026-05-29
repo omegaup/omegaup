@@ -6,12 +6,18 @@
     "target": "es6",
     "downlevelIteration": true,
     "strict": true,
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise", "dom.iterable"],
+    "lib": [
+      "DOM",
+      "ES5",
+      "ScriptHost",
+      "ES2020.Promise",
+      "dom.iterable"
+    ],
     "types": [
       "bootstrap-datepicker",
       "bootstrap.v3.datetimepicker"
     ],
-    "module": "es6",
+    "module": "esnext",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "listFiles": true,
@@ -19,10 +25,15 @@
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "paths": {
-      "@/*": ["frontend/www/*"]
+      "@/*": [
+        "frontend/www/*"
+      ]
     }
   },
-  "include": ["./frontend/www/js/omegaup/**/*.vue", "./frontend/www/**/*.ts"],
+  "include": [
+    "./frontend/www/js/omegaup/**/*.vue",
+    "./frontend/www/**/*.ts"
+  ],
   "exclude": [
     "./node_modules",
     "./cypress",

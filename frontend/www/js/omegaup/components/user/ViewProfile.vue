@@ -1,5 +1,69 @@
 <template>
   <div class="container-fluid p-0 mt-0">
+    <div
+      v-if="
+        isReadmeEnabled && (currentReadme !== null || profile.is_own_profile)
+      "
+      class="row mb-3"
+    >
+      <div class="col-md-12">
+        <div class="card">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <span>{{ T.profileReadme }}</span>
+            <div>
+              <button
+                v-if="profile.is_own_profile && !isEditingReadme"
+                class="btn btn-sm btn-outline-secondary"
+                @click="startEditReadme"
+              >
+                {{ T.wordsEdit }}
+              </button>
+              <button
+                v-if="
+                  !profile.is_own_profile &&
+                  currentReadme !== null &&
+                  !readmeReportSubmitted
+                "
+                class="btn btn-sm btn-outline-warning"
+                @click="reportReadme"
+              >
+                {{ T.profileReadmeReport }}
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <template v-if="!isEditingReadme">
+              <omegaup-markdown
+                v-if="currentReadme"
+                :markdown="currentReadme"
+                :full-width="true"
+              ></omegaup-markdown>
+              <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
+                {{ T.profileReadmeAddPrompt }}
+              </p>
+            </template>
+            <template v-else>
+              <textarea
+                v-model="readmeEditContent"
+                class="form-control mb-2"
+                rows="10"
+              ></textarea>
+              <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
+                {{ T.wordsSaveChanges }}
+              </button>
+              <button
+                class="btn btn-secondary btn-sm"
+                @click="cancelEditReadme"
+              >
+                {{ T.wordsCancel }}
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -203,6 +267,22 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
+                <div
+                  v-if="profileStatistics"
+                  class="row mb-4 statistics-boxes-row"
+                >
+                  <div class="col-lg-6 mb-3">
+                    <omegaup-problem-solving-progress
+                      :difficulty="profileStatistics.difficulty"
+                      :attempting="profileStatistics.attempting"
+                    ></omegaup-problem-solving-progress>
+                  </div>
+                  <div class="col-lg-6 mb-3">
+                    <omegaup-tags-solved-chart
+                      :tags="profileStatistics.tags"
+                    ></omegaup-tags-solved-chart>
+                  </div>
+                </div>
                 <div class="chart-section">
                   <omegaup-user-charts
                     v-if="charts"
@@ -230,26 +310,30 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import * as Highcharts from 'highcharts/highstock';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import T from '../../lang';
-import country_Flag from '../CountryFlag.vue';
-import user_BasicInfo from './BasicInfov2.vue';
-import user_Username from './Username.vue';
-import user_Charts from './Chartsv2.vue';
-import user_Heatmap from './UserHeatmap.vue';
-import user_MainInfo from './MainInfo.vue';
+import {
+  Contest,
+  ContestResult,
+  Course,
+  Problem,
+} from '../../linkable_resource';
+import { Experiments } from '../../omegaup';
+import * as ui from '../../ui';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
-import { types } from '../../api_types';
-import * as Highcharts from 'highcharts/highstock';
-import * as ui from '../../ui';
-import {
-  Problem,
-  ContestResult,
-  Contest,
-  Course,
-} from '../../linkable_resource';
+import country_Flag from '../CountryFlag.vue';
+import common_Markdown from '../Markdown.vue';
+import user_BasicInfo from './BasicInfov2.vue';
+import user_Charts from './Chartsv2.vue';
+import user_MainInfo from './MainInfo.vue';
+import problem_SolvingProgress from './ProblemSolvingProgress.vue';
+import tags_SolvedChart from './TagsSolvedChart.vue';
+import user_Heatmap from './UserHeatmap.vue';
+import user_Username from './Username.vue';
 
 export enum ViewProfileTabs {
   Badges = 'badges',
@@ -272,11 +356,14 @@ function getInitialSelectedTab(
 
 @Component({
   components: {
+    'omegaup-markdown': common_Markdown,
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-user-heatmap': user_Heatmap,
     'omegaup-user-maininfo': user_MainInfo,
+    'omegaup-problem-solving-progress': problem_SolvingProgress,
+    'omegaup-tags-solved-chart': tags_SolvedChart,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
     'omegaup-table-paginator': common_TablePaginator,
@@ -290,6 +377,17 @@ export default class ViewProfile extends Vue {
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
   @Prop({ default: () => [] }) availableYears!: number[];
+  @Prop({ default: null }) profileStatistics!: {
+    solved: number;
+    attempting: number;
+    difficulty: {
+      easy: number;
+      medium: number;
+      hard: number;
+      unlabelled: number;
+    };
+    tags: Array<{ name: string; count: number }>;
+  } | null;
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -308,6 +406,11 @@ export default class ViewProfile extends Vue {
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
+  currentReadme: string | null = this.profile.readme ?? null;
+  isEditingReadme = false;
+  readmeEditContent: string | null = null;
+  readmeReportSubmitted = false;
+  isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
@@ -370,6 +473,44 @@ export default class ViewProfile extends Vue {
     }
   }
 
+  startEditReadme(): void {
+    this.readmeEditContent = this.currentReadme;
+    this.isEditingReadme = true;
+  }
+
+  cancelEditReadme(): void {
+    this.isEditingReadme = false;
+    this.readmeEditContent = null;
+  }
+
+  saveReadme(): void {
+    const content = this.readmeEditContent ?? '';
+    this.$emit('save-readme', {
+      readme: content,
+      onSuccess: () => {
+        this.currentReadme = content;
+        this.isEditingReadme = false;
+      },
+    });
+  }
+
+  reportReadme(): void {
+    this.$emit('report-readme', {
+      username: this.profile.username ?? '',
+      onSuccess: () => {
+        this.readmeReportSubmitted = true;
+        ui.success(T.profileReadmeReportSuccess);
+      },
+    });
+  }
+
+  @Watch('selectedTab')
+  onSelectedTabPropChanged(newValue: string | null) {
+    if (newValue !== null) {
+      this.currentSelectedTab = getInitialSelectedTab(this.profile, newValue);
+    }
+  }
+
   @Watch('currentSelectedTab')
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);
@@ -399,5 +540,13 @@ a:hover {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--user-chart-title-color);
+}
+
+.statistics-boxes-row {
+  margin-top: 16px;
+}
+
+.statistics-boxes-row > [class*='col-'] {
+  display: flex;
 }
 </style>

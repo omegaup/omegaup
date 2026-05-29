@@ -165,9 +165,12 @@ class Authorization {
             return false;
         }
 
-        // TODO Temporary until isAdmin function is fixed
-        $identity_id = $identity->identity_id;
-        if ($clarification->author_id === $identity_id) {
+        // Author and receiver (invited user) can always view their clarifications.
+        $identityId = $identity->identity_id;
+        if (
+            $clarification->author_id === $identityId ||
+            $clarification->receiver_id === $identityId
+        ) {
             return true;
         }
 

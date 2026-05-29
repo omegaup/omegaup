@@ -308,7 +308,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -366,6 +366,11 @@ export default class Edit extends Vue {
   ui = ui;
   virtual = ui.isVirtual(this.details);
   showTab = this.selectedTab();
+
+  @Watch('initialTab')
+  onInitialTabChanged(newValue: string) {
+    this.showTab = newValue !== '' ? newValue : this.selectedTab();
+  }
   alreadyArchived = this.details.archived;
 
   selectedTab(): string {

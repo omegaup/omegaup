@@ -864,7 +864,7 @@ class Validators {
      */
     public static function validateZipFilePath(string $filePath): void {
         foreach (self::ZIP_FORBIDDEN_PATH_CHARS as $char) {
-            if (strpos($filePath, $char) !== false) {
+            if (str_contains($filePath, $char)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalidZipFilePath',
                     'zipFile'

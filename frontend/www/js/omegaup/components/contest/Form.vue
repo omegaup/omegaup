@@ -7,6 +7,7 @@
       <!-- Style Presets -->
       <div class="btn-group d-block mb-3 text-center introjs-style">
         <button
+          :class="{ selected: currentPreset === PresetType.OMI }"
           class="btn btn-secondary"
           data-contest-omi
           type="button"
@@ -15,6 +16,7 @@
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.PreIOI }"
           class="btn btn-secondary"
           data-contest-preioi
           type="button"
@@ -23,6 +25,7 @@
           {{ T.contestNewForm }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.Conacup }"
           class="btn btn-secondary"
           data-contest-conacup
           type="button"
@@ -31,6 +34,7 @@
           {{ T.contestNewFormConacupStyle }}
         </button>
         <button
+          :class="{ selected: currentPreset === PresetType.ICPC }"
           class="btn btn-secondary"
           data-contest-icpc
           type="button"
@@ -93,9 +97,16 @@
                     type="text"
                     required
                     :disabled="isSubmitting"
+                    :maxlength="MAX_LENGTH.title"
                     @blur="validateField(FieldName.Title)"
                     @input="clearFieldError(FieldName.Title)"
                   />
+                  <small
+                    class="character-counter"
+                    :class="{ 'text-danger': isExceedingTitle }"
+                  >
+                    {{ title.length }}/{{ MAX_LENGTH.title }}
+                  </small>
                   <div
                     v-if="
                       invalidParameterName === FieldName.Title ||
@@ -139,9 +150,16 @@
                     :disabled="update || isSubmitting"
                     type="text"
                     required
+                    :maxlength="MAX_LENGTH.alias"
                     @blur="validateField(FieldName.Alias)"
                     @input="clearFieldError(FieldName.Alias)"
                   />
+                  <small
+                    class="character-counter"
+                    :class="{ 'text-danger': isExceedingAlias }"
+                  >
+                    {{ alias.length }}/{{ MAX_LENGTH.alias }}
+                  </small>
                   <div
                     v-if="
                       invalidParameterName === FieldName.Alias ||
@@ -238,9 +256,16 @@
                     rows="10"
                     required
                     :disabled="isSubmitting"
+                    :maxlength="MAX_LENGTH.description"
                     @blur="validateField(FieldName.Description)"
                     @input="clearFieldError(FieldName.Description)"
                   ></textarea>
+                  <small
+                    class="character-counter"
+                    :class="{ 'text-danger': isExceedingDescription }"
+                  >
+                    {{ description.length }}/{{ MAX_LENGTH.description }}
+                  </small>
                   <div
                     v-if="
                       invalidParameterName === FieldName.Description ||
@@ -836,6 +861,18 @@
         </div>
       </form>
     </div>
+    <b-modal
+      v-model="showModal"
+      :title="T.contestNewFormPresetOverwriteWarningModalTitle"
+      :ok-title="T.wordsConfirm"
+      ok-only
+      @ok="
+        applyPreset(changePresetTo);
+        hasFormChanged = true;
+      "
+    >
+      {{ T.contestNewFormPresetOverwriteWarning }}
+    </b-modal>
   </div>
 </template>
 
@@ -852,6 +889,8 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
 
 import {
   FontAwesomeIcon,
@@ -863,7 +902,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { isValidAlias } from '../../validators';
 library.add(fas);
 
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 export enum ScoreMode {
   AllOrNothing = 'all_or_nothing',
@@ -1009,6 +1048,14 @@ const CONTEST_PRESETS: Record<PresetType, PresetConfig> = {
   },
 };
 
+const MAX_LENGTH = {
+  title: 256,
+  alias: 32,
+  description: 255,
+};
+
+const DANGER_THRESHOLD_PERCENTAGE = 0.8;
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -1028,6 +1075,7 @@ export default class Form extends Vue {
   PresetType = PresetType;
   FieldName = FieldName;
   SectionName = SectionName;
+  MAX_LENGTH = MAX_LENGTH;
 
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
@@ -1087,6 +1135,9 @@ export default class Form extends Vue {
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;
+  showModal: boolean = false;
+  changePresetTo: PresetType | null = null;
+  currentPreset: PresetType | null = null;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -1241,6 +1292,9 @@ export default class Form extends Vue {
 
   clearFieldError(fieldName: FieldName | string): void {
     delete this.localErrors[fieldName];
+    if (Object.keys(this.localErrors).length === 0) {
+      ui.dismissNotifications();
+    }
     this.$forceUpdate();
   }
 
@@ -1274,17 +1328,17 @@ export default class Form extends Vue {
 
   confirmPresetChange(presetType: PresetType): void {
     if (this.hasFormChanged && !this.update) {
-      if (!confirm(T.contestNewFormPresetOverwriteWarning)) {
-        return;
-      }
+      this.changePresetTo = presetType;
+      this.showModal = true;
+      return;
     }
-
     this.applyPreset(presetType);
     this.hasFormChanged = true;
   }
 
   applyPreset(presetType: PresetType): void {
     const preset = CONTEST_PRESETS[presetType];
+    this.currentPreset = presetType;
 
     if (preset.languages) {
       const allLangs = Object.keys(this.allLanguages);
@@ -1406,6 +1460,22 @@ export default class Form extends Vue {
     return false;
   }
 
+  // Computed properties for character limit danger thresholds
+  get isExceedingTitle(): boolean {
+    return this.title.length > MAX_LENGTH.title * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingAlias(): boolean {
+    return this.alias.length > MAX_LENGTH.alias * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingDescription(): boolean {
+    return (
+      this.description.length >
+      MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE
+    );
+  }
+
   onRemove(language: string) {
     if (this.catLanguageBlocked && language == 'cat') {
       this.$emit('language-remove-blocked', language);
@@ -1468,5 +1538,40 @@ export default class Form extends Vue {
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
   border-color: var(--form-input-error-color);
+}
+
+.character-counter {
+  display: block;
+  text-align: right;
+  color: var(--form-character-counter-color, #6c757d);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .modal-footer .btn {
+  background-color: var(--btn-ok-background-color);
+  border-color: var(--btn-ok-background-color);
+  color: var(--btn-ok-font-color);
+
+  &:hover {
+    color: var(--btn-ok-font-color--hover);
+  }
+}
+
+.btn-group .btn.selected {
+  outline: 3px solid var(--btn-contest-preset-outline-color) !important;
+  z-index: 1 !important;
+}
+
+// Overwrite default bootstrap focus styles
+.btn-group .btn:focus {
+  box-shadow: none !important;
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  z-index: 0;
+}
+.btn-group .btn:hover {
+  z-index: 0;
 }
 </style>
