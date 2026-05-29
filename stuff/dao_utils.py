@@ -198,6 +198,12 @@ def generate_dao(script: str) -> Generator[File, None, None]:
     vo_template = env.get_template('vo.php')
     dao_template = env.get_template('dao.php')
     for table in tables:
+        if table.name == 'Team_Groups':
+            for column in table.columns:
+                if column.not_null:
+                    column.php_type = column.php_primitive_type
+                else:
+                    column.php_type = '?' + column.php_primitive_type
         yield File(f'{table.class_name}.php', 'vo',
                    vo_template.render(table=table))
         yield File(f'{table.class_name}.php', 'dao',

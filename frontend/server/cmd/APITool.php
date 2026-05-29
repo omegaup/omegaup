@@ -1084,7 +1084,7 @@ class APIGenerator {
                 /** @var class-string */
                 $voClassName = "\\OmegaUp\\DAO\\VO\\{$typeName}";
                 $reflectionClass = new \ReflectionClass($voClassName);
-                /** @var array<string, string> */
+                /** @var array<string, array{expansion: string, isNullable: bool}> */
                 $properties = [];
                 foreach (
                     $reflectionClass->getProperties(
@@ -1105,19 +1105,24 @@ class APIGenerator {
                             $returns
                         )[0]
                     );
-                    if ($returnType->isNullable()) {
+                    $isNullable = $returnType->isNullable();
+                    if ($isNullable) {
                         $returnType->removeType('null');
                     }
                     $properties[
                         $reflectionProperty->getName()
-                    ] = $this->typeMapper->convertType(
-                        $returnType,
-                        $typeName
-                    )->typescriptExpansion;
+                    ] = [
+                        'expansion' => $this->typeMapper->convertType(
+                            $returnType,
+                            $typeName
+                        )->typescriptExpansion,
+                        'isNullable' => $isNullable,
+                    ];
                 }
                 ksort($properties);
-                foreach ($properties as $propertyTypeName => $propertyTypeExpansion) {
-                    echo "    {$propertyTypeName}?: {$propertyTypeExpansion};\n";
+                foreach ($properties as $propertyTypeName => $propertyInfo) {
+                    $optional = $propertyInfo['isNullable'] ? '?' : '';
+                    echo "    {$propertyTypeName}{$optional}: {$propertyInfo['expansion']};\n";
                 }
                 echo "  }\n\n";
             }
