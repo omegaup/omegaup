@@ -26,7 +26,9 @@
         data-preferred-language
         class="custom-select"
       >
-        <option value=""></option>
+        <option value="">
+          {{ T.userEditPreferredProgrammingLanguagePlaceholder }}
+        </option>
         <option
           v-for="[extension, name] in Object.entries(programmingLanguages)"
           :key="extension"
@@ -167,7 +169,7 @@ export default class UserPreferencesEdit extends Vue {
   ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
   locale = this.profile.locale;
-  preferredLanguage = this.profile.preferred_language;
+  preferredLanguage = this.profile.preferred_language ?? '';
   programmingLanguages = this.profile.programming_languages;
   isPrivate = this.profile.is_private;
   hideProblemTags = this.profile.hide_problem_tags;
@@ -267,7 +269,8 @@ export default class UserPreferencesEdit extends Vue {
     this.$emit('update-user-preferences', {
       userPreferences: {
         locale: this.locale,
-        preferred_language: this.preferredLanguage ?? null,
+        preferred_language:
+          this.preferredLanguage === '' ? null : this.preferredLanguage,
         is_private: this.isPrivate,
         hide_problem_tags: this.hideProblemTags,
         has_competitive_objective: this.hasCompetitiveObjective,
