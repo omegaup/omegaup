@@ -282,6 +282,7 @@ export default class UserPreferencesEdit extends Vue {
   handlePrivateProfileCheckboxChange(): void {
     this.show = this.isPrivate;
   }
+}
 </script>
 
 <style lang="scss" scoped>
