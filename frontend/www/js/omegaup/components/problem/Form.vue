@@ -76,7 +76,68 @@
                     :class="{ 'is-invalid': errors.includes('source') }"
                   />
                 </div>
-                <div class="form-group col-md-6 introjs-file">
+                <div
+                  v-if="!isUpdate && showCreationMethodSelector"
+                  class="form-group col-md-6 introjs-creation-method"
+                >
+                  <div class="btn-group btn-group-toggle d-flex" role="group">
+                    <button
+                      type="button"
+                      class="btn flex-fill"
+                      :class="{
+                        'btn-primary':
+                          currentCreationMethod === CreationMethods.Creator,
+                        'btn-outline-primary':
+                          currentCreationMethod !== CreationMethods.Creator,
+                      }"
+                      @click="setCurrentCreationMethod(CreationMethods.Creator)"
+                    >
+                      {{ T.problemCreatorTitle }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn flex-fill"
+                      :class="{
+                        'btn-primary':
+                          currentCreationMethod === CreationMethods.Zip,
+                        'btn-outline-primary':
+                          currentCreationMethod !== CreationMethods.Zip,
+                      }"
+                      @click="setCurrentCreationMethod(CreationMethods.Zip)"
+                    >
+                      {{ T.myproblemsListCreateProblemWithExistingZipFile }}
+                    </button>
+                  </div>
+                  <div
+                    v-if="currentCreationMethod === CreationMethods.Creator"
+                    class="mt-2 introjs-open-creator"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-info"
+                      @click="$emit('open-problem-creator')"
+                    >
+                      {{ T.openProblemCreator }}
+                    </button>
+                  </div>
+                  <div
+                    v-if="currentCreationMethod === CreationMethods.Zip"
+                    class="mt-2 introjs-file"
+                  >
+                    <input
+                      :required="!isUpdate"
+                      name="problem_contents"
+                      type="file"
+                      accept=".zip"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': errors.includes('problem_contents'),
+                      }"
+                      @change="onUploadFile"
+                    />
+                  </div>
+                </div>
+                <div v-else class="form-group col-md-6 introjs-file">
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
@@ -466,6 +527,11 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expires: -1 });
 
+export enum CreationMethods {
+  Creator = 'creator',
+  Zip = 'zip',
+}
+
 @Component({
   components: {
     'omegaup-problem-settings': problem_Settings,
@@ -478,6 +544,8 @@ export default class ProblemForm extends Vue {
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
   @Prop({ default: true }) hasVisitedSection!: boolean;
+  @Prop({ default: false }) showCreationMethodSelector!: boolean;
+  @Prop({ default: CreationMethods.Creator }) creationMethod!: CreationMethods;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
@@ -512,6 +580,8 @@ export default class ProblemForm extends Vue {
   validLanguages = this.data.validLanguages;
   validatorTypes = this.data.validatorTypes;
   currentLanguages = this.data.languages;
+  CreationMethods = CreationMethods;
+  currentCreationMethod: CreationMethods = this.creationMethod;
 
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
@@ -570,6 +640,10 @@ export default class ProblemForm extends Vue {
         .start();
       this.$cookies.set('has-visited-create-problem', true, -1);
     }
+  }
+
+  setCurrentCreationMethod(method: CreationMethods): void {
+    this.currentCreationMethod = method;
   }
 
   get howToWriteProblemLink(): string {

@@ -93,60 +93,55 @@ def _parse_date(s: str) -> datetime.date:
 
 def update_problem_accepted_stats(
     cur: mysql.connector.cursor.MySQLCursorDict,
-    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
 ) -> None:
     '''Updates the problem accepted stats'''
 
     logging.info('Updating accepted stats for problems...')
-    # This is using a subquery so that even problems that don't have a single
-    # AC run emit a row.
-    cur_readonly.execute('''
-        SELECT
-            `p`.`problem_id`,
-            (
-                SELECT
-                    COUNT(DISTINCT `s`.`identity_id`)
-                FROM
-                    `Submissions` AS `s`
-                INNER JOIN
-                    `Identities` AS `i` ON
-                    `i`.`identity_id` = `s`.`identity_id`
-                WHERE
-                    `s`.`problem_id` = `p`.`problem_id`
-                    AND `s`.verdict = 'AC'
-                    AND NOT EXISTS (
-                        SELECT
-                            `pf`.`problem_id`, `pf`.`user_id`
-                        FROM
-                            `Problems_Forfeited` AS `pf`
-                        WHERE
-                            `pf`.`problem_id` = `p`.`problem_id` AND
-                            `pf`.`user_id` = `i`.`user_id`
-                    )
-                    AND NOT EXISTS (
-                        SELECT
-                            `a`.`acl_id`
-                        FROM
-                            `ACLs` AS `a`
-                        WHERE
-                            `a`.`acl_id` = `p`.`acl_id` AND
-                            `a`.`owner_id` = `i`.`user_id`
-                    )
-            ) AS `accepted`
-        FROM
-            `Problems` AS `p`;
-    ''')
-    for row in cur_readonly.fetchall():
-        cur.execute(
-            '''
-                UPDATE
-                    `Problems` AS `p`
-                SET
-                    `p`.`accepted` = %s
-                WHERE
-                    `p`.`problem_id` = %s;
-            ''', (row['accepted'], row['problem_id']))
+    cur.execute(
+        '''
+        UPDATE
+            `Problems` AS `p`
+        LEFT JOIN (
+            SELECT
+                `s`.`problem_id`,
+                COUNT(DISTINCT `s`.`identity_id`) AS `accepted`
+            FROM
+                `Submissions` AS `s`
+            INNER JOIN
+                `Identities` AS `i` ON
+                `i`.`identity_id` = `s`.`identity_id`
+            INNER JOIN
+                `Problems` AS `inner_p` ON
+                `inner_p`.`problem_id` = `s`.`problem_id`
+            WHERE
+                `s`.`verdict` = 'AC'
+                AND NOT EXISTS (
+                    SELECT
+                        `pf`.`problem_id`, `pf`.`user_id`
+                    FROM
+                        `Problems_Forfeited` AS `pf`
+                    WHERE
+                        `pf`.`problem_id` = `inner_p`.`problem_id` AND
+                        `pf`.`user_id` = `i`.`user_id`
+                )
+                AND NOT EXISTS (
+                    SELECT
+                        `a`.`acl_id`
+                    FROM
+                        `ACLs` AS `a`
+                    WHERE
+                        `a`.`acl_id` = `inner_p`.`acl_id` AND
+                        `a`.`owner_id` = `i`.`user_id`
+                )
+            GROUP BY
+                `s`.`problem_id`
+        ) AS `stats`
+        ON
+            `stats`.`problem_id` = `p`.`problem_id`
+        SET
+            `p`.`accepted` = IFNULL(`stats`.`accepted`, 0);
+        ''')
     dbconn.commit()
 
 
@@ -1040,7 +1035,7 @@ def main() -> None:
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
             phase_start = time.monotonic()
-            update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
+            update_problem_accepted_stats(cur, dbconn.conn)
             logging.info(
                 'update_problem_accepted_stats completed in %.2fs',
                 time.monotonic() - phase_start,
