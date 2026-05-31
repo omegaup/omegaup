@@ -143,11 +143,14 @@ export default class Signin extends Vue {
 }
 
 .nav-link.active {
-  color: var(--btn-ok-font-color);
-  background-color: var(--btn-ok-background-color);
-  border-color: var(--btn-ok-background-color);
+  color: var(--signin-nav-link-active-color);
+  background-color: var(--signin-nav-link-active-background-color);
+  border-color: var(--signin-nav-tabs-border-color)
+    var(--signin-nav-tabs-border-color)
+    var(--signin-nav-link-active-background-color);
   position: relative;
   z-index: 1;
+  margin-bottom: -1px;
 }
 
 .tab-content {

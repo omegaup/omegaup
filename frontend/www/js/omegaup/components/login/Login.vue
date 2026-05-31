@@ -288,18 +288,19 @@ export default class Login extends Vue {
 .login-section {
   border: 2px solid var(--signin-nav-tabs-border-color);
   border-radius: 8px;
+  background-color: var(--signin-nav-link-background-color);
   padding: 24px;
   margin-bottom: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .login-section:hover {
   border-color: var(--btn-github-border-color--hover);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
 }
 
 h4 {
-  color: #212529;
+  color: var(--signin-nav-link-active-color);
   font-weight: 600;
   margin-bottom: 20px;
   border-bottom: 2px solid var(--btn-ok-background-color);
