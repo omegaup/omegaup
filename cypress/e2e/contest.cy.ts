@@ -548,9 +548,7 @@ describe('Contest Test', () => {
     cy.login(contestAdmin);
     cy.visit(`arena/${contestOptions.contestAlias}`);
     cy.get('a.nav-link[href="#runs"]').click();
-    cy.intercept({ method: 'POST', url: '/api/run/details/' }).as(
-      'runDetails',
-    );
+    cy.intercept({ method: 'POST', url: '/api/run/details/' }).as('runDetails');
     cy.get('[data-runs-actions-button]').first().click();
     cy.get('[data-runs-show-details-button]').first().click();
     cy.wait('@runDetails').its('response.statusCode').should('eq', 200);
