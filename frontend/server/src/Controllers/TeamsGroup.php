@@ -8,9 +8,9 @@
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type Participant=array{country_id?: string, gender?: string, name?: string, password?: string, school_name?: string, state_id?: string, username: string, participant_username: string, participant_password?: string}
  * @psalm-type TeamMember=array{classname: string, isMainUserIdentity: bool, name: null|string, team_alias: string, team_name: null|string, username: string}
- * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, maxNumberOfContestants: int, teamGroup: array{alias: string, description: null|string, name: null|string, numberOfContestants: int}, teamsMembers: list<TeamMember>}
+ * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, maxNumberOfContestants: int, teamGroup: array{alias: string, archived: bool, description: null|string, name: string, numberOfContestants: int}, teamsMembers: list<TeamMember>}
  * @psalm-type TeamGroupNewPayload=array{numberOfContestants: int, maxNumberOfContestants: int}
- * @psalm-type TeamsGroup=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
+ * @psalm-type TeamsGroup=array{alias: string, archived: bool, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type TeamsGroupListPayload=array{teamsGroups: list<TeamsGroup>}
  * @psalm-type ListItem=array{key: string, value: string}
  */
@@ -45,7 +45,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{team_group: array{create_time: int, alias: null|string, name: null|string, description: null|string}}
+     * @return array{team_group: TeamsGroup}
      *
      * @omegaup-request-param string $team_group_alias
      */
@@ -63,13 +63,15 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
-        /** @var array{create_time: int, alias: null|string, name: null|string, description: null|string} */
+        /** @var TeamsGroup */
         $filteredTeamGroup = $teamGroup->asFilteredArray([
             'create_time',
+            'archived',
             'alias',
             'name',
             'description',
         ]);
+
         return [
             'team_group' => $filteredTeamGroup,
         ];
@@ -151,9 +153,10 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'teamGroup' => [
                         'alias' => $teamGroupAlias,
-                        'name' => $teamGroup->name,
+                        'name' => strval($teamGroup->name),
                         'description' => $teamGroup->description,
                         'numberOfContestants' => $teamGroup->number_of_contestants,
+                        'archived' => $teamGroup->archived,
                     ],
                     'maxNumberOfContestants' => self::MAX_NUMBER_OF_CONTESTANTS,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
@@ -262,6 +265,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $alias
+     * @omegaup-request-param bool|null $archived
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
      * @omegaup-request-param int|null $numberOfContestants
@@ -287,11 +291,14 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         $teamsGroup->name = $r->ensureString('name');
         $teamsGroup->description = $r->ensureString('description');
-        $teamsGroup->number_of_contestants = $r->ensureInt(
+        $teamsGroup->number_of_contestants = $r->ensureOptionalInt(
             'numberOfContestants',
             lowerBound: 1,
             upperBound: self::MAX_NUMBER_OF_CONTESTANTS,
-        );
+        ) ?? $teamsGroup->number_of_contestants;
+        $teamsGroup->archived = $r->ensureOptionalBool(
+            'archived'
+        ) ?? $teamsGroup->archived;
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(
             "Teams group {$teamsGroup->alias} updated successfully."
