@@ -190,22 +190,29 @@ def get_school_of_the_month_candidates(
                 IFNULL(SUM(ROUND(100 / LOG(2, p.accepted + 1), 0)), 0.0)
                 AS score
             FROM Submissions AS su
-            STRAIGHT_JOIN Problems AS p
+            JOIN Problems AS p
                 ON p.problem_id = su.problem_id
-            STRAIGHT_JOIN Schools AS s
+                AND p.visibility >= 1
+                AND p.quality_seal = 1
+            JOIN Schools AS s
                 ON s.school_id = su.school_id
-            STRAIGHT_JOIN Identities AS i
+            JOIN Identities AS i
                 ON i.identity_id = su.identity_id
-            STRAIGHT_JOIN Users AS u
+            JOIN Users AS u
                 ON u.user_id = i.user_id
+                AND u.main_email_id IS NOT NULL
+            LEFT JOIN (
+                SELECT DISTINCT school_id
+                FROM School_Of_The_Month
+                WHERE (selected_by IS NOT NULL OR ranking = 1)
+                    AND time >= DATE_SUB(%s, INTERVAL 1 YEAR)
+            ) AS recent_winners
+                ON recent_winners.school_id = su.school_id
             WHERE
                 su.verdict = 'AC'
                 AND su.time BETWEEN %s AND %s
-                AND p.visibility >= 1
-                AND p.quality_seal = 1
                 AND su.school_id IS NOT NULL
-                AND u.main_email_id IS NOT NULL
-                AND i.user_id IS NOT NULL
+                AND recent_winners.school_id IS NULL
                 AND NOT EXISTS (
                     SELECT 1
                     FROM Submissions AS su_prev
@@ -219,21 +226,13 @@ def get_school_of_the_month_candidates(
                             su_prev.submission_id < su.submission_id)
                         )
                 )
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM School_Of_The_Month AS sotm
-                    WHERE
-                        sotm.school_id = su.school_id
-                        AND (sotm.selected_by IS NOT NULL OR sotm.ranking = 1)
-                        AND sotm.time >= DATE_SUB(%s, INTERVAL 1 YEAR)
-                )
             GROUP BY s.school_id
             ORDER BY score DESC
             LIMIT 100;
     '''
 
-    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_current_month,
-                                            first_day_of_next_month,
+    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_next_month,
+                                            first_day_of_current_month,
                                             first_day_of_next_month))
 
     for row in cur_readonly.fetchall():
@@ -245,7 +244,7 @@ def get_school_of_the_month_candidates(
         )
 
     cur_readonly.execute(
-        sql, (first_day_of_current_month, first_day_of_next_month,
+        sql, (first_day_of_next_month, first_day_of_current_month,
               first_day_of_next_month))
     candidates: List[School] = []
     for row in cur_readonly.fetchall():

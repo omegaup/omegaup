@@ -67,6 +67,12 @@ from utils import (
     get_first_day_of_next_month,
 )
 
+logging.basicConfig(
+    filename='update_ranks.log',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
+
 sys.path.insert(
     0,
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
@@ -486,17 +492,24 @@ def update_school_of_the_month_candidates(
         logging.info('Skipping because already exist selected schools.')
         return
     remove_school_of_the_month_candidates(cur, first_day_of_next_month)
-    schools_python = compute_points_for_school(
+    # schools_python = compute_points_for_school(
+    #     cur_readonly,
+    #     first_day_of_current_month,
+    #     first_day_of_next_month
+    # )
+    # if not schools_python:
+    #     logging.info('No eligible schools found.')
+    #     return
+
+    schools_sql = get_school_of_the_month_candidates(
         cur_readonly,
-        first_day_of_current_month,
-        first_day_of_next_month
+        first_day_of_next_month,
+        first_day_of_current_month
     )
-    if not schools_python:
-        logging.info('No eligible schools found.')
-        return
+
     if update_school_of_the_month:
         insert_school_of_the_month_candidates(
-            cur, first_day_of_next_month, schools_python)
+            cur, first_day_of_next_month, schools_sql)
     else:
         schools_sql = get_school_of_the_month_candidates(
             cur_readonly,
@@ -505,7 +518,7 @@ def update_school_of_the_month_candidates(
         )
         debug_school_of_the_month_candidates(
             first_day_of_next_month, schools_sql,
-            schools_python,
+            schools_sql,
             use_json_format=True)
 
 
