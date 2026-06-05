@@ -717,12 +717,9 @@ def compute_points_for_school(
     # Get the list of problem IDs for eligible problems
     problem_ids = list(eligible_problems.keys())
 
-    if not identity_ids:
-        logging.info('No eligible users founds.')
-        return []
-
-    if not problem_ids:
-        logging.info('No eligible problems found.')
+    if not identity_ids or not problem_ids:
+        missing = 'users' if not identity_ids else 'problems'
+        logging.info('No eligible %s founds.', missing)
         return []
 
     # Convert the list of identity IDs to a comma-separated string
