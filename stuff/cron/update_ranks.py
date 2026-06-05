@@ -74,6 +74,7 @@ sys.path.insert(
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
+
 class Cutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
     percentile: float
