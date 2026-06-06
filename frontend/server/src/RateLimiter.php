@@ -29,6 +29,15 @@ class RateLimiter {
      */
     private const KEY_TTL_SECONDS = 7200;
 
+    private const DEFAULT_LIMITS = [
+        'Course::apiCreate'     => 5,
+        'Contest::apiCreate'    => 10,
+        'Problem::apiCreate'    => 20,
+        'Group::apiCreate'      => 5,
+        'TeamsGroup::apiCreate' => 5,
+        'School::apiCreate'     => 5,
+    ];
+
     /**
      * Enable or disable rate limiting for testing purposes.
      */
@@ -42,18 +51,24 @@ class RateLimiter {
      *
      * System administrators are exempt from rate limiting.
      *
-     * @param string $endpoint A unique identifier for the endpoint
-     *                         (e.g., 'Group::apiCreate')
      * @param \OmegaUp\DAO\VO\Identities $identity The identity making the request
      * @param int $limit       Maximum number of requests allowed per window
      *
      * @throws \OmegaUp\Exceptions\RateLimitExceededException if the limit is exceeded
      */
     public static function assertWithinLimit(
-        string $endpoint,
         \OmegaUp\DAO\VO\Identities $identity,
-        int $limit
+        ?int $limit = null
     ): void {
+        [
+            'class' => $callerClass,
+            'function' => $callerFunction,
+            'type' => $callerType,
+        ] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+        $fullClass = $callerClass ?? 'Unknown';
+        $shortClass = substr($fullClass, strrpos($fullClass, '\\') + 1);
+        $endpoint = "{$shortClass}{$callerType}{$callerFunction}";
+        $limit = $limit ?? (self::DEFAULT_LIMITS[$endpoint] ?? 10);
         if (!self::$isEnabledForTesting) {
             return;
         }
@@ -81,19 +96,16 @@ class RateLimiter {
         );
 
         try {
-            $current = $cache->get();
+            // Atomically increment the counter with TTL.
+            // This avoids race conditions where multiple concurrent requests
+            // could both read the same value and exceed the limit.
+            $count = $cache->incWithTTL(self::KEY_TTL_SECONDS);
 
-            if (!is_null($current) && intval($current) >= $limit) {
+            if ($count > $limit) {
                 throw new \OmegaUp\Exceptions\RateLimitExceededException(
                     'contentCreationRateLimitExceeded'
                 );
             }
-
-            // Increment the counter (or initialize to 1).
-            $cache->set(
-                is_null($current) ? 1 : intval($current) + 1,
-                self::KEY_TTL_SECONDS
-            );
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
             // Re-throw rate limit exceptions — these are intentional
             throw $e;

@@ -74,19 +74,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentityIsOver13();
 
-        // Rate limit: 5 group creations per hour per user.
-        // System admins are exempt.
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin(
-                $r->identity
-            )
-        ) {
-            \OmegaUp\RateLimiter::assertWithinLimit(
-                'Group::apiCreate',
-                $r->identity,
-                5
-            );
-        }
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
 
         $groupAlias = $r->ensureString(
             'alias',

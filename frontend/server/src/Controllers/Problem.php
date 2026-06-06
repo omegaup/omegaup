@@ -461,19 +461,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentityIsOver13();
 
-        // Rate limit: 20 problem creations per hour per user.
-        // System admins are exempt.
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin(
-                $r->identity
-            )
-        ) {
-            \OmegaUp\RateLimiter::assertWithinLimit(
-                'Problem::apiCreate',
-                $r->identity,
-                20
-            );
-        }
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
 
         self::createProblem(
             $r->user,

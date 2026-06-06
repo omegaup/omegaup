@@ -862,19 +862,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $r->ensureMainUserIdentityIsOver13();
 
-        // Rate limit: 5 course creations per hour per user.
-        // System admins are exempt.
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin(
-                $r->identity
-            )
-        ) {
-            \OmegaUp\RateLimiter::assertWithinLimit(
-                'Course::apiCreate',
-                $r->identity,
-                5
-            );
-        }
+     
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
 
         $courseParams = self::convertRequestToCourseParams($r);
 

@@ -2943,19 +2943,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentityIsOver13();
 
-        // Rate limit: 10 contest creations per hour per user.
-        // System admins are exempt.
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin(
-                $r->identity
-            )
-        ) {
-            \OmegaUp\RateLimiter::assertWithinLimit(
-                'Contest::apiCreate',
-                $r->identity,
-                10
-            );
-        }
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
 
         // Validate request
         self::validateCreate($r, $r->identity);
