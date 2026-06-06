@@ -60,15 +60,23 @@ class RateLimiter {
         \OmegaUp\DAO\VO\Identities $identity,
         ?int $limit = null
     ): void {
-        [
-            'class' => $callerClass,
-            'function' => $callerFunction,
-            'type' => $callerType,
-        ] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-        $fullClass = $callerClass ?? 'Unknown';
-        $shortClass = substr($fullClass, strrpos($fullClass, '\\') + 1);
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+
+        /** @var array{class?: string, function?: string, type?: string} $caller */
+        $caller = $backtrace[1] ?? [];
+
+        $callerClass = $caller['class'] ?? 'Unknown';
+        $callerFunction = $caller['function'] ?? 'unknown';
+        $callerType = $caller['type'] ?? '::';
+
+        $lastBackslashPosition = strrpos($callerClass, '\\');
+        $shortClass = $lastBackslashPosition === false
+            ? $callerClass
+            : substr($callerClass, $lastBackslashPosition + 1);
+
         $endpoint = "{$shortClass}{$callerType}{$callerFunction}";
         $limit = $limit ?? (self::DEFAULT_LIMITS[$endpoint] ?? 10);
+
         if (!self::$isEnabledForTesting) {
             return;
         }
