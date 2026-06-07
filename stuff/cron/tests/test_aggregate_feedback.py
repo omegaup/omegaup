@@ -1,13 +1,5 @@
 '''Unit tests for the pure functions in `aggregate_feedback.py`.'''
-# pylint: disable=wrong-import-position
-import os
-import sys
 import unittest
-
-sys.path.insert(
-    0,
-    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                 "../"))
 
 from cron import aggregate_feedback
 from cron.tests.fixtures import sample_data

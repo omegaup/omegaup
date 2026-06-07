@@ -1,14 +1,6 @@
 '''Unit tests for `utils.py`.'''
-# pylint: disable=wrong-import-position
 import datetime
-import os
-import sys
 import unittest
-
-sys.path.insert(
-    0,
-    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                 "../"))
 
 from cron import utils
 
