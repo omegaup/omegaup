@@ -8,3 +8,7 @@ export function getLocationHash(): string {
 export function setLocationHash(hash: string): void {
   window.location.hash = hash;
 }
+
+export function pushLocationHash(hash: string): void {
+  history.pushState(null, '', hash);
+}

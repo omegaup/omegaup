@@ -137,4 +137,34 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame(1, $invocations);
     }
+
+    /**
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncWithTTL(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('incwithttl-');
+        $ttl = 2; // 2 seconds TTL
+
+        // First increment should return 1
+        $this->assertSame(1, $cache->incWithTTL($key, $ttl));
+
+        // Second increment should return 2
+        $this->assertSame(2, $cache->incWithTTL($key, $ttl));
+
+        // Third increment should return 3
+        $this->assertSame(3, $cache->incWithTTL($key, $ttl));
+
+        // Verify by doing another increment (should be 4)
+        $this->assertSame(4, $cache->incWithTTL($key, $ttl));
+
+        // TTL expiration test only for Redis and APCu
+        // InProcessCacheAdapter doesn't support TTL
+        if (!($cache instanceof \OmegaUp\InProcessCacheAdapter)) {
+            // Wait for TTL to expire
+            sleep($ttl + 1);
+
+            // After expiry, should start at 1 again
+            $this->assertSame(1, $cache->incWithTTL($key, $ttl));
+        }
+    }
 }
