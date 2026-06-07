@@ -5,10 +5,12 @@ import os
 import sys
 import unittest
 
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, os.path.dirname(THIS_DIR))
+sys.path.insert(
+    0,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 "../"))
 
-import utils
+from cron import utils
 
 
 class GetFirstDayOfNextMonthTest(unittest.TestCase):
@@ -39,10 +41,10 @@ class GetFirstDayOfNextMonthTest(unittest.TestCase):
             datetime.date(2026, 3, 1),
         )
 
-    def test_february_leap_year(self) -> None:
-        '''Leap years still return March 1st; only month/year matter.'''
+    def test_mid_month_resets_day_to_first(self) -> None:
+        '''Any day within a month rolls to the 1st of the next month.'''
         self._assert_next(
-            datetime.date(2024, 2, 1),
+            datetime.date(2024, 2, 15),
             datetime.date(2024, 3, 1),
         )
 

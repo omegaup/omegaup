@@ -1,8 +1,8 @@
 '''Typed sample fixtures shared across cron unit tests.'''
 from typing import Dict, List, Sequence
 
-import aggregate_feedback
-import utils
+from cron import aggregate_feedback
+from cron import utils
 
 # Cutoffs ordered descending by score so `get_weighting_factor` returns
 # the first classname whose score is at or below the user's score.
@@ -52,7 +52,9 @@ SAMPLE_TAG_VOTES_SINGLE_DOMINANT: Dict[str, float] = {
     'graph-theory': 1.0,
 }
 
-SAMPLE_TAG_VOTES_TIE_AT_PROPORTION: Dict[str, float] = {
+# graph-theory sits at exactly PROBLEM_TAG_VOTE_MIN_PROPORTION (5 / 20 = 0.25)
+# of the most-voted tag, so it survives the `>=` proportion filter.
+SAMPLE_TAG_VOTES_AT_MIN_PROPORTION: Dict[str, float] = {
     'math': 20.0,
     'graph-theory': 5.0,
 }

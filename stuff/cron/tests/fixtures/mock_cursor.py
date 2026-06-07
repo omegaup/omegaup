@@ -15,7 +15,12 @@ def _normalize(sql: str) -> str:
 
 
 class MockCursor:
-    '''Programmable stand-in for `mysql.connector.cursor.MySQLCursor`.'''
+    '''Programmable stand-in for `mysql.connector.cursor.MySQLCursor`.
+
+    The result-set shape is decided by the scripted rows: provide tuples to
+    mimic a plain cursor or dicts to mimic a ``dictionary=True`` cursor. The
+    ``dictionary`` flag is accepted only for signature parity.
+    '''
 
     def __init__(
         self,
@@ -25,6 +30,7 @@ class MockCursor:
         self._script: List[Tuple[str, Sequence[Row]]] = list(script or [])
         self._dictionary = dictionary
         self._current: Sequence[Row] = []
+        self._position = 0
         self.calls: List[Tuple[str, Any]] = []
 
     def execute(self, sql: str, params: Any = None) -> None:
@@ -32,10 +38,12 @@ class MockCursor:
         self.calls.append((sql, params))
         normalized = _normalize(sql)
         for substring, rows in self._script:
-            if substring.lower() in normalized:
+            if _normalize(substring) in normalized:
                 self._current = rows
+                self._position = 0
                 return
         self._current = []
+        self._position = 0
 
     def executemany(self, sql: str, seq_of_params: Iterable[Any]) -> None:
         '''Forward each parameter row through `execute`.'''
@@ -43,15 +51,24 @@ class MockCursor:
             self.execute(sql, params)
 
     def fetchall(self) -> List[Row]:
-        '''Return the currently scripted result set.'''
-        return list(self._current)
+        '''Return the rows not yet consumed and exhaust the cursor.'''
+        remaining = list(self._current[self._position:])
+        self._position = len(self._current)
+        return remaining
 
     def fetchone(self) -> Optional[Row]:
-        '''Return the first scripted row, or None.'''
-        return self._current[0] if self._current else None
+        '''Return the next scripted row and advance, or None when drained.'''
+        if self._position >= len(self._current):
+            return None
+        row = self._current[self._position]
+        self._position += 1
+        return row
 
     def __iter__(self) -> Iterator[Row]:
-        return iter(self._current)
+        while self._position < len(self._current):
+            row = self._current[self._position]
+            self._position += 1
+            yield row
 
     def __enter__(self) -> 'MockCursor':
         return self
@@ -76,6 +93,7 @@ class MockConnection:
         self._cur_ro = cur_readonly or cur
         self.commits = 0
         self.rollbacks = 0
+        self.get_warnings: bool = False
         self.conn = self
 
     def cursor(
@@ -83,7 +101,11 @@ class MockConnection:
         buffered: bool = False,
         dictionary: bool = False,
     ) -> MockCursor:
-        '''Return the scripted read-write cursor.'''
+        '''Return the scripted read-write cursor.
+
+        Row shape is controlled by the script, so `buffered`/`dictionary` are
+        accepted only for signature parity with `lib.db.Connection.cursor`.
+        '''
         del buffered, dictionary
         return self._cur
 

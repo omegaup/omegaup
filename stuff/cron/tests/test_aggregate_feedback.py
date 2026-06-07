@@ -4,12 +4,13 @@ import os
 import sys
 import unittest
 
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, os.path.dirname(THIS_DIR))
-sys.path.insert(0, THIS_DIR)
+sys.path.insert(
+    0,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 "../"))
 
-import aggregate_feedback
-from fixtures import sample_data  # type: ignore[import]
+from cron import aggregate_feedback
+from cron.tests.fixtures import sample_data
 
 
 class BayesianAverageTest(unittest.TestCase):
@@ -42,6 +43,14 @@ class BayesianAverageTest(unittest.TestCase):
         assert result is not None
         self.assertAlmostEqual(result, 230.0 / 60.0)
 
+    def test_returns_value_when_apriori_is_zero(self) -> None:
+        '''A 0.0 prior is a valid value, not a missing one.'''
+        votes = sample_data.make_quality_votes([0, 0, 10, 0, 0])
+        result = aggregate_feedback.bayesian_average(0.0, votes)
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertAlmostEqual(result, 1.0)
+
     def test_returns_none_when_all_zero_votes(self) -> None:
         '''No votes equals below-confidence; return None.'''
         votes = sample_data.make_quality_votes([0, 0, 0, 0, 0])
@@ -65,6 +74,18 @@ class GetWeightingFactorTest(unittest.TestCase):
         '''A user with no score falls back to the unranked weight.'''
         result = aggregate_feedback.get_weighting_factor(
             None,
+            sample_data.SAMPLE_RANK_CUTOFFS,
+            aggregate_feedback.WEIGHTING_FACTORS,
+        )
+        self.assertEqual(
+            result,
+            aggregate_feedback.WEIGHTING_FACTORS['user-rank-unranked'],
+        )
+
+    def test_score_below_all_cutoffs_returns_unranked(self) -> None:
+        '''A score under every cutoff falls through to the unranked weight.'''
+        result = aggregate_feedback.get_weighting_factor(
+            -1.0,
             sample_data.SAMPLE_RANK_CUTOFFS,
             aggregate_feedback.WEIGHTING_FACTORS,
         )
@@ -179,10 +200,10 @@ class GetMostVotedTagsTest(unittest.TestCase):
         assert result is not None
         self.assertEqual(list(result), ['math'])
 
-    def test_tie_at_min_proportion_keeps_both_tags(self) -> None:
+    def test_at_min_proportion_keeps_both_tags(self) -> None:
         '''A tag exactly at 0.25 of the maximum survives because of `>=`.'''
         result = aggregate_feedback.get_most_voted_tags(
-            sample_data.SAMPLE_TAG_VOTES_TIE_AT_PROPORTION,
+            sample_data.SAMPLE_TAG_VOTES_AT_MIN_PROPORTION,
             25,
         )
         self.assertIsNotNone(result)
@@ -195,6 +216,12 @@ class GetMostVotedTagsTest(unittest.TestCase):
             sample_data.SAMPLE_TAG_VOTES_EXCEED_LIMIT,
             50,
         )
+        self.assertIsNone(result)
+
+    def test_empty_votes_returns_none(self) -> None:
+        '''An empty vote map yields no tags instead of crashing on max().'''
+        result = aggregate_feedback.get_most_voted_tags(
+            {}, aggregate_feedback.MIN_POINTS)
         self.assertIsNone(result)
 
 

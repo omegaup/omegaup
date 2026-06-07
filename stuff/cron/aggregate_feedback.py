@@ -259,6 +259,8 @@ def get_most_voted_tags(problem_tag_votes: Mapping[str, float],
 
     if problem_tag_votes_n < MIN_POINTS:
         return None
+    if not problem_tag_votes:
+        return None
     maximum = problem_tag_votes[max(problem_tag_votes,
                                     key=lambda x: problem_tag_votes.get(x, 0))]
     final_tags = [tag for (tag, votes) in problem_tag_votes.items()
