@@ -795,6 +795,7 @@
 	"ephemeralGraderDescription": "Permitir que os usu\u00e1rios usem o IDE EphemeralGrader para testar seu c\u00f3digo diretamente na plataforma.",
 	"ephemeralGraderDisabled": "O IDE EphemeralGrader est\u00e1 desabilitado no momento.",
 	"ephemeralGraderEnable": "Habilitar IDE EphemeralGrader",
+	"ephemeralGraderUpdated": "Configura\u00e7\u00f5es do Ephemeral Grader atualizadas",
 	"errorWhileSendingMail": "Houve um erro ao enviar o e-mail de verifica\u00e7\u00e3o. Por favor, tente novamente mais tarde ou entre em contato soporte@omegaup.com para apoio. Seu e-mail n\u00e3o est\u00e1 verificado ainda.",
 	"feedbackLeftBy": "%(date), por:",
 	"feedbackNotSentYet": "Ainda n\u00e3o se tem enviado o feedback para esta submiss\u00e3o.",

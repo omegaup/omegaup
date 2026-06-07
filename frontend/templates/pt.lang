@@ -794,6 +794,7 @@ ephemeralGraderAlert = "Você precisa de uma tela de tamanho maior para usar o E
 ephemeralGraderDescription = "Permitir que os usuários usem o IDE EphemeralGrader para testar seu código diretamente na plataforma."
 ephemeralGraderDisabled = "O IDE EphemeralGrader está desabilitado no momento."
 ephemeralGraderEnable = "Habilitar IDE EphemeralGrader"
+ephemeralGraderUpdated = "Configurações do Ephemeral Grader atualizadas"
 errorWhileSendingMail = "Houve um erro ao enviar o e-mail de verificação. Por favor, tente novamente mais tarde ou entre em contato soporte@omegaup.com para apoio. Seu e-mail não está verificado ainda."
 feedbackLeftBy = "%(date), por:"
 feedbackNotSentYet = "Ainda não se tem enviado o feedback para esta submissão."

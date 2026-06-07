@@ -796,6 +796,7 @@ const translations: { [key: string]: string; } = {
   ephemeralGraderDescription: "Permitir a los usuarios usar el IDE EphemeralGrader para probar su c\u00f3digo directamente en la plataforma.",
   ephemeralGraderDisabled: "El IDE EphemeralGrader est\u00e1 deshabilitado actualmente.",
   ephemeralGraderEnable: "Habilitar IDE EphemeralGrader",
+  ephemeralGraderUpdated: "Configuraci\u00f3n del Ephemeral Grader actualizada",
   errorWhileSendingMail: "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a soporte@omegaup.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
   feedbackLeftBy: "%(date), por:",
   feedbackNotSentYet: "A\u00fan no se ha enviado la retroalimentaci\u00f3n para este env\u00edo.",

@@ -276,7 +276,7 @@
                   <template v-if="isAdmin">
                     <div class="dropdown-divider"></div>
                     <a
-                      class="dropdown-item text-primary font-weight-bold"
+                      class="dropdown-item"
                       href="/admin/settings.php"
                       data-nav-admin-settings
                     >

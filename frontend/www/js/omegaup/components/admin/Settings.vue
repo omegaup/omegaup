@@ -57,7 +57,7 @@ export default class Settings extends Vue {
         );
       }
     } catch (error: any) {
-      this.ui.error(error);
+      this.ui.apiError(error);
     } finally {
       this.loading = false;
     }
@@ -83,11 +83,9 @@ export default class Settings extends Vue {
       await api.Admin.updateSystemSettings({
         ephemeral_grader_enabled: newValue,
       });
-      this.ui.success(
-        newValue ? 'Ephemeral Grader enabled' : 'Ephemeral Grader disabled',
-      );
+      this.ui.success(T.ephemeralGraderUpdated);
     } catch (error: any) {
-      this.ui.error(error);
+      this.ui.apiError(error);
       // Rollback on failure
       this.ephemeralGraderEnabled = oldValue;
     } finally {
