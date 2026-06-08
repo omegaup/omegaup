@@ -212,12 +212,13 @@ def get_school_of_the_month_candidates(
                 su.verdict = 'AC'
                 AND su.time BETWEEN %s AND %s
                 AND su.school_id IS NOT NULL
+                AND i.user_id IS NOT NULL
                 AND recent_winners.school_id IS NULL
                 AND NOT EXISTS (
                     SELECT 1
                     FROM Submissions AS su_prev
                     WHERE
-                        su_prev.identity_id = su.identity_id
+                        su_prev.school_id = su.school_id
                         AND su_prev.problem_id = su.problem_id
                         AND su_prev.verdict = 'AC'
                         AND (

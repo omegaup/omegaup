@@ -4,10 +4,10 @@ ALTER TABLE `Submissions`
     ADD INDEX `idx_submissions_verdict_time_identity_problem_school`
         (`verdict`, `time`, `identity_id`, `problem_id`, `school_id`, `submission_id`);
 
--- Optimizes the NOT EXISTS lookup for first-AC per identity-problem.
+-- Optimizes the NOT EXISTS lookup for first-AC per school-problem.
 ALTER TABLE `Submissions`
-    ADD INDEX `idx_submissions_identity_problem_verdict_time_id`
-        (`identity_id`, `problem_id`, `verdict`, `time`, `submission_id`);
+    ADD INDEX `idx_submissions_school_problem_verdict_time_id`
+        (`school_id`, `problem_id`, `verdict`, `time`, `submission_id`);
 
 -- Speeds up recent-winner exclusion by school and time.
 ALTER TABLE `School_Of_The_Month`
