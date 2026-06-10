@@ -4,6 +4,15 @@
  * Tests for the system settings admin endpoints in the Admin controller.
  */
 class AdminSystemSettingsTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+        // Settings use a fixed cache key and the suite truncates the DB but
+        // not Redis between tests, so clear it to avoid cross-test leakage.
+        \OmegaUp\DAO\SystemSettings::invalidateCache(
+            'ephemeral_grader_enabled'
+        );
+    }
+
     public function testGetSystemSettingsRequiresAdmin() {
         [
             'identity' => $identity,
