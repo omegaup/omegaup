@@ -3130,6 +3130,7 @@ export namespace types {
     currentEmail: string;
     currentName?: string;
     currentUsername: string;
+    ephemeralGraderEnabled: boolean;
     gravatarURL128: string;
     gravatarURL51: string;
     inContest: boolean;
@@ -3846,7 +3847,6 @@ export namespace types {
 
   export interface FullIDEPayload {
     acceptedLanguages: string[];
-    ephemeralGraderEnabled: boolean;
     preferredLanguage?: string;
   }
 
@@ -4224,7 +4224,6 @@ export namespace types {
     creation_date: Date;
     difficulty?: number;
     email_clarifications: boolean;
-    ephemeralGraderEnabled?: boolean;
     input_limit: number;
     karel_problem: boolean;
     languages: string[];
@@ -4358,7 +4357,6 @@ export namespace types {
     accepts_submissions: boolean;
     alias: string;
     commit: string;
-    ephemeralGraderEnabled?: boolean;
     input_limit: number;
     karel_problem: boolean;
     languages: string[];
