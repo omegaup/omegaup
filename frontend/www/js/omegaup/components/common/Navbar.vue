@@ -273,17 +273,6 @@
                       T.navMyQualityNomination
                     }}</a>
                   </template>
-                  <template v-if="isAdmin">
-                    <div class="dropdown-divider"></div>
-                    <a
-                      class="dropdown-item"
-                      href="/admin/settings.php"
-                      data-nav-admin-settings
-                    >
-                      <font-awesome-icon :icon="['fas', 'cog']" />
-                      {{ T.omegaupTitleAdminSettings }}
-                    </a>
-                  </template>
                   <div class="dropdown-divider"></div>
                   <!-- Logout button for desktop - navbar menu -->
                   <a

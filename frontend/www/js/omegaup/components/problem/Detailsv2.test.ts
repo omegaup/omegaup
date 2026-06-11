@@ -78,7 +78,6 @@ describe('Detailsv2.vue', () => {
     version: '123',
     visibility: 1,
     visits: 5,
-    ephemeralGraderEnabled: true,
   };
 
   const runs: types.RunWithDetails[] = [

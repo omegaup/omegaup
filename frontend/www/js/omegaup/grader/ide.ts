@@ -5,7 +5,6 @@ import * as time from '../time';
 import * as Util from './util';
 import * as api from '../api';
 import * as ui from '../ui';
-import T from '../lang';
 import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
 
@@ -15,16 +14,7 @@ OmegaUp.on('ready', () => {
   main.style.flex = '1 1 auto';
 
   const payload = types.payloadParsers.FullIDEPayload();
-
-  if (!payload.ephemeralGraderEnabled) {
-    const alert = document.createElement('div');
-    alert.className = 'alert alert-danger';
-    alert.setAttribute('role', 'alert');
-    alert.textContent = T.ephemeralGraderDisabled;
-    main.innerHTML = '';
-    main.appendChild(alert);
-    return;
-  }
+  const commonPayload = types.payloadParsers.CommonPayload();
 
   const acceptedLanguages = payload.acceptedLanguages;
   const preferredLanguage = payload.preferredLanguage || acceptedLanguages[0];
@@ -37,6 +27,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement(grader_EphemeralIDE, {
         props: {
+          ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
           acceptedLanguages,
           preferredLanguage,
           isEmbedded: false,
