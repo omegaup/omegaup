@@ -931,20 +931,20 @@ def update_users_stats(
             scores = update_user_rank(cur, cur_readonly)
             update_user_rank_cutoffs(cur, scores)
             update_user_rank_classname(cur)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update user ranking')
             raise
 
         try:
             update_author_rank(cur, cur_readonly)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update authors ranking')
             raise
 
         try:
             update_coder_of_the_month_candidates(cur, cur_readonly, 'all',
                                                  args)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to update candidates to coder of the month')
             raise
@@ -952,7 +952,7 @@ def update_users_stats(
         try:
             update_coder_of_the_month_candidates(cur, cur_readonly, 'female',
                                                  args)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to update candidates to coder of the month female')
             raise
@@ -960,7 +960,7 @@ def update_users_stats(
         # Commit all user stats and coder of the month updates atomically.
         dbconn.commit()
         logging.info('Users stats updated')
-    except:  # noqa: bare-except
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to update all users stats')
         dbconn.rollback()
         raise
@@ -978,20 +978,20 @@ def update_schools_stats(
     try:
         try:
             update_schools_solved_problems(cur)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update schools solved problems')
             raise
 
         try:
             update_school_rank(cur)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update school ranking')
             raise
 
         try:
             update_school_of_the_month_candidates(cur, cur_readonly, date,
                                                   update_school_of_the_month)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to update candidates to school of the month')
             raise
@@ -999,7 +999,7 @@ def update_schools_stats(
         # Commit all school stats updates automatically.
         dbconn.commit()
         logging.info('Schools stats updated')
-    except:  # noqa: bare-except
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to update all schools stats')
         dbconn.rollback()
         raise

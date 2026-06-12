@@ -309,7 +309,7 @@ def replace_voted_tags(dbconn: lib.db.Connection,
             finally:
                 dbconn.conn.get_warnings = get_warnings
             dbconn.conn.commit()
-    except:  # noqa: bare-except
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to replace voted tags')
         dbconn.conn.rollback()
 
@@ -661,7 +661,7 @@ def main() -> None:
             logging.info(
                 'aggregate_reviewers_feedback completed in %.2fs',
                 time.monotonic() - phase_start)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to calculate problem quality seal and category.')
             has_failures = True
@@ -672,7 +672,7 @@ def main() -> None:
             logging.info(
                 'aggregate_feedback completed in %.2fs',
                 time.monotonic() - phase_start)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to aggregate feedback and update problem tags.')
             has_failures = True
@@ -688,7 +688,7 @@ def main() -> None:
                 time.monotonic() - phase_start)
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update problem of the week')
             has_failures = True
     finally:
