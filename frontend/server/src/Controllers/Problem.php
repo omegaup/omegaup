@@ -554,7 +554,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
                         continue;
                     }
-                    self::addTag($tagName, $tag['public'], $problem);
+                    \OmegaUp\ProblemTags::addTag($tagName, $tag['public'], $problem);
                 }
             }
 
@@ -817,70 +817,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        self::addTag($tagName, $isPublic, $problem);
+        \OmegaUp\ProblemTags::addTag($tagName, $isPublic, $problem);
 
         return [
             'name' => $tagName,
         ];
-    }
-
-    private static function addTag(
-        string $tagName,
-        bool $isPublic,
-        \OmegaUp\DAO\VO\Problems $problem,
-        bool $allowRestricted = false
-    ): void {
-        // Normalize name.
-        if (!$isPublic) {
-            $tagName = \OmegaUp\Controllers\Tag::normalize($tagName);
-        }
-
-        if (
-            !$allowRestricted &&
-            in_array($tagName, self::RESTRICTED_TAG_NAMES)
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'tagRestricted',
-                'name'
-            );
-        }
-
-        $tag = \OmegaUp\DAO\Tags::getByName($tagName);
-        if (is_null($tag)) {
-            if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
-                $tag = new \OmegaUp\DAO\VO\Tags([
-                    'name' => $tagName,
-                    'public' => true,
-                ]);
-            } else {
-                if ($isPublic) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'newPublicTagsNotAllowed',
-                        'public'
-                    );
-                }
-
-                // After normalization problemTag becomes problemtag
-                if (str_starts_with($tagName, 'problemtag')) {
-                    // Starts with 'problemtag'
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'tagPrefixRestricted',
-                        'name'
-                    );
-                }
-                $tag = new \OmegaUp\DAO\VO\Tags([
-                    'name' => $tagName,
-                    'public' => false,
-                ]);
-            }
-            \OmegaUp\DAO\Tags::create($tag);
-        }
-
-        \OmegaUp\DAO\ProblemsTags::replace(new \OmegaUp\DAO\VO\ProblemsTags([
-            'problem_id' => $problem->problem_id,
-            'tag_id' => $tag->tag_id,
-            'source' => 'owner',
-        ]));
     }
 
     /**
@@ -1041,17 +982,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if (in_array($tag->name, self::RESTRICTED_TAG_NAMES)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'tagRestricted',
-                'name'
-            );
-        }
-
-        \OmegaUp\DAO\ProblemsTags::delete(new \OmegaUp\DAO\VO\ProblemsTags([
-            'problem_id' => $problem->problem_id,
-            'tag_id' => $tag->tag_id,
-        ]));
+        \OmegaUp\ProblemTags::removeTag($tagName, $problem);
 
         return [
             'status' => 'ok',
