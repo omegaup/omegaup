@@ -1,5 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import T from '../lang';
 import Vue from 'vue';
 import problem_New from '../components/problem/Form.vue';
 import { CreationMethods } from '../components/problem/Form.vue';

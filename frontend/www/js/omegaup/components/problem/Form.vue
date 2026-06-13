@@ -865,7 +865,7 @@ export default class ProblemForm extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--problem-creator-modal-overlay-background-color);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -873,13 +873,13 @@ export default class ProblemForm extends Vue {
 }
 
 .problem-creator-modal-content {
-  background-color: white;
+  background-color: var(--problem-creator-modal-content-background-color);
   height: 81vh;
   width: 78%;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px var(--problem-creator-modal-box-shadow-color);
 }
 
 .problem-creator-modal-body {
@@ -890,7 +890,7 @@ export default class ProblemForm extends Vue {
 
 .problem-creator-modal-footer {
   padding: 20px;
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid var(--problem-creator-modal-footer-border-color);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
