@@ -134,6 +134,8 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
+
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['country_id'],
