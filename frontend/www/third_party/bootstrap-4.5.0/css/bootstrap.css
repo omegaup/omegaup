@@ -4267,10 +4267,20 @@ input[type="button"].btn-block {
 
 .nav-tabs {
   border-bottom: 1px solid #dee2e6;
+  transition: border-width 0.3s ease-out;
+}
+.nav-tabs:hover{
+border-bottom-width: 2px;
 }
 
 .nav-tabs .nav-item {
   margin-bottom: -1px;
+   transition: transform 0.3s ease-out, background 0.3s ease-out;
+}
+.nav-tabs .nav-item:hover {
+  transform: translateY(-3px); /* Moves up slightly */
+  background-image: linear-gradient(to right, #f8f9fa, #e9ecef); /* Light gradient effect */
+  border-radius: 5px; /* Optional: Adds slight rounding for smooth appearance */
 }
 
 .nav-tabs .nav-link {
@@ -4751,6 +4761,11 @@ input[type="button"].btn-block {
   background-clip: border-box;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
+  transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.card:hover{
+  background-color: #f8f9fa; 
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card > hr {
