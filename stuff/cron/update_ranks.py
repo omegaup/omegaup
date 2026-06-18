@@ -326,6 +326,11 @@ def update_user_rank(
                             country_id = VALUES(country_id),
                             state_id = VALUES(state_id),
                             school_id = VALUES(school_id),
+                            -- Keep `timestamp` meaning "last ranking refresh".
+                            -- The rank page surfaces the top user's timestamp
+                            -- as "last updated", and the delete-and-reinsert
+                            -- this replaces refreshed it on every run.
+                            `timestamp` = CURRENT_TIMESTAMP(),
                             -- The delete-and-reinsert this replaces also
                             -- cleared the author columns; update_author_rank
                             -- recomputes them right after in the same
