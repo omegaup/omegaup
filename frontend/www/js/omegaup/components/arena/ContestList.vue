@@ -579,6 +579,7 @@ class ArenaContestList extends Vue {
     if (category) {
       this.currentTab = category;
       this.fetchInitialContests();
+      window.scrollTo(0, 0);
     } else {
       // Returning to summary, ensure we have data for all
       this.fetchInitialContests();
