@@ -1,6 +1,6 @@
 <template>
   <transition name="modal">
-    <div class="modal-mask">
+    <div class="modal-mask" @click.self="$emit('close')">
       <div class="modal-container">
         <div class="d-flex justify-content-end">
           <button class="btn" @click="$emit('close')">❌</button>
@@ -165,6 +165,20 @@ export default class ProblemFinderWizard extends Vue {
       queryParameters.tag = this.selectedTags.map((tag) => tag.key);
     }
     this.$emit('search-problems', queryParameters);
+  }
+
+  mounted(): void {
+    document.addEventListener('keydown', this.onEsc);
+  }
+
+  beforeDestroy(): void {
+    document.removeEventListener('keydown', this.onEsc);
+  }
+
+  onEsc(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.$emit('close');
+    }
   }
 }
 </script>
