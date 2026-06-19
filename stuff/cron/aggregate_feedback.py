@@ -422,17 +422,13 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                         problem_id)
 
     logging.info(
-        'Finished aggregating feedback: '
-        'attempted=%d successful=%d failed=%d',
-        attempted_problems,
-        successful_problems,
-        failed_problems)
-    duration = time.monotonic() - start_time
-    logging.info(
-        'aggregate_feedback summary: attempted=%d failed=%d duration=%.2fs',
-        attempted_problems,
-        failed_problems,
-        duration,
+        'aggregate_feedback summary',
+        extra={
+            'problems_attempted': attempted_problems,
+            'problems_successful': successful_problems,
+            'problems_failed': failed_problems,
+            'duration_ms': round((time.monotonic() - start_time) * 1000),
+        },
     )
 
 
@@ -656,22 +652,16 @@ def main() -> None:
     has_failures = False
     try:
         try:
-            phase_start = time.monotonic()
-            aggregate_reviewers_feedback(dbconn)
-            logging.info(
-                'aggregate_reviewers_feedback completed in %.2fs',
-                time.monotonic() - phase_start)
+            with lib.logs.log_phase('aggregate_reviewers_feedback'):
+                aggregate_reviewers_feedback(dbconn)
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to calculate problem quality seal and category.')
             has_failures = True
 
         try:
-            phase_start = time.monotonic()
-            aggregate_feedback(dbconn)
-            logging.info(
-                'aggregate_feedback completed in %.2fs',
-                time.monotonic() - phase_start)
+            with lib.logs.log_phase('aggregate_feedback'):
+                aggregate_feedback(dbconn)
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to aggregate feedback and update problem tags.')
@@ -681,11 +671,8 @@ def main() -> None:
             # Problem of the week HAS to be computed AFTER feedback has been
             # aggregated. It uses difficulty tags computed from feedback to
             # pick a problem of the given difficulty.
-            phase_start = time.monotonic()
-            update_problem_of_the_week(dbconn, "easy")
-            logging.info(
-                'update_problem_of_the_week completed in %.2fs',
-                time.monotonic() - phase_start)
+            with lib.logs.log_phase('update_problem_of_the_week'):
+                update_problem_of_the_week(dbconn, "easy")
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
         except:  # noqa: bare-except
@@ -693,9 +680,15 @@ def main() -> None:
             has_failures = True
     finally:
         dbconn.conn.close()
-        logging.info('Total execution time: %.2fs',
-                     time.monotonic() - overall_start)
-        logging.info('Done')
+        logging.info(
+            'aggregate_feedback finished',
+            extra={
+                'job': 'aggregate_feedback',
+                'status': 'failed' if has_failures else 'ok',
+                'duration_ms': round(
+                    (time.monotonic() - overall_start) * 1000),
+            },
+        )
     if has_failures:
         sys.exit(1)
 
