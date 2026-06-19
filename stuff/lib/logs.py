@@ -7,10 +7,12 @@ Using this library consists of two parts:
 '''
 
 import argparse
+import contextlib
 import datetime
 import logging
+import time
 
-from typing import Any, Dict
+from typing import Any, Dict, Iterator
 
 from pythonjsonlogger import jsonlogger  # type: ignore
 
@@ -80,6 +82,44 @@ def init(program: str, args: argparse.Namespace) -> None:
         logging.basicConfig(filename=args.logfile or '',
                             format=f'%(asctime)s:{program}:%(message)s',
                             level=log_level)
+
+
+@contextlib.contextmanager
+def log_phase(phase: str) -> Iterator[Dict[str, Any]]:
+    '''Logs a cron phase start and finish as structured fields.
+
+    Emits `phase`, `status`, `duration_ms` and `error_class` on failure. The
+    yielded dict can hold extra fields (e.g. row counts) added to the finish
+    line. The exception is re-raised so callers keep their error handling.
+    '''
+    metrics: Dict[str, Any] = {}
+    start = time.monotonic()
+    logging.info('%s started', phase, extra={'phase': phase})
+    try:
+        yield metrics
+    except Exception as exc:
+        logging.error(
+            '%s failed',
+            phase,
+            extra={
+                'phase': phase,
+                'status': 'failed',
+                'duration_ms': round((time.monotonic() - start) * 1000),
+                'error_class': type(exc).__name__,
+                **metrics,
+            },
+        )
+        raise
+    logging.info(
+        '%s completed',
+        phase,
+        extra={
+            'phase': phase,
+            'status': 'ok',
+            'duration_ms': round((time.monotonic() - start) * 1000),
+            **metrics,
+        },
+    )
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
