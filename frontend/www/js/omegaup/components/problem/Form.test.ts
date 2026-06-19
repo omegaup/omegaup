@@ -159,4 +159,33 @@ describe('Settings.vue', () => {
       wrapper.find('.introjs-creation-method .introjs-file').exists(),
     ).toBe(true);
   });
+
+  it('Should open creator modal when clicking open creator button', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Creator });
+    await wrapper.find('.introjs-open-creator button').trigger('click');
+
+    expect((wrapper.vm as any).showProblemCreator).toBe(true);
+    expect(wrapper.find('.problem-creator-modal').exists()).toBe(true);
+  });
+
+  it('Should close creator modal when clicking close button', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ showProblemCreator: true });
+    await wrapper.find('[data-problem-creator-close]').trigger('click');
+
+    expect((wrapper.vm as any).showProblemCreator).toBe(false);
+  });
 });
