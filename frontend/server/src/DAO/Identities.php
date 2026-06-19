@@ -91,10 +91,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     FROM
                         Identities i
                     WHERE
-                        (
-                            i.username LIKE CONCAT('%', ?, '%') OR
-                            i.name LIKE CONCAT('%', ?, '%')
-                        ) AND
+                        MATCH(name, username) AGAINST (? IN BOOLEAN MODE) AND
                         i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
                 ) AS sq
             GROUP BY
@@ -104,7 +101,6 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             LIMIT
                 ?;";
         $args = [
-            $usernameOrName,
             $usernameOrName,
             $usernameOrName,
             $usernameOrName,
