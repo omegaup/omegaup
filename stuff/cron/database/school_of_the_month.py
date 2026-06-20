@@ -208,12 +208,17 @@ def get_school_of_the_month_candidates(
                     AND time >= DATE_SUB(%s, INTERVAL 1 YEAR)
             ) AS recent_winners
                 ON recent_winners.school_id = su.school_id
+            LEFT JOIN Problems_Forfeited AS pf
+                ON pf.user_id = i.user_id
+                AND pf.problem_id = su.problem_id
             WHERE
                 su.verdict = 'AC'
+                AND su.type = 'normal'
                 AND su.time BETWEEN %s AND %s
                 AND su.school_id IS NOT NULL
                 AND i.user_id IS NOT NULL
                 AND recent_winners.school_id IS NULL
+                AND pf.problem_id IS NULL
                 AND NOT EXISTS (
                     SELECT 1
                     FROM Submissions AS su_prev
@@ -221,6 +226,7 @@ def get_school_of_the_month_candidates(
                         su_prev.school_id = su.school_id
                         AND su_prev.problem_id = su.problem_id
                         AND su_prev.verdict = 'AC'
+                        AND su_prev.type = 'normal'
                         AND (
                             su_prev.time < su.time OR
                             (su_prev.time = su.time AND
