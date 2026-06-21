@@ -4,6 +4,15 @@
  * Tests for the \OmegaUp\DAO\SystemSettings data access object.
  */
 class SystemSettingsDAOTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+        // The in-process test cache persists across tests, so clear the
+        // seeded key to keep reads consistent with the database.
+        \OmegaUp\DAO\SystemSettings::invalidateCache(
+            'ephemeral_grader_enabled'
+        );
+    }
+
     public function testGetByKeyReturnsSeededSetting() {
         $setting = \OmegaUp\DAO\SystemSettings::getByKey(
             'ephemeral_grader_enabled'

@@ -1,5 +1,13 @@
 <template>
+  <div
+    v-if="!ephemeralGraderEnabled"
+    class="alert alert-danger m-0"
+    role="alert"
+  >
+    {{ T.ephemeralGraderDisabled }}
+  </div>
   <ephemeral-ide
+    v-else
     :accepted-languages="acceptedLanguages"
     :initial-language="initialLanguage"
     :problem="problem"
@@ -17,6 +25,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import * as Util from '../../grader/util';
 import Ephemeral from '../../grader/Ephemeral.vue';
 
@@ -26,6 +35,9 @@ import Ephemeral from '../../grader/Ephemeral.vue';
   },
 })
 export default class EphemeralGrader extends Vue {
+  T = T;
+
+  @Prop({ default: true }) ephemeralGraderEnabled!: boolean;
   @Prop({ default: () => ({ ...Util.DUMMY_PROBLEM }) })
   problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
