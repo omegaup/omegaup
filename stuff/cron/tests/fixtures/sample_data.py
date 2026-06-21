@@ -4,8 +4,6 @@ from typing import Dict, List, Sequence
 from cron import aggregate_feedback
 from cron import utils
 
-# Cutoffs ordered descending by score so `get_weighting_factor` returns
-# the first classname whose score is at or below the user's score.
 SAMPLE_RANK_CUTOFFS: Sequence[aggregate_feedback.RankCutoff] = (
     aggregate_feedback.RankCutoff(
         classname='user-rank-international-master', score=1900.0),
@@ -52,8 +50,6 @@ SAMPLE_TAG_VOTES_SINGLE_DOMINANT: Dict[str, float] = {
     'graph-theory': 1.0,
 }
 
-# graph-theory sits at exactly PROBLEM_TAG_VOTE_MIN_PROPORTION (5 / 20 = 0.25)
-# of the most-voted tag, so it survives the `>=` proportion filter.
 SAMPLE_TAG_VOTES_AT_MIN_PROPORTION: Dict[str, float] = {
     'math': 20.0,
     'graph-theory': 5.0,
