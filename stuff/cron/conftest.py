@@ -1,15 +1,18 @@
 '''Shared pytest setup for the cron test suite.
 
-Puts `stuff/` and `stuff/cron` on the import path so the tests can import the
-cron modules (`cron.*`, `lib.*`) and the scripts' own sibling imports
-(`database.*`, `utils`) without repeating the path boilerplate in every file.
+Puts `stuff/` on the import path so the tests can import the cron modules and
+their helpers through the `cron` package (`cron.update_ranks`, `cron.utils`,
+...) and the shared `lib.*` modules, without repeating the path boilerplate in
+every test file.
+
+Only `stuff/` is added on purpose: adding `stuff/cron` would expose its
+`database` package under the bare name `database`, shadowing the unrelated
+`database` package used by the stuff/pipelines tests.
 '''
 import os
 import sys
 
-_CRON_DIR = os.path.dirname(os.path.realpath(__file__))
-_STUFF_DIR = os.path.dirname(_CRON_DIR)
+_STUFF_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-for _path in (_STUFF_DIR, _CRON_DIR):
-    if _path not in sys.path:
-        sys.path.insert(0, _path)
+if _STUFF_DIR not in sys.path:
+    sys.path.insert(0, _STUFF_DIR)
