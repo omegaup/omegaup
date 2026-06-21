@@ -154,6 +154,47 @@ class ComputePointsForUserTest(_PatchHelpersMixin):
         forwarded = mocks['get_cotm_eligible_users'].call_args[0][4]
         self.assertEqual(forwarded, last_12)
 
+    def test_includes_zero_score_users_ranked_last(self) -> None:
+        '''A user who solved nothing is still ranked last, with score 0.'''
+        solver = _user(1)
+        idle = _user(2)
+        self._patch(
+            get_last_12_coders_of_the_month=[],
+            get_cotm_eligible_users=[solver, idle],
+            get_eligible_problems=_problems({1: 10.0}),
+            get_user_problems={
+                solver.identity_id: _solved(1),
+                idle.identity_id: _solved(),
+            },
+        )
+
+        result = update_ranks.compute_points_for_user(
+            _cursor(), _CURRENT_MONTH, _NEXT_MONTH, 'all', 10)
+
+        self.assertEqual([u.identity_id for u in result], [1, 2])
+        self.assertAlmostEqual(result[1].score, 0.0)
+        self.assertEqual(result[1].problems_solved, 0)
+
+    def test_preserves_input_order_on_score_ties(self) -> None:
+        '''Users with equal scores keep their original eligibility order.'''
+        first = _user(7)
+        second = _user(3)
+        self._patch(
+            get_last_12_coders_of_the_month=[],
+            get_cotm_eligible_users=[first, second],
+            get_eligible_problems=_problems({1: 10.0}),
+            get_user_problems={
+                first.identity_id: _solved(1),
+                second.identity_id: _solved(1),
+            },
+        )
+
+        result = update_ranks.compute_points_for_user(
+            _cursor(), _CURRENT_MONTH, _NEXT_MONTH, 'all', 10)
+
+        self.assertEqual([u.identity_id for u in result], [7, 3])
+        self.assertAlmostEqual(result[0].score, result[1].score)
+
 
 class ComputePointsForSchoolTest(_PatchHelpersMixin):
     '''Tests for `update_ranks.compute_points_for_school`.'''
@@ -287,6 +328,27 @@ class UpdateUserRankCutoffsTest(unittest.TestCase):
                 (scores[15], 0.15, 'user-rank-expert'),
                 (scores[35], 0.35, 'user-rank-specialist'),
                 (scores[40], 0.40, 'user-rank-beginner'),
+            ],
+        )
+
+    def test_handles_fewer_scores_than_buckets(self) -> None:
+        '''Short score lists still index in range (guards against overflow).'''
+        scores = [30.0, 20.0, 10.0]
+        cur = MockCursor()
+
+        update_ranks.update_user_rank_cutoffs(
+            cast(mysql.connector.cursor.MySQLCursorDict, cur), scores)
+
+        # int(3 * percentile) lands on 0 for the top three buckets and 1 for
+        # the last two; nothing reaches index 3, so no IndexError.
+        self.assertEqual(
+            self._inserts(cur),
+            [
+                (scores[0], 0.01, 'user-rank-international-master'),
+                (scores[0], 0.09, 'user-rank-master'),
+                (scores[0], 0.15, 'user-rank-expert'),
+                (scores[1], 0.35, 'user-rank-specialist'),
+                (scores[1], 0.40, 'user-rank-beginner'),
             ],
         )
 
