@@ -218,7 +218,6 @@ class ComputePointsForSchoolTest(_PatchHelpersMixin):
             _cursor(), _CURRENT_MONTH, _NEXT_MONTH)
 
         self.assertEqual(len(result), 1)
-        # Problem 2 is shared, so it is only counted once: 10 + 5 + 7.
         self.assertAlmostEqual(result[0].score, 22.0)
 
     def test_excludes_last_12_schools(self) -> None:
@@ -339,8 +338,6 @@ class UpdateUserRankCutoffsTest(unittest.TestCase):
         update_ranks.update_user_rank_cutoffs(
             cast(mysql.connector.cursor.MySQLCursorDict, cur), scores)
 
-        # int(3 * percentile) lands on 0 for the top three buckets and 1 for
-        # the last two; nothing reaches index 3, so no IndexError.
         self.assertEqual(
             self._inserts(cur),
             [
