@@ -12,6 +12,9 @@ import sys
 import time
 from typing import List, NamedTuple, Sequence, Dict, Set, Optional
 
+import mysql.connector
+import mysql.connector.cursor
+
 
 class UserRankRow(NamedTuple):
     '''Represents a row for User_Rank inserts.'''
@@ -40,17 +43,25 @@ class AuthorRankRow(NamedTuple):
     school_id: Optional[int]
 
 
-import mysql.connector
-import mysql.connector.cursor
+sys.path.insert(
+    0,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 "."))
 
-from database.coder_of_the_month import check_existing_coder_of_the_month
-from database.coder_of_the_month import get_cotm_eligible_users
-from database.coder_of_the_month import get_eligible_problems
-from database.coder_of_the_month import get_last_12_coders_of_the_month
-from database.coder_of_the_month import get_user_problems
-from database.coder_of_the_month import remove_coder_of_the_month_candidates
-from database.coder_of_the_month import insert_coder_of_the_month_candidates
-from database.school_of_the_month import (
+# The cron siblings are imported through the `cron` package (rather than bare
+# `database`/`utils`) so loading this module for tests does not shadow the
+# unrelated `database` package used by stuff/pipelines.
+# pylint: disable=wrong-import-position
+from cron.database.coder_of_the_month import (
+    check_existing_coder_of_the_month,
+    get_cotm_eligible_users,
+    get_eligible_problems,
+    get_last_12_coders_of_the_month,
+    get_user_problems,
+    remove_coder_of_the_month_candidates,
+    insert_coder_of_the_month_candidates,
+)
+from cron.database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
     get_school_of_the_month_candidates,
@@ -62,17 +73,13 @@ from database.school_of_the_month import (
     get_last_12_schools_of_the_month,
     get_candidate_schools_list,
 )
-from utils import (
+from cron.utils import (
     UserRank,
     get_first_day_of_next_month,
 )
-
-sys.path.insert(
-    0,
-    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                 "."))
-import lib.db  # pylint: disable=wrong-import-position
-import lib.logs  # pylint: disable=wrong-import-position
+import lib.db
+import lib.logs
+# pylint: enable=wrong-import-position
 
 
 class Cutoff(NamedTuple):
