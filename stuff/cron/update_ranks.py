@@ -48,9 +48,8 @@ sys.path.insert(
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                  "."))
 
-# The cron siblings are imported through the `cron` package (rather than bare
-# `database`/`utils`) so loading this module for tests does not shadow the
-# unrelated `database` package used by stuff/pipelines.
+# Imported as `cron.*` (not bare `database`/`utils`) so tests do not shadow
+# the pipelines `database` package.
 # pylint: disable=wrong-import-position
 from cron.database.coder_of_the_month import (
     check_existing_coder_of_the_month,
