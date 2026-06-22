@@ -213,138 +213,23 @@
           {{ T.navHelp }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            :href="YouTubeTutorialsURL"
-            target="_blank"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'video']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
+          <template v-for="(entry, index) in helpMenuEntries">
+            <hr
+              v-if="entry.divider"
+              :key="`help-divider-${index}`"
+              class="menu-divider"
             />
-            <span>
-              <span class="d-block">{{ T.navTutorials }}</span>
-              <small class="text-muted">{{ T.navTutorialsDesc }}</small>
-            </span>
-          </a>
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            :href="DiscordInviteURL"
-            target="_blank"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'comments']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
+            <navbar-item
+              v-else
+              :key="`help-item-${index}`"
+              :title="entry.title"
+              :description="entry.description"
+              :icon="entry.icon"
+              :href="entry.href"
+              target="_blank"
+              :rel="entry.rel"
             />
-            <span>
-              <span class="d-block">{{ T.navDiscord }}</span>
-              <small class="text-muted">{{ T.navDiscordDesc }}</small>
-            </span>
-          </a>
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            :href="OmegaUpBlogURL"
-            target="_blank"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'newspaper']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
-            />
-            <span>
-              <span class="d-block">{{ T.navBlog }}</span>
-              <small class="text-muted">{{ T.navBlogDesc }}</small>
-            </span>
-          </a>
-          <hr class="menu-divider" />
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            href="/problem/statement/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'pen']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
-            />
-            <span>
-              <span class="d-block">{{ T.navProblemStatementEditor }}</span>
-              <small class="text-muted">{{
-                T.navProblemStatementEditorDesc
-              }}</small>
-            </span>
-          </a>
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            href="/grader/ephemeral/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'code']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
-            />
-            <span>
-              <span class="d-block">{{ T.navOmegaUpIDE }}</span>
-              <small class="text-muted">{{ T.navOmegaUpIDEDesc }}</small>
-            </span>
-          </a>
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            href="/karel.js/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'robot']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
-            />
-            <span>
-              <span class="d-block">{{ T.navKarel }}</span>
-              <small class="text-muted">{{ T.navKarelDesc }}</small>
-            </span>
-          </a>
-          <hr class="menu-divider" />
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            :href="AlgorithmsBookURL"
-            target="_blank"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'book']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
-            />
-            <span>
-              <span class="d-block">{{ T.navAlgorithmsBook }}</span>
-              <small class="text-muted">{{ T.navAlgorithmsBookDesc }}</small>
-            </span>
-          </a>
-          <a
-            class="dropdown-item d-flex align-items-center help-dropdown-item"
-            :href="CompetitiveProgrammingBookURL"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'database']"
-              class="help-item-icon flex-shrink-0"
-              fixed-width
-            />
-            <span>
-              <span class="d-block">{{
-                T.navCompetitiveProgrammingDataStructuresBook
-              }}</span>
-              <small class="text-muted">{{
-                T.navCompetitiveProgrammingDataStructuresBookDesc
-              }}</small>
-            </span>
-          </a>
+          </template>
         </div>
       </li>
     </ul>
@@ -357,7 +242,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faBook,
   faCode,
@@ -368,6 +252,7 @@ import {
   faRobot,
   faVideo,
 } from '@fortawesome/free-solid-svg-icons';
+import NavbarItem from './NavbarItem.vue';
 
 library.add(
   faBook,
@@ -380,9 +265,18 @@ library.add(
   faVideo,
 );
 
+interface HelpMenuEntry {
+  divider?: boolean;
+  title?: string;
+  description?: string;
+  icon?: [string, string];
+  href?: string;
+  rel?: string | null;
+}
+
 @Component({
   components: {
-    FontAwesomeIcon,
+    NavbarItem,
   },
 })
 export default class NavbarItems extends Vue {
@@ -420,6 +314,65 @@ export default class NavbarItems extends Vue {
     return getExternalUrl('CompetitiveProgrammingBookURL');
   }
 
+  get helpMenuEntries(): HelpMenuEntry[] {
+    return [
+      {
+        title: T.navTutorials,
+        description: T.navTutorialsDesc,
+        icon: ['fas', 'video'],
+        href: this.YouTubeTutorialsURL,
+      },
+      {
+        title: T.navDiscord,
+        description: T.navDiscordDesc,
+        icon: ['fas', 'comments'],
+        href: this.DiscordInviteURL,
+      },
+      {
+        title: T.navBlog,
+        description: T.navBlogDesc,
+        icon: ['fas', 'newspaper'],
+        href: this.OmegaUpBlogURL,
+      },
+      { divider: true },
+      {
+        title: T.navProblemStatementEditor,
+        description: T.navProblemStatementEditorDesc,
+        icon: ['fas', 'pen'],
+        href: '/problem/statement/',
+        rel: 'noopener noreferrer',
+      },
+      {
+        title: T.navOmegaUpIDE,
+        description: T.navOmegaUpIDEDesc,
+        icon: ['fas', 'code'],
+        href: '/grader/ephemeral/',
+        rel: 'noopener noreferrer',
+      },
+      {
+        title: T.navKarel,
+        description: T.navKarelDesc,
+        icon: ['fas', 'robot'],
+        href: '/karel.js/',
+        rel: 'noopener noreferrer',
+      },
+      { divider: true },
+      {
+        title: T.navAlgorithmsBook,
+        description: T.navAlgorithmsBookDesc,
+        icon: ['fas', 'book'],
+        href: this.AlgorithmsBookURL,
+      },
+      {
+        title: T.navCompetitiveProgrammingDataStructuresBook,
+        description: T.navCompetitiveProgrammingDataStructuresBookDesc,
+        icon: ['fas', 'database'],
+        href: this.CompetitiveProgrammingBookURL,
+        rel: 'noopener noreferrer',
+      },
+    ];
+  }
+
   onCreateProblemClick(): void {
     this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
   }
@@ -452,23 +405,5 @@ export default class NavbarItems extends Vue {
   margin-top: 0em;
   margin-bottom: 0em;
   border-width: 2px;
-}
-
-.help-dropdown-item {
-  white-space: normal;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.help-item-icon {
-  box-sizing: content-box;
-  width: 1.5rem;
-  height: 1.5rem;
-  padding: 0.55rem;
-  margin-right: 0.85rem;
-  background-color: var(--header-help-dropdown-icon-background-color);
-  border-radius: 4px;
-  color: var(--header-help-dropdown-icon-color);
-  font-size: 1.25rem;
 }
 </style>
