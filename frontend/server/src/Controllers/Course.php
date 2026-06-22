@@ -4491,6 +4491,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $distinctActivity = \OmegaUp\DAO\Courses::getDistinctActivity($course);
+        $ipMapping = [];
+        $duplicates = \OmegaUp\ActivityReport::getActivityReportDuplicates($distinctActivity, $ipMapping);
+
         $report = \OmegaUp\DAO\Courses::getActivityReport(
             $course,
             $page,
@@ -4504,8 +4508,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'length' => $length,
                     'alias' => $courseAlias,
                     'events' => \OmegaUp\ActivityReport::getActivityReport(
-                        $report['activity']
+                        $report['activity'],
+                        $ipMapping
                     ),
+                    'users' => $duplicates['users'],
+                    'origins' => $duplicates['origins'],
                     'type' => 'course',
                     'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
                         $report['totalRows'],
@@ -5538,7 +5545,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a report with all user activity for a course.
      *
-     * @return array{events: list<ActivityEvent>, pagerItems: list<PageItem>}
+     * @return array{events: list<ActivityEvent>, users?: list<array{username: string, classname: string, ips: list<string>}>, origins?: list<array{origin: string, usernames: list<array{username: string, classname: string}>}>, pagerItems: list<PageItem>}
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param int|null $length
@@ -5563,6 +5570,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $distinctActivity = \OmegaUp\DAO\Courses::getDistinctActivity($course);
+        $ipMapping = [];
+        $duplicates = \OmegaUp\ActivityReport::getActivityReportDuplicates($distinctActivity, $ipMapping);
+
         $report = \OmegaUp\DAO\Courses::getActivityReport(
             $course,
             $page,
@@ -5571,8 +5582,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                $report['activity']
+                $report['activity'],
+                $ipMapping
             ),
+            'users' => $duplicates['users'],
+            'origins' => $duplicates['origins'],
             'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
                 $report['totalRows'],
                 $length,
