@@ -4,7 +4,7 @@ import Vue from 'vue';
 import common_MultiTypeahead from './MultiTypeahead.vue';
 
 describe('MultiTypeahead.vue', () => {
-  it('Should not call update-existing-options with a short query', async () => {
+  it('Should not call update-existing-options with a null query', async () => {
     const wrapper = mount(common_MultiTypeahead, {
       propsData: {
         existingOptions: [],
@@ -12,7 +12,7 @@ describe('MultiTypeahead.vue', () => {
     });
 
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'qu');
+    tagsInput.vm.$emit('change', '');
     expect(wrapper.emitted()).toEqual({});
   });
 

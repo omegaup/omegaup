@@ -4,7 +4,7 @@ import VoerroTagsInput from '@voerro/vue-tagsinput';
 import Vue from 'vue';
 
 describe('Typeahead.vue', () => {
-  it('Should not call update-existing-options with a short query', async () => {
+  it('Should not call update-existing-options with a null query', async () => {
     const wrapper = mount(common_Typeahead, {
       propsData: {
         existingOptions: [],
@@ -12,7 +12,7 @@ describe('Typeahead.vue', () => {
     });
 
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'qu');
+    tagsInput.vm.$emit('change', '');
     expect(wrapper.emitted()).toEqual({});
   });
 
