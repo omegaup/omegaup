@@ -17,6 +17,8 @@
   --header-navbar-primary-link-color: #dbe2f3;
   --header-navbar-brand-background-color: #f2f2f2;
   --header-navbar-dropdown-item-font-color: #000;
+  --header-help-dropdown-icon-background-color: #f1f3f5;
+  --header-help-dropdown-icon-color: #6c757d;
   --header-active-color: #5f87d4;
   --header-accent-color: #577dc7;
   --header-problem-card-color: #00000020;
@@ -326,6 +328,11 @@
   --vs-dark-btn-secondary-background-color: #444;
   --vs-dark-btn-secondary-background-color--hover: #555;
   --vs-dark-selected-form-border-color: #007bff;
+
+  // LANGUAGE DETECTION
+  --language-detected-bg: rgba(0, 0, 0, 0.04);
+  --language-detected-border: rgba(0, 0, 0, 0.08);
+
   // GRADER ZIP BUTTONS
   --zip-button-color--hover: #fff;
 
@@ -350,6 +357,9 @@
   // MULTI USER ADD AREA
   --multi-user-add-area-edit-button-color: #8bb0d3;
   --multi-user-add-area-edit-button-color--hover: #666;
+
+  // TEAMS GROUP
+  --teams-group-archive-btn-color: #8bb0d3;
 
   // CERTIFICATES
   --certificates-selected-certificate-border-color: #007bff;
@@ -388,4 +398,10 @@
   --diff-editor-divider-background-color: #e5e7eb;
   --diff-editor-readonly-badge-color: #6b7280;
   --diff-editor-readonly-badge-background-color: #e5e7eb;
+
+  // PROBLEM CREATOR MODAL
+  --problem-creator-modal-overlay-background-color: rgba(0, 0, 0, 0.5);
+  --problem-creator-modal-content-background-color: #fff;
+  --problem-creator-modal-box-shadow-color: rgba(0, 0, 0, 0.1);
+  --problem-creator-modal-footer-border-color: #dee2e6;
 }
