@@ -58,25 +58,14 @@
         </tbody>
       </table>
 
-      <div v-else class="text-center py-5">
-        <font-awesome-icon
-          :icon="['fas', 'users']"
-          size="3x"
-          class="mb-3 text-muted"
-        />
-
-        <h4 class="mb-2">
-          {{ T.teamsGroupEmptyTitle }}
-        </h4>
-
-        <p class="text-muted mb-4">
-          {{ T.teamsGroupEmptyDescription }}
-        </p>
-
-        <a class="btn btn-primary btn-lg" href="/teamsgroup/new/">
-          {{ T.createTeamsGroup }}
-        </a>
-      </div>
+      <omegaup-common-empty-state
+        v-else
+        :icon="['fas', 'users']"
+        :title="T.teamsGroupEmptyTitle"
+        :description="T.teamsGroupEmptyDescription"
+        :button-text="T.createTeamsGroup"
+        button-link="/teamsgroup/new/"
+      />
     </div>
 
     <b-modal
@@ -104,10 +93,13 @@ import {
   faArchive,
   faBoxOpen,
 } from '@fortawesome/free-solid-svg-icons';
+import common_EmptyState from '../common/EmptyState.vue';
+
 library.add(faEdit, faArchive, faBoxOpen);
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class TeamsGroupList extends Vue {

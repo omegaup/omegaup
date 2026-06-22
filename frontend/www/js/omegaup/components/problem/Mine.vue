@@ -82,163 +82,183 @@
           </div>
         </div>
       </div>
-      <div class="table-responsive">
-        <table class="table mb-0">
-          <thead>
-            <tr>
-              <th scope="col" class="text-center"></th>
-              <th scope="col" class="text-center">{{ T.wordsID }}</th>
-              <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
-              <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
-              <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
-              <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="problem in problems" :key="problem.alias">
-              <td class="align-middle">
-                <input
-                  v-model="selectedProblems"
-                  type="checkbox"
-                  :disabled="problem.visibility === -10"
-                  :data-selected-problem="problem.alias"
-                  :value="problem"
-                />
-              </td>
-              <td class="text-right align-middle">
-                {{ problem.problem_id }}
-              </td>
-              <td class="d-flex align-items-center">
-                <div class="d-inline-block ml-2">
-                  <a class="mr-1" :href="`/arena/problem/${problem.alias}/`">{{
-                    problem.title
-                  }}</a>
-                  <font-awesome-icon
-                    v-if="
-                      problem.visibility ==
-                        visibilityStatuses['publicWarning'] ||
-                      problem.visibility == visibilityStatuses['privateWarning']
-                    "
-                    :title="T.wordsWarningProblem"
-                    :icon="['fas', 'exclamation-triangle']"
+      <template v-if="problems && problems.length > 0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center"></th>
+                <th scope="col" class="text-center">{{ T.wordsID }}</th>
+                <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
+                <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
+                <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
+                <th scope="col" class="text-center">{{ T.wordsDelete }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="problem in problems" :key="problem.alias">
+                <td class="align-middle">
+                  <input
+                    v-model="selectedProblems"
+                    type="checkbox"
+                    :disabled="problem.visibility === -10"
+                    :data-selected-problem="problem.alias"
+                    :value="problem"
                   />
-                  <font-awesome-icon
-                    v-else-if="
-                      problem.visibility ==
-                        visibilityStatuses['publicBanned'] ||
-                      problem.visibility == visibilityStatuses['privateBanned']
-                    "
-                    :title="T.wordsBannedProblem"
-                    :icon="['fas', 'ban']"
-                  />
-                  <font-awesome-icon
-                    v-if="problem.visibility === visibilityStatuses['deleted']"
-                    :title="T.wordsDeleted"
-                    :icon="['fas', 'trash']"
-                  />
-                  <font-awesome-icon
-                    v-else-if="
-                      (problem.visibility <=
-                        visibilityStatuses['privateBanned'] ||
-                        problem.visibility ==
-                          visibilityStatuses['privateWarning'] ||
-                        problem.visibility == visibilityStatuses['private']) &&
-                      problem.visibility > visibilityStatuses['deleted']
-                    "
-                    :title="T.wordsPrivate"
-                    :icon="['fas', 'eye-slash']"
-                  />
-                  <div v-if="problem.tags.length" class="tags-badges">
+                </td>
+                <td class="text-right align-middle">
+                  {{ problem.problem_id }}
+                </td>
+                <td class="d-flex align-items-center">
+                  <div class="d-inline-block ml-2">
                     <a
-                      v-for="tag in problem.tags"
-                      :key="tag.name"
-                      class="badge custom-badge m-1 p-1 p-lg-2"
-                      :class="[
-                        {
-                          'custom-badge-quality': tag.name.includes(
-                            'problemLevel',
-                          ),
-                        },
-                        `custom-badge-${
-                          tag.source.includes('quality') ? 'owner' : tag.source
-                        }`,
-                      ]"
-                      :href="`/problem/?tag[]=${tag.name}`"
-                      >{{
-                        Object.prototype.hasOwnProperty.call(T, tag.name)
-                          ? T[tag.name]
-                          : tag.name
-                      }}</a
+                      class="mr-1"
+                      :href="`/arena/problem/${problem.alias}/`"
+                      >{{ problem.title }}</a
                     >
+                    <font-awesome-icon
+                      v-if="
+                        problem.visibility ==
+                          visibilityStatuses['publicWarning'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateWarning']
+                      "
+                      :title="T.wordsWarningProblem"
+                      :icon="['fas', 'exclamation-triangle']"
+                    />
+                    <font-awesome-icon
+                      v-else-if="
+                        problem.visibility ==
+                          visibilityStatuses['publicBanned'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateBanned']
+                      "
+                      :title="T.wordsBannedProblem"
+                      :icon="['fas', 'ban']"
+                    />
+                    <font-awesome-icon
+                      v-if="
+                        problem.visibility === visibilityStatuses['deleted']
+                      "
+                      :title="T.wordsDeleted"
+                      :icon="['fas', 'trash']"
+                    />
+                    <font-awesome-icon
+                      v-else-if="
+                        (problem.visibility <=
+                          visibilityStatuses['privateBanned'] ||
+                          problem.visibility ==
+                            visibilityStatuses['privateWarning'] ||
+                          problem.visibility ==
+                            visibilityStatuses['private']) &&
+                        problem.visibility > visibilityStatuses['deleted']
+                      "
+                      :title="T.wordsPrivate"
+                      :icon="['fas', 'eye-slash']"
+                    />
+                    <div v-if="problem.tags.length" class="tags-badges">
+                      <a
+                        v-for="tag in problem.tags"
+                        :key="tag.name"
+                        class="badge custom-badge m-1 p-1 p-lg-2"
+                        :class="[
+                          {
+                            'custom-badge-quality': tag.name.includes(
+                              'problemLevel',
+                            ),
+                          },
+                          `custom-badge-${
+                            tag.source.includes('quality')
+                              ? 'owner'
+                              : tag.source
+                          }`,
+                        ]"
+                        :href="`/problem/?tag[]=${tag.name}`"
+                        >{{
+                          Object.prototype.hasOwnProperty.call(T, tag.name)
+                            ? T[tag.name]
+                            : tag.name
+                        }}</a
+                      >
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td class="text-center align-middle">
-                <a :href="`/problem/${problem.alias}/edit/`">
-                  <font-awesome-icon :icon="['fas', 'edit']" />
-                </a>
-              </td>
-              <td class="text-center align-middle">
-                <a :href="`/problem/${problem.alias}/stats/`">
-                  <font-awesome-icon :icon="['fas', 'chart-bar']" />
-                </a>
-              </td>
-              <td class="text-center align-middle">
-                <button
+                </td>
+                <td class="text-center align-middle">
+                  <a :href="`/problem/${problem.alias}/edit/`">
+                    <font-awesome-icon :icon="['fas', 'edit']" />
+                  </a>
+                </td>
+                <td class="text-center align-middle">
+                  <a :href="`/problem/${problem.alias}/stats/`">
+                    <font-awesome-icon :icon="['fas', 'chart-bar']" />
+                  </a>
+                </td>
+                <td class="text-center align-middle">
+                  <button
+                    v-if="problemCanBeDeleted(problem)"
+                    :data-delete-problem="problem.alias"
+                    class="btn btn-danger"
+                    @click.prevent="toggleConfirmationModal(problem.alias)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'trash']" />
+                  </button>
+                </td>
+                <b-modal
                   v-if="problemCanBeDeleted(problem)"
-                  :data-delete-problem="problem.alias"
-                  class="btn btn-danger"
-                  @click.prevent="toggleConfirmationModal(problem.alias)"
+                  v-model="confirmationModal[problem.alias]"
+                  :title="
+                    ui.formatString(T.problemEditDeleteRequireConfirmation, {
+                      problemAlias: problem.alias,
+                    })
+                  "
+                  :ok-title="T.problemEditDeleteOk"
+                  ok-variant="danger"
+                  :cancel-title="T.problemEditDeleteCancel"
+                  @ok="
+                    $emit('remove', {
+                      alias: problem.alias,
+                      shouldShowAllProblems,
+                    })
+                  "
                 >
-                  <font-awesome-icon :icon="['fas', 'trash']" />
-                </button>
-              </td>
-              <b-modal
-                v-if="problemCanBeDeleted(problem)"
-                v-model="confirmationModal[problem.alias]"
-                :title="
-                  ui.formatString(T.problemEditDeleteRequireConfirmation, {
-                    problemAlias: problem.alias,
-                  })
-                "
-                :ok-title="T.problemEditDeleteOk"
-                ok-variant="danger"
-                :cancel-title="T.problemEditDeleteCancel"
-                @ok="
-                  $emit('remove', {
-                    alias: problem.alias,
-                    shouldShowAllProblems,
-                  })
-                "
-              >
-                <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
-              </b-modal>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <b-modal
-        v-model="showConfirmationModalDeleteAll"
-        :title="T.problemEditDeleteSelectedProblemsRequireConfirmation"
-        :ok-title="T.problemEditDeleteOk"
-        ok-variant="danger"
-        :cancel-title="T.problemEditDeleteCancel"
-        @ok="
-          $emit('remove-all-problems', {
-            selectedProblems,
-            shouldShowAllProblems,
-          });
-          selectedProblems = [];
-          allProblemsVisibilityOption = -1;
-        "
-      >
-        <p>{{ T.problemEditDeleteSelectedProblemsConfirmationMessage }}</p>
-      </b-modal>
-      <div class="card-footer">
-        <omegaup-common-paginator
-          :pager-items="pagerItems"
-          @page-changed="(page) => $emit('go-to-page', page)"
-        ></omegaup-common-paginator>
+                  <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+                </b-modal>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <b-modal
+          v-model="showConfirmationModalDeleteAll"
+          :title="T.problemEditDeleteSelectedProblemsRequireConfirmation"
+          :ok-title="T.problemEditDeleteOk"
+          ok-variant="danger"
+          :cancel-title="T.problemEditDeleteCancel"
+          @ok="
+            $emit('remove-all-problems', {
+              selectedProblems,
+              shouldShowAllProblems,
+            });
+            selectedProblems = [];
+            allProblemsVisibilityOption = -1;
+          "
+        >
+          <p>{{ T.problemEditDeleteSelectedProblemsConfirmationMessage }}</p>
+        </b-modal>
+        <div class="card-footer">
+          <omegaup-common-paginator
+            :pager-items="pagerItems"
+            @page-changed="(page) => $emit('go-to-page', page)"
+          ></omegaup-common-paginator>
+        </div>
+      </template>
+      <div v-else class="card-body">
+        <omegaup-common-empty-state
+          icon="clipboard-list"
+          :title="T.problemListEmptyTitle"
+          :description="T.problemListEmptyDescription"
+          :button-text="T.myproblemsListCreateProblem"
+          button-link="/problem/new/"
+        />
       </div>
     </div>
   </div>
@@ -249,6 +269,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -276,6 +297,7 @@ Vue.use(ModalPlugin);
   components: {
     FontAwesomeIcon,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class ProblemMine extends Vue {

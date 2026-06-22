@@ -18,22 +18,14 @@
         :show-percentage="false"
       />
     </template>
-    <div v-else class="text-center py-5">
-      <font-awesome-icon
-        icon="graduation-cap"
-        size="3x"
-        class="mb-3 text-muted"
-      />
-      <h4 class="mb-2">{{ T.courseListEmptyTitle }}</h4>
-      <p class="text-muted mb-4">{{ T.courseListEmptyDescription }}</p>
-      <a
-        v-if="isMainUserIdentity"
-        class="btn btn-primary btn-lg"
-        href="/course/new/"
-      >
-        {{ T.courseNew }}
-      </a>
-    </div>
+    <omegaup-common-empty-state
+      v-else
+      icon="graduation-cap"
+      :title="T.courseListEmptyTitle"
+      :description="T.courseListEmptyDescription"
+      :button-text="isMainUserIdentity ? T.courseNew : ''"
+      button-link="/course/new/"
+    />
   </div>
 </template>
 
@@ -43,6 +35,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import course_FilteredList from './FilteredList.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
@@ -54,6 +47,7 @@ library.add(fas);
   components: {
     'omegaup-course-filtered-list': course_FilteredList,
     'font-awesome-icon': FontAwesomeIcon,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class Mine extends Vue {
