@@ -2135,6 +2135,7 @@ const translations: { [key: string]: string; } = {
   verificationEmailSuccessfully: "Your email address has been verified.",
   verificationIdInvalid: "The provided verification information is not valid.",
   verificationParentalTokenGoToMyDependents: "Go to my dependents",
+  viewUnavailableTitle: "This view is currently unavailable",
   virtualContest: "Virtual contest",
   virtualContestSuffix: "%(title) [virtual]",
   virtualSuffix: "%(username) [virtual]",

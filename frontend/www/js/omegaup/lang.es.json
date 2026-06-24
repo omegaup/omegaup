@@ -2134,6 +2134,7 @@
 	"verificationEmailSuccessfully": "Tu direcci\u00f3n de correo electr\u00f3nico ha sido verificada.",
 	"verificationIdInvalid": "La informaci\u00f3n de verificaci\u00f3n suministrada no es v\u00e1lida.",
 	"verificationParentalTokenGoToMyDependents": "Ir a mis dependientes",
+	"viewUnavailableTitle": "Esta vista no est\u00e1 disponible por el momento",
 	"virtualContest": "Concurso virtual",
 	"virtualContestSuffix": "%(title) [virtual]",
 	"virtualSuffix": "%(username) [virtual]",
