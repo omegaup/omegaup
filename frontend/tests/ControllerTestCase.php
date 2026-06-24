@@ -24,6 +24,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         );
         \OmegaUp\Controllers\Session::invalidateCache();
         \OmegaUp\Controllers\Session::invalidateLocalCache();
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
         // Mock time
         $currentTime = time();
@@ -46,6 +47,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         parent::tearDown();
         self::logout();
 
+        \OmegaUp\Controllers\Clarification::$broadcaster = null;
         \OmegaUp\MySQLConnection::getInstance()->FailTrans();
         \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
         \OmegaUp\Test\Utils::cleanupDBForTearDown();

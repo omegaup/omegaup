@@ -236,6 +236,34 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should not render Virtual/Practice dropdown in Current contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    // Virtual/Practice actions are inside the contest dropdown. For the Current tab
+    // they should be hidden entirely (not just visually).
+    expect(wrapper.text()).not.toContain(T.contestVirtualMode);
+    expect(wrapper.text()).not.toContain(T.contestPracticeMode);
+  });
+
+  it('Should not render Virtual/Practice dropdown in Future contests', () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Future,
+      },
+    });
+
+    // Virtual/Practice actions are inside the contest dropdown. For the Future tab
+    // they should be hidden entirely (not just visually).
+    expect(wrapper.text()).not.toContain(T.contestVirtualMode);
+    expect(wrapper.text()).not.toContain(T.contestPracticeMode);
+  });
+
   it('Should handle filter buttons', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {

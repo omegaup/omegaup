@@ -470,7 +470,6 @@ export default class AdminSupport extends Vue {
   }
 
   autoResize(event: Event) {
-    console.log(event);
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
