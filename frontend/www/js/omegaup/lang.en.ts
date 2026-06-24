@@ -312,6 +312,7 @@ const translations: { [key: string]: string; } = {
   contestAddproblemContestOrder: "Contest order",
   contestAddproblemLatestVersion: "Latest version",
   contestAddproblemOtherVersion: "Other version",
+  contestAddproblemProblemConfirmRemove: "Do you really want to remove %(problem)?",
   contestAddproblemProblemName: "Problem",
   contestAddproblemProblemOrder: "Order",
   contestAddproblemProblemPoints: "Points this problem is worth",
