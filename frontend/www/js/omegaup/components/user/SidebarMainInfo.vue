@@ -77,7 +77,7 @@
     </div>
     <div v-if="profile.is_own_profile" class="card-body text-center">
       <a
-        v-for="url in currentUrlMapping.filter((url) => url.visible)"
+        v-for="url in visibleUrlMapping"
         :key="url.key"
         class="btn btn-primary btn-sm my-1 w-100"
         :href="`/profile/#${url.key}`"
@@ -180,6 +180,14 @@ export default class UserSidebarMainInfo extends Vue {
     urlMapping[addPasswordRowIndex].visible = true;
     urlMapping[changePasswordRowIndex].visible = false;
     return urlMapping;
+  }
+
+  get visibleUrlMapping(): {
+    key: string;
+    title: string;
+    visible: boolean;
+  }[] {
+    return this.currentUrlMapping.filter((url) => url.visible);
   }
 
   getSelectedValidTab(
