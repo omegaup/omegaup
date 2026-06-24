@@ -390,17 +390,57 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
      global_difficulty_average) = get_global_quality_and_difficulty_average(
          dbconn, rank_cutoffs)
 
+    max_qualitynomination_id = 0
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT MAX(qn.`qualitynomination_id`)
+                       FROM `QualityNominations` as qn;""")
+        row = cur.fetchone()
+        if row and row[0] is not None:
+            max_qualitynomination_id = row[0]
+
+    aggregate_feedback_state_id: Optional[int] = None
+    last_processed_qualitynomination_id: Optional[int] = None
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT
+                           afs.`id`,
+                           afs.`last_processed_qualitynomination_id`
+                       FROM `Cron_AggregateFeedback_State` as afs
+                       ORDER BY afs.`id` DESC
+                       LIMIT 1;""")
+        row = cur.fetchone()
+        if row is not None:
+            (
+                aggregate_feedback_state_id,
+                last_processed_qualitynomination_id,
+            ) = row
+
     attempted_problems = 0
     successful_problems = 0
     failed_problems = 0
     start_time = time.monotonic()
 
     with dbconn.cursor() as cur:
-        cur.execute("""SELECT DISTINCT qn.`problem_id`
-                       FROM `QualityNominations` as qn
-                       WHERE qn.`nomination` = 'suggestion'
-                         AND qn.`qualitynomination_id` > %s;""",
-                    (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
+        if (last_processed_qualitynomination_id is None or
+                last_processed_qualitynomination_id == 0):
+            cur.execute("""SELECT DISTINCT qn.`problem_id`
+                           FROM `QualityNominations` as qn
+                           WHERE
+                               qn.`nomination` = 'suggestion'
+                            AND qn.`qualitynomination_id` > %s;""",
+                        (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
+        else:
+            cur.execute("""SELECT DISTINCT qn.`problem_id`
+                           FROM `QualityNominations` as qn
+                           WHERE qn.`nomination` = 'suggestion'
+                             AND qn.`qualitynomination_id` > %s
+                             AND qn.`qualitynomination_id` <= %s;""",
+                        (
+                            max(
+                                QUALITYNOMINATION_QUESTION_CHANGE_ID,
+                                last_processed_qualitynomination_id,
+                            ),
+                            max_qualitynomination_id,
+                        ))
         for (problem_id,) in cur.fetchall():
             attempted_problems += 1
             try:
@@ -410,16 +450,11 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                 successful_problems += 1
             except Exception:  # pylint: disable=broad-except
                 failed_problems += 1
-                logging.exception(
-                    'Failed to aggregate feedback for problem %d. '
-                    'Continuing with remaining problems.',
-                    problem_id)
                 try:
                     dbconn.conn.rollback()
                 except Exception:  # pylint: disable=broad-except
-                    logging.exception(
-                        'Failed to rollback transaction for problem %d',
-                        problem_id)
+                    pass
+                continue
 
     logging.info(
         'Finished aggregating feedback: '
@@ -434,6 +469,26 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
         failed_problems,
         duration,
     )
+
+    if failed_problems == 0:
+        with dbconn.cursor() as cur:
+            if aggregate_feedback_state_id is None:
+                cur.execute(
+                    """INSERT INTO
+                           `Cron_AggregateFeedback_State`
+                           (`last_processed_qualitynomination_id`)
+                       VALUES
+                           (%s);""", (max_qualitynomination_id,))
+            else:
+                cur.execute(
+                    """UPDATE `Cron_AggregateFeedback_State` as afs
+                       SET
+                           afs.`last_processed_qualitynomination_id` = %s
+                       WHERE
+                           afs.`id` = %s;""",
+                    (max_qualitynomination_id,
+                     aggregate_feedback_state_id))
+            dbconn.conn.commit()
 
 
 def aggregate_reviewers_feedback_for_problem(
