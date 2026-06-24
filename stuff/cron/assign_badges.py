@@ -108,7 +108,15 @@ def process_badges(
             has_failures = True
             failed_badges.append(badge)
             logging.exception('Something went wrong with badge: %s.', badge)
-    logging.info('Successfully processed %d badges.', successful)
+    logging.info(
+        'assign_badges summary',
+        extra={
+            'badges_total': len(badges),
+            'badges_successful': successful,
+            'badges_failed': len(failed_badges),
+            'failed_badges': failed_badges,
+        },
+    )
     if failed_badges:
         logging.error('Badges that failed to process: %s',
                       ', '.join(failed_badges))
@@ -138,8 +146,9 @@ def main() -> None:
         with dbconn.cursor(buffered=True,
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
-            has_failures = process_badges(args.current_timestamp, dbconn,
-                                          cur, cur_readonly)
+            with lib.logs.log_phase('process_badges'):
+                has_failures = process_badges(args.current_timestamp, dbconn,
+                                              cur, cur_readonly)
         dbconn.conn.commit()
     finally:
         dbconn.conn.close()
