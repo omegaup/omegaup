@@ -1096,6 +1096,7 @@ CREATE TABLE `School_Of_The_Month` (
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
   KEY `idx_time` (`time`),
+  KEY `idx_sotm_school_time` (`school_id`,`time`),
   CONSTRAINT `fk_sotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sotms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Escuelas del Mes';
@@ -1224,6 +1225,8 @@ CREATE TABLE `Submissions` (
   KEY `idx_submissions_identity_problemset_problem` (`identity_id`,`problemset_id`,`problem_id`),
   KEY `idx_submissions_identity_type_problemset` (`identity_id`,`type`,`problemset_id`),
   KEY `idx_submissions_time_verdict` (`time`,`verdict`),
+  KEY `idx_submissions_verdict_time_identity_problem_school` (`verdict`,`time`,`identity_id`,`problem_id`,`school_id`,`submission_id`),
+  KEY `idx_submissions_school_problem_verdict_time_id` (`school_id`,`problem_id`,`verdict`,`time`,`submission_id`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
