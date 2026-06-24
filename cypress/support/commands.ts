@@ -281,7 +281,11 @@ Cypress.Commands.add(
         return;
       }
       cy.visit(`/arena/${contestAlias}/#problems`);
-      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+      cy.get(`a[data-problem="${problem.problemAlias}"]`, {
+        timeout: 10000,
+      })
+        .should('be.visible')
+        .click();
 
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
