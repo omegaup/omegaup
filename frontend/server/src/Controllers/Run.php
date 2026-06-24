@@ -512,7 +512,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity_id' => $r->identity->identity_id,
             'problem_id' => $problem->problem_id,
             'problemset_id' => $problemsetId,
-            'guid' => md5(uniqid(strval(rand()), true)),
+            'guid' => bin2hex(random_bytes(16)),
             'language' => $r->ensureString('language'),
             'time' => \OmegaUp\Time::get(),
             'status' => 'uploading',
