@@ -5,6 +5,7 @@ import {
   LoginOptions,
   TeamGroupOptions,
 } from '../support/types';
+import { DEFAULT_PASSWORD } from '../support/constants';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { getISODateTime, addSubtractDateTime } from '../support/commands';
@@ -73,7 +74,7 @@ describe('Contest Test', () => {
       username:
         groupOptions.groupTitle.split('-').slice(0, -1).join('-') +
         ':identity_1',
-      password: '12345678',
+      password: DEFAULT_PASSWORD,
     };
 
     loginPage.giveAdminPrivilege(
@@ -84,7 +85,10 @@ describe('Contest Test', () => {
     cy.login(loginOptions[0]);
     groupPage.createGroup(groupOptions);
     groupPage.addIdentitiesGroup();
-    contestPage.setPasswordForIdentity(identityLogin.username, '12345678');
+    contestPage.setPasswordForIdentity(
+      identityLogin.username,
+      DEFAULT_PASSWORD,
+    );
     contestPage.createContest(contestOptions, [identityLogin.username]);
     cy.logout();
 

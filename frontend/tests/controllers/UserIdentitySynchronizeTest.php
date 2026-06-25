@@ -13,7 +13,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => \OmegaUp\Test\Utils::createRandomString(),
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             'birth_date' => 946684800, // 01-01-2000
@@ -42,7 +42,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $identity->username,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'old_password' => $identity->password,
         ]);
 
@@ -192,7 +192,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         $newUsername = 'new_username_basic_info';
-        $newPassword = \OmegaUp\Test\Utils::createRandomString();
+        $newPassword = \OmegaUp\Test\Utils::createRandomPassword();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $newUsername,

@@ -52,7 +52,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $creatorLogin->auth_token,
             'username' => "{$group['group']->alias}:{$identityName}",
             'name' => $identityName,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
@@ -103,7 +103,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $creatorLogin->auth_token,
                 'username' => "{$wrongGroupAlias}:{$identityName}",
                 'name' => $identityName,
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'country_id' => 'MX',
                 'state_id' => 'QUE',
                 'gender' => 'male',
@@ -141,7 +141,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $creatorLogin->auth_token,
                 'username' => $identityName,
                 'name' => $identityName,
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'country_id' => 'MX',
                 'state_id' => 'QUE',
                 'gender' => 'male',
@@ -179,7 +179,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $creatorLogin->auth_token,
                 'username' => "{$group['group']->alias}:{$wrongIdentityName}",
                 'name' => $wrongIdentityName,
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'country_id' => 'MX',
                 'state_id' => 'QUE',
                 'gender' => 'male',
@@ -198,7 +198,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $creatorLogin->auth_token,
                 'username' => $wrongIdentityName,
                 'name' => $wrongIdentityName,
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'country_id' => 'MX',
                 'state_id' => 'QUE',
                 'gender' => 'male',
@@ -594,7 +594,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
-        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        $identityPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,

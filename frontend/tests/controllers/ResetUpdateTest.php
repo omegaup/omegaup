@@ -106,7 +106,7 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $reset_token = $create_response['token'];
         $user_data['reset_token'] = $reset_token;
 
-        $new_password = 'newpassword';
+        $new_password = 'N3wPassw0rd!';
         $user_data['password'] = $new_password;
         $user_data['password_confirmation'] = $new_password;
         $r = new \OmegaUp\Request($user_data);

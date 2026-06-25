@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { LoginOptions } from '../types';
+import { DEFAULT_PASSWORD } from '../constants';
 
 export class LoginPage {
   registerMultipleUsers(noOfUsers: number): LoginOptions[] {
@@ -8,7 +9,7 @@ export class LoginPage {
     for (let i = 0; i < noOfUsers; i++) {
       const userLoginOptions: LoginOptions = {
         username: 'utGroup_user' + i + '_' + uuid(),
-        password: 'P@55w0rd',
+        password: DEFAULT_PASSWORD,
       };
 
       cy.register(userLoginOptions);

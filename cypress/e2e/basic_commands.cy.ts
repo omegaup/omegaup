@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { LoginOptions, RunOptions } from '../support/types';
+import { DEFAULT_PASSWORD } from '../support/constants';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { coursePage } from '../support/pageObjects/coursePage';
 import { contestPage } from '../support/pageObjects/contestPage';
@@ -36,7 +37,7 @@ describe('Basic Commands Test', () => {
   it('Should register a user using the API', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
-      password: uuid(),
+      password: DEFAULT_PASSWORD,
     };
 
     cy.register(loginOptions);
@@ -46,7 +47,7 @@ describe('Basic Commands Test', () => {
   it('Should register a user', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
-      password: uuid(),
+      password: DEFAULT_PASSWORD,
     };
 
     loginPage.registerSingleUser(loginOptions);
