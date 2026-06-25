@@ -1,5 +1,5 @@
 '''Util functions for cron jobs'''
-from typing import NamedTuple, List, Optional, TypedDict
+from typing import Dict, NamedTuple, List, Optional, TypedDict
 import datetime
 
 
@@ -7,6 +7,7 @@ class UserProblems(TypedDict):
     '''Problems solved by a user and their calculated score'''
     solved: List[int]
     score: float
+    school_at_solve: Dict[int, Optional[int]]
 
 
 class UserRank(NamedTuple):

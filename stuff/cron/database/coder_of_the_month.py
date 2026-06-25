@@ -310,7 +310,8 @@ def get_user_problems(
     # each user
     user_problems: Dict[int, UserProblems] = {
         user.identity_id:
-            {'solved': [], 'score': 0.0} for user in eligible_users}
+            {'solved': [], 'score': 0.0, 'school_at_solve': {}}
+        for user in eligible_users}
 
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
@@ -318,10 +319,11 @@ def get_user_problems(
     problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
 
     sql = '''
-            SELECT
+            SELECT DISTINCT
                 s.identity_id,
                 s.problem_id,
-                MIN(s.time) AS first_time_solved
+                FIRST_VALUE(s.time) OVER w AS first_time_solved,
+                FIRST_VALUE(s.school_id) OVER w AS school_id_at_solve_time
             FROM
                 Submissions s
             INNER JOIN
@@ -336,9 +338,9 @@ def get_user_problems(
                 AND s.verdict     = 'AC'
                 AND s.type        = 'normal'
                 AND pf.problem_id IS NULL
-            GROUP BY
-                s.identity_id,
-                s.problem_id;
+            WINDOW w AS (
+                PARTITION BY s.identity_id, s.problem_id ORDER BY s.time ASC
+            );
     '''
     sql = sql.format(identity_ids_str=identity_ids_str,
                      problem_ids_str=problem_ids_str)
@@ -368,6 +370,9 @@ def get_user_problems(
             # Filter the problems that are not administred by the user
             if identity_id not in problems_admins.get(problem_id, []):
                 user_problems[identity_id]['solved'].append(problem_id)
+                user_problems[identity_id]['school_at_solve'][problem_id] = (
+                    row['school_id_at_solve_time']
+                )
 
     return user_problems
 
