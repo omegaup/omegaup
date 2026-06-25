@@ -8,7 +8,9 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
         'templateProperties' => [
             'fullWidth' => true,
             'payload' => [],
-            'title' => new \OmegaUp\TranslationString('wordsGlobalSubmissions'),
+            'title' => new \OmegaUp\TranslationString(
+                'arenaRunsLatestSubmissions'
+            ),
         ],
         'entrypoint' => 'arena_global_runs',
     ]
