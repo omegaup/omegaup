@@ -209,14 +209,17 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
 
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
@@ -254,14 +257,17 @@ jobs:
           define('OMEGAUP_LOG_FILE', 'php://stderr');
           EOF
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
 
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
@@ -355,14 +361,17 @@ jobs:
         with:
           install_host_python_deps: true
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
 
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
