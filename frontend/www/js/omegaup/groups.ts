@@ -76,29 +76,27 @@ export function getCSVRecords<T extends object>({
     );
   }
 
-  return records.map(
-    (record): T => {
-      // This is not type-safe, but TypeScript has no way of converting a type
-      // into a runtime object. This means that we can't validate that the fields
-      // match the keys of `T`.
-      const row: Record<string, string> = {};
-      for (const [i, field] of fields.entries()) {
-        if (record[i] === null) {
-          if (requiredFields.has(field)) {
-            throw new Error(
-              ui.formatString(T.teamsGroupsErrorFieldIsRequired, { field }),
-            );
-          }
-          continue;
+  return records.map((record): T => {
+    // This is not type-safe, but TypeScript has no way of converting a type
+    // into a runtime object. This means that we can't validate that the fields
+    // match the keys of `T`.
+    const row: Record<string, string> = {};
+    for (const [i, field] of fields.entries()) {
+      if (record[i] === null) {
+        if (requiredFields.has(field)) {
+          throw new Error(
+            ui.formatString(T.teamsGroupsErrorFieldIsRequired, { field }),
+          );
         }
-        if (!requiredFields.has(field) && !optionalFields?.has(field)) {
-          continue;
-        }
-        row[field] = String(record[i]);
+        continue;
       }
-      return row as T;
-    },
-  );
+      if (!requiredFields.has(field) && !optionalFields?.has(field)) {
+        continue;
+      }
+      row[field] = String(record[i]);
+    }
+    return row as T;
+  });
 }
 
 export function generatePassword(): string {

@@ -28,12 +28,9 @@ const carouselConfig: {
       pt: 'Comece a se preparar com o Intro OFMI',
     },
     description: {
-      en:
-        'New to competitive programming? Take the Intro OFMI course and start building the skills needed to participate in the Olympiad.',
-      es:
-        '¿Eres nueva en la programación competitiva? Toma el curso Intro OFMI y comienza a desarrollar las habilidades necesarias para participar en la olimpiada.',
-      pt:
-        'Nova na programação competitiva? Faça o curso Intro OFMI e comece a desenvolver as habilidades necessárias para participar da olimpíada.',
+      en: 'New to competitive programming? Take the Intro OFMI course and start building the skills needed to participate in the Olympiad.',
+      es: '¿Eres nueva en la programación competitiva? Toma el curso Intro OFMI y comienza a desarrollar las habilidades necesarias para participar en la olimpiada.',
+      pt: 'Nova na programação competitiva? Faça o curso Intro OFMI e comece a desenvolver as habilidades necessárias para participar da olimpíada.',
     },
     button: {
       text: {
@@ -53,12 +50,9 @@ const carouselConfig: {
       pt: 'Você já nos segue no Instagram?',
     },
     description: {
-      en:
-        'Stay up to date with news, events, and much more. Follow us and be part of the community!',
-      es:
-        'Entérate de noticias, eventos y mucho más. ¡Síguenos y sé parte de la comunidad!',
-      pt:
-        'Fique por dentro das novidades, eventos e muito mais. Siga-nos e faça parte da comunidade!',
+      en: 'Stay up to date with news, events, and much more. Follow us and be part of the community!',
+      es: 'Entérate de noticias, eventos y mucho más. ¡Síguenos y sé parte de la comunidad!',
+      pt: 'Fique por dentro das novidades, eventos e muito mais. Siga-nos e faça parte da comunidade!',
     },
     button: {
       text: {
@@ -78,12 +72,9 @@ const carouselConfig: {
       pt: 'Visite nosso blog',
     },
     description: {
-      en:
-        'Discover tutorials, articles, and the latest news from the omegaUp community.',
-      es:
-        'Descubre tutoriales, artículos y las últimas noticias de la comunidad de omegaUp.',
-      pt:
-        'Descubra tutoriais, artigos e as últimas notícias da comunidade omegaUp.',
+      en: 'Discover tutorials, articles, and the latest news from the omegaUp community.',
+      es: 'Descubre tutoriales, artículos y las últimas noticias de la comunidad de omegaUp.',
+      pt: 'Descubra tutoriais, artigos e as últimas notícias da comunidade omegaUp.',
     },
     button: {
       text: {
@@ -103,12 +94,9 @@ const carouselConfig: {
       pt: 'Experiência de usuário de omegaUp',
     },
     description: {
-      en:
-        'Your opinion builds our community!\nAt omegaUp, our priority is you. We want to know what you love and what we can improve so that your learning experience is amazing.\nIt will only take 3 minutes.\nThanks for helping us grow!',
-      es:
-        '¡Tu opinión construye nuestra comunidad!\nEn omegaUp, nuestra prioridad eres tú. Queremos saber qué te encanta y qué podemos mejorar para que tu experiencia de aprendizaje sea increíble.\nSolo te tomará 3 minutos.\n¡Gracias por ayudarnos a crecer!',
-      pt:
-        'Sua opinião constrói nossa comunidade!\nNa omegaUp, nossa prioridade é você. Queremos saber o que você ama e o que podemos melhorar para que sua experiência de aprendizado seja incrível.\nLevará apenas 3 minutos.\nObrigado por nos ajudar a crescer!',
+      en: 'Your opinion builds our community!\nAt omegaUp, our priority is you. We want to know what you love and what we can improve so that your learning experience is amazing.\nIt will only take 3 minutes.\nThanks for helping us grow!',
+      es: '¡Tu opinión construye nuestra comunidad!\nEn omegaUp, nuestra prioridad eres tú. Queremos saber qué te encanta y qué podemos mejorar para que tu experiencia de aprendizaje sea increíble.\nSolo te tomará 3 minutos.\n¡Gracias por ayudarnos a crecer!',
+      pt: 'Sua opinião constrói nossa comunidade!\nNa omegaUp, nossa prioridade é você. Queremos saber o que você ama e o que podemos melhorar para que sua experiência de aprendizado seja incrível.\nLevará apenas 3 minutos.\nObrigado por nos ajudar a crescer!',
     },
     button: {
       text: {

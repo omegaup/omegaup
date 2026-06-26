@@ -354,9 +354,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       | undefined {
       return state.request.input.validator.custom_validator;
     },
-    inputCases(
-      state: GraderStore,
-    ): {
+    inputCases(state: GraderStore): {
       [key: string]: { in: string; out: string; weight?: number };
     } {
       return state.request.input.cases;

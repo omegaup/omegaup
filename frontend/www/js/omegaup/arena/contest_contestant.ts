@@ -210,8 +210,8 @@ OmegaUp.on('ready', async () => {
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
-          shouldShowFirstAssociatedIdentityRunWarning: this
-            .shouldShowFirstAssociatedIdentityRunWarning,
+          shouldShowFirstAssociatedIdentityRunWarning:
+            this.shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
           isBlocked: this.isBlocked,
           blockedMessage: this.blockedMessage,
@@ -538,7 +538,8 @@ OmegaUp.on('ready', async () => {
         );
         rankingStore.commit('updateRanking', normalizedRanking);
 
-        const selectedProblem = contestContestant.problem as types.NavbarProblemsetProblem | null;
+        const selectedProblem =
+          contestContestant.problem as types.NavbarProblemsetProblem | null;
         if (!selectedProblem) {
           return;
         }

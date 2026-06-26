@@ -155,7 +155,8 @@ describe('ContestListv2.vue', () => {
         description: 'hello contest 3',
         contest_id: 3,
         contestants: 15,
-        finish_time: yesterday /*new Date(yesterday.getTime() - daySeconds * 2)*/,
+        finish_time:
+          yesterday /*new Date(yesterday.getTime() - daySeconds * 2)*/,
         last_updated: new Date(yesterday.getTime() - daySeconds),
         organizer: 'alfadown',
         original_finish_time: yesterday,
@@ -424,7 +425,7 @@ describe('ContestListv2.vue', () => {
     const initialCount = initialEvents.length;
 
     // Simulate a user clicking a different tab
-    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+    (wrapper.vm as unknown as { currentTab: ContestTab }).currentTab =
       ContestTab.Future;
     await wrapper.vm.$nextTick();
 
