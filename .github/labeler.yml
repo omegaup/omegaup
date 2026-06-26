@@ -71,7 +71,7 @@ dependencies:
       - any-glob-to-any-file:
           - 'package.json'
           - 'composer.json'
-          - 'yarn.lock'
+          - 'pnpm-lock.yaml'
           - 'composer.lock'
           - 'requirements.txt'
           - 'package-lock.json'
