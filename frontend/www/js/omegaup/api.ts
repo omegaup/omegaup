@@ -9,7 +9,7 @@ interface ApiCallOptions {
 export function apiCall<
   RequestType extends { [key: string]: any },
   ServerResponseType,
-  ResponseType = ServerResponseType
+  ResponseType = ServerResponseType,
 >(
   url: string,
   transform?: (result: ServerResponseType) => ResponseType,
