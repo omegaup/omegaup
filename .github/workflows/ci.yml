@@ -213,13 +213,16 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run JavaScript tests
-        run: yarn test:coverage
+        run: pnpm test:coverage
 
       - name: Upload code coverage
         run: |
@@ -255,10 +258,13 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -353,13 +359,16 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build webpack resources
-        run: yarn build
+        run: pnpm build
 
       - name: Wait for dependencies
         run: |

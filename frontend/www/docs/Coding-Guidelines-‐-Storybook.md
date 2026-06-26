@@ -13,7 +13,7 @@ In summary, Storybook is a fundamental tool for web component development, as it
 At OmegaUp, we have a script available to run Storybook (it is not necessary to spin up Docker):
 
 ```bash
-$ yarn storybook
+$ pnpm storybook
 ```
 This will spin up the collection of available stories in our component library and launch a dashboard at ```localhost:6006``` or ```(http://localhost:6006)``` where we can consult each one of them.
 
