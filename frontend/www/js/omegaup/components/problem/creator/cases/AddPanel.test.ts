@@ -134,16 +134,22 @@ describe('AddPanel.vue', () => {
     await wrapper.find('input[name="multiple-cases-count"]').setValue(10);
 
     expect(
-      (wrapper.find('input[name="multiple-cases-prefix"]')
-        .element as HTMLInputElement).value,
+      (
+        wrapper.find('input[name="multiple-cases-prefix"]')
+          .element as HTMLInputElement
+      ).value,
     ).toBe('test');
     expect(
-      (wrapper.find('input[name="multiple-cases-suffix"]')
-        .element as HTMLInputElement).value,
+      (
+        wrapper.find('input[name="multiple-cases-suffix"]')
+          .element as HTMLInputElement
+      ).value,
     ).toBe('case');
     expect(
-      (wrapper.find('input[name="multiple-cases-count"]')
-        .element as HTMLInputElement).value,
+      (
+        wrapper.find('input[name="multiple-cases-count"]')
+          .element as HTMLInputElement
+      ).value,
     ).toBe('10');
 
     await wrapper.find('form').trigger('submit.prevent');

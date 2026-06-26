@@ -136,14 +136,12 @@ export default class ReviewerPopup extends Vue {
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags
-      .map(
-        (x: string): ProblemTag => {
-          return {
-            value: x,
-            text: T[x],
-          };
-        },
-      )
+      .map((x: string): ProblemTag => {
+        return {
+          value: x,
+          text: T[x],
+        };
+      })
       .sort((a: ProblemTag, b: ProblemTag): number => {
         return a.text.localeCompare(b.text, T.lang);
       });

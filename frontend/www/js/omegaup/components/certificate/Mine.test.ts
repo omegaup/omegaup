@@ -85,7 +85,7 @@ describe('Mine.vue', () => {
 
   it('Should copy the verification code', () => {
     const defineSpy = jest.spyOn(
-      ((certificate_Mine as unknown) as Mine).options.methods,
+      (certificate_Mine as unknown as Mine).options.methods,
       'getVerificationLink',
     );
 
@@ -105,7 +105,7 @@ describe('Mine.vue', () => {
 
   it('Should download a file', async () => {
     const clickSpy = jest.spyOn(
-      ((certificate_Mine as unknown) as Mine).options.methods,
+      (certificate_Mine as unknown as Mine).options.methods,
       'getDownloadLink',
     );
 

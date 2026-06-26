@@ -257,7 +257,7 @@ export function remoteDate(date: Date): Date {
  */
 export function remoteTimeAdapter<T>(value: T): T {
   if (value instanceof Date) {
-    return (remoteDate(value) as unknown) as T;
+    return remoteDate(value) as unknown as T;
   }
 
   if (Array.isArray(value)) {

@@ -499,8 +499,10 @@ describe('CaseEdit.vue', () => {
     await modalButton.trigger('click');
 
     expect(
-      (modalBody.find('input[data-array-modal-generated-array]')
-        .element as HTMLInputElement).value,
+      (
+        modalBody.find('input[data-array-modal-generated-array]')
+          .element as HTMLInputElement
+      ).value,
     ).toBe('10 10 10 10 10');
 
     const modalFooter = wrapper.find('footer.modal-footer');
@@ -565,8 +567,10 @@ describe('CaseEdit.vue', () => {
 
     await modalButton.trigger('click');
     expect(
-      (modalBody.find('textarea[data-matrix-modal-generated-matrix]')
-        .element as HTMLInputElement).value,
+      (
+        modalBody.find('textarea[data-matrix-modal-generated-matrix]')
+          .element as HTMLInputElement
+      ).value,
     ).toBe('20 20 20\n20 20 20\n20 20 20');
 
     const modalFooter = wrapper.find('footer.modal-footer');
