@@ -520,7 +520,13 @@
     >
       <div class="problem-creator-modal-content">
         <div class="problem-creator-modal-body">
-          <omegaup-problem-creator v-if="showProblemCreator" />
+          <omegaup-problem-creator
+            v-if="showProblemCreator"
+            @download-zip-file="onDownloadZipFile"
+            @upload-zip-file="onUploadZipFile"
+            @show-update-success-message="onShowUpdateSuccessMessage"
+            @download-input-file="onDownloadInputFile"
+          />
         </div>
         <div class="problem-creator-modal-footer">
           <button
@@ -543,6 +549,8 @@ import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import problem_CreatorWrapper from './CreatorWrapper.vue';
 import T from '../../lang';
+import * as ui from '../../ui';
+import JSZip from 'jszip';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 import 'intro.js/introjs.css';
@@ -841,6 +849,49 @@ export default class ProblemForm extends Vue {
         }
       }
     }
+  }
+
+  onDownloadZipFile({
+    fileName,
+    zipContent,
+  }: {
+    fileName: string;
+    zipContent: JSZip;
+  }): void {
+    zipContent.generateAsync({ type: 'blob' }).then((content) => {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = `${fileName}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    });
+  }
+
+  onDownloadInputFile({
+    fileName,
+    fileContent,
+  }: {
+    fileName: string;
+    fileContent: string;
+  }): void {
+    const link = document.createElement('a');
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  }
+
+  onShowUpdateSuccessMessage(): void {
+    ui.success(T.problemCreatorUpdateAlert);
+  }
+
+  onUploadZipFile(data: unknown): void {
+    this.$emit('upload-zip-file', data);
   }
 
   @Watch('alias')
