@@ -53,6 +53,7 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
       /#include\s*<(iostream|vector|algorithm|string|map|set|queue|stack|cmath|bits\/stdc\+\+\.h)>/,
       /\b(std::cout|std::cin|std::endl|std::vector|std::string|namespace\s+std)\b/,
       /using\s+namespace\s+std/,
+      /\b(cin\s*>>|cout\s*<<)/,
     ],
     priority: 95,
   },
