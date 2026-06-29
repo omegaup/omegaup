@@ -126,6 +126,7 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
       /\bconsole\.log\b|\bmodule\.exports\b|\brequire\s*\(/,
       /=>\s*\{/,
       /\b(const|let|var)\s+\w+\s*=\s*/,
+      /\bfunction\s+\w+\s*\(/,
     ],
     priority: 82,
   },
