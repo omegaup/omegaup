@@ -189,7 +189,8 @@ export function detectLanguageFromCode(
       if (r.test(trimmed)) matches++;
     }
     if (matches > 0) {
-      const score = (matches / pat.patterns.length) * pat.priority;
+      const penalty = Math.min(1, pat.patterns.length / 4);
+      const score = (matches / pat.patterns.length) * pat.priority * penalty;
       if (score > bestScore) {
         bestScore = score;
         bestLanguage = pat.language;
