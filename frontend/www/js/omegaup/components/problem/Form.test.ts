@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import Form from './Form.vue';
 import { CreationMethods } from './Form.vue';
@@ -187,5 +188,84 @@ describe('Settings.vue', () => {
     await wrapper.find('[data-problem-creator-close]').trigger('click');
 
     expect((wrapper.vm as any).showProblemCreator).toBe(false);
+  });
+});
+
+describe('Form.vue creator modal events', () => {
+  async function mountWithOpenCreator() {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+    return wrapper;
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('Should show success notification on show-update-success-message', async () => {
+    const successSpy = jest
+      .spyOn(ui, 'success')
+      .mockImplementation(() => undefined);
+    const wrapper = await mountWithOpenCreator();
+
+    const creator = wrapper.find('omegaup-problem-creator-stub');
+    expect(creator.exists()).toBe(true);
+    creator.vm.$emit('show-update-success-message');
+
+    expect(successSpy).toHaveBeenCalledWith(T.problemCreatorUpdateAlert);
+  });
+
+  it('Should download a file on download-input-file', async () => {
+    const wrapper = await mountWithOpenCreator();
+
+    const link = document.createElement('a');
+    const clickSpy = jest
+      .spyOn(link, 'click')
+      .mockImplementation(() => undefined);
+    jest.spyOn(document, 'createElement').mockReturnValue(link);
+    (URL as any).createObjectURL = jest.fn(() => 'blob:mock');
+    (URL as any).revokeObjectURL = jest.fn();
+
+    wrapper
+      .find('omegaup-problem-creator-stub')
+      .vm.$emit('download-input-file', {
+        fileName: 'case.txt',
+        fileContent: '1 2 3',
+      });
+
+    expect(clickSpy).toHaveBeenCalled();
+    expect(link.download).toBe('case.txt');
+  });
+
+  it('Should download a zip on download-zip-file', async () => {
+    const wrapper = await mountWithOpenCreator();
+
+    const link = document.createElement('a');
+    const clickSpy = jest
+      .spyOn(link, 'click')
+      .mockImplementation(() => undefined);
+    jest.spyOn(document, 'createElement').mockReturnValue(link);
+    (URL as any).createObjectURL = jest.fn(() => 'blob:mock');
+    (URL as any).revokeObjectURL = jest.fn();
+
+    const zipContent = {
+      generateAsync: jest.fn().mockResolvedValue(new Blob(['zip'])),
+    };
+
+    wrapper.find('omegaup-problem-creator-stub').vm.$emit('download-zip-file', {
+      fileName: 'problem',
+      zipContent,
+    });
+    await wrapper.vm.$nextTick();
+    await Promise.resolve();
+
+    expect(zipContent.generateAsync).toHaveBeenCalledWith({ type: 'blob' });
+    expect(clickSpy).toHaveBeenCalled();
+    expect(link.download).toBe('problem.zip');
   });
 });
