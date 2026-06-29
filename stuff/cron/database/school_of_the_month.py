@@ -217,6 +217,33 @@ def get_school_of_the_month_candidates(
                 AND su.time BETWEEN %s AND %s
                 AND su.school_id IS NOT NULL
                 AND i.user_id IS NOT NULL
+                -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+                -- role_id = 1 is ADMIN_ROLE)
+                -- TODO: Replace magic numbers with constants
+                AND i.user_id NOT IN (
+                    SELECT ur.user_id
+                    FROM User_Roles AS ur
+                    WHERE ur.acl_id = 1 AND ur.role_id = 1
+                )
+                -- Exclude problems where the identity is admin/owner
+                AND NOT EXISTS (
+                    -- problem owner
+                    SELECT 1 FROM ACLs AS a
+                    WHERE a.acl_id = p.acl_id AND a.owner_id = i.user_id
+                    UNION
+                    -- direct problem admin (role_id = 1 is ADMIN_ROLE)
+                    SELECT 1 FROM User_Roles AS ur
+                    WHERE ur.acl_id = p.acl_id AND ur.role_id = 1
+                        AND ur.user_id = i.user_id
+                    UNION
+                    -- group problem admin (role_id = 1 is ADMIN_ROLE)
+                    SELECT 1
+                    FROM Group_Roles AS gr
+                    INNER JOIN Groups_Identities AS gi
+                        ON gi.group_id = gr.group_id
+                    WHERE gr.acl_id = p.acl_id AND gr.role_id = 1
+                        AND gi.identity_id = su.identity_id
+                )
                 AND recent_winners.school_id IS NULL
                 AND pf.problem_id IS NULL
                 AND NOT EXISTS (
