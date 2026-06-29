@@ -97,6 +97,7 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
       /\bprint\s*\(/,
       /if\s+__name__\s*==\s*['"]__main__['"]/,
       /\binput\s*\(/,
+      /\bfor\s+\w+\s+in\s+/,
     ],
     priority: 85,
   },
