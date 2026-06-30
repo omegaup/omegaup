@@ -280,7 +280,10 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
             $adminSchool,
             $problemAdmin
         );
-        \OmegaUp\Test\Factories\Schools::addUserToSchool($adminSchool, $student);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $adminSchool,
+            $student
+        );
         \OmegaUp\Test\Factories\Schools::addUserToSchool(
             $controlSchool,
             $controlStudent
