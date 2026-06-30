@@ -267,6 +267,28 @@ describe('ContestList.vue', () => {
     expect(wrapper.text()).toContain(T.contestListEmpty);
   });
 
+  it('Should not throw when recalculating scroll for a hidden/empty tab', () => {
+    const contestsWithOnlyPast: types.ContestList = {
+      current: [],
+      future: [],
+      past: contests.past,
+    };
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests: contestsWithOnlyPast,
+        tab: ContestTab.Current,
+      },
+    });
+
+    // Hidden tabs have no scrollContainer ref. onScroll previously did
+    // (this.$refs[key] as HTMLElement[])[0] and threw
+    // "Cannot read properties of undefined (reading '0')" on the missing ref.
+    expect(() => {
+      (wrapper.vm as any).onScroll(ContestTab.Current);
+      (wrapper.vm as any).onScroll(ContestTab.Future);
+    }).not.toThrow();
+  });
+
   it('Should not render Virtual/Practice in Current contests', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
