@@ -250,12 +250,7 @@ export default class Ephemeral extends Vue {
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
-  readonly themeToRef: { [key: string]: string } = {
-    [Util.MonacoThemes
-      .VSLight]: `/third_party/css/golden-layout/goldenlayout-light-theme.css`,
-    [Util.MonacoThemes
-      .VSDark]: `/third_party/css/golden-layout/goldenlayout-dark-theme.css`,
-  };
+
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
@@ -431,16 +426,7 @@ export default class Ephemeral extends Vue {
     this.zipHref = null;
     this.zipDownload = null;
   }
-  @Watch('theme')
-  onThemeChange() {
-    // remove old theme
-    for (const theme in this.themeToRef) {
-      if (theme === this.theme) continue;
-      const link = document.getElementById(this.themeToRef[theme]);
-      if (link) link.remove();
-    }
-    this.downloadThemeStylesheet(this.theme);
-  }
+
 
   onDetailsJsonReady(results: GraderResults) {
     store.dispatch('results', results);
@@ -882,15 +868,9 @@ export default class Ephemeral extends Vue {
     }
     this.goldenLayout?.updateSize();
   }
-  downloadThemeStylesheet(theme: string) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = this.themeToRef[theme];
-    document.head.appendChild(link);
-  }
+
   beforeMount() {
     this.initProblem();
-    this.downloadThemeStylesheet(this.theme);
   }
   mounted() {
     this.goldenLayout = new GoldenLayout(
@@ -918,7 +898,9 @@ export default class Ephemeral extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
-@import '../../../third_party/css/golden-layout/goldenlayout-base.css';
+@import '~golden-layout/src/css/goldenlayout-base.css';
+@import '~golden-layout/src/css/goldenlayout-light-theme.css';
+@import '~golden-layout/src/css/goldenlayout-dark-theme.css';
 
 div > section {
   min-height: 60em;
