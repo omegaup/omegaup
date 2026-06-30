@@ -1102,6 +1102,7 @@ const translations: { [key: string]: string; } = {
   notificationsNoNewNotifications: "N\u00e3o h\u00e1 novas notifica\u00e7\u00f5es.",
   officialSolutionsInfo: "Como funciona a solu\u00e7\u00e3o de problemas?",
   omegaUpTitleMyDependents: "Meus dependentes",
+  omegaupTitleAdminSettings: "Configura\u00e7\u00f5es de administrador",
   omegaupTitleAdminUsers: "Gerenciamento de coders",
   omegaupTitleAuthorsRank: "Ranking de contribuidores",
   omegaupTitleBadges: "Crach\u00e1s",
