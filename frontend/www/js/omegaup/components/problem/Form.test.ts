@@ -2,9 +2,11 @@ import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import Form from './Form.vue';
 import { CreationMethods } from './Form.vue';
+import CreatorWrapper from './CreatorWrapper.vue';
 
 const props: types.ProblemFormPayload = {
   title: 'title',
@@ -187,5 +189,99 @@ describe('Settings.vue', () => {
     await wrapper.find('[data-problem-creator-close]').trigger('click');
 
     expect((wrapper.vm as any).showProblemCreator).toBe(false);
+  });
+
+  it('Should show success message when creator emits show-update-success-message', async () => {
+    const successSpy = jest.spyOn(ui, 'success').mockImplementation(() => {});
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    wrapper.findComponent(CreatorWrapper).vm.$emit('show-update-success-message');
+
+    expect(successSpy).toHaveBeenCalledWith(T.problemCreatorUpdateAlert);
+    successSpy.mockRestore();
+  });
+
+  it('Should download input file when creator emits download-input-file', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const click = jest.fn();
+    const anchor = ({
+      href: '',
+      download: '',
+      click,
+    } as unknown) as HTMLAnchorElement;
+    const createElement = jest
+      .spyOn(document, 'createElement')
+      .mockReturnValue(anchor);
+    const appendChild = jest
+      .spyOn(document.body, 'appendChild')
+      .mockImplementation((node) => node);
+    const removeChild = jest
+      .spyOn(document.body, 'removeChild')
+      .mockImplementation((node) => node);
+    (global.URL as any).createObjectURL = jest.fn(() => 'blob:input');
+    (global.URL as any).revokeObjectURL = jest.fn();
+
+    wrapper.findComponent(CreatorWrapper).vm.$emit('download-input-file', {
+      fileName: 'cases/1.in',
+      fileContent: 'content',
+    });
+
+    expect(anchor.download).toBe('cases/1.in');
+    expect(click).toHaveBeenCalled();
+
+    createElement.mockRestore();
+    appendChild.mockRestore();
+    removeChild.mockRestore();
+  });
+
+  it('Should download zip file when creator emits download-zip-file', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const click = jest.fn();
+    const anchor = ({
+      href: '',
+      download: '',
+      click,
+    } as unknown) as HTMLAnchorElement;
+    const createElement = jest
+      .spyOn(document, 'createElement')
+      .mockReturnValue(anchor);
+    const appendChild = jest
+      .spyOn(document.body, 'appendChild')
+      .mockImplementation((node) => node);
+    const removeChild = jest
+      .spyOn(document.body, 'removeChild')
+      .mockImplementation((node) => node);
+    (global.URL as any).createObjectURL = jest.fn(() => 'blob:zip');
+    (global.URL as any).revokeObjectURL = jest.fn();
+
+    const zipContent = {
+      generateAsync: jest.fn().mockResolvedValue(new Blob()),
+    };
+    wrapper.findComponent(CreatorWrapper).vm.$emit('download-zip-file', {
+      fileName: 'problem',
+      zipContent,
+    });
+    // Flush the generateAsync().then() microtask before asserting.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(zipContent.generateAsync).toHaveBeenCalledWith({ type: 'blob' });
+    expect(anchor.download).toBe('problem.zip');
+    expect(click).toHaveBeenCalled();
+
+    createElement.mockRestore();
+    appendChild.mockRestore();
+    removeChild.mockRestore();
   });
 });
