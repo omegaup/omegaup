@@ -5,7 +5,6 @@
  * Tests rules of the School of the Month candidates
  */
 class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
-
     // Returns the last day of the previous month
     private static function previousMonthRunDate(): string {
         $previousMonth = date_create(date('Y-m-d', \OmegaUp\Time::get()));
@@ -34,7 +33,6 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testUniqueProblemsPerSchoolCountedOnce() {
-
         $schoolWithDuplicate = \OmegaUp\Test\Factories\Schools::createSchool();
         $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
 
@@ -267,7 +265,6 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
             'A forfeited problem must not be counted for the school'
         );
     }
-
 
     public function testProblemAdminOwnerSolvesDoNotCount() {
         $adminSchool = \OmegaUp\Test\Factories\Schools::createSchool();
