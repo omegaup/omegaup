@@ -94,7 +94,19 @@ If you want to run the JavaScript/TypeScript tests locally (outside of Docker), 
 
 ### Prerequisites
 
-1. **Node.js**: Install Node.js (version 20 or higher recommended; CI and Cypress tooling expect Node 20+)
+1. **Node.js**: Install Node.js 24 (LTS). CI, Docker, and Cypress tooling use Node 24.
+
+   The repository pins the expected version in [`.nvmrc`](https://github.com/omegaup/omegaup/blob/main/.nvmrc). We recommend using [nvm](https://github.com/nvm-sh/nvm) to install and switch Node versions locally:
+
+   ```shell
+   # Install nvm: https://github.com/nvm-sh/nvm#installing-and-updating
+   nvm install    # reads .nvmrc and installs Node 24
+   nvm use        # switches to the version in .nvmrc
+   node -v        # should print v24.x.x
+   ```
+
+   When the project upgrades Node.js in the future, update your local runtime with `nvm install` after pulling the latest changes.
+
 2. **Yarn**: Install Yarn package manager
 
 ### Setup Steps
@@ -252,7 +264,10 @@ ln -sf ~/.mysql.docker.cnf .my.cnf
 
 ---
 
-If you encounter errors related to Node.js version mismatch or `yarn install` failing after pulling the latest changes, rebuild the frontend container:
+If you encounter errors related to Node.js version mismatch or `yarn install` failing after pulling the latest changes:
+
+- **Outside Docker:** run `nvm install` and `nvm use` (see [Running Tests Locally](#running-tests-locally)).
+- **Inside Docker:** rebuild the frontend container:
 
 ```bash
 docker compose build frontend
