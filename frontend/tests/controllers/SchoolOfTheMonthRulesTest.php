@@ -360,4 +360,93 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
             'Problems solved by their owner/admin must not be counted'
         );
     }
+
+    public function testProblemSolvedBySchoolInPreviousMonth() {
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $oldstudent] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $newstudent] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $oldstudent);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $newstudent);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        $sharedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+        $exclusiveProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+        $priorDate = date(
+            'Y-m-15',
+            strtotime('first day of -2 months', \OmegaUp\Time::get())
+        );
+
+        // Prepare setup:
+        // school:        oldstudent=>sharedProblem (prior month, outside window)
+        //                newstudentr=>sharedProblem (current window, but school already has it)
+        //                newstudent=>exclusiveProblem (current window)
+        // controlSchool: controlStudent=>sharedProblem (current window)
+        //                controlStudent=>exclusiveProblem (current window)
+        //
+        // sharedProblem was already solved by $school before the evaluation window so
+        // newstudent's AC must not count for $school's score this month.
+        // Expected distinct problems: school=1, controlSchool=2
+        // The rank should be: controlSchool, school
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $sharedProblem,
+            $oldstudent
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            new \OmegaUp\Timestamp(strtotime($priorDate))
+        );
+
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $newstudent,
+            $sharedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $newstudent,
+            $exclusiveProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $sharedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $exclusiveProblem,
+            $runDate
+        );
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $schoolScore = self::findSchoolScore(
+            $candidates,
+            $school['request']['name']
+        );
+        $controlScore = self::findSchoolScore(
+            $candidates,
+            $controlSchool['request']['name']
+        );
+
+        $this->assertNotNull($schoolScore);
+        $this->assertNotNull($controlScore);
+        $this->assertGreaterThan(
+            $schoolScore,
+            $controlScore,
+            'A problem solved by the school in a prior month must not count again'
+        );
+    }
 }
