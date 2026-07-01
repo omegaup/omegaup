@@ -8,7 +8,7 @@
   >
     <slot name="title">
       <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+        <h1 class="text-center">{{ T.latestSubmissionsTitle }}</h1>
       </div>
     </slot>
     <div
