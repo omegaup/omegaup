@@ -1,11 +1,8 @@
 <template>
-  <div
+  <omegaup-common-view-unavailable
     v-if="!ephemeralGraderEnabled"
-    class="alert alert-danger m-0"
-    role="alert"
-  >
-    {{ T.ephemeralGraderDisabled }}
-  </div>
+    :description="T.ephemeralGraderDisabled"
+  ></omegaup-common-view-unavailable>
   <ephemeral-ide
     v-else
     :accepted-languages="acceptedLanguages"
@@ -28,10 +25,12 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as Util from '../../grader/util';
 import Ephemeral from '../../grader/Ephemeral.vue';
+import common_ViewUnavailable from '../common/ViewUnavailable.vue';
 
 @Component({
   components: {
     'ephemeral-ide': Ephemeral,
+    'omegaup-common-view-unavailable': common_ViewUnavailable,
   },
 })
 export default class EphemeralGrader extends Vue {

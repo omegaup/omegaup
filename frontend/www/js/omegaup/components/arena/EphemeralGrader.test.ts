@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 
+import T from '../../lang';
 import arena_EphemeralGrader from './EphemeralGrader.vue';
 
 describe('EphemeralGrader.vue', () => {
@@ -132,6 +133,23 @@ Here we can add code.
     expect(wrapper.get('[data-run-button]').exists()).toBe(true);
     expect(wrapper.get('[data-submit-button]').exists()).toBe(true);
     expect(wrapper.get('option[value="cpp17-gcc"]').exists()).toBe(true);
+
+    wrapper.destroy();
+  });
+
+  it('Should show the view unavailable message when the grader is disabled', () => {
+    const wrapper = mount(arena_EphemeralGrader, {
+      attachTo: '#root',
+      propsData: {
+        problem,
+        acceptedLanguages: ['py3'],
+        preferredLanguage: 'py3',
+        ephemeralGraderEnabled: false,
+      },
+    });
+
+    expect(wrapper.text()).toContain(T.ephemeralGraderDisabled);
+    expect(wrapper.find('[data-run-button]').exists()).toBe(false);
 
     wrapper.destroy();
   });
