@@ -6,13 +6,14 @@ class UserListTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSearchUsersBySubstringAndSpecialCharacters() {
         ['identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
             null,
             $creatorLogin
         );
+        $group = $groupData['group'];
         $password = \OmegaUp\Test\Utils::createRandomString();
 
         $identities = [
