@@ -60,17 +60,31 @@ class UserListTest extends \OmegaUp\Test\ControllerTestCase {
         // - usernames containing special characters (_, ., -)
         // - search terms starting with a MySQL boolean-mode operator ("-name")
         //   should match literally instead of being treated as an exclusion
-        $this->assertSearchResultContains('string', "{$group->alias}:substring_user");
-        $this->assertSearchResultContains('underscore_', "{$group->alias}:underscore_name");
+        $this->assertSearchResultContains(
+            'string',
+            "{$group->alias}:substring_user"
+        );
+        $this->assertSearchResultContains(
+            'underscore_',
+            "{$group->alias}:underscore_name"
+        );
         $this->assertSearchResultContains('dot.', "{$group->alias}:dot.name");
-        $this->assertSearchResultContains('dash-name', "{$group->alias}:dash-name");
+        $this->assertSearchResultContains(
+            'dash-name',
+            "{$group->alias}:dash-name"
+        );
         $this->assertSearchResultContains('-name', "{$group->alias}:dash-name");
     }
 
-    private function assertSearchResultContains(string $query, string $expectedUsername): void {
+    private function assertSearchResultContains(
+        string $query,
+        string $expectedUsername
+    ): void {
         $results = \OmegaUp\Controllers\User::apiList(new \OmegaUp\Request([
             'query' => $query,
-            'auth_token' => self::login(\OmegaUp\Test\Factories\User::createUser()['identity'])->auth_token,
+            'auth_token' => self::login(
+                \OmegaUp\Test\Factories\User::createUser()['identity']
+            )->auth_token,
         ]))['results'];
 
         $usernames = array_map(fn ($item) => $item['key'], $results);
