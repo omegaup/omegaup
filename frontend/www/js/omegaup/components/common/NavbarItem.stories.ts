@@ -1,10 +1,6 @@
 import { Meta, StoryObj } from '@storybook/vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faBook,
-  faComments,
-  faVideo,
-} from '@fortawesome/free-solid-svg-icons';
+import { faBook, faComments, faVideo } from '@fortawesome/free-solid-svg-icons';
 import NavbarItem from './NavbarItem.vue';
 
 library.add(faBook, faComments, faVideo);
