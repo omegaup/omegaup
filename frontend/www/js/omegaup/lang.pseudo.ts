@@ -2140,6 +2140,7 @@ const translations: { [key: string]: string; } = {
   verificationEmailSuccessfully: "(Y0ur 3mai1 addr355 ha5 b33n v3rifi3d.)",
   verificationIdInvalid: "(Th3 pr0vid3d v3rifica7i0n inf0rma7i0n i5 n07 va1id.)",
   verificationParentalTokenGoToMyDependents: "(G0 70 my d3p3nd3n75)",
+  viewUnavailableTitle: "(Thi5 vi3w i5 curr3n71y unavai1ab13)",
   virtualContest: "(Vir7ua1 c0n7357)",
   virtualContestSuffix: "(%(title) [vir7ua1])",
   virtualSuffix: "(%(username) [vir7ua1])",
