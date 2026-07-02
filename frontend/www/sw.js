@@ -1,15 +1,6 @@
 const CACHE_NAME = 'omegaup-static-v1';
 
-const CACHEABLE_PATHS = [
-  '/js/',
-  '/css/',
-  '/media/',
-  '/third_party/',
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(self.skipWaiting());
-});
+const CACHEABLE_PATHS = ['/js/', '/css/', '/media/', '/third_party/'];
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
@@ -21,8 +12,7 @@ self.addEventListener('activate', (event) => {
             .filter((key) => key !== CACHE_NAME)
             .map((key) => caches.delete(key)),
         ),
-      )
-      .then(() => self.clients.claim()),
+      ),
   );
 });
 
@@ -44,9 +34,11 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (isCacheable(url.pathname)) {
-    event.respondWith(
-      staleWhileRevalidate(request),
-    );
+    if (url.pathname.startsWith('/media/')) {
+      event.respondWith(staleWhileRevalidate(request));
+    } else {
+      event.respondWith(networkFirst(request));
+    }
   }
 });
 
@@ -59,9 +51,7 @@ function shouldSkip(pathname) {
 }
 
 function isCacheable(pathname) {
-  return CACHEABLE_PATHS.some((path) =>
-    pathname.startsWith(path),
-  );
+  return CACHEABLE_PATHS.some((path) => pathname.startsWith(path));
 }
 
 async function staleWhileRevalidate(request) {
@@ -72,10 +62,7 @@ async function staleWhileRevalidate(request) {
   const networkFetch = fetch(request)
     .then((response) => {
       if (response.ok) {
-        cache.put(
-          request,
-          response.clone(),
-        );
+        cache.put(request, response.clone()).catch(() => undefined);
       }
 
       return response;
@@ -83,4 +70,22 @@ async function staleWhileRevalidate(request) {
     .catch(() => cached);
 
   return cached || networkFetch;
+}
+
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+
+  try {
+    const response = await fetch(request);
+
+    if (response.ok) {
+      cache.put(request, response.clone()).catch(() => undefined);
+    }
+
+    return response;
+  } catch {
+    const cached = await cache.match(request);
+
+    return cached || Response.error();
+  }
 }
