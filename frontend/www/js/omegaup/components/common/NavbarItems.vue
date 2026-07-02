@@ -219,7 +219,7 @@
               :key="`help-divider-${index}`"
               class="menu-divider"
             />
-            <navbar-item
+            <omegaup-navbar-item
               v-else
               :key="`help-item-${index}`"
               :title="entry.title"
@@ -276,7 +276,7 @@ interface HelpMenuEntry {
 
 @Component({
   components: {
-    NavbarItem,
+    'omegaup-navbar-item': NavbarItem,
   },
 })
 export default class NavbarItems extends Vue {

@@ -46,4 +46,38 @@ describe('NavbarItem.vue', () => {
     expect(wrapper.text()).toContain('Tutorials');
     expect(wrapper.find('small').text()).toBe('Watch the videos');
   });
+
+  it('Should accept a plain string icon name', () => {
+    const wrapper = mount(common_NavbarItem, {
+      propsData: {
+        title: 'Tutorials',
+        icon: 'video',
+        href: '/videos/',
+      },
+    });
+
+    expect(wrapper.find('.help-item-icon').exists()).toBe(true);
+  });
+
+  it('Should mark links that leave the current host', () => {
+    const wrapper = mount(common_NavbarItem, {
+      propsData: {
+        title: 'Discord',
+        href: 'https://discord.example/invite',
+      },
+    });
+
+    expect(wrapper.find('.external-link-icon').exists()).toBe(true);
+  });
+
+  it('Should not mark links within the current host', () => {
+    const wrapper = mount(common_NavbarItem, {
+      propsData: {
+        title: 'Statement editor',
+        href: '/problem/statement/',
+      },
+    });
+
+    expect(wrapper.find('.external-link-icon').exists()).toBe(false);
+  });
 });
