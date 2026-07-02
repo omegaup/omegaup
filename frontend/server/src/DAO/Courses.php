@@ -669,9 +669,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 gi.group_id = ?
+            ORDER BY
+                i.name, i.username
             LIMIT ?, ?';
 
-        /** @var list<array{identity_id: int, username: string, name: null|string, country_id: null|string, classname: string}> */
+        /** @var list<array{classname: string, country_id: null|string, identity_id: int, name: null|string, username: string}> */
         $courseUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sqlUsers,
             [
@@ -734,7 +736,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 HAVING
                     MAX(r.contest_score) IS NOT NULL
                 ORDER BY
-                    i.name, a.\`order\`, psp.\`order\`
+                    i.name, a.`order`, psp.`order`
             ";
 
             /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: null|string, problem_alias: string, problem_score: float, username: string}> */
