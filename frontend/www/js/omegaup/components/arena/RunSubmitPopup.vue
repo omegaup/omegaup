@@ -110,13 +110,11 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage: null | string = this.preferredLanguage;
   code = '';
   now: number = Date.now();
-  hasRestoredLanguage: boolean = false;
 
   mounted(): void {
     const savedLanguage = SafeStorage.getItem('arena:selectedLanguage');
     if (savedLanguage && savedLanguage in this.allowedLanguages) {
       this.selectedLanguage = savedLanguage;
-      this.hasRestoredLanguage = true;
     }
   }
 
@@ -218,11 +216,30 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 
   @Watch('preferredLanguage')
-  onPreferredLanguageChanged(newValue: null | string): void {
-    if (this.hasRestoredLanguage) return;
-    if (newValue) {
-      this.selectedLanguage = newValue;
+  onPreferredLanguageChanged(): void {
+    this.revalidateLanguage();
+  }
+
+  @Watch('languages')
+  onLanguagesChanged(): void {
+    this.revalidateLanguage();
+  }
+
+  revalidateLanguage(): void {
+    if (
+      this.selectedLanguage &&
+      this.selectedLanguage in this.allowedLanguages
+    ) {
+      return;
     }
+    if (
+      this.preferredLanguage &&
+      this.preferredLanguage in this.allowedLanguages
+    ) {
+      this.selectedLanguage = this.preferredLanguage;
+      return;
+    }
+    this.selectedLanguage = Object.keys(this.allowedLanguages)[0] || null;
   }
 
   onSubmit(): void {
