@@ -80,4 +80,26 @@ describe('NavbarItem.vue', () => {
 
     expect(wrapper.find('.external-link-icon').exists()).toBe(false);
   });
+
+  it('Should default a safe rel on external links', () => {
+    const wrapper = mount(common_NavbarItem, {
+      propsData: {
+        title: 'Discord',
+        href: 'https://discord.example/invite',
+      },
+    });
+
+    expect(wrapper.find('a').attributes('rel')).toBe('noopener noreferrer');
+  });
+
+  it('Should not add a rel to internal links', () => {
+    const wrapper = mount(common_NavbarItem, {
+      propsData: {
+        title: 'Statement editor',
+        href: '/problem/statement/',
+      },
+    });
+
+    expect(wrapper.find('a').attributes('rel')).toBeUndefined();
+  });
 });

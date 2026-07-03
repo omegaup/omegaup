@@ -6,7 +6,7 @@
     ]"
     :href="href"
     :target="target"
-    :rel="rel"
+    :rel="relValue"
   >
     <font-awesome-icon
       v-if="hasIcon"
@@ -64,6 +64,15 @@ export default class NavbarItem extends Vue {
     } catch {
       return false;
     }
+  }
+
+  get relValue(): string | null {
+    // External links always get a safe rel so a new tab cannot reach back
+    // into omegaUp through window.opener.
+    if (this.isExternal) {
+      return this.rel ?? 'noopener noreferrer';
+    }
+    return this.rel;
   }
 }
 </script>
