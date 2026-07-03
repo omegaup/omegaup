@@ -20,7 +20,7 @@
         >
           {{ T.wordsContests }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="contests-items">
             <omegaup-navbar-item
               :title="T.navViewContests"
@@ -70,7 +70,7 @@
         >
           {{ T.navCourses }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="courses-items">
             <omegaup-navbar-item
               :title="T.navViewCourses"
@@ -114,7 +114,7 @@
         >
           {{ T.wordsProblems }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="problems-items">
             <omegaup-navbar-item
               :title="T.navViewProblems"
@@ -207,7 +207,7 @@
         >
           {{ T.navRanking }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <omegaup-navbar-item
             :title="T.navUserRanking"
             :description="T.navUserRankingDesc"
@@ -264,7 +264,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <template v-for="(entry, index) in helpMenuEntries">
             <hr
               v-if="entry.divider"
@@ -467,7 +467,7 @@ export default class NavbarItems extends Vue {
 
 <style lang="scss" scoped>
 @media only screen and (max-width: 992px) {
-  .help-dropdown {
+  .navbar-item-dropdown {
     min-width: auto !important;
     width: auto !important;
     max-width: 85vw !important;
