@@ -198,7 +198,9 @@ describe('Settings.vue', () => {
     });
     await wrapper.setData({ showProblemCreator: true });
 
-    wrapper.findComponent(CreatorWrapper).vm.$emit('show-update-success-message');
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('show-update-success-message');
 
     expect(successSpy).toHaveBeenCalledWith(T.problemCreatorUpdateAlert);
     successSpy.mockRestore();
