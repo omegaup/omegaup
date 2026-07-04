@@ -318,18 +318,43 @@ class RedisCacheAdapter extends CacheAdapter {
 
     /**
      * Atomically increments a counter with TTL support.
-     * Uses Redis INCR + EXPIRE in a Lua script for true atomicity.
+     * Uses a Lua script over the same serialize() format as the rest of the
+     * adapter for true atomicity.
      *
      * @param string $key
      * @param int $ttl Time to live in seconds
      * @return int The new value after incrementing
      */
     public function incWithTTL(string $key, int $ttl): int {
-        // Lua script ensures INCR + EXPIRE are atomic
-        $script = <<<LUA
-        local count = redis.call('INCR', KEYS[1])
+        // Every other method in this adapter stores values with PHP's
+        // serialize() (an integer N is stored as "i:N;"). A raw Redis INCR
+        // would instead store "N", which unserialize() cannot read and which
+        // makes INCR fail on values previously written by inc()/store(). So we
+        // read, increment and write the counter in that same serialized format,
+        // all inside a Lua script for atomicity. The TTL is only (re)set when
+        // the key is first created, preserving the previous behaviour.
+        $script = <<<'LUA'
+        local raw = redis.call('GET', KEYS[1])
+        local count
+        if raw == false then
+            count = 1
+        else
+            local n = string.match(raw, '^i:(%-?%d+);$')
+                or string.match(raw, '^(%-?%d+)$')
+            count = (n and tonumber(n) + 1) or 1
+        end
+        local value = 'i:' .. count .. ';'
         if count == 1 then
-            redis.call('EXPIRE', KEYS[1], ARGV[1])
+            redis.call('SET', KEYS[1], value)
+            if tonumber(ARGV[1]) > 0 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
+        else
+            local pttl = redis.call('PTTL', KEYS[1])
+            redis.call('SET', KEYS[1], value)
+            if pttl > 0 then
+                redis.call('PEXPIRE', KEYS[1], pttl)
+            end
         end
         return count
         LUA;
