@@ -117,8 +117,10 @@ describe('RunSubmitPopup.vue', () => {
 
     await wrapper.find('form[data-run-submit]').trigger('submit');
 
-    expect(wrapper.emitted('submit-run')).toBeDefined();
-    expect(wrapper.emitted('submit-run')![0][1]).toBe('cpp17-gcc');
+    const submitRunEvents = wrapper.emitted('submit-run');
+
+    expect(submitRunEvents).toBeDefined();
+    expect(submitRunEvents?.[0][1]).toBe('cpp17-gcc');
 
     wrapper.destroy();
   });
