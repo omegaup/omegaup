@@ -37,7 +37,7 @@ print(n * 2)`;
       const result = detectLanguageFromCode(simpleCodeExample);
       expect(result?.language).not.toBe('lua');
     });
-    
+
     it('should detect Lua for simple Lua code with io.read', () => {
       const luaCode = `local a, b = io.read("*n", "*n")
 print(a + b)`;
