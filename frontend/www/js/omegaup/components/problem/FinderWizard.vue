@@ -108,6 +108,7 @@ interface TagObject {
 })
 export default class ProblemFinderWizard extends Vue {
   @Prop() possibleTags!: { name: string }[];
+  @Prop({ default: false }) show!: boolean;
 
   T = T;
   karel = false;
@@ -176,7 +177,7 @@ export default class ProblemFinderWizard extends Vue {
   }
 
   onEsc(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
+    if (event.key === 'Escape' && this.show) {
       this.$emit('close');
     }
   }
