@@ -17,13 +17,6 @@ for _ in range(q):
       expect(result?.language).toBe('py3');
     });
 
-    it('should not falsely detect Lua for simple Python code', () => {
-      const simplePython = `n = int(input())
-print(n * 2)`;
-      const result = detectLanguageFromCode(simplePython);
-      expect(result?.language).not.toBe('lua');
-    });
-
     it('should detect Python for complete Python code with imports', () => {
       const completePython = `import sys
 def solve():
@@ -38,6 +31,13 @@ if __name__ == "__main__":
     });
   });
   describe('Lua detection', () => {
+    it('should not falsely detect Lua for simple code', () => {
+      const simpleCode = `n = int(input())
+print(n * 2)`;
+      const result = detectLanguageFromCode(simpleCode);
+      expect(result?.language).not.toBe('lua');
+    });
+    
     it('should detect Lua for simple Lua code with io.read', () => {
       const luaCode = `local a, b = io.read("*n", "*n")
 print(a + b)`;
@@ -59,7 +59,7 @@ solve()`;
       expect(result?.language).toBe('lua');
     });
 
-    it('should not detect Lua for simple code with low confidence', () => {
+    it('should detect Lua for simple code with low confidence', () => {
       const simpleCode = `local x = 5
 print(x)`;
       const result = detectLanguageFromCode(simpleCode);
