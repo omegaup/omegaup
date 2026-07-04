@@ -32,9 +32,9 @@ if __name__ == "__main__":
   });
   describe('Lua detection', () => {
     it('should not falsely detect Lua for simple code', () => {
-      const simpleCode = `n = int(input())
+      const simpleCodeExample = `n = int(input())
 print(n * 2)`;
-      const result = detectLanguageFromCode(simpleCode);
+      const result = detectLanguageFromCode(simpleCodeExample);
       expect(result?.language).not.toBe('lua');
     });
     
