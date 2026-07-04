@@ -51,9 +51,9 @@ describe('NavbarItems.vue', () => {
     const loggedOut = mount(common_NavbarItems, {
       propsData: { ...baseProps, isLoggedIn: false, isMainUserIdentity: false },
     });
-    expect(
-      loggedOut.find('[data-nav-problems-create-options]').exists(),
-    ).toBe(false);
+    expect(loggedOut.find('[data-nav-problems-create-options]').exists()).toBe(
+      false,
+    );
     expect(
       loggedOut.find('a.dropdown-item[href="/problem/creator/"]').exists(),
     ).toBe(true);
