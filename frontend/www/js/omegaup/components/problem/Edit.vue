@@ -293,6 +293,17 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { ModalPlugin } from 'bootstrap-vue';
 Vue.use(ModalPlugin);
 
+const availableTabs = [
+  'edit',
+  'markdown',
+  'version',
+  'solution',
+  'admins',
+  'tags',
+  'download',
+  'delete',
+];
+
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
@@ -374,6 +385,15 @@ export default class ProblemEdit extends Vue {
 
   onGotoPrintableVersion(): void {
     window.location.href = `/arena/problem/${this.alias}/print/`;
+  }
+
+  @Watch('initialTab')
+  onInitialTabChanged(newValue: string): void {
+    if (!availableTabs.includes(this.initialTab)) {
+      this.showTab = 'edit';
+      return;
+    }
+    this.showTab = newValue;
   }
 }
 </script>
