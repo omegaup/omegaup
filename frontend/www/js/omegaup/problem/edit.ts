@@ -366,4 +366,3 @@ OmegaUp.on('ready', () => {
 
   window.addEventListener('hashchange', onHashChange);
 });
-
