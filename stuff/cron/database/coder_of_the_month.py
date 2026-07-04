@@ -322,10 +322,28 @@ def get_user_problems(
             SELECT
                 s.identity_id,
                 s.problem_id,
-                MIN(s.time) AS first_time_solved
+                MIN(s.time) AS first_time_solved,
+                (
+                    SELECT s2.school_id
+                    FROM Submissions s2
+                    WHERE s2.identity_id = s.identity_id
+                      AND s2.problem_id  = s.problem_id
+                      AND s2.verdict     = 'AC'
+                      AND s2.type        = 'normal'
+                    ORDER BY s2.time ASC
+                    LIMIT 1
+                ) AS school_id_at_solve_time
             FROM
                 Submissions s
             INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf
+                ON  pf.user_id    = i.user_id
+                AND pf.problem_id = s.problem_id
+            WHERE
+                s.identity_id IN ({identity_ids_str})
+                AND s.problem_id  IN ({problem_ids_str})
                 AND s.verdict     = 'AC'
                 AND s.type        = 'normal'
                 AND pf.problem_id IS NULL
