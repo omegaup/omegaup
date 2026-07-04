@@ -319,28 +319,19 @@ def get_user_problems(
     problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
 
     sql = '''
-            SELECT DISTINCT
+            SELECT
                 s.identity_id,
                 s.problem_id,
-                FIRST_VALUE(s.time) OVER w AS first_time_solved,
-                FIRST_VALUE(s.school_id) OVER w AS school_id_at_solve_time
+                MIN(s.time) AS first_time_solved
             FROM
                 Submissions s
             INNER JOIN
-                Identities i ON i.identity_id = s.identity_id
-            LEFT JOIN
-                Problems_Forfeited pf
-                ON  pf.user_id    = i.user_id
-                AND pf.problem_id = s.problem_id
-            WHERE
-                s.identity_id IN ({identity_ids_str})
-                AND s.problem_id  IN ({problem_ids_str})
                 AND s.verdict     = 'AC'
                 AND s.type        = 'normal'
                 AND pf.problem_id IS NULL
-            WINDOW w AS (
-                PARTITION BY s.identity_id, s.problem_id ORDER BY s.time ASC
-            );
+            GROUP BY
+                s.identity_id,
+                s.problem_id;
     '''
     sql = sql.format(identity_ids_str=identity_ids_str,
                      problem_ids_str=problem_ids_str)
