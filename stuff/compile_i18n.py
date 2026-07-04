@@ -15,9 +15,11 @@ os.chdir(REPO_ROOT)
 
 from stuff.i18n_linter import I18nLinter
 
+
 def main() -> None:
+    """Main compilation entrypoint."""
     linter = I18nLinter()
-    
+
     def contents_callback(filename: str) -> bytes:
         try:
             with open(filename, 'rb') as f:
@@ -27,7 +29,7 @@ def main() -> None:
 
     # run_all returns linters.MultipleResults
     results = linter.run_all([], contents_callback)
-    
+
     if not results.new_contents:
         print('All translation files are up to date.')
         return
@@ -37,6 +39,7 @@ def main() -> None:
         print(f'Writing {filename}...')
         with open(filename, 'wb') as f:
             f.write(content)
+
 
 if __name__ == '__main__':
     main()
