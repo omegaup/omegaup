@@ -20,6 +20,7 @@
       </div>
       <div class="form-group mr-2">
         <omegaup-common-typeahead
+          ref="typeahead"
           data-problem-keyword-search
           :only-existing-tags="false"
           :max-results="10"
@@ -78,6 +79,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { shortcutManager } from '../../keyboard-shortcuts';
 import common_Typeahead from '../common/Typeahead.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -99,6 +101,8 @@ export default class ProblemSearchBar extends Vue {
   @Prop() onlyQualitySeal!: boolean;
   @Prop() searchResultProblems!: types.ListItem[];
 
+  @Ref('typeahead') readonly typeahead!: common_Typeahead;
+
   T = T;
 
   currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
@@ -110,6 +114,21 @@ export default class ProblemSearchBar extends Vue {
     if (language === 'en') return T.wordsEnglish;
     if (language === 'es') return T.wordsSpanish;
     return T.wordsPortuguese;
+  }
+
+  mounted() {
+    shortcutManager.registerShortcut({
+      key: 'l',
+      ctrlKey: true,
+      description: T.keyboardShortcutsSearchProblems,
+      action: () => {
+        this.typeahead.focus();
+      },
+    });
+  }
+
+  beforeDestroy() {
+    shortcutManager.unregisterShortcut('l', true);
   }
 
   get currentKeywordValue(): null | string {

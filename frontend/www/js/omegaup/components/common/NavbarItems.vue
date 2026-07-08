@@ -345,6 +345,14 @@
               }}</small>
             </span>
           </a>
+          <div class="dropdown-divider"></div>
+          <a
+            class="dropdown-item"
+            href="#"
+            @click.prevent="$emit('show-shortcuts')"
+          >
+            <i class="fas fa-keyboard mr-2"></i>{{ T.keyboardShortcutsTitle }}
+          </a>
         </div>
       </li>
     </ul>
