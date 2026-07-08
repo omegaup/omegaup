@@ -522,9 +522,9 @@
         <div class="problem-creator-modal-body">
           <omegaup-problem-creator
             v-if="showProblemCreator"
-            @download-zip-file="onDownloadZipFile"
-            @download-input-file="onDownloadInputFile"
-            @show-update-success-message="onShowUpdateSuccessMessage"
+            @download-zip-file="$emit('download-zip-file', $event)"
+            @download-input-file="$emit('download-input-file', $event)"
+            @show-update-success-message="$emit('show-update-success-message')"
           />
         </div>
         <div class="problem-creator-modal-footer">
@@ -548,10 +548,8 @@ import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import problem_CreatorWrapper from './CreatorWrapper.vue';
 import T from '../../lang';
-import * as ui from '../../ui';
 import latinize from 'latinize';
 import { types } from '../../api_types';
-import JSZip from 'jszip';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
@@ -684,45 +682,6 @@ export default class ProblemForm extends Vue {
 
   closeProblemCreatorModal(): void {
     this.showProblemCreator = false;
-  }
-
-  onShowUpdateSuccessMessage(): void {
-    ui.success(T.problemCreatorUpdateAlert);
-  }
-
-  onDownloadInputFile({
-    fileName,
-    fileContent,
-  }: {
-    fileName: string;
-    fileContent: string;
-  }): void {
-    const link = document.createElement('a');
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-  }
-
-  onDownloadZipFile({
-    fileName,
-    zipContent,
-  }: {
-    fileName: string;
-    zipContent: JSZip;
-  }): void {
-    zipContent.generateAsync({ type: 'blob' }).then((content) => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = `${fileName}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
-    });
   }
 
   get howToWriteProblemLink(): string {
