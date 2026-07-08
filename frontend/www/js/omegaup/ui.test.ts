@@ -137,4 +137,39 @@ describe('ui', () => {
       expect(notificationsStore.state.type).toBe(ui.MessageType.Success);
     });
   });
+
+  describe('persisted success message', () => {
+    afterEach(() => {
+      sessionStorage.clear();
+    });
+
+    it('persists a message and shows it on the next page, then clears it', () => {
+      ui.persistSuccessMessage('Password changed');
+      expect(sessionStorage.getItem('omegaup-pending-success-message')).toBe(
+        'Password changed',
+      );
+
+      ui.showPersistedSuccessMessage();
+
+      expect(notificationsStore.state.message).toBe('Password changed');
+      expect(notificationsStore.state.type).toBe(ui.MessageType.Success);
+      expect(
+        sessionStorage.getItem('omegaup-pending-success-message'),
+      ).toBeNull();
+    });
+
+    it('does not persist an empty message', () => {
+      ui.persistSuccessMessage('');
+      expect(
+        sessionStorage.getItem('omegaup-pending-success-message'),
+      ).toBeNull();
+    });
+
+    it('is a no-op when there is no pending message', () => {
+      expect(() => ui.showPersistedSuccessMessage()).not.toThrow();
+      expect(
+        sessionStorage.getItem('omegaup-pending-success-message'),
+      ).toBeNull();
+    });
+  });
 });

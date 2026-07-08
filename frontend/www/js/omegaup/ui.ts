@@ -136,6 +136,24 @@ export function success(message: string, options?: NotificationOptions): void {
   });
 }
 
+const PENDING_SUCCESS_MESSAGE_KEY = 'omegaup-pending-success-message';
+
+export function persistSuccessMessage(message: string): void {
+  if (!message) {
+    return;
+  }
+  sessionStorage.setItem(PENDING_SUCCESS_MESSAGE_KEY, message);
+}
+
+export function showPersistedSuccessMessage(): void {
+  const message = sessionStorage.getItem(PENDING_SUCCESS_MESSAGE_KEY);
+  if (message === null) {
+    return;
+  }
+  sessionStorage.removeItem(PENDING_SUCCESS_MESSAGE_KEY);
+  success(message);
+}
+
 export function warning(message: string, options?: NotificationOptions): void {
   displayStatus({ message, type: MessageType.Warning, ...options });
 }
