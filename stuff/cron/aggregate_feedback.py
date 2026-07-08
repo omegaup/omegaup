@@ -27,15 +27,15 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    QUALITYNOMINATION_QUESTION_CHANGE_ID,
+)
 
 CONFIDENCE = 10
 MIN_POINTS = 10
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 VOTES_NUM = 5
-
-# Before this id the questions were different
-QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
 
 # SQL Queries
 GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
@@ -393,6 +393,7 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
     attempted_problems = 0
     successful_problems = 0
     failed_problems = 0
+    start_time = time.monotonic()
 
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
@@ -426,6 +427,13 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
         attempted_problems,
         successful_problems,
         failed_problems)
+    duration = time.monotonic() - start_time
+    logging.info(
+        'aggregate_feedback summary: attempted=%d failed=%d duration=%.2fs',
+        attempted_problems,
+        failed_problems,
+        duration,
+    )
 
 
 def aggregate_reviewers_feedback_for_problem(
