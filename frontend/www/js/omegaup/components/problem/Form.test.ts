@@ -224,7 +224,9 @@ describe('Settings.vue', () => {
     await wrapper.setData({ showProblemCreator: true });
 
     const payload = { fileName: 'problem', zipContent: {} };
-    wrapper.findComponent(CreatorWrapper).vm.$emit('download-zip-file', payload);
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('download-zip-file', payload);
 
     expect(wrapper.emitted('download-zip-file')?.[0]).toEqual([payload]);
   });
