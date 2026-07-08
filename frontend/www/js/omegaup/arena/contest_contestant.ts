@@ -1,12 +1,13 @@
+import Vue from 'vue';
+import * as api from '../api';
+import { types } from '../api_types';
+import arena_Contest from '../components/arena/Contest.vue';
+import { DisqualificationType } from '../components/arena/Runs.vue';
+import { PopupDisplayed } from '../components/problem/Details.vue';
+import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as time from '../time';
-import { types } from '../api_types';
-import * as api from '../api';
 import * as ui from '../ui';
-import Vue from 'vue';
-import arena_Contest from '../components/arena/Contest.vue';
-import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
-import problemsStore from './problemStore';
 import {
   ContestClarification,
   ContestClarificationRequest,
@@ -14,12 +15,21 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
+import clarificationStore from './clarificationsStore';
+import { EventsSocket } from './events_socket';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   getScoreModeEnum,
   navigateToProblem,
   NavigationType,
 } from './navigation';
-import clarificationStore from './clarificationsStore';
+import { pushLocationHash } from '../location';
+import problemsStore from './problemStore';
+import { createChart, onRankingChanged, onRankingEvents } from './ranking';
+import rankingStore from './rankingStore';
+import { myRunsStore, RunFilters, runsStore } from './runsStore';
+import { enforceSingleTab } from './singleTabEnforcer';
+import socketStore from './socketStore';
 import {
   onRefreshRuns,
   showSubmission,
@@ -29,14 +39,6 @@ import {
   trackRun,
   updateRunFallback,
 } from './submissions';
-import { PopupDisplayed } from '../components/problem/Details.vue';
-import { createChart, onRankingChanged, onRankingEvents } from './ranking';
-import { EventsSocket } from './events_socket';
-import rankingStore from './rankingStore';
-import socketStore from './socketStore';
-import { myRunsStore, RunFilters, runsStore } from './runsStore';
-import T from '../lang';
-import { DisqualificationType } from '../components/arena/Runs.vue';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -44,10 +46,43 @@ OmegaUp.on('ready', async () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
+
+  // Enforce single tab for non-admin contestants
+  let isBlocked = false;
+  let blockedMessage: string | null = null;
+
+  if (!contestAdmin) {
+    const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+    await new Promise<void>((resolve) => {
+      let settled = false;
+
+      const timeoutId = window.setTimeout(() => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve();
+      }, TAB_ENFORCER_TIMEOUT_MS);
+
+      enforceSingleTab(payload.contest.alias, (message: string) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        isBlocked = true;
+        blockedMessage = message;
+        window.clearTimeout(timeoutId);
+        resolve();
+      });
+    });
+  }
+
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
-    window.location.hash = activeTab;
+    history.replaceState(null, '', `#${activeTab}`);
   }
+
   const {
     guid,
     popupDisplayed,
@@ -131,13 +166,20 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      activeTab: getSelectedValidTab(locationHash[0], contestAdmin),
       searchResultUsers: [] as types.ListItem[],
       nextSubmissionTimestamp,
       nextExecutionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
+      isBlocked,
+      blockedMessage,
+      logs: [] as types.ContestProblemChangeLog[],
     }),
+    beforeDestroy() {
+      window.removeEventListener('popstate', syncFromHash);
+    },
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
         props: {
@@ -151,7 +193,7 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
-          activeTab,
+          activeTab: this.activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
           miniRankingUsers: rankingStore.state.miniRankingUsers,
@@ -171,6 +213,9 @@ OmegaUp.on('ready', async () => {
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
+          logs: this.logs,
         },
         on: {
           'navigate-to-problem': ({
@@ -212,7 +257,8 @@ OmegaUp.on('ready', async () => {
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
                 if (request.hash) {
-                  window.location.hash = request.hash;
+                  pushLocationHash(request.hash);
+                  syncFromHash();
                 }
               })
               .catch((run) => {
@@ -391,7 +437,8 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
           'update:activeTab': (tabName: string) => {
-            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
+            contestContestant.activeTab = tabName;
+            pushLocationHash(`#${tabName}`);
           },
           'reset-hash': ({
             selectedTab,
@@ -401,18 +448,12 @@ OmegaUp.on('ready', async () => {
             alias: string;
           }) => {
             if (!alias) {
-              history.replaceState(
-                { selectedTab },
-                'resetHash',
-                `#${selectedTab}`,
-              );
+              pushLocationHash(`#${selectedTab}`);
+              syncFromHash();
               return;
             }
-            history.replaceState(
-              { selectedTab, alias },
-              'resetHash',
-              `#${selectedTab}/${alias}`,
-            );
+            pushLocationHash(`#${selectedTab}/${alias}`);
+            syncFromHash();
           },
           'new-submission-popup-displayed': () => {
             if (this.shouldShowFirstAssociatedIdentityRunWarning) {
@@ -440,6 +481,107 @@ OmegaUp.on('ready', async () => {
     },
   });
 
+  const onProblemListChanged = (): void => {
+    api.Contest.details({
+      contest_alias: payload.contest.alias,
+    })
+      .then((details) => {
+        const previousProblemsByAlias: Record<
+          string,
+          types.NavbarProblemsetProblem
+        > = {};
+        for (const problem of payload.problems) {
+          previousProblemsByAlias[problem.alias] = problem;
+        }
+        const updatedProblems = details.problems.map(
+          (problem, index): types.NavbarProblemsetProblem => {
+            const previousProblem = previousProblemsByAlias[problem.alias];
+            return {
+              acceptsSubmissions: problem.accepts_submissions,
+              alias: problem.alias,
+              bestScore: previousProblem?.bestScore ?? 0,
+              hasMyRuns: previousProblem?.hasMyRuns,
+              hasRuns:
+                previousProblem?.hasRuns ?? problem.has_submissions ?? false,
+              maxScore: problem.points,
+              myBestScore: previousProblem?.myBestScore,
+              text: `${problem.letter || ui.columnName(index)}. ${
+                problem.title
+              }`,
+            };
+          },
+        );
+
+        // Keep the same array reference so socket consumers stay in sync.
+        payload.problems.splice(0, payload.problems.length, ...updatedProblems);
+        contestContestant.problems = payload.problems;
+
+        const normalizedRanking = rankingStore.state.ranking.map(
+          (entry): types.ScoreboardRankingEntry => {
+            const byAlias: Record<string, types.ScoreboardRankingProblem> = {};
+            for (const p of entry.problems) {
+              if (p.alias) byAlias[p.alias] = p;
+            }
+            const normalizedProblems = updatedProblems.map(
+              (prob): types.ScoreboardRankingProblem =>
+                byAlias[prob.alias] ?? {
+                  alias: prob.alias,
+                  penalty: 0,
+                  percent: 0,
+                  pending: false,
+                  points: 0,
+                  runs: 0,
+                },
+            );
+            return { ...entry, problems: normalizedProblems };
+          },
+        );
+        rankingStore.commit('updateRanking', normalizedRanking);
+
+        const selectedProblem = contestContestant.problem as types.NavbarProblemsetProblem | null;
+        if (!selectedProblem) {
+          return;
+        }
+
+        const refreshedProblem = payload.problems.find(
+          (problem) => problem.alias === selectedProblem.alias,
+        );
+        if (!refreshedProblem) {
+          contestContestant.problem = null;
+          contestContestant.problemInfo = null;
+          history.replaceState(
+            { selectedTab: 'problems' },
+            'resetHash',
+            '#problems',
+          );
+          return;
+        }
+
+        contestContestant.problem = refreshedProblem;
+        api.Problem.details({
+          problem_alias: refreshedProblem.alias,
+          prevent_problemset_open: false,
+          contest_alias: payload.contest.alias,
+        })
+          .then(time.remoteTimeAdapter)
+          .then((problemInfo) => {
+            problemInfo.title = refreshedProblem.text ?? '';
+            contestContestant.problemInfo = problemInfo;
+            problemsStore.commit('addProblem', problemInfo);
+          })
+          .catch(ui.ignoreError);
+      })
+      .catch(ui.ignoreError);
+
+    api.Contest.problemChangeLogs({
+      contest_alias: payload.contest.alias,
+    })
+      .then((response) => {
+        contestContestant.logs = response.logs;
+      })
+      .catch(ui.ignoreError);
+  };
+
   const socket = new EventsSocket({
     disableSockets: false,
     problemsetAlias: payload.contest.alias,
@@ -456,8 +598,18 @@ OmegaUp.on('ready', async () => {
     currentUsername: commonPayload.currentUsername,
     intervalInMilliseconds: 5 * 60 * 1000,
     scoreMode: getScoreModeEnum(payload.contest.score_mode),
+    onProblemListChanged,
   });
   socket.connect();
+
+  // Fetch contest problem change logs to populate the summary.
+  api.Contest.problemChangeLogs({
+    contest_alias: payload.contest.alias,
+  })
+    .then((response: { logs: types.ContestProblemChangeLog[] }) => {
+      contestContestant.logs = response.logs;
+    })
+    .catch(ui.ignoreError);
 
   function refreshRuns(): void {
     api.Contest.runs({
@@ -492,6 +644,20 @@ OmegaUp.on('ready', async () => {
       trackRun({ run });
     }
   }
+
+  function syncFromHash(): void {
+    const locationHash = window.location.hash.replace('#', '').split('/');
+    const tab = getSelectedValidTab(locationHash[0], contestAdmin);
+
+    if (contestContestant.activeTab !== tab) {
+      contestContestant.activeTab = tab;
+    }
+  }
+
+  Vue.nextTick(() => {
+    syncFromHash();
+    window.addEventListener('popstate', syncFromHash);
+  });
 
   setInterval(() => {
     refreshContestClarifications({

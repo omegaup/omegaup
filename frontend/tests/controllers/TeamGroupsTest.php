@@ -125,6 +125,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'name' => $teamGroup->name,
                 'description' => $teamGroup->description,
                 'numberOfContestants' => $teamGroup->number_of_contestants,
+                'archived' => false,
             ]
         );
     }
@@ -237,6 +238,60 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $updatedNumberOfContestants,
             $teamsGroup->number_of_contestants
         );
+    }
+
+    /**
+     * Archive teams group test
+     */
+    public function testArchiveTeamsGroup() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $description = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+                'alias' => $alias,
+                'description' => $description,
+            ])
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        $this->assertNotNull($teamsGroup);
+        $this->assertFalse($teamsGroup->archived);
+
+        \OmegaUp\Controllers\TeamsGroup::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+                'alias' => $alias,
+                'description' => $description,
+                'numberOfContestants' => 3,
+                'archived' => true,
+            ])
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        $this->assertNotNull($teamsGroup);
+        $this->assertTrue($teamsGroup->archived);
+
+        \OmegaUp\Controllers\TeamsGroup::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+                'alias' => $alias,
+                'description' => $description,
+                'numberOfContestants' => 3,
+                'archived' => false,
+            ])
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        $this->assertNotNull($teamsGroup);
+        $this->assertFalse($teamsGroup->archived);
     }
 
     /**

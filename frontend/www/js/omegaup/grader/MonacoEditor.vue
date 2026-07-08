@@ -1,16 +1,27 @@
 <template>
   <div :class="['h-100', 'd-flex', 'flex-column', theme]">
-    <div class="editor-toolbar d-flex align-items-center p-1 form-inline">
-      <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
-      <select
-        v-model="selectedFontSize"
-        class="custom-select-sm"
-        @change="onFontSizeChange"
+    <div
+      class="editor-toolbar d-flex align-items-center justify-content-between p-1 form-inline"
+    >
+      <div class="d-flex align-items-center">
+        <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
+        <select
+          v-model="selectedFontSize"
+          class="custom-select-sm"
+          @change="onFontSizeChange"
+        >
+          <option v-for="size in fontSizes" :key="size" :value="size">
+            {{ size }}px
+          </option>
+        </select>
+      </div>
+      <button
+        class="btn btn-sm btn-secondary"
+        :title="T.resetToDefault"
+        @click="onReset"
       >
-        <option v-for="size in fontSizes" :key="size" :value="size">
-          {{ size }}px
-        </option>
-      </select>
+        <font-awesome-icon :icon="['fas', 'undo']" aria-hidden="true" />
+      </button>
     </div>
     <div ref="editorContainer" class="editor flex-grow-1 w-100 h-100"></div>
   </div>
@@ -23,8 +34,18 @@ import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
 import T from '../lang';
+import * as templates from './GraderTemplates';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faUndo } from '@fortawesome/free-solid-svg-icons';
+library.add(faUndo);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class MonacoEditor extends Vue {
   // TODO: place more restrictions on value of keys inside storeMapping
   @Prop({ required: true }) storeMapping!: {
@@ -40,6 +61,11 @@ export default class MonacoEditor extends Vue {
   fontSizes: number[] = [12, 14, 16, 18, 20];
 
   T = T; //getting translations
+
+  autoDetectActive: boolean = true;
+  isDetecting: boolean = false;
+  _detectTimeout: ReturnType<typeof setTimeout> | null = null;
+  isManualLanguageChange: boolean = false;
 
   get theme(): string {
     return store.getters['theme'];
@@ -77,6 +103,8 @@ export default class MonacoEditor extends Vue {
         Util.supportedLanguages[value].modelMapping,
       );
     }
+    window.dispatchEvent(new Event('grader:language-detect-clear'));
+    this.isManualLanguageChange = false;
   }
 
   @Watch('contents')
@@ -92,6 +120,27 @@ export default class MonacoEditor extends Vue {
         theme: value,
       });
     }
+  }
+
+  created(): void {
+    try {
+      const pref = localStorage.getItem('grader:autoDetectLanguage');
+      this.autoDetectActive = pref !== 'false';
+    } catch (e) {
+      // ignore
+    }
+    window.addEventListener(
+      'grader:auto-detect-preference',
+      this.onAutoDetectPreference as any,
+    );
+    window.addEventListener(
+      'trigger-auto-detect',
+      this.detectLanguageImmediate as any,
+    );
+    window.addEventListener(
+      'grader:manual-language-change',
+      this.onManualLanguageChange as any,
+    );
   }
 
   mounted(): void {
@@ -113,8 +162,19 @@ export default class MonacoEditor extends Vue {
     this._model = this._editor.getModel();
     if (!this._model) return;
 
-    this._model.onDidChangeContent(() => {
+    this._model.onDidChangeContent((e) => {
       store.dispatch(this.storeMapping.contents, this._model?.getValue() || '');
+      if (this._detectTimeout) clearTimeout(this._detectTimeout);
+      const isPaste =
+        e.changes.length > 1 || e.changes.some((c) => c.text.length > 20);
+      if (isPaste) {
+        setTimeout(() => this.detectLanguageImmediate(), 100);
+      } else {
+        this._detectTimeout = setTimeout(
+          () => this.detectLanguageImmediate(),
+          2000,
+        );
+      }
     });
 
     window.addEventListener('resize', this.onResize);
@@ -126,7 +186,30 @@ export default class MonacoEditor extends Vue {
       'code-and-language-set',
       this.onCodeAndLanguageSet,
     );
+    window.removeEventListener(
+      'grader:auto-detect-preference',
+      this.onAutoDetectPreference as any,
+    );
+    window.removeEventListener(
+      'trigger-auto-detect',
+      this.detectLanguageImmediate as any,
+    );
+    window.removeEventListener(
+      'grader:manual-language-change',
+      this.onManualLanguageChange as any,
+    );
     window.removeEventListener('resize', this.onResize);
+    if (this._detectTimeout) clearTimeout(this._detectTimeout);
+  }
+
+  onManualLanguageChange(): void {
+    this.isManualLanguageChange = true;
+
+    if (this._detectTimeout) {
+      clearTimeout(this._detectTimeout);
+      this._detectTimeout = null;
+    }
+    window.dispatchEvent(new Event('grader:language-detect-clear'));
   }
 
   onResize(): void {
@@ -147,6 +230,72 @@ export default class MonacoEditor extends Vue {
     if (this._editor) {
       this._editor.updateOptions({ fontSize: this.selectedFontSize });
     }
+  }
+
+  detectLanguageImmediate(): void {
+    if (
+      this.isDetecting ||
+      !this.autoDetectActive ||
+      this.isManualLanguageChange
+    ) {
+      this.isManualLanguageChange = false;
+      return;
+    }
+    const code = this._model?.getValue() || this.contents || '';
+    if (!code || code.trim().length < 20) {
+      window.dispatchEvent(new Event('grader:language-detect-clear'));
+      return;
+    }
+
+    this.isDetecting = true;
+    try {
+      const detected = Util.detectLanguageFromCode(code);
+      if (
+        detected &&
+        detected.language &&
+        detected.language !== this.language
+      ) {
+        const currentFamily = Util.LANGUAGE_FAMILIES[this.language];
+        const detectedFamily = Util.LANGUAGE_FAMILIES[detected.language];
+        if (
+          currentFamily &&
+          detectedFamily &&
+          currentFamily === detectedFamily
+        ) {
+          window.dispatchEvent(new Event('grader:language-detect-clear'));
+          return;
+        }
+        window.dispatchEvent(
+          new CustomEvent('grader:language-detected', { detail: detected }),
+        );
+      } else {
+        window.dispatchEvent(new Event('grader:language-detect-clear'));
+      }
+    } finally {
+      this.isDetecting = false;
+    }
+  }
+
+  onAutoDetectPreference(e: CustomEvent): void {
+    this.autoDetectActive = Boolean(e.detail);
+    if (!this.autoDetectActive) {
+      window.dispatchEvent(new Event('grader:language-detect-clear'));
+    }
+  }
+
+  get isInteractive(): boolean {
+    return store.getters['isInteractive'];
+  }
+
+  onReset(): void {
+    const extension = Util.supportedLanguages[this.language].extension;
+    if (this.isInteractive) {
+      // For interactive problems, use original interactive templates
+      this.contents = templates.originalInteractiveTemplates[extension];
+      return;
+    }
+    // For regular problems, use source templates
+    this.contents = templates.sourceTemplates[extension];
   }
 }
 </script>
@@ -170,6 +319,13 @@ export default class MonacoEditor extends Vue {
   font-size: 10px;
 }
 
+.editor-toolbar button {
+  font-size: 10px;
+  padding: 0.25rem 0.5rem;
+  background: var(--monaco-editor-toolbar-label-background-color);
+  color: var(--monaco-editor-toolbar-label-color);
+}
+
 .editor {
   border: 1px solid var(--monaco-editor-toolbar-label-border-color);
 }
@@ -185,6 +341,11 @@ export default class MonacoEditor extends Vue {
 }
 
 .vs-dark .editor-toolbar select {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .editor-toolbar button {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
 }

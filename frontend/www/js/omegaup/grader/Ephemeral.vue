@@ -5,6 +5,7 @@
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
       </span>
+
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
         <template v-if="!isEmbedded">
           <label>
@@ -49,6 +50,20 @@
                 aria-hidden="true"
               />
             </button>
+            <button
+              v-clipboard="getCopySource"
+              v-clipboard:success="handleCopyFeedback"
+              v-clipboard:error="handleCopyError"
+              type="button"
+              class="btn btn-sm mr-2 my-sm-0"
+              :class="isCopySuccess ? 'btn-success' : 'btn-secondary'"
+              data-copy-button
+              :title="T.wordsCopyToClipboard"
+              :aria-label="T.wordsCopyToClipboard"
+              copy-to-clipboard
+            >
+              <font-awesome-icon :icon="['fas', 'copy']" aria-hidden="true" />
+            </button>
           </label>
         </template>
         <select
@@ -56,14 +71,50 @@
           class="form-control form-control-sm mr-sm-2"
           data-language-select
         >
-          <option
-            v-for="language in languages"
-            :key="language"
-            :value="language"
-          >
-            {{ getLanguageName(language) }}
-          </option>
+          <optgroup v-if="languages.length > 1" :label="T.detectLanguage">
+            <option value="auto-detect">{{ T.detectLanguage }}</option>
+          </optgroup>
+          <optgroup :label="T.settingsLanguage">
+            <option
+              v-for="language in languages"
+              :key="language"
+              :value="language"
+            >
+              {{ getLanguageName(language) }}
+            </option>
+          </optgroup>
         </select>
+        <label>
+          <button
+            class="btn btn-secondary btn-sm mr-2"
+            :title="T.resetTemplate"
+            @click.prevent="resetToTemplate"
+          >
+            <font-awesome-icon :icon="['fas', 'undo']" aria-hidden="true" />
+          </button>
+        </label>
+        <div
+          v-if="showDetectedLabel"
+          class="language-detected d-flex align-items-center mr-2"
+        >
+          <span class="language-detected-text mr-2">
+            {{
+              ui.formatString(T.languageDetected, { lang: detectedDisplayName })
+            }}
+          </span>
+          <button
+            class="btn btn-sm btn-success mr-1"
+            @click.prevent="acceptDetectedLanguage"
+          >
+            {{ T.switchLanguage }}
+          </button>
+          <button
+            class="btn btn-sm btn-secondary"
+            @click.prevent="rejectDetectedLanguage"
+          >
+            {{ ui.formatString(T.keepLanguage, { lang: currentLanguageName }) }}
+          </button>
+        </div>
 
         <button
           v-if="isRunButton"
@@ -125,6 +176,7 @@ import * as monaco from 'monaco-editor';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
+import Clipboard from 'v-clipboard';
 import omegaup_Countdown from '../components/Countdown.vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
@@ -137,6 +189,7 @@ import DiffEditor from './DiffEditor.vue';
 import IDESettings from './IDESettings.vue';
 import MonacoEditor from './MonacoEditor.vue';
 import TextEditor from './TextEditor.vue';
+
 import ZipViewer from './ZipViewer.vue';
 import store, { GraderResults } from './GraderStore';
 import * as Util from './util';
@@ -158,10 +211,14 @@ import {
   faDownload,
   faSun,
   faMoon,
+  faUndo,
+  faCopy,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faUpload, faFileArchive, faDownload, faSun, faMoon);
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faUndo, faCopy);
+Vue.use(Clipboard);
 
 import T from '../lang';
+import * as ui from '../ui';
 
 interface GraderComponent extends Vue {
   title?: string;
@@ -195,19 +252,25 @@ export default class Ephemeral extends Vue {
 
   readonly themeToRef: { [key: string]: string } = {
     [Util.MonacoThemes
-      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+      .VSLight]: `/third_party/css/golden-layout/goldenlayout-light-theme.css`,
     [Util.MonacoThemes
-      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+      .VSDark]: `/third_party/css/golden-layout/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
+  ui = ui;
   omegaup = omegaup;
   isRunLoading = false;
   isSubmitLoading = false;
   zipHref: string | null = null;
   zipDownload: string | null = null;
   now: number = Date.now();
+  detectedLanguage: string | null = null;
+  detectedDisplayName: string = '';
+  showDetectedLabel: boolean = false;
+  isCopySuccess = false;
+  copySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -226,10 +289,22 @@ export default class Ephemeral extends Vue {
     return store.getters['request.language'];
   }
   set selectedLanguage(language: string) {
+    if (language === 'auto-detect') {
+      window.dispatchEvent(new Event('trigger-auto-detect'));
+      return;
+    }
+    window.dispatchEvent(
+      new CustomEvent('grader:manual-language-change', {
+        detail: language,
+      }),
+    );
     store.dispatch('request.language', language);
   }
   getLanguageName(language: string): string {
     return Util.supportedLanguages[language].name;
+  }
+  get currentLanguageName(): string {
+    return Util.supportedLanguages[this.selectedLanguage]?.name || '';
   }
   get languages(): string[] {
     return store.getters['languages'];
@@ -251,6 +326,57 @@ export default class Ephemeral extends Vue {
       return true;
     }
     return this.nextExecutionTimestamp.getTime() <= this.now;
+  }
+
+  created(): void {
+    window.addEventListener(
+      'grader:language-detected',
+      this.onLanguageDetected as any,
+    );
+    window.addEventListener(
+      'grader:language-detect-clear',
+      this.clearDetectedLabel as any,
+    );
+  }
+
+  onLanguageDetected(e: CustomEvent): void {
+    const detail = e.detail as { language: string; displayName: string };
+    if (!detail || detail.language === this.selectedLanguage) {
+      this.clearDetectedLabel();
+      return;
+    }
+    this.detectedLanguage = detail.language;
+    this.detectedDisplayName = detail.displayName;
+    this.showDetectedLabel = true;
+  }
+
+  clearDetectedLabel(): void {
+    this.detectedLanguage = null;
+    this.detectedDisplayName = '';
+    this.showDetectedLabel = false;
+  }
+
+  acceptDetectedLanguage(): void {
+    if (this.detectedLanguage) {
+      const currentCode = store.getters['request.source'];
+      const newLang = this.detectedLanguage;
+      store.dispatch('resetSource');
+      this.$nextTick(() => {
+        store.dispatch('request.language', newLang);
+        this.$nextTick(() => {
+          store.commit('request.source', currentCode);
+        });
+      });
+      this.clearDetectedLabel();
+    }
+  }
+
+  rejectDetectedLanguage(): void {
+    this.clearDetectedLabel();
+  }
+
+  resetToTemplate(): void {
+    store.dispatch('resetSource');
   }
 
   toggleTheme() {
@@ -468,6 +594,33 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
+  handleCopyFeedback() {
+    this.isCopySuccess = true;
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.copySuccessTimer = setTimeout(() => {
+      this.isCopySuccess = false;
+    }, 2000);
+  }
+  getCopySource(): string {
+    return store.getters['request.source'] || '';
+  }
+  handleCopyError() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.isCopySuccess = false;
+  }
+
+  beforeDestroy() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    window.removeEventListener(
+      'grader:language-detected',
+      this.onLanguageDetected as any,
+    );
+    window.removeEventListener(
+      'grader:language-detect-clear',
+      this.clearDetectedLabel as any,
+    );
+  }
+
   handleDownload(e: Event) {
     // the state is dirty when we need to re-configure zip file
     // if not, download the url (continue default behavior)
@@ -765,10 +918,24 @@ export default class Ephemeral extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
+@import '../../../third_party/css/golden-layout/goldenlayout-base.css';
 
 div > section {
   min-height: 60em;
 }
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .lm_item_container {
+  background-color: var(--vs-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .lm_item_container .vs-dark {
+  background-color: var(--vs-dark-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 div {
   &.vs-dark {
     background: var(--vs-dark-background-color);
@@ -781,13 +948,26 @@ div {
       color: var(--vs-dark-font-color);
     }
   }
+
   &.vs {
     background: var(--vs-background-color);
     border-bottom: 1px solid var(--vs-background-color);
   }
 }
+
+.language-detected {
+  background: var(--language-detected-bg);
+  border: 1px solid var(--language-detected-border);
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+.language-detected-text {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
 a:hover {
   color: var(--zip-button-color--hover);
 }
-@import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 </style>

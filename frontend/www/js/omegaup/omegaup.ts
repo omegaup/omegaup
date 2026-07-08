@@ -5,6 +5,7 @@ import * as errors from './errors';
 import * as time from './time';
 import { shortcutManager } from './keyboard-shortcuts';
 import T from './lang';
+import { clearSessionStorageForLogout, initLogoutListener } from './logoutSync';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -439,6 +440,7 @@ export namespace omegaup {
 
     _documentReady: boolean = false;
     _initialized: boolean = false;
+    _cleanupLogoutListener: (() => void) | null = null;
     _listeners: { [name: string]: EventListenerList } = {
       ready: new EventListenerList([
         () => {
@@ -482,6 +484,15 @@ export namespace omegaup {
             this.username = data.session.identity.username;
             this.identity = data.session.identity;
             this.email = data.session.email;
+            // Ensure we only keep one active logout listener for this page.
+            if (this._cleanupLogoutListener) {
+              this._cleanupLogoutListener();
+              this._cleanupLogoutListener = null;
+            }
+            this._cleanupLogoutListener = initLogoutListener(() => {
+              clearSessionStorageForLogout();
+              window.location.href = '/';
+            });
           }
           time._setRemoteDeltaTime(t0 - data.time * 1000);
 
@@ -491,6 +502,12 @@ export namespace omegaup {
           }
         })
         .catch(ui.apiError);
+
+      document.addEventListener('dragstart', (e: DragEvent) => {
+        if (e.target instanceof HTMLImageElement) {
+          e.preventDefault();
+        }
+      });
     }
 
     _notify(eventName: string): void {
