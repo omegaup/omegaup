@@ -56,6 +56,10 @@ class UserListTest extends \OmegaUp\Test\ControllerTestCase {
             'identities' => json_encode($identities),
             'group_alias' => $group->alias,
         ]));
+        // InnoDB updates FULLTEXT indexes at COMMIT time, so MATCH ... AGAINST
+        // cannot see these identities while they are still inside the test transaction.
+        \OmegaUp\Test\Utils::commit();
+
         // Regression tests for identity search via FULLTEXT ngram index:
         // - substring matches (partial word search still works)
         // - usernames containing special characters (_, ., -)
