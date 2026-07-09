@@ -706,7 +706,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sqlStudentsProgress = "
                 SELECT
                     i.username,
-                    i.name,
+                    COALESCE(i.name, i.username) AS name,
                     i.country_id,
                     IFNULL(ur.classname, 'user-rank-unranked') AS classname,
                     a.alias AS assignment_alias,
@@ -739,7 +739,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     i.name, a.`order`, psp.`order`
             ";
 
-            /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: null|string, problem_alias: string, problem_score: float, username: string}> */
+            /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: string, problem_alias: string, problem_score: float, username: string}> */
             $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sqlStudentsProgress,
                 array_merge($identityIds, [$courseId])
