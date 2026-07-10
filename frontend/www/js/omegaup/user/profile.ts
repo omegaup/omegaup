@@ -542,7 +542,9 @@ OmegaUp.on('ready', () => {
             aboutSection: string;
             onSuccess: () => void;
           }) => {
-            api.User.saveReadme({ readme: aboutSection }).then(onSuccess).catch(ui.apiError);
+            api.User.saveReadme({ readme: aboutSection })
+              .then(onSuccess)
+              .catch(ui.apiError);
           },
           'report-about-section': ({
             username,

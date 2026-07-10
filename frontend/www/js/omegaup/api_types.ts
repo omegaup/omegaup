@@ -5241,7 +5241,7 @@ export namespace types {
       problems_solved?: number;
       rank?: number;
     };
-    about_me?: string;
+    readme?: string;
     scholar_degree?: string;
     school?: string;
     school_id?: number;
