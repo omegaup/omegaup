@@ -28,8 +28,8 @@
             @heatmap-year-changed="
               (year) => $emit('heatmap-year-changed', year)
             "
-            @save-about-section="(payload) => $emit('save-about-section', payload)"
-            @report-about-section="(payload) => $emit('report-about-section', payload)"
+            @save-readme="(payload) => $emit('save-readme', payload)"
+            @report-readme="(payload) => $emit('report-readme', payload)"
           ></omegaup-user-view-profile>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-basic-information'">
