@@ -2,7 +2,7 @@
   <div class="container-fluid p-0 mt-0">
     <div
       v-if="
-        isAboutSectionEnabled && (currentAboutSection !== null || profile.is_own_profile)
+        isReadmeEnabled && (currentReadme !== null || profile.is_own_profile)
       "
       class="row mb-3"
     >
@@ -11,51 +11,51 @@
           <div
             class="card-header d-flex justify-content-between align-items-center"
           >
-            <span>{{ T.profileAboutSection }}</span>
+            <span>{{ T.profileReadme }}</span>
             <div>
               <button
-                v-if="profile.is_own_profile && !isEditingAboutSection"
+                v-if="profile.is_own_profile && !isEditingReadme"
                 class="btn btn-sm btn-outline-secondary"
-                @click="startEditAboutSection"
+                @click="startEditReadme"
               >
                 {{ T.wordsEdit }}
               </button>
               <button
                 v-if="
                   !profile.is_own_profile &&
-                  currentAboutSection !== null &&
-                  !aboutSectionReportSubmitted
+                  currentReadme !== null &&
+                  !readmeReportSubmitted
                 "
                 class="btn btn-sm btn-outline-warning"
-                @click="reportAboutSection"
+                @click="reportReadme"
               >
-                {{ T.profileAboutSectionReport }}
+                {{ T.profileReadmeReport }}
               </button>
             </div>
           </div>
           <div class="card-body">
-            <template v-if="!isEditingAboutSection">
+            <template v-if="!isEditingReadme">
               <omegaup-markdown
-                v-if="currentAboutSection"
-                :markdown="currentAboutSection"
+                v-if="currentReadme"
+                :markdown="currentReadme"
                 :full-width="true"
               ></omegaup-markdown>
               <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
-                {{ T.profileAboutSectionAddPrompt }}
+                {{ T.profileReadmeAddPrompt }}
               </p>
             </template>
             <template v-else>
               <textarea
-                v-model="aboutSectionEditContent"
+                v-model="readmeEditContent"
                 class="form-control mb-2"
                 rows="10"
               ></textarea>
-              <button class="btn btn-primary btn-sm mr-2" @click="saveAboutSection">
+              <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
                 {{ T.wordsSaveChanges }}
               </button>
               <button
                 class="btn btn-secondary btn-sm"
-                @click="cancelEditAboutSection"
+                @click="cancelEditReadme"
               >
                 {{ T.wordsCancel }}
               </button>
@@ -406,11 +406,11 @@ export default class ViewProfile extends Vue {
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentAboutSection: string | null = this.profile.readme ?? null;
-  isEditingAboutSection = false;
-  aboutSectionEditContent: string | null = null;
-  aboutSectionReportSubmitted = false;
-  isAboutSectionEnabled = Experiments.loadGlobal().isEnabled('user_about_section');
+  currentReadme: string | null = this.profile.readme ?? null;
+  isEditingReadme = false;
+  readmeEditContent: string | null = null;
+  readmeReportSubmitted = false;
+  isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
@@ -473,33 +473,33 @@ export default class ViewProfile extends Vue {
     }
   }
 
-  startEditAboutSection(): void {
-    this.aboutSectionEditContent = this.currentAboutSection;
-    this.isEditingAboutSection = true;
+  startEditReadme(): void {
+    this.readmeEditContent = this.currentReadme;
+    this.isEditingReadme = true;
   }
 
-  cancelEditAboutSection(): void {
-    this.isEditingAboutSection = false;
-    this.aboutSectionEditContent = null;
+  cancelEditReadme(): void {
+    this.isEditingReadme = false;
+    this.readmeEditContent = null;
   }
 
-  saveAboutSection(): void {
-    const content = this.aboutSectionEditContent ?? '';
-    this.$emit('save-about-section', {
-      aboutSection: content,
+  saveReadme(): void {
+    const content = this.readmeEditContent ?? '';
+    this.$emit('save-readme', {
+      readme: content,
       onSuccess: () => {
-        this.currentAboutSection = content;
-        this.isEditingAboutSection = false;
+        this.currentReadme = content;
+        this.isEditingReadme = false;
       },
     });
   }
 
-  reportAboutSection(): void {
-    this.$emit('report-about-section', {
+  reportReadme(): void {
+    this.$emit('report-readme', {
       username: this.profile.username ?? '',
       onSuccess: () => {
-        this.aboutSectionReportSubmitted = true;
-        ui.success(T.profileAboutSectionReportSuccess);
+        this.readmeReportSubmitted = true;
+        ui.success(T.profileReadmeReportSuccess);
       },
     });
   }
