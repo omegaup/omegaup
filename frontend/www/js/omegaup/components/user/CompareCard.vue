@@ -85,6 +85,18 @@
         </div>
       </div>
 
+      <!-- Report About My Profile -->
+      <div 
+        v-if="
+          !profile.is_own_profile &&
+          currentReadme !== null &&
+          !readmeReportSubmitted
+        "
+        class="report-readme mt-2 mb-0"
+      >
+        {{ T.profileReadmeReport }}
+      </div>
+
       <!-- Private Profile Notice -->
       <div v-if="profile.is_private" class="alert alert-info mt-3 mb-0">
         <small>{{ T.profileIsPrivate }}</small>
@@ -161,6 +173,12 @@ export default class CompareCard extends Vue {
 .stat-value {
   font-size: 1rem;
   margin-top: 0.25rem;
+}
+
+.report-readme {
+  font-size: 0.75rem;
+  color: red;
+  text-align: left;
 }
 
 .card {
