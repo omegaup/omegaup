@@ -5250,7 +5250,7 @@ export namespace types {
       problems_solved?: number;
       rank?: number;
     };
-    readme?: string;
+    about_me?: string;
     scholar_degree?: string;
     school?: string;
     school_id?: number;
