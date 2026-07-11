@@ -1290,6 +1290,8 @@ const translations: { [key: string]: string; } = {
   problemCreatorEmpty: "",
   problemCreatorEraseOutput: "Borrar salida",
   problemCreatorGenerateProblem: "Generar Problema",
+  problemCreatorGeneratingZip:
+    "El archivo del problema todavía se está generando. Por favor inténtalo de nuevo en unos segundos.",
   problemCreatorGroup: "Grupo",
   problemCreatorGroupName: "Nombre del grupo",
   problemCreatorGroups: "Grupos",
@@ -1338,6 +1340,8 @@ const translations: { [key: string]: string; } = {
   problemCreatorNumberOfCases: "N\u00famero de casos",
   problemCreatorNumberOfCasesHelper: "Los casos tendr\u00e1n el nombre:",
   problemCreatorOnlyNumbers: "Solo n\u00fameros",
+  problemCreatorOpenBeforeSubmit:
+    "Por favor abre el creador de problemas y construye tu problema antes de enviarlo.",
   problemCreatorOutputPlaceHolder: "Salida",
   problemCreatorPoints: "Puntaje",
   problemCreatorPointsAbbreviation: "pts",
