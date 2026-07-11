@@ -45,13 +45,21 @@
               </p>
             </template>
             <template v-else>
+              <div ref="aboutMarkdownButtonBar" class="wmd-button-bar mb-2"></div>
               <textarea
+                ref="aboutMarkdownInput"
                 v-model="readmeEditContent"
-                class="form-control mb-2"
-                rows="10"
+                class="form-control wmd-input mb-2"
+                rows="5"
               ></textarea>
+              <div v-if="readmeEditContent" class="border p-3 mb-2 readme-preview">
+                <omegaup-markdown
+                  :markdown="readmeEditContent"
+                  :full-width="true"
+                />
+              </div>
               <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
-                {{ T.wordsSaveChanges }}
+                {{ T.wordsSaveChanges }} +1
               </button>
               <button
                 class="btn btn-secondary btn-sm"
@@ -311,7 +319,7 @@
 
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
@@ -322,6 +330,8 @@ import {
 } from '../../linkable_resource';
 import { Experiments } from '../../omegaup';
 import * as ui from '../../ui';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdown from '../../markdown';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
@@ -354,6 +364,10 @@ function getInitialSelectedTab(
   return selectedTab ?? ViewProfileTabs.Badges;
 }
 
+const aboutMarkdownConverter = new markdown.Converter({
+  preview: true,
+});
+
 @Component({
   components: {
     'omegaup-markdown': common_Markdown,
@@ -371,6 +385,8 @@ function getInitialSelectedTab(
   },
 })
 export default class ViewProfile extends Vue {
+  @Ref() readonly aboutMarkdownButtonBar!: HTMLDivElement;
+  @Ref() readonly aboutMarkdownInput!: HTMLTextAreaElement;
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
@@ -403,6 +419,7 @@ export default class ViewProfile extends Vue {
   ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
+  aboutMarkdownEditor: Markdown.Editor | null = null;
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
@@ -411,6 +428,39 @@ export default class ViewProfile extends Vue {
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
+
+  mounted(): void {
+    if (this.isEditingReadme) {
+      this.$nextTick(() => {
+        this.initAboutEditor();
+      });
+    }
+  }
+
+  beforeDestroy(): void {
+    this.aboutMarkdownEditor = null;
+  }
+
+  private initAboutEditor(): void {
+    if (this.aboutMarkdownEditor) return;
+    if (!this.aboutMarkdownButtonBar || !this.aboutMarkdownInput) {
+      console.warn('Markdown editor refs not available yet');
+      return;
+    }
+
+    this.aboutMarkdownEditor = new Markdown.Editor(
+      aboutMarkdownConverter.converter,
+      '',
+      {
+        panels: {
+          buttonBar: this.aboutMarkdownButtonBar,
+          preview: null,
+          input: this.aboutMarkdownInput,
+        },
+      },
+    );
+    this.aboutMarkdownEditor.run();
+  }
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
@@ -476,6 +526,9 @@ export default class ViewProfile extends Vue {
   startEditReadme(): void {
     this.readmeEditContent = this.currentReadme;
     this.isEditingReadme = true;
+    this.$nextTick(() => {
+      this.initAboutEditor();
+    });
   }
 
   cancelEditReadme(): void {
@@ -515,10 +568,20 @@ export default class ViewProfile extends Vue {
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);
   }
+
+  @Watch('isEditingReadme')
+  onEditingReadmeChanged(newValue: boolean): void {
+    if (newValue) {
+      this.$nextTick(() => {
+        this.initAboutEditor();
+      });
+    }
+  }
 }
 </script>
 
 <style lang="scss">
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
 a:hover {
   cursor: pointer;
 }
@@ -548,5 +611,22 @@ a:hover {
 
 .statistics-boxes-row > [class*='col-'] {
   display: flex;
+}
+
+.wmd-button-bar {
+  background-color: var(--wmd-button-bar-background-color);
+}
+
+.wmd-input {
+  font-family: monospace;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.readme-preview {
+  min-height: 150px;
+  max-height: 500px;
+  overflow-y: auto;
+  background-color: var(--markdown-preview-background, #fafafa);
 }
 </style>
