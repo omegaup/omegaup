@@ -50,7 +50,6 @@
                 ref="aboutMarkdownInput"
                 v-model="readmeEditContent"
                 class="form-control wmd-input mb-2"
-                rows="5"
               ></textarea>
               <div v-if="readmeEditContent" class="border p-3 mb-2 readme-preview">
                 <omegaup-markdown
@@ -59,7 +58,7 @@
                 />
               </div>
               <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
-                {{ T.wordsSaveChanges }} +1
+                {{ T.wordsSaveChanges }}
               </button>
               <button
                 class="btn btn-secondary btn-sm"
@@ -528,6 +527,11 @@ export default class ViewProfile extends Vue {
     this.isEditingReadme = true;
     this.$nextTick(() => {
       this.initAboutEditor();
+        if (this.aboutMarkdownInput) {
+        this.aboutMarkdownInput.focus();
+        const length = this.aboutMarkdownInput.value.length;
+        this.aboutMarkdownInput.setSelectionRange(length, length);
+      }
     });
   }
 
