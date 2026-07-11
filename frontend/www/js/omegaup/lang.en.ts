@@ -1290,8 +1290,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorEmpty: "",
   problemCreatorEraseOutput: "Clear output",
   problemCreatorGenerateProblem: "Generate Problem",
-  problemCreatorGeneratingZip:
-    "The problem file is still being generated. Please try again in a few seconds.",
+  problemCreatorGeneratingZip: "The problem file is still being generated. Please try again in a few seconds.",
   problemCreatorGroup: "Group",
   problemCreatorGroupName: "Group Name",
   problemCreatorGroups: "Groups",
@@ -1340,8 +1339,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorNumberOfCases: "Number of Cases",
   problemCreatorNumberOfCasesHelper: "The cases will have the name:",
   problemCreatorOnlyNumbers: "Only numbers",
-  problemCreatorOpenBeforeSubmit:
-    "Please open the problem creator and build your problem before submitting.",
+  problemCreatorOpenBeforeSubmit: "Please open the problem creator and build your problem before submitting.",
   problemCreatorOutputPlaceHolder: "Output",
   problemCreatorPoints: "Points",
   problemCreatorPointsAbbreviation: "pts",

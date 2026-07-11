@@ -725,7 +725,6 @@ export default class ProblemForm extends Vue {
   }
 
   handleFormSubmit(ev: Event): void {
-    console.log(this.showCreationMethodSelector)
     if (
       this.isUpdate ||
       !this.showCreationMethodSelector ||
