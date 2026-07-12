@@ -57,6 +57,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._run_id: Optional[int] = None
         self._phases: List[Dict[str, Any]] = []
         self._rows_affected: Optional[int] = None
+        self._forced_failure = False
         self._start_monotonic = 0.0
 
     @property
@@ -124,6 +125,14 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         '''Records how many rows the job wrote, for reporting.'''
         self._rows_affected = rows
 
+    def mark_failure(self) -> None:
+        '''Forces this run to be recorded as a failure.
+
+        Useful for jobs that report failures through a return value instead
+        of raising, so the recorded status stays truthful.
+        '''
+        self._forced_failure = True
+
     def _acquire_lock(self) -> bool:
         assert self._connection is not None
         timeout = getattr(self._args, 'lock_timeout', 0)
@@ -156,7 +165,12 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
     def _finish(self, exc_value: Any) -> None:
         if self._connection is None or self._run_id is None:
             return
-        status = 'failure' if exc_value is not None else 'success'
+        phase_failed = any(
+            phase['status'] == 'failure' for phase in self._phases)
+        status = (
+            'failure'
+            if exc_value is not None or phase_failed or self._forced_failure
+            else 'success')
         error_text: Optional[str] = None
         if exc_value is not None:
             error_text = f'{type(exc_value).__name__}: {exc_value}'

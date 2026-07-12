@@ -169,6 +169,34 @@ def test_no_track_bypasses_all_database_access() -> None:
     assert conn.commits == 0
 
 
+def test_run_fails_when_phase_failed_but_error_was_swallowed() -> None:
+    '''A swallowed phase error still marks the whole run as failed.'''
+    conn = _FakeConnection(lock_acquired=True)
+    with _run('update_ranks.py', _args(), conn) as run:
+        try:
+            with run.phase('flaky'):
+                raise RuntimeError('handled')
+        except RuntimeError:
+            pass
+
+    status, _duration, _rows, phases, _error, _run_id = _matching(
+        conn.calls, 'update `cron_runs`')[0]
+    assert status == 'failure'
+    assert json.loads(phases)[0]['status'] == 'failure'
+
+
+def test_mark_failure_forces_failure_status() -> None:
+    '''mark_failure forces a failure status even without an exception.'''
+    conn = _FakeConnection(lock_acquired=True)
+    with _run('assign_badges.py', _args(), conn) as run:
+        with run.phase('process_badges'):
+            pass
+        run.mark_failure()
+
+    status = _matching(conn.calls, 'update `cron_runs`')[0][0]
+    assert status == 'failure'
+
+
 def test_records_every_phase_in_order() -> None:
     '''Phases are recorded in the order they ran.'''
     conn = _FakeConnection(lock_acquired=True)
