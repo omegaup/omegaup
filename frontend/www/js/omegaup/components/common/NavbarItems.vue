@@ -280,15 +280,6 @@ library.add(
   faVideo,
 );
 
-interface HelpMenuEntry {
-  divider?: boolean;
-  title?: string;
-  description?: string;
-  icon?: [string, string];
-  href?: string;
-  rel?: string | null;
-}
-
 @Component({
   components: {
     'omegaup-navbar-item': NavbarItem,
@@ -336,65 +327,6 @@ export default class NavbarItems extends Vue {
 
   get helpEntries(): NavbarMenuEntry[] {
     return visibleEntries(helpMenuEntries, this.access);
-  }
-
-  get helpMenuEntries(): HelpMenuEntry[] {
-    return [
-      {
-        title: T.navTutorials,
-        description: T.navTutorialsDesc,
-        icon: ['fas', 'video'],
-        href: this.YouTubeTutorialsURL,
-      },
-      {
-        title: T.navDiscord,
-        description: T.navDiscordDesc,
-        icon: ['fas', 'comments'],
-        href: this.DiscordInviteURL,
-      },
-      {
-        title: T.navBlog,
-        description: T.navBlogDesc,
-        icon: ['fas', 'newspaper'],
-        href: this.OmegaUpBlogURL,
-      },
-      { divider: true },
-      {
-        title: T.navProblemStatementEditor,
-        description: T.navProblemStatementEditorDesc,
-        icon: ['fas', 'pen'],
-        href: '/problem/statement/',
-        rel: 'noopener noreferrer',
-      },
-      {
-        title: T.navOmegaUpIDE,
-        description: T.navOmegaUpIDEDesc,
-        icon: ['fas', 'code'],
-        href: '/grader/ephemeral/',
-        rel: 'noopener noreferrer',
-      },
-      {
-        title: T.navKarel,
-        description: T.navKarelDesc,
-        icon: ['fas', 'robot'],
-        href: '/karel.js/',
-        rel: 'noopener noreferrer',
-      },
-      { divider: true },
-      {
-        title: T.navAlgorithmsBook,
-        description: T.navAlgorithmsBookDesc,
-        icon: ['fas', 'book'],
-        href: this.AlgorithmsBookURL,
-      },
-      {
-        title: T.navCompetitiveProgrammingDataStructuresBook,
-        description: T.navCompetitiveProgrammingDataStructuresBookDesc,
-        icon: ['fas', 'database'],
-        href: this.CompetitiveProgrammingBookURL,
-        rel: 'noopener noreferrer',
-      },
-    ];
   }
 
   onCreateProblemClick(): void {
