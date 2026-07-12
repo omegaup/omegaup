@@ -42,13 +42,18 @@ class Grader extends \OmegaUp\Controllers\Controller {
             $r->user?->user_id
         );
 
+        $ephemeralGraderEnabled = \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+            'ephemeral_grader_enabled',
+            true
+        );
+
         return [
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
                     'problemlessGrader'
                 ),
-                'fullWidth' => true,
-                'hideFooterAndHeader' => true,
+                'fullWidth' => $ephemeralGraderEnabled,
+                'hideFooterAndHeader' => $ephemeralGraderEnabled,
                 'payload' => [
                     'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES(),
                     'preferredLanguage' => $preferredLanguage,
