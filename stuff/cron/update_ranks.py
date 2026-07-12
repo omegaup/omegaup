@@ -9,7 +9,6 @@ import json
 import logging
 import os
 import sys
-import time
 from typing import List, NamedTuple, Sequence, Dict, Set, Optional
 
 
@@ -73,6 +72,7 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
 from cron.constants import (  # pylint: disable=wrong-import-position
     SYSTEM_ACL,
     ADMIN_ROLE,
@@ -895,6 +895,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     parser.add_argument('--date',
                         type=_parse_date,
@@ -910,40 +911,29 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    start_time = time.monotonic()
-    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-    dbconn_readonly = lib.db.connect_readonly(
-        lib.db.DatabaseConnectionArguments.from_args_readonly(args)) or dbconn
-    try:
-        with dbconn.cursor(buffered=True,
-                           dictionary=True) as cur, dbconn_readonly.cursor(
-                               buffered=True, dictionary=True) as cur_readonly:
-            phase_start = time.monotonic()
-            update_problem_accepted_stats(cur, dbconn.conn)
-            logging.info(
-                'update_problem_accepted_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-            phase_start = time.monotonic()
-            update_users_stats(cur, cur_readonly, dbconn.conn, args)
-            logging.info(
-                'update_users_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-            phase_start = time.monotonic()
-            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
-                                 args.update_school_of_the_month)
-            logging.info(
-                'update_schools_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-    finally:
-        dbconn.conn.close()
-        logging.info(
-            'Total execution time: %.2fs',
-            time.monotonic() - start_time,
-        )
-        logging.info('Done')
+    with lib.runner.run(parser.prog, args) as cron_run:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
+        dbconn_readonly = lib.db.connect_readonly(
+            lib.db.DatabaseConnectionArguments.from_args_readonly(
+                args)) or dbconn
+        try:
+            with dbconn.cursor(buffered=True,
+                               dictionary=True) as cur, (
+                                   dbconn_readonly.cursor(
+                                       buffered=True,
+                                       dictionary=True)) as cur_readonly:
+                with cron_run.phase('update_problem_accepted_stats'):
+                    update_problem_accepted_stats(cur, dbconn.conn)
+                with cron_run.phase('update_users_stats'):
+                    update_users_stats(cur, cur_readonly, dbconn.conn, args)
+                with cron_run.phase('update_schools_stats'):
+                    update_schools_stats(cur, cur_readonly, dbconn.conn,
+                                         args.date,
+                                         args.update_school_of_the_month)
+        finally:
+            dbconn.conn.close()
+            logging.info('Done')
 
 
 if __name__ == '__main__':
