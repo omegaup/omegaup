@@ -9,6 +9,9 @@
   * @psalm-type MessageLanguages=array{es: string, en: string, pt: string}
   * @psalm-type PredefinedTemplate=array{id: string, title: MessageLanguages, message: MessageLanguages, type: string}
   * @psalm-type MaintenanceModeStatus=array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
+  * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
+  * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
+  * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
@@ -320,5 +323,87 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'message' => $message,
             'type' => $status['type'],
         ];
+    }
+
+    /**
+     * @return list<CronJob>
+     */
+    private static function cronJobsPayload(): array {
+        $jobs = [];
+        foreach (\OmegaUp\DAO\CronJobs::getAllOrdered() as $job) {
+            $jobs[] = [
+                'name' => strval($job->name),
+                'description' => $job->description,
+                'schedule' => $job->schedule,
+                'enabled' => boolval($job->enabled),
+            ];
+        }
+        return $jobs;
+    }
+
+    /**
+     * @param list<\OmegaUp\DAO\VO\CronRuns> $runs
+     *
+     * @return list<CronRun>
+     */
+    private static function cronRunsPayload(array $runs): array {
+        $result = [];
+        foreach ($runs as $run) {
+            /** @var list<CronRunPhase> */
+            $phases = is_null($run->phases) ? [] : json_decode(
+                $run->phases,
+                associative: true
+            );
+            $result[] = [
+                'run_id' => intval($run->run_id),
+                'name' => strval($run->name),
+                'hostname' => $run->hostname,
+                'status' => strval($run->status),
+                'started_at' => $run->started_at,
+                'finished_at' => $run->finished_at,
+                'duration_seconds' => $run->duration_seconds,
+                'rows_affected' => $run->rows_affected,
+                'phases' => $phases,
+                'error_text' => $run->error_text,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Lists the registered cron jobs and their most recent runs.
+     *
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     */
+    public static function apiGetCrons(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return [
+            'jobs' => self::cronJobsPayload(),
+            'runs' => self::cronRunsPayload(
+                \OmegaUp\DAO\CronRuns::getRecent(50)
+            ),
+        ];
+    }
+
+    /**
+     * Returns the detail of a single cron run.
+     *
+     * @return array{run: CronRun|null}
+     *
+     * @omegaup-request-param int $run_id
+     */
+    public static function apiGetCronRun(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $run = \OmegaUp\DAO\CronRuns::getByPK($r->ensureInt('run_id'));
+        if (is_null($run)) {
+            return ['run' => null];
+        }
+        return ['run' => self::cronRunsPayload([$run])[0]];
     }
 }
