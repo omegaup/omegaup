@@ -402,6 +402,23 @@ CREATE TABLE `Cron_Jobs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Run_Requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `requested_by` int DEFAULT NULL,
+  `status` enum('pending','picked','done','failed') NOT NULL DEFAULT 'pending',
+  `requested_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `picked_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `run_id` int DEFAULT NULL,
+  `error_text` text,
+  PRIMARY KEY (`request_id`),
+  KEY `idx_cron_run_requests_status` (`status`),
+  KEY `idx_cron_run_requests_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Solicitudes de reejecución manual de trabajos cron';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Cron_Runs` (
   `run_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'Nombre del script (parser.prog). Denormalizado a propósito: el historial se registra aunque el trabajo no esté en Cron_Jobs y sobrevive a renombres o borrados del registro',
@@ -1505,3 +1522,4 @@ CREATE TABLE `Users_Experiments` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
