@@ -27,7 +27,11 @@
                 latestStatus(job.name) || '—'
               }}</span>
             </td>
-            <td>{{ latestStartedAt(job.name) }}</td>
+            <td>
+              <span :title="latestStartedAt(job.name)">{{
+                latestStartedAtRelative(job.name)
+              }}</span>
+            </td>
             <td class="text-right">
               <button
                 class="btn btn-sm btn-outline-primary"
@@ -74,7 +78,11 @@
               <td>
                 <span :class="statusClass(run.status)">{{ run.status }}</span>
               </td>
-              <td>{{ formatDate(run.started_at) }}</td>
+              <td>
+                <span :title="formatDate(run.started_at)">{{
+                  formatRelative(run.started_at)
+                }}</span>
+              </td>
               <td>{{ formatDuration(run.duration_seconds) }}</td>
               <td>{{ formatRows(run.rows_affected) }}</td>
             </tr>
@@ -119,6 +127,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { formatFutureDateRelative } from '../../time';
 
 @Component
 export default class Crons extends Vue {
@@ -161,8 +170,17 @@ export default class Crons extends Vue {
     return run ? this.formatDate(run.started_at) : '—';
   }
 
+  latestStartedAtRelative(name: string): string {
+    const run = this.latestRun(name);
+    return run ? this.formatRelative(run.started_at) : '—';
+  }
+
   formatDate(date: Date | null | undefined): string {
     return date ? new Date(date).toLocaleString() : '—';
+  }
+
+  formatRelative(date: Date | null | undefined): string {
+    return date ? formatFutureDateRelative(new Date(date)) : '—';
   }
 
   formatDuration(seconds: number | null | undefined): string {
