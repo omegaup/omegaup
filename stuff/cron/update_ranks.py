@@ -802,6 +802,46 @@ def debug_coder_of_the_month_candidates(
     logging.info(log_message)
 
 
+class RankingAuditError(Exception):
+    '''Raised when the freshly computed ranking fails a sanity check.'''
+
+
+def _count_user_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> int:
+    '''Returns the current number of rows in `User_Rank`.'''
+    cur.execute('SELECT COUNT(*) AS `n` FROM `User_Rank`;')
+    row = cur.fetchone()
+    return int(row['n']) if row else 0
+
+
+def audit_user_rank(
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    previous_count: int,
+    max_churn: float,
+) -> None:
+    '''Sanity-checks the uncommitted ranking before it is published.
+
+    Guards against a run that would replace a healthy ranking with an empty,
+    negative-scored or drastically smaller one. Raising here rolls back the
+    whole ranking transaction, so the previous ranking stays live.
+    '''
+    new_count = _count_user_rank(cur)
+    if new_count == 0:
+        raise RankingAuditError('new ranking is empty')
+
+    cur.execute('SELECT COUNT(*) AS `n` FROM `User_Rank` WHERE `score` < 0;')
+    row = cur.fetchone()
+    negatives = int(row['n']) if row else 0
+    if negatives:
+        raise RankingAuditError(
+            f'new ranking has {negatives} rows with a negative score')
+
+    if previous_count > 0 and new_count < previous_count * (1 - max_churn):
+        raise RankingAuditError(
+            f'new ranking shrank from {previous_count} to {new_count} rows, '
+            f'more than the allowed {max_churn:.0%} churn')
+    logging.info('Ranking audit passed: %d rows', new_count)
+
+
 def update_users_stats(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
@@ -811,10 +851,12 @@ def update_users_stats(
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
     try:
+        previous_rank_count = _count_user_rank(cur)
         try:
             scores = update_user_rank(cur, cur_readonly)
             update_user_rank_cutoffs(cur, scores)
             update_user_rank_classname(cur)
+            audit_user_rank(cur, previous_rank_count, args.max_rank_churn)
         except:  # noqa: bare-except
             logging.exception('Failed to update user ranking')
             raise
@@ -907,6 +949,12 @@ def main() -> None:
                         help='The number of candidates to save in the DB')
     parser.add_argument('--update-school-of-the-month', action='store_true',
                         help='Update the School of the month')
+    parser.add_argument('--max-rank-churn',
+                        type=float,
+                        default=0.5,
+                        help=('Abort publishing the new ranking if it drops '
+                              'more than this fraction of the previously '
+                              'ranked users'))
     args: argparse.Namespace = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
