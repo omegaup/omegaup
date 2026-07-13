@@ -2,8 +2,8 @@
 const translations: { [key: string]: string; } = {
   U13CannotPerform: "Coder menor de 13 anos n\u00e3o pode realizar esta a\u00e7\u00e3o.",
   aboutSectionAlreadyReported: "Voc\u00ea j\u00e1 denunciou este perfil.",
-  aboutTooLongError: "O texto ultrapassa o limite de caracteres permitido.",
   aboutToStart: "Voc\u00ea est\u00e1 prestes a iniciar o concurso. Seu tempo come\u00e7ar\u00e1 depois de clicar em Come\u00e7ar Concurso.",
+  aboutTooLongError: "O texto ultrapassa o limite de caracteres permitido.",
   acceptCodeOfConduct: "Li e aceito o [C\u00f3digo de Conduta](%(CodeofConductPolicyURL)).",
   acceptPrivacyPolicy: "Li e aceito a [Pol\u00edtica de Uso e Privacidade](%(PrivacyPolicyURL)) do site.",
   accountDeleteCancel: "Cancelar",
