@@ -76,6 +76,7 @@ module.exports = {
       './frontend/www/js/omegaup/course/submissions_list.ts',
     course_tabs: './frontend/www/js/omegaup/course/tabs.ts',
     grader_ide: './frontend/www/js/omegaup/grader/ide.ts',
+    grader_unavailable: './frontend/www/js/omegaup/grader/unavailable.ts',
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',

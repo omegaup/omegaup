@@ -47,17 +47,28 @@ class Grader extends \OmegaUp\Controllers\Controller {
             true
         );
 
+        $title = new \OmegaUp\TranslationString('problemlessGrader');
+        $payload = [
+            'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES(),
+            'preferredLanguage' => $preferredLanguage,
+        ];
+
+        if (!$ephemeralGraderEnabled) {
+            return [
+                'templateProperties' => [
+                    'title' => $title,
+                    'payload' => $payload,
+                ],
+                'entrypoint' => 'grader_unavailable',
+            ];
+        }
+
         return [
             'templateProperties' => [
-                'title' => new \OmegaUp\TranslationString(
-                    'problemlessGrader'
-                ),
-                'fullWidth' => $ephemeralGraderEnabled,
-                'hideFooterAndHeader' => $ephemeralGraderEnabled,
-                'payload' => [
-                    'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES(),
-                    'preferredLanguage' => $preferredLanguage,
-                ],
+                'title' => $title,
+                'fullWidth' => true,
+                'hideFooterAndHeader' => true,
+                'payload' => $payload,
             ],
             'entrypoint' => 'grader_ide',
         ];

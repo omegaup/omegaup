@@ -1,10 +1,5 @@
 <template>
-  <omegaup-common-view-unavailable
-    v-if="!ephemeralGraderEnabled"
-    :description="T.ephemeralGraderDisabled"
-  ></omegaup-common-view-unavailable>
   <ephemeral-ide
-    v-else
     :accepted-languages="acceptedLanguages"
     :initial-language="initialLanguage"
     :problem="problem"
@@ -22,21 +17,15 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import T from '../../lang';
 import * as Util from '../../grader/util';
 import Ephemeral from '../../grader/Ephemeral.vue';
-import common_ViewUnavailable from '../common/ViewUnavailable.vue';
 
 @Component({
   components: {
     'ephemeral-ide': Ephemeral,
-    'omegaup-common-view-unavailable': common_ViewUnavailable,
   },
 })
 export default class EphemeralGrader extends Vue {
-  T = T;
-
-  @Prop({ default: true }) ephemeralGraderEnabled!: boolean;
   @Prop({ default: () => ({ ...Util.DUMMY_PROBLEM }) })
   problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;

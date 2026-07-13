@@ -10,13 +10,10 @@ import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.FullIDEPayload();
-  const commonPayload = types.payloadParsers.CommonPayload();
 
-  if (commonPayload.ephemeralGraderEnabled) {
-    document.body.style.padding = '0';
-    const main = document.querySelector('main') as HTMLElement;
-    main.style.flex = '1 1 auto';
-  }
+  document.body.style.padding = '0';
+  const main = document.querySelector('main') as HTMLElement;
+  main.style.flex = '1 1 auto';
 
   const acceptedLanguages = payload.acceptedLanguages;
   const preferredLanguage = payload.preferredLanguage || acceptedLanguages[0];
@@ -29,7 +26,6 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement(grader_EphemeralIDE, {
         props: {
-          ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
           acceptedLanguages,
           preferredLanguage,
           isEmbedded: false,
