@@ -1136,6 +1136,8 @@ const translations: { [key: string]: string; } = {
   notificationCourseRequestFeedback: "**%(username)** tem solicitado feedback sobre a tarefa ***%(assignmentName)*** do curso ***%(courseName)***",
   notificationCourseSubmissionFeedback: "O feedback sobre sua submis\u00e3o para o problema ***%(problemAlias)*** no curso ***%(courseName)*** tem sido submetida.",
   notificationCourseSubmissionFeedbackThread: "**%(username)** respondeu em um feedback sobre seu envio para o problema ***%(problemAlias)*** no curso ***%(courseName)***",
+  notificationCronRerunFailed: "A reexecu\u00e7\u00e3o manual de **%(jobName)** falhou.",
+  notificationCronRerunSucceeded: "A reexecu\u00e7\u00e3o manual de **%(jobName)** terminou com sucesso.",
   notificationNewBadge: "Voc\u00ea tem recebido um novo distintivo: **%(badgeName)**",
   notificationNewContestCertificate: "Parab\u00e9ns! Voc\u00ea recebeu um diploma por sua conquista recente no concurso \"%(contest_title)\". Clique para baix\u00e1-lo.",
   notificationNotFound: "Notifica\u00e7\u00e3o n\u00e3o encontrada",
