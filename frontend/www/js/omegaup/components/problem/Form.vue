@@ -520,7 +520,12 @@
     >
       <div class="problem-creator-modal-content">
         <div class="problem-creator-modal-body">
-          <omegaup-problem-creator v-if="showProblemCreator" />
+          <omegaup-problem-creator
+            v-if="showProblemCreator"
+            @download-zip-file="$emit('download-zip-file', $event)"
+            @download-input-file="$emit('download-input-file', $event)"
+            @show-update-success-message="$emit('show-update-success-message')"
+          />
         </div>
         <div class="problem-creator-modal-footer">
           <button
