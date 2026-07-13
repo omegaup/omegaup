@@ -6,6 +6,7 @@
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/rerunCron/`](#apiadminreruncron)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
@@ -404,6 +405,25 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/rerunCron/`
+
+### Description
+
+Queues a manual rerun of a registered cron job. The web layer never
+runs a job directly; it records a pending request that a trusted worker
+later performs. If a request for the same job is already pending, no new
+request is queued.
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `name` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/admin/setMaintenanceMode/`
 
