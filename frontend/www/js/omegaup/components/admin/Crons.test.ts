@@ -46,6 +46,13 @@ describe('Crons.vue', () => {
     expect(wrapper.find('.badge-danger').exists()).toBe(true);
   });
 
+  it('Should show a health card per job with its success rate', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    expect(wrapper.find('[data-cron-health]').exists()).toBe(true);
+    expect(wrapper.find('[data-cron-health]').text()).toContain('100%');
+  });
+
   it('Should show phase detail when a run is expanded', async () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
 

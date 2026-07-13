@@ -4,6 +4,35 @@
       <div class="card-title h4 mb-0">{{ T.omegaupTitleAdminCrons }}</div>
     </div>
     <div class="card-body">
+      <div class="row mb-4" data-cron-health>
+        <div v-for="job in jobs" :key="job.name" class="col-sm-6 col-lg-4 mb-2">
+          <div class="card h-100">
+            <div class="card-body">
+              <h6 class="card-title text-truncate" :title="job.name">
+                {{ job.name }}
+              </h6>
+              <span :class="statusClass(latestStatus(job.name))">{{
+                latestStatus(job.name) || '—'
+              }}</span>
+              <dl class="row small mb-0 mt-2">
+                <dt class="col-7 font-weight-normal">
+                  {{ T.cronControlPlaneSuccessRate }}
+                </dt>
+                <dd class="col-5 mb-0 text-right">
+                  {{ successRate(job.name) }}
+                </dd>
+                <dt class="col-7 font-weight-normal">
+                  {{ T.cronControlPlaneAvgDuration }}
+                </dt>
+                <dd class="col-5 mb-0 text-right">
+                  {{ avgDuration(job.name) }}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <h5>{{ T.cronControlPlaneJobsHeading }}</h5>
       <table class="table table-sm" data-cron-jobs>
         <thead>
@@ -173,6 +202,32 @@ export default class Crons extends Vue {
   latestStartedAtRelative(name: string): string {
     const run = this.latestRun(name);
     return run ? this.formatRelative(run.started_at) : '—';
+  }
+
+  runsForJob(name: string): types.CronRun[] {
+    return this.runs.filter((run) => run.name === name);
+  }
+
+  successRate(name: string): string {
+    const finished = this.runsForJob(name).filter(
+      (run) => run.status !== 'running',
+    );
+    if (!finished.length) {
+      return '—';
+    }
+    const succeeded = finished.filter((run) => run.status === 'success').length;
+    return `${Math.round((100 * succeeded) / finished.length)}%`;
+  }
+
+  avgDuration(name: string): string {
+    const durations = this.runsForJob(name)
+      .map((run) => run.duration_seconds)
+      .filter((seconds): seconds is number => typeof seconds === 'number');
+    if (!durations.length) {
+      return '—';
+    }
+    const total = durations.reduce((sum, seconds) => sum + seconds, 0);
+    return `${(total / durations.length).toFixed(2)}s`;
   }
 
   formatDate(date: Date | null | undefined): string {
