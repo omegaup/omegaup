@@ -11,7 +11,7 @@
           <div
             class="card-header d-flex justify-content-between align-items-center"
           >
-            <span>{{ T.profileAboutSection  }}</span>
+            <span>{{ T.profileAboutSection }}</span>
             <div>
               <button
                 v-if="profile.is_own_profile && !isEditingReadme"
