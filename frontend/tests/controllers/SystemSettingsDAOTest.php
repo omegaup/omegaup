@@ -6,8 +6,6 @@
 class SystemSettingsDAOTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();
-        // The in-process test cache persists across tests, so clear the
-        // seeded key to keep reads consistent with the database.
         \OmegaUp\DAO\SystemSettings::invalidateCache(
             'ephemeral_grader_enabled'
         );

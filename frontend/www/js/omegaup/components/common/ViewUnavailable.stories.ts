@@ -1,12 +1,6 @@
 import { Meta, StoryObj } from '@storybook/vue';
 import ViewUnavailable from './ViewUnavailable.vue';
 
-/**
- * ViewUnavailable shows a consistent placeholder when a part of the app is
- * turned off from the server (for example the EphemeralGrader IDE, maintenance
- * or a future feature flag). The parent decides when to render it based on a
- * flag coming from the common payload.
- */
 const meta: Meta<typeof ViewUnavailable> = {
   component: ViewUnavailable,
   title: 'Components/Common/ViewUnavailable',

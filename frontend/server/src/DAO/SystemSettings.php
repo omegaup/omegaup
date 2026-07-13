@@ -50,8 +50,6 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
         }
         $setting = self::getByKey($key);
         if (is_null($setting)) {
-            // Do not cache the default so callers can pass different defaults
-            // for a key that has no stored row yet.
             return $default;
         }
         $value = intval($setting->setting_value) === 1;
@@ -114,8 +112,6 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
         }
         $setting = self::getByKey($key);
         if (is_null($setting)) {
-            // Do not cache the default so callers can pass different defaults
-            // for a key that has no stored row yet.
             return $default;
         }
         $value = strval($setting->setting_value);

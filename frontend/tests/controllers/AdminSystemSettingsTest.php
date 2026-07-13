@@ -6,8 +6,6 @@
 class AdminSystemSettingsTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();
-        // Settings use a fixed cache key and the suite truncates the DB but
-        // not Redis between tests, so clear it to avoid cross-test leakage.
         \OmegaUp\DAO\SystemSettings::invalidateCache(
             'ephemeral_grader_enabled'
         );
@@ -75,7 +73,6 @@ class AdminSystemSettingsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertFalse($response['settings']['ephemeralGraderEnabled']);
 
-        // Restore the default so other tests are unaffected.
         \OmegaUp\Controllers\Admin::apiUpdateSystemSettings(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'ephemeral_grader_enabled' => true,
