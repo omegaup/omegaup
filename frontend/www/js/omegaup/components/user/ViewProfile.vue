@@ -442,9 +442,9 @@ export default class ViewProfile extends Vue {
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null = this.profile.readme ?? null;
+  currentReadme: string = this.profile.readme ?? '';
   isEditingReadme = false;
-  readmeEditContent: string | null = null;
+  readmeEditContent: string = '';
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
   MAX_ABOUT_LENGTH = MAX_ABOUT_LENGTH;
@@ -673,6 +673,6 @@ a:hover {
   min-height: 150px;
   max-height: 500px;
   overflow-y: auto;
-  background-color: var(--markdown-preview-background, #fafafa);
+  background-color: var(--markdown-preview-background, var(--background-color-secondary));
 }
 </style>
