@@ -377,7 +377,6 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
-  // Used by Cypress selector + click toggle
   isCreateProblemSubmenuOpen = false;
 
   get OmegaUpBlogURL(): string {
