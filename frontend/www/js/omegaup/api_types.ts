@@ -1602,6 +1602,32 @@ export namespace types {
       );
     }
 
+    export function CronsDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CronsDetailsPayload {
+      return ((x) => {
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+              x.finished_at = ((x: number) => new Date(x * 1000))(
+                x.finished_at,
+              );
+            if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+              x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function EmailEditDetailsPayload(
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
@@ -3804,6 +3830,11 @@ export namespace types {
     error_class?: string;
     phase: string;
     status: string;
+  }
+
+  export interface CronsDetailsPayload {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
   }
 
   export interface CurrentSession {

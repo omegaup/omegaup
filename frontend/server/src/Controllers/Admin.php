@@ -12,6 +12,7 @@
   * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
@@ -405,5 +406,29 @@ class Admin extends \OmegaUp\Controllers\Controller {
             return ['run' => null];
         }
         return ['run' => self::cronRunsPayload([$run])[0]];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return [
+            'entrypoint' => 'admin_crons',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminCrons'
+                ),
+                'payload' => [
+                    'jobs' => self::cronJobsPayload(),
+                    'runs' => self::cronRunsPayload(
+                        \OmegaUp\DAO\CronRuns::getRecent(50)
+                    ),
+                ],
+            ],
+        ];
     }
 }
