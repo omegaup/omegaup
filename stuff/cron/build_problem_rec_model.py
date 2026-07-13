@@ -26,6 +26,7 @@ sys.path.insert(0,
                 os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
 
 # Default training parameters.
 _TRAIN_FRACTION = 0.8
@@ -325,6 +326,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     # Model params
     model_args = parser.add_argument_group('Model')
@@ -384,37 +386,41 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    try:
-        if args.sqlite_database:
-            runs = load_sqlite(args.sqlite_database)
-        else:
-            runs = load_mysql(args)
-        if args.save_sqlite_database:
-            with sqlite3.connect(args.save_sqlite_database) as conn:
-                runs.to_sql('Runs', con=conn, if_exists='replace')
-        if args.num_rows is not None:
-            runs = runs[:args.num_rows]
+    with lib.runner.run(parser.prog, args) as cron_run:
+        try:
+            with cron_run.phase('load_runs'):
+                if args.sqlite_database:
+                    runs = load_sqlite(args.sqlite_database)
+                else:
+                    runs = load_mysql(args)
+                if args.save_sqlite_database:
+                    with sqlite3.connect(args.save_sqlite_database) as conn:
+                        runs.to_sql('Runs', con=conn, if_exists='replace')
+                if args.num_rows is not None:
+                    runs = runs[:args.num_rows]
 
-        model = Model(
-            TrainingConfig(train_fraction=args.train_fraction,
-                           rng_seed=args.rng_seed,
-                           num_followups=args.num_followups,
-                           followup_decay=args.followup_decay), runs)
+            with cron_run.phase('train_model'):
+                model = Model(
+                    TrainingConfig(train_fraction=args.train_fraction,
+                                   rng_seed=args.rng_seed,
+                                   num_followups=args.num_followups,
+                                   followup_decay=args.followup_decay), runs)
 
-        score = model.evaluate()
-        logging.info('Model MAP score: %f', score)
-        if score >= args.min_map_score:
-            # Save current model
-            model.save(args.output)
-        else:
-            logging.error(
-                'Model NOT saved. Resulting accuracy was too low: '
-                '%f below %f', score, args.min_map_score)
-    except:  # noqa: bare-except
-        logging.exception('Failed to update recommendation model.')
-        raise
-    finally:
-        logging.info('Done')
+                score = model.evaluate()
+                logging.info('Model MAP score: %f', score)
+                if score >= args.min_map_score:
+                    # Save current model
+                    model.save(args.output)
+                else:
+                    logging.error(
+                        'Model NOT saved. Resulting accuracy was too low: '
+                        '%f below %f', score, args.min_map_score)
+                    cron_run.mark_failure()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update recommendation model.')
+            raise
+        finally:
+            logging.info('Done')
 
 
 if __name__ == '__main__':
