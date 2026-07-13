@@ -762,6 +762,8 @@
 	"createProblemInteractiveGuideWelcome": "Bem-vindo, vamos criar um problema.",
 	"createTeamsGroup": "Criar novo grupo de equipes",
 	"createZipFileForProblem": "Usar a ferramenta Criador de Problemas",
+	"cronControlPlaneAllJobs": "Todos os trabalhos",
+	"cronControlPlaneAllStatuses": "Todos os estados",
 	"cronControlPlaneAvgDuration": "Dura\u00e7\u00e3o m\u00e9dia",
 	"cronControlPlaneDuration": "Dura\u00e7\u00e3o",
 	"cronControlPlaneJobsHeading": "Tarefas",

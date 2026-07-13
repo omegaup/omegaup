@@ -76,6 +76,28 @@
       </table>
 
       <h5 class="mt-4">{{ T.cronControlPlaneRunsHeading }}</h5>
+      <div class="form-inline mb-2" data-cron-filters>
+        <select
+          v-model="filterJob"
+          class="form-control form-control-sm mr-2"
+          data-cron-filter-job
+        >
+          <option value="">{{ T.cronControlPlaneAllJobs }}</option>
+          <option v-for="job in jobs" :key="job.name" :value="job.name">
+            {{ job.name }}
+          </option>
+        </select>
+        <select
+          v-model="filterStatus"
+          class="form-control form-control-sm"
+          data-cron-filter-status
+        >
+          <option value="">{{ T.cronControlPlaneAllStatuses }}</option>
+          <option value="success">success</option>
+          <option value="failure">failure</option>
+          <option value="running">running</option>
+        </select>
+      </div>
       <table class="table table-sm table-hover" data-cron-runs>
         <thead>
           <tr>
@@ -88,7 +110,7 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="run in runs">
+          <template v-for="run in filteredRuns">
             <tr
               :key="run.run_id"
               class="cron-run-row"
@@ -165,6 +187,16 @@ export default class Crons extends Vue {
   @Prop({ default: () => [] }) runs!: types.CronRun[];
 
   expandedRunId: number | null = null;
+  filterJob = '';
+  filterStatus = '';
+
+  get filteredRuns(): types.CronRun[] {
+    return this.runs.filter(
+      (run) =>
+        (!this.filterJob || run.name === this.filterJob) &&
+        (!this.filterStatus || run.status === this.filterStatus),
+    );
+  }
 
   toggle(runId: number): void {
     this.expandedRunId = this.expandedRunId === runId ? null : runId;

@@ -763,6 +763,8 @@ const translations: { [key: string]: string; } = {
   createProblemInteractiveGuideWelcome: "Welcome, let's create a problem.",
   createTeamsGroup: "Create new teams group",
   createZipFileForProblem: "Use the Problem Creator tool",
+  cronControlPlaneAllJobs: "All jobs",
+  cronControlPlaneAllStatuses: "All statuses",
   cronControlPlaneAvgDuration: "Avg. duration",
   cronControlPlaneDuration: "Duration",
   cronControlPlaneJobsHeading: "Jobs",
