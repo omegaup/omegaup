@@ -5,6 +5,7 @@ import T from '../../lang';
 
 import Form from './Form.vue';
 import { CreationMethods } from './Form.vue';
+import CreatorWrapper from './CreatorWrapper.vue';
 
 const props: types.ProblemFormPayload = {
   title: 'title',
@@ -158,5 +159,75 @@ describe('Settings.vue', () => {
     expect(
       wrapper.find('.introjs-creation-method .introjs-file').exists(),
     ).toBe(true);
+  });
+
+  it('Should open creator modal when clicking open creator button', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Creator });
+    await wrapper.find('.introjs-open-creator button').trigger('click');
+
+    expect((wrapper.vm as any).showProblemCreator).toBe(true);
+    expect(wrapper.find('.problem-creator-modal').exists()).toBe(true);
+  });
+
+  it('Should close creator modal when clicking close button', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: {
+        data: props,
+        showCreationMethodSelector: true,
+      },
+    });
+
+    await wrapper.setData({ showProblemCreator: true });
+    await wrapper.find('[data-problem-creator-close]').trigger('click');
+
+    expect((wrapper.vm as any).showProblemCreator).toBe(false);
+  });
+
+  it('Should re-emit show-update-success-message from the creator', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('show-update-success-message');
+
+    expect(wrapper.emitted('show-update-success-message')).toBeTruthy();
+  });
+
+  it('Should re-emit download-input-file with its payload', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const payload = { fileName: 'cases/1.in', fileContent: 'content' };
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('download-input-file', payload);
+
+    expect(wrapper.emitted('download-input-file')?.[0]).toEqual([payload]);
+  });
+
+  it('Should re-emit download-zip-file with its payload', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const payload = { fileName: 'problem', zipContent: {} };
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('download-zip-file', payload);
+
+    expect(wrapper.emitted('download-zip-file')?.[0]).toEqual([payload]);
   });
 });
