@@ -1,7 +1,3 @@
-// Single configuration for the navbar dropdown menus. Each entry declares its
-// own visibility rule over the access flags coming from the payload, so the
-// available options are controlled from one place instead of conditions
-// spread across the template.
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
 
@@ -14,8 +10,6 @@ export interface NavbarAccess {
 
 export interface NavbarMenuEntry {
   divider?: boolean;
-  // Rendered by the template as the collapsed Create problem submenu, since
-  // its toggle is a button rather than a link.
   createProblemSubmenu?: boolean;
   title?: string;
   description?: string;
