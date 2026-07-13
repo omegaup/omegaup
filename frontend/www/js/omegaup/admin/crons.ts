@@ -6,25 +6,32 @@ import T from '../lang';
 import Vue from 'vue';
 import { types } from '../api_types';
 
+const REFRESH_INTERVAL_MS = 15000;
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CronsDetailsPayload();
 
-  new Vue({
+  const app = new Vue({
     el: '#main-container',
     components: {
       'omegaup-admin-crons': admin_Crons,
     },
+    data: {
+      jobs: payload.jobs,
+      runs: payload.runs,
+    },
     render: function (createElement) {
       return createElement('omegaup-admin-crons', {
         props: {
-          jobs: payload.jobs,
-          runs: payload.runs,
+          jobs: this.jobs,
+          runs: this.runs,
         },
         on: {
           rerun: (name: string) => {
             api.Admin.rerunCron({ name })
               .then(() => {
                 ui.success(T.cronControlPlaneRerunQueued);
+                refresh();
               })
               .catch(ui.apiError);
           },
@@ -32,4 +39,15 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  function refresh(): void {
+    api.Admin.getCrons()
+      .then((response) => {
+        app.jobs = response.jobs;
+        app.runs = response.runs;
+      })
+      .catch(() => undefined);
+  }
+
+  window.setInterval(refresh, REFRESH_INTERVAL_MS);
 });
