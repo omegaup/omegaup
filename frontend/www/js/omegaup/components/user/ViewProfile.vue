@@ -45,7 +45,10 @@
               </p>
             </template>
             <template v-else>
-              <div ref="aboutMarkdownButtonBar" class="wmd-button-bar mb-2"></div>
+              <div
+                ref="aboutMarkdownButtonBar"
+                class="wmd-button-bar mb-2"
+              ></div>
               <textarea
                 ref="aboutMarkdownInput"
                 v-model="readmeEditContent"
@@ -54,17 +57,20 @@
                 @input="enforceLimit"
               ></textarea>
               <div class="d-flex justify-content-end mt-1">
-                <small 
-                  :class="{ 
-                    'text-danger': isOverLimit, 
-                    'text-warning': isNearLimit, 
-                    'text-muted': !isNearLimit 
+                <small
+                  :class="{
+                    'text-danger': isOverLimit,
+                    'text-warning': isNearLimit,
+                    'text-muted': !isNearLimit,
                   }"
                 >
                   {{ charCount }} / {{ MAX_ABOUT_LENGTH }}
                 </small>
               </div>
-              <div v-if="readmeEditContent" class="border p-3 mb-2 readme-preview">
+              <div
+                v-if="readmeEditContent"
+                class="border p-3 mb-2 readme-preview"
+              >
                 <omegaup-markdown
                   :markdown="readmeEditContent"
                   :full-width="true"
@@ -465,7 +471,7 @@ export default class ViewProfile extends Vue {
         },
       },
     );
-    
+
     this.aboutMarkdownEditor.run();
   }
 
@@ -556,7 +562,7 @@ export default class ViewProfile extends Vue {
     this.isEditingReadme = true;
     this.$nextTick(() => {
       this.initAboutEditor();
-        if (this.aboutMarkdownInput) {
+      if (this.aboutMarkdownInput) {
         this.aboutMarkdownInput.focus();
         const length = this.aboutMarkdownInput.value.length;
         this.aboutMarkdownInput.setSelectionRange(length, length);

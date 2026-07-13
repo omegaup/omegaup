@@ -1,7 +1,7 @@
 U13CannotPerform = "Coder menor de 13 años no puede realizar esta acción."
 aboutSectionAlreadyReported = "Ya has reportado este perfil."
-aboutTooLongError = "El texto excede el límite de caracteres permitido."
 aboutToStart = "Estás a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciará."
+aboutTooLongError = "El texto excede el límite de caracteres permitido."
 acceptCodeOfConduct = "He leído y acepto el [Código de Conducta](%(CodeofConductPolicyURL))."
 acceptPrivacyPolicy = "He leído y acepto la [Política de Uso y Privacidad](%(PrivacyPolicyURL)) del sitio."
 accountDeleteCancel = "Cancelar"
