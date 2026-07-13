@@ -673,6 +673,9 @@ a:hover {
   min-height: 150px;
   max-height: 500px;
   overflow-y: auto;
-  background-color: var(--markdown-preview-background, var(--background-color-secondary));
+  background-color: var(
+    --markdown-preview-background,
+    var(--background-color-secondary)
+  );
 }
 </style>
