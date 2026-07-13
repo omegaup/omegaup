@@ -771,6 +771,8 @@ const translations: { [key: string]: string; } = {
   createTeamsGroup: "Crear nuevo grupo de equipos",
   createZipFileForProblem: "Usar la herramienta Creador de problemas",
   createZipFileForProblemDesc: "Crea el zip de un problema paso a paso",
+  cronControlPlaneAllJobs: "Todos los trabajos",
+  cronControlPlaneAllStatuses: "Todos los estados",
   cronControlPlaneAvgDuration: "Duraci\u00f3n media",
   cronControlPlaneDuration: "Duraci\u00f3n",
   cronControlPlaneJobsHeading: "Trabajos",

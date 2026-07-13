@@ -770,6 +770,8 @@
 	"createTeamsGroup": "Criar novo grupo de equipes",
 	"createZipFileForProblem": "Usar a ferramenta Criador de Problemas",
 	"createZipFileForProblemDesc": "Crie o zip de um problema passo a passo",
+	"cronControlPlaneAllJobs": "Todos os trabalhos",
+	"cronControlPlaneAllStatuses": "Todos os estados",
 	"cronControlPlaneAvgDuration": "Dura\u00e7\u00e3o m\u00e9dia",
 	"cronControlPlaneDuration": "Dura\u00e7\u00e3o",
 	"cronControlPlaneJobsHeading": "Tarefas",
