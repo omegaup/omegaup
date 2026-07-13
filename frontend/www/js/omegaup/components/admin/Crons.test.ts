@@ -100,4 +100,14 @@ describe('Crons.vue', () => {
     expect(vm.formatDuration(0)).toBe('0.00s');
     expect(vm.formatRows(0)).toBe('0');
   });
+
+  it('Should emit rerun with the job name when the button is clicked', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    await wrapper.find('[data-cron-rerun]').trigger('click');
+
+    const emitted = wrapper.emitted('rerun');
+    expect(emitted).toBeTruthy();
+    expect(emitted?.[0]).toEqual(['update_ranks.py']);
+  });
 });
