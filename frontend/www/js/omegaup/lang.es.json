@@ -1,6 +1,7 @@
 {
 	"U13CannotPerform": "Coder menor de 13 a\u00f1os no puede realizar esta acci\u00f3n.",
 	"aboutSectionAlreadyReported": "Ya has reportado este perfil.",
+	"aboutTooLongError": "El texto excede el l\u00edmite de caracteres permitido.",
 	"aboutToStart": "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciar\u00e1.",
 	"acceptCodeOfConduct": "He le\u00eddo y acepto el [C\u00f3digo de Conducta](%(CodeofConductPolicyURL)).",
 	"acceptPrivacyPolicy": "He le\u00eddo y acepto la [Pol\u00edtica de Uso y Privacidad](%(PrivacyPolicyURL)) del sitio.",

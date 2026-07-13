@@ -50,7 +50,20 @@
                 ref="aboutMarkdownInput"
                 v-model="readmeEditContent"
                 class="form-control wmd-input mb-2"
+                :maxlength="MAX_ABOUT_LENGTH"
+                @input="enforceLimit"
               ></textarea>
+              <div class="d-flex justify-content-end mt-1">
+                <small 
+                  :class="{ 
+                    'text-danger': isOverLimit, 
+                    'text-warning': isNearLimit, 
+                    'text-muted': !isNearLimit 
+                  }"
+                >
+                  {{ charCount }} / {{ MAX_ABOUT_LENGTH }}
+                </small>
+              </div>
               <div v-if="readmeEditContent" class="border p-3 mb-2 readme-preview">
                 <omegaup-markdown
                   :markdown="readmeEditContent"
@@ -366,6 +379,7 @@ function getInitialSelectedTab(
 const aboutMarkdownConverter = new markdown.Converter({
   preview: true,
 });
+const MAX_ABOUT_LENGTH = 1000;
 
 @Component({
   components: {
@@ -427,6 +441,7 @@ export default class ViewProfile extends Vue {
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
+  MAX_ABOUT_LENGTH = MAX_ABOUT_LENGTH;
 
   mounted(): void {
     if (this.isEditingReadme) {
@@ -436,16 +451,8 @@ export default class ViewProfile extends Vue {
     }
   }
 
-  beforeDestroy(): void {
-    this.aboutMarkdownEditor = null;
-  }
-
   private initAboutEditor(): void {
     if (this.aboutMarkdownEditor) return;
-    if (!this.aboutMarkdownButtonBar || !this.aboutMarkdownInput) {
-      console.warn('Markdown editor refs not available yet');
-      return;
-    }
 
     this.aboutMarkdownEditor = new Markdown.Editor(
       aboutMarkdownConverter.converter,
@@ -458,7 +465,20 @@ export default class ViewProfile extends Vue {
         },
       },
     );
+    
     this.aboutMarkdownEditor.run();
+  }
+
+  get charCount(): number {
+    return this.readmeEditContent?.length || 0;
+  }
+
+  get isNearLimit(): boolean {
+    return this.charCount >= MAX_ABOUT_LENGTH * 0.9;
+  }
+
+  get isOverLimit(): boolean {
+    return this.charCount > MAX_ABOUT_LENGTH;
   }
 
   get createdContests(): Contest[] {
@@ -522,6 +542,15 @@ export default class ViewProfile extends Vue {
     }
   }
 
+  enforceLimit(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    if (target.value.length > MAX_ABOUT_LENGTH) {
+      ui.error(T.aboutTooLongError);
+      target.value = target.value.substring(0, MAX_ABOUT_LENGTH);
+      this.readmeEditContent = target.value;
+    }
+  }
+
   startEditReadme(): void {
     this.readmeEditContent = this.currentReadme;
     this.isEditingReadme = true;
@@ -538,15 +567,22 @@ export default class ViewProfile extends Vue {
   cancelEditReadme(): void {
     this.isEditingReadme = false;
     this.readmeEditContent = null;
+    this.aboutMarkdownEditor = null;
   }
 
   saveReadme(): void {
+    if (this.isOverLimit) {
+      ui.error(T.aboutTooLongError);
+      return;
+    }
+
     const content = this.readmeEditContent ?? '';
     this.$emit('save-readme', {
       readme: content,
       onSuccess: () => {
         this.currentReadme = content;
         this.isEditingReadme = false;
+        this.aboutMarkdownEditor = null;
       },
     });
   }
