@@ -7,6 +7,8 @@ For more information about the API controllers, please refer to the [Controllers
 - [ACL](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#acl)
   - [`/api/aCL/userOwnedAclReport/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiacluserownedaclreport)
 - [Admin](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#admin)
+  - [`/api/admin/getCronRun/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiadmingetcronrun)
+  - [`/api/admin/getCrons/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiadmingetmaintenancemode)
   - [`/api/admin/platformReportStats/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiadminplatformreportstats)
   - [`/api/admin/setMaintenanceMode/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiadminsetmaintenancemode)

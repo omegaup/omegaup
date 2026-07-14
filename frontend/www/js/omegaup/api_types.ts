@@ -1602,6 +1602,32 @@ export namespace types {
       );
     }
 
+    export function CronsDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CronsDetailsPayload {
+      return ((x) => {
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+              x.finished_at = ((x: number) => new Date(x * 1000))(
+                x.finished_at,
+              );
+            if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+              x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function EmailEditDetailsPayload(
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
@@ -3779,6 +3805,38 @@ export namespace types {
     teachingAssistant: types.FilteredCourse[];
   }
 
+  export interface CronJob {
+    description?: string;
+    enabled: boolean;
+    name: string;
+    schedule?: string;
+  }
+
+  export interface CronRun {
+    duration_seconds?: number;
+    error_text?: string;
+    finished_at?: Date;
+    hostname?: string;
+    name: string;
+    phases: types.CronRunPhase[];
+    rows_affected?: number;
+    run_id: number;
+    started_at?: Date;
+    status: string;
+  }
+
+  export interface CronRunPhase {
+    duration: number;
+    error_class?: string;
+    phase: string;
+    status: string;
+  }
+
+  export interface CronsDetailsPayload {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
+  }
+
   export interface CurrentSession {
     apiTokenId?: number;
     api_tokens: types.ApiToken[];
@@ -5337,6 +5395,15 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetCronRunRequest = { [key: string]: any };
+  export type _AdminGetCronRunServerResponse = any;
+  export type AdminGetCronRunResponse = { run?: types.CronRun };
+  export type AdminGetCronsRequest = { [key: string]: any };
+  export type _AdminGetCronsServerResponse = any;
+  export type AdminGetCronsResponse = {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
+  };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
@@ -6352,6 +6419,12 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getCronRun: (
+      params?: messages.AdminGetCronRunRequest,
+    ) => Promise<messages.AdminGetCronRunResponse>;
+    getCrons: (
+      params?: messages.AdminGetCronsRequest,
+    ) => Promise<messages.AdminGetCronsResponse>;
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
