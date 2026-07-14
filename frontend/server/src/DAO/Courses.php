@@ -736,7 +736,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 HAVING
                     MAX(r.contest_score) IS NOT NULL
                 ORDER BY
-                    i.name, a.`order`, psp.`order`
+                    COALESCE(i.name, i.username), a.`order`, psp.`order`
             ";
 
             /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: string, problem_alias: string, problem_score: float, username: string}> */
