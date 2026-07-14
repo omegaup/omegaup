@@ -2,9 +2,11 @@ import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import Form from './Form.vue';
 import { CreationMethods } from './Form.vue';
+import CreatorWrapper from './CreatorWrapper.vue';
 
 const props: types.ProblemFormPayload = {
   title: 'title',
@@ -187,5 +189,116 @@ describe('Settings.vue', () => {
     await wrapper.find('[data-problem-creator-close]').trigger('click');
 
     expect((wrapper.vm as any).showProblemCreator).toBe(false);
+  });
+
+  it('Should re-emit show-update-success-message from the creator', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('show-update-success-message');
+
+    expect(wrapper.emitted('show-update-success-message')).toBeTruthy();
+  });
+
+  it('Should re-emit download-input-file with its payload', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const payload = { fileName: 'cases/1.in', fileContent: 'content' };
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('download-input-file', payload);
+
+    expect(wrapper.emitted('download-input-file')?.[0]).toEqual([payload]);
+  });
+
+  it('Should capture the generated zip from the creator for submission', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const blob = new Blob(['zip'], { type: 'application/zip' });
+    const payload = {
+      fileName: 'problem',
+      zipContent: { generateAsync: jest.fn().mockResolvedValue(blob) },
+    };
+    wrapper
+      .findComponent(CreatorWrapper)
+      .vm.$emit('download-zip-file', payload);
+    await new Promise(process.nextTick);
+
+    expect(wrapper.emitted('download-zip-file')).toBeFalsy();
+    expect((wrapper.vm as any).creatorGeneratedZipBlob).toBe(blob);
+    expect((wrapper.vm as any).isGeneratingCreatorZip).toBe(false);
+  });
+
+  it('Should block submit in creator mode when no zip has been generated', async () => {
+    const uiError = jest.spyOn(ui, 'error').mockImplementation(() => {});
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({
+      currentCreationMethod: CreationMethods.Creator,
+    });
+
+    const ev = { preventDefault: jest.fn() };
+    (wrapper.vm as any).handleFormSubmit(ev);
+
+    expect(ev.preventDefault).toHaveBeenCalled();
+    expect(uiError).toHaveBeenCalledWith(T.problemCreatorOpenBeforeSubmit);
+    uiError.mockRestore();
+  });
+
+  it('Should block submit while the creator zip is being generated', async () => {
+    const uiError = jest.spyOn(ui, 'error').mockImplementation(() => {});
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({
+      currentCreationMethod: CreationMethods.Creator,
+      isGeneratingCreatorZip: true,
+    });
+
+    const ev = { preventDefault: jest.fn() };
+    (wrapper.vm as any).handleFormSubmit(ev);
+
+    expect(ev.preventDefault).toHaveBeenCalled();
+    expect(uiError).toHaveBeenCalledWith(T.problemCreatorGeneratingZip);
+    uiError.mockRestore();
+  });
+
+  it('Should attach the generated zip to the hidden input on submit', async () => {
+    const addedFiles: File[] = [];
+    (window as any).DataTransfer = class {
+      items = { add: (file: File) => addedFiles.push(file) };
+      get files() {
+        return addedFiles;
+      }
+    };
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({
+      currentCreationMethod: CreationMethods.Creator,
+      creatorGeneratedZipBlob: new Blob(['zip'], { type: 'application/zip' }),
+    });
+
+    const fakeInput: { files: FileList | null } = { files: null };
+    (wrapper.vm as any).$refs.creatorFileInput = fakeInput;
+    const ev = { preventDefault: jest.fn() };
+    (wrapper.vm as any).handleFormSubmit(ev);
+
+    expect(ev.preventDefault).not.toHaveBeenCalled();
+    expect(addedFiles).toHaveLength(1);
+    expect(addedFiles[0].name).toBe('title.zip');
+    expect(fakeInput.files).toHaveLength(1);
+    delete (window as any).DataTransfer;
   });
 });
