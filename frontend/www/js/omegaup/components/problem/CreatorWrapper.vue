@@ -34,6 +34,10 @@ export default class CreatorWrapper extends Vue {
     this.creatorRef?.saveDraft();
   }
 
+  async importZipFile(zipFile: File): Promise<boolean> {
+    return this.creatorRef.importZipFile(zipFile);
+  }
+
   onDownloadZipFile(zipObject: unknown): void {
     this.$emit('download-zip-file', zipObject);
   }

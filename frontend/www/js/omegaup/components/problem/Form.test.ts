@@ -3,6 +3,7 @@ import { types } from '../../api_types';
 
 import T from '../../lang';
 import * as ui from '../../ui';
+import JSZip from 'jszip';
 
 import Form from './Form.vue';
 import { CreationMethods } from './Form.vue';
@@ -300,5 +301,57 @@ describe('Settings.vue', () => {
     expect(addedFiles[0].name).toBe('title.zip');
     expect(fakeInput.files).toHaveLength(1);
     delete (window as any).DataTransfer;
+  });
+
+  const makeZipFile = async (files: {
+    [path: string]: string;
+  }): Promise<File> => {
+    const zip = new JSZip();
+    Object.entries(files).forEach(([path, content]) => zip.file(path, content));
+    const blob = await zip.generateAsync({ type: 'blob' });
+    return new File([blob], 'problem.zip', { type: 'application/zip' });
+  };
+
+  it('Should open the creator pre-populated when a creator zip is uploaded', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Zip });
+
+    const file = await makeZipFile({ 'cdp.data': '{}' });
+    await (wrapper.vm as any).onUploadFile({ target: { files: [file] } });
+
+    expect((wrapper.vm as any).currentCreationMethod).toBe(
+      CreationMethods.Creator,
+    );
+    expect((wrapper.vm as any).showProblemCreator).toBe(true);
+  });
+
+  it('Should keep the zip flow when the uploaded zip is not creator-generated', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ currentCreationMethod: CreationMethods.Zip });
+
+    const file = await makeZipFile({ 'cases/1.in': '1 2' });
+    await (wrapper.vm as any).onUploadFile({ target: { files: [file] } });
+
+    expect((wrapper.vm as any).currentCreationMethod).toBe(CreationMethods.Zip);
+    expect((wrapper.vm as any).showProblemCreator).toBe(false);
+  });
+
+  it('Should forward the uploaded creator zip to the embedded creator', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const importZipFile = jest.fn().mockResolvedValue(true);
+    (wrapper.vm as any).$refs.problemCreator = { importZipFile };
+    const file = await makeZipFile({ 'cdp.data': '{}' });
+    await (wrapper.vm as any).importZipIntoCreator(file);
+
+    expect(importZipFile).toHaveBeenCalledWith(file);
+    expect((wrapper.vm as any).creatorGeneratedZipBlob).toBeNull();
   });
 });

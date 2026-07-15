@@ -122,39 +122,39 @@ export default class Header extends Vue {
     this.zipFile = this.readFile(ev.target as HTMLInputElement);
   }
 
-  retrieveStore(): void {
-    if (!this.zipFile) {
-      return;
+  async retrieveStore(): Promise<void> {
+    if (this.zipFile) {
+      await this.importZipFile(this.zipFile);
     }
-    const zipUploaded = new JSZip();
-    zipUploaded
-      .loadAsync(this.zipFile)
-      .then((zipContent) => {
-        const cdpDataFile = zipContent.file('cdp.data');
-        if (!cdpDataFile) {
-          ui.error(T.problemCreatorZipFileIsNotComplete);
-          return;
-        }
-        cdpDataFile.async('text').then((content) => {
-          const storeData = JSON.parse(content);
-          this.$emit('upload-zip-file', storeData);
-          this.name = storeData.problemName;
-          this.$store.replaceState({
-            ...this.$store.state,
-            problemName: storeData.problemName,
-            problemMarkdown: storeData.problemMarkdown,
-            problemCodeContent: storeData.problemCodeContent,
-            problemCodeExtension: storeData.problemCodeExtension,
-            problemSolutionMarkdown: storeData.problemSolutionMarkdown,
-          });
-          if (storeData.casesStore) {
-            this.$store.commit('casesStore/replaceState', storeData.casesStore);
-          }
-        });
-      })
-      .catch(() => {
-        ui.error(T.problemCreatorZipFileIsNotValid);
+  }
+
+  async importZipFile(zipFile: File): Promise<boolean> {
+    try {
+      const zipContent = await new JSZip().loadAsync(zipFile);
+      const cdpDataFile = zipContent.file('cdp.data');
+      if (!cdpDataFile) {
+        ui.error(T.problemCreatorZipFileIsNotComplete);
+        return false;
+      }
+      const storeData = JSON.parse(await cdpDataFile.async('text'));
+      this.$emit('upload-zip-file', storeData);
+      this.name = storeData.problemName;
+      this.$store.replaceState({
+        ...this.$store.state,
+        problemName: storeData.problemName,
+        problemMarkdown: storeData.problemMarkdown,
+        problemCodeContent: storeData.problemCodeContent,
+        problemCodeExtension: storeData.problemCodeExtension,
+        problemSolutionMarkdown: storeData.problemSolutionMarkdown,
       });
+      if (storeData.casesStore) {
+        this.$store.commit('casesStore/replaceState', storeData.casesStore);
+      }
+      return true;
+    } catch {
+      ui.error(T.problemCreatorZipFileIsNotValid);
+      return false;
+    }
   }
 
   @Watch('name')
