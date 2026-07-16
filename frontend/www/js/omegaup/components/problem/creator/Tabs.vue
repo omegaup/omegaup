@@ -8,8 +8,10 @@
         >
       </template>
       <omegaup-problem-creator-statement-tab
+        ref="statementTab"
         :current-markdown-prop="currentMarkdownProp"
         :active-tab-index="activeTabIndex"
+        :hide-save-button="hideSaveButtons"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -24,9 +26,11 @@
         >
       </template>
       <omegaup-problem-creator-code-tab
+        ref="codeTab"
         :code-prop="codeProp"
         :extension-prop="extensionProp"
         :active-tab-index="activeTabIndex"
+        :hide-save-button="hideSaveButtons"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -59,8 +63,10 @@
         >
       </template>
       <omegaup-problem-creator-solution-tab
+        ref="solutionTab"
         :current-solution-markdown-prop="currentSolutionMarkdownProp"
         :active-tab-index="activeTabIndex"
+        :hide-save-button="hideSaveButtons"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -70,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Ref } from 'vue-property-decorator';
 import problemCreator_CasesTab from './cases/CasesTab.vue';
 import problemCreator_StatementTab from './statement/StatementTab.vue';
 import problemCreator_CodeTab from './code/CodeTab.vue';
@@ -104,5 +110,16 @@ export default class Tabs extends Vue {
   codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty })
   extensionProp!: string;
+  @Prop({ default: false }) hideSaveButtons!: boolean;
+
+  @Ref('statementTab') statementTabRef!: problemCreator_StatementTab;
+  @Ref('codeTab') codeTabRef!: problemCreator_CodeTab;
+  @Ref('solutionTab') solutionTabRef!: problemCreator_SolutionTab;
+
+  saveAllDrafts(): void {
+    this.statementTabRef?.persistDraft();
+    this.codeTabRef?.persistDraft();
+    this.solutionTabRef?.persistDraft();
+  }
 }
 </script>

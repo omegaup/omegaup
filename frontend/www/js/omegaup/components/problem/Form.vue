@@ -16,7 +16,13 @@
       </p>
     </div>
     <div class="card-body px-2 px-sm-4">
-      <form ref="form" method="POST" class="form" enctype="multipart/form-data">
+      <form
+        ref="form"
+        method="POST"
+        class="form"
+        enctype="multipart/form-data"
+        @submit="handleFormSubmit"
+      >
         <div class="accordion mb-3">
           <div class="card">
             <div class="card-header">
@@ -119,6 +125,13 @@
                     >
                       {{ T.openProblemCreator }}
                     </button>
+                    <input
+                      ref="creatorFileInput"
+                      name="problem_contents"
+                      type="file"
+                      accept=".zip"
+                      class="d-none"
+                    />
                   </div>
                   <div
                     v-if="currentCreationMethod === CreationMethods.Zip"
@@ -522,7 +535,10 @@
         <div class="problem-creator-modal-body">
           <omegaup-problem-creator
             v-if="showProblemCreator"
-            @download-zip-file="$emit('download-zip-file', $event)"
+            ref="problemCreator"
+            :hide-header-actions="true"
+            :hide-save-buttons="true"
+            @download-zip-file="handleCreatorZipGeneration"
             @download-input-file="$emit('download-input-file', $event)"
             @show-update-success-message="$emit('show-update-success-message')"
           />
@@ -548,6 +564,8 @@ import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import problem_CreatorWrapper from './CreatorWrapper.vue';
 import T from '../../lang';
+import * as ui from '../../ui';
+import JSZip from 'jszip';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 import 'intro.js/introjs.css';
@@ -581,6 +599,8 @@ export default class ProblemForm extends Vue {
   @Ref('limits') limitsRef!: HTMLDivElement;
   @Ref('validation') validationRef!: HTMLButtonElement;
   @Ref('form') formRef!: HTMLFormElement;
+  @Ref('creatorFileInput') creatorFileInputRef!: HTMLInputElement;
+  @Ref('problemCreator') problemCreatorRef!: problem_CreatorWrapper;
 
   T = T;
   title = this.data.title;
@@ -612,6 +632,8 @@ export default class ProblemForm extends Vue {
   CreationMethods = CreationMethods;
   currentCreationMethod: CreationMethods = this.creationMethod;
   showProblemCreator = false;
+  creatorGeneratedZipBlob: Blob | null = null;
+  isGeneratingCreatorZip = false;
 
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
@@ -681,7 +703,53 @@ export default class ProblemForm extends Vue {
   }
 
   closeProblemCreatorModal(): void {
+    // Drafts are committed to the store and the zip is generated before
+    // hiding the modal because `v-if` destroys the creator component.
+    this.creatorGeneratedZipBlob = null;
+    this.problemCreatorRef?.saveDraft?.();
+    this.problemCreatorRef?.generateZip?.();
     this.showProblemCreator = false;
+  }
+
+  handleCreatorZipGeneration({ zipContent }: { zipContent: JSZip }): void {
+    this.isGeneratingCreatorZip = true;
+    zipContent
+      .generateAsync({ type: 'blob' })
+      .then((blob) => {
+        this.creatorGeneratedZipBlob = blob;
+        this.isGeneratingCreatorZip = false;
+      })
+      .catch(() => {
+        this.isGeneratingCreatorZip = false;
+      });
+  }
+
+  handleFormSubmit(ev: Event): void {
+    if (
+      this.isUpdate ||
+      !this.showCreationMethodSelector ||
+      this.currentCreationMethod !== CreationMethods.Creator
+    ) {
+      return;
+    }
+    if (this.isGeneratingCreatorZip) {
+      ev.preventDefault();
+      ui.error(T.problemCreatorGeneratingZip);
+      return;
+    }
+    if (!this.creatorGeneratedZipBlob || typeof DataTransfer !== 'function') {
+      ev.preventDefault();
+      ui.error(T.problemCreatorOpenBeforeSubmit);
+      return;
+    }
+    const file = new File(
+      [this.creatorGeneratedZipBlob],
+      `${this.alias || 'problem'}.zip`,
+      { type: 'application/zip' },
+    );
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    this.creatorFileInputRef.files = dataTransfer.files;
   }
 
   get howToWriteProblemLink(): string {
