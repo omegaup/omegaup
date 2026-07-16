@@ -101,37 +101,6 @@
                 :key="`problems-divider-${index}`"
                 class="menu-divider"
               />
-              <div
-                v-else-if="entry.createProblemSubmenu"
-                :key="`problems-create-${index}`"
-                class="collapse-submenu"
-              >
-                <button
-                  type="button"
-                  class="dropdown-item dropdown-toggle"
-                  data-nav-problems-create-options
-                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
-                  @click.stop.prevent="onCreateProblemClick"
-                >
-                  {{ T.myproblemsListCreateProblem }}
-                </button>
-
-                <div v-show="isCreateProblemSubmenuOpen" class="pl-3">
-                  <a
-                    class="dropdown-item"
-                    href="/problem/creator/"
-                    @click.stop
-                    >{{ T.myproblemsListCreateZipFileProblem }}</a
-                  >
-                  <a
-                    class="dropdown-item"
-                    href="/problem/new/"
-                    data-nav-problems-create
-                    @click.stop
-                    >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
-                  >
-                </div>
-              </div>
               <omegaup-navbar-item
                 v-else
                 :key="`problems-item-${index}`"
@@ -228,13 +197,14 @@ import {
   faBalanceScale,
   faBook,
   faBookmark,
-  faCalendarPlus,
   faChalkboardTeacher,
   faChartLine,
   faClipboardCheck,
   faCode,
   faComments,
   faDatabase,
+  faFileArchive,
+  faFlagCheckered,
   faGraduationCap,
   faHistory,
   faLayerGroup,
@@ -257,13 +227,14 @@ library.add(
   faBalanceScale,
   faBook,
   faBookmark,
-  faCalendarPlus,
   faChalkboardTeacher,
   faChartLine,
   faClipboardCheck,
   faCode,
   faComments,
   faDatabase,
+  faFileArchive,
+  faFlagCheckered,
   faGraduationCap,
   faHistory,
   faLayerGroup,
@@ -297,8 +268,6 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
-  isCreateProblemSubmenuOpen = false;
-
   get access(): NavbarAccess {
     return {
       isLoggedIn: this.isLoggedIn,
@@ -326,10 +295,6 @@ export default class NavbarItems extends Vue {
 
   get helpEntries(): NavbarMenuEntry[] {
     return visibleEntries(helpMenuEntries, this.access);
-  }
-
-  onCreateProblemClick(): void {
-    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
   }
 }
 </script>

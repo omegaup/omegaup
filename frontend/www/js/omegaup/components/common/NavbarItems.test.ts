@@ -42,20 +42,15 @@ describe('NavbarItems.vue', () => {
     expect(asReviewer.find('a[href="/nomination/"]').exists()).toBe(true);
   });
 
-  it('Should swap the create problem submenu for a direct link when logged out', () => {
+  it('Should show both create problem links when logged in and only the direct one when logged out', () => {
     const loggedIn = mount(common_NavbarItems, { propsData: baseProps });
-    expect(loggedIn.find('[data-nav-problems-create-options]').exists()).toBe(
-      true,
-    );
+    expect(loggedIn.find('a[href="/problem/creator/"]').exists()).toBe(true);
+    expect(loggedIn.find('[data-nav-problems-create]').exists()).toBe(true);
 
     const loggedOut = mount(common_NavbarItems, {
       propsData: { ...baseProps, isLoggedIn: false, isMainUserIdentity: false },
     });
-    expect(loggedOut.find('[data-nav-problems-create-options]').exists()).toBe(
-      false,
-    );
-    expect(
-      loggedOut.find('a.dropdown-item[href="/problem/creator/"]').exists(),
-    ).toBe(true);
+    expect(loggedOut.find('a[href="/problem/creator/"]').exists()).toBe(true);
+    expect(loggedOut.find('[data-nav-problems-create]').exists()).toBe(false);
   });
 });

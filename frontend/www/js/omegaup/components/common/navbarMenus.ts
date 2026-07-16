@@ -10,7 +10,6 @@ export interface NavbarAccess {
 
 export interface NavbarMenuEntry {
   divider?: boolean;
-  createProblemSubmenu?: boolean;
   title?: string;
   description?: string;
   icon?: [string, string];
@@ -46,7 +45,7 @@ export const contestsMenuEntries: NavbarMenuEntry[] = [
   {
     title: T.contestsCreate,
     description: T.contestsCreateDesc,
-    icon: ['fas', 'calendar-plus'],
+    icon: ['fas', 'flag-checkered'],
     href: '/contest/new/',
     dataAttr: 'data-nav-contests-create',
     visible: (access) => access.isMainUserIdentity && !access.isUnder13User,
@@ -107,7 +106,16 @@ export const problemsMenuEntries: NavbarMenuEntry[] = [
     visible: (access) => !access.isLoggedIn,
   },
   {
-    createProblemSubmenu: true,
+    title: T.myproblemsListCreateZipFileProblem,
+    icon: ['fas', 'plus-circle'],
+    href: '/problem/creator/',
+    visible: (access) => access.isLoggedIn,
+  },
+  {
+    title: T.myproblemsListCreateProblemWithExistingZipFile,
+    icon: ['fas', 'file-archive'],
+    href: '/problem/new/',
+    dataAttr: 'data-nav-problems-create',
     visible: (access) => access.isLoggedIn,
   },
   {
