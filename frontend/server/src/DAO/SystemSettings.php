@@ -43,11 +43,28 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
         string $key,
         bool $default = true
     ): bool {
+        $cache = new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key);
+        $cached = $cache->get();
+        if (!is_null($cached)) {
+            return intval($cached) === 1;
+        }
         $setting = self::getByKey($key);
         if (is_null($setting)) {
             return $default;
         }
-        return intval($setting->setting_value) === 1;
+        $value = intval($setting->setting_value) === 1;
+        // Store as int because Cache::get() treats a stored `false` as a miss.
+        $cache->set($value ? 1 : 0, timeout: 0);
+        return $value;
+    }
+
+    /**
+     * Drop the cached value for a setting so the next read hits the database.
+     *
+     * @param string $key The setting key
+     */
+    public static function invalidateCache(string $key): void {
+        (new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key))->delete();
     }
 
     /**
@@ -68,10 +85,13 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
                 'setting_value' => $value ? '1' : '0',
                 'setting_description' => '',
             ]);
-            return self::create($newSetting);
+            $affectedRows = self::create($newSetting);
+        } else {
+            $setting->setting_value = $value ? '1' : '0';
+            $affectedRows = self::update($setting);
         }
-        $setting->setting_value = $value ? '1' : '0';
-        return self::update($setting);
+        self::invalidateCache($key);
+        return $affectedRows;
     }
 
     /**
@@ -85,11 +105,18 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
         string $key,
         string $default = ''
     ): string {
+        $cache = new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key);
+        $cached = $cache->get();
+        if (!is_null($cached)) {
+            return strval($cached);
+        }
         $setting = self::getByKey($key);
         if (is_null($setting)) {
             return $default;
         }
-        return strval($setting->setting_value);
+        $value = strval($setting->setting_value);
+        $cache->set($value, timeout: 0);
+        return $value;
     }
 
     /**
@@ -110,9 +137,12 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
                 'setting_value' => $value,
                 'setting_description' => '',
             ]);
-            return self::create($newSetting);
+            $affectedRows = self::create($newSetting);
+        } else {
+            $setting->setting_value = $value;
+            $affectedRows = self::update($setting);
         }
-        $setting->setting_value = $value;
-        return self::update($setting);
+        self::invalidateCache($key);
+        return $affectedRows;
     }
 }
