@@ -1019,7 +1019,6 @@ const translations: { [key: string]: string; } = {
   mustLoginToJoinContest: "Debes iniciar sesi\u00f3n para poder participar en este concurso",
   mustRegisterToJoinContest: "Para participar en este concurso debes registrarte",
   mustRegisterToJoinCourse: "Para participar en este curso debes registrarte",
-  myproblemsListCreateProblem: "Crear Problema",
   myproblemsListCreateProblemWithExistingZipFile: "Tengo un archivo zip",
   myproblemsListCreateZipFileProblem: "Crear archivo zip",
   myproblemsListMyProblems: "Mis Problemas",

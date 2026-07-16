@@ -1019,7 +1019,6 @@ const translations: { [key: string]: string; } = {
   mustLoginToJoinContest: "(Y0u mu57 10gin 70 j0in 7hi5 c0n7357)",
   mustRegisterToJoinContest: "(Y0u mu57 r3gi573r 70 j0in 7hi5 c0n7357.)",
   mustRegisterToJoinCourse: "(Y0u mu57 r3gi573r 70 j0in 7hi5 c0ur53.)",
-  myproblemsListCreateProblem: "(Cr3a73 Pr0b13m)",
   myproblemsListCreateProblemWithExistingZipFile: "(I hav3 a zip fi13)",
   myproblemsListCreateZipFileProblem: "(Cr3a73 zip fi13)",
   myproblemsListMyProblems: "(My Pr0b13m5)",
