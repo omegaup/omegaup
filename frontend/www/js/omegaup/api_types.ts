@@ -2675,6 +2675,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function ViewUnavailablePayload(
+      elementId: string = 'payload',
+    ): types.ViewUnavailablePayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -5315,6 +5323,10 @@ export namespace types {
   export interface VerificationParentalTokenDetailsPayload {
     hasParentalVerificationToken: boolean;
     message: string;
+  }
+
+  export interface ViewUnavailablePayload {
+    description: string;
   }
 }
 
