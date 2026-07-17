@@ -135,3 +135,6 @@ stuff/inefficient_queries.csv
 
 # Ignore Claude Code instructions
 CLAUDE.md
+
+# Ignore Cursor Code plan instruction
+.cursor/plans/*
