@@ -106,13 +106,15 @@ export const problemsMenuEntries: NavbarMenuEntry[] = [
     visible: (access) => !access.isLoggedIn,
   },
   {
-    title: T.myproblemsListCreateZipFileProblem,
+    title: T.navCreateProblemFromScratch,
+    description: T.navCreateProblemFromScratchDesc,
     icon: ['fas', 'plus-circle'],
     href: '/problem/creator/',
     visible: (access) => access.isLoggedIn,
   },
   {
-    title: T.myproblemsListCreateProblemWithExistingZipFile,
+    title: T.navCreateProblemFromZip,
+    description: T.navCreateProblemFromZipDesc,
     icon: ['fas', 'file-archive'],
     href: '/problem/new/',
     dataAttr: 'data-nav-problems-create',
