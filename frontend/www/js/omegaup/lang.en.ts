@@ -1042,7 +1042,7 @@ const translations: { [key: string]: string; } = {
   navCourses: "Courses",
   navCoursesEnrolled: "Courses enrolled",
   navCreateProblemFromScratch: "Create Problem from Scratch",
-  navCreateProblemFromScratchDesc: "Build a new problem step by step with the problem creator",
+  navCreateProblemFromScratchDesc: "Build a new problem step by step",
   navCreateProblemFromZip: "Create Problem from ZIP",
   navCreateProblemFromZipDesc: "Upload a problem zip file you already have",
   navDependents: "My dependents",
