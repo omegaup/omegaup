@@ -5456,7 +5456,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         ) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'readmeAlreadyReported'
+                'aboutSectionAlreadyReported'
             );
         }
 
