@@ -41,7 +41,7 @@
 		},
 		"javascript": {
 			"extra_js_linters": [
-				"yarn run refactor"
+				"node stuff/refactor.js"
 			],
 			"allowlist": [
 				"frontend/www/js/.*\\.js$"
@@ -82,7 +82,7 @@
 		},
 		"typescript": {
 			"extra_js_linters": [
-				"yarn run refactor"
+				"node stuff/refactor.js"
 			],
 			"allowlist": [
 				"frontend/www/.*\\.ts$",
@@ -95,7 +95,7 @@
 		},
 		"vue": {
 			"extra_js_linters": [
-				"yarn run refactor"
+				"node stuff/refactor.js"
 			],
 			"stylelint": true,
 			"allowlist": [
