@@ -484,16 +484,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             if (is_numeric($query)) {
                 $clauses[] = [
                     "(
-                    p.title LIKE CONCAT('%', ?, '%') OR
-                    p.alias LIKE CONCAT('%', ?, '%') OR
+                    MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE) OR
                     p.problem_id = ?
                     )",
-                    [$query, $query, intval($query)],
+                    [$query, intval($query)],
                 ];
             } else {
                 $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
+                    "MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE)",
+                    [$query],
                 ];
             }
         }
@@ -1308,10 +1307,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!empty($query)) {
             $sql .= '
                 WHERE
-                    p.`title` LIKE CONCAT("%", ?, "%") OR
-                    p.`alias` LIKE CONCAT("%", ?, "%")
+                    MATCH(p.`title`, p.`alias`) AGAINST (? IN BOOLEAN MODE)
             ';
-            $params[] = $query;
             $params[] = $query;
         }
 
@@ -1832,9 +1829,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     WHERE
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 5, $query);
+            $args = array_fill(0, 3, $query);
             $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+            $args = array_merge($args, array_fill(0, 1, $curatedQuery));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
             $sql = "FROM
@@ -1854,18 +1851,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                             Problems p
                         WHERE
                             title = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            0.1 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            (
-                                title LIKE CONCAT('%', ?, '%') OR
-                                alias LIKE CONCAT('%', ?, '%') OR
-                                problem_id = ?
-                            )
                         UNION ALL
                         SELECT
                             {$fields},
