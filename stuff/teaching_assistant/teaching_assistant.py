@@ -137,7 +137,7 @@ def get_runs_from_course_endpoint(
     returns the list of run_ids and corresponding_users from last 30 days.
     """
     endpoint = (
-        f"api/course/runs/?"
+        f"api/course/runs?"
         f"course_alias={course_alias}&"
         f"assignment_alias={assignment_alias}"
     )
