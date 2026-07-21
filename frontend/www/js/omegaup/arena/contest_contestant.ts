@@ -23,6 +23,7 @@ import {
   navigateToProblem,
   NavigationType,
 } from './navigation';
+import { pushLocationHash } from '../location';
 import problemsStore from './problemStore';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import rankingStore from './rankingStore';
@@ -256,7 +257,7 @@ OmegaUp.on('ready', async () => {
               .then((runDetails) => {
                 this.runDetailsData = showSubmission({ request, runDetails });
                 if (request.hash) {
-                  history.pushState(null, '', `#${request.hash}`);
+                  pushLocationHash(request.hash);
                   syncFromHash();
                 }
               })
@@ -437,7 +438,7 @@ OmegaUp.on('ready', async () => {
           },
           'update:activeTab': (tabName: string) => {
             contestContestant.activeTab = tabName;
-            history.pushState(null, '', `#${tabName}`);
+            pushLocationHash(`#${tabName}`);
           },
           'reset-hash': ({
             selectedTab,
@@ -447,11 +448,11 @@ OmegaUp.on('ready', async () => {
             alias: string;
           }) => {
             if (!alias) {
-              history.pushState(null, '', `#${selectedTab}`);
+              pushLocationHash(`#${selectedTab}`);
               syncFromHash();
               return;
             }
-            history.pushState(null, '', `#${selectedTab}/${alias}`);
+            pushLocationHash(`#${selectedTab}/${alias}`);
             syncFromHash();
           },
           'new-submission-popup-displayed': () => {

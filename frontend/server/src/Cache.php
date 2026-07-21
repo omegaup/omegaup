@@ -75,6 +75,17 @@ abstract class CacheAdapter {
     }
 
     /**
+     * Atomically increments a counter with TTL support.
+     * If the key doesn't exist, initializes it to 1 and sets the TTL.
+     * If it exists, increments it (TTL is preserved).
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds (only set on initialization)
+     * @return int The new value after incrementing
+     */
+    abstract public function incWithTTL(string $key, int $ttl): int;
+
+    /**
      * If the specified $id exists in cache, gets its associated value from the
      * cache.  Otherwise, executes $setFunc() to generate the associated
      * value, stores it, and returns it.
@@ -306,6 +317,28 @@ class RedisCacheAdapter extends CacheAdapter {
     }
 
     /**
+     * Atomically increments a counter with TTL support.
+     * Uses Redis INCR + EXPIRE in a Lua script for true atomicity.
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds
+     * @return int The new value after incrementing
+     */
+    public function incWithTTL(string $key, int $ttl): int {
+        // Lua script ensures INCR + EXPIRE are atomic
+        $script = <<<LUA
+        local count = redis.call('INCR', KEYS[1])
+        if count == 1 then
+            redis.call('EXPIRE', KEYS[1], ARGV[1])
+        end
+        return count
+        LUA;
+        /** @var int */
+        $result = $this->redis->eval($script, [$key, $ttl], 1);
+        return $result;
+    }
+
+    /**
      * @return array{0: string, 1: string}|false
      */
     private function acquireLock(string $lockGroup): array|false {
@@ -458,6 +491,24 @@ class APCCacheAdapter extends CacheAdapter {
     public function store(string $key, $var, int $ttl = 0): bool {
         return apcu_store($key, $var, $ttl);
     }
+
+    /**
+     * Atomically increments a counter with TTL support.
+     * Uses apcu_entry() for atomic initialization, then CAS loop.
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds
+     * @return int The new value after incrementing
+     */
+    public function incWithTTL(string $key, int $ttl): int {
+        // Must do this in a loop to avoid race condition
+        do {
+            // Ensure the key exists with TTL (atomic initialization)
+            $current = $this->entry($key, 0, $ttl);
+            $newValue = $current + 1;
+        } while (!$this->cas($key, $current, $newValue));
+        return $newValue;
+    }
 }
 
 /**
@@ -540,6 +591,22 @@ class InProcessCacheAdapter extends CacheAdapter {
         $this->cache[$key] = $var;
         return true;
     }
+
+    /**
+     * Atomically increments a counter.
+     * TTL is ignored in the in-process cache (no expiration needed).
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds (ignored)
+     * @return int The new value after incrementing
+     */
+    public function incWithTTL(string $key, int $ttl): int {
+        if (!array_key_exists($key, $this->cache)) {
+            $this->cache[$key] = 0;
+        }
+        $this->cache[$key]++;
+        return $this->cache[$key];
+    }
 }
 
 /**
@@ -582,6 +649,7 @@ class Cache {
     const DATA_CASES_FILES = 'data-cases-files-';
     const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
     const PROBLEM_IDENTITY_TYPE = 'problems-identity-type-';
+    const SYSTEM_SETTINGS = 'system-settings-';
 
     /** @var \Monolog\Logger */
     private $log;
@@ -673,6 +741,28 @@ class Cache {
         }
         $this->log->debug("Cache hit for key: {$this->key}");
         return $result;
+    }
+
+    /**
+     * Atomically increments a counter with TTL support.
+     * If the key doesn't exist, initializes it to 1 and sets the TTL.
+     * If it exists, increments it (TTL is preserved).
+     *
+     * @param int $ttl Time to live in seconds (only set on initialization)
+     * @return int The new value after incrementing, or 0 if cache is disabled
+     */
+    public function incWithTTL(int $ttl): int {
+        if (!self::isEnabled()) {
+            return 0;
+        }
+        $newValue = CacheAdapter::getInstance()->incWithTTL(
+            $this->key,
+            $ttl
+        );
+        $this->log->debug(
+            "Cache counter incremented to {$newValue} for key: {$this->key}"
+        );
+        return $newValue;
     }
 
     /**

@@ -35,6 +35,7 @@ OmegaUp.on('ready', () => {
             })
               .then((data) => {
                 ui.success(data.message ?? '');
+                ui.navigateTo('/login/');
               })
               .catch(ui.apiError);
           },
