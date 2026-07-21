@@ -219,15 +219,6 @@
             </tr>
           </tfoot>
           <tbody>
-            <tr v-if="!loading && (!filteredRuns || filteredRuns.length === 0)">
-              <td colspan="16">
-                <omegaup-common-empty-state
-                  icon="terminal"
-                  :title="T.runsListEmptyTitle"
-                  :description="T.runsListEmptyDescription"
-                />
-              </td>
-            </tr>
             <tr v-for="run in filteredRuns" :key="run.guid">
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td>
@@ -459,7 +450,6 @@ import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
-import common_EmptyState from '../common/EmptyState.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -511,7 +501,6 @@ export enum PopupDisplayed {
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
-    'omegaup-common-empty-state': common_EmptyState,
   },
   directives: {
     infiniteScroll,
