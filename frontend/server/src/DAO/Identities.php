@@ -91,10 +91,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     FROM
                         Identities i
                     WHERE
-                        (
-                            i.username LIKE CONCAT('%', ?, '%') OR
-                            i.name LIKE CONCAT('%', ?, '%')
-                        ) AND
+                        MATCH(name, username) AGAINST (? IN BOOLEAN MODE) AND
                         i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
                 ) AS sq
             GROUP BY
@@ -103,11 +100,11 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 relevance DESC
             LIMIT
                 ?;";
+        $escapedUsernameOrName = self::escapeBooleanModeQuery($usernameOrName);
         $args = [
-            $usernameOrName,
-            $usernameOrName,
-            $usernameOrName,
-            $usernameOrName,
+            $escapedUsernameOrName,
+            $escapedUsernameOrName,
+            $escapedUsernameOrName,
             $rowcount,
         ];
 
@@ -122,6 +119,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ];
         }
         return $result;
+    }
+
+    private static function escapeBooleanModeQuery(string $query): string {
+        return addcslashes($query, '+-<>()~*"\\');
     }
 
     public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {
