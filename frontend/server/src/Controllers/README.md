@@ -2,8 +2,10 @@
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
+  - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -324,6 +326,18 @@ Get maintenance mode status
 types.MaintenanceModeStatus;
 ```
 
+## `/api/admin/getSystemSettings/`
+
+### Description
+
+Gets the current system settings. Only available to system admins.
+
+### Returns
+
+| Name       | Type                                   |
+| ---------- | -------------------------------------- |
+| `settings` | `{ ephemeralGraderEnabled: boolean; }` |
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
@@ -358,6 +372,22 @@ Set maintenance mode
 | `message_es` | `null\|string` |             |          |
 | `message_pt` | `null\|string` |             |          |
 | `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
+
+## `/api/admin/updateSystemSettings/`
+
+### Description
+
+Updates system settings. Only available to system admins.
+
+### Parameters
+
+| Name                       | Type         | Description | Required |
+| -------------------------- | ------------ | ----------- | -------- |
+| `ephemeral_grader_enabled` | `null\|bool` |             |          |
 
 ### Returns
 

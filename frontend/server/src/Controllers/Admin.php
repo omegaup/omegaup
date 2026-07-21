@@ -321,4 +321,76 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'type' => $status['type'],
         ];
     }
+
+    /**
+     * Gets the current system settings. Only available to system admins.
+     *
+     * @return array{settings: array{ephemeralGraderEnabled: bool}, status: string}
+     */
+    public static function apiGetSystemSettings(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'status' => 'ok',
+            'settings' => [
+                'ephemeralGraderEnabled' => \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+                    'ephemeral_grader_enabled',
+                    true
+                ),
+            ],
+        ];
+    }
+
+    /**
+     * Updates system settings. Only available to system admins.
+     *
+     * @omegaup-request-param null|bool $ephemeral_grader_enabled
+     *
+     * @return array{status: string}
+     */
+    public static function apiUpdateSystemSettings(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $ephemeralGraderEnabled = $r->ensureOptionalBool(
+            'ephemeral_grader_enabled'
+        );
+        if (!is_null($ephemeralGraderEnabled)) {
+            \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+                'ephemeral_grader_enabled',
+                $ephemeralGraderEnabled
+            );
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
+     */
+    public static function getSettingsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'entrypoint' => 'admin_settings',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminSettings'
+                ),
+                'payload' => [],
+            ],
+        ];
+    }
 }

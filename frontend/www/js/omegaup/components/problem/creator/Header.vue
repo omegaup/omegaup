@@ -1,5 +1,5 @@
 <template>
-  <b-row class="mb-3">
+  <b-row v-if="!hideHeaderActions" class="mb-3">
     <b-col class="d-flex align-items-center">
       <span class="mr-2">{{ T.problemCreatorName }}</span>
       <b-form-input
@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import JSZip from 'jszip';
 import { namespace } from 'vuex-class';
 import T from '../../../lang';
@@ -94,13 +94,14 @@ const casesStore = namespace('casesStore');
 
 @Component
 export default class Header extends Vue {
+  @Prop({ default: false }) hideHeaderActions!: boolean;
+
   T = T;
   zipFile: File | null = null;
   uploadZipModal: boolean = false;
   newProblemConfirmationModal: boolean = false;
 
   nameInternal: string = T.problemCreatorEmpty;
-  zip: JSZip = new JSZip();
 
   @casesStore.State('groups') groups!: Group[];
   @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
@@ -199,14 +200,17 @@ export default class Header extends Vue {
   }
 
   generateProblem() {
-    this.getStatement(this.zip);
-    this.getSolution(this.zip);
-    this.getCasesAndTestPlan(this.zip);
+    // A fresh zip is built on every call so files removed from the store
+    // since the last generation do not linger in the archive.
+    const zip = new JSZip();
+    this.getStatement(zip);
+    this.getSolution(zip);
+    this.getCasesAndTestPlan(zip);
 
     const problemName: string = this.$store.state.problemName;
     this.$emit('download-zip-file', {
       fileName: problemName.replace(/ /g, '_'),
-      zipContent: this.zip,
+      zipContent: zip,
     });
   }
 

@@ -27,15 +27,15 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    QUALITYNOMINATION_QUESTION_CHANGE_ID,
+)
 
 CONFIDENCE = 10
 MIN_POINTS = 10
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 VOTES_NUM = 5
-
-# Before this id the questions were different
-QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
 
 # SQL Queries
 GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
