@@ -2,6 +2,7 @@ import Vue from 'vue';
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
+import { pushLocationHash } from '../location';
 import {
   getOptionsFromLocation,
   getProblemAndRunDetails,
@@ -382,6 +383,9 @@ OmegaUp.on('ready', async () => {
           },
           'update:activeTab': (tabName: string) => {
             problemDetailsView.activeTab = tabName;
+            if (window.location.hash !== `#${tabName}`) {
+              pushLocationHash(`#${tabName}`);
+            }
           },
           'redirect-login-page': () => {
             window.location.href = `/login/?redirect=${encodeURIComponent(
