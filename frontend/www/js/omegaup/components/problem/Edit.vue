@@ -327,7 +327,7 @@ export default class ProblemEdit extends Vue {
 
   T = T;
   alias = this.data.alias;
-  showTab = this.initialTab;
+  showTab = availableTabs.includes(this.initialTab) ? this.initialTab : 'edit';
   currentStatement: types.ProblemStatement = this.statement;
   currentSolution: types.ProblemStatement =
     this.solution ||
@@ -389,7 +389,7 @@ export default class ProblemEdit extends Vue {
 
   @Watch('initialTab')
   onInitialTabChanged(newValue: string): void {
-    if (!availableTabs.includes(this.initialTab)) {
+    if (!availableTabs.includes(newValue)) {
       this.showTab = 'edit';
       return;
     }
