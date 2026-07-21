@@ -483,15 +483,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!is_null($query)) {
             if (is_numeric($query)) {
                 $clauses[] = [
-                    "(
+                    '(
                     MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE) OR
                     p.problem_id = ?
-                    )",
+                    )',
                     [$query, intval($query)],
                 ];
             } else {
                 $clauses[] = [
-                    "MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE)",
+                    'MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE)',
                     [$query],
                 ];
             }
