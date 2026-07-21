@@ -85,8 +85,7 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
      * Auto Incremento
 {%- endif %}
      *
-{%- if table.name == 'Team_Groups' %}
-     * @var {{ column.php_type }}
+{%- if table.strict_types %}
      */
     public {{ column.php_type }} ${{ column.name -}}
 {%- if column.default -%}

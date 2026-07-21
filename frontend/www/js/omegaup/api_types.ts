@@ -4,36 +4,36 @@
 export namespace dao {
   export interface Contests {
     acl_id?: number;
-    admission_mode: string;
+    admission_mode?: string;
     alias?: string;
-    archived: boolean;
+    archived?: boolean;
     certificate_cutoff?: number;
-    certificates_status: string;
-    check_plagiarism: boolean;
-    contest_for_teams: boolean;
+    certificates_status?: string;
+    check_plagiarism?: boolean;
+    contest_for_teams?: boolean;
     contest_id?: number;
-    default_show_all_contestants_in_scoreboard: boolean;
+    default_show_all_contestants_in_scoreboard?: boolean;
     description?: string;
-    feedback: string;
-    finish_time: Date;
+    feedback?: string;
+    finish_time?: Date;
     languages?: string;
-    last_updated: Date;
-    partial_score: boolean;
-    penalty: number;
+    last_updated?: Date;
+    partial_score?: boolean;
+    penalty?: number;
     penalty_calc_policy?: string;
     penalty_type?: string;
-    plagiarism_threshold: boolean;
-    points_decay_factor: number;
+    plagiarism_threshold?: boolean;
+    points_decay_factor?: number;
     problemset_id?: number;
-    recommended: boolean;
+    recommended?: boolean;
     rerun_id?: number;
-    score_mode: string;
-    scoreboard: number;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
+    score_mode?: string;
+    scoreboard?: number;
+    show_scoreboard_after?: boolean;
+    start_time?: Date;
+    submissions_gap?: number;
     title?: string;
-    urgent: boolean;
+    urgent?: boolean;
     window_length?: number;
   }
 
@@ -56,7 +56,7 @@ export namespace dao {
   }
 
   export interface SubmissionFeedback {
-    date: Date;
+    date?: Date;
     feedback?: string;
     identity_id?: number;
     range_bytes_end?: number;
@@ -67,7 +67,7 @@ export namespace dao {
 
   export interface SubmissionFeedbackThread {
     contents?: string;
-    date: Date;
+    date?: Date;
     identity_id?: number;
     submission_feedback_id?: number;
     submission_feedback_thread_id?: number;
@@ -75,7 +75,7 @@ export namespace dao {
 
   export interface Users {
     birth_date?: string;
-    creation_timestamp: Date;
+    creation_timestamp?: Date;
     deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
@@ -85,8 +85,8 @@ export namespace dao {
     has_scholar_objective?: boolean;
     has_teaching_objective?: boolean;
     hide_problem_tags?: boolean;
-    in_mailing_list: boolean;
-    is_private: boolean;
+    in_mailing_list?: boolean;
+    is_private?: boolean;
     linkedin_url?: string;
     main_email_id?: number;
     main_identity_id?: number;
@@ -101,7 +101,7 @@ export namespace dao {
     scholar_degree?: string;
     user_id?: number;
     verification_id?: string;
-    verified: boolean;
+    verified?: boolean;
     x_url?: string;
   }
 }
