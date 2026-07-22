@@ -1,6 +1,10 @@
 <template>
   <tr :class="studentProgress.username">
-    <th scope="row" class="text-center align-middle">
+    <th
+      scope="row"
+      class="text-center align-middle username-cell"
+      :title="studentProgress.username"
+    >
       <a :href="studentProgressUrl">
         <omegaup-user-username
           :classname="studentProgress.classname"
@@ -10,7 +14,10 @@
         ></omegaup-user-username>
       </a>
     </th>
-    <td data-global-score class="text-center font-weight-bold align-middle">
+    <td
+      data-global-score
+      class="text-center font-weight-bold align-middle global-score-cell"
+    >
       <span class="d-block"
         >{{ studentProgress.courseProgress.toFixed(0) }}%</span
       >
@@ -194,6 +201,41 @@ th {
   left: 0;
   background: white;
   z-index: 1;
+  min-width: 120px;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.username-cell {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 480px) {
+  .username-cell {
+    max-width: 80px;
+  }
+
+  .global-score-cell {
+    font-size: 0.75rem;
+    padding: 4px !important;
+    min-width: 80px;
+    max-width: 80px;
+  }
+
+  tr {
+    display: flex;
+    width: 100%;
+  }
+
+  th, td {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .box {
