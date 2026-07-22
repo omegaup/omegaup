@@ -881,6 +881,7 @@ const translations: { [key: string]: string; } = {
   homepageTeachSectionTitle: "(T3ach)",
   homepageTrainSectionDescription: "(S01v3 pr0b13m5 and impr0v3 y0ur 5ki115)",
   homepageTrainSectionTitle: "(Train)",
+  homepageTitle: '[omegaUp Homepage]',
   identityAlreadyAssociated: "(Y0u a1r3ady hav3 0n3 id3n7i7y a550cia73d wi7h 7h3 5am3 gr0up.)",
   identityAlreadyInUse: "(Id3n7i7y i5 a1r3ady u53d by an07h3r acc0un7.)",
   identityInGroup: "(Id3n7i7y i5 a1r3ady a550cia73d 70 7h3 gr0up.)",

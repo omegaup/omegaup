@@ -879,6 +879,7 @@ homepageTeachSectionDescription = "Acompanhe o progresso do seu aluno através d
 homepageTeachSectionTitle = "Ensine"
 homepageTrainSectionDescription = "Resolva problemas e melhore suas habilidades"
 homepageTrainSectionTitle = "Treine"
+homepageTitle = "omegaUp Homepage"
 identityAlreadyAssociated = "Você já tem uma identidade associada ao mesmo grupo."
 identityAlreadyInUse = "A identidade já é usada por outra conta."
 identityInGroup = "A identidade já está associada ao grupo"

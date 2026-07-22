@@ -881,6 +881,7 @@ const translations: { [key: string]: string; } = {
   homepageTeachSectionTitle: "Ense\u00f1a",
   homepageTrainSectionDescription: "Resuelve problemas y mejora tus habilidades",
   homepageTrainSectionTitle: "Entrena",
+  homepageTitle: 'omegaUp Página principal',
   identityAlreadyAssociated: "Ya cuentas con una identidad asociada con el mismo grupo.",
   identityAlreadyInUse: "La identidad ya est\u00e1 siendo utilizada por otra cuenta.",
   identityInGroup: "La identidad ya est\u00e1 asociada al grupo.",
