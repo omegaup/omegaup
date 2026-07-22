@@ -172,8 +172,6 @@ def get_cotm_eligible_users(
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
-    last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
-
     if category == 'female':
         gender_clause = " AND i.gender = 'female'"
     else:
@@ -182,7 +180,8 @@ def get_cotm_eligible_users(
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
-        last_12_coders_clause = f'AND i.username NOT IN ({last_12_coders_str})'
+        placeholders = ', '.join(['%s'] * len(last_12_coders))
+        last_12_coders_clause = f'AND i.username NOT IN ({placeholders})'
     logging.info(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category
@@ -235,10 +234,11 @@ def get_cotm_eligible_users(
                 -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
                 -- role_id = 1 is ADMIN_ROLE)
                 -- TODO: Replace magic numbers with constants
-                AND i.user_id NOT IN (
-                    SELECT ur.user_id
+                AND NOT EXISTS (
+                    SELECT 1
                     FROM User_Roles ur
                     WHERE ur.acl_id = 1 AND ur.role_id = 1
+                        AND ur.user_id = i.user_id
                 )
                 {last_12_coders_clause}
                 {gender_clause}
@@ -248,6 +248,7 @@ def get_cotm_eligible_users(
     cur_readonly.execute(sql, (
         first_day_of_current_month,
         first_day_of_next_month,
+        *last_12_coders,
     ))
 
     usernames: List[UserRank] = []
@@ -299,8 +300,8 @@ def get_eligible_problems(
 
 def get_user_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    identity_ids_str: str,
-    problem_ids_str: str,
+    identity_ids: List[int],
+    problem_ids: List[int],
     eligible_users: List[UserRank],
     first_day_of_current_month: datetime.date,
 ) -> Dict[int, UserProblems]:
@@ -315,7 +316,7 @@ def get_user_problems(
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
 
-    problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
+    problems_admins = get_problems_admins(cur_readonly, problem_ids)
 
     sql = '''
             SELECT
@@ -340,9 +341,11 @@ def get_user_problems(
                 s.identity_id,
                 s.problem_id;
     '''
-    sql = sql.format(identity_ids_str=identity_ids_str,
-                     problem_ids_str=problem_ids_str)
-    cur_readonly.execute('EXPLAIN ' + sql)
+    sql = sql.format(
+        identity_ids_str=', '.join(['%s'] * len(identity_ids)),
+        problem_ids_str=', '.join(['%s'] * len(problem_ids)))
+    params = tuple(identity_ids) + tuple(problem_ids)
+    cur_readonly.execute('EXPLAIN ' + sql, params)
 
     logging.info("Evaluating [get_user_problems] for %d "
                  "users and %d problems",
@@ -355,7 +358,7 @@ def get_user_problems(
             row.get('id'), row.get('table'), row.get('type'), row.get(
                 'key'), row.get('rows'), row.get('Extra')
         )
-    cur_readonly.execute(sql)
+    cur_readonly.execute(sql, params)
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']
@@ -374,10 +377,11 @@ def get_user_problems(
 
 def get_problems_admins(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    problem_ids_str: str,
+    problem_ids: List[int],
 ) -> Dict[int, List[int]]:
     '''Get the list of problems admins'''
 
+    problem_ids_str = ', '.join(['%s'] * len(problem_ids))
     cur_readonly.execute(f'''
         SELECT
             p.problem_id,
@@ -418,7 +422,7 @@ def get_problems_admins(
             p.problem_id IN ({problem_ids_str})
         ORDER BY
             problem_id;
-    ''')
+    ''', tuple(problem_ids) * 3)
 
     problems_admins: Dict[int, List[int]] = {}
 
