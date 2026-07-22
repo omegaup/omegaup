@@ -385,31 +385,34 @@ def main() -> None:
 
     logging.info('Started')
     try:
-        if args.sqlite_database:
-            runs = load_sqlite(args.sqlite_database)
-        else:
-            runs = load_mysql(args)
-        if args.save_sqlite_database:
-            with sqlite3.connect(args.save_sqlite_database) as conn:
-                runs.to_sql('Runs', con=conn, if_exists='replace')
-        if args.num_rows is not None:
-            runs = runs[:args.num_rows]
+        with lib.logs.log_phase('build_problem_rec_model') as metrics:
+            if args.sqlite_database:
+                runs = load_sqlite(args.sqlite_database)
+            else:
+                runs = load_mysql(args)
+            if args.save_sqlite_database:
+                with sqlite3.connect(args.save_sqlite_database) as conn:
+                    runs.to_sql('Runs', con=conn, if_exists='replace')
+            if args.num_rows is not None:
+                runs = runs[:args.num_rows]
 
-        model = Model(
-            TrainingConfig(train_fraction=args.train_fraction,
-                           rng_seed=args.rng_seed,
-                           num_followups=args.num_followups,
-                           followup_decay=args.followup_decay), runs)
+            model = Model(
+                TrainingConfig(train_fraction=args.train_fraction,
+                               rng_seed=args.rng_seed,
+                               num_followups=args.num_followups,
+                               followup_decay=args.followup_decay), runs)
 
-        score = model.evaluate()
-        logging.info('Model MAP score: %f', score)
-        if score >= args.min_map_score:
-            # Save current model
-            model.save(args.output)
-        else:
-            logging.error(
-                'Model NOT saved. Resulting accuracy was too low: '
-                '%f below %f', score, args.min_map_score)
+            score = model.evaluate()
+            metrics['map_score'] = round(score, 6)
+            if score >= args.min_map_score:
+                # Save current model
+                model.save(args.output)
+                metrics['model_saved'] = True
+            else:
+                metrics['model_saved'] = False
+                logging.error(
+                    'Model NOT saved. Resulting accuracy was too low: '
+                    '%f below %f', score, args.min_map_score)
     except:  # noqa: bare-except
         logging.exception('Failed to update recommendation model.')
         raise
