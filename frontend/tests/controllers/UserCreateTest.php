@@ -418,4 +418,66 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $response['users']
         );
     }
+
+    /**
+     * Creating a user without birth_date should fail
+     */
+    public function testNoBirthDate() {
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
+
+        try {
+            \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+                'username' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('birth_date', $e->parameter);
+        }
+    }
+
+    /**
+     * Creating a U13 user without parent_email should fail
+     */
+    public function testU13WithoutParentEmail() {
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
+
+        try {
+            \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+                'username' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+                'birth_date' => strtotime('-10 year', \OmegaUp\Time::get()),
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('parent_email', $e->parameter);
+        }
+    }
+
+    /**
+     * Creating a non-U13 user with parent_email should fail
+     */
+    public function testNonU13WithParentEmail() {
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
+
+        try {
+            \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
+                'username' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'parent_email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
+                'birth_date' => strtotime('-20 year', \OmegaUp\Time::get()),
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('parent_email', $e->parameter);
+        }
+    }
 }
