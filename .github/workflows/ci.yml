@@ -25,8 +25,16 @@ jobs:
 
       - name: Install yq
         run: |
-          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          chmod +x /usr/local/bin/yq
+          YQ_VERSION="v4.50.1"
+          YQ_BINARY="yq_linux_amd64"
+          wget -qO "/tmp/${YQ_BINARY}" \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}"
+          wget -qO /tmp/yq_checksums \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums"
+          EXPECTED=$(grep "${YQ_BINARY}" /tmp/yq_checksums | grep -oE '[a-f0-9]{64}' | head -1)
+          ACTUAL=$(sha256sum "/tmp/${YQ_BINARY}" | grep -oE '[a-f0-9]{64}')
+          [ "${EXPECTED}" = "${ACTUAL}" ] || { echo "Checksum mismatch! Expected: ${EXPECTED}, Got: ${ACTUAL}"; exit 1; }
+          install -m 0755 "/tmp/${YQ_BINARY}" /usr/local/bin/yq
 
       - name: Install jq
         run: |
