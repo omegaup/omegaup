@@ -312,6 +312,7 @@ const translations: { [key: string]: string; } = {
   contestAddproblemContestOrder: "(C0n7357 0rd3r)",
   contestAddproblemLatestVersion: "(La7357 v3r5i0n)",
   contestAddproblemOtherVersion: "(O7h3r v3r5i0n)",
+  contestAddproblemProblemConfirmRemove: "(D0 y0u r3a11y wan7 70 r3m0v3 %(problem)?)",
   contestAddproblemProblemName: "(Pr0b13m)",
   contestAddproblemProblemOrder: "(Ord3r)",
   contestAddproblemProblemPoints: "(P0in75 7hi5 pr0b13m i5 w0r7h)",
