@@ -1209,7 +1209,8 @@ if __name__ == \'__main__\':
         // Create all users
         $users = [];
         foreach (array_keys($testScenario['users']) as $userName) {
-            ['identity' => $users[$userName]] = \OmegaUp\Test\Factories\User::createUser();
+            $createdUser = \OmegaUp\Test\Factories\User::createUser();
+            $users[$userName] = $createdUser['identity'];
         }
 
         // Create all problems
