@@ -495,6 +495,7 @@ CREATE TABLE `Groups_` (
   `alias` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
+  `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el grupo ha sido archivado por el administrador.',
   PRIMARY KEY (`group_id`),
   UNIQUE KEY `groups_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
