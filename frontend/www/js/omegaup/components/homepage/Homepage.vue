@@ -68,7 +68,6 @@
         </div>
       </div>
     </div>
-    <omegaup-testimonials></omegaup-testimonials>
     <div class="container-lg py-5">
       <omegaup-section
         :title="T.homepageCompeteSectionTitle"
@@ -136,6 +135,7 @@
         ]"
       ></omegaup-sponsors>
     </div>
+    <omegaup-testimonials></omegaup-testimonials>
     <omegaup-cookie-accept-decline
       @cookie-clicked-accept="cookieClickedAccept"
       @cookie-clicked-decline="cookieClickedDecline"
