@@ -69,6 +69,10 @@ export default class Creator extends Vue {
     this.creatorTabsRef?.saveAllDrafts();
   }
 
+  async importZipFile(zipFile: File): Promise<boolean> {
+    return this.creatorHeaderRef.importZipFile(zipFile);
+  }
+
   mounted() {
     // The store outlives this component, so any drafts persisted before the
     // modal was closed are restored when it is opened again.

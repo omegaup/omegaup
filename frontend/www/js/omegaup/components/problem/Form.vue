@@ -833,9 +833,36 @@ export default class ProblemForm extends Vue {
     this.problemLevel = levelTag;
   }
 
-  onUploadFile(ev: InputEvent): void {
+  async onUploadFile(ev: InputEvent): Promise<void> {
     const uploadedFile = ev.target as HTMLInputElement;
-    this.hasFile = uploadedFile.files !== null;
+    this.hasFile = uploadedFile.files !== null && uploadedFile.files.length > 0;
+    if (
+      !this.isUpdate &&
+      this.showCreationMethodSelector &&
+      this.currentCreationMethod === CreationMethods.Zip &&
+      uploadedFile.files?.length
+    ) {
+      await this.importZipIntoCreator(uploadedFile.files[0]);
+    }
+  }
+
+  async importZipIntoCreator(zipFile: File): Promise<void> {
+    // Only Creator-generated zips (with a cdp.data snapshot) can populate the
+    // Creator; other zips keep the plain upload flow. Standard omegaUp zips
+    // will be supported in a follow-up.
+    try {
+      const zipContent = await new JSZip().loadAsync(zipFile);
+      if (!zipContent.file('cdp.data')) {
+        return;
+      }
+    } catch {
+      return;
+    }
+    this.currentCreationMethod = CreationMethods.Creator;
+    this.creatorGeneratedZipBlob = null;
+    this.openProblemCreatorModal();
+    await this.$nextTick();
+    await this.problemCreatorRef?.importZipFile?.(zipFile);
   }
 
   onGenerateAlias(): void {
