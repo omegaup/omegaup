@@ -13,6 +13,45 @@ namespace OmegaUp\DAO;
  */
 class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
+     * Finds a school whose name matches exactly, preferring the row whose
+     * country and state also match. The NULL-safe <=> operator is used so a
+     * missing country/state still compares correctly.
+     *
+     * @param string $name
+     * @param string|null $countryId
+     * @param string|null $stateId
+     * @return \OmegaUp\DAO\VO\Schools|null
+     */
+    public static function findByExactName(
+        string $name,
+        ?string $countryId,
+        ?string $stateId
+    ): ?\OmegaUp\DAO\VO\Schools {
+        $sql = '
+            SELECT
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Schools::FIELD_NAMES,
+            's'
+        ) . '
+            FROM
+                Schools s
+            WHERE
+                s.name = ?
+            ORDER BY
+                (s.country_id <=> ? AND s.state_id <=> ?) DESC,
+                s.school_id ASC
+            LIMIT 1';
+        $args = [$name, $countryId, $stateId];
+
+        /** @var array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float, state_id: null|string}|null $row */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+        if (is_null($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Schools($row);
+    }
+
+    /**
      * Finds schools that contains 'name'
      *
      * @param string $name
