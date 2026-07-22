@@ -34,7 +34,7 @@ OmegaUp.on('ready', () => {
               password_confirmation: passwordConfirmation,
             })
               .then((data) => {
-                ui.success(data.message ?? '');
+                ui.persistSuccessMessage(data.message ?? '');
                 ui.navigateTo('/login/');
               })
               .catch(ui.apiError);
