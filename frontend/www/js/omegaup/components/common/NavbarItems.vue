@@ -20,23 +20,30 @@
         >
           {{ T.wordsContests }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="contests-items">
-            <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
-              {{ T.navViewContests }}
-            </a>
+            <omegaup-navbar-item
+              :title="T.navViewContests"
+              :description="T.navViewContestsDesc"
+              :icon="['fas', 'trophy']"
+              href="/arena/"
+              data-nav-contests-arena
+            />
             <template v-if="isMainUserIdentity">
-              <a class="dropdown-item" href="/scoreboardmerge/">
-                {{ T.contestsJoinScoreboards }}
-              </a>
-              <a
+              <omegaup-navbar-item
+                :title="T.contestsJoinScoreboards"
+                :description="T.contestsJoinScoreboardsDesc"
+                :icon="['fas', 'list-ol']"
+                href="/scoreboardmerge/"
+              />
+              <omegaup-navbar-item
                 v-if="!isUnder13User"
-                class="dropdown-item"
+                :title="T.contestsCreate"
+                :description="T.contestsCreateDesc"
+                :icon="['fas', 'calendar-plus']"
                 href="/contest/new/"
                 data-nav-contests-create
-              >
-                {{ T.contestsCreate }}
-              </a>
+              />
             </template>
           </slot>
         </div>
@@ -63,19 +70,23 @@
         >
           {{ T.navCourses }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="courses-items">
-            <a class="dropdown-item" href="/course/" data-nav-courses-all>
-              {{ T.navViewCourses }}
-            </a>
+            <omegaup-navbar-item
+              :title="T.navViewCourses"
+              :description="T.navViewCoursesDesc"
+              :icon="['fas', 'graduation-cap']"
+              href="/course/"
+              data-nav-courses-all
+            />
             <template v-if="isMainUserIdentity && !isUnder13User">
-              <a
-                class="dropdown-item"
+              <omegaup-navbar-item
+                :title="T.courseCreate"
+                :description="T.courseCreateDesc"
+                :icon="['fas', 'chalkboard-teacher']"
                 href="/course/new/"
                 data-nav-courses-create
-              >
-                {{ T.courseCreate }}
-              </a>
+              />
             </template>
           </slot>
         </div>
@@ -103,29 +114,43 @@
         >
           {{ T.wordsProblems }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="problems-items">
-            <a
-              class="dropdown-item"
+            <omegaup-navbar-item
+              :title="T.navViewProblems"
+              :description="T.navViewProblemsDesc"
+              :icon="['fas', 'layer-group']"
               href="/problem/collection/"
               data-nav-problems-collection
-              >{{ T.navViewProblems }}</a
-            >
-            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
-              T.navViewProblemsAll
-            }}</a>
-            <a class="dropdown-item" href="/profile/#problems">{{
-              T.bookmarkedProblems
-            }}</a>
+            />
+            <omegaup-navbar-item
+              :title="T.navViewProblemsAll"
+              :description="T.navViewProblemsAllDesc"
+              :icon="['fas', 'list']"
+              href="/problem/"
+              data-nav-problems-list
+            />
+            <omegaup-navbar-item
+              :title="T.bookmarkedProblems"
+              :description="T.bookmarkedProblemsDesc"
+              :icon="['fas', 'bookmark']"
+              href="/profile/#problems"
+            />
             <hr class="menu-divider" />
-            <a class="dropdown-item" href="/submissions/">{{
-              T.navViewLatestSubmissions
-            }}</a>
+            <omegaup-navbar-item
+              :title="T.navViewLatestSubmissions"
+              :description="T.navViewLatestSubmissionsDesc"
+              :icon="['fas', 'history']"
+              href="/submissions/"
+            />
 
             <template v-if="!isLoggedIn">
-              <a class="dropdown-item" href="/problem/creator/">{{
-                T.createZipFileForProblem
-              }}</a>
+              <omegaup-navbar-item
+                :title="T.createZipFileForProblem"
+                :description="T.createZipFileForProblemDesc"
+                :icon="['fas', 'plus-circle']"
+                href="/problem/creator/"
+              />
             </template>
 
             <template v-else>
@@ -157,9 +182,13 @@
                 </div>
               </div>
             </template>
-            <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
-              T.navQualityNominationQueue
-            }}</a>
+            <omegaup-navbar-item
+              v-if="isReviewer"
+              :title="T.navQualityNominationQueue"
+              :description="T.navQualityNominationQueueDesc"
+              :icon="['fas', 'clipboard-check']"
+              href="/nomination/"
+            />
           </slot>
         </div>
       </li>
@@ -178,26 +207,49 @@
         >
           {{ T.navRanking }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
-          <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
-          <a class="dropdown-item" href="/rank/compare/">{{
-            T.navCompareUsers
-          }}</a>
-          <a class="dropdown-item" href="/rank/authors/">{{
-            T.navAuthorRanking
-          }}</a>
-          <a class="dropdown-item" href="/rank/schools/">{{
-            T.navSchoolRanking
-          }}</a>
-          <a class="dropdown-item" href="/coderofthemonth/">{{
-            T.navCoderOfTheMonth
-          }}</a>
-          <a href="/coderofthemonth/female/" class="dropdown-item">{{
-            T.navCoderOfTheMonthFemale
-          }}</a>
-          <a class="dropdown-item" href="/schoolofthemonth/">{{
-            T.navSchoolOfTheMonth
-          }}</a>
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
+          <omegaup-navbar-item
+            :title="T.navUserRanking"
+            :description="T.navUserRankingDesc"
+            :icon="['fas', 'chart-line']"
+            href="/rank/"
+          />
+          <omegaup-navbar-item
+            :title="T.navCompareUsers"
+            :description="T.navCompareUsersDesc"
+            :icon="['fas', 'balance-scale']"
+            href="/rank/compare/"
+          />
+          <omegaup-navbar-item
+            :title="T.navAuthorRanking"
+            :description="T.navAuthorRankingDesc"
+            :icon="['fas', 'pen-nib']"
+            href="/rank/authors/"
+          />
+          <omegaup-navbar-item
+            :title="T.navSchoolRanking"
+            :description="T.navSchoolRankingDesc"
+            :icon="['fas', 'school']"
+            href="/rank/schools/"
+          />
+          <omegaup-navbar-item
+            :title="T.navCoderOfTheMonth"
+            :description="T.navCoderOfTheMonthDesc"
+            :icon="['fas', 'medal']"
+            href="/coderofthemonth/"
+          />
+          <omegaup-navbar-item
+            :title="T.navCoderOfTheMonthFemale"
+            :description="T.navCoderOfTheMonthFemaleDesc"
+            :icon="['fas', 'medal']"
+            href="/coderofthemonth/female/"
+          />
+          <omegaup-navbar-item
+            :title="T.navSchoolOfTheMonth"
+            :description="T.navSchoolOfTheMonthDesc"
+            :icon="['fas', 'award']"
+            href="/schoolofthemonth/"
+          />
         </div>
       </li>
 
@@ -212,7 +264,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <template v-for="(entry, index) in helpMenuEntries">
             <hr
               v-if="entry.divider"
@@ -243,25 +295,59 @@ import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faAward,
+  faBalanceScale,
   faBook,
+  faBookmark,
+  faCalendarPlus,
+  faChalkboardTeacher,
+  faChartLine,
+  faClipboardCheck,
   faCode,
   faComments,
   faDatabase,
+  faGraduationCap,
+  faHistory,
+  faLayerGroup,
+  faList,
+  faListOl,
+  faMedal,
   faNewspaper,
   faPen,
+  faPenNib,
+  faPlusCircle,
   faRobot,
+  faSchool,
+  faTrophy,
   faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 import NavbarItem from './NavbarItem.vue';
 
 library.add(
+  faAward,
+  faBalanceScale,
   faBook,
+  faBookmark,
+  faCalendarPlus,
+  faChalkboardTeacher,
+  faChartLine,
+  faClipboardCheck,
   faCode,
   faComments,
   faDatabase,
+  faGraduationCap,
+  faHistory,
+  faLayerGroup,
+  faList,
+  faListOl,
+  faMedal,
   faNewspaper,
   faPen,
+  faPenNib,
+  faPlusCircle,
   faRobot,
+  faSchool,
+  faTrophy,
   faVideo,
 );
 
@@ -291,7 +377,6 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
-  // Used by Cypress selector + click toggle
   isCreateProblemSubmenuOpen = false;
 
   get OmegaUpBlogURL(): string {
@@ -381,7 +466,7 @@ export default class NavbarItems extends Vue {
 
 <style lang="scss" scoped>
 @media only screen and (max-width: 992px) {
-  .help-dropdown {
+  .navbar-item-dropdown {
     min-width: auto !important;
     width: auto !important;
     max-width: 85vw !important;
