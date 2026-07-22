@@ -388,6 +388,14 @@ CREATE TABLE `Courses` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_AggregateFeedback_State` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `last_processed_qualitynomination_id` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Emails` (
   `email_id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,

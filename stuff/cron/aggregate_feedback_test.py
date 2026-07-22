@@ -16,10 +16,20 @@ class _FakeCursor:
 
     def __init__(self, problem_ids: List[int]) -> None:
         self._problem_ids = problem_ids
+        self._last_query = ''
 
     def execute(self, query: str, params: Any = None) -> None:
         '''Executes a fake SQL query without touching a real database.'''
-        del query, params
+        del params
+        self._last_query = query
+
+    def fetchone(self) -> Any:
+        '''Returns one fake row depending on the latest executed query.'''
+        if 'MAX(qn.`qualitynomination_id`)' in self._last_query:
+            return (0,)
+        if 'FROM `Cron_AggregateFeedback_State`' in self._last_query:
+            return None
+        return None
 
     def fetchall(self) -> List[Tuple[int]]:
         '''Returns all fake problem_id rows for this cursor.'''
