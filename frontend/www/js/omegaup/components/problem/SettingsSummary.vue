@@ -50,6 +50,14 @@
           }"
         />
       </button>
+      <button
+        v-if="showAddAction"
+        class="btn btn-link p-0 ml-2"
+        :title="T.problemAddToContestOrCourse"
+        @click.prevent.stop="$emit('open-add-to-contest-or-course')"
+      >
+        <font-awesome-icon :icon="['fas', 'cogs']" />
+      </button>
     </h3>
 
     <!-- Warning/Ban Reasons Banner -->
@@ -111,6 +119,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBan,
   faBookmark,
+  faCogs,
   faEdit,
   faExclamationTriangle,
   faExternalLinkAlt,
@@ -124,6 +133,7 @@ library.add(
   faBan,
   faExternalLinkAlt,
   faBookmark,
+  faCogs,
 );
 
 @Component({
@@ -139,6 +149,7 @@ export default class ProblemSettingsSummary extends Vue {
   @Prop({ default: false }) userLoggedIn!: boolean;
   @Prop({ default: false }) isBookmarked!: boolean;
   @Prop({ default: false }) inContestOrCourse!: boolean;
+  @Prop({ default: false }) showAddAction!: boolean;
 
   T = T;
 
