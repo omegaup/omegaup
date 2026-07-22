@@ -181,7 +181,7 @@ export function detectLanguageFromCode(
   let bestLanguage = '';
   let bestDisplayName = '';
   let bestScore = 0;
-  let bestPriority = 0;
+  let bestConfidence = 0;
 
   for (const pat of LANGUAGE_PATTERNS) {
     let matches = 0;
@@ -195,17 +195,13 @@ export function detectLanguageFromCode(
         bestScore = score;
         bestLanguage = pat.language;
         bestDisplayName = pat.displayName;
-        bestPriority = pat.priority;
+        bestConfidence = Math.round((matches / pat.patterns.length) * 100);
       }
     }
   }
 
   if (!bestLanguage) return null;
-  const confidence = Math.min(
-    100,
-    Math.round((bestScore / bestPriority) * 100),
-  );
-  if (confidence < 30) return null;
+  if (bestConfidence < 30) return null;
   if (!supportedLanguages[bestLanguage]) return null;
   return { language: bestLanguage, displayName: bestDisplayName };
 }
