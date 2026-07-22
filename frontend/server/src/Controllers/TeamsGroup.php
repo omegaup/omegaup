@@ -238,6 +238,8 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentityIsOver13();
 
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
+
         $teamGroupAlias = $r->ensureString(
             'alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
