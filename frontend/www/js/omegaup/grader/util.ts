@@ -247,6 +247,7 @@ export interface LanguageInfo {
   name: string;
   modelMapping: string;
   language: string;
+  tabSize?: number;
 }
 
 export const supportedLanguages: Record<string, LanguageInfo> = languages;
