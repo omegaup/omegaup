@@ -1,28 +1,36 @@
 <template>
-  <div class="password-input-wrapper">
-    <input
-      v-bind="$attrs"
-      :value="value"
-      :type="showPassword ? 'text' : 'password'"
-      :name="name"
-      :class="['form-control', inputClass]"
-      :tabindex="tabindex"
-      :autocomplete="autocomplete"
-      :size="size"
-      :required="required"
-      @input="$emit('input', $event.target.value)"
+  <div>
+    <div class="password-input-wrapper">
+      <input
+        v-bind="$attrs"
+        :value="value"
+        :type="showPassword ? 'text' : 'password'"
+        :name="name"
+        :class="['form-control', inputClass]"
+        :tabindex="tabindex"
+        :autocomplete="autocomplete"
+        :size="size"
+        :required="required"
+        @input="$emit('input', $event.target.value)"
+      />
+      <button
+        type="button"
+        class="password-toggle-btn"
+        :aria-label="
+          showPassword ? T.passwordHidePassword : T.passwordShowPassword
+        "
+        :title="showPassword ? T.passwordHidePassword : T.passwordShowPassword"
+        @click="togglePasswordVisibility"
+      >
+        <font-awesome-icon
+          :icon="['fas', showPassword ? 'eye-slash' : 'eye']"
+        />
+      </button>
+    </div>
+    <omegaup-password-strength-feedback
+      v-if="showStrengthFeedback"
+      :password="value"
     />
-    <button
-      type="button"
-      class="password-toggle-btn"
-      :aria-label="
-        showPassword ? T.passwordHidePassword : T.passwordShowPassword
-      "
-      :title="showPassword ? T.passwordHidePassword : T.passwordShowPassword"
-      @click="togglePasswordVisibility"
-    >
-      <font-awesome-icon :icon="['fas', showPassword ? 'eye-slash' : 'eye']" />
-    </button>
   </div>
 </template>
 
@@ -32,6 +40,7 @@ import T from '../../lang';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import PasswordStrengthFeedback from './PasswordStrengthFeedback.vue';
 
 library.add(faEye, faEyeSlash);
 
@@ -39,6 +48,7 @@ library.add(faEye, faEyeSlash);
   inheritAttrs: false,
   components: {
     FontAwesomeIcon,
+    'omegaup-password-strength-feedback': PasswordStrengthFeedback,
   },
 })
 export default class PasswordInput extends Vue {
@@ -49,6 +59,7 @@ export default class PasswordInput extends Vue {
   @Prop({ default: 'current-password' }) autocomplete!: string;
   @Prop({ default: null }) size!: number | null;
   @Prop({ default: false }) required!: boolean;
+  @Prop({ default: false }) showStrengthFeedback!: boolean;
 
   T = T;
   showPassword = false;

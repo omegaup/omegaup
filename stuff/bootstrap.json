@@ -324,7 +324,7 @@
 					"finish_time": "$NOW$+18000",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -372,7 +372,7 @@
 					"finish_time": "$NOW$+1800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -484,7 +484,7 @@
 					"finish_time": "$NOW$+86400",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "max_per_group",
+					"score_mode": "max_per_group",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1001,7 +1001,7 @@
 				"params": {
 					"username": "test_user_0",
 					"email": "test_user_0@localhost.localdomain",
-					"password": "test_user_0"
+					"password": "Test_user_0!"
 				}
 			},
 			{
@@ -1009,7 +1009,7 @@
 				"params": {
 					"username": "test_user_1",
 					"email": "test_user_1@localhost.localdomain",
-					"password": "test_user_1"
+					"password": "Test_user_1!"
 				}
 			},
 			{
@@ -1017,7 +1017,7 @@
 				"params": {
 					"username": "test_user_2",
 					"email": "test_user_2@localhost.localdomain",
-					"password": "test_user_2"
+					"password": "Test_user_2!"
 				}
 			},
 			{
@@ -1025,7 +1025,7 @@
 				"params": {
 					"username": "test_user_3",
 					"email": "test_user_3@localhost.localdomain",
-					"password": "test_user_3"
+					"password": "Test_user_3!"
 				}
 			},
 			{
@@ -1033,7 +1033,7 @@
 				"params": {
 					"username": "test_user_4",
 					"email": "test_user_4@localhost.localdomain",
-					"password": "test_user_4"
+					"password": "Test_user_4!"
 				}
 			},
 			{
@@ -1041,7 +1041,7 @@
 				"params": {
 					"username": "test_user_5",
 					"email": "test_user_5@localhost.localdomain",
-					"password": "test_user_5"
+					"password": "Test_user_5!"
 				}
 			},
 			{
@@ -1049,7 +1049,7 @@
 				"params": {
 					"username": "test_user_6",
 					"email": "test_user_6@localhost.localdomain",
-					"password": "test_user_6"
+					"password": "Test_user_6!"
 				}
 			},
 			{
@@ -1057,7 +1057,7 @@
 				"params": {
 					"username": "test_user_7",
 					"email": "test_user_7@localhost.localdomain",
-					"password": "test_user_7"
+					"password": "Test_user_7!"
 				}
 			},
 			{
@@ -1065,7 +1065,7 @@
 				"params": {
 					"username": "test_user_8",
 					"email": "test_user_8@localhost.localdomain",
-					"password": "test_user_8"
+					"password": "Test_user_8!"
 				}
 			},
 			{
@@ -1073,7 +1073,7 @@
 				"params": {
 					"username": "test_user_9",
 					"email": "test_user_9@localhost.localdomain",
-					"password": "test_user_9"
+					"password": "Test_user_9!"
 				}
 			},
 			{
@@ -1081,7 +1081,7 @@
 				"params": {
 					"username": "course_test_user_0",
 					"email": "course_test_user_0@localhost.localdomain",
-					"password": "course_test_user_0"
+					"password": "Course_test_user_0!"
 				}
 			},
 			{
@@ -1089,7 +1089,7 @@
 				"params": {
 					"username": "course_test_user_1",
 					"email": "course_test_user_1@localhost.localdomain",
-					"password": "course_test_user_1"
+					"password": "Course_test_user_1!"
 				}
 			},
 			{
@@ -1097,7 +1097,7 @@
 				"params": {
 					"username": "course_test_user_2",
 					"email": "course_test_user_2@localhost.localdomain",
-					"password": "course_test_user_2"
+					"password": "Course_test_user_2!"
 				}
 			},
 			{
@@ -1165,7 +1165,7 @@
 					"finish_time": "$NOW$+10800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1189,7 +1189,7 @@
 					"finish_time": "$NOW$+18000",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1213,7 +1213,7 @@
 					"finish_time": "$NOW$+75600",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1237,7 +1237,7 @@
 					"finish_time": "$NOW$+86400",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1261,7 +1261,7 @@
 					"finish_time": "$NOW$+72000",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1285,7 +1285,7 @@
 					"finish_time": "$NOW$+36000",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1309,7 +1309,7 @@
 					"finish_time": "$NOW$+7200",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1333,7 +1333,7 @@
 					"finish_time": "$NOW$+3600",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1357,7 +1357,7 @@
 					"finish_time": "$NOW$+21600",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1381,7 +1381,7 @@
 					"finish_time": "$NOW$+25200",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1405,7 +1405,7 @@
 					"finish_time": "$NOW$+32400",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1429,7 +1429,7 @@
 					"finish_time": "$NOW$+28800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1453,7 +1453,7 @@
 					"finish_time": "$NOW$+43200",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1477,7 +1477,7 @@
 					"finish_time": "$NOW$+54000",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1501,7 +1501,7 @@
 					"finish_time": "$NOW$+46800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1525,7 +1525,7 @@
 					"finish_time": "$NOW$+1800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1549,7 +1549,7 @@
 					"finish_time": "$NOW$+64800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1573,7 +1573,7 @@
 					"finish_time": "$NOW$+39600",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1597,7 +1597,7 @@
 					"finish_time": "$NOW$+14400",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1621,7 +1621,7 @@
 					"finish_time": "$NOW$+50400",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1645,7 +1645,7 @@
 					"finish_time": "$NOW$+57600",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1669,7 +1669,7 @@
 					"finish_time": "$NOW$+68400",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1693,7 +1693,7 @@
 					"finish_time": "$NOW$+79200",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1717,7 +1717,7 @@
 					"finish_time": "$NOW$+61200",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1741,7 +1741,7 @@
 					"finish_time": "$NOW$+82800",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1765,7 +1765,7 @@
 					"finish_time": "$NOW$+90000",
 					"window_length": "0",
 					"scoreboard": 100,
-					"score_mode" : "partial",
+					"score_mode": "partial",
 					"points_decay_factor": 0,
 					"submissions_gap": 1200,
 					"penalty": 0,
@@ -1782,7 +1782,7 @@
 	},
 	{
 		"username": "test_user_0",
-		"password": "test_user_0",
+		"password": "Test_user_0!",
 		"requests": [
 			{
 				"api": "/run/create/",
@@ -1898,7 +1898,7 @@
 	},
 	{
 		"username": "test_user_1",
-		"password": "test_user_1",
+		"password": "Test_user_1!",
 		"requests": [
 			{
 				"api": "/run/create/",
@@ -1975,7 +1975,7 @@
 	},
 	{
 		"username": "test_user_2",
-		"password": "test_user_2",
+		"password": "Test_user_2!",
 		"requests": [
 			{
 				"api": "/run/create/",
@@ -2062,7 +2062,7 @@
 	},
 	{
 		"username": "test_user_3",
-		"password": "test_user_3",
+		"password": "Test_user_3!",
 		"requests": [
 			{
 				"api": "/run/create/",
@@ -2119,7 +2119,7 @@
 	},
 	{
 		"username": "test_user_4",
-		"password": "test_user_4",
+		"password": "Test_user_4!",
 		"requests": [
 			{
 				"api": "/run/create/",
@@ -2249,7 +2249,7 @@
 	},
 	{
 		"username": "test_user_5",
-		"password": "test_user_5",
+		"password": "Test_user_5!",
 		"requests": [
 			{
 				"api": "/contest/open/",
@@ -2321,7 +2321,7 @@
 	},
 	{
 		"username": "test_user_6",
-		"password": "test_user_6",
+		"password": "Test_user_6!",
 		"requests": [
 			{
 				"api": "/contest/open/",
@@ -2343,7 +2343,7 @@
 	},
 	{
 		"username": "test_user_7",
-		"password": "test_user_7",
+		"password": "Test_user_7!",
 		"requests": [
 			{
 				"api": "/contest/open/",
@@ -2385,7 +2385,7 @@
 	},
 	{
 		"username": "test_user_8",
-		"password": "test_user_8",
+		"password": "Test_user_8!",
 		"requests": [
 			{
 				"api": "/contest/open/",
@@ -2487,7 +2487,7 @@
 	},
 	{
 		"username": "test_user_9",
-		"password": "test_user_9",
+		"password": "Test_user_9!",
 		"requests": [
 			{
 				"api": "/contest/open/",
@@ -2579,7 +2579,7 @@
 	},
 	{
 		"username": "course_test_user_0",
-		"password": "course_test_user_0",
+		"password": "Course_test_user_0!",
 		"requests": [
 			{
 				"api": "/course/introDetails/",
@@ -2601,7 +2601,7 @@
 	},
 	{
 		"username": "course_test_user_1",
-		"password": "course_test_user_1",
+		"password": "Course_test_user_1!",
 		"requests": [
 			{
 				"api": "/course/introDetails/",

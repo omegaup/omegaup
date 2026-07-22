@@ -29,6 +29,7 @@
               name="new-password-1"
               :size="30"
               autocomplete="new-password"
+              :show-strength-feedback="true"
             />
           </div>
         </div>
