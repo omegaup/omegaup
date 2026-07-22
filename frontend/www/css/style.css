@@ -705,3 +705,20 @@ las pestañas del framework. */
   vertical-align: middle;
   text-align: center;
 }
+/* Mobile Fix for Button Overlap */
+@media (max-width: 768px) {
+  .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .container {
+    padding: 10px;
+  }
+}
