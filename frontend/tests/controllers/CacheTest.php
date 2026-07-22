@@ -167,4 +167,41 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame(1, $cache->incWithTTL($key, $ttl));
         }
     }
+
+    /**
+     * A counter written by incWithTTL() must be readable by fetch(): both must
+     * agree on the storage format.
+     *
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncWithTTLThenFetch(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('incwithttl-fetch-');
+        $ttl = 60;
+
+        $this->assertSame(1, $cache->incWithTTL($key, $ttl));
+        $this->assertSame(2, $cache->incWithTTL($key, $ttl));
+
+        // fetch() must return the counter, not treat it as a miss.
+        $this->assertSame(2, $cache->fetch($key));
+    }
+
+    /**
+     * inc() and incWithTTL() must share the same storage format, so a counter
+     * started with one can be continued with the other.
+     *
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncThenIncWithTTL(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('inc-incwithttl-');
+        $ttl = 60;
+
+        // inc() stores using the serialized format.
+        $this->assertSame(1, $cache->inc($key));
+
+        // incWithTTL() must read that value and continue, not reset or return 0.
+        $this->assertSame(2, $cache->incWithTTL($key, $ttl));
+        $this->assertSame(3, $cache->incWithTTL($key, $ttl));
+
+        $this->assertSame(3, $cache->fetch($key));
+    }
 }
