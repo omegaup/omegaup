@@ -595,12 +595,9 @@ def compute_points_for_school(
     # Get the list of problem IDs for eligible problems
     problem_ids = list(eligible_problems.keys())
 
-    if not identity_ids:
-        logging.info('No eligible users founds.')
-        return []
-
-    if not problem_ids:
-        logging.info('No eligible problems found.')
+    if not identity_ids or not problem_ids:
+        missing = 'users' if not identity_ids else 'problems'
+        logging.info('No eligible %s founds.', missing)
         return []
 
     # Convert the list of identity IDs to a comma-separated string
@@ -626,17 +623,16 @@ def compute_points_for_school(
     school_map: Dict[int, School] = {}
     for school in eligible_schools:
         school_map[school.school_id] = school
-    # Group users by school to find unique problems per school
+    # Group problems by the school the user belonged to when they solved them
     school_problems: Dict[int, Set[int]] = {}
     for user in eligible_users:
-        school_id = user.school_id
-        if school_id is not None and school_id in school_map:
-            if school_id not in school_problems:
-                school_problems[school_id] = set()
-            # Add all problems solved by this user to the school's set
-            school_problems[school_id].update(
-                user_problems[user.identity_id]['solved']
-            )
+        for problem_id in user_problems[user.identity_id]['solved']:
+            school_id = user_problems[user.identity_id][
+                'school_at_solve'].get(problem_id)
+            if school_id is not None and school_id in school_map:
+                if school_id not in school_problems:
+                    school_problems[school_id] = set()
+                school_problems[school_id].add(problem_id)
 
     # Calculate score for each school based on unique problems solved
     for school_id, unique_problem_ids in school_problems.items():
