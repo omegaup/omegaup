@@ -30,6 +30,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
      * @return array{status: string, job_id?: string}
      */
     public static function apiGenerate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $problemAlias = $r->ensureString(
             'problem_alias',
@@ -281,6 +282,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiReview(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $jobId = $r->ensureString('job_id');
         $action = $r->ensureString('action');
@@ -515,6 +517,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiUpdateJob(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // This endpoint is called by the worker using the original user's auth_token
         $r->ensureIdentity();
 

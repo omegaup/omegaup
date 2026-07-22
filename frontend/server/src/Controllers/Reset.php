@@ -15,6 +15,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $email
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         self::validateCreateRequest($r);
 
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -143,6 +144,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $reset_token
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['email'],
             'email'
