@@ -67,8 +67,6 @@ export default class NavbarItem extends Vue {
   }
 
   get relValue(): string | null {
-    // External links always get a safe rel so a new tab cannot reach back
-    // into omegaUp through window.opener.
     if (this.isExternal) {
       return this.rel ?? 'noopener noreferrer';
     }
