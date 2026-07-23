@@ -768,6 +768,8 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneLastStatus: "(La57 57a7u5)",
   cronControlPlaneName: "(Nam3)",
   cronControlPlaneNoPhases: "(N0 pha53 d37ai1)",
+  cronControlPlaneRerun: "(R3run)",
+  cronControlPlaneRerunQueued: "(R3run r3qu3573d)",
   cronControlPlaneRows: "(R0w5)",
   cronControlPlaneRunsHeading: "(R3c3n7 run5)",
   cronControlPlaneSchedule: "(Sch3du13)",

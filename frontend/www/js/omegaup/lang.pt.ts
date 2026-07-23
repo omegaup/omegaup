@@ -768,6 +768,8 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneLastStatus: "\u00daltimo estado",
   cronControlPlaneName: "Nome",
   cronControlPlaneNoPhases: "Sem detalhe de fases",
+  cronControlPlaneRerun: "Reexecutar",
+  cronControlPlaneRerunQueued: "Reexecu\u00e7\u00e3o solicitada",
   cronControlPlaneRows: "Linhas",
   cronControlPlaneRunsHeading: "Execu\u00e7\u00f5es recentes",
   cronControlPlaneSchedule: "Agenda",

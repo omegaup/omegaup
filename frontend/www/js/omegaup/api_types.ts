@@ -5420,6 +5420,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminRerunCronRequest = { [key: string]: any };
+  export type AdminRerunCronResponse = {};
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
 
@@ -6431,6 +6433,9 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    rerunCron: (
+      params?: messages.AdminRerunCronRequest,
+    ) => Promise<messages.AdminRerunCronResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;

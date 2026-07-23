@@ -409,6 +409,42 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Queues a manual rerun of a registered cron job. The web layer never
+     * runs a job directly; it records a pending request that a trusted worker
+     * later performs. If a request for the same job is already pending, no new
+     * request is queued.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $name
+     */
+    public static function apiRerunCron(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $name = $r->ensureString('name');
+        if (is_null(\OmegaUp\DAO\CronJobs::getByName($name))) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
+        if (
+            is_null(\OmegaUp\DAO\CronRunRequests::getActiveByName($name))
+        ) {
+            \OmegaUp\DAO\CronRunRequests::create(
+                new \OmegaUp\DAO\VO\CronRunRequests([
+                    'name' => $name,
+                    'requested_by' => $r->user->user_id,
+                    'status' => 'pending',
+                ])
+            );
+        }
+        return ['status' => 'ok'];
+    }
+
+    /**
      * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
