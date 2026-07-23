@@ -65,6 +65,10 @@ class _FakeCursor:
         '''Records the executed statement and its params.'''
         self._connection.calls.append((query, params))
 
+    def fetchone(self) -> Any:
+        '''Returns the scripted row for the last query.'''
+        return self._connection.next_fetchone
+
     def __enter__(self) -> '_FakeCursor':
         return self
 
@@ -78,6 +82,7 @@ class _FakeConnection:
     def __init__(self) -> None:
         self.calls: List[Tuple[str, Any]] = []
         self.commits = 0
+        self.next_fetchone: Any = None
         self.conn = self
 
     def cursor(self, **_kwargs: Any) -> _FakeCursor:
@@ -135,6 +140,72 @@ class TestRecordModelRun(unittest.TestCase):
         self.assertIsNone(params[0])
         self.assertEqual(params[7], 0)
         self.assertEqual(params[8], 'MAP score 0.1200 below minimum 0.3000')
+
+
+class TestShouldPublish(unittest.TestCase):
+    '''Test the write-audit-publish guardrail decision.'''
+
+    def test_publishes_when_above_floor_and_no_baseline(self) -> None:
+        '''A good first model with no previous baseline is published.'''
+        published, reason = build_problem_rec_model.should_publish(
+            score=0.40,
+            min_map_score=0.30,
+            last_published_map=None,
+            max_map_regression=0.05)
+        self.assertTrue(published)
+        self.assertIsNone(reason)
+
+    def test_rejects_below_absolute_floor(self) -> None:
+        '''A model below the minimum MAP is not published.'''
+        published, reason = build_problem_rec_model.should_publish(
+            score=0.20,
+            min_map_score=0.30,
+            last_published_map=None,
+            max_map_regression=0.05)
+        self.assertFalse(published)
+        assert reason is not None
+        self.assertIn('below minimum', reason)
+
+    def test_rejects_regression_beyond_tolerance(self) -> None:
+        '''Too large a regression from the baseline is not published.'''
+        published, reason = build_problem_rec_model.should_publish(
+            score=0.40,
+            min_map_score=0.30,
+            last_published_map=0.50,
+            max_map_regression=0.05)
+        self.assertFalse(published)
+        assert reason is not None
+        self.assertIn('regressed', reason)
+
+    def test_allows_small_regression_within_tolerance(self) -> None:
+        '''A model within the regression tolerance is still published.'''
+        published, reason = build_problem_rec_model.should_publish(
+            score=0.47,
+            min_map_score=0.30,
+            last_published_map=0.50,
+            max_map_regression=0.05)
+        self.assertTrue(published)
+        self.assertIsNone(reason)
+
+
+class TestGetLastPublishedMap(unittest.TestCase):
+    '''Test reading the last published MAP for the guardrail baseline.'''
+
+    def test_returns_score_when_present(self) -> None:
+        '''Returns the queried MAP score as a float.'''
+        conn = _FakeConnection()
+        conn.next_fetchone = (0.42,)
+        result = build_problem_rec_model.get_last_published_map(
+            cast(lib.db.Connection, conn))
+        self.assertEqual(result, 0.42)
+
+    def test_returns_none_when_no_published_model(self) -> None:
+        '''Returns None when there is no published model yet.'''
+        conn = _FakeConnection()
+        conn.next_fetchone = None
+        result = build_problem_rec_model.get_last_published_map(
+            cast(lib.db.Connection, conn))
+        self.assertIsNone(result)
 
 
 if __name__ == '__main__':
