@@ -480,19 +480,25 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
-        if (!is_null($query)) {
+        if (!is_null($query) && $query !== '') {
             if (is_numeric($query)) {
                 $clauses[] = [
                     '(
-                    MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE) OR
+                    MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE) OR
+                    p.title LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.alias LIKE CONCAT(\'%\', ?, \'%\') OR
                     p.problem_id = ?
                     )',
-                    [$query, intval($query)],
+                    [$query, $query, $query, intval($query)],
                 ];
             } else {
                 $clauses[] = [
-                    'MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE)',
-                    [$query],
+                    '(
+                    MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE) OR
+                    p.title LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.alias LIKE CONCAT(\'%\', ?, \'%\')
+                    )',
+                    [$query, $query, $query],
                 ];
             }
         }
@@ -1307,8 +1313,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!empty($query)) {
             $sql .= '
                 WHERE
-                    MATCH(p.`title`, p.`alias`) AGAINST (? IN BOOLEAN MODE)
+                    MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE) OR
+                    p.`title` LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.`alias` LIKE CONCAT(\'%\', ?, \'%\')
             ';
+            $params[] = $query;
+            $params[] = $query;
             $params[] = $query;
         }
 
@@ -1829,9 +1839,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     WHERE
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 3, $query);
+            $args = array_fill(0, 5, $query);
             $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 1, $curatedQuery));
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
             $sql = "FROM
@@ -1851,6 +1861,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                             Problems p
                         WHERE
                             title = ?
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            0.1 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            (
+                                title LIKE CONCAT('%', ?, '%') OR
+                                alias LIKE CONCAT('%', ?, '%') OR
+                                problem_id = ?
+                            )
                         UNION ALL
                         SELECT
                             {$fields},
