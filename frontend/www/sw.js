@@ -67,7 +67,7 @@ async function staleWhileRevalidate(request) {
 
       return response;
     })
-    .catch(() => cached);
+    .catch(() => cached || Response.error());
 
   return cached || networkFetch;
 }
