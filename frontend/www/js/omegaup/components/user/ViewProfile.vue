@@ -11,7 +11,7 @@
           <div
             class="card-header d-flex justify-content-between align-items-center"
           >
-            <span>{{ T.profileReadme }}</span>
+            <span>{{ T.profileAboutSection }}</span>
             <div>
               <button
                 v-if="profile.is_own_profile && !isEditingReadme"
@@ -29,7 +29,7 @@
                 class="btn btn-sm btn-outline-warning"
                 @click="reportReadme"
               >
-                {{ T.profileReadmeReport }}
+                {{ T.profileAboutSectionReport }}
               </button>
             </div>
           </div>
@@ -41,15 +41,41 @@
                 :full-width="true"
               ></omegaup-markdown>
               <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
-                {{ T.profileReadmeAddPrompt }}
+                {{ T.profileAboutSectionAddPrompt }}
               </p>
             </template>
             <template v-else>
+              <div
+                ref="aboutMarkdownButtonBar"
+                class="wmd-button-bar mb-2"
+              ></div>
               <textarea
+                ref="aboutMarkdownInput"
                 v-model="readmeEditContent"
-                class="form-control mb-2"
-                rows="10"
+                class="form-control wmd-input mb-2"
+                :maxlength="MAX_ABOUT_LENGTH"
+                @input="enforceLimit"
               ></textarea>
+              <div class="d-flex justify-content-end mt-1">
+                <small
+                  :class="{
+                    'text-danger': isOverLimit,
+                    'text-warning': isNearLimit,
+                    'text-muted': !isNearLimit,
+                  }"
+                >
+                  {{ charCount }} / {{ MAX_ABOUT_LENGTH }}
+                </small>
+              </div>
+              <div
+                v-if="readmeEditContent"
+                class="border p-3 mb-2 readme-preview"
+              >
+                <omegaup-markdown
+                  :markdown="readmeEditContent"
+                  :full-width="true"
+                />
+              </div>
               <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
                 {{ T.wordsSaveChanges }}
               </button>
@@ -311,7 +337,7 @@
 
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
@@ -322,6 +348,8 @@ import {
 } from '../../linkable_resource';
 import { Experiments } from '../../omegaup';
 import * as ui from '../../ui';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdown from '../../markdown';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
@@ -354,6 +382,11 @@ function getInitialSelectedTab(
   return selectedTab ?? ViewProfileTabs.Badges;
 }
 
+const aboutMarkdownConverter = new markdown.Converter({
+  preview: true,
+});
+const MAX_ABOUT_LENGTH = 1000;
+
 @Component({
   components: {
     'omegaup-markdown': common_Markdown,
@@ -371,6 +404,8 @@ function getInitialSelectedTab(
   },
 })
 export default class ViewProfile extends Vue {
+  @Ref() readonly aboutMarkdownButtonBar!: HTMLDivElement;
+  @Ref() readonly aboutMarkdownInput!: HTMLTextAreaElement;
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
@@ -403,14 +438,54 @@ export default class ViewProfile extends Vue {
   ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
+  aboutMarkdownEditor: Markdown.Editor | null = null;
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null = this.profile.readme ?? null;
+  currentReadme: string = this.profile.readme ?? '';
   isEditingReadme = false;
-  readmeEditContent: string | null = null;
+  readmeEditContent: string = '';
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
+  MAX_ABOUT_LENGTH = MAX_ABOUT_LENGTH;
+
+  mounted(): void {
+    if (this.isEditingReadme) {
+      this.$nextTick(() => {
+        this.initAboutEditor();
+      });
+    }
+  }
+
+  private initAboutEditor(): void {
+    if (this.aboutMarkdownEditor) return;
+
+    this.aboutMarkdownEditor = new Markdown.Editor(
+      aboutMarkdownConverter.converter,
+      '',
+      {
+        panels: {
+          buttonBar: this.aboutMarkdownButtonBar,
+          preview: null,
+          input: this.aboutMarkdownInput,
+        },
+      },
+    );
+
+    this.aboutMarkdownEditor.run();
+  }
+
+  get charCount(): number {
+    return this.readmeEditContent?.length || 0;
+  }
+
+  get isNearLimit(): boolean {
+    return this.charCount >= MAX_ABOUT_LENGTH * 0.9;
+  }
+
+  get isOverLimit(): boolean {
+    return this.charCount > MAX_ABOUT_LENGTH;
+  }
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
@@ -473,23 +548,47 @@ export default class ViewProfile extends Vue {
     }
   }
 
+  enforceLimit(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    if (target.value.length > MAX_ABOUT_LENGTH) {
+      ui.error(T.aboutTooLongError);
+      target.value = target.value.substring(0, MAX_ABOUT_LENGTH);
+      this.readmeEditContent = target.value;
+    }
+  }
+
   startEditReadme(): void {
     this.readmeEditContent = this.currentReadme;
     this.isEditingReadme = true;
+    this.$nextTick(() => {
+      this.initAboutEditor();
+      if (this.aboutMarkdownInput) {
+        this.aboutMarkdownInput.focus();
+        const length = this.aboutMarkdownInput.value.length;
+        this.aboutMarkdownInput.setSelectionRange(length, length);
+      }
+    });
   }
 
   cancelEditReadme(): void {
     this.isEditingReadme = false;
     this.readmeEditContent = null;
+    this.aboutMarkdownEditor = null;
   }
 
   saveReadme(): void {
+    if (this.isOverLimit) {
+      ui.error(T.aboutTooLongError);
+      return;
+    }
+
     const content = this.readmeEditContent ?? '';
     this.$emit('save-readme', {
       readme: content,
       onSuccess: () => {
         this.currentReadme = content;
         this.isEditingReadme = false;
+        this.aboutMarkdownEditor = null;
       },
     });
   }
@@ -499,7 +598,7 @@ export default class ViewProfile extends Vue {
       username: this.profile.username ?? '',
       onSuccess: () => {
         this.readmeReportSubmitted = true;
-        ui.success(T.profileReadmeReportSuccess);
+        ui.success(T.profileAboutSectionReportSuccess);
       },
     });
   }
@@ -515,10 +614,20 @@ export default class ViewProfile extends Vue {
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);
   }
+
+  @Watch('isEditingReadme')
+  onEditingReadmeChanged(newValue: boolean): void {
+    if (newValue) {
+      this.$nextTick(() => {
+        this.initAboutEditor();
+      });
+    }
+  }
 }
 </script>
 
 <style lang="scss">
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
 a:hover {
   cursor: pointer;
 }
@@ -548,5 +657,25 @@ a:hover {
 
 .statistics-boxes-row > [class*='col-'] {
   display: flex;
+}
+
+.wmd-button-bar {
+  background-color: var(--wmd-button-bar-background-color);
+}
+
+.wmd-input {
+  font-family: monospace;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.readme-preview {
+  min-height: 150px;
+  max-height: 500px;
+  overflow-y: auto;
+  background-color: var(
+    --markdown-preview-background,
+    var(--background-color-secondary)
+  );
 }
 </style>
