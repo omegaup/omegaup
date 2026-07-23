@@ -1067,6 +1067,24 @@ CREATE TABLE `QualityNominations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Recommendation_Model_Runs` (
+  `model_run_id` int NOT NULL AUTO_INCREMENT,
+  `cron_run_id` int DEFAULT NULL,
+  `map_score` double NOT NULL,
+  `dataset_size` int NOT NULL,
+  `num_followups` int NOT NULL,
+  `followup_decay` double NOT NULL,
+  `train_fraction` double NOT NULL,
+  `output_path` varchar(255) DEFAULT NULL,
+  `published` tinyint(1) NOT NULL DEFAULT '0',
+  `skip_reason` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`model_run_id`),
+  KEY `idx_rec_model_runs_published_created` (`published`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de entrenamientos del modelo de recomendación de problemas';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Roles` (
   `role_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del rol.',
