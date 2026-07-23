@@ -480,20 +480,25 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
-        if (!is_null($query)) {
+        if (!is_null($query) && $query !== '') {
             if (is_numeric($query)) {
                 $clauses[] = [
-                    "(
-                    p.title LIKE CONCAT('%', ?, '%') OR
-                    p.alias LIKE CONCAT('%', ?, '%') OR
+                    '(
+                    MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE) OR
+                    p.title LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.alias LIKE CONCAT(\'%\', ?, \'%\') OR
                     p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
+                    )',
+                    [$query, $query, $query, intval($query)],
                 ];
             } else {
                 $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
+                    '(
+                    MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE) OR
+                    p.title LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.alias LIKE CONCAT(\'%\', ?, \'%\')
+                    )',
+                    [$query, $query, $query],
                 ];
             }
         }
@@ -1308,9 +1313,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!empty($query)) {
             $sql .= '
                 WHERE
-                    p.`title` LIKE CONCAT("%", ?, "%") OR
-                    p.`alias` LIKE CONCAT("%", ?, "%")
+                    MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE) OR
+                    p.`title` LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.`alias` LIKE CONCAT(\'%\', ?, \'%\')
             ';
+            $params[] = $query;
             $params[] = $query;
             $params[] = $query;
         }
