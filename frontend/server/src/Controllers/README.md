@@ -1,6 +1,8 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
+  - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
@@ -311,6 +313,52 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 # Admin
 
 Admin Controller
+
+## `/api/admin/getCronRun/`
+
+### Description
+
+Returns the detail of a single cron run.
+
+### Parameters
+
+| Name     | Type  | Description | Required |
+| -------- | ----- | ----------- | -------- |
+| `run_id` | `int` |             | ✓        |
+
+### Returns
+
+| Name  | Type            |
+| ----- | --------------- |
+| `run` | `types.CronRun` |
+
+**`types.CronRun` fields:**
+
+| Name               | Type                       | Required |
+| ------------------ | -------------------------- | -------- |
+| `duration_seconds` | `number`                   |          |
+| `error_text`       | `string`                   |          |
+| `finished_at`      | `Date`                     |          |
+| `hostname`         | `string`                   |          |
+| `name`             | `string`                   | ✓        |
+| `phases`           | `List[types.CronRunPhase]` | ✓        |
+| `rows_affected`    | `number`                   |          |
+| `run_id`           | `number`                   | ✓        |
+| `started_at`       | `Date`                     |          |
+| `status`           | `string`                   | ✓        |
+
+## `/api/admin/getCrons/`
+
+### Description
+
+Lists the registered cron jobs and their most recent runs.
+
+### Returns
+
+| Name   | Type                  |
+| ------ | --------------------- |
+| `jobs` | `List[types.CronJob]` |
+| `runs` | `List[types.CronRun]` |
 
 ## `/api/admin/getMaintenanceMode/`
 
