@@ -61,6 +61,11 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._start_monotonic = 0.0
 
     @property
+    def run_id(self) -> Optional[int]:
+        '''The Cron_Runs id of this execution, or None when not tracking.'''
+        return self._run_id
+
+    @property
     def _lock_name(self) -> str:
         return f'cron:{self._program}'[:64]
 

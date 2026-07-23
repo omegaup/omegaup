@@ -7,11 +7,12 @@ Integration tests should be done via a PHP entry point.
 
 import os.path
 import unittest
-from typing import Any
+from typing import Any, List, Tuple, cast
 
 import pandas as pd  # type: ignore
 
 import build_problem_rec_model
+import lib.db  # pylint: disable=wrong-import-position,wrong-import-order
 
 
 class TestModelGeneration(unittest.TestCase):
@@ -51,6 +52,89 @@ class TestModelEvaluation(unittest.TestCase):
                 os.path.join(os.path.dirname(os.path.realpath(__file__)),
                              'testdata.db')))
         self.assertGreater(model.evaluate(), 0.3)
+
+
+class _FakeCursor:
+    '''Records executed statements so the insert can be asserted on.'''
+
+    def __init__(self, connection: '_FakeConnection') -> None:
+        self._connection = connection
+        self.lastrowid = 1
+
+    def execute(self, query: str, params: Any = None) -> None:
+        '''Records the executed statement and its params.'''
+        self._connection.calls.append((query, params))
+
+    def __enter__(self) -> '_FakeCursor':
+        return self
+
+    def __exit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
+        del exc_type, exc, traceback
+
+
+class _FakeConnection:
+    '''Minimal in-memory stand-in for lib.db.Connection.'''
+
+    def __init__(self) -> None:
+        self.calls: List[Tuple[str, Any]] = []
+        self.commits = 0
+        self.conn = self
+
+    def cursor(self, **_kwargs: Any) -> _FakeCursor:
+        '''Returns a fake cursor bound to this connection.'''
+        return _FakeCursor(self)
+
+    def commit(self) -> None:
+        '''Counts commits so the test can assert one happened.'''
+        self.commits += 1
+
+
+class TestRecordModelRun(unittest.TestCase):
+    '''Test recording a training run into Recommendation_Model_Runs.'''
+
+    def test_record_model_run_inserts_published_row(self) -> None:
+        '''A published run is stored with published set to 1.'''
+        conn = _FakeConnection()
+        config = build_problem_rec_model.TrainingConfig(
+            train_fraction=0.8, num_followups=3, followup_decay=0.4)
+
+        build_problem_rec_model.record_model_run(
+            cast(lib.db.Connection, conn),
+            cron_run_id=42,
+            config=config,
+            map_score=0.51,
+            dataset_size=1234,
+            output_path='/tmp/model.db',
+            published=True,
+            skip_reason=None)
+
+        self.assertEqual(len(conn.calls), 1)
+        query, params = conn.calls[0]
+        self.assertIn('Recommendation_Model_Runs', query)
+        self.assertEqual(
+            params,
+            (42, 0.51, 1234, 3, 0.4, 0.8, '/tmp/model.db', 1, None))
+        self.assertEqual(conn.commits, 1)
+
+    def test_record_unpublished_stores_skip_reason(self) -> None:
+        '''An unpublished run stores published=0 and the skip reason.'''
+        conn = _FakeConnection()
+        config = build_problem_rec_model.TrainingConfig()
+
+        build_problem_rec_model.record_model_run(
+            cast(lib.db.Connection, conn),
+            cron_run_id=None,
+            config=config,
+            map_score=0.12,
+            dataset_size=10,
+            output_path='/tmp/model.db',
+            published=False,
+            skip_reason='MAP score 0.1200 below minimum 0.3000')
+
+        _query, params = conn.calls[0]
+        self.assertIsNone(params[0])
+        self.assertEqual(params[7], 0)
+        self.assertEqual(params[8], 'MAP score 0.1200 below minimum 0.3000')
 
 
 if __name__ == '__main__':

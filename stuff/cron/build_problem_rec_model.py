@@ -319,6 +319,36 @@ class Model:
         return score / user_count
 
 
+def record_model_run(
+        dbconn: lib.db.Connection,
+        *,
+        cron_run_id: Optional[int],
+        config: 'TrainingConfig',
+        map_score: float,
+        dataset_size: int,
+        output_path: str,
+        published: bool,
+        skip_reason: Optional[str],
+) -> None:
+    '''Records one training run into `Recommendation_Model_Runs`.
+
+    This is what lets the admin dashboard show how the model quality has moved
+    over time and lets the guardrail compare against the last published model.
+    '''
+    with dbconn.cursor() as cur:
+        cur.execute(
+            '''
+            INSERT INTO `Recommendation_Model_Runs`
+                (`cron_run_id`, `map_score`, `dataset_size`, `num_followups`,
+                 `followup_decay`, `train_fraction`, `output_path`,
+                 `published`, `skip_reason`)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
+            (cron_run_id, map_score, dataset_size, config.num_followups,
+             config.followup_decay, config.train_fraction, output_path,
+             1 if published else 0, skip_reason))
+    dbconn.conn.commit()
+
+
 def build_parser() -> argparse.ArgumentParser:
     '''Returns a argparse.ArgumentParser for this tool.'''
     parser = argparse.ArgumentParser(
@@ -408,14 +438,34 @@ def main() -> None:
 
                 score = model.evaluate()
                 logging.info('Model MAP score: %f', score)
-                if score >= args.min_map_score:
-                    # Save current model
+                dataset_size = len(runs)
+                cron_run.set_rows_affected(dataset_size)
+                published = score >= args.min_map_score
+                skip_reason: Optional[str] = None
+                if published:
                     model.save(args.output)
                 else:
-                    logging.error(
-                        'Model NOT saved. Resulting accuracy was too low: '
-                        '%f below %f', score, args.min_map_score)
+                    skip_reason = (
+                        f'MAP score {score:.4f} below minimum '
+                        f'{args.min_map_score:.4f}')
+                    logging.error('Model NOT saved. %s', skip_reason)
                     cron_run.mark_failure()
+
+            if not args.no_track:
+                dbconn = lib.db.connect(
+                    lib.db.DatabaseConnectionArguments.from_args(args))
+                try:
+                    record_model_run(
+                        dbconn,
+                        cron_run_id=cron_run.run_id,
+                        config=model.config,
+                        map_score=score,
+                        dataset_size=dataset_size,
+                        output_path=args.output,
+                        published=published,
+                        skip_reason=skip_reason)
+                finally:
+                    dbconn.conn.close()
         except:  # noqa: bare-except
             logging.exception('Failed to update recommendation model.')
             raise
