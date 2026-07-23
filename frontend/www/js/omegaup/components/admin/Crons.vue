@@ -111,6 +111,40 @@
           </template>
         </tbody>
       </table>
+
+      <h5 class="mt-4">{{ T.cronControlPlaneModelHeading }}</h5>
+      <table
+        v-if="recommendationModelRuns.length"
+        class="table table-sm table-hover"
+        data-cron-model-runs
+      >
+        <thead>
+          <tr>
+            <th>{{ T.cronControlPlaneStarted }}</th>
+            <th>{{ T.cronControlPlaneModelScore }}</th>
+            <th>{{ T.cronControlPlaneModelDataset }}</th>
+            <th>{{ T.cronControlPlaneModelPublished }}</th>
+            <th>{{ T.cronControlPlaneModelSkipReason }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(modelRun, index) in recommendationModelRuns"
+            :key="`model-run-${index}`"
+          >
+            <td>{{ formatDate(modelRun.created_at) }}</td>
+            <td>{{ modelRun.map_score.toFixed(4) }}</td>
+            <td>{{ modelRun.dataset_size }}</td>
+            <td>
+              <span :class="publishedClass(modelRun.published)">{{
+                modelRun.published ? '✓' : '✗'
+              }}</span>
+            </td>
+            <td>{{ modelRun.skip_reason || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <span v-else>{{ T.cronControlPlaneModelNoRuns }}</span>
     </div>
   </div>
 </template>
@@ -125,6 +159,12 @@ export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
+  @Prop({ default: () => [] })
+  recommendationModelRuns!: types.RecommendationModelRun[];
+
+  publishedClass(published: boolean): string {
+    return published ? 'badge badge-success' : 'badge badge-secondary';
+  }
 
   expandedRunId: number | null = null;
 

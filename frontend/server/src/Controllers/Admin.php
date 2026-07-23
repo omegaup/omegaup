@@ -12,7 +12,8 @@
   * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
-  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>}
+  * @psalm-type RecommendationModelRun=array{map_score: float, dataset_size: int, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, recommendationModelRuns: list<RecommendationModelRun>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
@@ -343,6 +344,27 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param list<\OmegaUp\DAO\VO\RecommendationModelRuns> $modelRuns
+     *
+     * @return list<RecommendationModelRun>
+     */
+    private static function recommendationModelRunsPayload(
+        array $modelRuns
+    ): array {
+        $result = [];
+        foreach ($modelRuns as $modelRun) {
+            $result[] = [
+                'map_score' => floatval($modelRun->map_score),
+                'dataset_size' => intval($modelRun->dataset_size),
+                'published' => boolval($modelRun->published),
+                'skip_reason' => $modelRun->skip_reason,
+                'created_at' => $modelRun->created_at,
+            ];
+        }
+        return $result;
+    }
+
+    /**
      * @param list<\OmegaUp\DAO\VO\CronRuns> $runs
      *
      * @return list<CronRun>
@@ -463,6 +485,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
                     'runs' => self::cronRunsPayload(
                         \OmegaUp\DAO\CronRuns::getRecent(50)
                     ),
+                    'recommendationModelRuns' =>
+                        self::recommendationModelRunsPayload(
+                            \OmegaUp\DAO\RecommendationModelRuns::getRecent(10)
+                        ),
                 ],
             ],
         ];

@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
         props: {
           jobs: payload.jobs,
           runs: payload.runs,
+          recommendationModelRuns: payload.recommendationModelRuns,
         },
         on: {
           rerun: (name: string) => {
