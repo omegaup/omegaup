@@ -11,7 +11,7 @@
           <div
             class="card-header d-flex justify-content-between align-items-center"
           >
-            <span>{{ T.profileReadme }}</span>
+            <span>{{ T.profileAboutSection }}</span>
             <div>
               <button
                 v-if="profile.is_own_profile && !isEditingReadme"
@@ -29,7 +29,7 @@
                 class="btn btn-sm btn-outline-warning"
                 @click="reportReadme"
               >
-                {{ T.profileReadmeReport }}
+                {{ T.profileAboutSectionReport }}
               </button>
             </div>
           </div>
@@ -41,7 +41,7 @@
                 :full-width="true"
               ></omegaup-markdown>
               <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
-                {{ T.profileReadmeAddPrompt }}
+                {{ T.profileAboutSectionAddPrompt }}
               </p>
             </template>
             <template v-else>
@@ -499,7 +499,7 @@ export default class ViewProfile extends Vue {
       username: this.profile.username ?? '',
       onSuccess: () => {
         this.readmeReportSubmitted = true;
-        ui.success(T.profileReadmeReportSuccess);
+        ui.success(T.profileAboutSectionReportSuccess);
       },
     });
   }
