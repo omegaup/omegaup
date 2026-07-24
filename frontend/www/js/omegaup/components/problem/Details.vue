@@ -787,6 +787,11 @@ export default class ProblemDetails extends Vue {
     return this.selectedTab;
   }
 
+  @Watch('activeTab')
+  onActiveTabChanged(newTab: string): void {
+    this.selectedTab = newTab;
+  }
+
   @Watch('clarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
