@@ -42,6 +42,10 @@ describe('Edit.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.problemEditEditProblem);
+    expect((wrapper.vm as any).showTab).toBe('edit');
+
+    await wrapper.setProps({ initialTab: 'markdown' });
+    expect((wrapper.vm as any).showTab).toBe('markdown');
 
     // All the links are available
     await wrapper.find('a[data-tab-markdown]').trigger('click');
