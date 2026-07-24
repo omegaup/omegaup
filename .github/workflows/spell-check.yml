@@ -39,7 +39,6 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
 
       - name: Install cspell with dictionaries
         run: |
@@ -66,7 +65,7 @@ jobs:
           CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v -E '^(node_modules|vendor|frontend/www/js/libs|frontend/server/libs/third_party)/' || true)
 
           # Exclude lock files
-          CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v -E '(package-lock\.json|yarn\.lock|composer\.lock)$' || true)
+          CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v -E '(package-lock\.json|pnpm-lock\.yaml|composer\.lock)$' || true)
 
           # Remove empty lines
           CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v '^$' || true)

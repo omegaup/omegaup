@@ -108,7 +108,8 @@ const casesStore = namespace('casesStore');
 @Component({
   components: {
     'omegaup-problem-creator-case-input': problemCreator_Cases_CaseInput,
-    'omegaup-problem-creator-multiple-cases-input': problemCreator_Cases_MultipleCasesInput,
+    'omegaup-problem-creator-multiple-cases-input':
+      problemCreator_Cases_MultipleCasesInput,
     'omegaup-problem-creator-group-input': problemCreator_Cases_GroupInput,
   },
 })
@@ -188,10 +189,10 @@ export default class AddPanel extends Vue {
         cases: [],
       });
     } else if (this.tab === 'multiplecases') {
-      const multipleCasesPrefix = this.multipleCasesInputRef
-        .multipleCasesPrefix;
-      const multipleCasesSuffix = this.multipleCasesInputRef
-        .multipleCasesSuffix;
+      const multipleCasesPrefix =
+        this.multipleCasesInputRef.multipleCasesPrefix;
+      const multipleCasesSuffix =
+        this.multipleCasesInputRef.multipleCasesSuffix;
       const multipleCasesCount = this.multipleCasesInputRef.multipleCasesCount;
       const multipleCasesGroup = this.multipleCasesInputRef.multipleCasesGroup;
 

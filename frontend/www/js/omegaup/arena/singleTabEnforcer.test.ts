@@ -49,9 +49,11 @@ class MockBroadcastChannel {
 }
 
 // Set up global mock
-((global as unknown) as {
-  BroadcastChannel: typeof MockBroadcastChannel;
-}).BroadcastChannel = MockBroadcastChannel;
+(
+  global as unknown as {
+    BroadcastChannel: typeof MockBroadcastChannel;
+  }
+).BroadcastChannel = MockBroadcastChannel;
 
 describe('SingleTabEnforcer', () => {
   beforeEach(() => {

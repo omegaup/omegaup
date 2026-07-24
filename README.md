@@ -61,8 +61,9 @@ cd omegaup
 git submodule update --init --recursive
 
 # Instalar dependencias y ejecutar pruebas
-yarn install
-yarn test
+corepack enable
+pnpm install
+pnpm test
 ```
 
 ## Licencia
@@ -90,8 +91,9 @@ cd omegaup
 git submodule update --init --recursive
 
 # Install dependencies and run tests
-yarn install
-yarn test
+corepack enable
+pnpm install
+pnpm test
 ```
 
 ## Directories
@@ -185,8 +187,9 @@ cd omegaup
 git submodule update --init --recursive
 
 # Instalar dependências e executar testes
-yarn install
-yarn test
+corepack enable
+pnpm install
+pnpm test
 ```
 
 ## Licença
@@ -246,8 +249,9 @@ cd omegaup
 git submodule update --init --recursive
 
 # Installare le dipendenze ed eseguire i test
-yarn install
-yarn test
+corepack enable
+pnpm install
+pnpm test
 ```
 
 ## Licenza
