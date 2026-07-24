@@ -1084,40 +1084,55 @@ class APIGenerator {
                 /** @var class-string */
                 $voClassName = "\\OmegaUp\\DAO\\VO\\{$typeName}";
                 $reflectionClass = new \ReflectionClass($voClassName);
-                /** @var array<string, string> */
+                /** @var array<string, array{expansion: string, isNullable: bool}> */
                 $properties = [];
                 foreach (
                     $reflectionClass->getProperties(
                         ReflectionProperty::IS_PUBLIC
                     ) as $reflectionProperty
                 ) {
-                    $docComment = $this->parseDocComment(
-                        strval($reflectionProperty->getDocComment())
-                    );
-                    $returns = $docComment->tags['var'];
-                    if (count($returns) != 1) {
-                        throw new \Exception(
-                            'More @var annotations than expected!'
+                    if ($reflectionProperty->hasType()) {
+                        $propertyType = $reflectionProperty->getType();
+                        /** @var \ReflectionNamedType $propertyType */
+                        $typeNameFromType = $propertyType->getName();
+                        $isNullable = $propertyType->allowsNull();
+                        $returnType = \Psalm\Type::parseString(
+                            $typeNameFromType
                         );
-                    }
-                    $returnType = \Psalm\Type::parseString(
-                        array_values(
-                            $returns
-                        )[0]
-                    );
-                    if ($returnType->isNullable()) {
-                        $returnType->removeType('null');
+                    } else {
+                        $docComment = $this->parseDocComment(
+                            strval($reflectionProperty->getDocComment())
+                        );
+                        $returns = $docComment->tags['var'] ?? [];
+                        if (count($returns) != 1) {
+                            throw new \Exception(
+                                'More @var annotations than expected!'
+                            );
+                        }
+                        $returnType = \Psalm\Type::parseString(
+                            array_values(
+                                $returns
+                            )[0]
+                        );
+                        $isNullable = true;
+                        if ($returnType->isNullable()) {
+                            $returnType->removeType('null');
+                        }
                     }
                     $properties[
                         $reflectionProperty->getName()
-                    ] = $this->typeMapper->convertType(
-                        $returnType,
-                        $typeName
-                    )->typescriptExpansion;
+                    ] = [
+                        'expansion' => $this->typeMapper->convertType(
+                            $returnType,
+                            $typeName
+                        )->typescriptExpansion,
+                        'isNullable' => $isNullable,
+                    ];
                 }
                 ksort($properties);
-                foreach ($properties as $propertyTypeName => $propertyTypeExpansion) {
-                    echo "    {$propertyTypeName}?: {$propertyTypeExpansion};\n";
+                foreach ($properties as $propertyTypeName => $propertyInfo) {
+                    $optional = $propertyInfo['isNullable'] ? '?' : '';
+                    echo "    {$propertyTypeName}{$optional}: {$propertyInfo['expansion']};\n";
                 }
                 echo "  }\n\n";
             }
@@ -1553,22 +1568,31 @@ EOD;
                         ReflectionProperty::IS_PUBLIC
                     ) as $reflectionProperty
                 ) {
-                    $docComment = $this->parseDocComment(
-                        strval($reflectionProperty->getDocComment())
-                    );
-                    $returns = $docComment->tags['var'];
-                    if (count($returns) != 1) {
-                        throw new \Exception(
-                            'More @var annotations than expected!'
+                    if ($reflectionProperty->hasType()) {
+                        $propertyType = $reflectionProperty->getType();
+                        /** @var \ReflectionNamedType $propertyType */
+                        $typeNameFromType = $propertyType->getName();
+                        $returnType = \Psalm\Type::parseString(
+                            $typeNameFromType
                         );
-                    }
-                    $returnType = \Psalm\Type::parseString(
-                        array_values(
-                            $returns
-                        )[0]
-                    );
-                    if ($returnType->isNullable()) {
-                        $returnType->removeType('null');
+                    } else {
+                        $docComment = $this->parseDocComment(
+                            strval($reflectionProperty->getDocComment())
+                        );
+                        $returns = $docComment->tags['var'] ?? [];
+                        if (count($returns) != 1) {
+                            throw new \Exception(
+                                'More @var annotations than expected!'
+                            );
+                        }
+                        $returnType = \Psalm\Type::parseString(
+                            array_values(
+                                $returns
+                            )[0]
+                        );
+                        if ($returnType->isNullable()) {
+                            $returnType->removeType('null');
+                        }
                     }
                     $properties[
                         $reflectionProperty->getName()

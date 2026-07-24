@@ -14,6 +14,11 @@ from pyparsing import (  # type: ignore
     Suppress, Word, ZeroOrMore, alphanums, delimited_list)
 
 
+_STRICT_TYPES_TABLES = {
+    'Team_Groups',
+}
+
+
 # pylint: disable=too-many-instance-attributes,too-few-public-methods
 class Column:
     '''Represents a MySQL column definition.'''
@@ -62,6 +67,7 @@ class Table:
     def __init__(self, tokens: ParseResults):
         self.name: str = tokens.tbl_name
         self.class_name: str = tokens.tbl_name.replace('_', '')
+        self.strict_types: bool = self.name in _STRICT_TYPES_TABLES
         self.columns: Sequence[Column] = [column for column in tokens
                                           if isinstance(column, Column)]
         self.constraints: Sequence[Constraint] = [
@@ -198,6 +204,12 @@ def generate_dao(script: str) -> Generator[File, None, None]:
     vo_template = env.get_template('vo.php')
     dao_template = env.get_template('dao.php')
     for table in tables:
+        if table.strict_types:
+            for column in table.columns:
+                if column.not_null:
+                    column.php_type = column.php_primitive_type
+                else:
+                    column.php_type = '?' + column.php_primitive_type
         yield File(f'{table.class_name}.php', 'vo',
                    vo_template.render(table=table))
         yield File(f'{table.class_name}.php', 'dao',
