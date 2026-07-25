@@ -13,7 +13,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type MaintenanceMessage=array{message: string, type: string}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, mentorCanChooseCoder: bool, isUnder13User: bool, userVerificationDeadline: \OmegaUp\Timestamp|null, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null, preferredLanguage: string, maintenanceMessage: MaintenanceMessage|null}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, ephemeralGraderEnabled: bool, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, mentorCanChooseCoder: bool, isUnder13User: bool, userVerificationDeadline: \OmegaUp\Timestamp|null, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null, preferredLanguage: string, maintenanceMessage: MaintenanceMessage|null}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, timestamp: \OmegaUp\Timestamp|null, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
@@ -71,12 +71,23 @@ class User extends \OmegaUp\Controllers\Controller {
     public static $urlHelper;
 
     const ALLOWED_SCHOLAR_DEGREES = [
-        'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
-        'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
+        'none',
+        'early_childhood',
+        'pre_primary',
+        'primary',
+        'lower_secondary',
+        'upper_secondary',
+        'post_secondary',
+        'tertiary',
+        'bachelors',
+        'master',
         'doctorate',
     ];
     const ALLOWED_GENDER_OPTIONS = [
-        'female','male','other','decline',
+        'female',
+        'male',
+        'other',
+        'decline',
     ];
 
     const SENDY_SUCCESS = '1';
@@ -88,7 +99,8 @@ class User extends \OmegaUp\Controllers\Controller {
     const LANGUAGE_PSEUDO = 4;
 
     const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
-        'all', 'female',
+        'all',
+        'female',
     ];
 
     const README_REPORT_THRESHOLD = 10;
@@ -281,12 +293,12 @@ class User extends \OmegaUp\Controllers\Controller {
             // use key 'http' even if you send the request to https://...
             $options = [
                 'http' => [
-                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method'  => 'POST',
+                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method' => 'POST',
                     'content' => http_build_query($data),
                 ],
             ];
-            $context  = stream_context_create($options);
+            $context = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
 
             if ($result === false) {
@@ -399,16 +411,17 @@ class User extends \OmegaUp\Controllers\Controller {
                 'email' => $email->email,
                 'list' => OMEGAUP_EMAIL_SENDY_LIST,
                 'boolean' => 'true' /* get a plaintext response, API: https://sendy.co/api */
-                ]
+            ]
         );
         $opts = [
             'http' => [
-                'method'  => 'POST',
-                'header'  => 'Content-type: application/x-www-form-urlencoded',
-                'content' => $postdata]
+                'method' => 'POST',
+                'header' => 'Content-type: application/x-www-form-urlencoded',
+                'content' => $postdata
+            ]
         ];
 
-        $context  = stream_context_create($opts);
+        $context = stream_context_create($opts);
         $result = self::$urlHelper->fetchUrl(
             OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL,
             $context
@@ -538,7 +551,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $password = $r->ensureOptionalString(
             'password',
             required: false,
-            validator: fn (string $password) => \OmegaUp\Validators::stringNonEmpty(
+            validator: fn(string $password) => \OmegaUp\Validators::stringNonEmpty(
                 $password
             )
         );
@@ -679,7 +692,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $usernameOrEmail = $r->ensureOptionalString(
             'usernameOrEmail',
             required: false,
-            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            validator: fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -908,7 +921,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $contestAlias = $r->ensureString(
             'contest_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            fn(string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         $response = [];
@@ -1136,7 +1149,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'ORIG1516-CEL' => 38,
                 'ORIG1516-DHI' => 15,
                 'ORIG1516-GTO' => 14,
@@ -1156,7 +1169,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIZAC-2018' => 20
             ];
         } elseif ($r['contest_type'] == 'Pr8oUAIE') {
@@ -1167,7 +1180,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'Pr8oUAIE' => 20
             ];
         } elseif ($r['contest_type'] == 'OMICHH') {
@@ -1177,7 +1190,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
-            $keys =  [
+            $keys = [
                 'OMICHH_2020' => 50
             ];
         } elseif ($r['contest_type'] == 'OMIZAC') {
@@ -1188,7 +1201,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIZAC-Prim' => 60,
                 'OMIZAC-Sec' => 60,
                 'OMIZAC-Prepa' => 60
@@ -1201,7 +1214,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'MS-UAIE' => 60,
                 'Prim-UAIE' => 40,
                 'Sec-UAIE' => 40,
@@ -1217,7 +1230,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIAGS-2018' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2017') {
@@ -1228,7 +1241,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIAGS-2017' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIP-AGS') {
@@ -1239,7 +1252,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIP-AGS' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIS-AGS') {
@@ -1250,7 +1263,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIS-AGS' => 30
             ];
         } elseif ($r['contest_type'] == 'OSI') {
@@ -1261,7 +1274,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OSI16' => 120
             ];
         } elseif ($r['contest_type'] == 'UNAMFC') {
@@ -1272,7 +1285,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
-            $keys =  [
+            $keys = [
                 'UNAMFC16' => 65
             ];
         } elseif ($r['contest_type'] == 'OVI') {
@@ -1282,7 +1295,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
-            $keys =  [
+            $keys = [
                 'OVI19' => 200
             ];
         } elseif ($r['contest_type'] == 'UDCCUP') {
@@ -1292,7 +1305,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
-            $keys =  [
+            $keys = [
                 'UDCCUP-2017' => 40
             ];
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
@@ -1314,7 +1327,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
-            $keys =  [
+            $keys = [
                 'OIC-16' => 225
             ];
         } elseif ($r['contest_type'] == 'OMIQROO') {
@@ -1377,7 +1390,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMI_CHH-2020' => 50
             ];
         } elseif ($r['contest_type'] == 'OMIP_CHH-2020') {
@@ -1388,7 +1401,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIP_CHH-2020' => 50
             ];
         } elseif ($r['contest_type'] == 'OMIS_CHH-2020') {
@@ -1399,7 +1412,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            $keys =  [
+            $keys = [
                 'OMIS_CHH-2020' => 70
             ];
         } elseif ($r['contest_type'] == 'CONTESTCAC') {
@@ -1501,9 +1514,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $response['school'] = $userDb['school'];
         $response['school_id'] = $userDb['school_id'];
         $response['locale'] =
-        \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
-            $userDb['locale']
-        );
+            \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
+                $userDb['locale']
+            );
 
         $response['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5(
             strval($response['email'])
@@ -1717,7 +1730,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $email = $r->ensureString(
             'email',
-            fn (string $email) => \OmegaUp\Validators::email($email)
+            fn(string $email) => \OmegaUp\Validators::email($email)
         );
         $response = \OmegaUp\DAO\Users::getStatusVerified($email);
 
@@ -1752,7 +1765,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $usernameOrEmail = $r->ensureString(
             'usernameOrEmail',
-            fn (string $usernameOrEmail) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $usernameOrEmail) => \OmegaUp\Validators::usernameOrEmail(
                 $usernameOrEmail
             )
         );
@@ -2230,14 +2243,14 @@ class User extends \OmegaUp\Controllers\Controller {
         $term = $r->ensureOptionalString(
             'term',
             required: false,
-            validator: fn (string $term) => \OmegaUp\Validators::stringNonEmpty(
+            validator: fn(string $term) => \OmegaUp\Validators::stringNonEmpty(
                 $term
             )
         );
         $query = $r->ensureOptionalString(
             'query',
             required: false,
-            validator: fn (string $query) => \OmegaUp\Validators::stringNonEmpty(
+            validator: fn(string $query) => \OmegaUp\Validators::stringNonEmpty(
                 $query
             )
         );
@@ -2436,8 +2449,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 && !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
             )
         )
-        && !is_null($user)
-        && boolval($user->is_private);
+            && !is_null($user)
+            && boolval($user->is_private);
     }
 
     /**
@@ -2533,7 +2546,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString(
             key: 'username',
             required: false,
-            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+            validator: fn(string $username) => \OmegaUp\Validators::normalUsername(
                 $username
             )
         );
@@ -2712,7 +2725,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'username',
             'scholar_degree',
             'birth_date' => [
-                'transform' => fn (int $value): string => strval(
+                'transform' => fn(int $value): string => strval(
                     gmdate('Y-m-d', $value)
                 ),
             ],
@@ -2756,7 +2769,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $r->identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
             } elseif (
                 (!is_null($newSchoolId)
-                || !is_null($currentSchoolId))
+                    || !is_null($currentSchoolId))
                 && ($currentGraduationDate !== $newGraduationDate)
             ) {
                 $graduationDate = !is_null(
@@ -2853,7 +2866,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CODERS_OF_THE_MONTH,
             "{$date}-{$rowCount}",
-            fn () => \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
+            fn() => \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
                 $date,
                 'all',
                 $rowCount
@@ -2920,7 +2933,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK,
             "{$offset}-{$rowCount}",
-            fn () => \OmegaUp\DAO\UserRank::getAuthorsRank(
+            fn() => \OmegaUp\DAO\UserRank::getAuthorsRank(
                 $offset,
                 $rowCount
             ),
@@ -2974,7 +2987,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK_WITH_QUALITY_PROBLEMS,
             "{$offset}-{$rowCount}",
-            fn () => \OmegaUp\DAO\UserRank::getAuthorsRankWithQualityProblems(
+            fn() => \OmegaUp\DAO\UserRank::getAuthorsRankWithQualityProblems(
                 $offset,
                 $rowCount
             ),
@@ -3080,7 +3093,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $originalEmail = $r->ensureOptionalString(
             'originalEmail',
             required: false,
-            validator: fn (string $originalEmail) => \OmegaUp\Validators::email(
+            validator: fn(string $originalEmail) => \OmegaUp\Validators::email(
                 $originalEmail
             )
         );
@@ -3111,7 +3124,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $emailParam = $r->ensureString(
             'email',
-            fn (string $email) => \OmegaUp\Validators::email($email)
+            fn(string $email) => \OmegaUp\Validators::email($email)
         );
 
         try {
@@ -3322,14 +3335,14 @@ class User extends \OmegaUp\Controllers\Controller {
                     [
                         'request' => $r2,
                     ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
-                        'problemset_id' => $problemsetId,
-                        'auth_token' => $authToken,
-                        'tokens' => $tokens,
-                    ]));
+                                    'problemset_id' => $problemsetId,
+                                    'auth_token' => $authToken,
+                                    'tokens' => $tokens,
+                                ]));
                     $contestAlias = $r2->ensureOptionalString(
                         'contest_alias',
                         required: false,
-                        validator: fn (string $alias) => \OmegaUp\Validators::alias(
+                        validator: fn(string $alias) => \OmegaUp\Validators::alias(
                             $alias
                         )
                     );
@@ -3490,7 +3503,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $role = self::validateAddRemoveRole($r->identity, $role);
         $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -3536,7 +3549,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $role = self::validateAddRemoveRole($r->identity, $role);
         $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -3566,7 +3579,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString(
             'username',
             required: false,
-            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            validator: fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -3630,7 +3643,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString(
             'username',
             required: false,
-            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            validator: fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -3702,7 +3715,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $groupAlias = $r->ensureString(
             'group',
-            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+            fn(string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateAddRemoveGroup($groupAlias);
         \OmegaUp\DAO\GroupsIdentities::create(
@@ -3729,7 +3742,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $groupAlias = $r->ensureString(
             'group',
-            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+            fn(string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateAddRemoveGroup($groupAlias);
 
@@ -3760,7 +3773,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -3797,7 +3810,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -4149,7 +4162,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $currentFilter = $filter ?? \OmegaUp\DAO\Enum\RankFilter::NONE;
         $params = [];
         if ($currentFilter !== \OmegaUp\DAO\Enum\RankFilter::NONE) {
-            $params[ 'filter'] = $currentFilter;
+            $params['filter'] = $currentFilter;
         }
 
         try {
@@ -4330,7 +4343,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $date = $r->ensureOptionalString(
             'date',
             required: false,
-            validator: fn (string $date): bool => \OmegaUp\Validators::stringNonEmpty(
+            validator: fn(string $date): bool => \OmegaUp\Validators::stringNonEmpty(
                 $date
             )
         );
@@ -4493,7 +4506,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString(
             'username',
             required: false,
-            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+            validator: fn(string $username) => \OmegaUp\Validators::normalUsername(
                 $username
             )
         );
@@ -4558,36 +4571,33 @@ class User extends \OmegaUp\Controllers\Controller {
         $cachedExtraProfileDetails = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             "{$targetIdentity->username}-extraProfileDetails",
-            function () use (
-                $targetIdentity,
-                $targetIdentityId
-            ): array {
+            function () use ($targetIdentity, $targetIdentityId): array {
                 return
-                [
-                    'contests' => self::getContestStats($targetIdentity),
-                    'solvedProblems' => self::getSolvedProblems(
-                        $targetIdentityId
-                    ),
-                    'unsolvedProblems' => self::getUnsolvedProblems(
-                        $targetIdentityId
-                    ),
-                    'createdProblems' => self::getCreatedProblems(
-                        $targetIdentityId
-                    ),
-                    'bookmarkedProblems' => \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
-                        $targetIdentityId
-                    ),
-                    'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
-                        $targetIdentityId
-                    ),
-                    'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
-                        $targetIdentityId
-                    ),
-                    'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                        $targetIdentityId
-                    ),
-                    'badges' => \OmegaUp\Controllers\Badge::getAllBadges()
-                ];
+                    [
+                        'contests' => self::getContestStats($targetIdentity),
+                        'solvedProblems' => self::getSolvedProblems(
+                            $targetIdentityId
+                        ),
+                        'unsolvedProblems' => self::getUnsolvedProblems(
+                            $targetIdentityId
+                        ),
+                        'createdProblems' => self::getCreatedProblems(
+                            $targetIdentityId
+                        ),
+                        'bookmarkedProblems' => \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
+                            $targetIdentityId
+                        ),
+                        'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
+                            $targetIdentityId
+                        ),
+                        'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
+                            $targetIdentityId
+                        ),
+                        'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                            $targetIdentityId
+                        ),
+                        'badges' => \OmegaUp\Controllers\Badge::getAllBadges()
+                    ];
             },
             APC_USER_CACHE_USER_RANK_TIMEOUT
         );
@@ -4610,8 +4620,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 'profile' => $profile,
                 'extraProfileDetails' => array_merge(
                     [
-                    'ownedBadges' => $ownedBadges,
-                    'hasPassword' => !is_null($targetIdentity->password),
+                        'ownedBadges' => $ownedBadges,
+                        'hasPassword' => !is_null($targetIdentity->password),
                     ],
                     $cachedExtraProfileDetails
                 ),
@@ -4629,9 +4639,12 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getUserDetailsForTypeScript(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
         $username = $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -4811,7 +4824,7 @@ class User extends \OmegaUp\Controllers\Controller {
     ): array {
         if (
             !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
-                && $loggedIdentity->user_id !== $user->user_id
+            && $loggedIdentity->user_id !== $user->user_id
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -5008,7 +5021,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $name = $r->ensureString(
             'name',
-            fn (string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
+            fn(string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
         );
         $token = \OmegaUp\SecurityTools::randomHexString(40);
         $apiToken = new \OmegaUp\DAO\VO\APITokens([
@@ -5069,7 +5082,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $name = $r->ensureString(
             'name',
-            fn (string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
+            fn(string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
         );
 
         \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
@@ -5088,7 +5101,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $token = $r->ensureString(
             'parental_verification_token',
-            validator: fn (string $token) => preg_match(
+            validator: fn(string $token) => preg_match(
                 '/^[a-zA-Z0-9]{24}$/',
                 $token
             ) === 1
@@ -5368,8 +5381,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $content = $r->ensureOptionalString(
             'readme',
             required: false,
-            validator: fn (string $content) =>
-                \OmegaUp\Validators::stringOfLengthInRange($content, 1, 10000)
+            validator: fn(string $content) =>
+            \OmegaUp\Validators::stringOfLengthInRange($content, 1, 10000)
         );
         if (is_null($content)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -5420,7 +5433,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $username = $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn(string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
