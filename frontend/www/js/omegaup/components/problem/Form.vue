@@ -862,7 +862,11 @@ export default class ProblemForm extends Vue {
     this.creatorGeneratedZipBlob = null;
     this.openProblemCreatorModal();
     await this.$nextTick();
-    await this.problemCreatorRef?.importZipFile?.(zipFile);
+    const success = await this.problemCreatorRef?.importZipFile?.(zipFile);
+    if (!success) {
+      this.showProblemCreator = false;
+      this.currentCreationMethod = CreationMethods.Zip;
+    }
   }
 
   onGenerateAlias(): void {

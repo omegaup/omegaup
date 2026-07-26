@@ -318,6 +318,12 @@ describe('Settings.vue', () => {
     });
     await wrapper.setData({ currentCreationMethod: CreationMethods.Zip });
 
+    const importZipFile = jest.fn().mockResolvedValue(true);
+    const mockRef = { importZipFile };
+    Object.defineProperty(wrapper.vm, 'problemCreatorRef', {
+      get: () => mockRef,
+      configurable: true,
+    });
     const file = await makeZipFile({ 'cdp.data': '{}' });
     await (wrapper.vm as any).onUploadFile({ target: { files: [file] } });
 
@@ -353,5 +359,21 @@ describe('Settings.vue', () => {
 
     expect(importZipFile).toHaveBeenCalledWith(file);
     expect((wrapper.vm as any).creatorGeneratedZipBlob).toBeNull();
+  });
+
+  it('Should revert to the zip flow when the creator import fails', async () => {
+    const wrapper = shallowMount(Form, {
+      propsData: { data: props, showCreationMethodSelector: true },
+    });
+    await wrapper.setData({ showProblemCreator: true });
+
+    const importZipFile = jest.fn().mockResolvedValue(false);
+    (wrapper.vm as any).$refs.problemCreator = { importZipFile };
+    const file = await makeZipFile({ 'cdp.data': 'invalid json' });
+    await (wrapper.vm as any).importZipIntoCreator(file);
+
+    expect(importZipFile).toHaveBeenCalledWith(file);
+    expect((wrapper.vm as any).currentCreationMethod).toBe(CreationMethods.Zip);
+    expect((wrapper.vm as any).showProblemCreator).toBe(false);
   });
 });
