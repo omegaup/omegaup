@@ -765,8 +765,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
     /**
      * Returns the next contest (active or future) a user registered for, when it is
-     * a future contest it can be filtered by a limit of d
-     * Limit param.
+     * a future contest it can be filtered by a limit of days between the start of the
+     * next registered contest and the current date using the $dayLimit param.
      *
      * @return ContestListItem|null
      */
