@@ -73,6 +73,10 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    SYSTEM_ACL,
+    ADMIN_ROLE,
+)
 
 
 class Cutoff(NamedTuple):
@@ -195,17 +199,15 @@ def update_user_rank(
             `full_isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
             `full_u`.`is_private` = 0
-            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
-            -- role_id = 1 is ADMIN_ROLE)
-            -- TODO: Replace magic numbers with constants
+            -- Exclude site-admins (SYSTEM_ACL / ADMIN_ROLE).
             AND `full_u`.`user_id` NOT IN (
                 SELECT
                     `ur`.`user_id`
                 FROM
                     `User_Roles` AS `ur`
                 WHERE
-                    `ur`.`acl_id` = 1 AND
-                    `ur`.`role_id` = 1
+                    `ur`.`acl_id` = %s AND
+                    `ur`.`role_id` = %s
             )
             AND NOT EXISTS (
                 SELECT
@@ -229,7 +231,7 @@ def update_user_rank(
             `identity_id`
         ORDER BY
             `score` DESC;
-    ''')
+    ''', (SYSTEM_ACL, ADMIN_ROLE))
     prev_score = None
     rank = 0
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
@@ -300,23 +302,21 @@ def update_author_rank(
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
             `full_p`.`quality` IS NOT NULL
-            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
-            -- role_id = 1 is ADMIN_ROLE)
-            -- TODO: Replace magic numbers with constants
+            -- Exclude site-admins (SYSTEM_ACL / ADMIN_ROLE).
             AND `u`.`user_id` NOT IN (
                 SELECT
                     `ur`.`user_id`
                 FROM
                     `User_Roles` AS `ur`
                 WHERE
-                    `ur`.`acl_id` = 1 AND
-                    `ur`.`role_id` = 1
+                    `ur`.`acl_id` = %s AND
+                    `ur`.`role_id` = %s
             )
         GROUP BY
             `u`.`user_id`
         ORDER BY
             `author_score` DESC
-    ''')
+    ''', (SYSTEM_ACL, ADMIN_ROLE))
 
     prev_score = None
     rank = 0
