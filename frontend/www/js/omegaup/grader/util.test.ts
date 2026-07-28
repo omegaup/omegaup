@@ -83,6 +83,34 @@ int main() {
     });
   });
 
+  describe('single-pattern detection', () => {
+    it('should detect C from printf without an include', () => {
+      const code = `int main() {
+    printf("%d", x);
+    return 0;
+}`;
+      const result = detectLanguageFromCode(code);
+      expect(result).not.toBeNull();
+      expect(result?.language).toBe('c11-gcc');
+    });
+
+    it('should detect Java from a bare public class', () => {
+      const code = `public class Solution {
+}`;
+      const result = detectLanguageFromCode(code);
+      expect(result).not.toBeNull();
+      expect(result?.language).toBe('java');
+    });
+
+    it('should detect Lua from local declarations only', () => {
+      const code = `local x = 5
+local y = 10`;
+      const result = detectLanguageFromCode(code);
+      expect(result).not.toBeNull();
+      expect(result?.language).toBe('lua');
+    });
+  });
+
   describe('C++ detection', () => {
     it('should detect C++ for competitive programming code', () => {
       const cppCode = `#include "bits/stdc++.h"
