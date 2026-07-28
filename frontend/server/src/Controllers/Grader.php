@@ -7,6 +7,7 @@
  *
  * @psalm-type GraderStatus=array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
  * @psalm-type FullIDEPayload=array{acceptedLanguages: list<string>, preferredLanguage: null | string}
+ * @psalm-type ViewUnavailablePayload=array{description: string}
  */
 class Grader extends \OmegaUp\Controllers\Controller {
     /**
@@ -26,7 +27,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * @return array{templateProperties: array{payload: FullIDEPayload, title: \OmegaUp\TranslationString, fullWidth?: bool, hideFooterAndHeader?: bool}, entrypoint: string}
+     * @return array{templateProperties: array{payload: FullIDEPayload|ViewUnavailablePayload, title: \OmegaUp\TranslationString, fullWidth?: bool, hideFooterAndHeader?: bool}, entrypoint: string}
     */
     public static function getGraderForTypeScript(
         \OmegaUp\Request $r
@@ -57,9 +58,13 @@ class Grader extends \OmegaUp\Controllers\Controller {
             return [
                 'templateProperties' => [
                     'title' => $title,
-                    'payload' => $payload,
+                    'payload' => [
+                        'description' => \OmegaUp\Translations::getInstance()->get(
+                            'ephemeralGraderDisabled'
+                        ),
+                    ],
                 ],
-                'entrypoint' => 'grader_unavailable',
+                'entrypoint' => 'common_view_unavailable',
             ];
         }
 

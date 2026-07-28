@@ -48,6 +48,8 @@ module.exports = {
     common_global_notifications:
       './frontend/www/js/omegaup/common/global_notifications.ts',
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
+    common_view_unavailable:
+      './frontend/www/js/omegaup/common/view_unavailable.ts',
     contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
     contest_intro: './frontend/www/js/omegaup/contest/intro.ts',
     contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
@@ -76,7 +78,6 @@ module.exports = {
       './frontend/www/js/omegaup/course/submissions_list.ts',
     course_tabs: './frontend/www/js/omegaup/course/tabs.ts',
     grader_ide: './frontend/www/js/omegaup/grader/ide.ts',
-    grader_unavailable: './frontend/www/js/omegaup/grader/unavailable.ts',
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',
