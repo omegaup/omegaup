@@ -481,21 +481,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query) && $query !== '') {
-            $useLikeSearch = mb_strlen($query) < 2;
             $isNumericQuery = is_numeric($query);
-
-            if ($useLikeSearch) {
-                $conditions = [
-                    'p.title LIKE CONCAT(\'%\', ?, \'%\')',
-                    'p.alias LIKE CONCAT(\'%\', ?, \'%\')',
-                ];
-                $argsForQuery = [$query, $query];
-            } else {
-                $conditions = [
-                    'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
-                ];
-                $argsForQuery = [$query];
-            }
+            $conditions = [
+                'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
+            ];
+            $argsForQuery = [$query];
 
             if ($isNumericQuery) {
                 $conditions[] = 'p.problem_id = ?';
@@ -1316,21 +1306,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Problems AS p
         ';
         if (!empty($query)) {
-            if (mb_strlen($query) < 2) {
-                $sql .= '
-                    WHERE
-                        p.`title` LIKE CONCAT(\'%\', ?, \'%\') OR
-                        p.`alias` LIKE CONCAT(\'%\', ?, \'%\')
-                ';
-                $params[] = $query;
-                $params[] = $query;
-            } else {
-                $sql .= '
-                    WHERE
-                        MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE)
-                ';
-                $params[] = $query;
-            }
+            $sql .= '
+                WHERE
+                    MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE)
+            ';
+            $params[] = $query;
         }
 
         /** @var int */
@@ -1853,99 +1833,52 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $curatedQuery = strval(preg_replace('/\W+/', ' ', $query));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
-            if (mb_strlen($query) < 2) {
-                $args = array_fill(0, 5, $query);
-                $args = array_merge($args, array_fill(0, 2, $curatedQuery));
-                $sql = "FROM
-                        (
-                            SELECT
-                                {$fields},
-                                2.0 AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                alias = ?
-                            UNION ALL
-                            SELECT
-                                {$fields},
-                                1.0 AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                title = ?
-                            UNION ALL
-                            SELECT
-                                {$fields},
-                                0.1 AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                (
-                                    title LIKE CONCAT('%', ?, '%') OR
-                                    alias LIKE CONCAT('%', ?, '%') OR
-                                    problem_id = ?
-                                )
-                            UNION ALL
-                            SELECT
-                                {$fields},
-                                IFNULL(
-                                    MATCH(alias, title)
-                                    AGAINST (? IN BOOLEAN MODE), 0.0
-                                ) AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                MATCH(alias, title)
-                                AGAINST (? IN BOOLEAN MODE)
-                        ) AS p";
-            } else {
-                $problemIdUnion = '';
-                $args = array_fill(0, 2, $query);
-                if (is_numeric($query)) {
-                    $problemIdUnion = "
-                            UNION ALL
-                            SELECT
-                                {$fields},
-                                2.0 AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                problem_id = ?";
-                    $args[] = intval($query);
-                }
-                $args = array_merge($args, array_fill(0, 2, $curatedQuery));
-                $sql = "FROM
-                        (
-                            SELECT
-                                {$fields},
-                                2.0 AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                alias = ?
-                            UNION ALL
-                            SELECT
-                                {$fields},
-                                1.0 AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                title = ?
-                            {$problemIdUnion}
-                            UNION ALL
-                            SELECT
-                                {$fields},
-                                IFNULL(
-                                    MATCH(alias, title)
-                                    AGAINST (? IN BOOLEAN MODE), 0.0
-                                ) AS relevance
-                            FROM
-                                Problems p
-                            WHERE
-                                MATCH(alias, title)
-                                AGAINST (? IN BOOLEAN MODE)
-                        ) AS p";
+            $problemIdUnion = '';
+            $args = array_fill(0, 2, $query);
+            if (is_numeric($query)) {
+                $problemIdUnion = "
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            2.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            problem_id = ?";
+                $args[] = intval($query);
             }
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+            $sql = "FROM
+                    (
+                        SELECT
+                            {$fields},
+                            2.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            alias = ?
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            1.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            title = ?
+                        {$problemIdUnion}
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            IFNULL(
+                                MATCH(alias, title)
+                                AGAINST (? IN BOOLEAN MODE), 0.0
+                            ) AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            MATCH(alias, title)
+                            AGAINST (? IN BOOLEAN MODE)
+                    ) AS p";
             $groupByClause = "
                         GROUP BY {$fields}
             ";
