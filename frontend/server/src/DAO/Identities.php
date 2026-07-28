@@ -90,7 +90,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $rowcount,
         ];
 
-        /** @var list<array{name: null|string, relevance: float|null, username: string}> $rs */
+        /** @var array{name: null|string, relevance: float, username: string} $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $user) {
