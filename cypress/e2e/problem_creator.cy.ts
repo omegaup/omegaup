@@ -296,4 +296,31 @@ describe('Problem creator Test', () => {
       });
     });
   });
+
+  it('Should submit create problem using creator-generated zip in feature-flag flow', () => {
+    cy.login(loginOptions);
+    cy.setCookie('has-visited-create-problem', true.toString());
+
+    cy.visit('/problem/new/?experiments=problem_creation_method_selector');
+
+    cy.get('[name="title"]').type('Cypress Creator Submit').blur();
+    cy.get('[name="source"]').type('Cypress');
+
+    cy.get('.introjs-creation-method .btn-group button').first().click();
+    cy.get('.introjs-open-creator button').click();
+    cy.get('[data-problem-creator-close]').click();
+
+    cy.get('form').then(($form) => {
+      $form.on('submit', (e) => e.preventDefault());
+    });
+
+    cy.get('button[type="submit"]').click();
+
+    cy.get('.introjs-open-creator input[name="problem_contents"]').should(
+      ($input) => {
+        const files = ($input[0] as HTMLInputElement).files;
+        expect(files?.length).to.eq(1);
+      },
+    );
+  });
 });

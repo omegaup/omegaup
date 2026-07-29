@@ -123,6 +123,7 @@ export default class SolutionTab extends Vue {
   }
 
   startIntroGuide() {
+    if (this.hideSaveButton) return;
     if (!this.$cookies.get('has-visited-solution-tab')) {
       introJs()
         .setOptions({

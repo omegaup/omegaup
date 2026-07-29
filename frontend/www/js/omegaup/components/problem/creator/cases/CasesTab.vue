@@ -49,6 +49,7 @@ Vue.use(VueCookies, { expires: -1 });
 })
 export default class CasesTab extends Vue {
   @Prop() activeTabIndex!: TabIndex;
+  @Prop({ default: false }) hideSaveButton!: boolean;
 
   shouldShowAddWindow = false;
   shouldShowCaseEditWindow = false;
@@ -79,6 +80,7 @@ export default class CasesTab extends Vue {
   }
 
   startIntroGuide() {
+    if (this.hideSaveButton) return;
     if (!this.$cookies.get('has-visited-cases-tab')) {
       this.$nextTick(() => {
         const intro = introJs();
