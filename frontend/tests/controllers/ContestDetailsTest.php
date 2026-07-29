@@ -1246,4 +1246,40 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $supportTeamMember->identity_id
         ));
     }
+
+    /**
+     * Check that support team members can access private contests before they
+     * start without being explicitly added to the contest.
+     */
+    public function testSupportTeamMemberCanAccessPrivateContestBeforeStart() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+                'startTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() + 60 * 60
+                ),
+                'finishTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() + 2 * 60 * 60
+                ),
+            ])
+        );
+        $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
+
+        [
+            'identity' => $supportTeamMember,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
+        $login = self::login($supportTeamMember);
+
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertContestDetails($contestData, $problems, $response);
+        $this->assertFalse($response['admin']);
+    }
 }

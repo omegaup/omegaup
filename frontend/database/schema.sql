@@ -380,10 +380,43 @@ CREATE TABLE `Courses` (
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
   KEY `idx_admission_mode_recommended_archived` (`archived`,`admission_mode`,`recommended`),
+  KEY `idx_courses_name` (`name`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Un curso/clase que un maestro da.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Jobs` (
+  `job_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `description` text,
+  `schedule` varchar(64) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`job_id`),
+  UNIQUE KEY `unique_cron_job_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de los trabajos programados (cron) del sistema';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Runs` (
+  `run_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL COMMENT 'Nombre del script (parser.prog). Denormalizado a propósito: el historial se registra aunque el trabajo no esté en Cron_Jobs y sobrevive a renombres o borrados del registro',
+  `hostname` varchar(255) DEFAULT NULL,
+  `status` enum('running','success','failure') NOT NULL DEFAULT 'running',
+  `started_at` datetime NOT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `duration_seconds` double DEFAULT NULL,
+  `rows_affected` int DEFAULT NULL,
+  `phases` json DEFAULT NULL,
+  `error_text` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`run_id`),
+  KEY `idx_cron_runs_name_started` (`name`,`started_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de ejecuciones de los trabajos cron';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -568,7 +601,7 @@ CREATE TABLE `Identities` (
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
   KEY `current_identity_school_id` (`current_identity_school_id`),
-  FULLTEXT KEY `ft_user_username` (`username`,`name`),
+  FULLTEXT KEY `ft_user_username_ngram` (`username`,`name`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`),
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
@@ -1096,6 +1129,7 @@ CREATE TABLE `School_Of_The_Month` (
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
   KEY `idx_time` (`time`),
+  KEY `idx_sotm_school_time` (`school_id`,`time`),
   CONSTRAINT `fk_sotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_sotms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Escuelas del Mes';
@@ -1224,6 +1258,8 @@ CREATE TABLE `Submissions` (
   KEY `idx_submissions_identity_problemset_problem` (`identity_id`,`problemset_id`,`problem_id`),
   KEY `idx_submissions_identity_type_problemset` (`identity_id`,`type`,`problemset_id`),
   KEY `idx_submissions_time_verdict` (`time`,`verdict`),
+  KEY `idx_submissions_verdict_time_identity_problem_school` (`verdict`,`time`,`identity_id`,`problem_id`,`school_id`,`submission_id`),
+  KEY `idx_submissions_school_problem_verdict_time_id` (`school_id`,`problem_id`,`verdict`,`time`,`submission_id`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1469,4 +1505,3 @@ CREATE TABLE `Users_Experiments` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
