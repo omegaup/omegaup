@@ -28,7 +28,7 @@ export class SafeStorage {
   static clearOldItems(): void {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     try {
-      for (let i = 0; i < localStorage.length; i++) {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && key.startsWith('clarification-')) {
           const timestamp = localStorage.getItem(key);

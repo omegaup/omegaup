@@ -99,6 +99,7 @@ OmegaUp.on('ready', async () => {
           activeTab: this.activeTab,
           allRuns: runsStore.state.runs,
           problem: payload.problem,
+          ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
           runs: myRunsStore.state.runs,
           solvers: payload.solvers,
           user: payload.user,

@@ -1,10 +1,12 @@
 ## Preliminary Steps
 
-You need to have `node` installed to use `cypress`:
+You need to have Node.js 24 (LTS) installed to use Cypress. The project pins the version in [`.nvmrc`](https://github.com/omegaup/omegaup/blob/main/.nvmrc). We recommend [nvm](https://github.com/nvm-sh/nvm):
 
 ```bash
-sudo apt-get install nodejs
-sudo apt-get install npm
+nvm install    # reads .nvmrc and installs Node 24
+nvm use        # switches to the version in .nvmrc
+node -v        # should print v24.x.x
+yarn install
 ```
 
 If you still get:
