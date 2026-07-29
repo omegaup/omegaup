@@ -111,6 +111,44 @@
           </template>
         </tbody>
       </table>
+
+      <h5 class="mt-4">{{ T.problemHealthHeading }}</h5>
+      <table
+        v-if="problemHealthFindings.length"
+        class="table table-sm table-hover"
+        data-problem-health
+      >
+        <thead>
+          <tr>
+            <th>{{ T.problemHealthProblem }}</th>
+            <th>{{ T.problemHealthCheckType }}</th>
+            <th>{{ T.problemHealthSeverity }}</th>
+            <th>{{ T.problemHealthDetail }}</th>
+            <th>{{ T.problemHealthSince }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="finding in problemHealthFindings"
+            :key="`${finding.problem_id}-${finding.check_type}`"
+          >
+            <td>
+              <a :href="`/arena/problem/${finding.alias}/`">{{
+                finding.title
+              }}</a>
+            </td>
+            <td>{{ finding.check_type }}</td>
+            <td>
+              <span :class="severityClass(finding.severity)">{{
+                finding.severity
+              }}</span>
+            </td>
+            <td>{{ finding.detail }}</td>
+            <td>{{ formatDate(finding.first_detected_at) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <span v-else>{{ T.problemHealthNoFindings }}</span>
     </div>
   </div>
 </template>
@@ -125,6 +163,12 @@ export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
+  @Prop({ default: () => [] })
+  problemHealthFindings!: types.ProblemHealthFinding[];
+
+  severityClass(severity: string): string {
+    return severity === 'error' ? 'badge badge-danger' : 'badge badge-warning';
+  }
 
   expandedRunId: number | null = null;
 
