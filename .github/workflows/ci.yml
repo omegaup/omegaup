@@ -210,9 +210,9 @@ jobs:
           submodules: recursive
 
       - name: Set up Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install yarn dependencies
@@ -250,6 +250,12 @@ jobs:
           <?php
           define('OMEGAUP_LOG_FILE', 'php://stderr');
           EOF
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - name: Install yarn dependencies
         run: yarn install
@@ -342,6 +348,12 @@ jobs:
         uses: ./.github/actions/prepare-env
         with:
           install_host_python_deps: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - name: Install yarn dependencies
         run: yarn install
