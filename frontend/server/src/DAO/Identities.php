@@ -71,47 +71,26 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         int $rowcount = 100
     ) {
         $sql = "SELECT
-                    sq.name,
-                    sq.username,
-                    SUM(sq.relevance) AS relevance
-                FROM (
-                    SELECT
-                        i.name,
-                        i.username,
-                        IFNULL(MATCH(name, username) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
-                    FROM
-                        Identities i
-                    WHERE
-                        MATCH(name, username) AGAINST (? IN BOOLEAN MODE)
-                    UNION DISTINCT
-                    SELECT DISTINCT
-                        i.name,
-                        i.username,
-                        0 AS relevance
-                    FROM
-                        Identities i
-                    WHERE
-                        (
-                            i.username LIKE CONCAT('%', ?, '%') OR
-                            i.name LIKE CONCAT('%', ?, '%')
-                        ) AND
-                        i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
-                ) AS sq
-            GROUP BY
-                username, name
+                    i.name,
+                    i.username,
+                    IFNULL(MATCH(name, username) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
+                FROM
+                    Identities i
+                WHERE
+                    MATCH(name, username) AGAINST (? IN BOOLEAN MODE) AND
+                    i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
             ORDER BY
                 relevance DESC
             LIMIT
                 ?;";
+        $escapedUsernameOrName = self::escapeBooleanModeQuery($usernameOrName);
         $args = [
-            $usernameOrName,
-            $usernameOrName,
-            $usernameOrName,
-            $usernameOrName,
+            $escapedUsernameOrName,
+            $escapedUsernameOrName,
             $rowcount,
         ];
 
-        /** @var list<array{name: null|string, relevance: float|null, username: string}> $rs */
+        /** @var list<array{name: null|string, relevance: float, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $user) {
@@ -122,6 +101,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ];
         }
         return $result;
+    }
+
+    private static function escapeBooleanModeQuery(string $query): string {
+        return addcslashes($query, '+-<>()~*"\\');
     }
 
     public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {

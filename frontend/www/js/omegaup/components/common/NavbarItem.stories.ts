@@ -5,12 +5,6 @@ import NavbarItem from './NavbarItem.vue';
 
 library.add(faBook, faComments, faVideo);
 
-/**
- * NavbarItem renders one dropdown entry: an optional icon box, a title with an
- * optional description, and an external-link marker when the href points
- * outside the current host. The icon prop accepts both a `[prefix, name]`
- * tuple and a plain icon name string.
- */
 const meta: Meta<typeof NavbarItem> = {
   component: NavbarItem,
   title: 'Components/Common/NavbarItem',
