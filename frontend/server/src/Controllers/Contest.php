@@ -1895,13 +1895,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestAdmin = false;
 
         // If the contest has not started, user should not see it, unless it is
-        // admin or has a token.
+        // admin, staff, or has a token.
         if (is_null($token)) {
             // Crack the request to get the current user
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
-            self::validateAccessContest($contest, $identity);
+            $canInspectContest = self::canInspectContestDetails(
+                $contest,
+                $identity
+            );
+            if (!$canInspectContest) {
+                self::validateAccessContest($contest, $identity);
+            }
 
             $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
                 $identity,
@@ -1909,7 +1915,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
             if (
                 !\OmegaUp\DAO\Contests::hasStarted($contest) &&
-                !$contestAdmin
+                !$contestAdmin &&
+                !$canInspectContest
             ) {
                 $exception = new \OmegaUp\Exceptions\PreconditionFailedException(
                     'contestNotStarted'
@@ -1938,6 +1945,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias' => $contestAlias,
             'problemset' => $problemset,
         ];
+    }
+
+    private static function canInspectContestDetails(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        return \OmegaUp\Authorization::isContestAdmin($identity, $contest) ||
+            \OmegaUp\Authorization::isSupportTeamMember($identity) ||
+            \OmegaUp\Authorization::isSystemAdmin($identity);
     }
 
     /**

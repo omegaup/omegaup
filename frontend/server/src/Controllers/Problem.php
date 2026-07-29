@@ -3044,6 +3044,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 intval($loggedIdentity->identity_id)
             );
         }
+
         return $response;
     }
 
