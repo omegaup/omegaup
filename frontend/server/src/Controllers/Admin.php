@@ -135,44 +135,69 @@ class Admin extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
             \OmegaUp\DAO\SystemSettings::setBooleanSetting(
                 self::MAINTENANCE_ENABLED_KEY,
-                $enabled
+                $enabled,
+                invalidateCache: false
             );
             if ($enabled) {
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_ES_KEY,
-                    $messageEs
+                    $messageEs,
+                    invalidateCache: false
                 );
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_EN_KEY,
-                    $messageEn
+                    $messageEn,
+                    invalidateCache: false
                 );
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_PT_KEY,
-                    $messagePt
+                    $messagePt,
+                    invalidateCache: false
                 );
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_TYPE_KEY,
-                    $type
+                    $type,
+                    invalidateCache: false
                 );
             } else {
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_ES_KEY,
-                    ''
+                    '',
+                    invalidateCache: false
                 );
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_EN_KEY,
-                    ''
+                    '',
+                    invalidateCache: false
                 );
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_PT_KEY,
-                    ''
+                    '',
+                    invalidateCache: false
                 );
                 \OmegaUp\DAO\SystemSettings::setStringSetting(
                     self::MAINTENANCE_MESSAGE_TYPE_KEY,
-                    self::MAINTENANCE_MESSAGE_TYPES[self::INFO]
+                    self::MAINTENANCE_MESSAGE_TYPES[self::INFO],
+                    invalidateCache: false
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
+
+            \OmegaUp\DAO\SystemSettings::invalidateCache(
+                self::MAINTENANCE_ENABLED_KEY
+            );
+            \OmegaUp\DAO\SystemSettings::invalidateCache(
+                self::MAINTENANCE_MESSAGE_ES_KEY
+            );
+            \OmegaUp\DAO\SystemSettings::invalidateCache(
+                self::MAINTENANCE_MESSAGE_EN_KEY
+            );
+            \OmegaUp\DAO\SystemSettings::invalidateCache(
+                self::MAINTENANCE_MESSAGE_PT_KEY
+            );
+            \OmegaUp\DAO\SystemSettings::invalidateCache(
+                self::MAINTENANCE_MESSAGE_TYPE_KEY
+            );
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;

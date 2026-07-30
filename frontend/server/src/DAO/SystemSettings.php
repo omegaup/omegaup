@@ -76,7 +76,8 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function setBooleanSetting(
         string $key,
-        bool $value
+        bool $value,
+        bool $invalidateCache = true
     ): int {
         $setting = self::getByKey($key);
         if (is_null($setting)) {
@@ -90,7 +91,9 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
             $setting->setting_value = $value ? '1' : '0';
             $affectedRows = self::update($setting);
         }
-        self::invalidateCache($key);
+        if ($invalidateCache) {
+            self::invalidateCache($key);
+        }
         return $affectedRows;
     }
 
@@ -128,7 +131,8 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function setStringSetting(
         string $key,
-        string $value
+        string $value,
+        bool $invalidateCache = true
     ): int {
         $setting = self::getByKey($key);
         if (is_null($setting)) {
@@ -142,7 +146,9 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
             $setting->setting_value = $value;
             $affectedRows = self::update($setting);
         }
-        self::invalidateCache($key);
+        if ($invalidateCache) {
+            self::invalidateCache($key);
+        }
         return $affectedRows;
     }
 }
