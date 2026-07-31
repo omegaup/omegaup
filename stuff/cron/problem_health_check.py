@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
 '''Detects problems that silently stopped working.
 
-A problem can keep looking fine long after it stops being usable: the judge or
-the validator starts failing, the enabled languages get misconfigured so nobody
-can submit, or the problem turns out to be impossible. Today the only signal is
-a user reporting it through a quality nomination.
-
-This script looks for those cases in the database and records what it finds in
-`Problem_Health_Checks`, so an admin can see them in one place. Findings are
-upserted, so a finding keeps the date it was first detected, and a finding that
-is no longer detected gets marked as resolved instead of disappearing.
+Findings are recorded in `Problem_Health_Checks`, upserted so each one keeps
+the date it was first detected, and resolved once it stops being detected.
 '''
 
 import argparse
@@ -27,15 +20,13 @@ import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 import lib.runner  # pylint: disable=wrong-import-position
 
-# Defaults for the thresholds, all overridable from the command line so they
-# can be tuned without a code change.
 _MIN_SUBMISSIONS_NEVER_SOLVED = 20
 _MIN_JUDGE_ERRORS = 5
 _JUDGE_ERROR_SAMPLE = 50
 
 
 class Finding(NamedTuple):
-    '''One detected problem, ready to be recorded.'''
+    '''One detected problem.'''
     problem_id: int
     check_type: str
     severity: str
@@ -47,11 +38,7 @@ def find_judge_errors(
         min_errors: int = _MIN_JUDGE_ERRORS,
         sample: int = _JUDGE_ERROR_SAMPLE,
 ) -> List[Finding]:
-    '''Finds problems whose recent runs keep failing to be judged.
-
-    A judge error or a validator error is not the contestant's fault, it means
-    the problem itself is misconfigured.
-    '''
+    '''Finds problems whose recent runs keep failing to be judged.'''
     cur.execute(
         '''
         SELECT
@@ -83,10 +70,7 @@ def find_judge_errors(
 
 def find_problems_without_languages(
         cur: mysql.connector.cursor.MySQLCursorBufferedDict) -> List[Finding]:
-    '''Finds public problems that nobody can submit to.
-
-    With no enabled language the problem is visible but unusable.
-    '''
+    '''Finds public problems that have no enabled language.'''
     cur.execute(
         '''
         SELECT
@@ -114,10 +98,7 @@ def find_never_solved(
         cur: mysql.connector.cursor.MySQLCursorBufferedDict,
         min_submissions: int = _MIN_SUBMISSIONS_NEVER_SOLVED,
 ) -> List[Finding]:
-    '''Finds public problems many people tried and nobody ever solved.
-
-    That usually means the expected output or the limits are wrong.
-    '''
+    '''Finds public problems many people tried and nobody ever solved.'''
     cur.execute(
         '''
         SELECT
@@ -167,11 +148,7 @@ def record_findings(
         findings: Sequence[Finding],
         run_timestamp: str,
 ) -> None:
-    '''Stores the findings, keeping the date each one was first detected.
-
-    Every finding of this run is stamped with the same `run_timestamp`, which is
-    what lets the resolve step tell this run apart from the previous one.
-    '''
+    '''Stores the findings, keeping the date each one was first detected.'''
     with dbconn.cursor() as cur:
         for finding in findings:
             cur.execute(
@@ -194,25 +171,23 @@ def resolve_missing_findings(
         dbconn: lib.db.Connection,
         run_timestamp: str,
 ) -> int:
-    '''Marks as resolved the findings that were not detected in this run.
-
-    Anything still open that was not stamped with this run's timestamp is no
-    longer being detected, so the problem behind it looks fixed.
-    '''
-    with dbconn.cursor() as cur:
+    '''Marks as resolved the findings that were not detected in this run.'''
+    with dbconn.cursor(buffered=True, dictionary=True) as cur:
         cur.execute(
             '''
             UPDATE `Problem_Health_Checks`
             SET `resolved_at` = %s
             WHERE `resolved_at` IS NULL AND `last_seen_at` < %s;''',
             (run_timestamp, run_timestamp))
-        resolved = cur.rowcount
+        cur.execute('SELECT ROW_COUNT() AS `resolved`;')
+        row = cur.fetchone()
+        resolved = int(row['resolved']) if row else 0
     dbconn.conn.commit()
     return resolved
 
 
 def current_timestamp(dbconn: lib.db.Connection) -> str:
-    '''Returns the database clock, so every row of a run shares one timestamp.'''
+    '''Returns the database clock, shared by every row of one run.'''
     with dbconn.cursor() as cur:
         cur.execute('SELECT NOW();')
         row = cur.fetchone()
