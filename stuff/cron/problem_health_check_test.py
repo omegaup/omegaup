@@ -24,7 +24,6 @@ class _FakeCursor:
 
     def __init__(self, connection: '_FakeConnection') -> None:
         self._connection = connection
-        self.rowcount = connection.rowcount
 
     def execute(self, query: str, params: Any = None) -> None:
         '''Records the statement and its params.'''
@@ -51,7 +50,6 @@ class _FakeConnection:
     def __init__(self, rows: Sequence[Dict[str, Any]] = ()) -> None:
         self.rows: Sequence[Dict[str, Any]] = rows
         self.single_row: Any = None
-        self.rowcount = 0
         self.calls: List[Tuple[str, Any]] = []
         self.commits = 0
         self.conn = self
@@ -139,9 +137,10 @@ class TestRecording(unittest.TestCase):
         self.assertEqual(len(conn.calls), 1)
         query, params = conn.calls[0]
         self.assertIn('ON DUPLICATE KEY UPDATE', query)
-        self.assertEqual(params, (4, 'never_solved', 'warning',
-                                  '30 submissions and no accepted solution yet',
-                                  '2026-07-29 10:00:00'))
+        self.assertEqual(
+            params,
+            (4, 'never_solved', 'warning', finding.detail,
+             '2026-07-29 10:00:00'))
         self.assertEqual(conn.commits, 1)
 
     def test_record_findings_with_nothing_to_record(self) -> None:
@@ -156,7 +155,7 @@ class TestRecording(unittest.TestCase):
     def test_resolve_uses_the_same_run_timestamp(self) -> None:
         '''Findings not seen in this run are closed with the run timestamp.'''
         conn = _FakeConnection()
-        conn.rowcount = 2
+        conn.single_row = {'resolved': 2}
 
         resolved = problem_health_check.resolve_missing_findings(
             cast(lib.db.Connection, conn), '2026-07-29 10:00:00')
