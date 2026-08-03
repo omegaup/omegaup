@@ -7,6 +7,7 @@
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/rerunCron/`](#apiadminreruncron)
+  - [`/api/admin/setCronJobEnabled/`](#apiadminsetcronjobenabled)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
@@ -417,6 +418,23 @@ Queues a manual rerun of a registered cron job for a worker to pick up.
 | Name   | Type     | Description | Required |
 | ------ | -------- | ----------- | -------- |
 | `name` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/admin/setCronJobEnabled/`
+
+### Description
+
+Enables or disables a cron job. A disabled job skips its scheduled runs.
+
+### Parameters
+
+| Name      | Type     | Description | Required |
+| --------- | -------- | ----------- | -------- |
+| `enabled` | `bool`   |             | ✓        |
+| `name`    | `string` |             | ✓        |
 
 ### Returns
 

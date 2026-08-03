@@ -27,6 +27,20 @@ OmegaUp.on('ready', () => {
           runs: this.runs,
         },
         on: {
+          'set-enabled': ({
+            name,
+            enabled,
+          }: {
+            name: string;
+            enabled: boolean;
+          }) => {
+            api.Admin.setCronJobEnabled({ name, enabled })
+              .then(() => {
+                ui.success(T.cronControlPlaneEnabledUpdated);
+                refresh();
+              })
+              .catch(ui.apiError);
+          },
           rerun: (name: string) => {
             api.Admin.rerunCron({ name })
               .then(() => {

@@ -777,6 +777,8 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneAvgDurationInfo: "(Av3rag3 7im3 7h3 j0b 700k acr055 i75 r3c0rd3d run5.)",
   cronControlPlaneDuration: "(Dura7i0n)",
   cronControlPlaneDurationInfo: "(H0w 10ng 7hi5 run 700k fr0m 57ar7 70 fini5h.)",
+  cronControlPlaneEnabled: "(Enab13d)",
+  cronControlPlaneEnabledUpdated: "(J0b upda73d)",
   cronControlPlaneEveryDayAt: "(Ev3ry day a7 %(time))",
   cronControlPlaneEveryWeekAt: "(Ev3ry %(day) a7 %(time))",
   cronControlPlaneHost: "(Machin3)",
