@@ -769,6 +769,8 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneAvgDurationInfo: "Tempo m\u00e9dio que o trabalho levou nas execu\u00e7\u00f5es registradas.",
   cronControlPlaneDuration: "Dura\u00e7\u00e3o",
   cronControlPlaneDurationInfo: "Quanto tempo esta execu\u00e7\u00e3o levou do in\u00edcio ao fim.",
+  cronControlPlaneEnabled: "Habilitado",
+  cronControlPlaneEnabledUpdated: "Trabalho atualizado",
   cronControlPlaneEveryDayAt: "Todos os dias \u00e0s %(time)",
   cronControlPlaneEveryWeekAt: "Toda %(day) \u00e0s %(time)",
   cronControlPlaneHost: "M\u00e1quina",

@@ -140,4 +140,68 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($second);
         $this->assertSame($first->request_id, $second->request_id);
     }
+
+    public function testSetCronJobEnabledRequiresAdmin() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Admin::apiSetCronJobEnabled(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'update_ranks.py',
+                    'enabled' => false,
+                ])
+            );
+            $this->fail('Should not have allowed access to non-admin');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testSetCronJobEnabledTogglesTheJob() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $response = \OmegaUp\Controllers\Admin::apiSetCronJobEnabled(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => 'update_ranks.py',
+                'enabled' => false,
+            ])
+        );
+        $this->assertSame('ok', $response['status']);
+        $this->assertFalse(
+            \OmegaUp\DAO\CronJobs::getByName('update_ranks.py')->enabled
+        );
+
+        \OmegaUp\Controllers\Admin::apiSetCronJobEnabled(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => 'update_ranks.py',
+                'enabled' => true,
+            ])
+        );
+        $this->assertTrue(
+            \OmegaUp\DAO\CronJobs::getByName('update_ranks.py')->enabled
+        );
+    }
+
+    public function testSetCronJobEnabledRejectsUnknownJob() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Admin::apiSetCronJobEnabled(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'not_a_real_job.py',
+                    'enabled' => false,
+                ])
+            );
+            $this->fail('Should not have accepted an unknown job');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+        }
+    }
 }

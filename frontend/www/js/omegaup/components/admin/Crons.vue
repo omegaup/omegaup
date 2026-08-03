@@ -86,6 +86,23 @@
               }}</span>
             </td>
             <td class="text-right">
+              <div
+                class="custom-control custom-switch d-inline-block mr-2 align-middle"
+              >
+                <input
+                  :id="`cron-enabled-${job.name}`"
+                  class="custom-control-input"
+                  type="checkbox"
+                  :checked="job.enabled"
+                  data-cron-enabled
+                  @change="setEnabled(job.name, $event.target.checked)"
+                />
+                <label
+                  class="custom-control-label"
+                  :for="`cron-enabled-${job.name}`"
+                  >{{ T.cronControlPlaneEnabled }}</label
+                >
+              </div>
               <button
                 class="btn btn-sm btn-outline-primary"
                 type="button"
@@ -349,6 +366,10 @@ export default class Crons extends Vue {
 
   rerun(name: string): void {
     this.$emit('rerun', name);
+  }
+
+  setEnabled(name: string, enabled: boolean): void {
+    this.$emit('set-enabled', { name, enabled });
   }
 
   statusClass(status: string | null): string {

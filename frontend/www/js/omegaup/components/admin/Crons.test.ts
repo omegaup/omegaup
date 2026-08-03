@@ -106,6 +106,18 @@ describe('Crons.vue', () => {
     expect(wrapper.text()).toContain(T.cronControlPlaneNoRuns);
   });
 
+  it('Should emit set-enabled when the switch is toggled', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    const toggle = wrapper.find('[data-cron-enabled]');
+    expect((toggle.element as HTMLInputElement).checked).toBe(true);
+    await toggle.setChecked(false);
+
+    const emitted = wrapper.emitted('set-enabled');
+    expect(emitted).toBeTruthy();
+    expect(emitted?.[0]).toEqual([{ name: 'update_ranks.py', enabled: false }]);
+  });
+
   it('Should emit rerun with the job name when the button is clicked', async () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
 

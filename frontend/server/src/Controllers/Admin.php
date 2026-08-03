@@ -484,6 +484,33 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Enables or disables a cron job. A disabled job skips its scheduled runs.
+     *
+     * @omegaup-request-param string $name
+     * @omegaup-request-param bool $enabled
+     *
+     * @return array{status: string}
+     */
+    public static function apiSetCronJobEnabled(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $name = $r->ensureString('name');
+        $enabled = $r->ensureBool('enabled');
+        $job = \OmegaUp\DAO\CronJobs::getByName($name);
+        if (is_null($job)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
+        $job->enabled = $enabled;
+        \OmegaUp\DAO\CronJobs::update($job);
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Queues a manual rerun of a registered cron job. The web layer never
      * runs a job directly; it records a pending request that a trusted worker
      * later performs. If a request for the same job is already pending, no new
