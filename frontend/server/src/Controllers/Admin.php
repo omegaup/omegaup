@@ -11,11 +11,11 @@
   * @psalm-type MaintenanceModeStatus=array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
-    const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
-    const MAINTENANCE_MESSAGE_EN_KEY = 'system:maintenance_message_en';
-    const MAINTENANCE_MESSAGE_PT_KEY = 'system:maintenance_message_pt';
-    const MAINTENANCE_ENABLED_KEY = 'system:maintenance_enabled';
-    const MAINTENANCE_MESSAGE_TYPE_KEY = 'system:maintenance_message_type';
+    const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
+    const MAINTENANCE_MESSAGE_EN_KEY = 'maintenance_message_en';
+    const MAINTENANCE_MESSAGE_PT_KEY = 'maintenance_message_pt';
+    const MAINTENANCE_ENABLED_KEY = 'maintenance_enabled';
+    const MAINTENANCE_MESSAGE_TYPE_KEY = 'maintenance_message_type';
 
     const INFO = 0;
     const WARNING = 1;
@@ -131,37 +131,52 @@ class Admin extends \OmegaUp\Controllers\Controller {
             self::MAINTENANCE_MESSAGE_TYPES
         ) ?? self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
 
-        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
-        $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
-        $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
-        $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
-        $cacheMessageType = new \OmegaUp\Cache(
-            self::MAINTENANCE_MESSAGE_TYPE_KEY
-        );
-        if ($enabled) {
-            $cacheEnabled->set(value: true, timeout: 0); // No expiration
-            $cacheMessageEs->set($messageEs, timeout: 0);
-            $cacheMessageEn->set($messageEn, timeout: 0);
-            $cacheMessagePt->set($messagePt, timeout: 0);
-
-            // Store the index, not the string value
-            $typeIndex = array_search(
-                $type,
-                self::MAINTENANCE_MESSAGE_TYPES,
-                strict: true
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+                self::MAINTENANCE_ENABLED_KEY,
+                $enabled
             );
-            $cacheMessageType->set(
-                $typeIndex !== false ? $typeIndex : self::INFO,
-                timeout: 0
-            );
-        } else {
-            $cacheEnabled->delete();
-            $cacheMessageEs->delete();
-            $cacheMessageEn->delete();
-            $cacheMessagePt->delete();
-            $cacheMessageType->delete();
+            if ($enabled) {
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_ES_KEY,
+                    $messageEs
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_EN_KEY,
+                    $messageEn
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_PT_KEY,
+                    $messagePt
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_TYPE_KEY,
+                    $type
+                );
+            } else {
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_ES_KEY,
+                    ''
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_EN_KEY,
+                    ''
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_PT_KEY,
+                    ''
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_TYPE_KEY,
+                    self::MAINTENANCE_MESSAGE_TYPES[self::INFO]
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-
         return ['status' => 'ok'];
     }
 
@@ -181,22 +196,20 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Get the message type from cache
+     * Get the message type from system settings
      *
      * @return string
      */
-    private static function getMessageTypeFromCache(): string {
-        $cacheMessageType = new \OmegaUp\Cache(
-            self::MAINTENANCE_MESSAGE_TYPE_KEY
+    private static function getMessageTypeFromSettings(): string {
+        $messageType = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_TYPE_KEY,
+            self::MAINTENANCE_MESSAGE_TYPES[self::INFO]
         );
-        $messageTypeIndex = $cacheMessageType->get();
-        return (is_int(
-            $messageTypeIndex
-        ) && isset(
-            self::MAINTENANCE_MESSAGE_TYPES[$messageTypeIndex]
-        ))
-            ? self::MAINTENANCE_MESSAGE_TYPES[$messageTypeIndex]
-            : self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
+        return in_array(
+            $messageType,
+            self::MAINTENANCE_MESSAGE_TYPES,
+            strict: true
+        ) ? $messageType : self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
     }
 
     /**
@@ -205,31 +218,21 @@ class Admin extends \OmegaUp\Controllers\Controller {
      * @return MaintenanceModeStatus
      */
     public static function getMaintenanceModeStatus(): array {
-        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
-        $enabled = boolval($cacheEnabled->get());
-
-        $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
-        $messageEs = is_null(
-            $cacheMessageEs->get()
-        ) ? null : strval(
-            $cacheMessageEs->get()
+        $enabled = \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+            self::MAINTENANCE_ENABLED_KEY,
+            false
+        );
+        $messageEs = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_ES_KEY
+        );
+        $messageEn = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_EN_KEY
+        );
+        $messagePt = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_PT_KEY
         );
 
-        $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
-        $messageEn = is_null(
-            $cacheMessageEn->get()
-        ) ? null : strval(
-            $cacheMessageEn->get()
-        );
-
-        $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
-        $messagePt = is_null(
-            $cacheMessagePt->get()
-        ) ? null : strval(
-            $cacheMessagePt->get()
-        );
-
-        $type = self::getMessageTypeFromCache();
+        $type = self::getMessageTypeFromSettings();
 
         return [
             'enabled' => $enabled,
