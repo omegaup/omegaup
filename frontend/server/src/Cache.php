@@ -221,7 +221,8 @@ class RedisCacheAdapter extends CacheAdapter {
             if (
                 $this->redis->multi()->set(
                     $key,
-                    serialize($defaultVar)
+                    serialize($defaultVar),
+                    $flags
                 )->exec()
             ) {
                 return $defaultVar;
