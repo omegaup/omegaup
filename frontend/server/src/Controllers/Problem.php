@@ -461,6 +461,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentityIsOver13();
 
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
+
         self::createProblem(
             $r->user,
             $r->identity,
