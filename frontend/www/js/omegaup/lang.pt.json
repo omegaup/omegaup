@@ -770,6 +770,7 @@
 	"cronControlPlaneModelNoRuns": "Ainda n\u00e3o h\u00e1 treinamentos registrados",
 	"cronControlPlaneModelPublished": "Publicado",
 	"cronControlPlaneModelScore": "Pontua\u00e7\u00e3o MAP",
+	"cronControlPlaneModelScoreInfo": "Com que frequ\u00eancia o modelo sugeriu um problema que o usu\u00e1rio realmente resolveu depois. Mais alto \u00e9 melhor. Um modelo novo s\u00f3 \u00e9 publicado se passar do m\u00ednimo e n\u00e3o for claramente pior que o \u00faltimo publicado.",
 	"cronControlPlaneModelSkipReason": "Motivo pelo qual n\u00e3o foi publicado",
 	"cronControlPlaneName": "Nome",
 	"cronControlPlaneNoPhases": "Sem detalhe de fases",

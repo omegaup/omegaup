@@ -771,6 +771,7 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneModelNoRuns: "(N0 7raining run5 r3c0rd3d y37)",
   cronControlPlaneModelPublished: "(Pub1i5h3d)",
   cronControlPlaneModelScore: "(MAP 5c0r3)",
+  cronControlPlaneModelScoreInfo: "(H0w 0f73n 7h3 m0d31 5ugg3573d a pr0b13m 7h3 u53r ac7ua11y 501v3d n3x7. High3r i5 b3773r. A n3w m0d31 i5 0n1y pub1i5h3d if i7 c13ar5 7h3 minimum and i5 n07 c13ar1y w0r53 7han 7h3 1a57 pub1i5h3d 0n3.)",
   cronControlPlaneModelSkipReason: "(R3a50n n07 pub1i5h3d)",
   cronControlPlaneName: "(Nam3)",
   cronControlPlaneNoPhases: "(N0 pha53 d37ai1)",

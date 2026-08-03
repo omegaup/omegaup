@@ -121,7 +121,15 @@
         <thead>
           <tr>
             <th>{{ T.cronControlPlaneStarted }}</th>
-            <th>{{ T.cronControlPlaneModelScore }}</th>
+            <th>
+              {{ T.cronControlPlaneModelScore }}
+              <font-awesome-icon
+                v-b-tooltip.hover
+                class="text-muted"
+                :icon="['fas', 'info-circle']"
+                :title="T.cronControlPlaneModelScoreInfo"
+              />
+            </th>
             <th>{{ T.cronControlPlaneModelDataset }}</th>
             <th>{{ T.cronControlPlaneModelPublished }}</th>
             <th>{{ T.cronControlPlaneModelSkipReason }}</th>
@@ -151,10 +159,21 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { VBTooltipPlugin } from 'bootstrap-vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import T from '../../lang';
 import { types } from '../../api_types';
 
-@Component
+library.add(faInfoCircle);
+Vue.use(VBTooltipPlugin);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];

@@ -771,6 +771,7 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneModelNoRuns: "A\u00fan no hay entrenamientos registrados",
   cronControlPlaneModelPublished: "Publicado",
   cronControlPlaneModelScore: "Puntaje MAP",
+  cronControlPlaneModelScoreInfo: "Con qu\u00e9 frecuencia el modelo sugiri\u00f3 un problema que el usuario realmente resolvi\u00f3 despu\u00e9s. M\u00e1s alto es mejor. Un modelo nuevo solo se publica si supera el m\u00ednimo y no es claramente peor que el \u00faltimo publicado.",
   cronControlPlaneModelSkipReason: "Raz\u00f3n por la que no se public\u00f3",
   cronControlPlaneName: "Nombre",
   cronControlPlaneNoPhases: "Sin detalle de fases",
