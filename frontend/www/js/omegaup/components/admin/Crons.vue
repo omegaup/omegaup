@@ -6,10 +6,10 @@
     <div class="card-body">
       <div class="row mb-4" data-cron-health>
         <div v-for="job in jobs" :key="job.name" class="col-sm-6 col-lg-4 mb-2">
-          <div class="card h-100">
+          <div class="card h-100 cron-health-card">
             <div class="card-body">
               <h6 class="card-title text-truncate" :title="job.name">
-                {{ job.name }}
+                {{ jobTitle(job.name) }}
               </h6>
               <span :class="statusClass(latestStatus(job.name))">{{
                 latestStatus(job.name) || '—'
@@ -17,12 +17,24 @@
               <dl class="row small mb-0 mt-2">
                 <dt class="col-7 font-weight-normal">
                   {{ T.cronControlPlaneSuccessRate }}
+                  <font-awesome-icon
+                    v-b-tooltip.hover
+                    class="text-muted"
+                    :icon="['fas', 'info-circle']"
+                    :title="T.cronControlPlaneSuccessRateInfo"
+                  />
                 </dt>
                 <dd class="col-5 mb-0 text-right">
                   {{ successRate(job.name) }}
                 </dd>
                 <dt class="col-7 font-weight-normal">
                   {{ T.cronControlPlaneAvgDuration }}
+                  <font-awesome-icon
+                    v-b-tooltip.hover
+                    class="text-muted"
+                    :icon="['fas', 'info-circle']"
+                    :title="T.cronControlPlaneAvgDurationInfo"
+                  />
                 </dt>
                 <dd class="col-5 mb-0 text-right">
                   {{ avgDuration(job.name) }}
@@ -45,10 +57,22 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="!jobs.length">
+            <td colspan="5" class="text-muted">
+              {{ T.cronControlPlaneNoJobs }}
+            </td>
+          </tr>
           <tr v-for="job in jobs" :key="job.name">
-            <td>{{ job.name }}</td>
             <td>
-              <code v-if="job.schedule">{{ job.schedule }}</code>
+              <span :title="job.name">{{ jobTitle(job.name) }}</span>
+              <div v-if="job.description" class="small text-muted">
+                {{ job.description }}
+              </div>
+            </td>
+            <td>
+              <span v-if="job.schedule" :title="job.schedule">{{
+                humanSchedule(job.schedule)
+              }}</span>
               <span v-else>—</span>
             </td>
             <td>
@@ -84,7 +108,7 @@
         >
           <option value="">{{ T.cronControlPlaneAllJobs }}</option>
           <option v-for="job in jobs" :key="job.name" :value="job.name">
-            {{ job.name }}
+            {{ jobTitle(job.name) }}
           </option>
         </select>
         <select
@@ -105,11 +129,41 @@
             <th>{{ T.cronControlPlaneName }}</th>
             <th>{{ T.cronControlPlaneStatus }}</th>
             <th>{{ T.cronControlPlaneStarted }}</th>
-            <th>{{ T.cronControlPlaneDuration }}</th>
-            <th>{{ T.cronControlPlaneRows }}</th>
+            <th>
+              {{ T.cronControlPlaneDuration }}
+              <font-awesome-icon
+                v-b-tooltip.hover
+                class="text-muted"
+                :icon="['fas', 'info-circle']"
+                :title="T.cronControlPlaneDurationInfo"
+              />
+            </th>
+            <th>
+              {{ T.cronControlPlaneRows }}
+              <font-awesome-icon
+                v-b-tooltip.hover
+                class="text-muted"
+                :icon="['fas', 'info-circle']"
+                :title="T.cronControlPlaneRowsInfo"
+              />
+            </th>
+            <th>
+              {{ T.cronControlPlaneHost }}
+              <font-awesome-icon
+                v-b-tooltip.hover
+                class="text-muted"
+                :icon="['fas', 'info-circle']"
+                :title="T.cronControlPlaneHostInfo"
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
+          <tr v-if="!filteredRuns.length">
+            <td colspan="7" class="text-muted">
+              {{ T.cronControlPlaneNoRuns }}
+            </td>
+          </tr>
           <template v-for="run in filteredRuns">
             <tr
               :key="run.run_id"
@@ -125,7 +179,9 @@
                   >▸</span
                 >
               </td>
-              <td>{{ run.name }}</td>
+              <td>
+                <span :title="run.name">{{ jobTitle(run.name) }}</span>
+              </td>
               <td>
                 <span :class="statusClass(run.status)">{{ run.status }}</span>
               </td>
@@ -136,6 +192,7 @@
               </td>
               <td>{{ formatDuration(run.duration_seconds) }}</td>
               <td>{{ formatRows(run.rows_affected) }}</td>
+              <td class="text-muted">{{ run.hostname || '—' }}</td>
             </tr>
             <tr
               v-if="expandedRunId === run.run_id"
@@ -143,7 +200,7 @@
               class="cron-run-detail"
             >
               <td></td>
-              <td colspan="5">
+              <td colspan="6">
                 <div v-if="run.error_text" class="text-danger mb-2">
                   {{ run.error_text }}
                 </div>
@@ -152,9 +209,28 @@
                   class="table table-sm table-borderless mb-0"
                   data-cron-phases
                 >
+                  <thead>
+                    <tr>
+                      <th>
+                        {{ T.cronControlPlaneStep }}
+                        <font-awesome-icon
+                          v-b-tooltip.hover
+                          class="text-muted"
+                          :icon="['fas', 'info-circle']"
+                          :title="T.cronControlPlaneStepsInfo"
+                        />
+                      </th>
+                      <th>{{ T.cronControlPlaneStatus }}</th>
+                      <th>{{ T.cronControlPlaneDuration }}</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr v-for="(phase, index) in run.phases" :key="index">
-                      <td>{{ phase.phase }}</td>
+                      <td>
+                        <span :title="phase.phase">{{
+                          phaseTitle(phase.phase)
+                        }}</span>
+                      </td>
                       <td>
                         <span :class="statusClass(phase.status)">{{
                           phase.status
@@ -176,11 +252,42 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { VBTooltipPlugin } from 'bootstrap-vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import T from '../../lang';
+import * as ui from '../../ui';
 import { types } from '../../api_types';
 import { formatFutureDateRelative } from '../../time';
 
-@Component
+library.add(faInfoCircle);
+Vue.use(VBTooltipPlugin);
+
+const JOB_TITLES: Record<string, string> = {
+  'update_ranks.py': 'Update rankings',
+  'assign_badges.py': 'Award badges',
+  'aggregate_feedback.py': 'Aggregate problem feedback',
+  'build_problem_rec_model.py': 'Train recommendation model',
+  'plagiarism_detector.py': 'Detect plagiarism',
+  'problem_health_check.py': 'Check problem health',
+};
+
+const WEEKDAYS = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
@@ -196,6 +303,44 @@ export default class Crons extends Vue {
         (!this.filterJob || run.name === this.filterJob) &&
         (!this.filterStatus || run.status === this.filterStatus),
     );
+  }
+
+  jobTitle(name: string): string {
+    if (JOB_TITLES[name]) {
+      return JOB_TITLES[name];
+    }
+    const readable = name.replace(/\.py$/, '').replace(/_/g, ' ');
+    return readable.charAt(0).toUpperCase() + readable.slice(1);
+  }
+
+  phaseTitle(phase: string): string {
+    const readable = phase.replace(/_/g, ' ');
+    return readable.charAt(0).toUpperCase() + readable.slice(1);
+  }
+
+  humanSchedule(schedule: string): string {
+    const parts = schedule.trim().split(/\s+/);
+    if (parts.length !== 5) {
+      return schedule;
+    }
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+    if (!/^\d{1,2}$/.test(minute) || !/^\d{1,2}$/.test(hour)) {
+      return schedule;
+    }
+    const time = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+    if (dayOfMonth !== '*' || month !== '*') {
+      return schedule;
+    }
+    if (dayOfWeek === '*') {
+      return ui.formatString(T.cronControlPlaneEveryDayAt, { time });
+    }
+    if (/^[0-6]$/.test(dayOfWeek)) {
+      return ui.formatString(T.cronControlPlaneEveryWeekAt, {
+        day: WEEKDAYS[Number(dayOfWeek)],
+        time,
+      });
+    }
+    return schedule;
   }
 
   toggle(runId: number): void {
@@ -281,8 +426,14 @@ export default class Crons extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .cron-card-header {
   background-color: var(--header-primary-color);
+}
+
+.cron-health-card {
+  border-top: 3px solid $omegaup-primary--accent;
 }
 
 .cron-run-row {
