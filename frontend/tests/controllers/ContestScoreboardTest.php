@@ -1710,4 +1710,111 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
     }
+
+    public function testScoreboardDownload() {
+        $runMap = [
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 60,
+            ],
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 1,
+                'points' => 0.5,
+                'verdict' => 'PA',
+                'submit_delay' => 60,
+            ],
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 120,
+            ],
+        ];
+        $testData = $this->prepareContestScoreboardData(2, $runMap);
+
+        // Login as contest admin
+        $login = self::login($testData['contestIdentityAdmin']);
+        $contestAlias = $testData['contestData']['request']['alias'];
+
+        // Test CSV download
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestAlias,
+            'format' => 'csv',
+        ]);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiScoreboardDownload($r);
+            $this->fail('Expected exception was not thrown');
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected since the method calls exit()
+            $this->assertStringContainsString(
+                'Content-Type: text/csv',
+                $e->getMessage()
+            );
+            $this->assertStringContainsString(
+                'Content-Disposition: attachment; filename=',
+                $e->getMessage()
+            );
+        }
+
+        // Test XLSX download
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestAlias,
+            'format' => 'xlsx',
+        ]);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiScoreboardDownload($r);
+            $this->fail('Expected exception was not thrown');
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected since the method calls exit()
+            $this->assertStringContainsString(
+                'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                $e->getMessage()
+            );
+            $this->assertStringContainsString(
+                'Content-Disposition: attachment; filename=',
+                $e->getMessage()
+            );
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            // This is expected if PhpSpreadsheet is not available in test environment
+            $this->assertEquals('phpspreadsheetNotAvailable', $e->getMessage());
+        }
+
+        // Test access denied for non-admin user
+        $loginContestant = self::login($testData['contestants'][0]);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $loginContestant->auth_token,
+            'contest_alias' => $contestAlias,
+            'format' => 'csv',
+        ]);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiScoreboardDownload($r);
+            $this->fail('Expected ForbiddenAccessException was not thrown');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        // Test invalid format
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestAlias,
+            'format' => 'invalid',
+        ]);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiScoreboardDownload($r);
+            $this->fail('Expected InvalidParameterException was not thrown');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
+    }
 }
