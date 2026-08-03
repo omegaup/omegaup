@@ -71,6 +71,11 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
             or lib.db.connect(
                 lib.db.DatabaseConnectionArguments.from_args(self._args)))
         self._owns_connection = self._external_connection is None
+        if self._is_disabled():
+            logging.info(
+                'cron job %s is disabled, skipping', self._program)
+            self._close_connection()
+            raise SystemExit(0)
         if not self._acquire_lock():
             logging.info(
                 'cron job %s is already running, skipping', self._program)
@@ -123,6 +128,20 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
     def set_rows_affected(self, rows: int) -> None:
         '''Records how many rows the job wrote, for reporting.'''
         self._rows_affected = rows
+
+    def _is_disabled(self) -> bool:
+        '''Whether the registry says this job should not run.
+
+        A job with no registry row runs normally, so the ondemand scripts that
+        are not registered are unaffected.
+        '''
+        assert self._connection is not None
+        with self._connection.cursor() as cur:
+            cur.execute(
+                'SELECT `enabled` FROM `Cron_Jobs` WHERE `name` = %s;',
+                (self._program,))
+            row = cur.fetchone()
+        return bool(row is not None and not row[0])
 
     def _acquire_lock(self) -> bool:
         assert self._connection is not None
