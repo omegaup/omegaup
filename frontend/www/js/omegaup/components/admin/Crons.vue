@@ -164,20 +164,11 @@
                 :title="T.cronControlPlaneRowsInfo"
               />
             </th>
-            <th>
-              {{ T.cronControlPlaneHost }}
-              <font-awesome-icon
-                v-b-tooltip.hover
-                class="text-muted"
-                :icon="['fas', 'info-circle']"
-                :title="T.cronControlPlaneHostInfo"
-              />
-            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!filteredRuns.length">
-            <td colspan="7" class="text-muted">
+            <td colspan="6" class="text-muted">
               {{ T.cronControlPlaneNoRuns }}
             </td>
           </tr>
@@ -209,7 +200,6 @@
               </td>
               <td>{{ formatDuration(run.duration_seconds) }}</td>
               <td>{{ formatRows(run.rows_affected) }}</td>
-              <td class="text-muted">{{ run.hostname || '—' }}</td>
             </tr>
             <tr
               v-if="expandedRunId === run.run_id"
@@ -217,9 +207,17 @@
               class="cron-run-detail"
             >
               <td></td>
-              <td colspan="6">
+              <td colspan="5">
                 <div v-if="run.error_text" class="text-danger mb-2">
                   {{ run.error_text }}
+                </div>
+                <div v-if="run.hostname" class="small text-muted mb-2">
+                  {{ T.cronControlPlaneHost }}: {{ run.hostname }}
+                  <font-awesome-icon
+                    v-b-tooltip.hover
+                    :icon="['fas', 'info-circle']"
+                    :title="T.cronControlPlaneHostInfo"
+                  />
                 </div>
                 <table
                   v-if="run.phases.length"
