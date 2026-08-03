@@ -32,7 +32,9 @@ class _FakeCursor:
         '''Records the statement and scripts the next GET_LOCK answer.'''
         self._connection.calls.append((query, params))
         normalized = ' '.join(query.lower().split())
-        if 'get_lock' in normalized:
+        if 'from `cron_jobs`' in normalized:
+            self._connection.last_fetchone = self._connection.enabled_row
+        elif 'get_lock' in normalized:
             self._connection.last_fetchone = (
                 (1,) if self._connection.lock_acquired else (0,))
         else:
@@ -53,11 +55,15 @@ class _FakeCursor:
         del exc_type, exc, traceback
 
 
-class _FakeConnection:
+class _FakeConnection:  # pylint: disable=too-many-instance-attributes
     '''Minimal stand-in for lib.db.Connection.'''
 
-    def __init__(self, lock_acquired: bool = True) -> None:
+    def __init__(
+            self,
+            lock_acquired: bool = True,
+            enabled_row: Optional[Tuple[int]] = None) -> None:
         self.lock_acquired = lock_acquired
+        self.enabled_row = enabled_row
         self.calls: List[Tuple[str, Any]] = []
         self.commits = 0
         self.closed = False
@@ -180,3 +186,30 @@ def test_records_every_phase_in_order() -> None:
 
     phases = json.loads(_matching(conn.calls, 'update `cron_runs`')[0][3])
     assert [entry['phase'] for entry in phases] == ['first', 'second']
+
+
+def test_disabled_job_skips_without_recording() -> None:
+    '''A job the registry marks disabled exits cleanly and records nothing.'''
+    conn = _FakeConnection(lock_acquired=True, enabled_row=(0,))
+    args = _args()
+
+    with pytest.raises(SystemExit) as excinfo:
+        with lib.runner.run('update_ranks.py', args,
+                            connection=cast(lib.db.Connection, conn)):
+            pass
+
+    assert excinfo.value.code == 0
+    assert not any('INSERT INTO `Cron_Runs`' in query
+                   for query, _ in conn.calls)
+
+
+def test_unregistered_job_still_runs() -> None:
+    '''A job with no registry row is not treated as disabled.'''
+    conn = _FakeConnection(lock_acquired=True, enabled_row=None)
+    args = _args()
+
+    with lib.runner.run('plagiarism_detector.py', args,
+                        connection=cast(lib.db.Connection, conn)):
+        pass
+
+    assert any('INSERT INTO `Cron_Runs`' in query for query, _ in conn.calls)
