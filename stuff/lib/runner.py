@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 '''A reusable runner for cron scripts.
 
-Records each execution into the `Cron_Runs` table (start, end, status,
-per-phase timings and errors) and holds a MySQL advisory lock so that two
-runs of the same job cannot overlap. A cron wraps the body of its `main()`
-with `lib.runner.run(...)`:
+Records each execution into `Cron_Runs` and holds a MySQL advisory lock so two
+runs of the same job cannot overlap:
 
     with lib.runner.run(parser.prog, args) as cron_run:
         with cron_run.phase('update_users_stats'):
@@ -53,7 +51,6 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._enabled = not getattr(args, 'no_track', False)
         self._external_connection = connection
         self._connection: Optional[lib.db.Connection] = None
-        self._owns_connection = False
         self._run_id: Optional[int] = None
         self._phases: List[Dict[str, Any]] = []
         self._rows_affected: Optional[int] = None
@@ -70,7 +67,6 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
             self._external_connection
             or lib.db.connect(
                 lib.db.DatabaseConnectionArguments.from_args(self._args)))
-        self._owns_connection = self._external_connection is None
         if self._is_disabled():
             logging.info(
                 'cron job %s is disabled, skipping', self._program)
@@ -105,7 +101,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         error_class: Optional[str] = None
         try:
             yield
-        except BaseException as exc:  # noqa: bare-except
+        except BaseException as exc:
             status = 'failure'
             error_class = type(exc).__name__
             raise
@@ -126,15 +122,11 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
                 })
 
     def set_rows_affected(self, rows: int) -> None:
-        '''Records how many rows the job wrote, for reporting.'''
+        '''Records how many rows the job wrote.'''
         self._rows_affected = rows
 
     def _is_disabled(self) -> bool:
-        '''Whether the registry says this job should not run.
-
-        A job with no registry row runs normally, so the ondemand scripts that
-        are not registered are unaffected.
-        '''
+        '''Whether the registry disabled this job. Unregistered jobs run.'''
         assert self._connection is not None
         with self._connection.cursor() as cur:
             cur.execute(
@@ -197,7 +189,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._connection.conn.commit()
 
     def _close_connection(self) -> None:
-        if self._owns_connection and self._connection is not None:
+        if self._external_connection is None and self._connection is not None:
             self._connection.conn.close()
         self._connection = None
 
@@ -209,6 +201,6 @@ def run(
         connection: Optional[lib.db.Connection] = None) -> CronRun:
     '''Returns a context manager that records a cron execution.
 
-    If `--no-track` is set the runner is a no-op that still runs the job.
+    With `--no-track` it is a no-op that still runs the job.
     '''
     return CronRun(program, args, connection=connection)
