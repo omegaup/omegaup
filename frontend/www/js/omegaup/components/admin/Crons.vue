@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="text-white bg-primary card-header">
+    <div class="text-white card-header cron-card-header">
       <div class="card-title h4 mb-0">{{ T.omegaupTitleAdminCrons }}</div>
     </div>
     <div class="card-body">
@@ -161,6 +161,10 @@ export default class Crons extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.cron-card-header {
+  background-color: var(--header-primary-color);
+}
+
 .cron-run-row {
   cursor: pointer;
 }
