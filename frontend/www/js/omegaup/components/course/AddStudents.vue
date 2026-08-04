@@ -48,11 +48,21 @@
           </button>
         </div>
       </form>
-      <div v-if="students.length == 0">
-        <div class="empty-category">
-          {{ T.courseStudentsEmpty }}
-        </div>
-      </div>
+      <omegaup-view-unavailable
+        v-if="students.length == 0"
+        class="course-students-empty"
+        icon="user-plus"
+        :title="T.courseStudentsEmptyTitle"
+        :description="T.courseStudentsEmptyDescription"
+      >
+        <button
+          class="btn btn-primary mt-2"
+          type="button"
+          @click="focusParticipantInput"
+        >
+          {{ T.courseEditAddStudentsAdd }}
+        </button>
+      </omegaup-view-unavailable>
       <table v-else class="table table-striped table-over">
         <thead>
           <tr>
@@ -102,11 +112,13 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Requests from '../common/Requests.vue';
+import common_ViewUnavailable from '../common/ViewUnavailable.vue';
 
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-requests': common_Requests,
+    'omegaup-view-unavailable': common_ViewUnavailable,
   },
 })
 export default class CourseAddStudents extends Vue {
@@ -137,6 +149,10 @@ export default class CourseAddStudents extends Vue {
 
     this.participant = null;
   }
+  focusParticipantInput(): void {
+    const input = this.$el.querySelector<HTMLInputElement>('input');
+    input?.focus();
+  }
 
   @Watch('identityRequests')
   onDataChange(): void {
@@ -148,5 +164,9 @@ export default class CourseAddStudents extends Vue {
 <style>
 .omegaup-course-addstudent th.align-right {
   text-align: right;
+}
+
+.course-students-empty {
+  min-height: auto !important;
 }
 </style>
