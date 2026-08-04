@@ -236,10 +236,9 @@ def update_user_rank(
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
     # Stage the freshly computed ranking and merge it into `User_Rank` with an
-    # upsert instead of deleting and reinserting the whole table. Unchanged
-    # rows become no-op updates, which keeps the undo log and binlog churn
-    # proportional to the rows that actually changed. A temporary table does
-    # not implicitly commit, so the whole phase stays in one transaction.
+    # upsert, so each row costs one write instead of a delete plus an insert
+    # and the table is never left empty mid run. A temporary table does not
+    # implicitly commit, so the whole phase stays in one transaction.
     cur.execute('DROP TEMPORARY TABLE IF EXISTS `User_Rank_Staging`;')
     cur.execute('''
                     CREATE TEMPORARY TABLE `User_Rank_Staging` (
@@ -295,8 +294,8 @@ def update_user_rank(
                     LEFT JOIN `User_Rank_Staging` AS `s`
                         ON `s`.`user_id` = `ur`.`user_id`
                     WHERE `s`.`user_id` IS NULL;''')
-    # Remove rows whose username now belongs to a different user, so the
-    # upsert below cannot match the wrong row through the unique username key.
+    # Usernames are unique in `User_Rank`, so a username that moved to another
+    # user would make the upsert below match the wrong row.
     cur.execute('''
                     DELETE `ur`
                     FROM `User_Rank` AS `ur`
@@ -326,15 +325,10 @@ def update_user_rank(
                             country_id = VALUES(country_id),
                             state_id = VALUES(state_id),
                             school_id = VALUES(school_id),
-                            -- Keep `timestamp` meaning "last ranking refresh".
-                            -- The rank page surfaces the top user's timestamp
-                            -- as "last updated", and the delete-and-reinsert
-                            -- this replaces refreshed it on every run.
+                            -- The rank page reads this as "last updated".
                             `timestamp` = CURRENT_TIMESTAMP(),
-                            -- The delete-and-reinsert this replaces also
-                            -- cleared the author columns; update_author_rank
-                            -- recomputes them right after in the same
-                            -- transaction.
+                            -- Cleared like the delete-and-reinsert did;
+                            -- update_author_rank recomputes them next.
                             author_score = 0,
                             author_ranking = NULL;''')
     logging.info('User rank merged for %d users', len(scores))
