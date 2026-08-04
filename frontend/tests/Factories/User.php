@@ -63,7 +63,7 @@ class UserParams {
     public function __construct(array $params = []) {
         $emailBase = \OmegaUp\Test\Utils::CreateRandomString();
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $this->name = array_key_exists('name', $params) ? $params['name'] : \OmegaUp\Test\Utils::CreateRandomString();
+        $this->name = $params['name'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->email = $params['email'] ?? "{$emailBase}@mail.com";
         $this->parentEmail = $params['email'] ?? "parent_{$emailBase}@mail.com";
