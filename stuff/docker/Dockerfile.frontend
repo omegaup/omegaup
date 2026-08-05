@@ -26,11 +26,10 @@ RUN apt-get update -y && \
 
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+    corepack enable
 
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y nginx yarn nodejs && \
+    apt-get install --no-install-recommends -y nginx nodejs && \
     apt-get autoremove -y && \
     apt-get clean
 
@@ -47,7 +46,7 @@ RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submod
 WORKDIR /opt/omegaup/frontend/www/rekarel
 RUN npm install && npx gulp && npm run build
 WORKDIR /opt/omegaup
-RUN yarn install && yarn build
+RUN corepack enable && pnpm install --frozen-lockfile && pnpm build
 RUN composer install --no-dev --classmap-authoritative
 RUN printf "<?php\n\
 define('OMEGAUP_ENVIRONMENT', 'production');\n\
