@@ -254,13 +254,34 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * List of groups
      */
     public function testGroupsMyList() {
-        // Create 5 groups for the same owner
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        // Create 5 groups for the same owner.
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         $groups = [];
         $n = 5;
         for ($i = 0; $i < $n; $i++) {
             $groups[] = \OmegaUp\Test\Factories\Groups::createGroup($identity);
         }
+
+        // Create a group where the user has a direct admin role.
+        $directAdminGroup = \OmegaUp\Test\Factories\Groups::createGroup();
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
+            'acl_id' => $directAdminGroup['group']->acl_id,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'user_id' => $user->user_id,
+        ]));
+
+        // Create a group where the user has an inherited admin role through a group.
+        $adminGroup = \OmegaUp\Test\Factories\Groups::createGroup();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($adminGroup, $identity);
+        $inheritedAdminGroup = \OmegaUp\Test\Factories\Groups::createGroup();
+        \OmegaUp\DAO\GroupRoles::create(new \OmegaUp\DAO\VO\GroupRoles([
+            'acl_id' => $inheritedAdminGroup['group']->acl_id,
+            'group_id' => $adminGroup['group']->group_id,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+        ]));
 
         // Create a group for another user
         \OmegaUp\Test\Factories\Groups::createGroup();
@@ -271,7 +292,18 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertSame($n, count($response['groups']));
+        $expectedAliases = array_map(
+            fn ($groupData) => $groupData['group']->alias,
+            $groups
+        );
+        $expectedAliases[] = $directAdminGroup['group']->alias;
+        $expectedAliases[] = $inheritedAdminGroup['group']->alias;
+        sort($expectedAliases);
+
+        $actualAliases = array_column($response['groups'], 'alias');
+        sort($actualAliases);
+
+        $this->assertSame($expectedAliases, $actualAliases);
     }
 
     /**
