@@ -929,50 +929,72 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $sql = "SELECT
                 {$fields},
-                MAX(
-                    CASE
-                        WHEN ur.role_id = ? OR gr.role_id = ? THEN ?
-                        WHEN ur.role_id = ? OR gr.role_id = ? THEN ?
-                        ELSE 0
-                    END
-                ) AS highest_role
+                cr.highest_role
             FROM
-                Courses AS c
-            INNER JOIN
-                ACLs AS a ON a.acl_id = c.acl_id
-            INNER JOIN
-                Identities AS ai ON a.owner_id = ai.user_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = c.acl_id
-            LEFT JOIN
-                Identities uri ON ur.user_id = uri.user_id AND uri.identity_id = ?
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = c.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id AND gi.identity_id = ?
+                (
+                SELECT
+                    course_roles.acl_id,
+                    MAX(course_roles.highest_role) AS highest_role
+                FROM (
+                    SELECT
+                        a.acl_id,
+                        ? AS highest_role
+                    FROM
+                        ACLs AS a
+                    INNER JOIN
+                        Identities AS i ON i.user_id = a.owner_id
+                    WHERE
+                        i.identity_id = ?
+
+                    UNION ALL
+
+                    SELECT
+                        ur.acl_id,
+                        ur.role_id AS highest_role
+                    FROM
+                        User_Roles AS ur
+                    INNER JOIN
+                        Identities AS i ON i.user_id = ur.user_id
+                    WHERE
+                        i.identity_id = ?
+                        AND ur.role_id IN (?, ?)
+
+                    UNION ALL
+
+                    SELECT
+                        gr.acl_id,
+                        gr.role_id AS highest_role
+                    FROM
+                        Groups_Identities AS gi
+                    INNER JOIN
+                        Group_Roles AS gr ON gr.group_id = gi.group_id
+                    WHERE
+                        gi.identity_id = ?
+                        AND gr.role_id IN (?, ?)
+                ) AS course_roles
+                GROUP BY
+                    course_roles.acl_id
+            ) AS cr
+            STRAIGHT_JOIN
+                Courses AS c ON c.acl_id = cr.acl_id
             WHERE
-                c.archived = 0 AND (
-                    ai.identity_id = ? OR
-                    (ur.role_id IN (?, ?) AND uri.identity_id IS NOT NULL) OR
-                    (gr.role_id IN (?, ?) AND gi.identity_id IS NOT NULL)
-                )
-            GROUP BY
-                c.course_id
+                c.archived = 0
             ORDER BY
                 c.course_id DESC
             LIMIT
                 ?, ?";
 
         $params = [
-        $adminRole, $adminRole, $adminRole,
-        $taRole, $taRole, $taRole,
-        $identityId,
-        $identityId,
-        $identityId,
-        $adminRole, $taRole,
-        $adminRole, $taRole,
-        max(0, $page - 1) * $pageSize,
-        $pageSize,
+            $adminRole,
+            $identityId,
+            $identityId,
+            $adminRole,
+            $taRole,
+            $identityId,
+            $adminRole,
+            $taRole,
+            max(0, $page - 1) * $pageSize,
+            $pageSize,
         ];
 
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, highest_role: int|null, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, teaching_assistant_enabled: bool}> */
