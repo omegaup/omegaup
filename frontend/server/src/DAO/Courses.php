@@ -929,56 +929,63 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $sql = "SELECT
                 {$fields},
-                cr.highest_role
+                acr.highest_role
             FROM
                 (
                 SELECT
-                    course_roles.acl_id,
-                    MAX(course_roles.highest_role) AS highest_role
+                    admined_course_roles.course_id,
+                    MAX(admined_course_roles.highest_role) AS highest_role
                 FROM (
                     SELECT
-                        a.acl_id,
+                        c.course_id,
                         ? AS highest_role
                     FROM
                         ACLs AS a
                     INNER JOIN
                         Identities AS i ON i.user_id = a.owner_id
+                    INNER JOIN
+                        Courses AS c ON c.acl_id = a.acl_id
                     WHERE
                         i.identity_id = ?
+                        AND c.archived = 0
 
                     UNION ALL
 
                     SELECT
-                        ur.acl_id,
+                        c.course_id,
                         ur.role_id AS highest_role
                     FROM
                         User_Roles AS ur
                     INNER JOIN
                         Identities AS i ON i.user_id = ur.user_id
+                    INNER JOIN
+                        Courses AS c ON c.acl_id = ur.acl_id
                     WHERE
                         i.identity_id = ?
                         AND ur.role_id IN (?, ?)
+                        AND c.archived = 0
 
                     UNION ALL
 
                     SELECT
-                        gr.acl_id,
+                        c.course_id,
                         gr.role_id AS highest_role
                     FROM
                         Groups_Identities AS gi
                     INNER JOIN
                         Group_Roles AS gr ON gr.group_id = gi.group_id
+                    INNER JOIN
+                        Courses AS c ON c.acl_id = gr.acl_id
                     WHERE
                         gi.identity_id = ?
                         AND gr.role_id IN (?, ?)
-                ) AS course_roles
+                        AND c.archived = 0
+                ) AS admined_course_roles
                 GROUP BY
-                    course_roles.acl_id
-            ) AS cr
-            STRAIGHT_JOIN
-                Courses AS c ON c.acl_id = cr.acl_id
-            WHERE
-                c.archived = 0
+                    admined_course_roles.course_id
+            ) AS acr
+            INNER JOIN
+                Courses AS c ON c.course_id = acr.course_id
             ORDER BY
                 c.course_id DESC
             LIMIT
