@@ -94,35 +94,69 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         // ONLY_FULL_GROUP_BY mode is enabled.
         $sql = '
             SELECT
-                DISTINCT g.alias,
-                g.create_time,
-                g.description,
-                g.name,
-                g.group_id
-            FROM
-                `Groups_` AS g
-            INNER JOIN
-                ACLs AS a ON a.acl_id = g.acl_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = g.acl_id
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = g.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id
-            WHERE
-                a.owner_id = ? OR
-                (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)
+                admined_groups.alias,
+                admined_groups.create_time,
+                admined_groups.description,
+                admined_groups.name,
+                admined_groups.group_id
+            FROM (
+                SELECT
+                    g.alias,
+                    g.create_time,
+                    g.description,
+                    g.name,
+                    g.group_id
+                FROM
+                    ACLs AS a
+                INNER JOIN
+                    `Groups_` AS g ON g.acl_id = a.acl_id
+                WHERE
+                    a.owner_id = ?
+
+                UNION DISTINCT
+
+                SELECT
+                    g.alias,
+                    g.create_time,
+                    g.description,
+                    g.name,
+                    g.group_id
+                FROM
+                    User_Roles AS ur
+                INNER JOIN
+                    `Groups_` AS g ON g.acl_id = ur.acl_id
+                WHERE
+                    ur.user_id = ?
+                    AND ur.role_id = ?
+
+                UNION DISTINCT
+
+                SELECT
+                    g.alias,
+                    g.create_time,
+                    g.description,
+                    g.name,
+                    g.group_id
+                FROM
+                    Groups_Identities AS gi
+                INNER JOIN
+                    Group_Roles AS gr ON gr.group_id = gi.group_id
+                INNER JOIN
+                    `Groups_` AS g ON g.acl_id = gr.acl_id
+                WHERE
+                    gi.identity_id = ?
+                    AND gr.role_id = ?
+            ) AS admined_groups
             ORDER BY
-                g.group_id DESC;';
+                admined_groups.group_id DESC;';
 
         /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
             $userId,
-            \OmegaUp\Authorization::ADMIN_ROLE,
             $userId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
         ]);
         foreach ($rs as &$row) {
             unset($row['group_id']);
