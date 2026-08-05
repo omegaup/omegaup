@@ -709,6 +709,8 @@
 	"courseStudentSelectAssignment": "Seleccionar trabajo",
 	"courseStudentSelectStudent": "Seleccionar estudiante",
 	"courseStudentsEmpty": "No hay estudiantes",
+	"courseStudentsEmptyDescription": "Agrega estudiantes a este curso para comenzar a seguir su progreso.",
+	"courseStudentsEmptyTitle": "A\u00fan no hay estudiantes inscritos",
 	"courseStudentsProgress": "Progreso de los estudiantes",
 	"courseStudentsProgressExportToSpreadsheet": "Exportar tabla como:",
 	"courseSubmissionNotFound": "El env\u00edo para alg\u00fan problema de este curso no ha sido encontrado.",
