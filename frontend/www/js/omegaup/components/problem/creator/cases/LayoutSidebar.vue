@@ -42,8 +42,9 @@
             <b-dropdown-item
               data-layout-dropdown-rename-layout
               @click="
-                showRenameModal[layout.layoutID] =
-                  !showRenameModal[layout.layoutID]
+                showRenameModal[layout.layoutID] = !showRenameModal[
+                  layout.layoutID
+                ]
               "
             >
               <div class="d-flex">

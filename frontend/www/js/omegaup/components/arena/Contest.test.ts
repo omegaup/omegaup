@@ -234,7 +234,8 @@ describe('Contest.vue', () => {
       [
         {
           guid: '78099022574726af861839e1b4210188',
-          hash: '#problems/problemOmegaUp/show-run:78099022574726af861839e1b4210188',
+          hash:
+            '#problems/problemOmegaUp/show-run:78099022574726af861839e1b4210188',
           isAdmin: false,
         },
       ],

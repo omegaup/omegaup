@@ -45,11 +45,9 @@ class MockBroadcastChannel {
 }
 
 // Install the mock globally before any imports run.
-(
-  global as unknown as {
-    BroadcastChannel: typeof MockBroadcastChannel;
-  }
-).BroadcastChannel = MockBroadcastChannel;
+((global as unknown) as {
+  BroadcastChannel: typeof MockBroadcastChannel;
+}).BroadcastChannel = MockBroadcastChannel;
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -214,14 +212,17 @@ describe('initLogoutListener', () => {
 
   it('returns a no-op cleanup when BroadcastChannel is unavailable', () => {
     // Temporarily remove BroadcastChannel to simulate an unsupported env.
-    const original = (global as unknown as Record<string, unknown>)
+    const original = ((global as unknown) as Record<string, unknown>)
       .BroadcastChannel;
-    delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+    delete ((global as unknown) as Record<string, unknown>).BroadcastChannel;
 
     const cleanup = initLogoutListener(jest.fn());
 
     // Restore immediately.
-    (global as unknown as Record<string, unknown>).BroadcastChannel = original;
+    ((global as unknown) as Record<
+      string,
+      unknown
+    >).BroadcastChannel = original;
 
     // No channel should have been created, and cleanup should not throw.
     expect(() => cleanup()).not.toThrow();

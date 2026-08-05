@@ -65,12 +65,12 @@ global.URL.createObjectURL = jest.fn();
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {
-  return {
+  return ({
     setEnd: () => {},
     setStart: () => {},
     getBoundingClientRect: () => {},
     getClientRects: () => [],
-  } as any as Range;
+  } as any) as Range;
 };
 
 // Any write to console.error() will cause a test failure.

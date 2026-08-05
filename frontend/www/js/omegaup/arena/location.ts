@@ -91,8 +91,9 @@ export async function getProblemAndRunDetails({
   problemDetails: null | types.ProblemDetails;
 }> {
   const { guid, problemAlias } = getOptionsFromLocation(location);
-  let problemPromise: Promise<null | types.ProblemDetails> =
-    Promise.resolve(null);
+  let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
+    null,
+  );
   let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
 
   if (problemAlias) {
