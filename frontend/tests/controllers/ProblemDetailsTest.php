@@ -130,7 +130,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         )['group'];
 
         // Create a group, a set of identities, get one of them
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
 
         // Create identities and get one unassociated and other one to be
         // associated with a user

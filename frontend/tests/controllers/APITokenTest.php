@@ -209,7 +209,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         \OmegaUp\Controllers\Identity::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
@@ -288,7 +288,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         \OmegaUp\Controllers\Identity::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,

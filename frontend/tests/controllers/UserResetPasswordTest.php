@@ -14,7 +14,7 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $identity->username,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'old_password' => $identity->password,
         ]);
 
@@ -48,7 +48,7 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiChangePassword(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $identity->username,
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'old_password' => 'bad old password',
             ]));
             $this->fail('should have failed due to bad old password');
