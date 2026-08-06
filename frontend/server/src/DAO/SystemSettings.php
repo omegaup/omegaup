@@ -80,12 +80,16 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
     ): int {
         $setting = self::getByKey($key);
         if (is_null($setting)) {
-            $newSetting = new \OmegaUp\DAO\VO\SystemSettings([
-                'setting_key' => $key,
-                'setting_value' => $value ? '1' : '0',
-                'setting_description' => '',
-            ]);
-            $affectedRows = self::create($newSetting);
+            $sql = '
+                INSERT INTO `System_Settings` (`setting_key`, `setting_value`, `setting_description`)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE `setting_value` = VALUES(`setting_value`);
+            ';
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                $sql,
+                [$key, $value ? '1' : '0', '']
+            );
+            $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         } else {
             $setting->setting_value = $value ? '1' : '0';
             $affectedRows = self::update($setting);
@@ -132,12 +136,16 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
     ): int {
         $setting = self::getByKey($key);
         if (is_null($setting)) {
-            $newSetting = new \OmegaUp\DAO\VO\SystemSettings([
-                'setting_key' => $key,
-                'setting_value' => $value,
-                'setting_description' => '',
-            ]);
-            $affectedRows = self::create($newSetting);
+            $sql = '
+                INSERT INTO `System_Settings` (`setting_key`, `setting_value`, `setting_description`)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE `setting_value` = VALUES(`setting_value`);
+            ';
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                $sql,
+                [$key, $value, '']
+            );
+            $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         } else {
             $setting->setting_value = $value;
             $affectedRows = self::update($setting);
