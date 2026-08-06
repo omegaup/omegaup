@@ -205,7 +205,11 @@ export default class ProblemTags extends Vue {
 
   addPublicTag(tag: string): void {
     if (this.canAddNewTags && !this.selectedPublicTags.includes(tag)) {
-      this.$emit('emit-add-tag', this.alias, tag, true);
+      this.$emit('emit-add-tag', {
+        alias: this.alias,
+        tagname: tag,
+        isPublic: true,
+      });
     }
     this.newPublicTag = '';
   }
@@ -216,14 +220,22 @@ export default class ProblemTags extends Vue {
       this.newPrivateTag !== '' &&
       !this.selectedPrivateTags.includes(this.newPrivateTag)
     ) {
-      this.$emit('emit-add-tag', this.alias, this.newPrivateTag, false);
+      this.$emit('emit-add-tag', {
+        alias: this.alias,
+        tagname: this.newPrivateTag,
+        isPublic: false,
+      });
       this.newPrivateTag = '';
     }
   }
 
   removeTag(tag: string, isPublic: boolean): void {
     if (this.canAddNewTags) {
-      this.$emit('emit-remove-tag', this.alias, tag, isPublic);
+      this.$emit('emit-remove-tag', {
+        alias: this.alias,
+        tagname: tag,
+        isPublic,
+      });
     }
   }
 
@@ -256,12 +268,11 @@ export default class ProblemTags extends Vue {
     if (!this.canAddNewTags) {
       return;
     }
-    this.$emit(
-      'emit-change-allow-user-add-tag',
-      this.alias,
-      this.title,
-      newValue,
-    );
+    this.$emit('emit-change-allow-user-add-tag', {
+      alias: this.alias,
+      title: this.title,
+      allowTags: newValue,
+    });
   }
 }
 </script>
