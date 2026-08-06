@@ -46,14 +46,18 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 
 import {
-  BootstrapVue,
+  TablePlugin,
+  ButtonPlugin,
+  VBTooltipPlugin,
   BIconChevronRight,
   BIconChevronDown,
   BIconQuestionCircleFill,
 } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
+Vue.use(TablePlugin);
+Vue.use(ButtonPlugin);
+Vue.use(VBTooltipPlugin);
 
 export enum PopupDisplayed {
   None,
