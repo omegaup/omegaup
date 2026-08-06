@@ -32,7 +32,7 @@ import { types } from '../../api_types';
 })
 export default class MultiTypeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
-  @Prop({ default: 3 }) activationThreshold!: number;
+  @Prop({ default: 1 }) activationThreshold!: number;
   @Prop({ default: 10 }) maxResults!: number;
   @Prop({ default: () => [] }) value!: types.ListItem[];
 
