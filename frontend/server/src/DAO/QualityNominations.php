@@ -169,6 +169,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * @return list<array{time: \OmegaUp\Timestamp|null, vote: int, user: array{username: string, name: string|null}}>
      */
     private static function getVotesForNomination(int $qualitynomination_id) {
+        // Use derived table instead of correlated subquery to avoid per-row execution.
+        // Index idx_qnc_nomination_user_comment supports the latest-vote lookup.
         $sql = '
         SELECT
             i.username,
@@ -177,27 +179,21 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             qnc.`time`
         FROM
             QualityNomination_Reviewers qnr
-        LEFT JOIN
-            QualityNomination_Comments qnc
-        ON
-            qnc.qualitynomination_id = qnr.qualitynomination_id AND
-            qnc.user_id = qnr.user_id AND
-            qnc.qualitynomination_comment_id = (
-                -- Gets the last vote per qualitynomination_id, user_id.
-                SELECT
-                    MAX(qualitynomination_comment_id)
-                FROM
-                    QualityNomination_Comments
-                WHERE
-                    qualitynomination_id = qnr.qualitynomination_id AND
-                    user_id = qnr.user_id
-                GROUP BY
-                    user_id
-            )
         INNER JOIN
-            Identities i
-        ON
-            i.user_id = qnr.user_id
+            Identities i ON i.user_id = qnr.user_id
+        LEFT JOIN (
+            SELECT qnc1.qualitynomination_id, qnc1.user_id, qnc1.vote, qnc1.`time`
+            FROM QualityNomination_Comments qnc1
+            INNER JOIN (
+                SELECT qualitynomination_id, user_id, MAX(qualitynomination_comment_id) as max_id
+                FROM QualityNomination_Comments
+                WHERE qualitynomination_id = ?
+                GROUP BY qualitynomination_id, user_id
+            ) latest
+            ON qnc1.qualitynomination_id = latest.qualitynomination_id
+              AND qnc1.user_id = latest.user_id
+              AND qnc1.qualitynomination_comment_id = latest.max_id
+        ) qnc ON qnc.qualitynomination_id = qnr.qualitynomination_id AND qnc.user_id = qnr.user_id
         WHERE
             qnr.qualitynomination_id = ?
         ORDER BY
@@ -209,7 +205,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [$qualitynomination_id]
+                [$qualitynomination_id, $qualitynomination_id]
             ) as $vote
         ) {
             $vote['user'] = [
