@@ -310,7 +310,8 @@ def get_user_problems(
     # each user
     user_problems: Dict[int, UserProblems] = {
         user.identity_id:
-            {'solved': [], 'score': 0.0} for user in eligible_users}
+            {'solved': [], 'score': 0.0, 'school_at_solve': {}}
+        for user in eligible_users}
 
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
@@ -321,7 +322,17 @@ def get_user_problems(
             SELECT
                 s.identity_id,
                 s.problem_id,
-                MIN(s.time) AS first_time_solved
+                MIN(s.time) AS first_time_solved,
+                (
+                    SELECT s2.school_id
+                    FROM Submissions s2
+                    WHERE s2.identity_id = s.identity_id
+                      AND s2.problem_id  = s.problem_id
+                      AND s2.verdict     = 'AC'
+                      AND s2.type        = 'normal'
+                    ORDER BY s2.time ASC
+                    LIMIT 1
+                ) AS school_id_at_solve_time
             FROM
                 Submissions s
             INNER JOIN
@@ -368,6 +379,9 @@ def get_user_problems(
             # Filter the problems that are not administred by the user
             if identity_id not in problems_admins.get(problem_id, []):
                 user_problems[identity_id]['solved'].append(problem_id)
+                user_problems[identity_id]['school_at_solve'][problem_id] = (
+                    row['school_id_at_solve_time']
+                )
 
     return user_problems
 
