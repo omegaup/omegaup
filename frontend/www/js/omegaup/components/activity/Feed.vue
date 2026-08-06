@@ -230,6 +230,9 @@ export default class ActivityFeed extends Vue {
   @Prop() report!: types.ActivityEvent[];
   @Prop() pagerItems!: types.PageItem[];
 
+  @Prop({ default: () => [] }) reportUsers!: User[];
+  @Prop({ default: () => [] }) reportOrigins!: Origin[];
+
   T = T;
   time = time;
   showTab = 'report';
@@ -290,6 +293,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get users(): User[] {
+    if (this.reportUsers && this.reportUsers.length > 0) {
+      return this.reportUsers;
+    }
     let userMapping: Mapping = {};
     for (let evt of this.report) {
       this.addMapping(userMapping, evt.username, String(evt.ip));
@@ -311,6 +317,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get origins(): Origin[] {
+    if (this.reportOrigins && this.reportOrigins.length > 0) {
+      return this.reportOrigins;
+    }
     let originMapping: Mapping = {};
     for (let evt of this.report) {
       this.addMapping(originMapping, String(evt.ip), evt.username);

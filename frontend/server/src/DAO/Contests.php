@@ -1707,6 +1707,47 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ];
     }
 
+    /**
+     * @return list<array{username: string, ip: int, classname: string}>
+     */
+    public static function getDistinctActivity(
+        \OmegaUp\DAO\VO\Contests $contest
+    ): array {
+        $sql = 'SELECT DISTINCT
+                    i.username,
+                    pal.ip,
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
+                FROM
+                    Problemset_Access_Log pal
+                INNER JOIN
+                    Identities i ON i.identity_id = pal.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+                WHERE
+                    pal.problemset_id = ?
+
+                UNION DISTINCT
+
+                SELECT DISTINCT
+                    i.username,
+                    sl.ip,
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
+                FROM
+                    Submission_Log sl
+                INNER JOIN
+                    Identities i ON i.identity_id = sl.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+                WHERE
+                    sl.problemset_id = ?';
+
+        /** @var list<array{classname: string, ip: int, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$contest->problemset_id, $contest->problemset_id]
+        );
+    }
+
     private static function getOrder(
         int $orderBy,
         string $defaultOrder = '`original_finish_time`',

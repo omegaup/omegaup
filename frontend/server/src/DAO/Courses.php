@@ -1565,6 +1565,71 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         ];
     }
     /**
+     * @return list<array{username: string, ip: int|null, classname: string}>
+     */
+    public static function getDistinctActivity(
+        \OmegaUp\DAO\VO\Courses $course
+    ): array {
+        $sql = 'WITH course_assignments AS (
+                    SELECT problemset_id
+                    FROM Assignments
+                    WHERE course_id = ?
+                )
+                SELECT DISTINCT
+                    i.username,
+                    pal.ip,
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
+                FROM
+                    Problemset_Access_Log pal
+                INNER JOIN
+                    course_assignments a ON a.problemset_id = pal.problemset_id
+                INNER JOIN
+                    Identities i ON i.identity_id = pal.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+
+                UNION DISTINCT
+
+                SELECT DISTINCT
+                    i.username,
+                    sl.ip,
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
+                FROM
+                    Submission_Log sl
+                INNER JOIN
+                    course_assignments a ON a.problemset_id = sl.problemset_id
+                INNER JOIN
+                    Identities i ON i.identity_id = sl.identity_id
+                INNER JOIN
+                    Submissions s ON s.submission_id = sl.submission_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+
+                UNION DISTINCT
+
+                SELECT DISTINCT
+                    i.username,
+                    INET_ATON(ccl.ip) AS ip,
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
+                FROM
+                    Course_Clone_Log ccl
+                INNER JOIN
+                    Users u ON u.user_id = ccl.user_id
+                INNER JOIN
+                    Identities i ON i.identity_id = u.main_identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+                WHERE
+                    ccl.course_id = ?';
+
+        /** @var list<array{classname: string, ip: int|null, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$course->course_id, $course->course_id]
+        );
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Groups>
      */
     public static function getCourseTeachingAssistantGroups(
