@@ -202,7 +202,18 @@ export default class UserCharts extends Vue {
         delta: [],
         cumulative: [],
       };
-      const verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
+      const verdicts = [
+        'AC',
+        'PA',
+        'WA',
+        'TLE',
+        'RTE',
+        'CE',
+        'JE',
+        'MLE',
+        'OLE',
+        'VE',
+      ];
       for (const verdict of verdicts) {
         runsByVerdict[period][verdict] = 0;
       }
@@ -260,7 +271,18 @@ export default class UserCharts extends Vue {
       periodStats[period] = stats.reduce(
         (groups: omegaup.VerdictByDate, item: omegaup.RunInfo) => {
           const val = item[period] || '';
-          groups[val] = groups[val] || { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 };
+          groups[val] = groups[val] || {
+            WA: 0,
+            PA: 0,
+            AC: 0,
+            TLE: 0,
+            RTE: 0,
+            CE: 0,
+            JE: 0,
+            MLE: 0,
+            OLE: 0,
+            VE: 0,
+          };
           groups[val][item.verdict] += item.runs;
           return groups;
         },
