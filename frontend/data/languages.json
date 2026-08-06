@@ -75,13 +75,15 @@
     "extension": "py",
     "name": "Python (2.7)",
     "modelMapping": "python",
-    "language": "py2"
+    "language": "py2",
+    "tabSize": 4
   },
   "py3": {
     "extension": "py",
     "name": "Python (3.9)",
     "modelMapping": "python",
-    "language": "py3"
+    "language": "py3",
+    "tabSize": 4
   },
   "rb": {
     "extension": "rb",
