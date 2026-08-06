@@ -449,4 +449,447 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
             'A problem solved by the school in a prior month must not count again'
         );
     }
+
+    public function testProblemsWithoutQualitySeal() {
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $student);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        $sealedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+        $unsealedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => false])
+        );
+
+        $runDate = self::previousMonthRunDate();
+
+        // Prepare setup:
+        // school:        student=>sealedProblem, student=>unsealedProblem
+        // controlSchool: controlStudent=>sealedProblem
+        //
+        // unsealedProblem has no quality seal so it must not add points.
+        // Expected counted problems: school=1, controlSchool=1
+        // The rank should be: tie (same score)
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $sealedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $unsealedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $sealedProblem,
+            $runDate
+        );
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $schoolScore = self::findSchoolScore(
+            $candidates,
+            $school['request']['name']
+        );
+        $controlScore = self::findSchoolScore(
+            $candidates,
+            $controlSchool['request']['name']
+        );
+
+        $this->assertNotNull($schoolScore);
+        $this->assertNotNull($controlScore);
+        // Both schools only get points for sealedProblem; if the problem
+        // without quality seal were counted the scores would differ.
+        $this->assertEqualsWithDelta(
+            $controlScore,
+            $schoolScore,
+            0.01,
+            'A problem without quality seal must not be counted'
+        );
+    }
+
+    public function testIdentitiesWithoutMainEmail() {
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        [
+            'identity' => $student,
+            'user' => $studentUser,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $student);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+
+        // Prepare setup:
+        // school:        student=>problem (student has no main email)
+        // controlSchool: controlStudent=>problem
+        //
+        // student's user has main_email_id = NULL so their submissions must
+        // be excluded and school must not appear among the candidates.
+        // Expected candidates: controlSchool only
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $problem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $problem,
+            $runDate
+        );
+
+        // Remove the student's main email after the runs are created.
+        $user = \OmegaUp\DAO\Users::getByPK(intval($studentUser->user_id));
+        if (is_null($user)) {
+            $this->fail('The student user must exist');
+        }
+        $user->main_email_id = null;
+        \OmegaUp\DAO\Users::update($user);
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $this->assertNull(
+            self::findSchoolScore($candidates, $school['request']['name']),
+            'A school whose only solver has no main email must not be a candidate'
+        );
+        $this->assertNotNull(
+            self::findSchoolScore(
+                $candidates,
+                $controlSchool['request']['name']
+            ),
+            'The school of the user with a main email must be a candidate'
+        );
+    }
+
+    public function testSchoolEligibility() {
+        // 12 months rule
+        $ineligibleSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+        $eligibleSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $ineligibleStudent] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $eligibleStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $ineligibleSchool,
+            $ineligibleStudent
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $eligibleSchool,
+            $eligibleStudent
+        );
+
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+        // The cron computes candidates for the month that follows $runDate.
+        $firstDayOfNextMonth = date('Y-m-01', strtotime($runDate . ' +1 day'));
+        // Latest previous win that is still inside the 12-month exclusion
+        // window (time >= DATE_SUB(first_day_of_next_month, INTERVAL 1 YEAR)).
+        $boundaryDate = date(
+            'Y-m-d',
+            strtotime($firstDayOfNextMonth . ' -1 year')
+        );
+        // One day earlier the win is more than 12 months old.
+        $beforeBoundaryDate = date(
+            'Y-m-d',
+            strtotime($boundaryDate . ' -1 day')
+        );
+
+        // Prepare setup:
+        // ineligibleSchool: won exactly 12 months before the target month,
+        //                   still inside the window => excluded
+        // eligibleSchool:   won 12 months and one day before the target
+        //                   month => eligible again
+        // Both schools solve the same problem within the evaluation window.
+        \OmegaUp\DAO\SchoolOfTheMonth::create(
+            new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+                'school_id' => $ineligibleSchool['school']->school_id,
+                'time' => $boundaryDate,
+                'ranking' => 1,
+            ])
+        );
+        \OmegaUp\DAO\SchoolOfTheMonth::create(
+            new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+                'school_id' => $eligibleSchool['school']->school_id,
+                'time' => $beforeBoundaryDate,
+                'ranking' => 1,
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $ineligibleStudent,
+            $problem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $eligibleStudent,
+            $problem,
+            $runDate
+        );
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $this->assertNull(
+            self::findSchoolScore(
+                $candidates,
+                $ineligibleSchool['request']['name']
+            ),
+            'A school selected less than 12 months ago must not be eligible'
+        );
+        $this->assertNotNull(
+            self::findSchoolScore(
+                $candidates,
+                $eligibleSchool['request']['name']
+            ),
+            'A school selected more than 12 months ago must be eligible again'
+        );
+    }
+
+    public function testGroupProblemAdminSolvesDoNotCount() {
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $groupMember] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $groupMember);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        // Problem owned by $owner and administered by a group that contains
+        // $groupMember.
+        $ownedProblem = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $owner
+        );
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup($owner);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $groupMember
+        );
+        \OmegaUp\Test\Factories\Problem::addGroupAdmin(
+            $ownedProblem,
+            $groupData['group']
+        );
+        // A separate problem with no special relationship to the school.
+        $neutralProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+
+        // Prepare setup:
+        // school:        groupMember=>ownedProblem (excluded: group admin),
+        //                groupMember=>neutralProblem
+        // controlSchool: controlStudent=>neutralProblem
+        //
+        // ownedProblem solved by a group admin must not count for school.
+        // Expected distinct problems: school=1, controlSchool=1
+        // The rank should be: tie (same score)
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $groupMember,
+            $ownedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $groupMember,
+            $neutralProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $neutralProblem,
+            $runDate
+        );
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $schoolScore = self::findSchoolScore(
+            $candidates,
+            $school['request']['name']
+        );
+        $controlScore = self::findSchoolScore(
+            $candidates,
+            $controlSchool['request']['name']
+        );
+
+        $this->assertNotNull($schoolScore);
+        $this->assertNotNull($controlScore);
+        // The problem administered through a group must be ignored, so the
+        // school is left only with the neutral problem, same as the control.
+        $this->assertEqualsWithDelta(
+            $controlScore,
+            $schoolScore,
+            0.01,
+            'Problems administered by the solver through a group must not be counted'
+        );
+    }
+
+    public function testNonAcceptedRuns() {
+        // Only AC counts
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $student);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        $solvedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+        $attemptedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+
+        // Prepare setup:
+        // school:        student=>solvedProblem (AC),
+        //                student=>attemptedProblem (WA)
+        // controlSchool: controlStudent=>solvedProblem (AC)
+        //
+        // The WA run on attemptedProblem must not add ranking points.
+        // Expected counted problems: school=1, controlSchool=1
+        // The rank should be: tie (same score)
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $solvedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $attemptedProblem,
+            $runDate,
+            0,
+            'WA'
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $solvedProblem,
+            $runDate
+        );
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $schoolScore = self::findSchoolScore(
+            $candidates,
+            $school['request']['name']
+        );
+        $controlScore = self::findSchoolScore(
+            $candidates,
+            $controlSchool['request']['name']
+        );
+
+        $this->assertNotNull($schoolScore);
+        $this->assertNotNull($controlScore);
+        // Only accepted runs gives ranking points, so both schools must end
+        // up with the same score.
+        $this->assertEqualsWithDelta(
+            $controlScore,
+            $schoolScore,
+            0.01,
+            'A non-accepted run must not add ranking points'
+        );
+    }
+
+    public function testPrivateProblemsExcluded() {
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $student);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        $sharedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+        // Created public so that the run can be submitted; it will be made
+        // private before the ranks are computed.
+        $hiddenProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+
+        // Prepare setup:
+        // school:        student=>hiddenProblem (private at rank time),
+        //                student=>sharedProblem
+        // controlSchool: controlStudent=>sharedProblem
+        //
+        // hiddenProblem has visibility < 1 when the ranks are computed so it
+        // must not add points.
+        // Expected counted problems: school=1, controlSchool=1
+        // The rank should be: tie (same score)
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $hiddenProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $sharedProblem,
+            $runDate
+        );
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $sharedProblem,
+            $runDate
+        );
+
+        // Make the problem private before the ranks are computed.
+        $problem = $hiddenProblem['problem'];
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+        \OmegaUp\DAO\Problems::update($problem);
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $schoolScore = self::findSchoolScore(
+            $candidates,
+            $school['request']['name']
+        );
+        $controlScore = self::findSchoolScore(
+            $candidates,
+            $controlSchool['request']['name']
+        );
+
+        $this->assertNotNull($schoolScore);
+        $this->assertNotNull($controlScore);
+        // The private problem must be ignored, so both schools only count
+        // the shared problem.
+        $this->assertEqualsWithDelta(
+            $controlScore,
+            $schoolScore,
+            0.01,
+            'A problem that is not public must not be counted'
+        );
+    }
 }
