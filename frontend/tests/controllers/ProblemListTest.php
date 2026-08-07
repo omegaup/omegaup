@@ -733,6 +733,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'alias',
             $alias
         );
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'page_size' => 1,
+            ])
+        );
+        $nextPage = end($response['pagerItems']);
+        $this->assertSame('disabled', $nextPage['class']);
     }
 
     /**
