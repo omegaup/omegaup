@@ -1365,28 +1365,54 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             'p'
         );
         $sql = '
-            FROM
-                Problems AS p
+            FROM (
+                SELECT
+                    p.problem_id
+                FROM
+                    Identities AS i
+                STRAIGHT_JOIN
+                    ACLs AS a ON a.owner_id = i.user_id
+                STRAIGHT_JOIN
+                    Problems AS p ON p.acl_id = a.acl_id
+                WHERE
+                    i.identity_id = ?
+                    AND p.visibility > ?
+
+                UNION
+
+                SELECT
+                    p.problem_id
+                FROM
+                    Identities AS i
+                INNER JOIN
+                    User_Roles AS ur ON ur.user_id = i.user_id
+                INNER JOIN
+                    Problems AS p ON p.acl_id = ur.acl_id
+                WHERE
+                    i.identity_id = ?
+                    AND ur.role_id = ?
+                    AND p.visibility > ?
+
+                UNION
+
+                SELECT
+                    p.problem_id
+                FROM
+                    Groups_Identities AS gi
+                INNER JOIN
+                    Group_Roles AS gr ON gr.group_id = gi.group_id
+                INNER JOIN
+                    Problems AS p ON p.acl_id = gr.acl_id
+                WHERE
+                    gi.identity_id = ?
+                    AND gr.role_id = ?
+                    AND p.visibility > ?
+            ) AS admined_problems
             INNER JOIN
-                ACLs AS a ON a.acl_id = p.acl_id
-            INNER JOIN
-                Identities AS ai ON a.owner_id = ai.user_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = p.acl_id
-            LEFT JOIN
-                Identities uri ON ur.user_id = uri.user_id
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = p.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id
+                Problems AS p ON p.problem_id = admined_problems.problem_id
             WHERE
-                (ai.identity_id = ? OR
-                (ur.role_id = ? AND uri.identity_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)) AND
-                p.visibility > ?';
+                1 = 1';
         $limits = '
-            GROUP BY
-                p.problem_id
             ORDER BY
                 p.problem_id DESC
             LIMIT
@@ -1394,10 +1420,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [
             $identityId,
-            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\ProblemParams::VISIBILITY_DELETED,
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\ProblemParams::VISIBILITY_DELETED,
             $identityId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
         ];
 
