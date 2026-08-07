@@ -1194,12 +1194,23 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         // Do not leak plain emails, birth dates, genders and user's objectives in case the request is for a profile other than
         // the logged identity's one. Admins can see emails, birth dates, genders and user's objectives
+        //
+        // `is_own_profile` must only be true when the logged identity IS the
+        // profile being viewed. Being a system admin grants visibility into
+        // otherwise-private fields (handled below), but it must NOT make the
+        // frontend think this is the admin's own profile, since that also
+        // enables self-edit UI (see omegaup/omegaup#9982).
         if (
             !is_null($loggedIdentity)
-            && (\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
-                || $identity->identity_id === $loggedIdentity->identity_id)
+            && $identity->identity_id === $loggedIdentity->identity_id
         ) {
             $response['is_own_profile'] = true;
+            return $response;
+        }
+        if (
+            !is_null($loggedIdentity)
+            && \OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+        ) {
             return $response;
         }
         unset($response['birth_date']);
