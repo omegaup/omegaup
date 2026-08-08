@@ -669,7 +669,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 gi.group_id = ?
             ORDER BY
-                COALESCE(i.name, i.username), i.username
+                i.name, i.username
             LIMIT ?, ?';
 
         /** @var list<array{classname: string, country_id: null|string, identity_id: int, name: null|string, username: string}> */
