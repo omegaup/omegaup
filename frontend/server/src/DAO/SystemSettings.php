@@ -65,7 +65,10 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function invalidateCache(string ...$keys): void {
         foreach ($keys as $key) {
-            (new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key))->delete();
+            (new \OmegaUp\Cache(
+                \OmegaUp\Cache::SYSTEM_SETTINGS,
+                $key
+            ))->delete();
         }
     }
 
