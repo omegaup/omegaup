@@ -304,6 +304,8 @@ class RateLimiterTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiUpdateBasicInfo(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
+                    'username' => $identity->username,
+                    'password' => 'anypassword',
                     'school_name' => "Profile School RL {$i}",
                 ])
             );
