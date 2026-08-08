@@ -335,8 +335,9 @@ class RedisCacheAdapter extends CacheAdapter {
         // the key is first created, preserving the previous behaviour.
         $script = <<<'LUA'
         local raw = redis.call('GET', KEYS[1])
+        local is_new = raw == false
         local count
-        if raw == false then
+        if is_new then
             count = 1
         else
             local n = string.match(raw, '^i:(%-?%d+);$')
@@ -344,7 +345,7 @@ class RedisCacheAdapter extends CacheAdapter {
             count = (n and tonumber(n) + 1) or 1
         end
         local value = 'i:' .. count .. ';'
-        if count == 1 then
+        if is_new then
             redis.call('SET', KEYS[1], value)
             if tonumber(ARGV[1]) > 0 then
                 redis.call('EXPIRE', KEYS[1], ARGV[1])

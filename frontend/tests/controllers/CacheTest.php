@@ -204,4 +204,39 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame(3, $cache->fetch($key));
     }
+
+    /**
+     * Regression test for #10074: incWithTTL() must preserve the existing TTL
+     * of a key whose serialized value is `i:0;`, not overwrite it with the
+     * argument TTL. A key stored with value 0 and a short TTL, then incremented
+     * with a much larger argument TTL, must expire at the original (short) TTL.
+     *
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncWithTTLPreservesTTLOnZeroValue(
+        \OmegaUp\CacheAdapter $cache
+    ): void {
+        if ($cache instanceof \OmegaUp\InProcessCacheAdapter) {
+            // InProcessCacheAdapter does not support TTL.
+            return;
+        }
+        $key = uniqid('incwithttl-zero-');
+        $originalTtl = 3;
+        $argumentTtl = 30;
+
+        // Store value 0 with a short TTL (writes the serialized `i:0;`).
+        $this->assertTrue($cache->store($key, 0, $originalTtl));
+
+        // Increment with a much larger argument TTL. If the bug were present,
+        // the key's TTL would be reset to $argumentTtl (30s); with the fix, the
+        // original 3s TTL is preserved.
+        $this->assertSame(1, $cache->incWithTTL($key, $argumentTtl));
+
+        // Wait past the original TTL but well before the argument TTL.
+        sleep($originalTtl + 5);
+
+        // The key must have expired at the original (short) TTL, so the next
+        // increment starts again at 1.
+        $this->assertSame(1, $cache->incWithTTL($key, $argumentTtl));
+    }
 }
