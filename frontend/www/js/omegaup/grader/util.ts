@@ -53,6 +53,7 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
       /#include\s*<(iostream|vector|algorithm|string|map|set|queue|stack|cmath|bits\/stdc\+\+\.h)>/,
       /\b(std::cout|std::cin|std::endl|std::vector|std::string|namespace\s+std)\b/,
       /using\s+namespace\s+std/,
+      /\b(cin\s*>>|cout\s*<<)/,
     ],
     priority: 95,
   },
@@ -95,6 +96,10 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
       /^def\s+\w+\s*\(/m,
       /\bprint\s*\(/,
       /if\s+__name__\s*==\s*['"]__main__['"]/,
+      /\binput\s*\(/,
+      /\bfor\s+\w+\s+in\s+/,
+      /:\s*$/m,
+      /\b(range|len|int|str)\s*\(/,
     ],
     priority: 85,
   },
@@ -125,6 +130,7 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
       /\bconsole\.log\b|\bmodule\.exports\b|\brequire\s*\(/,
       /=>\s*\{/,
       /\b(const|let|var)\s+\w+\s*=\s*/,
+      /\bfunction\s+\w+\s*\(/,
     ],
     priority: 82,
   },
@@ -175,7 +181,7 @@ export function detectLanguageFromCode(
   let bestLanguage = '';
   let bestDisplayName = '';
   let bestScore = 0;
-  let bestPriority = 0;
+  let bestConfidence = 0;
 
   for (const pat of LANGUAGE_PATTERNS) {
     let matches = 0;
@@ -183,22 +189,19 @@ export function detectLanguageFromCode(
       if (r.test(trimmed)) matches++;
     }
     if (matches > 0) {
-      const score = (matches / pat.patterns.length) * pat.priority;
+      const penalty = Math.min(1, pat.patterns.length / 4);
+      const score = (matches / pat.patterns.length) * pat.priority * penalty;
       if (score > bestScore) {
         bestScore = score;
         bestLanguage = pat.language;
         bestDisplayName = pat.displayName;
-        bestPriority = pat.priority;
+        bestConfidence = Math.round((matches / pat.patterns.length) * 100);
       }
     }
   }
 
   if (!bestLanguage) return null;
-  const confidence = Math.min(
-    100,
-    Math.round((bestScore / bestPriority) * 100),
-  );
-  if (confidence < 30) return null;
+  if (bestConfidence < 30) return null;
   if (!supportedLanguages[bestLanguage]) return null;
   return { language: bestLanguage, displayName: bestDisplayName };
 }

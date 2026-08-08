@@ -81,6 +81,7 @@ import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
+import { SafeStorage } from '../../safe_storage';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
@@ -109,6 +110,13 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage: null | string = this.preferredLanguage;
   code = '';
   now: number = Date.now();
+
+  mounted(): void {
+    const savedLanguage = SafeStorage.getItem('arena:selectedLanguage');
+    if (savedLanguage && savedLanguage in this.allowedLanguages) {
+      this.selectedLanguage = savedLanguage;
+    }
+  }
 
   getLanguageExtension(language: string): string {
     if (!language || language === 'cat') {
@@ -156,6 +164,9 @@ export default class ArenaRunSubmitPopup extends Vue {
   ): void {
     if (!newLanguage || newLanguage === oldLanguage) return;
     this.loadBoilerplateForLanguage(newLanguage);
+    if (oldLanguage !== undefined) {
+      SafeStorage.setItem('arena:selectedLanguage', newLanguage);
+    }
   }
 
   get canSubmit(): boolean {
@@ -205,10 +216,30 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 
   @Watch('preferredLanguage')
-  onPreferredLanguageChanged(newValue: null | string): void {
-    if (newValue) {
-      this.selectedLanguage = newValue;
+  onPreferredLanguageChanged(): void {
+    this.revalidateLanguage();
+  }
+
+  @Watch('languages')
+  onLanguagesChanged(): void {
+    this.revalidateLanguage();
+  }
+
+  revalidateLanguage(): void {
+    if (
+      this.selectedLanguage &&
+      this.selectedLanguage in this.allowedLanguages
+    ) {
+      return;
     }
+    if (
+      this.preferredLanguage &&
+      this.preferredLanguage in this.allowedLanguages
+    ) {
+      this.selectedLanguage = this.preferredLanguage;
+      return;
+    }
+    this.selectedLanguage = Object.keys(this.allowedLanguages)[0] || null;
   }
 
   onSubmit(): void {
