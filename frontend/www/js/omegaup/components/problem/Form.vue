@@ -131,6 +131,12 @@
                       type="file"
                       accept=".zip"
                       class="d-none"
+                      :data-problem-creator-zip-ready="
+                        creatorGeneratedZipBlob !== null &&
+                        !isGeneratingCreatorZip
+                          ? 'true'
+                          : 'false'
+                      "
                     />
                   </div>
                   <div
