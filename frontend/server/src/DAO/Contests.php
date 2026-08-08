@@ -492,11 +492,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $sql = '
             FROM
-                Contests
-            INNER JOIN
-                ACLs a ON a.acl_id = Contests.acl_id
-            INNER JOIN
-                Users u ON u.user_id = a.owner_id
+                Users u
+            STRAIGHT_JOIN
+                ACLs a ON a.owner_id = u.user_id
+            STRAIGHT_JOIN
+                Contests ON Contests.acl_id = a.acl_id
             INNER JOIN
                 Problemsets p ON p.problemset_id = Contests.problemset_id
             WHERE

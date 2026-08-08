@@ -27,15 +27,15 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    QUALITYNOMINATION_QUESTION_CHANGE_ID,
+)
 
 CONFIDENCE = 10
 MIN_POINTS = 10
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 VOTES_NUM = 5
-
-# Before this id the questions were different
-QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
 
 # SQL Queries
 GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
@@ -309,7 +309,7 @@ def replace_voted_tags(dbconn: lib.db.Connection,
             finally:
                 dbconn.conn.get_warnings = get_warnings
             dbconn.conn.commit()
-    except:  # noqa: bare-except
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to replace voted tags')
         dbconn.conn.rollback()
 
@@ -654,7 +654,7 @@ def main() -> None:
         try:
             with lib.logs.log_phase('aggregate_reviewers_feedback'):
                 aggregate_reviewers_feedback(dbconn)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to calculate problem quality seal and category.')
             has_failures = True
@@ -662,7 +662,7 @@ def main() -> None:
         try:
             with lib.logs.log_phase('aggregate_feedback'):
                 aggregate_feedback(dbconn)
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to aggregate feedback and update problem tags.')
             has_failures = True
@@ -675,7 +675,7 @@ def main() -> None:
                 update_problem_of_the_week(dbconn, "easy")
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update problem of the week')
             has_failures = True
     finally:
