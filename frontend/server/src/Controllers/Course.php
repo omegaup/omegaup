@@ -861,6 +861,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentityIsOver13();
+
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
+
         $courseParams = self::convertRequestToCourseParams($r);
 
         if (is_null($courseParams->schoolId)) {
