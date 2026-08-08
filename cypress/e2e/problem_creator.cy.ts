@@ -304,12 +304,26 @@ describe('Problem creator Test', () => {
     const creatorProblemContentsInput =
       '.introjs-open-creator input[name="problem_contents"]';
 
+    // Enable the experiment via the admin API so the test does not depend on
+    // OMEGAUP_EXPERIMENT_SECRET / HMAC hashes that differ between environments.
+    cy.loginAdmin();
+    cy.request({
+      method: 'POST',
+      url: '/api/user/addExperiment/',
+      form: true,
+      body: {
+        username: loginOptions.username,
+        experiment: 'problem_creation_method_selector',
+      },
+    }).then((response) => {
+      expect(response.status).to.equal(200);
+    });
+    cy.logoutUsingApi();
+
     cy.login(loginOptions);
     cy.setCookie('has-visited-create-problem', true.toString());
 
-    cy.visit(
-      '/problem/new/?experiments=problem_creation_method_selector=88d4440378f469bf2786a514762d83093ac2e3c4',
-    );
+    cy.visit('/problem/new/');
 
     cy.get('[name="title"]').type(problemAlias).blur();
     cy.get('[name="source"]').type(problemAlias);
