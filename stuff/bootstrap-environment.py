@@ -120,7 +120,7 @@ class Session:
             return None
         try:
             result: Dict[str, Any] = req.json()
-        except:  # noqa: bare-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to parse json: %s', req.text)
             raise
         logging.debug('Result: %s', result)

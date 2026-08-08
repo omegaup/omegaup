@@ -77,6 +77,7 @@
       <div class="row">
         <div class="col-md-12">
           <button
+            v-if="!hideSaveButton"
             data-problem-creator-code-save-btn
             class="btn btn-primary .intro-js-code"
             type="submit"
@@ -119,6 +120,7 @@ export default class CodeTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
   @Prop() activeTabIndex!: TabIndex;
+  @Prop({ default: false }) hideSaveButton!: boolean;
   @Ref('fileInput') fileInput!: HTMLInputElement;
 
   inputLimit = 512 * 1024;
@@ -249,6 +251,11 @@ export default class CodeTab extends Vue {
     this.$store.commit('updateCodeContent', this.code);
     this.$store.commit('updateCodeExtension', this.extension);
     this.$emit('show-update-success-message');
+  }
+
+  persistDraft(): void {
+    this.$store.commit('updateCodeContent', this.code);
+    this.$store.commit('updateCodeExtension', this.extension);
   }
 
   startIntroGuide() {

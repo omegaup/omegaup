@@ -27,6 +27,7 @@
       <div class="row">
         <div class="col-md-12">
           <button
+            v-if="!hideSaveButton"
             data-problem-creator-save-markdown
             class="btn btn-primary"
             type="submit"
@@ -62,6 +63,7 @@ export default class StatementTab extends Vue {
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
   @Prop({ default: T.problemCreatorEmpty }) currentMarkdownProp!: string;
+  @Prop({ default: false }) hideSaveButton!: boolean;
 
   T = T;
   ui = ui;
@@ -98,6 +100,10 @@ export default class StatementTab extends Vue {
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
     this.$emit('show-update-success-message');
+  }
+
+  persistDraft(): void {
+    this.$store.commit('updateMarkdown', this.currentMarkdown);
   }
 
   /**
