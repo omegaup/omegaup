@@ -288,6 +288,51 @@ class RateLimiterTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test that updating a user's basic info with a new school name does not
+     * consume the user-facing School::apiCreate rate limit. School creation
+     * triggered internally from User::apiUpdateBasicInfo must not count against
+     * the external /api/school/create quota (see #10077).
+     */
+    public function testSchoolCreateViaProfileUpdateNotRateLimited(): void {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // 6 profile updates, each with a distinct new school name. If the
+        // internal School::apiCreate call consumed the external rate limit
+        // bucket, the 6th would throw RateLimitExceededException.
+        for ($i = 0; $i < 6; $i++) {
+            \OmegaUp\Controllers\User::apiUpdateBasicInfo(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'school_name' => "Profile School RL {$i}",
+                ])
+            );
+        }
+
+        // Direct school creation still counts against its own limit.
+        for ($i = 0; $i < 5; $i++) {
+            \OmegaUp\Controllers\School::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => "Direct School RL {$i}",
+                ])
+            );
+        }
+
+        try {
+            \OmegaUp\Controllers\School::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'Direct School RL Excess',
+                ])
+            );
+            $this->fail('Expected RateLimitExceededException');
+        } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
+            $this->assertSame(429, $e->getCode());
+        }
+    }
+
+    /**
      * Test that Problem::apiCreate is rate limited to 20 per hour.
      */
     public function testProblemCreateRateLimit(): void {
