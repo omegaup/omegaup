@@ -918,32 +918,22 @@ def main() -> None:
         with dbconn.cursor(buffered=True,
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
-            phase_start = time.monotonic()
-            update_problem_accepted_stats(cur, dbconn.conn)
-            logging.info(
-                'update_problem_accepted_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-            phase_start = time.monotonic()
-            update_users_stats(cur, cur_readonly, dbconn.conn, args)
-            logging.info(
-                'update_users_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-            phase_start = time.monotonic()
-            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
-                                 args.update_school_of_the_month)
-            logging.info(
-                'update_schools_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
+            with lib.logs.log_phase('update_problem_accepted_stats'):
+                update_problem_accepted_stats(cur, dbconn.conn)
+            with lib.logs.log_phase('update_users_stats'):
+                update_users_stats(cur, cur_readonly, dbconn.conn, args)
+            with lib.logs.log_phase('update_schools_stats'):
+                update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
+                                     args.update_school_of_the_month)
     finally:
         dbconn.conn.close()
         logging.info(
-            'Total execution time: %.2fs',
-            time.monotonic() - start_time,
+            'update_ranks finished',
+            extra={
+                'job': 'update_ranks',
+                'duration_ms': round((time.monotonic() - start_time) * 1000),
+            },
         )
-        logging.info('Done')
 
 
 if __name__ == '__main__':
