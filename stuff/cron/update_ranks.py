@@ -235,32 +235,45 @@ def update_user_rank(
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
-    # Stage the freshly computed ranking and merge it into `User_Rank` with an
-    # upsert, so each row costs one write instead of a delete plus an insert
-    # and the table is never left empty mid run. A temporary table does not
-    # implicitly commit, so the whole phase stays in one transaction.
-    cur.execute('DROP TEMPORARY TABLE IF EXISTS `User_Rank_Staging`;')
+    # Merge into `User_Rank` with an upsert, like `update_author_rank` does, so
+    # each row costs one write instead of a delete plus an insert and the table
+    # is never left empty mid run.
+    cur.execute('SELECT NOW() AS `now`;')
+    run_start = cur.fetchone()['now']
+    # Usernames are unique in `User_Rank`, so a username that moved to another
+    # user would make the upsert below match the wrong row.
     cur.execute('''
-                    CREATE TEMPORARY TABLE `User_Rank_Staging` (
-                        `user_id` int NOT NULL,
-                        `ranking` int DEFAULT NULL,
-                        `problems_solved_count` int NOT NULL DEFAULT 0,
-                        `score` double NOT NULL DEFAULT 0,
-                        `username` varchar(50) NOT NULL,
-                        `name` varchar(256) DEFAULT NULL,
-                        `country_id` char(3) DEFAULT NULL,
-                        `state_id` char(3) DEFAULT NULL,
-                        `school_id` int DEFAULT NULL,
-                        PRIMARY KEY (`user_id`),
-                        KEY `username` (`username`)
-                    ) ENGINE=InnoDB;''')
-    insert_staging_sql = '''
+                    DELETE `ur`
+                    FROM `User_Rank` AS `ur`
+                    INNER JOIN `Identities` AS `i`
+                        ON `i`.`username` = `ur`.`username`
+                    WHERE `i`.`user_id` IS NOT NULL
+                        AND `i`.`user_id` != `ur`.`user_id`;''')
+    insert_user_rank_sql = '''
                     INSERT INTO
-                        `User_Rank_Staging` (`user_id`, `ranking`,
-                                             `problems_solved_count`, `score`,
-                                             `username`, `name`, `country_id`,
-                                             `state_id`, `school_id`)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+                        `User_Rank` (`user_id`, `ranking`,
+                                     `problems_solved_count`, `score`,
+                                     `username`, `name`, `country_id`,
+                                     `state_id`, `school_id`)
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY
+                        UPDATE
+                            ranking = VALUES(ranking),
+                            problems_solved_count =
+                                VALUES(problems_solved_count),
+                            score = VALUES(score),
+                            username = VALUES(username),
+                            name = VALUES(name),
+                            country_id = VALUES(country_id),
+                            state_id = VALUES(state_id),
+                            school_id = VALUES(school_id),
+                            -- The rank page reads this as "last updated", and
+                            -- the sweep below uses it to find stale rows.
+                            `timestamp` = CURRENT_TIMESTAMP(),
+                            -- Cleared like the delete-and-reinsert did;
+                            -- update_author_rank recomputes them next.
+                            author_score = 0,
+                            author_ranking = NULL;'''
     user_rank_rows: List[UserRankRow] = []
     batch_size = 1000
     for index, row in enumerate(cur_readonly):
@@ -282,57 +295,15 @@ def update_user_rank(
                 school_id=row['school_id'],
             ))
         if len(user_rank_rows) >= batch_size:
-            cur.executemany(insert_staging_sql, user_rank_rows)
+            cur.executemany(insert_user_rank_sql, user_rank_rows)
             user_rank_rows.clear()
     if user_rank_rows:
-        cur.executemany(insert_staging_sql, user_rank_rows)
+        cur.executemany(insert_user_rank_sql, user_rank_rows)
 
-    # Remove users that fell out of the ranking.
-    cur.execute('''
-                    DELETE `ur`
-                    FROM `User_Rank` AS `ur`
-                    LEFT JOIN `User_Rank_Staging` AS `s`
-                        ON `s`.`user_id` = `ur`.`user_id`
-                    WHERE `s`.`user_id` IS NULL;''')
-    # Usernames are unique in `User_Rank`, so a username that moved to another
-    # user would make the upsert below match the wrong row.
-    cur.execute('''
-                    DELETE `ur`
-                    FROM `User_Rank` AS `ur`
-                    INNER JOIN `User_Rank_Staging` AS `s`
-                        ON `s`.`username` = `ur`.`username`
-                    WHERE `s`.`user_id` != `ur`.`user_id`;''')
-    cur.execute('''
-                    INSERT INTO
-                        `User_Rank` (`user_id`, `ranking`,
-                                     `problems_solved_count`, `score`,
-                                     `username`, `name`, `country_id`,
-                                     `state_id`, `school_id`)
-                    SELECT
-                        `user_id`, `ranking`, `problems_solved_count`,
-                        `score`, `username`, `name`, `country_id`,
-                        `state_id`, `school_id`
-                    FROM
-                        `User_Rank_Staging`
-                    ON DUPLICATE KEY
-                        UPDATE
-                            ranking = VALUES(ranking),
-                            problems_solved_count =
-                                VALUES(problems_solved_count),
-                            score = VALUES(score),
-                            username = VALUES(username),
-                            name = VALUES(name),
-                            country_id = VALUES(country_id),
-                            state_id = VALUES(state_id),
-                            school_id = VALUES(school_id),
-                            -- The rank page reads this as "last updated".
-                            `timestamp` = CURRENT_TIMESTAMP(),
-                            -- Cleared like the delete-and-reinsert did;
-                            -- update_author_rank recomputes them next.
-                            author_score = 0,
-                            author_ranking = NULL;''')
+    # Rows the upsert did not touch are users that fell out of the ranking.
+    cur.execute('DELETE FROM `User_Rank` WHERE `timestamp` < %s;',
+                (run_start,))
     logging.info('User rank merged for %d users', len(scores))
-    cur.execute('DROP TEMPORARY TABLE `User_Rank_Staging`;')
     return scores
 
 
