@@ -102,6 +102,10 @@ export const Admin = {
     messages.AdminGetMaintenanceModeRequest,
     messages.AdminGetMaintenanceModeResponse
   >('/api/admin/getMaintenanceMode/'),
+  getSystemSettings: apiCall<
+    messages.AdminGetSystemSettingsRequest,
+    messages.AdminGetSystemSettingsResponse
+  >('/api/admin/getSystemSettings/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
@@ -110,6 +114,10 @@ export const Admin = {
     messages.AdminSetMaintenanceModeRequest,
     messages.AdminSetMaintenanceModeResponse
   >('/api/admin/setMaintenanceMode/'),
+  updateSystemSettings: apiCall<
+    messages.AdminUpdateSystemSettingsRequest,
+    messages.AdminUpdateSystemSettingsResponse
+  >('/api/admin/updateSystemSettings/'),
 };
 
 export const AiEditorial = {

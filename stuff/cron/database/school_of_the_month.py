@@ -184,77 +184,89 @@ def get_school_of_the_month_candidates(
     '''Returns a list of elegible schools of the month candidates'''
     logging.info("Getting school of the month candidates")
     sql = '''
-        SELECT
-            `s`.`school_id`,
-            `s`.`name`,
-            IFNULL(
-                SUM(
-                    ROUND(
-                        100 / LOG(2, `distinct_school_problems`.`accepted`+1),
-                        0
-                    )
-                ),
-                0.0
-            ) AS `score`
-        FROM
-            `Schools` AS `s`
-        INNER JOIN
-            (
-                SELECT
-                    `su`.`school_id`,
-                    `p`.`accepted`,
-                    MIN(`su`.`time`) AS `first_ac_time`
-                FROM
-                    `Submissions` AS `su`
-                INNER JOIN
-                    `Problems` AS `p` ON `p`.`problem_id`=`su`.`problem_id`
-                INNER JOIN
-                    `Identities` AS `i`
-                    ON `i`.`identity_id`=`su`.`identity_id`
-                INNER JOIN
-                    `Users` AS `u` ON `u`.`user_id`=`i`.`user_id`
-                WHERE
-                    `su`.`verdict`="AC"
-                    AND `p`.`visibility` >= 1
-                    AND `p`.`quality_seal`=1
-                    AND `su`.`school_id` IS NOT NULL
-                    AND `u`.`main_email_id` IS NOT NULL
-                    AND `i`.`user_id` IS NOT NULL
-                GROUP BY
-                    `su`.`school_id`,
-                    `su`.`problem_id`
-                HAVING
-                    `first_ac_time` BETWEEN %s AND %s
-            ) AS `distinct_school_problems`
-        ON
-            `distinct_school_problems`.`school_id`=`s`.`school_id`
-        WHERE
-            NOT EXISTS(
-                SELECT
-                    `sotm`.`school_id`,
-                    MAX(`time`) AS `latest_time`
-                FROM
-                    `School_Of_The_Month` AS `sotm`
-                WHERE
-                    `sotm`.`school_id`=`s`.`school_id`
-                    AND(
-                        `sotm`.`selected_by` IS NOT NULL OR
-                        `sotm`.`ranking`=1
-                    )
-                GROUP BY
-                    `sotm`.`school_id`
-                HAVING
-                    DATE_ADD(`latest_time`, INTERVAL 1 YEAR) >= %s
-            )
-        GROUP BY
-            `s`.`school_id`
-        ORDER BY
-            `score` DESC
-        LIMIT 100;
+            SELECT
+                s.school_id,
+                s.name,
+                IFNULL(SUM(ROUND(100 / LOG(2, p.accepted + 1), 0)), 0.0)
+                AS score
+            FROM Submissions AS su
+            JOIN Problems AS p
+                ON p.problem_id = su.problem_id
+                AND p.visibility >= 1
+                AND p.quality_seal = 1
+            JOIN Schools AS s
+                ON s.school_id = su.school_id
+            JOIN Identities AS i
+                ON i.identity_id = su.identity_id
+            JOIN Users AS u
+                ON u.user_id = i.user_id
+                AND u.main_email_id IS NOT NULL
+            LEFT JOIN (
+                SELECT DISTINCT school_id
+                FROM School_Of_The_Month
+                WHERE (selected_by IS NOT NULL OR ranking = 1)
+                    AND time >= DATE_SUB(%s, INTERVAL 1 YEAR)
+            ) AS recent_winners
+                ON recent_winners.school_id = su.school_id
+            LEFT JOIN Problems_Forfeited AS pf
+                ON pf.user_id = i.user_id
+                AND pf.problem_id = su.problem_id
+            WHERE
+                su.verdict = 'AC'
+                AND su.type = 'normal'
+                AND su.time BETWEEN %s AND %s
+                AND su.school_id IS NOT NULL
+                AND i.user_id IS NOT NULL
+                -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+                -- role_id = 1 is ADMIN_ROLE)
+                -- TODO: Replace magic numbers with constants
+                AND i.user_id NOT IN (
+                    SELECT ur.user_id
+                    FROM User_Roles AS ur
+                    WHERE ur.acl_id = 1 AND ur.role_id = 1
+                )
+                -- Exclude problems where the identity is admin/owner
+                AND NOT EXISTS (
+                    -- problem owner
+                    SELECT 1 FROM ACLs AS a
+                    WHERE a.acl_id = p.acl_id AND a.owner_id = i.user_id
+                    UNION
+                    -- direct problem admin (role_id = 1 is ADMIN_ROLE)
+                    SELECT 1 FROM User_Roles AS ur
+                    WHERE ur.acl_id = p.acl_id AND ur.role_id = 1
+                        AND ur.user_id = i.user_id
+                    UNION
+                    -- group problem admin (role_id = 1 is ADMIN_ROLE)
+                    SELECT 1
+                    FROM Group_Roles AS gr
+                    INNER JOIN Groups_Identities AS gi
+                        ON gi.group_id = gr.group_id
+                    WHERE gr.acl_id = p.acl_id AND gr.role_id = 1
+                        AND gi.identity_id = su.identity_id
+                )
+                AND recent_winners.school_id IS NULL
+                AND pf.problem_id IS NULL
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Submissions AS su_prev
+                    WHERE
+                        su_prev.school_id = su.school_id
+                        AND su_prev.problem_id = su.problem_id
+                        AND su_prev.verdict = 'AC'
+                        AND su_prev.type = 'normal'
+                        AND (
+                            su_prev.time < su.time OR
+                            (su_prev.time = su.time AND
+                            su_prev.submission_id < su.submission_id)
+                        )
+                )
+            GROUP BY s.school_id
+            ORDER BY score DESC
+            LIMIT 100;
     '''
 
-    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_current_month,
-                                            first_day_of_next_month,
+    cur_readonly.execute('EXPLAIN ' + sql, (first_day_of_next_month,
+                                            first_day_of_current_month,
                                             first_day_of_next_month))
 
     for row in cur_readonly.fetchall():
@@ -266,7 +278,7 @@ def get_school_of_the_month_candidates(
         )
 
     cur_readonly.execute(
-        sql, (first_day_of_current_month, first_day_of_next_month,
+        sql, (first_day_of_next_month, first_day_of_current_month,
               first_day_of_next_month))
     candidates: List[School] = []
     for row in cur_readonly.fetchall():

@@ -16,7 +16,13 @@
       </p>
     </div>
     <div class="card-body px-2 px-sm-4">
-      <form ref="form" method="POST" class="form" enctype="multipart/form-data">
+      <form
+        ref="form"
+        method="POST"
+        class="form"
+        enctype="multipart/form-data"
+        @submit="handleFormSubmit"
+      >
         <div class="accordion mb-3">
           <div class="card">
             <div class="card-header">
@@ -115,10 +121,17 @@
                     <button
                       type="button"
                       class="btn btn-info"
-                      @click="$emit('open-problem-creator')"
+                      @click="openProblemCreatorModal()"
                     >
                       {{ T.openProblemCreator }}
                     </button>
+                    <input
+                      ref="creatorFileInput"
+                      name="problem_contents"
+                      type="file"
+                      accept=".zip"
+                      class="d-none"
+                    />
                   </div>
                   <div
                     v-if="currentCreationMethod === CreationMethods.Zip"
@@ -512,6 +525,36 @@
         </div>
       </form>
     </div>
+    <div
+      v-if="showCreationMethodSelector"
+      v-show="showProblemCreator"
+      class="problem-creator-modal"
+      @click.self="closeProblemCreatorModal"
+    >
+      <div class="problem-creator-modal-content">
+        <div class="problem-creator-modal-body">
+          <omegaup-problem-creator
+            v-if="showProblemCreator"
+            ref="problemCreator"
+            :hide-header-actions="true"
+            :hide-save-buttons="true"
+            @download-zip-file="handleCreatorZipGeneration"
+            @download-input-file="$emit('download-input-file', $event)"
+            @show-update-success-message="$emit('show-update-success-message')"
+          />
+        </div>
+        <div class="problem-creator-modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-problem-creator-close
+            @click="closeProblemCreatorModal"
+          >
+            {{ T.wordsClose }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -519,7 +562,10 @@
 import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
+import problem_CreatorWrapper from './CreatorWrapper.vue';
 import T from '../../lang';
+import * as ui from '../../ui';
+import JSZip from 'jszip';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 import 'intro.js/introjs.css';
@@ -536,6 +582,7 @@ export enum CreationMethods {
   components: {
     'omegaup-problem-settings': problem_Settings,
     'omegaup-problem-tags': problem_Tags,
+    'omegaup-problem-creator': problem_CreatorWrapper,
   },
 })
 export default class ProblemForm extends Vue {
@@ -552,6 +599,8 @@ export default class ProblemForm extends Vue {
   @Ref('limits') limitsRef!: HTMLDivElement;
   @Ref('validation') validationRef!: HTMLButtonElement;
   @Ref('form') formRef!: HTMLFormElement;
+  @Ref('creatorFileInput') creatorFileInputRef!: HTMLInputElement;
+  @Ref('problemCreator') problemCreatorRef!: problem_CreatorWrapper;
 
   T = T;
   title = this.data.title;
@@ -582,6 +631,9 @@ export default class ProblemForm extends Vue {
   currentLanguages = this.data.languages;
   CreationMethods = CreationMethods;
   currentCreationMethod: CreationMethods = this.creationMethod;
+  showProblemCreator = false;
+  creatorGeneratedZipBlob: Blob | null = null;
+  isGeneratingCreatorZip = false;
 
   mounted() {
     const title = T.createProblemInteractiveGuideTitle;
@@ -644,6 +696,60 @@ export default class ProblemForm extends Vue {
 
   setCurrentCreationMethod(method: CreationMethods): void {
     this.currentCreationMethod = method;
+  }
+
+  openProblemCreatorModal(): void {
+    this.showProblemCreator = true;
+  }
+
+  closeProblemCreatorModal(): void {
+    // Drafts are committed to the store and the zip is generated before
+    // hiding the modal because `v-if` destroys the creator component.
+    this.creatorGeneratedZipBlob = null;
+    this.problemCreatorRef?.saveDraft?.();
+    this.problemCreatorRef?.generateZip?.();
+    this.showProblemCreator = false;
+  }
+
+  handleCreatorZipGeneration({ zipContent }: { zipContent: JSZip }): void {
+    this.isGeneratingCreatorZip = true;
+    zipContent
+      .generateAsync({ type: 'blob' })
+      .then((blob) => {
+        this.creatorGeneratedZipBlob = blob;
+        this.isGeneratingCreatorZip = false;
+      })
+      .catch(() => {
+        this.isGeneratingCreatorZip = false;
+      });
+  }
+
+  handleFormSubmit(ev: Event): void {
+    if (
+      this.isUpdate ||
+      !this.showCreationMethodSelector ||
+      this.currentCreationMethod !== CreationMethods.Creator
+    ) {
+      return;
+    }
+    if (this.isGeneratingCreatorZip) {
+      ev.preventDefault();
+      ui.error(T.problemCreatorGeneratingZip);
+      return;
+    }
+    if (!this.creatorGeneratedZipBlob || typeof DataTransfer !== 'function') {
+      ev.preventDefault();
+      ui.error(T.problemCreatorOpenBeforeSubmit);
+      return;
+    }
+    const file = new File(
+      [this.creatorGeneratedZipBlob],
+      `${this.alias || 'problem'}.zip`,
+      { type: 'application/zip' },
+    );
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    this.creatorFileInputRef.files = dataTransfer.files;
   }
 
   get howToWriteProblemLink(): string {
@@ -727,9 +833,40 @@ export default class ProblemForm extends Vue {
     this.problemLevel = levelTag;
   }
 
-  onUploadFile(ev: InputEvent): void {
+  async onUploadFile(ev: InputEvent): Promise<void> {
     const uploadedFile = ev.target as HTMLInputElement;
-    this.hasFile = uploadedFile.files !== null;
+    this.hasFile = uploadedFile.files !== null && uploadedFile.files.length > 0;
+    if (
+      !this.isUpdate &&
+      this.showCreationMethodSelector &&
+      this.currentCreationMethod === CreationMethods.Zip &&
+      uploadedFile.files?.length
+    ) {
+      await this.importZipIntoCreator(uploadedFile.files[0]);
+    }
+  }
+
+  async importZipIntoCreator(zipFile: File): Promise<void> {
+    // Only Creator-generated zips (with a cdp.data snapshot) can populate the
+    // Creator; other zips keep the plain upload flow. Standard omegaUp zips
+    // will be supported in a follow-up.
+    try {
+      const zipContent = await new JSZip().loadAsync(zipFile);
+      if (!zipContent.file('cdp.data')) {
+        return;
+      }
+    } catch {
+      return;
+    }
+    this.currentCreationMethod = CreationMethods.Creator;
+    this.creatorGeneratedZipBlob = null;
+    this.openProblemCreatorModal();
+    await this.$nextTick();
+    const success = await this.problemCreatorRef?.importZipFile?.(zipFile);
+    if (!success) {
+      this.showProblemCreator = false;
+      this.currentCreationMethod = CreationMethods.Zip;
+    }
   }
 
   onGenerateAlias(): void {
@@ -824,5 +961,65 @@ export default class ProblemForm extends Vue {
 .problem-form .languages {
   padding: 0;
   width: 100%;
+}
+
+.problem-creator-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--problem-creator-modal-overlay-background-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1060;
+}
+
+.problem-creator-modal-content {
+  background-color: var(--problem-creator-modal-content-background-color);
+  height: 81vh;
+  width: 78%;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px var(--problem-creator-modal-box-shadow-color);
+}
+
+.problem-creator-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.problem-creator-modal-footer {
+  padding: 20px;
+  border-top: 1px solid var(--problem-creator-modal-footer-border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .problem-creator-modal {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .problem-creator-modal-content {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .problem-creator-modal-body {
+    padding: 0;
+  }
+
+  .problem-creator-modal-footer {
+    padding: 8px 12px;
+  }
 }
 </style>
