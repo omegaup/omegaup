@@ -1252,16 +1252,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         string $assignment_alias
     ): int {
         $sql = 'UPDATE Assignments a
-                JOIN (
-                    SELECT assignment_id, sum(psp.points) as max_points
-                    FROM Assignments a
-                    INNER JOIN Problemset_Problems psp
-                        ON a.problemset_id = psp.problemset_id
-                    GROUP BY a.assignment_id
-                ) q
-                ON a.assignment_id = q.assignment_id
-                SET a.max_points = q.max_points
-                WHERE alias = ? AND course_id = ?;';
+                SET a.max_points = (
+                    SELECT IFNULL(SUM(psp.points), 0.0)
+                    FROM Problemset_Problems psp
+                    WHERE psp.problemset_id = a.problemset_id
+                )
+                WHERE a.alias = ? AND a.course_id = ?;';
 
         $params = [$assignment_alias, $course->course_id];
 
