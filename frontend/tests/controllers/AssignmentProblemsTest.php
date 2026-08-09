@@ -170,6 +170,15 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment' => $assignmentAlias,
         ]));
         $this->assertSame(0, sizeof($getAssignmentResponse['problems']));
+
+        $courseId = $courseData['course']->course_id;
+        $this->assertNotNull($courseId);
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $courseId
+        );
+        $this->assertNotNull($assignment);
+        $this->assertSame(0.0, $assignment->max_points);
     }
 
     public function testAddRemoveProblems() {
