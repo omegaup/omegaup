@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
-
+import common_ViewUnavailable from '../common/ViewUnavailable.vue';
 import T from '../../lang';
 
 import course_AddStudents from './AddStudents.vue';
@@ -16,8 +16,10 @@ describe('AddStudents.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.courseEditAddStudentsAdd);
-    expect(wrapper.text()).toContain(T.courseStudentsEmptyTitle);
-    expect(wrapper.text()).toContain(T.courseStudentsEmptyDescription);
+    const emptyState = wrapper.findComponent(common_ViewUnavailable);
+    expect(emptyState.exists()).toBe(true);
+    expect(emptyState.props('title')).toBe(T.courseStudentsEmptyTitle);
+    expect(emptyState.props('description')).toBe(T.courseStudentsEmptyDescription);
   });
 
   it('Should handle students list and requests list', () => {
