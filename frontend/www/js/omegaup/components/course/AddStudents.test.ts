@@ -16,7 +16,8 @@ describe('AddStudents.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.courseEditAddStudentsAdd);
-    expect(wrapper.text()).toContain(T.courseStudentsEmpty);
+    expect(wrapper.text()).toContain(T.courseStudentsEmptyTitle);
+    expect(wrapper.text()).toContain(T.courseStudentsEmptyDescription);
   });
 
   it('Should handle students list and requests list', () => {

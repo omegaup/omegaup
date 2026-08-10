@@ -48,6 +48,8 @@
           </button>
         </div>
       </form>
+
+      <!-- TODO(#9875): Replace with the dedicated empty-state component once that PR is merged -->
       <omegaup-view-unavailable
         v-if="students.length == 0"
         class="course-students-empty"
