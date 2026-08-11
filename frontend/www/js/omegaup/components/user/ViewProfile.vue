@@ -45,46 +45,65 @@
               </p>
             </template>
             <template v-else>
-              <div
-                ref="aboutMarkdownButtonBar"
-                class="wmd-button-bar mb-2"
-              ></div>
-              <textarea
-                ref="aboutMarkdownInput"
-                v-model="readmeEditContent"
-                class="form-control wmd-input mb-2"
-                :maxlength="MAX_ABOUT_LENGTH"
-                @input="enforceLimit"
-              ></textarea>
-              <div class="d-flex justify-content-end mt-1">
+              <div class="d-flex align-items-center mb-2">
+                <div class="btn-group btn-group-sm ml-auto">
+                  <button
+                    type="button"
+                    class="btn"
+                    :class="readmeEditMode ? 'btn-primary' : 'btn-outline-secondary'"
+                    @click="readmeEditMode = true"
+                  >
+                    {{ T.wordsEdit }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn"
+                    :class="!readmeEditMode ? 'btn-primary' : 'btn-outline-secondary'"
+                    @click="readmeEditMode = false"
+                  >
+                    {{ T.wordsPreview }}
+                  </button>
+                </div>
+              </div>
+
+              <template v-if="readmeEditMode">
+                <div ref="aboutMarkdownButtonBar" class="wmd-button-bar mb-2"></div>
+                <textarea
+                  ref="aboutMarkdownInput"
+                  v-model="readmeEditContent"
+                  class="form-control wmd-input mb-2"
+                  :maxlength="MAX_ABOUT_LENGTH"
+                  @input="enforceLimit"
+                  rows="8"
+                ></textarea>
+              </template>
+
+              <omegaup-markdown
+                v-else
+                :markdown="readmeEditContent || ''"
+                class="wmd-preview border rounded p-3 mb-2"
+                :full-width="true"
+              ></omegaup-markdown>
+
+              <div class="d-flex justify-content-between align-items-center">
                 <small
-                  :class="{
-                    'text-danger': isOverLimit,
-                    'text-warning': isNearLimit,
-                    'text-muted': !isNearLimit,
+                  :class="{ 
+                    'text-danger': isOverLimit, 
+                    'text-warning': isNearLimit, 
+                    'text-muted': !isNearLimit 
                   }"
                 >
                   {{ charCount }} / {{ MAX_ABOUT_LENGTH }}
                 </small>
+                <div>
+                  <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
+                    {{ T.wordsSaveChanges }}
+                  </button>
+                  <button class="btn btn-secondary btn-sm" @click="cancelEditReadme">
+                    {{ T.wordsCancel }}
+                  </button>
+                </div>
               </div>
-              <div
-                v-if="readmeEditContent"
-                class="border p-3 mb-2 readme-preview"
-              >
-                <omegaup-markdown
-                  :markdown="readmeEditContent"
-                  :full-width="true"
-                />
-              </div>
-              <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
-                {{ T.wordsSaveChanges }}
-              </button>
-              <button
-                class="btn btn-secondary btn-sm"
-                @click="cancelEditReadme"
-              >
-                {{ T.wordsCancel }}
-              </button>
             </template>
           </div>
         </div>
@@ -439,23 +458,40 @@ export default class ViewProfile extends Vue {
   T = T;
   ui = ui;
   aboutMarkdownEditor: Markdown.Editor | null = null;
-  columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
-  normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
   currentReadme: string = this.profile.readme ?? '';
   isEditingReadme = false;
+  normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
+  readmeEditMode = true;
   readmeEditContent: string = '';
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
   MAX_ABOUT_LENGTH = MAX_ABOUT_LENGTH;
 
-  mounted(): void {
-    if (this.isEditingReadme) {
-      this.$nextTick(() => {
-        this.initAboutEditor();
-      });
+  @Watch('selectedTab')
+  onSelectedTabPropChanged(newValue: string | null): void {
+    if (newValue !== null) {
+      this.currentSelectedTab = getInitialSelectedTab(this.profile, newValue);
     }
   }
+
+  @Watch('currentSelectedTab')
+  onCurrentSelectedTabChanged(newValue: string): void {
+    this.$emit('update:selectedTab', newValue);
+  }
+
+  @Watch('readmeEditMode')
+  onReadmeEditModeChanged(newValue: boolean): void {
+    if (newValue) {
+      this.$nextTick(() => {
+        this.initAboutEditor();
+        this.removeDisabledButtons();
+        if (this.aboutMarkdownInput) {
+          this.aboutMarkdownInput.focus();
+        }
+      });
+    }
+  }  
 
   private initAboutEditor(): void {
     if (this.aboutMarkdownEditor) return;
@@ -473,6 +509,33 @@ export default class ViewProfile extends Vue {
     );
 
     this.aboutMarkdownEditor.run();
+  }
+
+  private removeDisabledButtons(): void {
+    // Remove Link button from DOM
+    const linkButton = this.aboutMarkdownButtonBar?.querySelector('#wmd-link-button');
+    if (linkButton) {
+      linkButton.remove();
+    }
+
+    // Remove Image button from DOM
+    const imageButton = this.aboutMarkdownButtonBar?.querySelector('#wmd-image-button');
+    if (imageButton) {
+      imageButton.remove();
+    }
+
+    // Block keyboard shortcuts for Link (Ctrl+L) and Image (Ctrl+G)
+    this.aboutMarkdownInput?.addEventListener(
+      'keydown',
+      (event: KeyboardEvent) => {
+        if ((event.ctrlKey || event.metaKey) && 
+            (event.key.toLowerCase() === 'l' || event.key.toLowerCase() === 'g')) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
   }
 
   get charCount(): number {
@@ -560,8 +623,10 @@ export default class ViewProfile extends Vue {
   startEditReadme(): void {
     this.readmeEditContent = this.currentReadme;
     this.isEditingReadme = true;
+    this.readmeEditMode = true;
     this.$nextTick(() => {
       this.initAboutEditor();
+      this.removeDisabledButtons();
       if (this.aboutMarkdownInput) {
         this.aboutMarkdownInput.focus();
         const length = this.aboutMarkdownInput.value.length;
@@ -573,6 +638,7 @@ export default class ViewProfile extends Vue {
   cancelEditReadme(): void {
     this.isEditingReadme = false;
     this.readmeEditContent = '';
+    this.readmeEditMode = true;
     this.aboutMarkdownEditor = null;
   }
 
@@ -601,27 +667,6 @@ export default class ViewProfile extends Vue {
         ui.success(T.profileAboutSectionReportSuccess);
       },
     });
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabPropChanged(newValue: string | null) {
-    if (newValue !== null) {
-      this.currentSelectedTab = getInitialSelectedTab(this.profile, newValue);
-    }
-  }
-
-  @Watch('currentSelectedTab')
-  onCurrentSelectedTabChanged(newValue: string) {
-    this.$emit('update:selectedTab', newValue);
-  }
-
-  @Watch('isEditingReadme')
-  onEditingReadmeChanged(newValue: boolean): void {
-    if (newValue) {
-      this.$nextTick(() => {
-        this.initAboutEditor();
-      });
-    }
   }
 }
 </script>
