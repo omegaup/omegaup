@@ -55,6 +55,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._phases: List[Dict[str, Any]] = []
         self._rows_affected: Optional[int] = None
         self._start_monotonic = 0.0
+        self._forced_failure = False
 
     @property
     def _lock_name(self) -> str:
@@ -67,17 +68,25 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
             self._external_connection
             or lib.db.connect(
                 lib.db.DatabaseConnectionArguments.from_args(self._args)))
-        if self._is_disabled():
-            logging.info(
-                'cron job %s is disabled, skipping', self._program)
+        # __exit__ does not run when __enter__ raises, so anything acquired
+        # here has to be released here.
+        locked = False
+        try:
+            if self._is_disabled():
+                logging.info(
+                    'cron job %s is disabled, skipping', self._program)
+                raise SystemExit(0)
+            if not self._acquire_lock():
+                logging.info(
+                    'cron job %s is already running, skipping', self._program)
+                raise SystemExit(0)
+            locked = True
+            self._insert_running_row()
+        except BaseException:
+            if locked:
+                self._release_lock()
             self._close_connection()
-            raise SystemExit(0)
-        if not self._acquire_lock():
-            logging.info(
-                'cron job %s is already running, skipping', self._program)
-            self._close_connection()
-            raise SystemExit(0)
-        self._insert_running_row()
+            raise
         return self
 
     def __exit__(
@@ -89,9 +98,11 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
             return
         try:
             self._finish(exc_value)
-            self._release_lock()
         finally:
-            self._close_connection()
+            try:
+                self._release_lock()
+            finally:
+                self._close_connection()
 
     @contextlib.contextmanager
     def phase(self, name: str) -> Iterator[None]:
@@ -124,6 +135,14 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
     def set_rows_affected(self, rows: int) -> None:
         '''Records how many rows the job wrote.'''
         self._rows_affected = rows
+
+    def mark_failure(self) -> None:
+        '''Records this run as failed even if nothing was raised.
+
+        Jobs that report failures through a return value need this, otherwise
+        the run would be recorded as successful.
+        '''
+        self._forced_failure = True
 
     def _is_disabled(self) -> bool:
         '''Whether the registry disabled this job. Unregistered jobs run.'''
@@ -167,7 +186,8 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
     def _finish(self, exc_value: Any) -> None:
         if self._connection is None or self._run_id is None:
             return
-        status = 'failure' if exc_value is not None else 'success'
+        failed = exc_value is not None or self._forced_failure
+        status = 'failure' if failed else 'success'
         error_text: Optional[str] = None
         if exc_value is not None:
             error_text = f'{type(exc_value).__name__}: {exc_value}'

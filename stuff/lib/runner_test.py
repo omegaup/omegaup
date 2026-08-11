@@ -32,6 +32,9 @@ class _FakeCursor:
         '''Records the statement and scripts the next GET_LOCK answer.'''
         self._connection.calls.append((query, params))
         normalized = ' '.join(query.lower().split())
+        if (self._connection.fail_on is not None
+                and self._connection.fail_on in normalized):
+            raise RuntimeError('database is unhappy')
         if 'from `cron_jobs`' in normalized:
             self._connection.last_fetchone = self._connection.enabled_row
         elif 'get_lock' in normalized:
@@ -61,9 +64,11 @@ class _FakeConnection:  # pylint: disable=too-many-instance-attributes
     def __init__(
             self,
             lock_acquired: bool = True,
-            enabled_row: Optional[Tuple[int]] = None) -> None:
+            enabled_row: Optional[Tuple[int]] = None,
+            fail_on: Optional[str] = None) -> None:
         self.lock_acquired = lock_acquired
         self.enabled_row = enabled_row
+        self.fail_on = fail_on
         self.calls: List[Tuple[str, Any]] = []
         self.commits = 0
         self.closed = False
@@ -213,3 +218,54 @@ def test_unregistered_job_still_runs() -> None:
         pass
 
     assert any('INSERT INTO `Cron_Runs`' in query for query, _ in conn.calls)
+
+
+def test_mark_failure_records_a_failed_run() -> None:
+    '''A job that handles its own error is still recorded as failed.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        cron_run.mark_failure()
+
+    assert _matching(conn.calls, 'update `cron_runs`')[0][0] == 'failure'
+
+
+def test_releases_lock_when_recording_the_start_fails() -> None:
+    '''A failure between the lock and the start row still frees the lock.'''
+    conn = _FakeConnection(fail_on='insert into `cron_runs`')
+    args = _args()
+
+    with pytest.raises(RuntimeError):
+        with _run('update_ranks.py', args, conn):
+            pass
+
+    assert _matching(conn.calls, 'release_lock')
+
+
+def test_closes_owned_connection_when_recording_the_start_fails(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    '''The runner closes the connection it opened when startup fails.'''
+    conn = _FakeConnection(fail_on='insert into `cron_runs`')
+    monkeypatch.setattr(
+        lib.db.DatabaseConnectionArguments, 'from_args',
+        staticmethod(lambda _args: None))
+    monkeypatch.setattr(lib.db, 'connect', lambda _config: conn)
+
+    with pytest.raises(RuntimeError):
+        with lib.runner.run('update_ranks.py', _args()):
+            pass
+
+    assert conn.closed
+
+
+def test_releases_lock_when_finishing_fails() -> None:
+    '''A failure while writing the final status still frees the lock.'''
+    conn = _FakeConnection(fail_on='update `cron_runs`')
+    args = _args()
+
+    with pytest.raises(RuntimeError):
+        with _run('update_ranks.py', args, conn):
+            pass
+
+    assert _matching(conn.calls, 'release_lock')
