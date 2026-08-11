@@ -11,7 +11,7 @@ class UserParams {
 
     /**
      * @readonly
-     * @var string
+     * @var null|string
      */
     public $name;
 
@@ -58,13 +58,16 @@ class UserParams {
     public $birthDate;
 
     /**
-     * @param array{username?: string, name?: string, password?: string, email?: string, parentEmail?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string, birthDate?: int} $params
+     * @param array{username?: string, name?: null|string, password?: string, email?: string, parentEmail?: string, isPrivate?: bool, verify?: bool, preferredLanguage?: string, birthDate?: int} $params
      */
     public function __construct(array $params = []) {
         $emailBase = \OmegaUp\Test\Utils::CreateRandomString();
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $hasName = array_key_exists('name', $params);
-        $this->name = $hasName ? $params['name'] : \OmegaUp\Test\Utils::CreateRandomString();
+        if (array_key_exists('name', $params)) {
+            $this->name = $params['name'];
+        } else {
+            $this->name = \OmegaUp\Test\Utils::CreateRandomString();
+        }
         $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->email = $params['email'] ?? "{$emailBase}@mail.com";
         $this->parentEmail = $params['email'] ?? "parent_{$emailBase}@mail.com";
