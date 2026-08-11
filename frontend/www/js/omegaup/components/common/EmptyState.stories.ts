@@ -46,7 +46,8 @@ export const WithButtonLink: Story = {
   args: {
     icon: 'users',
     title: 'No team groups created',
-    description: 'Create your first team group to start organizing contestants.',
+    description:
+      'Create your first team group to start organizing contestants.',
     buttonText: 'Create Team Group',
     buttonLink: '/group/new/',
   },
