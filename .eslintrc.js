@@ -8,7 +8,7 @@ module.exports = {
     jquery: true,
     node: true,
   },
-  plugins: ['@typescript-eslint', 'jest-dom'],
+  plugins: ['@typescript-eslint', 'jest-dom', 'simple-import-sort'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -21,6 +21,10 @@ module.exports = {
     'prettier/vue',
   ],
   rules: {
+    // Enforce sorted imports and exports for consistency and reduced merge conflicts.
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
+
     // Disabling this rule since inferrable types are still useful to declare
     // for humans.
     '@typescript-eslint/no-inferrable-types': 'off',
