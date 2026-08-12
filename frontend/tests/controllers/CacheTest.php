@@ -218,7 +218,9 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
     ): void {
         if ($cache instanceof \OmegaUp\InProcessCacheAdapter) {
             // InProcessCacheAdapter does not support TTL.
-            return;
+            $this->markTestSkipped(
+                'InProcessCacheAdapter does not support TTL.'
+            );
         }
         $key = uniqid('incwithttl-zero-');
         $originalTtl = 3;
