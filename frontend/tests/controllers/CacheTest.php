@@ -141,6 +141,23 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @dataProvider cacheAdapterProvider
      */
+    public function testCacheEntryWithTTL(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('entrywithttl-');
+        $ttl = 2;
+
+        $this->assertSame('first', $cache->entry($key, 'first', $ttl));
+        $this->assertSame('first', $cache->fetch($key));
+
+        if (!($cache instanceof \OmegaUp\InProcessCacheAdapter)) {
+            sleep($ttl + 1);
+            $this->assertSame('second', $cache->entry($key, 'second', $ttl));
+            $this->assertSame('second', $cache->fetch($key));
+        }
+    }
+
+    /**
+     * @dataProvider cacheAdapterProvider
+     */
     public function testCacheIncWithTTL(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid('incwithttl-');
         $ttl = 2; // 2 seconds TTL
