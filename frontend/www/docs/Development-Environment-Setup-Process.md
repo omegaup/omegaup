@@ -129,13 +129,14 @@ If you want to run the JavaScript/TypeScript tests locally (outside of Docker), 
 2. **Install Node Dependencies**
 
    ```shell
-   yarn install
+   corepack enable
+   pnpm install
    ```
 
 3. **Run Tests**
 
    ```shell
-   yarn test
+   pnpm test
    ```
 
 ### Common Issues
@@ -153,8 +154,9 @@ For a fresh clone, use this single command to clone with all submodules:
 ```shell
 git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
 cd omegaup
-yarn install
-yarn test
+corepack enable
+pnpm install
+pnpm test
 ```
 
 ## Codebase structure
@@ -264,7 +266,7 @@ ln -sf ~/.mysql.docker.cnf .my.cnf
 
 ---
 
-If you encounter errors related to Node.js version mismatch or `yarn install` failing after pulling the latest changes:
+If you encounter errors related to Node.js version mismatch or `pnpm install` failing after pulling the latest changes:
 
 - **Outside Docker:** run `nvm install` and `nvm use` (see [Running Tests Locally](#running-tests-locally)).
 - **Inside Docker:** rebuild the frontend container:
@@ -311,7 +313,7 @@ frontend-1 | mkdir: cannot create directory '/opt/omegaup/frontend/www/phpminiad
 frontend-1 | 2026-01-31 06:20:54,401 INFO success: developer-environment entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
 frontend-1 | 2026-01-31 06:20:54,402 INFO exited: developer-environment (exit status 1; not expected)
 frontend-1 | 2026-01-31 06:20:55,402 INFO spawned: 'developer-environment' with pid 1163
-frontend-1 | 2026-01-31 06:20:55,403 INFO success: yarn-run entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+frontend-1 | 2026-01-31 06:20:55,403 INFO success: pnpm-run entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 ```
 
 
