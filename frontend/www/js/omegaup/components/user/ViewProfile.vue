@@ -50,7 +50,9 @@
                   <button
                     type="button"
                     class="btn"
-                    :class="readmeEditMode ? 'btn-primary' : 'btn-outline-secondary'"
+                    :class="
+                      readmeEditMode ? 'btn-primary' : 'btn-outline-secondary'
+                    "
                     @click="readmeEditMode = true"
                   >
                     {{ T.wordsEdit }}
@@ -58,7 +60,9 @@
                   <button
                     type="button"
                     class="btn"
-                    :class="!readmeEditMode ? 'btn-primary' : 'btn-outline-secondary'"
+                    :class="
+                      !readmeEditMode ? 'btn-primary' : 'btn-outline-secondary'
+                    "
                     @click="readmeEditMode = false"
                   >
                     {{ T.wordsPreview }}
@@ -85,19 +89,25 @@
 
               <div class="d-flex justify-content-between align-items-center">
                 <small
-                  :class="{ 
-                    'text-danger': isOverLimit, 
-                    'text-warning': isNearLimit, 
-                    'text-muted': !isNearLimit 
+                  :class="{
+                    'text-danger': isOverLimit,
+                    'text-warning': isNearLimit,
+                    'text-muted': !isNearLimit,
                   }"
                 >
                   {{ charCount }} / {{ MAX_ABOUT_LENGTH }}
                 </small>
                 <div>
-                  <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
+                  <button
+                    class="btn btn-primary btn-sm mr-2"
+                    @click="saveReadme"
+                  >
                     {{ T.wordsSaveChanges }}
                   </button>
-                  <button class="btn btn-secondary btn-sm" @click="cancelEditReadme">
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    @click="cancelEditReadme"
+                  >
                     {{ T.wordsCancel }}
                   </button>
                 </div>
@@ -467,12 +477,16 @@ export default class ViewProfile extends Vue {
   MAX_ABOUT_LENGTH = MAX_ABOUT_LENGTH;
 
   private removeDisabledButtons(): void {
-    const linkButton = this.aboutMarkdownButtonBar.querySelector('#wmd-link-button');
+    const linkButton = this.aboutMarkdownButtonBar.querySelector(
+      '#wmd-link-button',
+    );
     if (linkButton) {
       linkButton.remove();
     }
 
-    const imageButton = this.aboutMarkdownButtonBar.querySelector('#wmd-image-button');
+    const imageButton = this.aboutMarkdownButtonBar.querySelector(
+      '#wmd-image-button',
+    );
     if (imageButton) {
       imageButton.remove();
     }
