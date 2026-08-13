@@ -45,7 +45,7 @@
               </p>
             </template>
             <template v-else>
-              <div class="d-flex align-items-center mb-2">
+              <div class="d-flex align-items-center mb-1">
                 <div class="btn-group btn-group-sm ml-auto">
                   <button
                     type="button"
@@ -67,22 +67,20 @@
               </div>
 
               <template v-if="readmeEditMode">
-                <div ref="aboutMarkdownButtonBar" class="wmd-button-bar mb-2"></div>
+                <div ref="aboutMarkdownButtonBar" class="wmd-button-bar"></div>
                 <textarea
                   ref="aboutMarkdownInput"
                   v-model="readmeEditContent"
-                  class="form-control wmd-input mb-2"
+                  class="form-control wmd-input"
                   :maxlength="MAX_ABOUT_LENGTH"
                   @input="enforceLimit"
-                  rows="8"
                 ></textarea>
               </template>
 
               <omegaup-markdown
                 v-else
                 :markdown="readmeEditContent || ''"
-                class="wmd-preview border rounded p-3 mb-2"
-                :full-width="true"
+                class="wmd-preview border rounded p-2"
               ></omegaup-markdown>
 
               <div class="d-flex justify-content-between align-items-center">
@@ -462,11 +460,37 @@ export default class ViewProfile extends Vue {
   currentReadme: string = this.profile.readme ?? '';
   isEditingReadme = false;
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  readmeEditMode = true;
+  readmeEditMode = false;
   readmeEditContent: string = '';
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
   MAX_ABOUT_LENGTH = MAX_ABOUT_LENGTH;
+
+  private removeDisabledButtons(): void {
+    const linkButton = this.aboutMarkdownButtonBar.querySelector('#wmd-link-button');
+    if (linkButton) {
+      linkButton.remove();
+    }
+
+    const imageButton = this.aboutMarkdownButtonBar.querySelector('#wmd-image-button');
+    if (imageButton) {
+      imageButton.remove();
+    }
+
+    this.aboutMarkdownInput.addEventListener(
+      'keydown',
+      (event: KeyboardEvent) => {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          (event.key.toLowerCase() === 'l' || event.key.toLowerCase() === 'g')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
+  }
 
   @Watch('selectedTab')
   onSelectedTabPropChanged(newValue: string | null): void {
@@ -484,58 +508,25 @@ export default class ViewProfile extends Vue {
   onReadmeEditModeChanged(newValue: boolean): void {
     if (newValue) {
       this.$nextTick(() => {
-        this.initAboutEditor();
+        this.aboutMarkdownEditor = new Markdown.Editor(
+          aboutMarkdownConverter.converter,
+          '',
+          {
+            panels: {
+              buttonBar: this.aboutMarkdownButtonBar,
+              preview: null,
+              input: this.aboutMarkdownInput,
+            },
+          },
+        );
+        this.aboutMarkdownEditor.run();
         this.removeDisabledButtons();
+
         if (this.aboutMarkdownInput) {
           this.aboutMarkdownInput.focus();
         }
       });
     }
-  }  
-
-  private initAboutEditor(): void {
-    if (this.aboutMarkdownEditor) return;
-
-    this.aboutMarkdownEditor = new Markdown.Editor(
-      aboutMarkdownConverter.converter,
-      '',
-      {
-        panels: {
-          buttonBar: this.aboutMarkdownButtonBar,
-          preview: null,
-          input: this.aboutMarkdownInput,
-        },
-      },
-    );
-
-    this.aboutMarkdownEditor.run();
-  }
-
-  private removeDisabledButtons(): void {
-    // Remove Link button from DOM
-    const linkButton = this.aboutMarkdownButtonBar?.querySelector('#wmd-link-button');
-    if (linkButton) {
-      linkButton.remove();
-    }
-
-    // Remove Image button from DOM
-    const imageButton = this.aboutMarkdownButtonBar?.querySelector('#wmd-image-button');
-    if (imageButton) {
-      imageButton.remove();
-    }
-
-    // Block keyboard shortcuts for Link (Ctrl+L) and Image (Ctrl+G)
-    this.aboutMarkdownInput?.addEventListener(
-      'keydown',
-      (event: KeyboardEvent) => {
-        if ((event.ctrlKey || event.metaKey) && 
-            (event.key.toLowerCase() === 'l' || event.key.toLowerCase() === 'g')) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-        }
-      },
-      true,
-    );
   }
 
   get charCount(): number {
@@ -624,21 +615,12 @@ export default class ViewProfile extends Vue {
     this.readmeEditContent = this.currentReadme;
     this.isEditingReadme = true;
     this.readmeEditMode = true;
-    this.$nextTick(() => {
-      this.initAboutEditor();
-      this.removeDisabledButtons();
-      if (this.aboutMarkdownInput) {
-        this.aboutMarkdownInput.focus();
-        const length = this.aboutMarkdownInput.value.length;
-        this.aboutMarkdownInput.setSelectionRange(length, length);
-      }
-    });
   }
 
   cancelEditReadme(): void {
     this.isEditingReadme = false;
     this.readmeEditContent = '';
-    this.readmeEditMode = true;
+    this.readmeEditMode = false;
     this.aboutMarkdownEditor = null;
   }
 
@@ -648,12 +630,13 @@ export default class ViewProfile extends Vue {
       return;
     }
 
-    const content = this.readmeEditContent ?? '';
+    const content = this.readmeEditContent;
     this.$emit('save-readme', {
       readme: content,
       onSuccess: () => {
         this.currentReadme = content;
         this.isEditingReadme = false;
+        this.readmeEditMode = false;
         this.aboutMarkdownEditor = null;
       },
     });
