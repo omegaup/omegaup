@@ -935,14 +935,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 SELECT
                     admined_course_roles.course_id,
                     IF(
-                        MAX(admined_course_roles.is_admin),
+                        MAX(admined_course_roles.role_priority) = 1,
                         ?,
                         ?
                     ) AS highest_role
                 FROM (
                     SELECT
                         c.course_id,
-                        TRUE AS is_admin
+                        0 AS role_priority
                     FROM
                         ACLs AS a
                     INNER JOIN
@@ -957,7 +957,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
                     SELECT
                         c.course_id,
-                        (ur.role_id = ?) AS is_admin
+                        IF(ur.role_id = ?, 2, 1) AS role_priority
                     FROM
                         User_Roles AS ur
                     INNER JOIN
@@ -973,7 +973,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
                     SELECT
                         c.course_id,
-                        (gr.role_id = ?) AS is_admin
+                        IF(gr.role_id = ?, 2, 1) AS role_priority
                     FROM
                         Groups_Identities AS gi
                     INNER JOIN
@@ -996,8 +996,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ?, ?";
 
         $params = [
-            $adminRole,
             $taRole,
+            $adminRole,
             $identityId,
             $adminRole,
             $identityId,

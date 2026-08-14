@@ -191,7 +191,9 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant(
             new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
+                'auth_token' => self::login(
+                    $courseData['admin']
+                )->auth_token,
                 'group' => $groupData['request']['alias'],
                 'course_alias' => $courseData['course_alias'],
             ])
