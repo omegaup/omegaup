@@ -171,6 +171,51 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty($courses['filteredCourses']['current']['courses']);
     }
 
+    public function testAdminRoleTakesPriorityOverGroupTeachingAssistantRole() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $adminLogin = self::login($courseData['admin']);
+        \OmegaUp\Controllers\Course::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $identity->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            owner: $courseData['admin']
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identity
+        );
+        \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'group' => $groupData['request']['alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $courses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($identity)->auth_token,
+            ])
+        )['templateProperties']['payload']['courses']['admin'];
+
+        $this->assertCount(
+            1,
+            $courses['filteredCourses']['current']['courses']
+        );
+        $this->assertSame(
+            $courseData['course_alias'],
+            $courses['filteredCourses']['current']['courses'][0]['alias']
+        );
+        $this->assertEmpty(
+            $courses['filteredCourses']['teachingAssistant']['courses']
+        );
+    }
+
     public function testListCoursesMineForTeachingAssistant() {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
