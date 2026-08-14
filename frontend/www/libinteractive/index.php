@@ -61,4 +61,5 @@ if ($location[strlen($location) - 1] != '/') {
     $location .= '/';
 }
 
-header("Location: {$location}{$preferred}/");
+header("Location: /libinteractive/{$preferred}/");
+
