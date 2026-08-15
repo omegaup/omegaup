@@ -19,7 +19,9 @@ describe('AddStudents.vue', () => {
     const emptyState = wrapper.findComponent(common_ViewUnavailable);
     expect(emptyState.exists()).toBe(true);
     expect(emptyState.props('title')).toBe(T.courseStudentsEmptyTitle);
-    expect(emptyState.props('description')).toBe(T.courseStudentsEmptyDescription);
+    expect(emptyState.props('description')).toBe(
+      T.courseStudentsEmptyDescription,
+    );
   });
 
   it('Should handle students list and requests list', () => {
