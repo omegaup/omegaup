@@ -33,6 +33,13 @@ class GetFirstDayOfNextMonthTest(unittest.TestCase):
             datetime.date(2026, 3, 1),
         )
 
+    def test_february_leap_year(self) -> None:
+        '''February 1st rolls forward to March 1st in a leap year too.'''
+        self._assert_next(
+            datetime.date(2024, 2, 1),
+            datetime.date(2024, 3, 1),
+        )
+
     def test_mid_month_resets_day_to_first(self) -> None:
         '''Any day within a month rolls to the 1st of the next month.'''
         self._assert_next(
