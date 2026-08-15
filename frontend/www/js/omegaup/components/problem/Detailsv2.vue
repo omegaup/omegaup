@@ -165,6 +165,12 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
+export enum Tabs {
+  Details = 'Details',
+  Submissions = 'submissions',
+  Clarifications = 'clarifications',
+}
+
 @Component({
   components: {
     'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
