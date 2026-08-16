@@ -36,7 +36,7 @@ class Identity {
                 foreach (range(0, $numberOfContestants - 1) as $id) {
                     $members[] = [
                         'username' => "{$groupAlias}:{$data[0]}_identity_{$id}",
-                        'password' => \OmegaUp\Test\Utils::createRandomString(),
+                        'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                     ];
                 }
                 $members = json_encode($members);
@@ -57,7 +57,7 @@ class Identity {
                 'gender' => strval($data[4]),
                 'password' => is_null(
                     $password
-                ) ? \OmegaUp\Test\Utils::createRandomString() : $password,
+                ) ? \OmegaUp\Test\Utils::createRandomPassword() : $password,
                 'usernames' => $members,
             ];
             if (isset($data[5])) {

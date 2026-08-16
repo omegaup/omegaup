@@ -11,7 +11,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a group, a set of identities, get one of them
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         [
             $unassociatedIdentity,
             $associatedIdentity
@@ -48,7 +48,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Create a group, a set of identities, get one of them
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         [
             $unassociatedIdentity,
             $associatedIdentity
@@ -82,7 +82,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRestrictionsForProblems() {
         // Create a group, a set of identities, get one of them
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         [
             $unassociatedIdentity,
             $associatedIdentity
@@ -114,7 +114,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRestrictionsForGroups() {
         // Create a group, a set of identities, get one of them
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         [
             $unassociatedIdentity,
             $associatedIdentity

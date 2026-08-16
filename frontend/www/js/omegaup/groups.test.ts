@@ -73,6 +73,10 @@ describe('groups_utils', () => {
     it("Shouldn't be human-readable (equal to 8 characters)", () => {
       const password = generatePassword();
       expect(password.length).toBe(simplePasswordLength);
+      expect(password).toMatch(/[a-z]/);
+      expect(password).toMatch(/[A-Z]/);
+      expect(password).toMatch(/[0-9]/);
+      expect(password).toMatch(/[!@#$%&*]/);
     });
   });
 

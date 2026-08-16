@@ -1137,7 +1137,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
-        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        $identityPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -1215,16 +1215,16 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $submissionsMapping = [
-            ['username' => 'id_1', 'numRuns' => 3, 'password' => 'password_1'],
-            ['username' => 'id_2', 'numRuns' => 4, 'password' => 'password_2'],
-            ['username' => 'id_3', 'numRuns' => 2, 'password' => 'password_3'],
-            ['username' => 'id_4', 'numRuns' => 6, 'password' => 'password_4'],
-            ['username' => 'id_5', 'numRuns' => 5, 'password' => 'password_5'],
+            ['username' => 'id_1', 'numRuns' => 3, 'password' => 'Password_1!'],
+            ['username' => 'id_2', 'numRuns' => 4, 'password' => 'Password_2!'],
+            ['username' => 'id_3', 'numRuns' => 2, 'password' => 'Password_3!'],
+            ['username' => 'id_4', 'numRuns' => 6, 'password' => 'Password_4!'],
+            ['username' => 'id_5', 'numRuns' => 5, 'password' => 'Password_5!'],
         ];
 
         $identities = [];
 
-        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        $identityPassword = \OmegaUp\Test\Utils::createRandomPassword();
         foreach ($submissionsMapping as $index => $submissionsByUser) {
             $identityName = $submissionsByUser['username'];
             $identityPassword = $submissionsByUser['password'];

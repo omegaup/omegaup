@@ -102,28 +102,48 @@ export function getCSVRecords<T extends object>({
 }
 
 export function generatePassword(): string {
-  const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
+  const lowercase = 'acdefhjkmnpqruvwxy';
+  const uppercase = 'ACDEFHJKLMNPQRUVWXY';
+  const digits = '3469';
+  const special = '!@#$%&*';
+  const allChars = lowercase + uppercase + digits + special;
   const len = 8;
-  // Browser supports window.crypto
-  if (typeof window.crypto == 'object') {
-    const arr = new Uint8Array(2 * len);
-    window.crypto.getRandomValues(arr);
-    return Array.from(
-      arr.filter((value) => value <= 255 - (255 % validChars.length)),
-      (value) => validChars[value % validChars.length],
-    )
-      .join('')
-      .substr(0, len);
+
+  // Use cryptographically secure random when available, fallback to Math.random
+  const secureRandom = (max: number): number => {
+    if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] % max;
+    }
+    return Math.floor(Math.random() * max);
+  };
+
+  const pickRandom = (chars: string): string =>
+    chars.charAt(secureRandom(chars.length));
+
+  // Ensure at least one character from each required category
+  const guaranteed = [
+    pickRandom(lowercase),
+    pickRandom(uppercase),
+    pickRandom(digits),
+    pickRandom(special),
+  ];
+
+  // Fill the remaining characters
+  const remaining: string[] = [];
+  for (let i = 0; i < len - guaranteed.length; i++) {
+    remaining.push(pickRandom(allChars));
   }
 
-  // Browser does not support window.crypto
-  let password = '';
-  for (let i = 0; i < len; i++) {
-    password += validChars.charAt(
-      Math.floor(Math.random() * validChars.length),
-    );
+  // Shuffle all characters together (Fisher-Yates)
+  const combined = [...guaranteed, ...remaining];
+  for (let i = combined.length - 1; i > 0; i--) {
+    const j = secureRandom(i + 1);
+    [combined[i], combined[j]] = [combined[j], combined[i]];
   }
-  return password;
+
+  return combined.join('');
 }
 
 export function generateHumanReadablePassword() {
@@ -167,6 +187,7 @@ export function generateHumanReadablePassword() {
   };
   const wordsNumber = 12;
   const totalNumbers = 6;
+  const specialChars = '!@#$%&*';
 
   let langWords: string[] = [];
   switch (T.locale) {
@@ -186,5 +207,7 @@ export function generateHumanReadablePassword() {
   for (let i = 0; i < totalNumbers; i++) {
     password += Math.floor(Math.random() * 10); // random numbers
   }
+  // Add a special character to meet password strength requirements
+  password += specialChars[Math.floor(Math.random() * specialChars.length)];
   return password;
 }
