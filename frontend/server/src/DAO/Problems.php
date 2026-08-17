@@ -1367,51 +1367,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql = '
             FROM (
                 SELECT
-                    p.problem_id
+                    a.acl_id
                 FROM
                     Identities AS i
                 STRAIGHT_JOIN
                     ACLs AS a ON a.owner_id = i.user_id
-                STRAIGHT_JOIN
-                    Problems AS p ON p.acl_id = a.acl_id
                 WHERE
                     i.identity_id = ?
-                    AND p.visibility > ?
 
                 UNION
 
                 SELECT
-                    p.problem_id
+                    ur.acl_id
                 FROM
                     Identities AS i
                 INNER JOIN
                     User_Roles AS ur ON ur.user_id = i.user_id
-                INNER JOIN
-                    Problems AS p ON p.acl_id = ur.acl_id
                 WHERE
                     i.identity_id = ?
                     AND ur.role_id = ?
-                    AND p.visibility > ?
 
                 UNION
 
                 SELECT
-                    p.problem_id
+                    gr.acl_id
                 FROM
                     Groups_Identities AS gi
                 INNER JOIN
                     Group_Roles AS gr ON gr.group_id = gi.group_id
-                INNER JOIN
-                    Problems AS p ON p.acl_id = gr.acl_id
                 WHERE
                     gi.identity_id = ?
                     AND gr.role_id = ?
-                    AND p.visibility > ?
-            ) AS admined_problems
+            ) AS admined_acls
             INNER JOIN
-                Problems AS p ON p.problem_id = admined_problems.problem_id
+                Problems AS p ON p.acl_id = admined_acls.acl_id
             WHERE
-                1 = 1';
+                p.visibility > ?';
         $limits = '
             ORDER BY
                 p.problem_id DESC
@@ -1420,10 +1411,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [
             $identityId,
-            \OmegaUp\ProblemParams::VISIBILITY_DELETED,
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
-            \OmegaUp\ProblemParams::VISIBILITY_DELETED,
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,

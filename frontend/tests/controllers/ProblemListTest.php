@@ -719,6 +719,26 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        // Grant access through all three permission paths simultaneously:
+        // ownership, a direct admin role, and an admin role through a group.
+        \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $authorLogin->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
+            'usernameOrEmail' => $identity->username,
+        ]));
+
+        $adminedProblems = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
+            $identity->identity_id,
+            1,
+            10
+        );
+        $this->assertSame(1, $adminedProblems['count']);
+        $this->assertCount(1, $adminedProblems['problems']);
+        $this->assertSame(
+            $problemDataPrivate['problem']->problem_id,
+            $adminedProblems['problems'][0]->problem_id
+        );
+
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
