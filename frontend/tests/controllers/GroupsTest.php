@@ -283,6 +283,21 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
         ]));
 
+        // Create a group where the user has access through all three routes.
+        $multipleAccessGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $identity
+        );
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
+            'acl_id' => $multipleAccessGroup['group']->acl_id,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'user_id' => $user->user_id,
+        ]));
+        \OmegaUp\DAO\GroupRoles::create(new \OmegaUp\DAO\VO\GroupRoles([
+            'acl_id' => $multipleAccessGroup['group']->acl_id,
+            'group_id' => $adminGroup['group']->group_id,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+        ]));
+
         // Create a group for another user
         \OmegaUp\Test\Factories\Groups::createGroup();
 
@@ -298,9 +313,15 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $expectedAliases[] = $directAdminGroup['group']->alias;
         $expectedAliases[] = $inheritedAdminGroup['group']->alias;
+        $expectedAliases[] = $multipleAccessGroup['group']->alias;
         sort($expectedAliases);
 
         $actualAliases = array_column($response['groups'], 'alias');
+        $aliasesCount = array_count_values($actualAliases);
+        $this->assertSame(
+            1,
+            $aliasesCount[$multipleAccessGroup['group']->alias]
+        );
         sort($actualAliases);
 
         $this->assertSame($expectedAliases, $actualAliases);
