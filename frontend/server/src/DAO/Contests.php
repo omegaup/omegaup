@@ -35,14 +35,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 ';
 
     /** @var string */
-    private static $contestantsSubquery = '(
+    private static $contestantsLateralJoin = 'INNER JOIN LATERAL (
         SELECT
-            COUNT(*)
+            COUNT(*) AS contestants
         FROM
             Problemset_Identities pi
         WHERE
             pi.problemset_id = Contests.problemset_id
-    )';
+    ) AS pic ON TRUE';
 
     final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
         $sql = 'SELECT ' .
@@ -587,7 +587,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $filter['type']
         );
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
-        $contestantsSubquery = self::$contestantsSubquery;
+        $contestantsLateralJoin = self::$contestantsLateralJoin;
 
         $sqlCount = '
             SELECT
@@ -598,7 +598,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
-                        {$contestantsSubquery} AS contestants,
+                        pic.contestants,
                         TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                         1 AS participating,
                         ANY_VALUE(organizer.username) AS organizer";
@@ -650,12 +650,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Identities AS organizer
             ON
                 a.owner_id = organizer.user_id
+            {$contestantsLateralJoin}
             WHERE
                 $recommendedCondition AND
                 $activeCondition AND
                 $queryCondition AND
                 archived = 0
-            GROUP BY Contests.contest_id
+            GROUP BY Contests.contest_id, pic.contestants
         ";
         $params = [
             // Direct participation
@@ -895,7 +896,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $filter = self::formatSearch($query);
         $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
-        $contestantsSubquery = self::$contestantsSubquery;
+        $contestantsLateralJoin = self::$contestantsLateralJoin;
 
         $sqlCount = "
                     SELECT
@@ -910,7 +911,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                     $columns,
-                    {$contestantsSubquery} AS contestants,
+                    pic.contestants,
                     ANY_VALUE(organizer.username) AS organizer,
                     TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                     (participating.identity_id IS NOT NULL) AS `participating`";
@@ -926,6 +927,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Identities AS organizer
             ON
                 a.owner_id = organizer.user_id
+            {$contestantsLateralJoin}
             LEFT JOIN
                 Problemset_Identities participating
             ON
@@ -1243,7 +1245,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
-        $contestantsSubquery = self::$contestantsSubquery;
+        $contestantsLateralJoin = self::$contestantsLateralJoin;
 
         $sqlCount = "
                     SELECT
@@ -1260,7 +1262,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        {$contestantsSubquery} AS contestants,
+                        pic.contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         IF(
                             window_length IS NULL,
@@ -1284,6 +1286,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     Identities AS organizer
                 ON
                     a.owner_id = organizer.user_id
+                {$contestantsLateralJoin}
                 WHERE
                     `admission_mode` IN ('public', 'registration')
                     AND $recommendedCheck
@@ -1352,7 +1355,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         );
         $filter = self::formatSearch($query);
         $queryCheck = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
-        $contestantsSubquery = self::$contestantsSubquery;
+        $contestantsLateralJoin = self::$contestantsLateralJoin;
 
         $sqlCount = "
                     SELECT
@@ -1365,7 +1368,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $select = "SELECT
                         $columns,
-                        {$contestantsSubquery} AS contestants,
+                        pic.contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                         TRUE AS participating";
@@ -1380,6 +1383,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     Identities AS organizer
                 ON
                     a.owner_id = organizer.user_id
+                {$contestantsLateralJoin}
                 WHERE $recommendedCheck AND $endCheck AND $queryCheck AND archived = 0
                 ";
 
