@@ -258,6 +258,51 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testGetStudentsProgressPaginationIsSortedByName() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $suffix = \OmegaUp\Test\Utils::createRandomString();
+
+        [
+            'identity' => $lastStudent,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => "student_z_{$suffix}",
+                'name' => 'Zoe Student',
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $lastStudent
+        );
+
+        [
+            'identity' => $firstStudent,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => "student_a_{$suffix}",
+                'name' => 'Ana Student',
+            ])
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $firstStudent
+        );
+
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+            $courseData['course']->course_id,
+            $courseData['course']->group_id,
+            1,
+            1
+        );
+
+        $this->assertSame(2, $results['totalRows']);
+        $this->assertCount(1, $results['studentsProgress']);
+        $this->assertSame(
+            $firstStudent->username,
+            $results['studentsProgress'][0]['username']
+        );
+    }
+
     public function testApiStudentsProgress() {
         $problemsData = [];
         for ($i = 0; $i < 4; $i++) {

@@ -9,13 +9,16 @@
   * @psalm-type MessageLanguages=array{es: string, en: string, pt: string}
   * @psalm-type PredefinedTemplate=array{id: string, title: MessageLanguages, message: MessageLanguages, type: string}
   * @psalm-type MaintenanceModeStatus=array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
+  * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
+  * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
+  * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
-    const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
-    const MAINTENANCE_MESSAGE_EN_KEY = 'system:maintenance_message_en';
-    const MAINTENANCE_MESSAGE_PT_KEY = 'system:maintenance_message_pt';
-    const MAINTENANCE_ENABLED_KEY = 'system:maintenance_enabled';
-    const MAINTENANCE_MESSAGE_TYPE_KEY = 'system:maintenance_message_type';
+    const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
+    const MAINTENANCE_MESSAGE_EN_KEY = 'maintenance_message_en';
+    const MAINTENANCE_MESSAGE_PT_KEY = 'maintenance_message_pt';
+    const MAINTENANCE_ENABLED_KEY = 'maintenance_enabled';
+    const MAINTENANCE_MESSAGE_TYPE_KEY = 'maintenance_message_type';
 
     const INFO = 0;
     const WARNING = 1;
@@ -131,37 +134,69 @@ class Admin extends \OmegaUp\Controllers\Controller {
             self::MAINTENANCE_MESSAGE_TYPES
         ) ?? self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
 
-        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
-        $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
-        $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
-        $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
-        $cacheMessageType = new \OmegaUp\Cache(
-            self::MAINTENANCE_MESSAGE_TYPE_KEY
-        );
-        if ($enabled) {
-            $cacheEnabled->set(value: true, timeout: 0); // No expiration
-            $cacheMessageEs->set($messageEs, timeout: 0);
-            $cacheMessageEn->set($messageEn, timeout: 0);
-            $cacheMessagePt->set($messagePt, timeout: 0);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+                self::MAINTENANCE_ENABLED_KEY,
+                $enabled,
+                invalidateCache: false
+            );
+            if ($enabled) {
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_ES_KEY,
+                    $messageEs,
+                    invalidateCache: false
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_EN_KEY,
+                    $messageEn,
+                    invalidateCache: false
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_PT_KEY,
+                    $messagePt,
+                    invalidateCache: false
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_TYPE_KEY,
+                    $type,
+                    invalidateCache: false
+                );
+            } else {
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_ES_KEY,
+                    '',
+                    invalidateCache: false
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_EN_KEY,
+                    '',
+                    invalidateCache: false
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_PT_KEY,
+                    '',
+                    invalidateCache: false
+                );
+                \OmegaUp\DAO\SystemSettings::setStringSetting(
+                    self::MAINTENANCE_MESSAGE_TYPE_KEY,
+                    self::MAINTENANCE_MESSAGE_TYPES[self::INFO],
+                    invalidateCache: false
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
 
-            // Store the index, not the string value
-            $typeIndex = array_search(
-                $type,
-                self::MAINTENANCE_MESSAGE_TYPES,
-                strict: true
+            \OmegaUp\DAO\SystemSettings::invalidateCache(
+                self::MAINTENANCE_ENABLED_KEY,
+                self::MAINTENANCE_MESSAGE_ES_KEY,
+                self::MAINTENANCE_MESSAGE_EN_KEY,
+                self::MAINTENANCE_MESSAGE_PT_KEY,
+                self::MAINTENANCE_MESSAGE_TYPE_KEY
             );
-            $cacheMessageType->set(
-                $typeIndex !== false ? $typeIndex : self::INFO,
-                timeout: 0
-            );
-        } else {
-            $cacheEnabled->delete();
-            $cacheMessageEs->delete();
-            $cacheMessageEn->delete();
-            $cacheMessagePt->delete();
-            $cacheMessageType->delete();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-
         return ['status' => 'ok'];
     }
 
@@ -181,22 +216,20 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Get the message type from cache
+     * Get the message type from system settings
      *
      * @return string
      */
-    private static function getMessageTypeFromCache(): string {
-        $cacheMessageType = new \OmegaUp\Cache(
-            self::MAINTENANCE_MESSAGE_TYPE_KEY
+    private static function getMessageTypeFromSettings(): string {
+        $messageType = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_TYPE_KEY,
+            self::MAINTENANCE_MESSAGE_TYPES[self::INFO]
         );
-        $messageTypeIndex = $cacheMessageType->get();
-        return (is_int(
-            $messageTypeIndex
-        ) && isset(
-            self::MAINTENANCE_MESSAGE_TYPES[$messageTypeIndex]
-        ))
-            ? self::MAINTENANCE_MESSAGE_TYPES[$messageTypeIndex]
-            : self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
+        return in_array(
+            $messageType,
+            self::MAINTENANCE_MESSAGE_TYPES,
+            strict: true
+        ) ? $messageType : self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
     }
 
     /**
@@ -205,31 +238,21 @@ class Admin extends \OmegaUp\Controllers\Controller {
      * @return MaintenanceModeStatus
      */
     public static function getMaintenanceModeStatus(): array {
-        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
-        $enabled = boolval($cacheEnabled->get());
-
-        $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
-        $messageEs = is_null(
-            $cacheMessageEs->get()
-        ) ? null : strval(
-            $cacheMessageEs->get()
+        $enabled = \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+            self::MAINTENANCE_ENABLED_KEY,
+            false
+        );
+        $messageEs = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_ES_KEY
+        );
+        $messageEn = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_EN_KEY
+        );
+        $messagePt = \OmegaUp\DAO\SystemSettings::getStringSetting(
+            self::MAINTENANCE_MESSAGE_PT_KEY
         );
 
-        $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
-        $messageEn = is_null(
-            $cacheMessageEn->get()
-        ) ? null : strval(
-            $cacheMessageEn->get()
-        );
-
-        $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
-        $messagePt = is_null(
-            $cacheMessagePt->get()
-        ) ? null : strval(
-            $cacheMessagePt->get()
-        );
-
-        $type = self::getMessageTypeFromCache();
+        $type = self::getMessageTypeFromSettings();
 
         return [
             'enabled' => $enabled,
@@ -320,5 +343,159 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'message' => $message,
             'type' => $status['type'],
         ];
+    }
+
+    /**
+     * Gets the current system settings. Only available to system admins.
+     *
+     * @return array{settings: array{ephemeralGraderEnabled: bool}, status: string}
+     */
+    public static function apiGetSystemSettings(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'status' => 'ok',
+            'settings' => [
+                'ephemeralGraderEnabled' => \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+                    'ephemeral_grader_enabled',
+                    true
+                ),
+            ],
+        ];
+    }
+
+    /**
+     * Updates system settings. Only available to system admins.
+     *
+     * @omegaup-request-param null|bool $ephemeral_grader_enabled
+     *
+     * @return array{status: string}
+     */
+    public static function apiUpdateSystemSettings(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $ephemeralGraderEnabled = $r->ensureOptionalBool(
+            'ephemeral_grader_enabled'
+        );
+        if (!is_null($ephemeralGraderEnabled)) {
+            \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+                'ephemeral_grader_enabled',
+                $ephemeralGraderEnabled
+            );
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
+     */
+    public static function getSettingsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'entrypoint' => 'admin_settings',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminSettings'
+                ),
+                'payload' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @return list<CronJob>
+     */
+    private static function cronJobsPayload(): array {
+        $jobs = [];
+        foreach (\OmegaUp\DAO\CronJobs::getAllOrdered() as $job) {
+            $jobs[] = [
+                'name' => strval($job->name),
+                'description' => $job->description,
+                'schedule' => $job->schedule,
+                'enabled' => boolval($job->enabled),
+            ];
+        }
+        return $jobs;
+    }
+
+    /**
+     * @param list<\OmegaUp\DAO\VO\CronRuns> $runs
+     *
+     * @return list<CronRun>
+     */
+    private static function cronRunsPayload(array $runs): array {
+        $result = [];
+        foreach ($runs as $run) {
+            /** @var list<CronRunPhase> */
+            $phases = is_null($run->phases) ? [] : json_decode(
+                $run->phases,
+                associative: true
+            );
+            $result[] = [
+                'run_id' => intval($run->run_id),
+                'name' => strval($run->name),
+                'hostname' => $run->hostname,
+                'status' => strval($run->status),
+                'started_at' => $run->started_at,
+                'finished_at' => $run->finished_at,
+                'duration_seconds' => $run->duration_seconds,
+                'rows_affected' => $run->rows_affected,
+                'phases' => $phases,
+                'error_text' => $run->error_text,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Lists the registered cron jobs and their most recent runs.
+     *
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     */
+    public static function apiGetCrons(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return [
+            'jobs' => self::cronJobsPayload(),
+            'runs' => self::cronRunsPayload(
+                \OmegaUp\DAO\CronRuns::getRecent(50)
+            ),
+        ];
+    }
+
+    /**
+     * Returns the detail of a single cron run.
+     *
+     * @return array{run: CronRun|null}
+     *
+     * @omegaup-request-param int $run_id
+     */
+    public static function apiGetCronRun(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $run = \OmegaUp\DAO\CronRuns::getByPK($r->ensureInt('run_id'));
+        if (is_null($run)) {
+            return ['run' => null];
+        }
+        return ['run' => self::cronRunsPayload([$run])[0]];
     }
 }
