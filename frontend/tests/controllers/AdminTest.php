@@ -86,4 +86,56 @@ class AdminTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Cache::clearCacheForTesting();
         }
     }
+
+    public function testMaintenanceModePreservesOriginalExceptionWhenCacheInvalidationFails() {
+        [
+            'identity' => $supportIdentity,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
+        $supportLogin = \OmegaUp\Test\ControllerTestCase::login($supportIdentity);
+
+        $reflection = new \ReflectionClass(\OmegaUp\CacheAdapter::class);
+        $instanceProperty = $reflection->getProperty('_instance');
+        $instanceProperty->setAccessible(true);
+        $originalAdapter = $instanceProperty->getValue();
+        $throwingAdapter = new class extends \OmegaUp\InProcessCacheAdapter {
+            public function delete(string $key): bool {
+                throw new \RuntimeException('Simulated cache backend failure');
+            }
+        };
+        $instanceProperty->setValue($throwingAdapter);
+
+        $exception = null;
+        try {
+            \OmegaUp\Controllers\Admin::apiSetMaintenanceMode(
+                new \OmegaUp\Request([
+                    'auth_token' => $supportLogin->auth_token,
+                    'enabled' => true,
+                ])
+            );
+        } catch (\Exception $e) {
+            $exception = $e;
+        } finally {
+            $instanceProperty->setValue($originalAdapter);
+            \OmegaUp\Controllers\Admin::apiSetMaintenanceMode(
+                new \OmegaUp\Request([
+                    'auth_token' => $supportLogin->auth_token,
+                    'enabled' => false,
+                ])
+            );
+            \OmegaUp\Cache::clearCacheForTesting();
+        }
+
+        $this->assertNotNull(
+            $exception,
+            'Expected the cache failure to propagate as an exception'
+        );
+        $this->assertStringContainsString(
+            'Simulated cache backend failure',
+            $exception->getMessage()
+        );
+        $this->assertStringNotContainsString(
+            'Called FailTrans() outside of a transaction',
+            $exception->getMessage()
+        );
+    }
 }
