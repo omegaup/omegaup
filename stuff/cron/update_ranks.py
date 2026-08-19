@@ -237,14 +237,45 @@ def update_user_rank(
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
-    cur.execute('DELETE FROM `User_Rank`;')
+    # Merge into `User_Rank` with an upsert, like `update_author_rank` does, so
+    # each row costs one write instead of a delete plus an insert and the table
+    # is never left empty mid run.
+    cur.execute('SELECT NOW() AS `now`;')
+    run_start = cur.fetchone()['now']
+    # Usernames are unique in `User_Rank`, so a username that moved to another
+    # user would make the upsert below match the wrong row.
+    cur.execute('''
+                    DELETE `ur`
+                    FROM `User_Rank` AS `ur`
+                    INNER JOIN `Identities` AS `i`
+                        ON `i`.`username` = `ur`.`username`
+                    WHERE `i`.`user_id` IS NOT NULL
+                        AND `i`.`user_id` != `ur`.`user_id`;''')
     insert_user_rank_sql = '''
                     INSERT INTO
                         `User_Rank` (`user_id`, `ranking`,
                                      `problems_solved_count`, `score`,
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY
+                        UPDATE
+                            ranking = VALUES(ranking),
+                            problems_solved_count =
+                                VALUES(problems_solved_count),
+                            score = VALUES(score),
+                            username = VALUES(username),
+                            name = VALUES(name),
+                            country_id = VALUES(country_id),
+                            state_id = VALUES(state_id),
+                            school_id = VALUES(school_id),
+                            -- The rank page reads this as "last updated", and
+                            -- the sweep below uses it to find stale rows.
+                            `timestamp` = CURRENT_TIMESTAMP(),
+                            -- Cleared like the delete-and-reinsert did;
+                            -- update_author_rank recomputes them next.
+                            author_score = 0,
+                            author_ranking = NULL;'''
     user_rank_rows: List[UserRankRow] = []
     batch_size = 1000
     for index, row in enumerate(cur_readonly):
@@ -270,6 +301,11 @@ def update_user_rank(
             user_rank_rows.clear()
     if user_rank_rows:
         cur.executemany(insert_user_rank_sql, user_rank_rows)
+
+    # Rows the upsert did not touch are users that fell out of the ranking.
+    cur.execute('DELETE FROM `User_Rank` WHERE `timestamp` < %s;',
+                (run_start,))
+    logging.info('User rank merged for %d users', len(scores))
     return scores
 
 
@@ -603,15 +639,9 @@ def compute_points_for_school(
         logging.info('No eligible problems found.')
         return []
 
-    # Convert the list of identity IDs to a comma-separated string
-    identity_ids_str = ', '.join(map(str, identity_ids))
-
-    # Convert the list of problem IDs to a comma-separated string
-    problem_ids_str = ', '.join(map(str, problem_ids))
-
     user_problems = get_user_problems(cur_readonly,
-                                      identity_ids_str,
-                                      problem_ids_str,
+                                      identity_ids,
+                                      problem_ids,
                                       eligible_users,
                                       first_day_of_current_month,
                                       )
@@ -697,15 +727,9 @@ def compute_points_for_user(
         logging.info('No eligible problems found.')
         return []
 
-    # Convert the list of identity IDs to a comma-separated string
-    identity_ids_str = ', '.join(map(str, identity_ids))
-
-    # Convert the list of problem IDs to a comma-separated string
-    problem_ids_str = ', '.join(map(str, problem_ids))
-
     user_problems = get_user_problems(cur_readonly,
-                                      identity_ids_str,
-                                      problem_ids_str,
+                                      identity_ids,
+                                      problem_ids,
                                       eligible_users,
                                       first_day_of_current_month,
                                       )
