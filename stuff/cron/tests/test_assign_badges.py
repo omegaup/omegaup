@@ -39,8 +39,8 @@ class GetAllOwnersTest(unittest.TestCase):
 
         self.assertEqual(result, {1, 2})
 
-    def test_replaces_now_with_the_given_timestamp(self) -> None:
-        '''A timestamp is substituted for the literal NOW().'''
+    def test_binds_timestamp_to_a_session_variable(self) -> None:
+        '''The timestamp is bound to @current_time, replacing NOW().'''
         cur = MockCursor(script=[('select user_id', [])])
         timestamp = datetime.datetime(2026, 6, 1, 3, 0, 0)
 
@@ -49,9 +49,14 @@ class GetAllOwnersTest(unittest.TestCase):
             assign_badges.get_all_owners(
                 'coderOfTheMonth', timestamp, _as_cursor(cur))
 
+        set_sql, set_params = cur.calls[0]
+        self.assertIn('SET @current_time', set_sql)
+        self.assertEqual(set_params, (timestamp,))
+        self.assertNotIn('2026-06-01 03:00:00', set_sql)
         executed_sql = cur.calls[-1][0]
-        self.assertIn('2026-06-01 03:00:00', executed_sql)
+        self.assertIn('@current_time', executed_sql)
         self.assertNotIn('NOW()', executed_sql)
+        self.assertNotIn('2026-06-01 03:00:00', executed_sql)
 
     def test_keeps_now_when_no_timestamp_is_given(self) -> None:
         '''Without a timestamp the query is executed unchanged.'''
@@ -62,7 +67,9 @@ class GetAllOwnersTest(unittest.TestCase):
             assign_badges.get_all_owners(
                 'coderOfTheMonth', None, _as_cursor(cur))
 
-        self.assertIn('NOW()', cur.calls[-1][0])
+        self.assertEqual(len(cur.calls), 1)
+        self.assertIn('NOW()', cur.calls[0][0])
+        self.assertNotIn('@current_time', cur.calls[0][0])
 
 
 class GetCurrentOwnersTest(unittest.TestCase):
