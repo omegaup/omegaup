@@ -467,29 +467,6 @@ def get_last_published_map(dbconn: lib.db.Connection) -> Optional[float]:
     return float(row[0])
 
 
-def get_current_cron_run_id(
-        dbconn: lib.db.Connection,
-        program: str,
-) -> Optional[int]:
-    '''Returns the `Cron_Runs` row that the runner opened for this run.
-
-    The runner holds the overlap lock for the whole execution, so the newest
-    row for this job is the one it just wrote for us.
-    '''
-    with dbconn.cursor() as cur:
-        cur.execute(
-            '''
-            SELECT `run_id`
-            FROM `Cron_Runs`
-            WHERE `name` = %s
-            ORDER BY `run_id` DESC
-            LIMIT 1;''', (program,))
-        row = cur.fetchone()
-    if not row:
-        return None
-    return int(row[0])
-
-
 def should_publish(
         score: float,
         min_map_score: float,
@@ -555,8 +532,7 @@ def train_and_publish(
 
         if dbconn is not None:
             record_model_run(dbconn,
-                             cron_run_id=get_current_cron_run_id(
-                                 dbconn, program),
+                             cron_run_id=cron_run.run_id,
                              config=model.config,
                              map_score=score,
                              dataset_size=dataset_size,

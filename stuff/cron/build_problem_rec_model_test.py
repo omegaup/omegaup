@@ -336,29 +336,6 @@ class TestGetLastPublishedMap(unittest.TestCase):
         self.assertIsNone(result)
 
 
-class TestGetCurrentCronRunId(unittest.TestCase):
-    '''Test linking the model run back to its Cron_Runs row.'''
-
-    def test_returns_the_newest_run_for_the_job(self) -> None:
-        '''Returns the id the runner just inserted.'''
-        conn = _FakeConnection()
-        conn.next_fetchone = (7,)
-        result = build_problem_rec_model.get_current_cron_run_id(
-            cast(lib.db.Connection, conn), 'build_problem_rec_model.py')
-        self.assertEqual(result, 7)
-        query, params = conn.calls[0]
-        self.assertIn('Cron_Runs', query)
-        self.assertEqual(params, ('build_problem_rec_model.py',))
-
-    def test_returns_none_when_untracked(self) -> None:
-        '''Returns None when the runner recorded nothing.'''
-        conn = _FakeConnection()
-        conn.next_fetchone = None
-        self.assertIsNone(
-            build_problem_rec_model.get_current_cron_run_id(
-                cast(lib.db.Connection, conn), 'build_problem_rec_model.py'))
-
-
 if __name__ == '__main__':
     unittest.main()
 
