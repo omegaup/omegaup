@@ -11,9 +11,6 @@ import os
 import sys
 from typing import List, NamedTuple, Sequence, Dict, Set, Optional
 
-import mysql.connector
-import mysql.connector.cursor
-
 
 class UserRankRow(NamedTuple):
     '''Represents a row for User_Rank inserts.'''
@@ -42,15 +39,17 @@ class AuthorRankRow(NamedTuple):
     school_id: Optional[int]
 
 
+import mysql.connector
+import mysql.connector.cursor
+
 sys.path.insert(
     0,
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                  "."))
-
-# Imported as `cron.*` (not bare `database`/`utils`) so tests do not shadow
-# the pipelines `database` package.
-# pylint: disable=wrong-import-position
-from cron.constants import (
+import lib.db  # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
     SYSTEM_ACL,
     ADMIN_ROLE,
 )
@@ -79,10 +78,6 @@ from cron.utils import (
     UserRank,
     get_first_day_of_next_month,
 )
-import lib.db
-import lib.logs
-import lib.runner
-# pylint: enable=wrong-import-position
 
 
 class Cutoff(NamedTuple):
