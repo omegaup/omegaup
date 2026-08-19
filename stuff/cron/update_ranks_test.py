@@ -97,6 +97,10 @@ class UpdateRanksAuditTest(unittest.TestCase):
         '''The churn check is skipped when there was no previous ranking.'''
         _audit(_FakeCursor(new_count=50), previous_count=0, max_churn=0.5)
 
+    def test_allows_empty_when_there_was_nothing_before(self) -> None:
+        '''An empty ranking is fine when there was nothing to lose.'''
+        _audit(_FakeCursor(new_count=0), previous_count=0, max_churn=0.5)
+
 
 if __name__ == '__main__':
     unittest.main()

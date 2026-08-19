@@ -849,7 +849,8 @@ def audit_user_rank(
     whole ranking transaction, so the previous ranking stays live.
     '''
     new_count = _count_user_rank(cur)
-    if new_count == 0:
+    # Only a regression, not a legitimately empty first run.
+    if new_count == 0 and previous_count > 0:
         raise RankingAuditError('new ranking is empty')
 
     cur.execute('SELECT COUNT(*) AS `n` FROM `User_Rank` WHERE `score` < 0;')
