@@ -91,7 +91,9 @@ class AdminTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'identity' => $supportIdentity,
         ] = \OmegaUp\Test\Factories\User::createSupportUser();
-        $supportLogin = \OmegaUp\Test\ControllerTestCase::login($supportIdentity);
+        $supportLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $supportIdentity
+        );
 
         $reflection = new \ReflectionClass(\OmegaUp\CacheAdapter::class);
         $instanceProperty = $reflection->getProperty('_instance');
