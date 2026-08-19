@@ -12,6 +12,7 @@ up to the latest one.
 import argparse
 import collections
 import logging
+import math
 import os
 import os.path
 import sqlite3
@@ -50,6 +51,74 @@ def mean_average_precision(
         float,
         sum((predicted[:num_problems] == expected[:num_problems]) *
             (1. / np.arange(1, num_problems + 1))))
+
+
+def precision_at_k(
+    predicted: ProblemList,
+    expected: ProblemList,
+    k: int,
+) -> Optional[float]:
+    '''Fraction of the top k recommendations that were relevant.'''
+    if k <= 0 or not expected:
+        return None
+    relevant = set(expected)
+    hits = sum(1 for problem_id in predicted[:k] if problem_id in relevant)
+    return hits / k
+
+
+def recall_at_k(
+    predicted: ProblemList,
+    expected: ProblemList,
+    k: int,
+) -> Optional[float]:
+    '''Fraction of the relevant problems that the top k recovered.'''
+    if k <= 0 or not expected:
+        return None
+    relevant = set(expected)
+    return len(set(predicted[:k]) & relevant) / len(relevant)
+
+
+def average_precision_at_k(
+    predicted: ProblemList,
+    expected: ProblemList,
+    k: int,
+) -> Optional[float]:
+    '''Average precision of the top k, normalized by min(relevant, k).
+
+    Position aware: a relevant problem near the top is worth more than the
+    same problem further down.
+    '''
+    if k <= 0 or not expected:
+        return None
+    relevant = set(expected)
+    score = 0.
+    hits = 0
+    for rank, problem_id in enumerate(predicted[:k], start=1):
+        if problem_id in relevant:
+            hits += 1
+            score += hits / rank
+    return score / min(len(relevant), k)
+
+
+def ndcg_at_k(
+    predicted: ProblemList,
+    expected: ProblemList,
+    k: int,
+) -> Optional[float]:
+    '''Normalized discounted cumulative gain of the top k.
+
+    Binary relevance with the usual 1 / log2(rank + 1) discount, divided by
+    the gain of the ideal ordering so it stays in [0, 1].
+    '''
+    if k <= 0 or not expected:
+        return None
+    relevant = set(expected)
+    dcg = sum(1. / math.log2(rank + 1)
+              for rank, problem_id in enumerate(predicted[:k], start=1)
+              if problem_id in relevant)
+    idcg = sum(1. / math.log2(rank + 1)
+               for rank in range(1, min(len(relevant), k) + 1))
+    return dcg / idcg
 
 
 def load_sqlite(database: str) -> pd.DataFrame:
@@ -317,6 +386,39 @@ class Model:
 
         return score / user_count
 
+    def evaluate_metrics(self, k: Optional[int] = None) -> Dict[str, float]:
+        '''Break the model quality down into standard ranking metrics.
+
+        Replays every test user: after each solved problem the model is asked
+        for k recommendations and they are scored against the problems the
+        user really solved next. Returns precision@k, recall@k, MAP@k and
+        NDCG@k averaged over every such prediction, which is what makes the
+        single score from `evaluate()` auditable.
+        '''
+        if k is None:
+            k = self.config.num_followups
+        metric_fns = {
+            'precision': precision_at_k,
+            'recall': recall_at_k,
+            'map': average_precision_at_k,
+            'ndcg': ndcg_at_k,
+        }
+        totals: DefaultDict[str, float] = collections.defaultdict(float)
+        predictions = 0
+        for problems in self.test_ac_map.values():
+            for i in range(1, len(problems)):
+                recs = self.recommend(problems[i - 1], set(problems[:i - 1]),
+                                      k)
+                expected = problems[i:i + k]
+                if not recs or not expected:
+                    continue
+                predictions += 1
+                for name, metric_fn in metric_fns.items():
+                    totals[name] += metric_fn(recs, expected, k) or 0.
+        if not predictions:
+            return {name: 0. for name in metric_fns}
+        return {name: totals[name] / predictions for name in metric_fns}
+
 
 def build_parser() -> argparse.ArgumentParser:
     '''Returns a argparse.ArgumentParser for this tool.'''
@@ -402,7 +504,13 @@ def main() -> None:
                            followup_decay=args.followup_decay), runs)
 
         score = model.evaluate()
+        metrics = model.evaluate_metrics()
         logging.info('Model MAP score: %f', score)
+        logging.info(
+            'Model ranking metrics at k=%d: precision=%.4f recall=%.4f '
+            'map=%.4f ndcg=%.4f', model.config.num_followups,
+            metrics['precision'], metrics['recall'], metrics['map'],
+            metrics['ndcg'])
         if score >= args.min_map_score:
             # Save current model
             model.save(args.output)
