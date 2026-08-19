@@ -46,6 +46,7 @@
       </template>
       <omegaup-problem-creator-cases-tab
         :active-tab-index="activeTabIndex"
+        :hide-save-button="hideSaveButtons"
         @download-zip-file="
           (zipObject) => $emit('download-zip-file', zipObject)
         "

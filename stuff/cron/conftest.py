@@ -1,6 +1,7 @@
-'''Adds `stuff/` to the path so tests import cron modules as `cron.*`.
+'''Shared pytest setup for the cron test suite.
 
-Only `stuff/` is added; `stuff/cron` would shadow the pipelines `database`.
+Puts `stuff/` on the import path so the tests can import the cron modules as
+`cron.*` and `lib.*` without repeating the path boilerplate in every file.
 '''
 import os
 import sys
