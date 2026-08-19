@@ -1,19 +1,35 @@
-'''Unit tests for the ranking logic in `update_ranks.py`.'''
+'''Unit tests for the ranking logic in `update_ranks.py` and its helpers.'''
 import datetime
 import unittest
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional, Sequence, Tuple, cast
 from unittest import mock
 
 import mysql.connector.cursor
 
 from cron import update_ranks
-from cron.database.coder_of_the_month import Problem
+from cron.database.coder_of_the_month import Problem, get_user_problems
 from cron.database.school_of_the_month import School
+from cron.tests.fixtures import sqlite_cursor
 from cron.tests.fixtures.mock_cursor import MockCursor
 from cron.utils import UserProblems, UserRank
 
 _CURRENT_MONTH = datetime.date(2026, 6, 1)
 _NEXT_MONTH = datetime.date(2026, 7, 1)
+
+# Only the columns the `get_user_problems` queries touch.
+_USER_PROBLEMS_SCHEMA = (
+    'CREATE TABLE Identities (identity_id INTEGER, user_id INTEGER);',
+    'CREATE TABLE Submissions (identity_id INTEGER, problem_id INTEGER, '
+    'verdict TEXT, type TEXT, time TEXT);',
+    'CREATE TABLE Problems_Forfeited (user_id INTEGER, problem_id INTEGER);',
+    'CREATE TABLE Problems (problem_id INTEGER, acl_id INTEGER);',
+    'CREATE TABLE ACLs (acl_id INTEGER, owner_id INTEGER);',
+    'CREATE TABLE User_Roles (user_id INTEGER, acl_id INTEGER, '
+    'role_id INTEGER);',
+    'CREATE TABLE Group_Roles (group_id INTEGER, acl_id INTEGER, '
+    'role_id INTEGER);',
+    'CREATE TABLE Groups_Identities (group_id INTEGER, identity_id INTEGER);',
+)
 
 
 def _cursor() -> mysql.connector.cursor.MySQLCursorDict:
@@ -52,6 +68,46 @@ def _solved(*problem_ids: int) -> UserProblems:
     return {'solved': list(problem_ids), 'score': 0.0}
 
 
+def _run_get_user_problems(
+    submissions: Sequence[Tuple[int, int, str, str, str]],
+    forfeited: Sequence[Tuple[int, int]] = (),
+    problem_owners: Sequence[Tuple[int, int]] = (),
+) -> Dict[int, List[int]]:
+    '''Run `get_user_problems` over SQLite and return the solved ids.
+
+    Submissions are `(identity_id, problem_id, verdict, type, time)` and
+    `problem_owners` are `(problem_id, acl owner user_id)`. Each identity uses
+    the user id of the same number.
+    '''
+    identity_ids = sorted({row[0] for row in submissions})
+    problem_ids = sorted({row[1] for row in submissions})
+    conn = sqlite_cursor.connect(*_USER_PROBLEMS_SCHEMA)
+    conn.executemany(
+        'INSERT INTO Identities VALUES (?, ?);',
+        [(identity_id, identity_id) for identity_id in identity_ids])
+    conn.executemany('INSERT INTO Submissions VALUES (?, ?, ?, ?, ?);',
+                     submissions)
+    conn.executemany('INSERT INTO Problems_Forfeited VALUES (?, ?);',
+                     forfeited)
+    conn.executemany(
+        'INSERT INTO Problems VALUES (?, ?);',
+        [(problem_id, problem_id) for problem_id in problem_ids])
+    conn.executemany('INSERT INTO ACLs VALUES (?, ?);', problem_owners)
+
+    user_problems = get_user_problems(
+        cast(mysql.connector.cursor.MySQLCursorDict,
+             sqlite_cursor.SqliteCursor(conn)),
+        identity_ids,
+        problem_ids,
+        [_user(identity_id) for identity_id in identity_ids],
+        _CURRENT_MONTH,
+    )
+    return {
+        identity_id: problems['solved']
+        for identity_id, problems in user_problems.items()
+    }
+
+
 class _PatchHelpersMixin(unittest.TestCase):
     '''Patches the database helpers update_ranks delegates to.'''
 
@@ -63,6 +119,79 @@ class _PatchHelpersMixin(unittest.TestCase):
             mocks[name] = patcher.start()
             self.addCleanup(patcher.stop)
         return mocks
+
+
+class GetUserProblemsTest(unittest.TestCase):
+    '''Tests for the filtering rules in `get_user_problems`.'''
+
+    def test_counts_problems_first_solved_in_the_month(self) -> None:
+        '''An accepted run inside the month counts for its identity.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'AC', 'normal', '2026-06-01 00:00:00'),
+            (2, 20, 'AC', 'normal', '2026-06-30 23:59:59'),
+        ])
+
+        self.assertEqual(solved, {1: [10], 2: [20]})
+
+    def test_skips_problems_first_solved_before_the_month(self) -> None:
+        '''Re-solving a problem inside the month does not make it count.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'AC', 'normal', '2026-05-31 23:59:59'),
+            (1, 10, 'AC', 'normal', '2026-06-15 10:00:00'),
+        ])
+
+        self.assertEqual(solved, {1: []})
+
+    def test_skips_problems_first_solved_after_the_month(self) -> None:
+        '''A problem first solved in a later month does not count.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'AC', 'normal', '2026-07-01 00:00:00'),
+        ])
+
+        self.assertEqual(solved, {1: []})
+
+    def test_skips_forfeited_problems(self) -> None:
+        '''A forfeited problem is dropped only for the user that forfeited.'''
+        solved = _run_get_user_problems(
+            [
+                (1, 10, 'AC', 'normal', '2026-06-05 10:00:00'),
+                (2, 10, 'AC', 'normal', '2026-06-05 10:00:00'),
+            ],
+            forfeited=[(1, 10)],
+        )
+
+        self.assertEqual(solved, {1: [], 2: [10]})
+
+    def test_skips_problems_administered_by_the_user(self) -> None:
+        '''A problem is dropped only for the identity that administers it.'''
+        solved = _run_get_user_problems(
+            [
+                (1, 10, 'AC', 'normal', '2026-06-05 10:00:00'),
+                (2, 10, 'AC', 'normal', '2026-06-05 10:00:00'),
+            ],
+            problem_owners=[(10, 1)],
+        )
+
+        self.assertEqual(solved, {1: [], 2: [10]})
+
+    def test_deduplicates_by_user_and_problem(self) -> None:
+        '''Repeated accepted runs on one problem are counted once.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'AC', 'normal', '2026-06-05 10:00:00'),
+            (1, 10, 'AC', 'normal', '2026-06-06 10:00:00'),
+            (1, 10, 'AC', 'normal', '2026-06-07 10:00:00'),
+        ])
+
+        self.assertEqual(solved, {1: [10]})
+
+    def test_skips_rejected_and_non_normal_runs(self) -> None:
+        '''Only accepted runs of type `normal` count.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'WA', 'normal', '2026-06-05 10:00:00'),
+            (1, 20, 'AC', 'test', '2026-06-05 10:00:00'),
+        ])
+
+        self.assertEqual(solved, {1: []})
 
 
 class ComputePointsForUserTest(_PatchHelpersMixin):
@@ -289,6 +418,21 @@ class ComputePointsForSchoolTest(_PatchHelpersMixin):
 
         self.assertEqual(result, [])
 
+    def test_returns_empty_when_no_eligible_problems(self) -> None:
+        '''No eligible problems yields no ranking, not zero-scored schools.'''
+        self._patch(
+            get_last_12_schools_of_the_month=[],
+            get_candidate_schools_list=[School(5, 'School 5', 0.0)],
+            get_cotm_eligible_users=[_user(1, school_id=5)],
+            get_eligible_problems={},
+            get_user_problems={1: _solved()},
+        )
+
+        result = update_ranks.compute_points_for_school(
+            _cursor(), _CURRENT_MONTH, _NEXT_MONTH)
+
+        self.assertEqual(result, [])
+
 
 class UpdateUserRankCutoffsTest(unittest.TestCase):
     '''Tests for `update_ranks.update_user_rank_cutoffs`.'''
@@ -353,15 +497,62 @@ class UpdateUserRankCutoffsTest(unittest.TestCase):
 class UpdateUserRankClassnameTest(unittest.TestCase):
     '''Tests for `update_ranks.update_user_rank_classname`.'''
 
-    def test_executes_single_classname_update(self) -> None:
-        '''The function issues one UPDATE against User_Rank.'''
-        cur = MockCursor()
+    _CUTOFFS = (
+        (1900.0, 0.01, 'user-rank-international-master'),
+        (1500.0, 0.09, 'user-rank-master'),
+        (1100.0, 0.15, 'user-rank-expert'),
+        (800.0, 0.35, 'user-rank-specialist'),
+        (500.0, 0.40, 'user-rank-beginner'),
+    )
+
+    @staticmethod
+    def _classnames(
+        scores: Sequence[float],
+        cutoffs: Sequence[Tuple[float, float, str]],
+    ) -> List[Optional[str]]:
+        '''Run the real UPDATE over SQLite and return the stored classnames.'''
+        conn = sqlite_cursor.connect(
+            'CREATE TABLE User_Rank (user_id INTEGER, score REAL, '
+            'classname TEXT);',
+            'CREATE TABLE User_Rank_Cutoffs (score REAL, percentile REAL, '
+            'classname TEXT);')
+        conn.executemany('INSERT INTO User_Rank VALUES (?, ?, NULL);',
+                         list(enumerate(scores, start=1)))
+        conn.executemany('INSERT INTO User_Rank_Cutoffs VALUES (?, ?, ?);',
+                         cutoffs)
 
         update_ranks.update_user_rank_classname(
-            cast(mysql.connector.cursor.MySQLCursorDict, cur))
+            cast(mysql.connector.cursor.MySQLCursorDict,
+                 sqlite_cursor.SqliteCursor(conn)))
 
-        self.assertEqual(len(cur.calls), 1)
-        self.assertIn('UPDATE USER_RANK', cur.calls[0][0].upper())
+        return [
+            row[0] for row in conn.execute(
+                'SELECT classname FROM User_Rank ORDER BY user_id;')
+        ]
+
+    def test_assigns_the_most_selective_cutoff_reached(self) -> None:
+        '''A score takes the most selective cutoff it reaches.'''
+        self.assertEqual(
+            self._classnames(
+                [2000.0, 1900.0, 1600.0, 1100.0, 900.0, 500.0], self._CUTOFFS),
+            [
+                'user-rank-international-master',
+                'user-rank-international-master',
+                'user-rank-master',
+                'user-rank-expert',
+                'user-rank-specialist',
+                'user-rank-beginner',
+            ])
+
+    def test_falls_back_to_unranked_below_every_cutoff(self) -> None:
+        '''A score under the lowest cutoff is unranked.'''
+        self.assertEqual(self._classnames([499.0, 0.0], self._CUTOFFS),
+                         ['user-rank-unranked', 'user-rank-unranked'])
+
+    def test_falls_back_to_unranked_without_cutoffs(self) -> None:
+        '''With no cutoffs stored every user is unranked.'''
+        self.assertEqual(self._classnames([2000.0], []),
+                         ['user-rank-unranked'])
 
 
 if __name__ == '__main__':
