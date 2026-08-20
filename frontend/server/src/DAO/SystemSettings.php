@@ -59,12 +59,17 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
     }
 
     /**
-     * Drop the cached value for a setting so the next read hits the database.
+     * Drop the cached value for one or more settings so the next read hits the database.
      *
-     * @param string $key The setting key
+     * @param string ...$keys The setting keys to invalidate
      */
-    public static function invalidateCache(string $key): void {
-        (new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key))->delete();
+    public static function invalidateCache(string ...$keys): void {
+        foreach ($keys as $key) {
+            (new \OmegaUp\Cache(
+                \OmegaUp\Cache::SYSTEM_SETTINGS,
+                $key
+            ))->delete();
+        }
     }
 
     /**
@@ -76,7 +81,8 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function setBooleanSetting(
         string $key,
-        bool $value
+        bool $value,
+        bool $invalidateCache = true
     ): int {
         $setting = self::getByKey($key);
         if (is_null($setting)) {
@@ -90,7 +96,9 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
             $setting->setting_value = $value ? '1' : '0';
             $affectedRows = self::update($setting);
         }
-        self::invalidateCache($key);
+        if ($invalidateCache) {
+            self::invalidateCache($key);
+        }
         return $affectedRows;
     }
 
@@ -128,7 +136,8 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function setStringSetting(
         string $key,
-        string $value
+        string $value,
+        bool $invalidateCache = true
     ): int {
         $setting = self::getByKey($key);
         if (is_null($setting)) {
@@ -142,7 +151,9 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
             $setting->setting_value = $value;
             $affectedRows = self::update($setting);
         }
-        self::invalidateCache($key);
+        if ($invalidateCache) {
+            self::invalidateCache($key);
+        }
         return $affectedRows;
     }
 }
