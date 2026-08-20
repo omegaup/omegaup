@@ -493,7 +493,6 @@ def should_publish(
 
 
 def train_and_publish(
-        program: str,
         cron_run: lib.runner.CronRun,
         args: argparse.Namespace,
         runs: pd.DataFrame,
@@ -631,7 +630,7 @@ def main() -> None:
                     runs = runs[:args.num_rows]
 
             with cron_run.phase('train_model'):
-                train_and_publish(parser.prog, cron_run, args, runs)
+                train_and_publish(cron_run, args, runs)
         except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update recommendation model.')
             raise
