@@ -32,6 +32,19 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
         return null;
     }
 
+    // Forces the type of an already created submission
+    private static function setSubmissionType(
+        string $guid,
+        string $type
+    ): void {
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $submission->type = $type;
+        \OmegaUp\DAO\Submissions::update($submission);
+    }
+
     public function testUniqueProblemsPerSchoolCountedOnce() {
         $schoolWithDuplicate = \OmegaUp\Test\Factories\Schools::createSchool();
         $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
@@ -814,6 +827,93 @@ class SchoolOfTheMonthRulesTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolScore,
             0.01,
             'A non-accepted run must not add ranking points'
+        );
+    }
+
+    public function testNonNormalSubmissions() {
+        // Only submissions of type 'normal' count
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
+        $controlSchool = \OmegaUp\Test\Factories\Schools::createSchool();
+
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $controlStudent] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Schools::addUserToSchool($school, $student);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $controlSchool,
+            $controlStudent
+        );
+
+        $sharedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+        $testTypeProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+        $disqualifiedProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams(['quality_seal' => true])
+        );
+
+        $runDate = self::previousMonthRunDate();
+
+        // Prepare setup:
+        // school:        student=>sharedProblem (AC, normal),
+        //                student=>testTypeProblem (AC, type='test'),
+        //                student=>disqualifiedProblem (AC, type='disqualified')
+        // controlSchool: controlStudent=>sharedProblem (AC, normal)
+        //
+        // The accepted runs whose submission is not of type 'normal' must not
+        // add ranking points, even though their verdict is AC.
+        // Expected counted problems: school=1, controlSchool=1
+        // The rank should be: tie (same score)
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $sharedProblem,
+            $runDate
+        );
+
+        $testTypeRun = \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $testTypeProblem,
+            $runDate
+        );
+        self::setSubmissionType($testTypeRun['response']['guid'], 'test');
+
+        $disqualifiedRun = \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $student,
+            $disqualifiedProblem,
+            $runDate
+        );
+        self::setSubmissionType(
+            $disqualifiedRun['response']['guid'],
+            'disqualified'
+        );
+
+        \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+            $controlStudent,
+            $sharedProblem,
+            $runDate
+        );
+
+        $candidates = self::calculateAndGetCandidates($runDate);
+
+        $schoolScore = self::findSchoolScore(
+            $candidates,
+            $school['request']['name']
+        );
+        $controlScore = self::findSchoolScore(
+            $candidates,
+            $controlSchool['request']['name']
+        );
+
+        $this->assertNotNull($schoolScore);
+        $this->assertNotNull($controlScore);
+        // Only submissions of type 'normal' give ranking points, so both
+        // schools must end up with the same score.
+        $this->assertEqualsWithDelta(
+            $controlScore,
+            $schoolScore,
+            0.01,
+            'A submission that is not of type normal must not add ranking points'
         );
     }
 
