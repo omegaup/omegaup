@@ -7,6 +7,7 @@ from typing import (Any, Dict, Iterable, Iterator, List, Optional, Sequence,
 
 Row = Union[Tuple[Any, ...], Dict[str, Any]]
 Script = Sequence[Tuple[str, Sequence[Row]]]
+SqlWarning = Tuple[str, int, str]
 
 
 def _normalize(sql: str) -> str:
@@ -26,11 +27,13 @@ class MockCursor:
         self,
         script: Optional[Script] = None,
         dictionary: bool = False,
+        warnings: Optional[Sequence[SqlWarning]] = None,
     ) -> None:
         self._script: List[Tuple[str, Sequence[Row]]] = list(script or [])
         self._dictionary = dictionary
         self._current: Sequence[Row] = []
         self._position = 0
+        self._warnings: List[SqlWarning] = list(warnings or [])
         self.calls: List[Tuple[str, Any]] = []
 
     def execute(self, sql: str, params: Any = None) -> None:
@@ -63,6 +66,10 @@ class MockCursor:
         row = self._current[self._position]
         self._position += 1
         return row
+
+    def fetchwarnings(self) -> Optional[List[SqlWarning]]:
+        '''Return the scripted warnings, or None like a real cursor.'''
+        return list(self._warnings) if self._warnings else None
 
     def __iter__(self) -> Iterator[Row]:
         while self._position < len(self._current):

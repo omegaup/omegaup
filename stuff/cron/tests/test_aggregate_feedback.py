@@ -1,7 +1,9 @@
-'''Unit tests for the pure functions in `aggregate_feedback.py`.'''
+'''Unit tests for `aggregate_feedback.py`.'''
 import unittest
+from typing import Any, cast
 
 from cron import aggregate_feedback
+from cron.tests.fixtures import mock_cursor
 from cron.tests.fixtures import sample_data
 
 
@@ -215,6 +217,32 @@ class GetMostVotedTagsTest(unittest.TestCase):
         result = aggregate_feedback.get_most_voted_tags(
             {}, aggregate_feedback.MIN_POINTS)
         self.assertIsNone(result)
+
+
+class ReplaceVotedTagsTest(unittest.TestCase):
+    '''Tests for `aggregate_feedback.replace_voted_tags`.'''
+
+    def test_commits_and_restores_get_warnings(self) -> None:
+        '''The delete and insert both run, then the flag is put back.'''
+        cur = mock_cursor.MockCursor()
+        dbconn = mock_cursor.MockConnection(cur)
+        aggregate_feedback.replace_voted_tags(
+            cast(Any, dbconn), 7, ['math', 'greedy'])
+        self.assertEqual(len(cur.calls), 2)
+        self.assertEqual(dbconn.commits, 1)
+        self.assertEqual(dbconn.rollbacks, 0)
+        self.assertFalse(dbconn.get_warnings)
+
+    def test_logs_unexpected_warning(self) -> None:
+        '''A warning that is not a duplicate entry is logged, not swallowed.'''
+        cur = mock_cursor.MockCursor(
+            warnings=[('Warning', 1264, 'out of range')])
+        dbconn = mock_cursor.MockConnection(cur)
+        with self.assertLogs(level='WARNING') as logs:
+            aggregate_feedback.replace_voted_tags(
+                cast(Any, dbconn), 7, ['math'])
+        self.assertIn('out of range', logs.output[0])
+        self.assertEqual(dbconn.commits, 1)
 
 
 if __name__ == '__main__':
