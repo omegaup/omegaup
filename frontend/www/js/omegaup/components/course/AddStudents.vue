@@ -48,23 +48,14 @@
           </button>
         </div>
       </form>
-
-      <!-- TODO(#9875): Replace with the dedicated empty-state component once that PR is merged -->
-      <omegaup-view-unavailable
+      <omegaup-common-empty-state
         v-if="students.length == 0"
-        class="course-students-empty"
-        icon="user-plus"
+        icon="users"
         :title="T.courseStudentsEmptyTitle"
         :description="T.courseStudentsEmptyDescription"
-      >
-        <button
-          class="btn btn-primary mt-2"
-          type="button"
-          @click="focusParticipantInput"
-        >
-          {{ T.courseEditAddStudentsAdd }}
-        </button>
-      </omegaup-view-unavailable>
+        :button-text="T.courseEditAddStudentsAdd"
+        @action="focusParticipantInput"
+      ></omegaup-common-empty-state>
       <table v-else class="table table-striped table-over">
         <thead>
           <tr>
@@ -114,13 +105,13 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Requests from '../common/Requests.vue';
-import common_ViewUnavailable from '../common/ViewUnavailable.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-requests': common_Requests,
-    'omegaup-view-unavailable': common_ViewUnavailable,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class CourseAddStudents extends Vue {
@@ -166,9 +157,5 @@ export default class CourseAddStudents extends Vue {
 <style>
 .omegaup-course-addstudent th.align-right {
   text-align: right;
-}
-
-.course-students-empty {
-  min-height: auto !important;
 }
 </style>
