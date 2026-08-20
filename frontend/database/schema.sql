@@ -388,6 +388,38 @@ CREATE TABLE `Courses` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Jobs` (
+  `job_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `description` text,
+  `schedule` varchar(64) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`job_id`),
+  UNIQUE KEY `unique_cron_job_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de los trabajos programados (cron) del sistema';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Runs` (
+  `run_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL COMMENT 'Nombre del script (parser.prog). Denormalizado a propósito: el historial se registra aunque el trabajo no esté en Cron_Jobs y sobrevive a renombres o borrados del registro',
+  `hostname` varchar(255) DEFAULT NULL,
+  `status` enum('running','success','failure') NOT NULL DEFAULT 'running',
+  `started_at` datetime NOT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `duration_seconds` double DEFAULT NULL,
+  `rows_affected` int DEFAULT NULL,
+  `phases` json DEFAULT NULL,
+  `error_text` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`run_id`),
+  KEY `idx_cron_runs_name_started` (`name`,`started_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de ejecuciones de los trabajos cron';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Emails` (
   `email_id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
@@ -569,7 +601,7 @@ CREATE TABLE `Identities` (
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
   KEY `current_identity_school_id` (`current_identity_school_id`),
-  FULLTEXT KEY `ft_user_username` (`username`,`name`),
+  FULLTEXT KEY `ft_user_username_ngram` (`username`,`name`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`),
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
@@ -728,6 +760,23 @@ CREATE TABLE `Problem_Bookmarks` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Problem_Health_Checks` (
+  `check_id` int NOT NULL AUTO_INCREMENT,
+  `problem_id` int NOT NULL,
+  `check_type` enum('judge_errors','no_languages','never_solved','deprecated_public') NOT NULL COMMENT 'El tipo de revisión que detectó el problema',
+  `severity` enum('warning','error') NOT NULL DEFAULT 'warning',
+  `detail` varchar(255) DEFAULT NULL COMMENT 'Explicación legible de lo que se detectó',
+  `first_detected_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La primera vez que se detectó, se conserva entre ejecuciones',
+  `last_seen_at` datetime NOT NULL COMMENT 'La última ejecución en la que se seguía detectando',
+  `resolved_at` datetime DEFAULT NULL COMMENT 'Cuando dejó de detectarse, NULL si sigue vigente',
+  PRIMARY KEY (`check_id`),
+  UNIQUE KEY `unique_problem_check` (`problem_id`,`check_type`),
+  KEY `idx_problem_health_open` (`resolved_at`,`severity`),
+  CONSTRAINT `fk_phc_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Hallazgos de las revisiones automáticas de salud de los problemas';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problem_Of_The_Week` (
   `problem_of_the_week_id` int NOT NULL AUTO_INCREMENT,
   `problem_id` int NOT NULL COMMENT 'El id del problema escogido como problema de la semana.',
@@ -786,7 +835,7 @@ CREATE TABLE `Problems` (
   KEY `idx_quality_seal` (`quality_seal`),
   KEY `idx_problems_title` (`title`),
   KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
-  FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
+  FULLTEXT KEY `ft_alias_title_ngram` (`alias`,`title`) /*!50100 WITH PARSER `ngram` */ ,
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1473,3 +1522,4 @@ CREATE TABLE `Users_Experiments` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+

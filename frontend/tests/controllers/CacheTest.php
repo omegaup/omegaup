@@ -141,6 +141,23 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @dataProvider cacheAdapterProvider
      */
+    public function testCacheEntryWithTTL(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('entrywithttl-');
+        $ttl = 2;
+
+        $this->assertSame('first', $cache->entry($key, 'first', $ttl));
+        $this->assertSame('first', $cache->fetch($key));
+
+        if (!($cache instanceof \OmegaUp\InProcessCacheAdapter)) {
+            sleep($ttl + 1);
+            $this->assertSame('second', $cache->entry($key, 'second', $ttl));
+            $this->assertSame('second', $cache->fetch($key));
+        }
+    }
+
+    /**
+     * @dataProvider cacheAdapterProvider
+     */
     public function testCacheIncWithTTL(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid('incwithttl-');
         $ttl = 2; // 2 seconds TTL
@@ -166,5 +183,79 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
             // After expiry, should start at 1 again
             $this->assertSame(1, $cache->incWithTTL($key, $ttl));
         }
+    }
+
+    /**
+     * A counter written by incWithTTL() must be readable by fetch(): both must
+     * agree on the storage format.
+     *
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncWithTTLThenFetch(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('incwithttl-fetch-');
+        $ttl = 60;
+
+        $this->assertSame(1, $cache->incWithTTL($key, $ttl));
+        $this->assertSame(2, $cache->incWithTTL($key, $ttl));
+
+        // fetch() must return the counter, not treat it as a miss.
+        $this->assertSame(2, $cache->fetch($key));
+    }
+
+    /**
+     * inc() and incWithTTL() must share the same storage format, so a counter
+     * started with one can be continued with the other.
+     *
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncThenIncWithTTL(\OmegaUp\CacheAdapter $cache) {
+        $key = uniqid('inc-incwithttl-');
+        $ttl = 60;
+
+        // inc() stores using the serialized format.
+        $this->assertSame(1, $cache->inc($key));
+
+        // incWithTTL() must read that value and continue, not reset or return 0.
+        $this->assertSame(2, $cache->incWithTTL($key, $ttl));
+        $this->assertSame(3, $cache->incWithTTL($key, $ttl));
+
+        $this->assertSame(3, $cache->fetch($key));
+    }
+
+    /**
+     * Regression test for #10074: incWithTTL() must preserve the existing TTL
+     * of a key whose serialized value is `i:0;`, not overwrite it with the
+     * argument TTL. A key stored with value 0 and a short TTL, then incremented
+     * with a much larger argument TTL, must expire at the original (short) TTL.
+     *
+     * @dataProvider cacheAdapterProvider
+     */
+    public function testCacheIncWithTTLPreservesTTLOnZeroValue(
+        \OmegaUp\CacheAdapter $cache
+    ): void {
+        if ($cache instanceof \OmegaUp\InProcessCacheAdapter) {
+            // InProcessCacheAdapter does not support TTL.
+            $this->markTestSkipped(
+                'InProcessCacheAdapter does not support TTL.'
+            );
+        }
+        $key = uniqid('incwithttl-zero-');
+        $originalTtl = 3;
+        $argumentTtl = 30;
+
+        // Store value 0 with a short TTL (writes the serialized `i:0;`).
+        $this->assertTrue($cache->store($key, 0, $originalTtl));
+
+        // Increment with a much larger argument TTL. If the bug were present,
+        // the key's TTL would be reset to $argumentTtl (30s); with the fix, the
+        // original 3s TTL is preserved.
+        $this->assertSame(1, $cache->incWithTTL($key, $argumentTtl));
+
+        // Wait past the original TTL but well before the argument TTL.
+        sleep($originalTtl + 5);
+
+        // The key must have expired at the original (short) TTL, so the next
+        // increment starts again at 1.
+        $this->assertSame(1, $cache->incWithTTL($key, $argumentTtl));
     }
 }

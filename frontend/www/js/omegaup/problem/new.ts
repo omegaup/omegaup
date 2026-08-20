@@ -6,6 +6,11 @@ import problem_New from '../components/problem/Form.vue';
 import { CreationMethods } from '../components/problem/Form.vue';
 import * as ui from '../ui';
 import * as api from '../api';
+import {
+  downloadInputFile,
+  downloadZipFile,
+  showUpdateSuccessMessage,
+} from './creator/downloadHandlers';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -69,6 +74,9 @@ OmegaUp.on('ready', () => {
                 ui.apiError(error);
               });
           },
+          'show-update-success-message': showUpdateSuccessMessage,
+          'download-input-file': downloadInputFile,
+          'download-zip-file': downloadZipFile,
         },
       });
     },

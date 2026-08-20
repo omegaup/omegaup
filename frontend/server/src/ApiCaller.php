@@ -200,6 +200,7 @@ class ApiCaller {
         $readOnlyAllowlist = [
             'execute',
             'executeforide',
+            'getsystemsettings',
             'lastprivacypolicyaccepted',
             'listassociatedidentities',
             'statusverified',

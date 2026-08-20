@@ -219,6 +219,10 @@ class UITools {
             'maintenanceMessage' => \OmegaUp\Controllers\Admin::getMaintenanceMessage(
                 \OmegaUp\Controllers\Identity::getPreferredLanguage($identity)
             ),
+            'ephemeralGraderEnabled' => \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+                'ephemeral_grader_enabled',
+                true
+            ),
         ];
     }
 
