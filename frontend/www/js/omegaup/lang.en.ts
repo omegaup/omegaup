@@ -710,6 +710,8 @@ const translations: { [key: string]: string; } = {
   courseStudentSelectAssignment: "Select content",
   courseStudentSelectStudent: "Select student",
   courseStudentsEmpty: "No students",
+  courseStudentsEmptyDescription: "Add students to this course to start tracking their progress.",
+  courseStudentsEmptyTitle: "No students enrolled yet",
   courseStudentsProgress: "Students' progress",
   courseStudentsProgressExportToSpreadsheet: "Export table as:",
   courseSubmissionNotFound: "The submission for any problem of this course has not been found",

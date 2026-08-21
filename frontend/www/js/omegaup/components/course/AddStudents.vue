@@ -48,11 +48,14 @@
           </button>
         </div>
       </form>
-      <div v-if="students.length == 0">
-        <div class="empty-category">
-          {{ T.courseStudentsEmpty }}
-        </div>
-      </div>
+      <omegaup-common-empty-state
+        v-if="students.length == 0"
+        icon="users"
+        :title="T.courseStudentsEmptyTitle"
+        :description="T.courseStudentsEmptyDescription"
+        :button-text="T.courseEditAddStudentsAdd"
+        @action="focusParticipantInput"
+      ></omegaup-common-empty-state>
       <table v-else class="table table-striped table-over">
         <thead>
           <tr>
@@ -102,11 +105,13 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Requests from '../common/Requests.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-requests': common_Requests,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class CourseAddStudents extends Vue {
@@ -136,6 +141,10 @@ export default class CourseAddStudents extends Vue {
     this.participants += this.participant?.key;
 
     this.participant = null;
+  }
+  focusParticipantInput(): void {
+    const input = this.$el.querySelector<HTMLInputElement>('input');
+    input?.focus();
   }
 
   @Watch('identityRequests')
