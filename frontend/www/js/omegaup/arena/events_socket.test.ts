@@ -15,7 +15,13 @@ import { clarificationStoreConfig } from './clarificationsStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
-import { onRankingChanged, onRankingEvents } from './ranking';
+import {
+  createChart,
+  onRankingChanged,
+  onRankingEvents,
+  onVirtualRankingChanged,
+} from './ranking';
+import rankingStore from './rankingStore';
 import { mocked } from 'ts-jest/utils';
 import { ScoreMode } from './navigation';
 
@@ -55,6 +61,25 @@ const options: SocketOptions = {
   intervalInMilliseconds: 500,
   scoreMode: ScoreMode.Partial,
 };
+
+// The polling fallback is several promise hops deep -- scoreboard fetch,
+// commit, scoreboardEvents fetch, chart. Fake timers are installed, so reach
+// past them to the real macrotask queue to let every hop settle.
+const { setImmediate: realSetImmediate } = jest.requireActual('timers');
+const flushPromises = (): Promise<void> =>
+  new Promise((resolve) => realSetImmediate(resolve));
+
+// Fallback intervals outlive the test that armed them, and afterEach's
+// runOnlyPendingTimers would fire them against a torn-down server.
+const stopPolling = (client: EventsSocket): void => {
+  const internals = client as any;
+  clearInterval(internals.clarificationInterval);
+  clearInterval(internals.rankingInterval);
+  internals.clarificationInterval = null;
+  internals.rankingInterval = null;
+  internals.pollingActive = false;
+};
+
 describe('EventsSocket', () => {
   let server: WS | null = null;
 
@@ -279,6 +304,150 @@ describe('EventsSocket', () => {
 
     // Clean up keepalive timer so afterEach's runOnlyPendingTimers doesn't fire on a closed socket
     (client as any).onclose();
+  });
+
+  it('should commit the polled scoreboard to the ranking store', async () => {
+    mocked(onRankingChanged, true).mockReset();
+    mocked(onRankingEvents, false).mockReset();
+    mocked(createChart, false).mockReset();
+
+    const ranking: types.ScoreboardRankingEntry[] = [
+      {
+        classname: 'user-rank-unranked',
+        country: 'MX',
+        is_invited: true,
+        place: 1,
+        problems: [],
+        total: { penalty: 20, points: 100 },
+        username: 'omegaUp',
+      },
+    ];
+    const miniRankingUsers = [
+      {
+        classname: 'user-rank-unranked',
+        country: 'MX',
+        position: 1,
+        penalty: 20,
+        points: 100,
+        username: 'omegaUp',
+      },
+    ];
+    const lastTimeUpdated = new Date(1674625378734);
+
+    mocked(onRankingChanged, true).mockReturnValue({
+      users: miniRankingUsers,
+      ranking,
+      currentRanking: { omegaUp: 0 },
+      maxPoints: 200,
+      lastTimeUpdated,
+    });
+    mocked(onRankingEvents, false).mockReturnValue({
+      series: [
+        {
+          type: 'line',
+          rank: 0,
+          data: [[1674625378734, 100]],
+          name: 'omegaUp',
+          step: 'right',
+        },
+      ],
+      navigatorData: [[1674625378734, 100]],
+    });
+
+    rankingStore.commit('updateRanking', []);
+    rankingStore.commit('updateMiniRankingUsers', []);
+    rankingStore.commit('updateLastTimeUpdated', null);
+
+    const client = new EventsSocket({ ...options, disableSockets: false });
+    (client as any).socket = null;
+    (client as any).setupPolls();
+    await flushPromises();
+
+    // The socket path commits all three of these; the fallback used to call
+    // onRankingChanged and drop the result on the floor.
+    expect(rankingStore.state.ranking).toEqual(ranking);
+    expect(rankingStore.state.miniRankingUsers).toEqual(miniRankingUsers);
+    expect(rankingStore.state.lastTimeUpdated).toEqual(lastTimeUpdated);
+    expect(createChart).toHaveBeenCalled();
+
+    stopPolling(client);
+  });
+
+  it('should route virtual contests through onVirtualRankingChanged while polling', async () => {
+    mocked(onRankingChanged, true).mockReset();
+    mocked(onVirtualRankingChanged, false).mockReset();
+
+    const client = new EventsSocket({
+      ...options,
+      disableSockets: false,
+      isVirtual: true,
+      originalProblemsetId: 2,
+    });
+    (client as any).socket = null;
+    (client as any).setupPolls();
+    await flushPromises();
+
+    expect(onVirtualRankingChanged).toHaveBeenCalled();
+    expect(onRankingChanged).not.toHaveBeenCalled();
+
+    stopPolling(client);
+  });
+
+  it('should start polling when the socket gives up reconnecting', () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+
+    // A socket that connected once and then dropped for good: the retry
+    // budget is spent, so onclose takes the give-up branch.
+    client.shouldRetry = true;
+    client.retries = 0;
+    (client as any).onclose();
+
+    expect(client.socketStatus).toEqual(SocketStatus.Failed);
+    expect((client as any).clarificationInterval).not.toBeNull();
+    expect((client as any).rankingInterval).not.toBeNull();
+
+    stopPolling(client);
+  });
+
+  it('should arm the fallback only once across repeated close events', () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+
+    client.shouldRetry = true;
+    client.retries = 0;
+    (client as any).onclose();
+
+    const clarificationInterval = (client as any).clarificationInterval;
+    const rankingInterval = (client as any).rankingInterval;
+    expect(clarificationInterval).not.toBeNull();
+    expect(rankingInterval).not.toBeNull();
+
+    (client as any).onclose();
+
+    expect((client as any).clarificationInterval).toBe(clarificationInterval);
+    expect((client as any).rankingInterval).toBe(rankingInterval);
+
+    stopPolling(client);
+  });
+
+  it('should spend the whole retry budget on repeated reconnect failures', () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+
+    // connectSocket used to clear shouldRetry on every attempt, so the first
+    // failed reconnect fell through to the give-up branch and the remaining
+    // nine retries were never spent.
+    client.shouldRetry = true;
+    (client as any).connectSocket().catch(() => {});
+    expect(client.shouldRetry).toEqual(true);
+
+    (client as any).onclose();
+    expect(client.retries).toEqual(9);
+    expect(client.socketStatus).toEqual(SocketStatus.Waiting);
+
+    (client as any).onclose();
+    expect(client.retries).toEqual(8);
+    expect(client.socketStatus).toEqual(SocketStatus.Waiting);
+
+    stopPolling(client);
   });
 
   it('should handle a socket when server sends /run/update/ message', async () => {
