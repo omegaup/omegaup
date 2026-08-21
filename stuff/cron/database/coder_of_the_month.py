@@ -90,24 +90,17 @@ def get_last_12_coders_of_the_month(
           INNER JOIN
               Identities i ON i.identity_id = u.main_identity_id
           LEFT JOIN
-              Emails e ON e.user_id = u.user_id
+              Emails e ON e.email_id = u.main_email_id
           LEFT JOIN
               User_Rank ur ON ur.user_id = cm.user_id
+          LEFT JOIN (
+              SELECT DISTINCT `time`
+              FROM Coder_Of_The_Month
+              WHERE selected_by IS NOT NULL AND category = %s
+          ) AS manual_sel ON manual_sel.time = cm.time
           WHERE
-              (cm.selected_by IS NOT NULL
-              OR (
-                  cm.`ranking` = 1 AND
-                  NOT EXISTS (
-                      SELECT
-                          *
-                      FROM
-                          Coder_Of_The_Month
-                      WHERE
-                          time = cm.time AND
-                          selected_by IS NOT NULL AND
-                          category = %s
-                  )
-              ))
+              (cm.selected_by IS NOT NULL OR
+               (cm.`ranking` = 1 AND manual_sel.time IS NULL))
               AND cm.category = %s
               AND cm.time <= %s
               AND cm.time > DATE_SUB(%s, INTERVAL 12 MONTH)
