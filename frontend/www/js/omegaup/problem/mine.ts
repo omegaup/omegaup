@@ -17,6 +17,8 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problems: [] as types.ProblemListItem[],
       pagerItems: [] as types.PageItem[],
+      currentQuery: payload.query ?? '',
+      isSearching: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-mine', {
@@ -26,12 +28,17 @@ OmegaUp.on('ready', () => {
           isSysadmin: payload.isSysadmin,
           pagerItems: this.pagerItems,
           visibilityStatuses: payload.visibilityStatuses,
-          query: payload.query,
+          query: this.currentQuery,
+          isSearching: this.isSearching,
         },
         on: {
           'change-show-all-problems': (shouldShowAll: boolean) => {
             showAllProblems = shouldShowAll;
-            showProblems(shouldShowAll);
+            showProblems(shouldShowAll, /* pageNumber= */ 1);
+          },
+          'search-problems': (query: string) => {
+            this.currentQuery = query;
+            showProblems(showAllProblems, /* pageNumber= */ 1);
           },
           'change-visibility': (
             selectedProblems: types.ProblemListItem[],
@@ -111,21 +118,36 @@ OmegaUp.on('ready', () => {
   });
 
   function showProblems(showAllProblems: boolean, pageNumber?: number): void {
+    problemsMine.isSearching = true;
+    syncSearchQuery(problemsMine.currentQuery);
     (showAllProblems
       ? api.Problem.adminList({
           page: pageNumber,
-          query: payload.query ?? null,
+          query: problemsMine.currentQuery || null,
         })
       : api.Problem.myList({
           page: pageNumber,
-          query: payload.query ?? null,
+          query: problemsMine.currentQuery || null,
         })
     )
       .then((result) => {
         problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })
-      .catch(ui.apiError);
+      .catch(ui.apiError)
+      .finally(() => {
+        problemsMine.isSearching = false;
+      });
+  }
+
+  function syncSearchQuery(query: string): void {
+    const url = new URL(window.location.href);
+    if (query) {
+      url.searchParams.set('query', query);
+    } else {
+      url.searchParams.delete('query');
+    }
+    window.history.replaceState({}, '', url.toString());
   }
 
   function normalizeVisibility(

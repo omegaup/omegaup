@@ -18,26 +18,23 @@
     <div class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
       <div class="card-body px-2 px-sm-4">
-        <div class="row align-items-center mb-3">
+        <form class="row align-items-center mb-3" @submit.prevent="emitSearch">
           <div class="col-9 col-lg-6">
             <input
               v-model="currentQuery"
               class="typeahead form-control px-1 px-sm-3"
               :placeholder="T.wordsKeywordSearch"
+              @input="onQueryInput"
+              @keyup.enter.prevent="emitSearch"
             />
+            <small v-if="isSearching" class="form-text text-muted">
+              {{ T.wordsLoading }}
+            </small>
           </div>
-          <a
-            class="btn btn-primary"
-            role="button"
-            :class="{ disabled: currentQuery === '' }"
-            :href="
-              currentQuery
-                ? `/problem/mine/?query=${encodeURIComponent(currentQuery)}`
-                : ''
-            "
-            >{{ T.wordsSearch }}</a
-          >
-        </div>
+          <button class="btn btn-primary" type="submit">
+            {{ T.wordsSearch }}
+          </button>
+        </form>
         <div class="form-row">
           <div class="col">
             <div class="form-check">
@@ -82,7 +79,7 @@
           </div>
         </div>
       </div>
-      <div class="table-responsive">
+      <div v-if="problems.length" class="table-responsive">
         <table class="table mb-0">
           <thead>
             <tr>
@@ -217,6 +214,11 @@
           </tbody>
         </table>
       </div>
+      <div v-else class="card-body border-top text-center text-muted">
+        {{
+          currentQuery ? T.wordsNoResultsFound : T.courseAssignmentProblemsEmpty
+        }}
+      </div>
       <b-modal
         v-model="showConfirmationModalDeleteAll"
         :title="T.problemEditDeleteSelectedProblemsRequireConfirmation"
@@ -245,7 +247,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
@@ -285,6 +287,7 @@ export default class ProblemMine extends Vue {
   @Prop() isSysadmin!: boolean;
   @Prop() visibilityStatuses!: Record<string, number>;
   @Prop() query!: string | null;
+  @Prop({ default: false }) isSearching!: boolean;
 
   T = T;
   ui = ui;
@@ -294,6 +297,7 @@ export default class ProblemMine extends Vue {
   allProblemsVisibilityOption = -1;
   confirmationModal: Record<string, boolean> = {};
   showConfirmationModalDeleteAll = false;
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   get statementShowAllProblems(): string {
     return this.isSysadmin
@@ -344,6 +348,34 @@ export default class ProblemMine extends Vue {
     );
     this.selectedProblems = [];
     this.allProblemsVisibilityOption = -1;
+  }
+
+  onQueryInput(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = setTimeout(() => {
+      this.emitSearch();
+    }, 300);
+  }
+
+  emitSearch(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    this.$emit('search-problems', this.currentQuery.trim());
+  }
+
+  beforeDestroy(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+  }
+
+  @Watch('query')
+  onQueryChanged(newQuery: string | null): void {
+    this.currentQuery = newQuery ?? '';
   }
 }
 </script>
