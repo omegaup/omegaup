@@ -108,6 +108,20 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ValueError', $phases[1]['error_class']);
     }
 
+    public function testGetCronsForTypeScriptRequiresAdmin() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Admin::getCronsForTypeScript(
+                new \OmegaUp\Request(['auth_token' => $login->auth_token])
+            );
+            $this->fail('Should not have allowed access to non-admin');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
     public function testGetCronRunReturnsNullForUnknownRun() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
