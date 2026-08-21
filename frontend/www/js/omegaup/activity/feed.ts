@@ -20,6 +20,8 @@ OmegaUp.on('ready', function () {
           alias: payload.alias,
           report: payload.events,
           pagerItems: payload.pagerItems,
+          reportUsers: (payload as any).users,
+          reportOrigins: (payload as any).origins,
         },
       });
     },
