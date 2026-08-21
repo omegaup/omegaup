@@ -24,7 +24,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * @return list<\OmegaUp\DAO\VO\Courses>
      */
-    public static function findByName(string $name): array {
+    public static function findByExactName(string $name): array {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
             'c'
