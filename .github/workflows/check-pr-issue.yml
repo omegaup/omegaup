@@ -23,6 +23,9 @@ jobs:
                     closingIssuesReferences(first: 10) {
                       nodes {
                         number
+                        author {
+                          login
+                        }
                         assignees(first: 10) {
                           nodes {
                             login
@@ -78,9 +81,10 @@ jobs:
                 });
 
                 const assignees = issue.data.assignees.map(node => node.login.toLowerCase());
-                console.log(`Issue #${issueNumber} assignees: ${JSON.stringify(assignees)}`);
+                const issueAuthor = issue.data.user ? issue.data.user.login.toLowerCase() : "";
+                console.log(`Issue #${issueNumber} assignees: ${JSON.stringify(assignees)}, author: ${issueAuthor}`);
 
-                if (assignees.includes(prAuthor)) {
+                if (assignees.includes(prAuthor) || prAuthor === issueAuthor) {
                   isAssigned = true;
                   break;
                 }
@@ -101,9 +105,10 @@ jobs:
             for (const issue of linkedIssues) {
               linkedIssueNumbers.push("#" + issue.number);
               const assignees = issue.assignees.nodes.map(node => node.login.toLowerCase());
-              console.log(`Issue #${issue.number} assignees: ${JSON.stringify(assignees)}`);
+              const issueAuthor = (issue.author && issue.author.login) ? issue.author.login.toLowerCase() : "";
+              console.log(`Issue #${issue.number} assignees: ${JSON.stringify(assignees)}, author: ${issueAuthor}`);
               
-              if (assignees.includes(prAuthor)) {
+              if (assignees.includes(prAuthor) || prAuthor === issueAuthor) {
                 isAssigned = true;
                 break;
               }
