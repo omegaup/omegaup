@@ -174,12 +174,10 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
                 s.problem_id
             ORDER BY
                 s.identity_id ASC,
-                s.time ASC;
-            """, dbconn)
+                `time` ASC;
+            """, dbconn.conn)
 
-        # MySQL needs to select any columns that appear in the ORDER BY
-        # section, but we want to not propagate the values of that column to
-        # the rest of the script.
+        # `time` only orders the rows, the rest of the script does not use it.
         runs.drop(['time'], axis=1, inplace=True)
 
         # There's no need to preserve the original identities, so we will
