@@ -134,7 +134,7 @@ def load_sqlite(database: str) -> pd.DataFrame:
                 problem_id
             FROM
                 Runs;
-            """, dbconn.conn)
+            """, dbconn)
         logging.info('Found %d runs', len(runs))
         return runs
     finally:
