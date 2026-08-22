@@ -49,8 +49,11 @@ jobs:
 
             console.log(`PR Author: ${prAuthor}, association: ${authorAssociation}`);
 
-            // Skip this check for organization members and Dependabot
-            if (authorAssociation === "MEMBER" || prAuthor === "dependabot[bot]") {
+            // Skip this check for organization members, owners, collaborators and Dependabot
+            if (authorAssociation === "OWNER" || 
+                authorAssociation === "MEMBER" || 
+                authorAssociation === "COLLABORATOR" || 
+                prAuthor === "dependabot[bot]") {
               console.log("Skipping linked-issue & assignee check for member/dependabot author.");
               return;
             }

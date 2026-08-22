@@ -1,6 +1,6 @@
 <template>
   <div class="card w-100">
-    <ul class="nav nav-tabs justify-content-arround" role="tablist">
+    <ul class="nav nav-tabs justify-content-around" role="tablist">
       <li v-for="tab in availableTabs" :key="tab.id" class="nav-item">
         <a
           :href="getTabName(tab)"

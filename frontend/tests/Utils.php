@@ -379,7 +379,7 @@ class Utils {
         }
     }
 
-    private static function commit(): void {
+    public static function commit(): void {
         \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
         \OmegaUp\MySQLConnection::getInstance()->StartTrans();
         self::$committed = true;

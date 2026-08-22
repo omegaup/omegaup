@@ -40,6 +40,9 @@ OmegaUp.on('ready', () => {
       searchResultUsers: [] as types.ListItem[],
       searchResultSchools: searchResultSchools,
     }),
+    beforeDestroy() {
+      window.removeEventListener('hashchange', onHashChange);
+    },
     methods: {
       refreshGroupScoreboards: (): void => {
         api.Group.details({ group_alias: payload.groupAlias })
@@ -329,7 +332,7 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-  const onHashChange = () => {
+  function onHashChange(): void {
     const hash = window.location.hash.substring(1).split('#')[0];
 
     if (!Object.values(AvailableTabs).includes(hash as AvailableTabs)) {
@@ -338,12 +341,8 @@ OmegaUp.on('ready', () => {
     }
 
     groupEdit.tab = hash as AvailableTabs;
-  };
+  }
 
   window.addEventListener('hashchange', onHashChange);
   onHashChange();
-
-  groupEdit.$once('hook:beforeDestroy', () => {
-    window.removeEventListener('hashchange', onHashChange);
-  });
 });

@@ -1,9 +1,13 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
+  - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
+  - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -52,9 +56,11 @@
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
+  - [`/api/contest/listAllTabs/`](#apicontestlistalltabs)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
+  - [`/api/contest/problemChangeLogs/`](#apicontestproblemchangelogs)
   - [`/api/contest/problemClarifications/`](#apicontestproblemclarifications)
   - [`/api/contest/problems/`](#apicontestproblems)
   - [`/api/contest/publicDetails/`](#apicontestpublicdetails)
@@ -310,6 +316,52 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 Admin Controller
 
+## `/api/admin/getCronRun/`
+
+### Description
+
+Returns the detail of a single cron run.
+
+### Parameters
+
+| Name     | Type  | Description | Required |
+| -------- | ----- | ----------- | -------- |
+| `run_id` | `int` |             | ✓        |
+
+### Returns
+
+| Name  | Type            |
+| ----- | --------------- |
+| `run` | `types.CronRun` |
+
+**`types.CronRun` fields:**
+
+| Name               | Type                       | Required |
+| ------------------ | -------------------------- | -------- |
+| `duration_seconds` | `number`                   |          |
+| `error_text`       | `string`                   |          |
+| `finished_at`      | `Date`                     |          |
+| `hostname`         | `string`                   |          |
+| `name`             | `string`                   | ✓        |
+| `phases`           | `List[types.CronRunPhase]` | ✓        |
+| `rows_affected`    | `number`                   |          |
+| `run_id`           | `number`                   | ✓        |
+| `started_at`       | `Date`                     |          |
+| `status`           | `string`                   | ✓        |
+
+## `/api/admin/getCrons/`
+
+### Description
+
+Lists the registered cron jobs and their most recent runs.
+
+### Returns
+
+| Name   | Type                  |
+| ------ | --------------------- |
+| `jobs` | `List[types.CronJob]` |
+| `runs` | `List[types.CronRun]` |
+
 ## `/api/admin/getMaintenanceMode/`
 
 ### Description
@@ -321,6 +373,18 @@ Get maintenance mode status
 ```typescript
 types.MaintenanceModeStatus;
 ```
+
+## `/api/admin/getSystemSettings/`
+
+### Description
+
+Gets the current system settings. Only available to system admins.
+
+### Returns
+
+| Name       | Type                                   |
+| ---------- | -------------------------------------- |
+| `settings` | `{ ephemeralGraderEnabled: boolean; }` |
 
 ## `/api/admin/platformReportStats/`
 
@@ -356,6 +420,22 @@ Set maintenance mode
 | `message_es` | `null\|string` |             |          |
 | `message_pt` | `null\|string` |             |          |
 | `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
+
+## `/api/admin/updateSystemSettings/`
+
+### Description
+
+Updates system settings. Only available to system admins.
+
+### Parameters
+
+| Name                       | Type         | Description | Required |
+| -------------------------- | ------------ | ----------- | -------- |
+| `ephemeral_grader_enabled` | `null\|bool` |             |          |
 
 ### Returns
 
@@ -1181,24 +1261,74 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type                                        | Description | Required |
-| ---------------- | ------------------------------------------- | ----------- | -------- |
-| `page`           | `int`                                       |             | ✓        |
-| `page_size`      | `int`                                       |             | ✓        |
-| `query`          | `string`                                    |             | ✓        |
-| `tab_name`       | `string`                                    |             | ✓        |
-| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |          |
-| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |          |
-| `participating`  | `int\|null`                                 |             |          |
-| `recommended`    | `int\|null`                                 |             |          |
-| `sort_order`     | `null\|string`                              |             |          |
+| Name             | Type                                                                                | Description | Required |
+| ---------------- | ----------------------------------------------------------------------------------- | ----------- | -------- |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null`                                         |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`                                            |             |          |
+| `page`           | `int\|null`                                                                         |             |          |
+| `page_size`      | `int\|null`                                                                         |             |          |
+| `participating`  | `int\|null`                                                                         |             |          |
+| `query`          | `null\|string`                                                                      |             |          |
+| `recommended`    | `int\|null`                                                                         |             |          |
+| `sort_order`     | `'contestants'\|'duration'\|'ends'\|'none'\|'organizer'\|'signedup'\|'title'\|null` |             |          |
+| `tab_name`       | `'all'\|'current'\|'future'\|'past'\|null`                                          |             |          |
 
 ### Returns
 
-| Name                | Type                          |
-| ------------------- | ----------------------------- |
-| `number_of_results` | `number`                      |
-| `results`           | `List[types.ContestListItem]` |
+```typescript
+types.ContestListTabPayload;
+```
+
+## `/api/contest/listAllTabs/`
+
+### Description
+
+Returns paginated contest lists for current, past, and future in one API call.
+
+### Parameters
+
+| Name             | Type                                                                                | Description | Required |
+| ---------------- | ----------------------------------------------------------------------------------- | ----------- | -------- |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null`                                         |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`                                            |             |          |
+| `page`           | `int\|null`                                                                         |             |          |
+| `page_size`      | `int\|null`                                                                         |             |          |
+| `participating`  | `int\|null`                                                                         |             |          |
+| `query`          | `null\|string`                                                                      |             |          |
+| `recommended`    | `int\|null`                                                                         |             |          |
+| `sort_order`     | `'contestants'\|'duration'\|'ends'\|'none'\|'organizer'\|'signedup'\|'title'\|null` |             |          |
+| `tab_name`       | `'all'\|'current'\|'future'\|'past'\|null`                                          |             |          |
+
+### Returns
+
+| Name      | Type                          |
+| --------- | ----------------------------- |
+| `current` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
+
+| `future` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
+
+| `past` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
 
 ## `/api/contest/listParticipating/`
 
@@ -1263,6 +1393,25 @@ Joins a contest - explicitly adds a identity to a contest.
 ### Returns
 
 _Nothing_
+
+## `/api/contest/problemChangeLogs/`
+
+### Description
+
+Returns the problem change log for a contest.
+Queries the Contest_Problem_Change_Log table directly to get the change history of problems in a contest, including additions, removals, and modifications.
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+
+### Returns
+
+| Name   | Type                                  |
+| ------ | ------------------------------------- |
+| `logs` | `List[types.ContestProblemChangeLog]` |
 
 ## `/api/contest/problemClarifications/`
 
@@ -4759,9 +4908,19 @@ Details of a team group
 
 ### Returns
 
-| Name         | Type                                                                         |
-| ------------ | ---------------------------------------------------------------------------- |
-| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+| Name         | Type               |
+| ------------ | ------------------ |
+| `team_group` | `types.TeamsGroup` |
+
+**`types.TeamsGroup` fields:**
+
+| Name          | Type      | Required |
+| ------------- | --------- | -------- |
+| `alias`       | `string`  | ✓        |
+| `archived`    | `boolean` | ✓        |
+| `create_time` | `Date`    | ✓        |
+| `description` | `string`  |          |
+| `name`        | `string`  | ✓        |
 
 ## `/api/teamsGroup/list/`
 
@@ -4864,12 +5023,13 @@ Update an existing teams group
 
 ### Parameters
 
-| Name                  | Type        | Description | Required |
-| --------------------- | ----------- | ----------- | -------- |
-| `alias`               | `string`    |             | ✓        |
-| `description`         | `string`    |             | ✓        |
-| `name`                | `string`    |             | ✓        |
-| `numberOfContestants` | `int\|null` |             |          |
+| Name                  | Type         | Description | Required |
+| --------------------- | ------------ | ----------- | -------- |
+| `alias`               | `string`     |             | ✓        |
+| `description`         | `string`     |             | ✓        |
+| `name`                | `string`     |             | ✓        |
+| `archived`            | `bool\|null` |             |          |
+| `numberOfContestants` | `int\|null`  |             |          |
 
 ### Returns
 

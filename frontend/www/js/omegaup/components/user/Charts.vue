@@ -224,7 +224,7 @@ export default class UserCharts extends Vue {
   }
 
   get groupedPeriods(): GroupedPeriods {
-    const stats = this.data;
+    const stats = this.data.map((run) => ({ ...run }));
     const periods: Array<'day' | 'week' | 'month' | 'year'> = [
       'day',
       'week',
