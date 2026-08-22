@@ -22,11 +22,13 @@ def normalize_query(query: str) -> str:
     Replaces:
     - numbers with '?'
     - single-quoted and double-quoted strings with '?'
+    - consecutive whitespace with a single space
     '''
     query = re.sub(r'\b\d+\b', '?', query)
     query = re.sub(r"'[^']*'", '?', query)
     query = re.sub(r'"[^"]*"', '?', query)
-    return query
+    query = re.sub(r'\s+', ' ', query)
+    return query.strip()
 
 
 def create_connection(
