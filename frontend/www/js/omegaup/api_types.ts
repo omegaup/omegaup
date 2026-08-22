@@ -1602,6 +1602,43 @@ export namespace types {
       );
     }
 
+    export function CronsDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CronsDetailsPayload {
+      return ((x) => {
+        x.problemHealthFindings = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.first_detected_at = ((x: number) => new Date(x * 1000))(
+              x.first_detected_at,
+            );
+            return x;
+          });
+        })(x.problemHealthFindings);
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+              x.finished_at = ((x: number) => new Date(x * 1000))(
+                x.finished_at,
+              );
+            if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+              x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function EmailEditDetailsPayload(
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
@@ -3815,6 +3852,12 @@ export namespace types {
     status: string;
   }
 
+  export interface CronsDetailsPayload {
+    jobs: types.CronJob[];
+    problemHealthFindings: types.ProblemHealthFinding[];
+    runs: types.CronRun[];
+  }
+
   export interface CurrentSession {
     apiTokenId?: number;
     api_tokens: types.ApiToken[];
@@ -4386,6 +4429,16 @@ export namespace types {
     alias: string;
     name: string;
     role: string;
+  }
+
+  export interface ProblemHealthFinding {
+    alias: string;
+    check_type: string;
+    detail?: string;
+    first_detected_at: Date;
+    problem_id: number;
+    severity: string;
+    title: string;
   }
 
   export interface ProblemInfo {
