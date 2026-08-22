@@ -23,6 +23,24 @@ _LANG_RE = re.compile(r'^(\w+)\s*=', flags=re.MULTILINE)
 _EXCLUDED_STRINGS = set(('lang', 'hasOwnProperty'))
 
 
+def _get_python_strings() -> Set[str]:
+    """Obtains the translation strings quoted in the scripts under stuff/.
+
+    Cron and pipeline scripts create notifications directly, so they name the
+    string as a literal instead of going through the frontend.
+    """
+    strings: Set[str] = set()
+    for root, _, filenames in os.walk('stuff'):
+        for filename in filenames:
+            if not filename.endswith('.py'):
+                continue
+            with open(os.path.join(root, filename), encoding='utf-8') as f:
+                for line in f:
+                    for linematch in _PYTHON_RE.finditer(line):
+                        strings.add(linematch[1])
+    return strings
+
+
 def _get_expected_strings() -> Set[str]:
     """Obtains all translation strings from the frontend."""
     expected_strings: Set[str] = set()
@@ -45,17 +63,7 @@ def _get_expected_strings() -> Set[str]:
                             continue
                         expected_strings.add(linematch[1])
 
-    # Then the strings referenced from the Python scripts under stuff/, which
-    # create notifications without going through the frontend.
-    for root, _, filenames in os.walk('stuff'):
-        for filename in filenames:
-            if not filename.endswith('.py'):
-                continue
-            path = os.path.join(root, filename)
-            with open(path, encoding='utf-8') as f:
-                for line in f:
-                    for linematch in _PYTHON_RE.finditer(line):
-                        expected_strings.add(linematch[1])
+    expected_strings.update(_get_python_strings())
 
     # Now get the Psalm-obtained translation strings from PHP.
     for filename in os.listdir('frontend/tests/runfiles/translation_strings'):
