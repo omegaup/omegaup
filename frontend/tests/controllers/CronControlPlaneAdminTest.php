@@ -122,6 +122,21 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testGetCronsForTypeScriptReturnsThePayload() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $response = \OmegaUp\Controllers\Admin::getCronsForTypeScript(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        $this->assertSame('admin_crons', $response['entrypoint']);
+        $payload = $response['templateProperties']['payload'];
+        $names = array_map(fn ($job) => $job['name'], $payload['jobs']);
+        $this->assertContains('update_ranks.py', $names);
+        $this->assertIsArray($payload['runs']);
+    }
+
     public function testGetCronRunReturnsNullForUnknownRun() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
