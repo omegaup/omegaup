@@ -41,11 +41,15 @@ class Finding(NamedTuple):
 
 def find_judge_errors(
         cur: mysql.connector.cursor.MySQLCursorBufferedDict,
-        since: datetime.datetime,
+        run_timestamp: datetime.datetime,
+        window_hours: int = _JUDGE_ERROR_WINDOW_HOURS,
         min_errors: int = _MIN_JUDGE_ERRORS,
         min_ratio: float = _MIN_JUDGE_ERROR_RATIO,
 ) -> List[Finding]:
     '''Finds problems that are failing to judge the submissions they get.
+
+    Only judged submissions count, on both sides of the ratio: one still
+    waiting for a runner carries a verdict it was never given.
 
     Both thresholds must hold: enough failures to rule out a one-off, and
     enough of the problem's own traffic to rule out a flaky submission.
@@ -62,7 +66,9 @@ def find_judge_errors(
                 SUM(`s`.`verdict` IN ('JE', 'VE')) AS `error_count`,
                 COUNT(*) AS `submission_count`
             FROM `Submissions` `s`
-            WHERE `s`.`time` >= %s
+            WHERE
+                `s`.`time` >= %s AND
+                `s`.`status` = 'ready'
             GROUP BY `s`.`problem_id`
             HAVING
                 `error_count` >= %s AND
@@ -72,15 +78,16 @@ def find_judge_errors(
         WHERE
             `p`.`deprecated` = 0 AND
             `p`.`visibility` >= %s;''',
-        (since, min_errors, min_ratio, PROBLEM_VISIBILITY_PUBLIC))
+        (run_timestamp - datetime.timedelta(hours=window_hours), min_errors,
+         min_ratio, PROBLEM_VISIBILITY_PUBLIC))
     return [
         Finding(
             problem_id=int(row['problem_id']),
             check_type='judge_errors',
             severity='error',
-            detail=(f'{int(row["error_count"])} of the problem\'s last '
-                    f'{int(row["submission_count"])} submissions ended in a '
-                    f'judge or validator error'),
+            detail=(f'{int(row["error_count"])} of '
+                    f'{int(row["submission_count"])} submissions in the last '
+                    f'{window_hours}h ended in a judge or validator error'),
         ) for row in cur.fetchall()
     ]
 
@@ -295,8 +302,6 @@ def main() -> None:
             # One clock for the whole run, read before any write, so a finding
             # stored now is never mistaken for one that went missing.
             run_timestamp = current_timestamp(dbconn)
-            judge_errors_since = run_timestamp - datetime.timedelta(
-                hours=args.judge_error_window_hours)
             created_before = run_timestamp - datetime.timedelta(
                 days=args.min_age_days_never_solved)
 
@@ -306,7 +311,8 @@ def main() -> None:
             with dbconn.cursor(buffered=True, dictionary=True) as cur:
                 with cron_run.phase('judge_errors'):
                     findings.extend(
-                        find_judge_errors(cur, judge_errors_since,
+                        find_judge_errors(cur, run_timestamp,
+                                          args.judge_error_window_hours,
                                           args.min_judge_errors,
                                           args.min_judge_error_ratio))
                 with cron_run.phase('no_languages'):

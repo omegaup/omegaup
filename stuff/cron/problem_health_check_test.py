@@ -46,6 +46,7 @@ CREATE TABLE `Submissions` (
     `submission_id` INTEGER PRIMARY KEY,
     `problem_id` INTEGER NOT NULL,
     `verdict` TEXT NOT NULL,
+    `status` TEXT NOT NULL DEFAULT 'ready',
     `time` TEXT NOT NULL
 );
 CREATE TABLE `Problem_Health_Checks` (
@@ -62,9 +63,9 @@ CREATE TABLE `Problem_Health_Checks` (
 '''
 
 _NOW = datetime.datetime(2026, 7, 29, 10, 0, 0)
-_SINCE = _NOW - datetime.timedelta(hours=24)
 _IN_WINDOW = _NOW - datetime.timedelta(hours=1)
 _BEFORE_WINDOW = _NOW - datetime.timedelta(hours=48)
+_OLDER_IN_WINDOW = _NOW - datetime.timedelta(hours=8)
 _CREATED_BEFORE = _NOW - datetime.timedelta(days=7)
 _ESTABLISHED = _NOW - datetime.timedelta(days=365)
 _BRAND_NEW = _NOW - datetime.timedelta(days=1)
@@ -179,13 +180,15 @@ class _Fixture(unittest.TestCase):
                         problem_id: int,
                         verdict: str,
                         count: int,
-                        when: datetime.datetime = _IN_WINDOW) -> None:
+                        when: datetime.datetime = _IN_WINDOW,
+                        status: str = 'ready') -> None:
         '''Seeds `count` submissions on one problem.'''
         for _ in range(count):
             self.db.conn.execute(
                 'INSERT INTO `Submissions` '
-                '(`problem_id`, `verdict`, `time`) VALUES (?, ?, ?)',
-                (problem_id, verdict, when))
+                '(`problem_id`, `verdict`, `status`, `time`) '
+                'VALUES (?, ?, ?, ?)',
+                (problem_id, verdict, status, when))
         self.db.conn.commit()
 
     def open_findings(self) -> List[Dict[str, Any]]:
@@ -206,14 +209,14 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'AC', 2)
 
         findings = problem_health_check.find_judge_errors(
-            self.cursor, _SINCE)
+            self.cursor, _NOW)
 
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].problem_id, 7)
         self.assertEqual(findings[0].check_type, 'judge_errors')
         self.assertEqual(findings[0].severity, 'error')
         self.assertEqual(findings[0].detail,
-                         "3 of the problem's last 5 submissions ended in a "
+                         '3 of 5 submissions in the last 24h ended in a '
                          'judge or validator error')
 
     def test_errors_before_the_window_are_ignored(self) -> None:
@@ -222,7 +225,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 8, when=_BEFORE_WINDOW)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_too_few_errors_are_ignored(self) -> None:
         '''A couple of failures is not enough to raise a finding.'''
@@ -230,7 +233,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 2)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_a_small_share_of_errors_is_ignored(self) -> None:
         '''Failures the problem's own traffic dwarfs are flakiness.'''
@@ -239,7 +242,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'AC', 27)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_a_quiet_problem_failing_every_time_is_reported(self) -> None:
         '''Three submissions that all failed still count.'''
@@ -249,7 +252,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(8, 'AC', 500)
 
         findings = problem_health_check.find_judge_errors(
-            self.cursor, _SINCE)
+            self.cursor, _NOW)
 
         self.assertEqual([finding.problem_id for finding in findings], [7])
 
@@ -260,10 +263,10 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 1)
 
         findings = problem_health_check.find_judge_errors(
-            self.cursor, _SINCE)
+            self.cursor, _NOW)
 
         self.assertEqual(len(findings), 1)
-        self.assertIn('3 of the problem', findings[0].detail)
+        self.assertIn('3 of 3 submissions', findings[0].detail)
 
     def test_ordinary_verdicts_are_not_errors(self) -> None:
         '''Wrong answers are the student's problem, not the site's.'''
@@ -271,7 +274,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'WA', 10)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_deprecated_problems_are_excluded(self) -> None:
         '''Nobody is being served by a deprecated problem.'''
@@ -279,7 +282,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 8)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_private_problems_are_excluded(self) -> None:
         '''A private problem is not on offer to students.'''
@@ -287,7 +290,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 8)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_a_problem_under_a_visibility_warning_is_excluded(self) -> None:
         '''Visibility 1 is not in the catalog, so nobody is served it.'''
@@ -295,7 +298,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 3)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
 
     def test_a_promoted_problem_is_included(self) -> None:
         '''Visibility 3 is above the catalog threshold, not below it.'''
@@ -303,7 +306,7 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'JE', 3)
 
         self.assertEqual(
-            len(problem_health_check.find_judge_errors(self.cursor, _SINCE)),
+            len(problem_health_check.find_judge_errors(self.cursor, _NOW)),
             1)
 
     def test_the_thresholds_are_honoured(self) -> None:
@@ -313,13 +316,13 @@ class TestJudgeErrors(_Fixture):
         self.add_submissions(7, 'AC', 9)
 
         findings = problem_health_check.find_judge_errors(self.cursor,
-                                                          _SINCE,
+                                                          _NOW,
                                                           min_errors=1,
                                                           min_ratio=0.1)
 
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].detail,
-                         "1 of the problem's last 10 submissions ended in a "
+                         '1 of 10 submissions in the last 24h ended in a '
                          'judge or validator error')
 
     def test_each_problem_is_counted_on_its_own(self) -> None:
@@ -330,7 +333,49 @@ class TestJudgeErrors(_Fixture):
             self.add_submissions(problem_id, 'AC', 9)
 
         self.assertEqual(
-            problem_health_check.find_judge_errors(self.cursor, _SINCE), [])
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
+
+    def test_unjudged_submissions_are_not_errors(self) -> None:
+        '''A submission still waiting for a runner was never judged.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 8, status='new')
+
+        self.assertEqual(
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
+
+    def test_unjudged_submissions_do_not_pad_the_ratio(self) -> None:
+        '''Counting them in the denominator would hide a broken problem.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 3)
+        self.add_submissions(7, 'AC', 27, status='new')
+
+        findings = problem_health_check.find_judge_errors(self.cursor, _NOW)
+
+        self.assertEqual(len(findings), 1)
+        self.assertIn('3 of 3 submissions', findings[0].detail)
+
+    def test_a_shorter_window_excludes_older_errors(self) -> None:
+        '''The window the caller asks for is the one the query uses.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 8, when=_OLDER_IN_WINDOW)
+
+        self.assertEqual(
+            problem_health_check.find_judge_errors(self.cursor,
+                                                   _NOW,
+                                                   window_hours=6), [])
+
+    def test_the_detail_names_the_window_it_used(self) -> None:
+        '''The counts come from the window, so the text has to say so.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 3)
+
+        findings = problem_health_check.find_judge_errors(self.cursor,
+                                                          _NOW,
+                                                          window_hours=6)
+
+        self.assertEqual(findings[0].detail,
+                         '3 of 3 submissions in the last 6h ended in a '
+                         'judge or validator error')
 
 
 class TestNoLanguages(_Fixture):
