@@ -11,7 +11,7 @@ from typing import Any
 
 import pandas as pd  # type: ignore
 
-import build_problem_rec_model
+from cron import build_problem_rec_model
 
 
 class TestModelGeneration(unittest.TestCase):
