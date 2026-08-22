@@ -186,18 +186,18 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
-
-            \OmegaUp\DAO\SystemSettings::invalidateCache(
-                self::MAINTENANCE_ENABLED_KEY,
-                self::MAINTENANCE_MESSAGE_ES_KEY,
-                self::MAINTENANCE_MESSAGE_EN_KEY,
-                self::MAINTENANCE_MESSAGE_PT_KEY,
-                self::MAINTENANCE_MESSAGE_TYPE_KEY
-            );
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
+
+        \OmegaUp\DAO\SystemSettings::invalidateCache(
+            self::MAINTENANCE_ENABLED_KEY,
+            self::MAINTENANCE_MESSAGE_ES_KEY,
+            self::MAINTENANCE_MESSAGE_EN_KEY,
+            self::MAINTENANCE_MESSAGE_PT_KEY,
+            self::MAINTENANCE_MESSAGE_TYPE_KEY
+        );
         return ['status' => 'ok'];
     }
 
