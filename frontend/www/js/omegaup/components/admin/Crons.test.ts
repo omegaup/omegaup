@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 
 import Crons from './Crons.vue';
 import { types } from '../../api_types';
+import T from '../../lang';
 
 const jobs: types.CronJob[] = [
   {
@@ -35,6 +36,22 @@ const runs: types.CronRun[] = [
   },
 ];
 
+const recommendationModelRuns: types.RecommendationModelRun[] = [
+  {
+    created_at: new Date(),
+    map_score: 0.3419,
+    dataset_size: 700,
+    published: true,
+  },
+  {
+    created_at: new Date(),
+    map_score: 0.2151,
+    dataset_size: 700,
+    published: false,
+    skip_reason: 'MAP score 0.2151 below minimum 0.3000',
+  },
+];
+
 describe('Crons.vue', () => {
   it('Should render the jobs and runs tables', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
@@ -65,6 +82,35 @@ describe('Crons.vue', () => {
     expect(wrapper.find('[data-cron-phases]').exists()).toBe(true);
     await row.trigger('click');
     expect(wrapper.find('[data-cron-phases]').exists()).toBe(false);
+  });
+
+  it('Should render the recommendation model quality table', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, recommendationModelRuns },
+    });
+
+    expect(wrapper.find('[data-cron-model-runs]').exists()).toBe(true);
+    const text = wrapper.find('[data-cron-model-runs]').text();
+    expect(text).toContain('0.3419');
+    expect(text).toContain('700');
+    expect(text).toContain('MAP score 0.2151 below minimum 0.3000');
+  });
+
+  it('Should show a placeholder when no model runs were recorded', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    expect(wrapper.find('[data-cron-model-runs]').exists()).toBe(false);
+    expect(wrapper.text()).toContain(T.cronControlPlaneModelNoRuns);
+  });
+
+  it('Should style the published flag of each model run', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, recommendationModelRuns },
+    });
+    const vm = wrapper.vm as any;
+
+    expect(vm.publishedClass(true)).toBe('badge badge-success');
+    expect(vm.publishedClass(false)).toBe('badge badge-secondary');
   });
 
   it('Should style each run status and fall back for unknown ones', () => {
