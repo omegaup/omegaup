@@ -423,17 +423,16 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                         problem_id)
 
     logging.info(
-        'Finished aggregating feedback: '
-        'attempted=%d successful=%d failed=%d',
+        'aggregate_feedback summary: attempted=%d successful=%d failed=%d',
         attempted_problems,
         successful_problems,
-        failed_problems)
-    duration = time.monotonic() - start_time
-    logging.info(
-        'aggregate_feedback summary: attempted=%d failed=%d duration=%.2fs',
-        attempted_problems,
         failed_problems,
-        duration,
+        extra={
+            'problems_attempted': attempted_problems,
+            'problems_successful': successful_problems,
+            'problems_failed': failed_problems,
+            'duration_ms': round((time.monotonic() - start_time) * 1000),
+        },
     )
 
 
