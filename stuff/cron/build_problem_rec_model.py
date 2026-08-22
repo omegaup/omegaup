@@ -134,7 +134,7 @@ def load_sqlite(database: str) -> pd.DataFrame:
                 problem_id
             FROM
                 Runs;
-            """, dbconn)
+            """, dbconn.conn)
         logging.info('Found %d runs', len(runs))
         return runs
     finally:
@@ -383,6 +383,10 @@ class Model:
 
             score += cur_score / (num_problems - 1)
 
+        if not user_count:
+            # No test user solved more than one problem, so there is nothing
+            # to score against.
+            return 0.
         return score / user_count
 
     def evaluate_metrics(self, k: Optional[int] = None) -> Dict[str, float]:
