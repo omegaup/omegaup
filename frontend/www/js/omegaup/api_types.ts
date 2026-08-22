@@ -1602,6 +1602,32 @@ export namespace types {
       );
     }
 
+    export function CronsDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CronsDetailsPayload {
+      return ((x) => {
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+              x.finished_at = ((x: number) => new Date(x * 1000))(
+                x.finished_at,
+              );
+            if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+              x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function EmailEditDetailsPayload(
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
@@ -3815,6 +3841,11 @@ export namespace types {
     status: string;
   }
 
+  export interface CronsDetailsPayload {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
+  }
+
   export interface CurrentSession {
     apiTokenId?: number;
     api_tokens: types.ApiToken[];
@@ -5406,6 +5437,10 @@ export namespace messages {
       };
     };
   };
+  export type AdminRerunCronRequest = { [key: string]: any };
+  export type AdminRerunCronResponse = {};
+  export type AdminSetCronJobEnabledRequest = { [key: string]: any };
+  export type AdminSetCronJobEnabledResponse = {};
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
   export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
@@ -6422,6 +6457,12 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    rerunCron: (
+      params?: messages.AdminRerunCronRequest,
+    ) => Promise<messages.AdminRerunCronResponse>;
+    setCronJobEnabled: (
+      params?: messages.AdminSetCronJobEnabledRequest,
+    ) => Promise<messages.AdminSetCronJobEnabledResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;
