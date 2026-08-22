@@ -16,6 +16,9 @@ _ALLOWLIST_RE = re.compile(
     r'^(frontend/www/js/.*\.(js|ts|vue))|(frontend/templates/.*\.tpl)$')
 _FRONTEND_RE = re.compile(r'\bT\.(\w+)')
 _TEMPLATE_RE = re.compile(r'\{#(\w+)#\}')
+# Cron and pipeline scripts write notifications directly, so the strings they
+# reference are quoted literals rather than `T.` lookups.
+_PYTHON_RE = re.compile(r'[\'"](\w+)[\'"]')
 _LANG_RE = re.compile(r'^(\w+)\s*=', flags=re.MULTILINE)
 _EXCLUDED_STRINGS = set(('lang', 'hasOwnProperty'))
 
@@ -40,6 +43,18 @@ def _get_expected_strings() -> Set[str]:
                     for linematch in regex.finditer(line):
                         if linematch[1] in _EXCLUDED_STRINGS:
                             continue
+                        expected_strings.add(linematch[1])
+
+    # Then the strings referenced from the Python scripts under stuff/, which
+    # create notifications without going through the frontend.
+    for root, _, filenames in os.walk('stuff'):
+        for filename in filenames:
+            if not filename.endswith('.py'):
+                continue
+            path = os.path.join(root, filename)
+            with open(path, encoding='utf-8') as f:
+                for line in f:
+                    for linematch in _PYTHON_RE.finditer(line):
                         expected_strings.add(linematch[1])
 
     # Now get the Psalm-obtained translation strings from PHP.
