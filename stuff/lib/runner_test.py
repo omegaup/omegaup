@@ -269,3 +269,17 @@ def test_releases_lock_when_finishing_fails() -> None:
             pass
 
     assert _matching(conn.calls, 'release_lock')
+
+
+def test_run_id_exposes_the_inserted_row() -> None:
+    '''The run id the runner opened is readable from the context manager.'''
+    conn = _FakeConnection(lock_acquired=True)
+    with _run('update_ranks.py', _args(), conn) as run:
+        assert run.run_id == conn.next_run_id
+
+
+def test_run_id_is_none_when_untracked() -> None:
+    '''No row is opened with --no-track, so there is no id.'''
+    conn = _FakeConnection(lock_acquired=True)
+    with _run('update_ranks.py', _args(no_track=True), conn) as run:
+        assert run.run_id is None
