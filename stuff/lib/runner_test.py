@@ -160,8 +160,9 @@ def test_skips_when_lock_is_held() -> None:
         with _run('update_ranks.py', _args(), conn):
             body_ran = True
 
-    assert isinstance(excinfo.value, SystemExit)
-    assert excinfo.value.code == 0
+    exc = excinfo.value
+    assert isinstance(exc, SystemExit)
+    assert exc.code == 0
     assert body_ran is False
     assert _matching(conn.calls, 'get_lock')
     assert not _matching(conn.calls, 'insert into `cron_runs`')
@@ -204,8 +205,9 @@ def test_disabled_job_skips_without_recording() -> None:
                             connection=cast(lib.db.Connection, conn)):
             pass
 
-    assert isinstance(excinfo.value, SystemExit)
-    assert excinfo.value.code == 0
+    exc = excinfo.value
+    assert isinstance(exc, SystemExit)
+    assert exc.code == 0
     assert not any('INSERT INTO `Cron_Runs`' in query
                    for query, _ in conn.calls)
 
