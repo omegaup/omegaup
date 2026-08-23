@@ -669,7 +669,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 gi.group_id = ?
             ORDER BY
-                i.name, i.username
+                COALESCE(i.name, i.username), i.username
             LIMIT ?, ?';
 
         /** @var list<array{classname: string, country_id: null|string, identity_id: int, name: null|string, username: string}> */
@@ -929,53 +929,89 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $sql = "SELECT
                 {$fields},
-                MAX(
-                    CASE
-                        WHEN ur.role_id = ? OR gr.role_id = ? THEN ?
-                        WHEN ur.role_id = ? OR gr.role_id = ? THEN ?
-                        ELSE 0
-                    END
-                ) AS highest_role
+                acr.highest_role
             FROM
-                Courses AS c
+                (
+                SELECT
+                    admined_course_roles.course_id,
+                    IF(
+                        MAX(admined_course_roles.role_priority) = 1,
+                        ?,
+                        ?
+                    ) AS highest_role
+                FROM (
+                    SELECT
+                        c.course_id,
+                        0 AS role_priority
+                    FROM
+                        ACLs AS a
+                    INNER JOIN
+                        Identities AS i ON i.user_id = a.owner_id
+                    INNER JOIN
+                        Courses AS c ON c.acl_id = a.acl_id
+                    WHERE
+                        i.identity_id = ?
+                        AND c.archived = 0
+
+                    UNION ALL
+
+                    SELECT
+                        c.course_id,
+                        IF(ur.role_id = ?, 2, 1) AS role_priority
+                    FROM
+                        User_Roles AS ur
+                    INNER JOIN
+                        Identities AS i ON i.user_id = ur.user_id
+                    INNER JOIN
+                        Courses AS c ON c.acl_id = ur.acl_id
+                    WHERE
+                        i.identity_id = ?
+                        AND ur.role_id IN (?, ?)
+                        AND c.archived = 0
+
+                    UNION ALL
+
+                    SELECT
+                        c.course_id,
+                        IF(gr.role_id = ?, 2, 1) AS role_priority
+                    FROM
+                        Groups_Identities AS gi
+                    INNER JOIN
+                        Group_Roles AS gr ON gr.group_id = gi.group_id
+                    INNER JOIN
+                        Courses AS c ON c.acl_id = gr.acl_id
+                    WHERE
+                        gi.identity_id = ?
+                        AND gr.role_id IN (?, ?)
+                        AND c.archived = 0
+                ) AS admined_course_roles
+                GROUP BY
+                    admined_course_roles.course_id
+            ) AS acr
             INNER JOIN
-                ACLs AS a ON a.acl_id = c.acl_id
-            INNER JOIN
-                Identities AS ai ON a.owner_id = ai.user_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = c.acl_id
-            LEFT JOIN
-                Identities uri ON ur.user_id = uri.user_id AND uri.identity_id = ?
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = c.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id AND gi.identity_id = ?
-            WHERE
-                c.archived = 0 AND (
-                    ai.identity_id = ? OR
-                    (ur.role_id IN (?, ?) AND uri.identity_id IS NOT NULL) OR
-                    (gr.role_id IN (?, ?) AND gi.identity_id IS NOT NULL)
-                )
-            GROUP BY
-                c.course_id
+                Courses AS c ON c.course_id = acr.course_id
             ORDER BY
                 c.course_id DESC
             LIMIT
                 ?, ?";
 
         $params = [
-        $adminRole, $adminRole, $adminRole,
-        $taRole, $taRole, $taRole,
-        $identityId,
-        $identityId,
-        $identityId,
-        $adminRole, $taRole,
-        $adminRole, $taRole,
-        max(0, $page - 1) * $pageSize,
-        $pageSize,
+            $taRole,
+            $adminRole,
+            $identityId,
+            $adminRole,
+            $identityId,
+            $adminRole,
+            $taRole,
+            $adminRole,
+            $identityId,
+            $adminRole,
+            $taRole,
+            max(0, $page - 1) * $pageSize,
+            $pageSize,
         ];
 
-        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, highest_role: int|null, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, teaching_assistant_enabled: bool}> */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, highest_role: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, teaching_assistant_enabled: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = ['admin' => [], 'teachingAssistant' => []];
@@ -1252,16 +1288,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         string $assignment_alias
     ): int {
         $sql = 'UPDATE Assignments a
-                JOIN (
-                    SELECT assignment_id, sum(psp.points) as max_points
-                    FROM Assignments a
-                    INNER JOIN Problemset_Problems psp
-                        ON a.problemset_id = psp.problemset_id
-                    GROUP BY a.assignment_id
-                ) q
-                ON a.assignment_id = q.assignment_id
-                SET a.max_points = q.max_points
-                WHERE alias = ? AND course_id = ?;';
+                SET a.max_points = (
+                    SELECT IFNULL(SUM(psp.points), 0.0)
+                    FROM Problemset_Problems psp
+                    WHERE psp.problemset_id = a.problemset_id
+                )
+                WHERE a.alias = ? AND a.course_id = ?;';
 
         $params = [$assignment_alias, $course->course_id];
 
