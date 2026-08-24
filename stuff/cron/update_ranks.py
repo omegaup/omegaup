@@ -9,7 +9,6 @@ import json
 import logging
 import os
 import sys
-import time
 from typing import List, NamedTuple, Sequence, Dict, Set, Optional
 
 
@@ -43,14 +42,27 @@ class AuthorRankRow(NamedTuple):
 import mysql.connector
 import mysql.connector.cursor
 
-from database.coder_of_the_month import check_existing_coder_of_the_month
-from database.coder_of_the_month import get_cotm_eligible_users
-from database.coder_of_the_month import get_eligible_problems
-from database.coder_of_the_month import get_last_12_coders_of_the_month
-from database.coder_of_the_month import get_user_problems
-from database.coder_of_the_month import remove_coder_of_the_month_candidates
-from database.coder_of_the_month import insert_coder_of_the_month_candidates
-from database.school_of_the_month import (
+sys.path.insert(
+    0,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 "."))
+import lib.db  # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    SYSTEM_ACL,
+    ADMIN_ROLE,
+)
+from cron.database.coder_of_the_month import (
+    check_existing_coder_of_the_month,
+    get_cotm_eligible_users,
+    get_eligible_problems,
+    get_last_12_coders_of_the_month,
+    get_user_problems,
+    remove_coder_of_the_month_candidates,
+    insert_coder_of_the_month_candidates,
+)
+from cron.database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
     get_school_of_the_month_candidates,
@@ -62,20 +74,9 @@ from database.school_of_the_month import (
     get_last_12_schools_of_the_month,
     get_candidate_schools_list,
 )
-from utils import (
+from cron.utils import (
     UserRank,
     get_first_day_of_next_month,
-)
-
-sys.path.insert(
-    0,
-    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                 "."))
-import lib.db  # pylint: disable=wrong-import-position
-import lib.logs  # pylint: disable=wrong-import-position
-from cron.constants import (  # pylint: disable=wrong-import-position
-    SYSTEM_ACL,
-    ADMIN_ROLE,
 )
 
 
@@ -919,6 +920,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     parser.add_argument('--date',
                         type=_parse_date,
@@ -934,40 +936,29 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    start_time = time.monotonic()
-    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-    dbconn_readonly = lib.db.connect_readonly(
-        lib.db.DatabaseConnectionArguments.from_args_readonly(args)) or dbconn
-    try:
-        with dbconn.cursor(buffered=True,
-                           dictionary=True) as cur, dbconn_readonly.cursor(
-                               buffered=True, dictionary=True) as cur_readonly:
-            phase_start = time.monotonic()
-            update_problem_accepted_stats(cur, dbconn.conn)
-            logging.info(
-                'update_problem_accepted_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-            phase_start = time.monotonic()
-            update_users_stats(cur, cur_readonly, dbconn.conn, args)
-            logging.info(
-                'update_users_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-            phase_start = time.monotonic()
-            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
-                                 args.update_school_of_the_month)
-            logging.info(
-                'update_schools_stats completed in %.2fs',
-                time.monotonic() - phase_start,
-            )
-    finally:
-        dbconn.conn.close()
-        logging.info(
-            'Total execution time: %.2fs',
-            time.monotonic() - start_time,
-        )
-        logging.info('Done')
+    with lib.runner.run(parser.prog, args) as cron_run:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
+        dbconn_readonly = lib.db.connect_readonly(
+            lib.db.DatabaseConnectionArguments.from_args_readonly(
+                args)) or dbconn
+        try:
+            with dbconn.cursor(buffered=True,
+                               dictionary=True) as cur, (
+                                   dbconn_readonly.cursor(
+                                       buffered=True,
+                                       dictionary=True)) as cur_readonly:
+                with cron_run.phase('update_problem_accepted_stats'):
+                    update_problem_accepted_stats(cur, dbconn.conn)
+                with cron_run.phase('update_users_stats'):
+                    update_users_stats(cur, cur_readonly, dbconn.conn, args)
+                with cron_run.phase('update_schools_stats'):
+                    update_schools_stats(cur, cur_readonly, dbconn.conn,
+                                         args.date,
+                                         args.update_school_of_the_month)
+        finally:
+            dbconn.conn.close()
+            logging.info('Done')
 
 
 if __name__ == '__main__':
