@@ -6,6 +6,7 @@ replace a healthy ranking with an empty, negative-scored or drastically
 smaller one.
 '''
 
+import sqlite3
 import sys
 import unittest
 
@@ -61,6 +62,51 @@ def _audit(cursor: _FakeCursor, previous_count: int, max_churn: float) -> None:
         cast(mysql.connector.cursor.MySQLCursorDict, cursor),
         previous_count=previous_count,
         max_churn=max_churn)
+
+
+class _SqliteCursor:
+    '''Runs the real count query against an in memory User_Rank.'''
+
+    def __init__(self, ranked: int, author_only: int) -> None:
+        self._conn = sqlite3.connect(':memory:')
+        self._conn.execute(
+            'CREATE TABLE User_Rank (user_id INTEGER, ranking INTEGER)')
+        rows = ([(i, i + 1) for i in range(ranked)] +
+                [(1000 + i, None) for i in range(author_only)])
+        self._conn.executemany('INSERT INTO User_Rank VALUES (?, ?)', rows)
+        self._cur = self._conn.cursor()
+
+    def execute(self, query: str, params: Any = None) -> None:
+        '''Executes the query with the backticks sqlite does not accept.'''
+        del params
+        self._cur.execute(query.replace('`', '"').rstrip(';'))
+
+    def fetchone(self) -> Optional[Dict[str, int]]:
+        '''Returns the row as the dictionary cursor would.'''
+        row = self._cur.fetchone()
+        return {'n': row[0]} if row else None
+
+
+class CountUserRankTest(unittest.TestCase):
+    '''Tests for update_ranks._count_user_rank.'''
+
+    def _count(self, ranked: int, author_only: int) -> int:
+        # pylint: disable=protected-access
+        return update_ranks._count_user_rank(
+            cast(mysql.connector.cursor.MySQLCursorDict,
+                 _SqliteCursor(ranked, author_only)))
+
+    def test_counts_the_users_in_the_ranking(self) -> None:
+        '''A table of ranked users counts all of them.'''
+        self.assertEqual(self._count(ranked=7, author_only=0), 7)
+
+    def test_ignores_author_only_rows(self) -> None:
+        '''Author rows have a null ranking and are not part of the count.'''
+        self.assertEqual(self._count(ranked=7, author_only=9), 7)
+
+    def test_counts_nothing_when_only_authors_are_stored(self) -> None:
+        '''An author only table is an empty ranking, not a full one.'''
+        self.assertEqual(self._count(ranked=0, author_only=9), 0)
 
 
 class UpdateRanksAuditTest(unittest.TestCase):

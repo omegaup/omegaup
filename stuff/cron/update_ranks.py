@@ -831,8 +831,14 @@ class RankingAuditError(Exception):
 
 
 def _count_user_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> int:
-    '''Returns the current number of rows in `User_Rank`.'''
-    cur.execute('SELECT COUNT(*) AS `n` FROM `User_Rank`;')
+    '''Returns how many users are in the ranking.
+
+    `User_Rank` also holds author only rows, written by `update_author_rank`
+    with a null `ranking`. Counting those would compare two different
+    populations, since the audit runs before the authors are rewritten.
+    '''
+    cur.execute(
+        'SELECT COUNT(*) AS `n` FROM `User_Rank` WHERE `ranking` IS NOT NULL;')
     row = cur.fetchone()
     return int(row['n']) if row else 0
 
