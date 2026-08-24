@@ -1787,6 +1787,8 @@ const translations: { [key: string]: string; } = {
   qualityFormRateBeforeAc: "\u00a1Voc\u00ea j\u00e1 pode avaliar este problema!",
   qualityFormThanksForReview: "Obrigado por voc\u00ea reveja",
   qualityNominationCreatedBy: "Criado por",
+  qualityNominationListEmptyDescription: "N\u00e3o h\u00e1 nomea\u00e7\u00f5es de qualidade para revisar no momento.",
+  qualityNominationListEmptyTitle: "N\u00e3o h\u00e1 nomea\u00e7\u00f5es de qualidade para revisar",
   qualityNominationMustHaveSolvedProblem: "Voc\u00ea deve resolver o problema antes de nome\u00e1-lo",
   qualityNominationMustHaveTriedToSolveProblem: "Voc\u00ea deve ter tentado resolver o problema antes de nome\u00e1-lo",
   qualityNominationMustNotHaveSolvedProblem: "Voc\u00ea n\u00e3o deve ter resolvido o problema para poder enviar uma 'nomea\u00e7\u00e3o antes de veredicto AC'",
