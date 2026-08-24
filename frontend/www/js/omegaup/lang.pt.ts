@@ -1866,6 +1866,8 @@ const translations: { [key: string]: string; } = {
   runNotFound: "Run n\u00e3o encontrado",
   runNotInsideContest: "Tempo de concurso expirou ou n\u00e3o foi iniciado ainda.",
   runWaitGap: "Voc\u00ea tem que esperar entre solu\u00e7\u00f5es consecutivas.",
+  runsListEmptyDescription: "N\u00e3o h\u00e1 submiss\u00f5es para mostrar no momento.",
+  runsListEmptyTitle: "N\u00e3o h\u00e1 submiss\u00f5es para mostrar",
   schoolNotFound: "Escola n\u00e3o encontrada",
   schoolNotSelected: "Nenhuma escola selecionada",
   schoolOfTheMonth: "Escola do M\u00eas",
