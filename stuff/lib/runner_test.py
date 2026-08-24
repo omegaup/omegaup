@@ -156,11 +156,13 @@ def test_skips_when_lock_is_held() -> None:
     '''A run whose lock is held exits cleanly without recording.'''
     conn = _FakeConnection(lock_acquired=False)
     body_ran = False
-    with pytest.raises(SystemExit) as excinfo:
+    try:
         with _run('update_ranks.py', _args(), conn):
             body_ran = True
-
-    assert excinfo.value.args == (0,)
+    except SystemExit as exc:
+        assert exc.code == 0
+    else:
+        raise AssertionError('Expected SystemExit')
     assert body_ran is False
     assert _matching(conn.calls, 'get_lock')
     assert not _matching(conn.calls, 'insert into `cron_runs`')
@@ -198,12 +200,14 @@ def test_disabled_job_skips_without_recording() -> None:
     conn = _FakeConnection(lock_acquired=True, enabled_row=(0,))
     args = _args()
 
-    with pytest.raises(SystemExit) as excinfo:
+    try:
         with lib.runner.run('update_ranks.py', args,
                             connection=cast(lib.db.Connection, conn)):
             pass
-
-    assert excinfo.value.args == (0,)
+    except SystemExit as exc:
+        assert exc.code == 0
+    else:
+        raise AssertionError('Expected SystemExit')
     assert not any('INSERT INTO `Cron_Runs`' in query
                    for query, _ in conn.calls)
 
