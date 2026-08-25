@@ -11,8 +11,26 @@ from typing import Any, Iterable, Tuple, Optional, List, Dict, Set
 import configparser
 import re
 import mysql.connector
+import yaml
 from mysql.connector import Error  # type: ignore
 from tqdm import tqdm  # type: ignore
+
+
+ALLOWLIST_VERSION = 1
+ALLOWLIST_ENTRY_FIELDS = {
+    'normalized_query',
+    'table',
+    'issue',
+    'reason',
+}
+DEFAULT_ALLOWLIST_PATH = os.path.join(
+    os.path.dirname(__file__),
+    'inefficient_queries_allowlist.yml',
+)
+
+
+class AllowlistValidationError(ValueError):
+    '''Raised when the inefficient queries allowlist is not valid.'''
 
 
 def normalize_query(query: str) -> str:
@@ -39,6 +57,118 @@ def build_query_family(normalized_query: str) -> str:
         normalized_query,
         flags=re.IGNORECASE,
     )
+
+
+def _get_non_empty_string(
+    entry: Dict[str, Any],
+    field: str,
+    entry_number: int,
+) -> str:
+    '''Return a required string field from an allowlist entry.'''
+    value = entry.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise AllowlistValidationError(
+            f'Allowlist entry {entry_number} field "{field}" must be '
+            'a non-empty string.'
+        )
+    if value != value.strip():
+        raise AllowlistValidationError(
+            f'Allowlist entry {entry_number} field "{field}" must not '
+            'have leading or trailing whitespace.'
+        )
+    return value
+
+
+def load_allowlist(path: str) -> List[Dict[str, Any]]:
+    '''Load and validate the inefficient queries allowlist.'''
+    try:
+        with open(path, 'r', encoding='utf-8') as allowlist_file:
+            data = yaml.safe_load(allowlist_file)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            f'Allowlist file not found: {path}'
+        ) from exc
+    except yaml.YAMLError as exc:
+        raise AllowlistValidationError(
+            f'Invalid YAML in allowlist {path}: {exc}'
+        ) from exc
+
+    if not isinstance(data, dict):
+        raise AllowlistValidationError(
+            'Allowlist must be a mapping with "version" and "entries".'
+        )
+
+    expected_top_level_fields = {'version', 'entries'}
+    if set(data) != expected_top_level_fields:
+        raise AllowlistValidationError(
+            'Allowlist must contain exactly the fields "version" and '
+            '"entries".'
+        )
+
+    version = data['version']
+    if (
+        not isinstance(version, int)
+        or isinstance(version, bool)
+        or version != ALLOWLIST_VERSION
+    ):
+        raise AllowlistValidationError(
+            f'Allowlist version must be {ALLOWLIST_VERSION}.'
+        )
+
+    entries = data['entries']
+    if not isinstance(entries, list):
+        raise AllowlistValidationError(
+            'Allowlist field "entries" must be a list.'
+        )
+
+    validated_entries: List[Dict[str, Any]] = []
+    seen: Set[Tuple[str, str]] = set()
+    for entry_number, entry in enumerate(entries, start=1):
+        if not isinstance(entry, dict):
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} must be a mapping.'
+            )
+        if set(entry) != ALLOWLIST_ENTRY_FIELDS:
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} must contain exactly: '
+                'normalized_query, table, issue, reason.'
+            )
+
+        normalized_query = _get_non_empty_string(
+            entry,
+            'normalized_query',
+            entry_number,
+        )
+        if normalize_query(normalized_query) != normalized_query:
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} field '
+                '"normalized_query" must already be normalized.'
+            )
+
+        table = _get_non_empty_string(entry, 'table', entry_number)
+        _get_non_empty_string(entry, 'reason', entry_number)
+
+        issue = entry['issue']
+        if (
+            not isinstance(issue, int)
+            or isinstance(issue, bool)
+            or issue <= 0
+        ):
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} field "issue" must be '
+                'a positive integer.'
+            )
+
+        identity = (normalized_query, table)
+        if identity in seen:
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} duplicates the identity '
+                f'{identity}.'
+            )
+        seen.add(identity)
+        validated_entries.append(entry)
+
+    return validated_entries
 
 
 def build_inefficiency_key(
@@ -314,6 +444,12 @@ def _main() -> None:
     """
     Main function to handle the logic.
     """
+    try:
+        load_allowlist(DEFAULT_ALLOWLIST_PATH)
+    except (OSError, AllowlistValidationError) as exc:
+        logging.error('Failed to load allowlist: %s', exc)
+        sys.exit(1)
+
     connection = create_connection(
         host_name="mysql",
         port=13306,
