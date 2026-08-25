@@ -403,6 +403,8 @@
 	"contestListArchivedContests": "Concursos arquivados",
 	"contestListCurrent": "Atuais",
 	"contestListEmpty": "N\u00e3o h\u00e1 concursos que atendam a essas caracter\u00edsticas",
+	"contestListEmptyDescription": "Crie seu primeiro concurso para come\u00e7ar a avaliar e praticar.",
+	"contestListEmptyTitle": "Voc\u00ea ainda n\u00e3o tem nenhum concurso",
 	"contestListFuture": "Pr\u00f3ximos",
 	"contestListPast": "Passados",
 	"contestListShowAdminContests": "Tamb\u00e9m mostrar concursos que eu gerencio",

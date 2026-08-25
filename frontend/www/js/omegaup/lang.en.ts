@@ -404,6 +404,8 @@ const translations: { [key: string]: string; } = {
   contestListArchivedContests: "Archived contests",
   contestListCurrent: "Current",
   contestListEmpty: "There are no contests that meet those characteristics",
+  contestListEmptyDescription: "Create your first contest to start assessing and practicing.",
+  contestListEmptyTitle: "You do not have any contests yet",
   contestListFuture: "Future",
   contestListPast: "Past",
   contestListShowAdminContests: "Also show contests I manage",

@@ -404,6 +404,8 @@ const translations: { [key: string]: string; } = {
   contestListArchivedContests: "(Archiv3d c0n73575)",
   contestListCurrent: "(Curr3n7)",
   contestListEmpty: "(Th3r3 ar3 n0 c0n73575 7ha7 m337 7h053 charac73ri57ic5)",
+  contestListEmptyDescription: "(Cr3a73 y0ur fir57 c0n7357 70 57ar7 a55355ing and prac7icing.)",
+  contestListEmptyTitle: "(Y0u d0 n07 hav3 any c0n73575 y37)",
   contestListFuture: "(Fu7ur3)",
   contestListPast: "(Pa57)",
   contestListShowAdminContests: "(A150 5h0w c0n73575 I manag3)",
