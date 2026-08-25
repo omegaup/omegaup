@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 '''Unit tests for the MySQL EXPLAIN log processor.'''
 
+from pathlib import Path
 from typing import Dict
 
 import pytest
 
 from process_mysql_explain_logs import (
+    AllowlistValidationError,
     build_inefficiency_key,
     build_query_family,
     deduplicate_results,
+    load_allowlist,
     normalize_query,
     sort_results_for_csv,
 )
@@ -163,3 +166,162 @@ def test_sort_results_for_csv_uses_review_order() -> None:
         first_family,
         first_id,
     ]) == [first_family, other_table, first_id, second_id]
+
+
+def test_load_allowlist_accepts_an_empty_list(
+    tmp_path: Path,
+) -> None:
+    '''An empty versioned allowlist is valid.'''
+    allowlist = tmp_path / 'allowlist.yml'
+    allowlist.write_text(
+        'version: 1\nentries: []\n',
+        encoding='utf-8',
+    )
+
+    assert not load_allowlist(str(allowlist))
+
+
+def test_load_allowlist_accepts_valid_entries(
+    tmp_path: Path,
+) -> None:
+    '''Valid entries preserve their order and fields.'''
+    allowlist = tmp_path / 'allowlist.yml'
+    allowlist.write_text(
+        '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests WHERE contest_id = ?
+    table: Contests
+    issue: 10130
+    reason: Known query pending optimization
+  - normalized_query: SELECT * FROM Problems WHERE alias = ?
+    table: Problems
+    issue: 10131
+    reason: Full scan accepted for this small table
+'''.lstrip(),
+        encoding='utf-8',
+    )
+
+    assert load_allowlist(str(allowlist)) == [
+        {
+            'normalized_query': (
+                'SELECT * FROM Contests WHERE contest_id = ?'
+            ),
+            'table': 'Contests',
+            'issue': 10130,
+            'reason': 'Known query pending optimization',
+        },
+        {
+            'normalized_query': 'SELECT * FROM Problems WHERE alias = ?',
+            'table': 'Problems',
+            'issue': 10131,
+            'reason': 'Full scan accepted for this small table',
+        },
+    ]
+
+
+def test_load_allowlist_rejects_a_missing_file(
+    tmp_path: Path,
+) -> None:
+    '''A missing allowlist has a clear error.'''
+    missing_path = tmp_path / 'missing.yml'
+
+    with pytest.raises(FileNotFoundError, match='Allowlist file not found'):
+        load_allowlist(str(missing_path))
+
+
+def test_load_allowlist_rejects_invalid_yaml(
+    tmp_path: Path,
+) -> None:
+    '''Invalid YAML has a clear validation error.'''
+    allowlist = tmp_path / 'allowlist.yml'
+    allowlist.write_text(
+        'version: 1\nentries: [\n',
+        encoding='utf-8',
+    )
+
+    with pytest.raises(AllowlistValidationError, match='Invalid YAML'):
+        load_allowlist(str(allowlist))
+
+
+@pytest.mark.parametrize(
+    ('content', 'message'),
+    [
+        (
+            'version: 2\nentries: []\n',
+            'version must be 1',
+        ),
+        (
+            'version: 1\nentries: {}\n',
+            'entries.*must be a list',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: 10130
+'''.lstrip(),
+            'must contain exactly',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: "10130"
+    reason: Known query
+'''.lstrip(),
+            'issue.*must be a positive integer',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests WHERE contest_id = 10
+    table: Contests
+    issue: 10130
+    reason: Known query
+'''.lstrip(),
+            'must already be normalized',
+        ),
+    ],
+)
+def test_load_allowlist_rejects_invalid_schemas(
+    tmp_path: Path,
+    content: str,
+    message: str,
+) -> None:
+    '''Invalid schema values are rejected with a useful message.'''
+    allowlist = tmp_path / 'allowlist.yml'
+    allowlist.write_text(content, encoding='utf-8')
+
+    with pytest.raises(AllowlistValidationError, match=message):
+        load_allowlist(str(allowlist))
+
+
+def test_load_allowlist_rejects_duplicate_identities(
+    tmp_path: Path,
+) -> None:
+    '''The same normalized query and table cannot appear twice.'''
+    allowlist = tmp_path / 'allowlist.yml'
+    allowlist.write_text(
+        '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: 10130
+    reason: First entry
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: 10131
+    reason: Duplicate entry
+'''.lstrip(),
+        encoding='utf-8',
+    )
+
+    with pytest.raises(AllowlistValidationError, match='duplicates'):
+        load_allowlist(str(allowlist))
