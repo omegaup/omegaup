@@ -25,6 +25,7 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
 
 
 class Results(NamedTuple):
@@ -295,24 +296,31 @@ def main() -> None:
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     args = parser.parse_args()
     args.verbose = True
     lib.logs.init(parser.prog, args)
 
     logging.info('started')
-    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
+    with lib.runner.run(parser.prog, args) as cron_run:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
+        try:
+            with cron_run.phase('detect_plagiarism'):
+                if args.local_downloader_dir is not None:
+                    download: SubmissionDownloader = LocalSubmissionDownloader(
+                        args.local_downloader_dir)
+                else:
+                    download = S3SubmissionDownloader()
 
-    if args.local_downloader_dir is not None:
-        download: SubmissionDownloader = LocalSubmissionDownloader(
-            args.local_downloader_dir)
-    else:
-        download = S3SubmissionDownloader()
+                for contest in get_contests(dbconn):
+                    run_detector_for_contest(dbconn, download,
+                                             contest['contest_id'])
 
-    for contest in get_contests(dbconn):
-        run_detector_for_contest(dbconn, download, contest['contest_id'])
-
-    dbconn.conn.commit()
+                dbconn.conn.commit()
+        finally:
+            dbconn.conn.close()
 
 
 if __name__ == '__main__':
