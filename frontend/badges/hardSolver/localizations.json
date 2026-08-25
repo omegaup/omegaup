@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Resolutor Difícil",
+      "description": "Otorgado a personas que resolvieron al menos 10 problemas difíciles durante una racha de 7 días consecutivos."
+    },
+    "en": {
+      "name": "Hard Solver",
+      "description": "Awarded to users who solved at least 10 hard problems during a 7-day streak."
+    },
+    "pt": {
+      "name": "Solucionador Difícil",
+      "description": "Concedido a pessoas que resolveram pelo menos 10 problemas difíceis durante uma sequência de 7 dias consecutivos."
+    }
+  }
+  
