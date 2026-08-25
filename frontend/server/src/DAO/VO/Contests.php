@@ -48,6 +48,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'score_mode' => true,
         'plagiarism_threshold' => true,
         'check_plagiarism' => true,
+        'orden' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -248,6 +249,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['check_plagiarism'])) {
             $this->check_plagiarism = boolval(
                 $data['check_plagiarism']
+            );
+        }
+        if (isset($data['orden'])) {
+            $this->orden = intval(
+                $data['orden']
             );
         }
     }
@@ -477,4 +483,15 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $check_plagiarism = false;
+    
+    /** @var int|null */
+    public $orden;
+
+    public function toArray(): array {
+        $array = [
+            'orden' => $this->orden,
+            // ... rest of the array
+        ];
+        return $array;
+    }
 }
