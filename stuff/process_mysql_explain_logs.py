@@ -7,7 +7,7 @@ import logging
 import sys
 import os
 import csv
-from typing import Any, Iterable, Tuple, Optional, List, Dict
+from typing import Any, Iterable, Tuple, Optional, List, Dict, Set
 import configparser
 import re
 import mysql.connector
@@ -29,6 +29,53 @@ def normalize_query(query: str) -> str:
     query = re.sub(r'"[^"]*"', '?', query)
     query = re.sub(r'\s+', ' ', query)
     return query.strip()
+
+
+def build_query_family(normalized_query: str) -> str:
+    '''Return a broader representation used only to group CSV rows.'''
+    return re.sub(
+        r'\bIN\s*\(\s*\?(?:\s*,\s*\?)*\s*\)',
+        'IN (?)',
+        normalized_query,
+        flags=re.IGNORECASE,
+    )
+
+
+def build_inefficiency_key(
+    result: Dict[str, str],
+) -> Tuple[str, str]:
+    '''Return the stable identity of an inefficient EXPLAIN row.'''
+    return (result['Normalized Query'], result['Table'])
+
+
+def deduplicate_results(
+    results: Iterable[Dict[str, str]],
+) -> List[Dict[str, str]]:
+    '''Remove duplicate query-table results while preserving their order.'''
+    seen: Set[Tuple[str, str]] = set()
+    deduplicated: List[Dict[str, str]] = []
+    for result in results:
+        key = build_inefficiency_key(result)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduplicated.append(result)
+    return deduplicated
+
+
+def sort_results_for_csv(
+    results: Iterable[Dict[str, str]],
+) -> List[Dict[str, str]]:
+    '''Sort results so similar query families are adjacent in the CSV.'''
+    return sorted(
+        results,
+        key=lambda result: (
+            result['Query Family'],
+            result['Normalized Query'],
+            result['Table'],
+            int(result['Query ID']),
+        ),
+    )
 
 
 def create_connection(
@@ -142,6 +189,7 @@ def explain_queries(
     try:
         for query in queries_list:
             query_text = query[0]
+            normalized_query = normalize_query(query_text)
             if query_text not in query_id_map:
                 query_id_map[query_text] = len(query_id_map) + 1
 
@@ -209,7 +257,8 @@ def explain_queries(
                     results.append({
                         "Query ID": str(query_id_map[query_text]),
                         "Query": query_text,
-                        "Normalized Query": normalize_query(query_text),
+                        "Normalized Query": normalized_query,
+                        "Query Family": build_query_family(normalized_query),
                         "Table": table_name,
                         "Type": str(row[type_idx]),
                         "Key": "" if key_val is None else str(key_val),
@@ -229,16 +278,7 @@ def explain_queries(
         cursor.close()
         progress_bar.close()
 
-    seen = set()
-    deduped: List[Dict[str, str]] = []
-    for rec in results:
-        dkey = rec["Normalized Query"]
-        if dkey in seen:
-            continue
-        seen.add(dkey)
-        deduped.append(rec)
-
-    return deduped
+    return deduplicate_results(results)
 
 
 def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
@@ -253,6 +293,7 @@ def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
             "Query ID",
             "Query",
             "Normalized Query",
+            "Query Family",
             "Table",
             "Type",
             "Key",
@@ -262,7 +303,7 @@ def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
         with open(path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerows(results)
+            writer.writerows(sort_results_for_csv(results))
         return path
     except Error as exc:
         logging.error("Failed to save CSV: %s", exc)
@@ -297,7 +338,7 @@ def _main() -> None:
             try:
                 saved = save_to_csv(rows)
                 logging.warning(
-                    "%d inefficient queries; saved to %s",
+                    "%d inefficient query-table pairs; saved to %s",
                     len(rows),
                     saved
                 )
