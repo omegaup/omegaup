@@ -12,7 +12,7 @@ from typing import Any, Callable, cast, Dict, List, Optional, Tuple
 
 import pandas as pd  # type: ignore
 
-import build_problem_rec_model
+from cron import build_problem_rec_model
 import lib.db  # pylint: disable=wrong-import-order
 
 _TESTDATA = os.path.join(os.path.dirname(os.path.realpath(__file__)),
