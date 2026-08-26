@@ -206,6 +206,32 @@ class ProcessBadgesTest(unittest.TestCase):
         self.assertEqual(save.call_args[0][0], 'goodBadge')
         self.assertEqual(save.call_args[0][1], {1})
 
+    def test_summary_counts_the_badges_it_processed(self) -> None:
+        '''The run summary reports the totals and names the failed badges.'''
+        self._patch(
+            'get_all_owners', side_effect=[{1}, RuntimeError('boom'), {2}])
+        self._patch('get_current_owners', return_value=set())
+        self._patch('save_new_owners')
+        self._patch_badge_dirs('firstBadge', 'brokenBadge', 'lastBadge')
+        dbconn = MockConnection(MockCursor())
+
+        with self.assertLogs(level='INFO') as logs:
+            assign_badges.process_badges(
+                None, _as_conn(dbconn),
+                _as_cursor(MockCursor()), _as_cursor(MockCursor()))
+
+        summary = next(
+            record for record in logs.records
+            if record.msg.startswith('assign_badges summary'))
+        self.assertIn('total=3 successful=2 failed=1', summary.getMessage())
+        self.assertEqual(summary.__dict__['badges_total'], 3)
+        self.assertEqual(summary.__dict__['badges_successful'], 2)
+        self.assertEqual(summary.__dict__['badges_failed'], 1)
+        self.assertEqual(
+            [record.getMessage() for record in logs.records
+             if record.msg.startswith('Badges that failed')],
+            ['Badges that failed to process: brokenBadge'])
+
 
 if __name__ == '__main__':
     unittest.main()
