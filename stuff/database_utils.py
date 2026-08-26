@@ -136,7 +136,7 @@ def mysqldump(*,
             '--create-options',
             '--single-transaction',
             '--routines',
-            '--default-character-set=utf8',
+            '--default-character-set=utf8mb4',
             '--result-file',
             outfile.name,
         ])

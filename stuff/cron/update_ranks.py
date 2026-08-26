@@ -42,14 +42,27 @@ class AuthorRankRow(NamedTuple):
 import mysql.connector
 import mysql.connector.cursor
 
-from database.coder_of_the_month import check_existing_coder_of_the_month
-from database.coder_of_the_month import get_cotm_eligible_users
-from database.coder_of_the_month import get_eligible_problems
-from database.coder_of_the_month import get_last_12_coders_of_the_month
-from database.coder_of_the_month import get_user_problems
-from database.coder_of_the_month import remove_coder_of_the_month_candidates
-from database.coder_of_the_month import insert_coder_of_the_month_candidates
-from database.school_of_the_month import (
+sys.path.insert(
+    0,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                 "."))
+import lib.db  # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    SYSTEM_ACL,
+    ADMIN_ROLE,
+)
+from cron.database.coder_of_the_month import (
+    check_existing_coder_of_the_month,
+    get_cotm_eligible_users,
+    get_eligible_problems,
+    get_last_12_coders_of_the_month,
+    get_user_problems,
+    remove_coder_of_the_month_candidates,
+    insert_coder_of_the_month_candidates,
+)
+from cron.database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
     get_school_of_the_month_candidates,
@@ -61,21 +74,9 @@ from database.school_of_the_month import (
     get_last_12_schools_of_the_month,
     get_candidate_schools_list,
 )
-from utils import (
+from cron.utils import (
     UserRank,
     get_first_day_of_next_month,
-)
-
-sys.path.insert(
-    0,
-    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                 "."))
-import lib.db  # pylint: disable=wrong-import-position
-import lib.logs  # pylint: disable=wrong-import-position
-import lib.runner  # pylint: disable=wrong-import-position
-from cron.constants import (  # pylint: disable=wrong-import-position
-    SYSTEM_ACL,
-    ADMIN_ROLE,
 )
 
 
@@ -826,6 +827,53 @@ def debug_coder_of_the_month_candidates(
     logging.info(log_message)
 
 
+class RankingAuditError(Exception):
+    '''Raised when the freshly computed ranking fails a sanity check.'''
+
+
+def _count_user_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> int:
+    '''Returns how many users are in the ranking.
+
+    `User_Rank` also holds author only rows, written by `update_author_rank`
+    with a null `ranking`. Counting those would compare two different
+    populations, since the audit runs before the authors are rewritten.
+    '''
+    cur.execute(
+        'SELECT COUNT(*) AS `n` FROM `User_Rank` WHERE `ranking` IS NOT NULL;')
+    row = cur.fetchone()
+    return int(row['n']) if row else 0
+
+
+def audit_user_rank(
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    previous_count: int,
+    max_churn: float,
+) -> None:
+    '''Sanity-checks the uncommitted ranking before it is published.
+
+    Guards against a run that would replace a healthy ranking with an empty,
+    negative-scored or drastically smaller one. Raising here rolls back the
+    whole ranking transaction, so the previous ranking stays live.
+    '''
+    new_count = _count_user_rank(cur)
+    # Only a regression, not a legitimately empty first run.
+    if new_count == 0 and previous_count > 0:
+        raise RankingAuditError('new ranking is empty')
+
+    cur.execute('SELECT COUNT(*) AS `n` FROM `User_Rank` WHERE `score` < 0;')
+    row = cur.fetchone()
+    negatives = int(row['n']) if row else 0
+    if negatives:
+        raise RankingAuditError(
+            f'new ranking has {negatives} rows with a negative score')
+
+    if previous_count > 0 and new_count < previous_count * (1 - max_churn):
+        raise RankingAuditError(
+            f'new ranking shrank from {previous_count} to {new_count} rows, '
+            f'more than the allowed {max_churn:.0%} churn')
+    logging.info('Ranking audit passed: %d rows', new_count)
+
+
 def update_users_stats(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
@@ -835,10 +883,12 @@ def update_users_stats(
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
     try:
+        previous_rank_count = _count_user_rank(cur)
         try:
             scores = update_user_rank(cur, cur_readonly)
             update_user_rank_cutoffs(cur, scores)
             update_user_rank_classname(cur)
+            audit_user_rank(cur, previous_rank_count, args.max_rank_churn)
         except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update user ranking')
             raise
@@ -931,6 +981,12 @@ def main() -> None:
                         help='The number of candidates to save in the DB')
     parser.add_argument('--update-school-of-the-month', action='store_true',
                         help='Update the School of the month')
+    parser.add_argument('--max-rank-churn',
+                        type=float,
+                        default=0.5,
+                        help=('Abort publishing the new ranking if it drops '
+                              'more than this fraction of the previously '
+                              'ranked users'))
     args: argparse.Namespace = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
