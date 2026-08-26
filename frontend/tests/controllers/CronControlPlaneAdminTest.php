@@ -172,12 +172,17 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $names = array_map(fn ($job) => $job['name'], $payload['jobs']);
         $this->assertContains('update_ranks.py', $names);
 
-        $this->assertCount(1, $payload['runs']);
-        $this->assertSame(intval($run->run_id), $payload['runs'][0]['run_id']);
-        $this->assertSame('update_ranks.py', $payload['runs'][0]['name']);
-        $this->assertSame('success', $payload['runs'][0]['status']);
-        $this->assertSame(1.5, $payload['runs'][0]['duration_seconds']);
-        $this->assertSame(7, $payload['runs'][0]['rows_affected']);
-        $this->assertSame([], $payload['runs'][0]['phases']);
+        // Other tests share the database, so find the run this one created
+        // rather than assuming it is the only one.
+        $runs = array_values(array_filter(
+            $payload['runs'],
+            fn ($row) => $row['run_id'] === intval($run->run_id)
+        ));
+        $this->assertCount(1, $runs);
+        $this->assertSame('update_ranks.py', $runs[0]['name']);
+        $this->assertSame('success', $runs[0]['status']);
+        $this->assertSame(1.5, $runs[0]['duration_seconds']);
+        $this->assertSame(7, $runs[0]['rows_affected']);
+        $this->assertSame([], $runs[0]['phases']);
     }
 }
