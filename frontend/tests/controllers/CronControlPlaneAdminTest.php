@@ -108,6 +108,18 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ValueError', $phases[1]['error_class']);
     }
 
+    public function testGetCronRunReturnsNullForUnknownRun() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $response = \OmegaUp\Controllers\Admin::apiGetCronRun(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'run_id' => 999999999,
+        ]));
+
+        $this->assertNull($response['run']);
+    }
+
     public function testGetCronsForTypeScriptRequiresAdmin() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
@@ -122,30 +134,50 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testGetCronsForTypeScriptReturnsThePayload() {
+    public function testGetCronsForTypeScriptRequiresLogin() {
+        try {
+            \OmegaUp\Controllers\Admin::getCronsForTypeScript(
+                new \OmegaUp\Request([])
+            );
+            $this->fail('Should not have allowed access to a logged out user');
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertSame('loginRequired', $e->getMessage());
+        }
+    }
+
+    public function testGetCronsForTypeScriptReturnsTheJobsAndTheRuns() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $run = new \OmegaUp\DAO\VO\CronRuns([
+            'name' => 'update_ranks.py',
+            'status' => 'success',
+            'started_at' => new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            'duration_seconds' => 1.5,
+            'rows_affected' => 7,
+        ]);
+        \OmegaUp\DAO\CronRuns::create($run);
 
         $response = \OmegaUp\Controllers\Admin::getCronsForTypeScript(
             new \OmegaUp\Request(['auth_token' => $login->auth_token])
         );
 
         $this->assertSame('admin_crons', $response['entrypoint']);
+        $this->assertSame(
+            'omegaupTitleAdminCrons',
+            $response['templateProperties']['title']->message
+        );
+
         $payload = $response['templateProperties']['payload'];
         $names = array_map(fn ($job) => $job['name'], $payload['jobs']);
         $this->assertContains('update_ranks.py', $names);
-        $this->assertIsArray($payload['runs']);
-    }
 
-    public function testGetCronRunReturnsNullForUnknownRun() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
-        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
-
-        $response = \OmegaUp\Controllers\Admin::apiGetCronRun(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'run_id' => 999999999,
-        ]));
-
-        $this->assertNull($response['run']);
+        $this->assertCount(1, $payload['runs']);
+        $this->assertSame(intval($run->run_id), $payload['runs'][0]['run_id']);
+        $this->assertSame('update_ranks.py', $payload['runs'][0]['name']);
+        $this->assertSame('success', $payload['runs'][0]['status']);
+        $this->assertSame(1.5, $payload['runs'][0]['duration_seconds']);
+        $this->assertSame(7, $payload['runs'][0]['rows_affected']);
+        $this->assertSame([], $payload['runs'][0]['phases']);
     }
 }
