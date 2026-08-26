@@ -33,8 +33,9 @@ def get_all_owners(
               encoding='utf-8') as fd:
         query = fd.read()
     if current_timestamp is not None:
-        query = query.replace(
-            'NOW()', f"'{current_timestamp.strftime('%Y-%m-%d %H:%M:%S')}'")
+        # Bind the timestamp instead of splicing it into the query text.
+        cur_readonly.execute('SET @current_time = %s;', (current_timestamp,))
+        query = query.replace('NOW()', '@current_time')
     cur_readonly.execute(query)
     return set(row['user_id'] for row in cur_readonly)
 
