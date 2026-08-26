@@ -1,7 +1,7 @@
 <template>
   <div class="card">
-    <div class="text-white card-header cron-card-header">
-      <div class="card-title h4 mb-0">{{ T.omegaupTitleAdminCrons }}</div>
+    <div class="text-white bg-primary card-header">
+      <div class="card-title h4">{{ T.omegaupTitleAdminCrons }}</div>
     </div>
     <div class="card-body">
       <h5>{{ T.cronControlPlaneJobsHeading }}</h5>
@@ -49,7 +49,6 @@
               :key="run.run_id"
               class="cron-run-row"
               :class="{ 'table-active': expandedRunId === run.run_id }"
-              role="button"
               @click="toggle(run.run_id)"
             >
               <td>
@@ -90,7 +89,7 @@
                           phase.status
                         }}</span>
                       </td>
-                      <td>{{ phase.duration.toFixed(3) }}s</td>
+                      <td>{{ formatDuration(phase.duration) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -107,6 +106,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import * as time from '../../time';
 import { types } from '../../api_types';
 
 @Component
@@ -133,6 +133,7 @@ export default class Crons extends Vue {
     return classes[status] || 'badge badge-light';
   }
 
+  // runs arrive newest first.
   latestRun(name: string): types.CronRun | undefined {
     return this.runs.find((run) => run.name === name);
   }
@@ -147,7 +148,7 @@ export default class Crons extends Vue {
   }
 
   formatDate(date: Date | null | undefined): string {
-    return date ? new Date(date).toLocaleString() : '—';
+    return date ? time.formatDateTime(date) : '—';
   }
 
   formatDuration(seconds: number | null | undefined): string {
@@ -161,10 +162,6 @@ export default class Crons extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.cron-card-header {
-  background-color: var(--header-primary-color);
-}
-
 .cron-run-row {
   cursor: pointer;
 }

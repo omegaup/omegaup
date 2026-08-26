@@ -1,7 +1,11 @@
 import { mount } from '@vue/test-utils';
+import T from '../../lang';
+import * as time from '../../time';
 
 import Crons from './Crons.vue';
 import { types } from '../../api_types';
+
+const startedAt = new Date(Date.UTC(2026, 0, 2, 3, 4, 5));
 
 const jobs: types.CronJob[] = [
   {
@@ -17,8 +21,8 @@ const runs: types.CronRun[] = [
     run_id: 1,
     name: 'update_ranks.py',
     status: 'success',
-    started_at: new Date(),
-    finished_at: new Date(),
+    started_at: startedAt,
+    finished_at: startedAt,
     duration_seconds: 0.19,
     rows_affected: 5,
     phases: [
@@ -29,37 +33,54 @@ const runs: types.CronRun[] = [
     run_id: 2,
     name: 'assign_badges.py',
     status: 'failure',
-    started_at: new Date(),
+    started_at: startedAt,
     phases: [],
     error_text: 'boom',
   },
 ];
 
 describe('Crons.vue', () => {
-  it('Should render the jobs and runs tables', () => {
+  it('Should show each job with the status of its latest run', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
-    expect(wrapper.find('[data-cron-jobs]').exists()).toBe(true);
-    expect(wrapper.find('[data-cron-runs]').exists()).toBe(true);
-    expect(wrapper.text()).toContain('update_ranks.py');
-    expect(wrapper.find('.badge-success').exists()).toBe(true);
-    expect(wrapper.find('.badge-danger').exists()).toBe(true);
+    expect(cells.at(0).text()).toBe('update_ranks.py');
+    expect(cells.at(1).text()).toBe('19 8 * * *');
+    expect(cells.at(2).text()).toBe('success');
+    expect(cells.at(2).find('.badge-success').exists()).toBe(true);
+    expect(cells.at(3).text()).toBe(time.formatDateTime(startedAt));
+  });
+
+  it('Should show one row per run with its status and totals', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const rows = wrapper.findAll('.cron-run-row');
+
+    expect(rows).toHaveLength(2);
+    expect(rows.at(0).findAll('td').at(1).text()).toBe('update_ranks.py');
+    expect(rows.at(0).find('.badge-success').text()).toBe('success');
+    expect(rows.at(0).findAll('td').at(3).text()).toBe(
+      time.formatDateTime(startedAt),
+    );
+    expect(rows.at(0).findAll('td').at(4).text()).toBe('0.19s');
+    expect(rows.at(0).findAll('td').at(5).text()).toBe('5');
+    expect(rows.at(1).find('.badge-danger').text()).toBe('failure');
   });
 
   it('Should show phase detail when a run is expanded', async () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
 
     expect(wrapper.find('[data-cron-phases]').exists()).toBe(false);
-    await wrapper.findAll('[data-cron-runs] tbody tr').at(0).trigger('click');
-    expect(wrapper.find('[data-cron-phases]').exists()).toBe(true);
-    expect(wrapper.find('[data-cron-phases]').text()).toContain(
-      'update_users_stats',
-    );
+    await wrapper.findAll('.cron-run-row').at(0).trigger('click');
+
+    const phase = wrapper.findAll('[data-cron-phases] tbody tr td');
+    expect(phase.at(0).text()).toBe('update_users_stats');
+    expect(phase.at(1).text()).toBe('success');
+    expect(phase.at(2).text()).toBe('0.05s');
   });
 
   it('Should collapse an expanded run when it is clicked again', async () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
-    const row = wrapper.findAll('[data-cron-runs] tbody tr').at(0);
+    const row = wrapper.findAll('.cron-run-row').at(0);
 
     await row.trigger('click');
     expect(wrapper.find('[data-cron-phases]').exists()).toBe(true);
@@ -67,37 +88,83 @@ describe('Crons.vue', () => {
     expect(wrapper.find('[data-cron-phases]').exists()).toBe(false);
   });
 
-  it('Should style each run status and fall back for unknown ones', () => {
+  it('Should show the error output of a run that recorded no phases', async () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
-    const vm = wrapper.vm as any;
 
-    expect(vm.statusClass('success')).toBe('badge badge-success');
-    expect(vm.statusClass('failure')).toBe('badge badge-danger');
-    expect(vm.statusClass('running')).toBe('badge badge-secondary');
-    expect(vm.statusClass('something-else')).toBe('badge badge-light');
-    expect(vm.statusClass(null)).toBe('');
+    await wrapper.findAll('.cron-run-row').at(1).trigger('click');
+
+    const detail = wrapper.find('.cron-run-detail');
+    expect(detail.find('.text-danger').text()).toBe('boom');
+    expect(detail.find('[data-cron-phases]').exists()).toBe(false);
+    expect(detail.text()).toContain(T.cronControlPlaneNoPhases);
+  });
+
+  it('Should badge a status it does not recognize', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs: [{ ...runs[0], status: 'queued' }] },
+    });
+
+    expect(wrapper.find('.cron-run-row .badge-light').text()).toBe('queued');
+  });
+
+  it('Should dash out the values a run did not record', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs: [{ ...jobs[0], schedule: null }],
+        runs: [
+          {
+            ...runs[0],
+            started_at: null,
+            duration_seconds: null,
+            rows_affected: null,
+          },
+        ],
+      },
+    });
+
+    expect(wrapper.findAll('[data-cron-jobs] tbody tr td').at(1).text()).toBe(
+      '—',
+    );
+    const cells = wrapper.findAll('.cron-run-row td');
+    expect(cells.at(3).text()).toBe('—');
+    expect(cells.at(4).text()).toBe('—');
+    expect(cells.at(5).text()).toBe('—');
+  });
+
+  it('Should keep zero as a real value instead of a dash', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs,
+        runs: [{ ...runs[0], duration_seconds: 0, rows_affected: 0 }],
+      },
+    });
+
+    const cells = wrapper.findAll('.cron-run-row td');
+    expect(cells.at(4).text()).toBe('0.00s');
+    expect(cells.at(5).text()).toBe('0');
   });
 
   it('Should report no status for a job that has never run', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs: [] } });
-    const vm = wrapper.vm as any;
+    const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
-    expect(vm.latestRun('update_ranks.py')).toBeUndefined();
-    expect(vm.latestStatus('update_ranks.py')).toBeNull();
-    expect(vm.latestStartedAt('update_ranks.py')).toBe('—');
+    expect(cells.at(2).text()).toBe('—');
+    expect(cells.at(3).text()).toBe('—');
   });
 
-  it('Should show a dash instead of empty values', () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
-    const vm = wrapper.vm as any;
+  it('Should take the newest run as the status of a job', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs,
+        runs: [
+          { ...runs[0], run_id: 4, status: 'running' },
+          { ...runs[0], run_id: 3, status: 'success' },
+        ],
+      },
+    });
 
-    expect(vm.formatDate(null)).toBe('—');
-    expect(vm.formatDuration(null)).toBe('—');
-    expect(vm.formatDuration(undefined)).toBe('—');
-    expect(vm.formatRows(null)).toBe('—');
-    expect(vm.formatRows(undefined)).toBe('—');
-    // Zero is a real value, not an empty one.
-    expect(vm.formatDuration(0)).toBe('0.00s');
-    expect(vm.formatRows(0)).toBe('0');
+    expect(wrapper.findAll('[data-cron-jobs] tbody tr td').at(2).text()).toBe(
+      'running',
+    );
   });
 });
