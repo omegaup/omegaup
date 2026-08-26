@@ -27,6 +27,7 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
 from cron.constants import (  # pylint: disable=wrong-import-position
     QUALITYNOMINATION_QUESTION_CHANGE_ID,
 )
@@ -259,6 +260,8 @@ def get_most_voted_tags(problem_tag_votes: Mapping[str, float],
 
     if problem_tag_votes_n < MIN_POINTS:
         return None
+    if not problem_tag_votes:
+        return None
     maximum = problem_tag_votes[max(problem_tag_votes,
                                     key=lambda x: problem_tag_votes.get(x, 0))]
     final_tags = [tag for (tag, votes) in problem_tag_votes.items()
@@ -422,17 +425,16 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                         problem_id)
 
     logging.info(
-        'Finished aggregating feedback: '
-        'attempted=%d successful=%d failed=%d',
+        'aggregate_feedback summary: attempted=%d successful=%d failed=%d',
         attempted_problems,
         successful_problems,
-        failed_problems)
-    duration = time.monotonic() - start_time
-    logging.info(
-        'aggregate_feedback summary: attempted=%d failed=%d duration=%.2fs',
-        attempted_problems,
         failed_problems,
-        duration,
+        extra={
+            'problems_attempted': attempted_problems,
+            'problems_successful': successful_problems,
+            'problems_failed': failed_problems,
+            'duration_ms': round((time.monotonic() - start_time) * 1000),
+        },
     )
 
 
@@ -646,56 +648,49 @@ def main() -> None:
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    overall_start = time.monotonic()
-    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
     has_failures = False
-    try:
+    with lib.runner.run(parser.prog, args) as cron_run:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
         try:
-            phase_start = time.monotonic()
-            aggregate_reviewers_feedback(dbconn)
-            logging.info(
-                'aggregate_reviewers_feedback completed in %.2fs',
-                time.monotonic() - phase_start)
-        except Exception:  # pylint: disable=broad-except
-            logging.exception(
-                'Failed to calculate problem quality seal and category.')
-            has_failures = True
+            try:
+                with cron_run.phase('aggregate_reviewers_feedback'):
+                    aggregate_reviewers_feedback(dbconn)
+            except Exception:  # pylint: disable=broad-except
+                logging.exception(
+                    'Failed to calculate problem quality seal and category.')
+                has_failures = True
 
-        try:
-            phase_start = time.monotonic()
-            aggregate_feedback(dbconn)
-            logging.info(
-                'aggregate_feedback completed in %.2fs',
-                time.monotonic() - phase_start)
-        except Exception:  # pylint: disable=broad-except
-            logging.exception(
-                'Failed to aggregate feedback and update problem tags.')
-            has_failures = True
+            try:
+                with cron_run.phase('aggregate_feedback'):
+                    aggregate_feedback(dbconn)
+            except Exception:  # pylint: disable=broad-except
+                logging.exception(
+                    'Failed to aggregate feedback and update problem tags.')
+                has_failures = True
 
-        try:
-            # Problem of the week HAS to be computed AFTER feedback has been
-            # aggregated. It uses difficulty tags computed from feedback to
-            # pick a problem of the given difficulty.
-            phase_start = time.monotonic()
-            update_problem_of_the_week(dbconn, "easy")
-            logging.info(
-                'update_problem_of_the_week completed in %.2fs',
-                time.monotonic() - phase_start)
-            # TODO(heduenas): Compute "hard" problem of the week when we get
-            # enough feedback records.
-        except Exception:  # pylint: disable=broad-except
-            logging.exception('Failed to update problem of the week')
-            has_failures = True
-    finally:
-        dbconn.conn.close()
-        logging.info('Total execution time: %.2fs',
-                     time.monotonic() - overall_start)
-        logging.info('Done')
+            try:
+                # Problem of the week HAS to be computed AFTER feedback has
+                # been aggregated. It uses difficulty tags computed from
+                # feedback to pick a problem of the given difficulty.
+                with cron_run.phase('update_problem_of_the_week'):
+                    update_problem_of_the_week(dbconn, "easy")
+                # TODO(heduenas): Compute "hard" problem of the week when we
+                # get enough feedback records.
+            except Exception:  # pylint: disable=broad-except
+                logging.exception('Failed to update problem of the week')
+                has_failures = True
+        finally:
+            dbconn.conn.close()
+            logging.info('Done')
+        if has_failures:
+            cron_run.mark_failure()
     if has_failures:
         sys.exit(1)
 
