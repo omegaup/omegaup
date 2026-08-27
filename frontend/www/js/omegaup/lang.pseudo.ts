@@ -1868,6 +1868,8 @@ const translations: { [key: string]: string; } = {
   runNotFound: "(Run n07 f0und.)",
   runNotInsideContest: "(C0n7357 7im3 ha5 3xpir3d 0r n07 57ar73d y37.)",
   runWaitGap: "(Y0u hav3 70 wai7 b37w33n c0n53cu7iv3 5ubmi55i0n5.)",
+  runsListEmptyDescription: "(Th3r3 ar3 n0 run5 70 5h0w a7 7hi5 m0m3n7.)",
+  runsListEmptyTitle: "(N0 run5 70 5h0w)",
   schoolNotFound: "(Sch001 n07 f0und)",
   schoolNotSelected: "(N0 5ch001 5313c73d)",
   schoolOfTheMonth: "(Sch001 0f 7h3 M0n7h)",
