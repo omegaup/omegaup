@@ -13,6 +13,7 @@ from process_mysql_explain_logs import (
     build_query_family,
     compare_results_with_allowlist,
     deduplicate_results,
+    get_comparison_exit_code,
     load_allowlist,
     log_allowlist_comparison,
     normalize_query,
@@ -193,6 +194,21 @@ def test_log_allowlist_comparison_reports_new_results(
     assert 'New inefficient query for table Users: SELECT * FROM Users' in (
         caplog.messages
     )
+
+
+def test_comparison_exit_code_only_fails_for_new_results() -> None:
+    '''Only results missing from the allowlist should fail the process.'''
+    normalized_query = 'SELECT * FROM Users WHERE user_id = ?'
+    detected = _result('1', normalized_query, 'Users')
+    allowlist_entry = _allowlist_entry(normalized_query, 'Users')
+
+    known = compare_results_with_allowlist([detected], [allowlist_entry])
+    not_detected = compare_results_with_allowlist([], [allowlist_entry])
+    new = compare_results_with_allowlist([detected], [])
+
+    assert get_comparison_exit_code(known) == 0
+    assert get_comparison_exit_code(not_detected) == 0
+    assert get_comparison_exit_code(new) == 1
 
 
 def test_deduplicate_results_uses_query_and_table() -> None:
