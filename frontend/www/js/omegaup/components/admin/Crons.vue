@@ -143,8 +143,7 @@ export default class Crons extends Vue {
   }
 
   latestStartedAt(name: string): string {
-    const run = this.latestRun(name);
-    return run ? this.formatDate(run.started_at) : '—';
+    return this.formatDate(this.latestRun(name)?.started_at);
   }
 
   formatDate(date: Date | null | undefined): string {
