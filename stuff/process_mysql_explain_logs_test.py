@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 '''Unit tests for the MySQL EXPLAIN log processor.'''
 
+import logging
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 import pytest
 
@@ -10,8 +11,10 @@ from process_mysql_explain_logs import (
     AllowlistValidationError,
     build_inefficiency_key,
     build_query_family,
+    compare_results_with_allowlist,
     deduplicate_results,
     load_allowlist,
+    log_allowlist_comparison,
     normalize_query,
     sort_results_for_csv,
 )
@@ -27,6 +30,18 @@ def _result(
         'Normalized Query': normalized_query,
         'Query Family': build_query_family(normalized_query),
         'Table': table,
+    }
+
+
+def _allowlist_entry(
+    normalized_query: str,
+    table: str,
+) -> Dict[str, Any]:
+    return {
+        'normalized_query': normalized_query,
+        'table': table,
+        'issue': 10108,
+        'reason': 'Known query pending optimization',
     }
 
 
@@ -115,6 +130,69 @@ def test_inefficiency_key_includes_table() -> None:
     courses = _result('1', 'SELECT * FROM Users JOIN Courses', 'Courses')
 
     assert build_inefficiency_key(users) != build_inefficiency_key(courses)
+
+
+def test_compare_results_with_allowlist_classifies_each_identity() -> None:
+    '''Results are grouped using the normalized query and table.'''
+    normalized_query = 'SELECT * FROM Users JOIN Courses'
+    known = _result('1', normalized_query, 'Users')
+    new = _result('1', normalized_query, 'Courses')
+    not_detected = _allowlist_entry(
+        'SELECT * FROM Problems',
+        'Problems',
+    )
+
+    comparison = compare_results_with_allowlist(
+        [known, new],
+        [
+            _allowlist_entry(normalized_query, 'Users'),
+            not_detected,
+        ],
+    )
+
+    assert comparison.known_results == [known]
+    assert comparison.new_results == [new]
+    assert comparison.not_detected_entries == [not_detected]
+
+
+def test_compare_results_with_allowlist_does_not_use_query_family() -> None:
+    '''Queries in one family still need their own allowlist entry.'''
+    detected = _result(
+        '1',
+        'SELECT * FROM Users WHERE user_id IN (?, ?, ?)',
+        'Users',
+    )
+    allowlist_entry = _allowlist_entry(
+        'SELECT * FROM Users WHERE user_id IN (?, ?)',
+        'Users',
+    )
+
+    comparison = compare_results_with_allowlist(
+        [detected],
+        [allowlist_entry],
+    )
+
+    assert not comparison.known_results
+    assert comparison.new_results == [detected]
+    assert comparison.not_detected_entries == [allowlist_entry]
+
+
+def test_log_allowlist_comparison_reports_new_results(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''The summary identifies new inefficient query-table pairs.'''
+    detected = _result('1', 'SELECT * FROM Users', 'Users')
+    comparison = compare_results_with_allowlist([detected], [])
+
+    with caplog.at_level(logging.WARNING):
+        log_allowlist_comparison(comparison)
+
+    assert '0 known, 1 new, 0 allowlist entries not detected' in (
+        caplog.messages
+    )
+    assert 'New inefficient query for table Users: SELECT * FROM Users' in (
+        caplog.messages
+    )
 
 
 def test_deduplicate_results_uses_query_and_table() -> None:
