@@ -79,7 +79,7 @@
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
           <omegaup-arena-ephemeral-grader
-            v-if="!problem.karel_problem"
+            v-if="shouldShowEphemeralGrader"
             :problem="problem"
             :can-submit="false"
             :accepted-languages="filteredLanguages"
@@ -182,6 +182,7 @@ export default class ProblemDetails extends Vue {
   @Prop() currentRunDetails!: types.RunDetails | null;
   @Prop({ default: null }) languages!: null | string[];
   @Prop() problem!: types.ProblemDetails;
+  @Prop({ default: true }) ephemeralGraderEnabled!: boolean;
   @Prop() user!: types.UserInfoForProblem;
   @Prop() userRuns!: types.Run[];
 
@@ -194,6 +195,10 @@ export default class ProblemDetails extends Vue {
 
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = PopupDisplayed.None;
+
+  get shouldShowEphemeralGrader(): boolean {
+    return !this.problem.karel_problem && this.ephemeralGraderEnabled;
+  }
 
   get filteredLanguages(): string[] {
     if (!this.languages) {

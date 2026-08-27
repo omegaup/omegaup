@@ -186,7 +186,7 @@
         <template v-if="problem.accepts_submissions">
           <div class="d-none d-sm-block">
             <omegaup-arena-ephemeral-grader
-              v-if="!problem.karel_problem"
+              v-if="shouldShowEphemeralGrader"
               :problem="problem"
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
@@ -476,6 +476,7 @@ export default class ProblemDetails extends Vue {
   allRuns!: types.Run[];
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
+  @Prop({ default: true }) ephemeralGraderEnabled!: boolean;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
@@ -530,6 +531,10 @@ export default class ProblemDetails extends Vue {
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
+
+  get shouldShowEphemeralGrader(): boolean {
+    return !this.problem.karel_problem && this.ephemeralGraderEnabled;
+  }
 
   get availableTabs(): Tab[] {
     const tabs = [
