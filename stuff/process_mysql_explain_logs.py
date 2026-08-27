@@ -244,6 +244,11 @@ def log_allowlist_comparison(comparison: AllowlistComparison) -> None:
         )
 
 
+def get_comparison_exit_code(comparison: AllowlistComparison) -> int:
+    '''Return a failing exit code when new inefficiencies are detected.'''
+    return 1 if comparison.new_results else 0
+
+
 def deduplicate_results(
     results: Iterable[Dict[str, str]],
 ) -> List[Dict[str, str]]:
@@ -552,7 +557,7 @@ def _main() -> None:
         comparison = compare_results_with_allowlist(rows, allowlist)
         log_allowlist_comparison(comparison)
 
-        sys.exit(0)
+        sys.exit(get_comparison_exit_code(comparison))
     finally:
         connection.close()
 
