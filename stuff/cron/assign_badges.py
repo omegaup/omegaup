@@ -33,8 +33,9 @@ def get_all_owners(
               encoding='utf-8') as fd:
         query = fd.read()
     if current_timestamp is not None:
-        query = query.replace(
-            'NOW()', f"'{current_timestamp.strftime('%Y-%m-%d %H:%M:%S')}'")
+        # Bind the timestamp instead of splicing it into the query text.
+        cur_readonly.execute('SET @current_time = %s;', (current_timestamp,))
+        query = query.replace('NOW()', '@current_time')
     cur_readonly.execute(query)
     return set(row['user_id'] for row in cur_readonly)
 
@@ -109,7 +110,17 @@ def process_badges(
             has_failures = True
             failed_badges.append(badge)
             logging.exception('Something went wrong with badge: %s.', badge)
-    logging.info('Successfully processed %d badges.', successful)
+    logging.info(
+        'assign_badges summary: total=%d successful=%d failed=%d',
+        len(badges),
+        successful,
+        len(failed_badges),
+        extra={
+            'badges_total': len(badges),
+            'badges_successful': successful,
+            'badges_failed': len(failed_badges),
+        },
+    )
     if failed_badges:
         logging.error('Badges that failed to process: %s',
                       ', '.join(failed_badges))

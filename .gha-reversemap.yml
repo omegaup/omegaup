@@ -27,10 +27,10 @@ cirrus-actions/rebase:
   sha-url: https://github.com/cirrus-actions/rebase/commit/b87d48154a87a85666003575337e27b8cd65f691
   tag-url: https://github.com/cirrus-actions/rebase/tree/1.8
 actions/github-script:
-  sha: f28e40c7f34bde8b3046d885e986cb6290c5673b
-  sha-url: https://github.com/actions/github-script/commit/f28e40c7f34bde8b3046d885e986cb6290c5673b
-  tag: v7
-  tag-url: https://github.com/actions/github-script/tree/v7
+  sha: ed597411d8f924073f98dfc5c65a23a2325f34cd
+  sha-url: https://github.com/actions/github-script/commit/ed597411d8f924073f98dfc5c65a23a2325f34cd
+  tag: v8
+  tag-url: https://github.com/actions/github-script/tree/v8
 actions/labeler:
   sha: 634933edcd8ababfe52f92936142cc22ac488b1b
   sha-url: https://github.com/actions/labeler/commit/634933edcd8ababfe52f92936142cc22ac488b1b
