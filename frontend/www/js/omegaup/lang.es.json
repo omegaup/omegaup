@@ -1786,6 +1786,8 @@
 	"qualityFormRateBeforeAc": "Ya puedes calificar este problema.",
 	"qualityFormThanksForReview": "\u00a1Gracias por tus comentarios!",
 	"qualityNominationCreatedBy": "Creado por",
+	"qualityNominationListEmptyDescription": "No hay nominaciones de calidad por revisar en este momento.",
+	"qualityNominationListEmptyTitle": "No hay nominaciones de calidad por revisar",
 	"qualityNominationMustHaveSolvedProblem": "Debes resolver el problema antes de poder nominarlo",
 	"qualityNominationMustHaveTriedToSolveProblem": "Debes haber intentado resolver el problema antes de poder nominarlo",
 	"qualityNominationMustNotHaveSolvedProblem": "No debes haber resuelto el problema para poder enviar una 'nominaci\u00f3n antes de veredicto AC'",

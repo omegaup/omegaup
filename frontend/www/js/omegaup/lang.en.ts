@@ -1787,6 +1787,8 @@ const translations: { [key: string]: string; } = {
   qualityFormRateBeforeAc: "You can already rate this problem!",
   qualityFormThanksForReview: "Thanks for review!",
   qualityNominationCreatedBy: "Created by",
+  qualityNominationListEmptyDescription: "There are no quality nominations to review at this moment.",
+  qualityNominationListEmptyTitle: "No quality nominations to review",
   qualityNominationMustHaveSolvedProblem: "You must solve a problem before nominating it",
   qualityNominationMustHaveTriedToSolveProblem: "You must have tried to solve the problem before nominating it",
   qualityNominationMustNotHaveSolvedProblem: "You must not have solved the problem for 'before_ac' nominating it",
