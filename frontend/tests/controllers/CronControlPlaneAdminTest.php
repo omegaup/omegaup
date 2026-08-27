@@ -169,11 +169,14 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $payload = $response['templateProperties']['payload'];
-        $names = array_map(fn ($job) => $job['name'], $payload['jobs']);
-        $this->assertContains('update_ranks.py', $names);
+        $jobs = array_values(array_filter(
+            $payload['jobs'],
+            fn ($job) => $job['name'] === 'update_ranks.py'
+        ));
+        $this->assertCount(1, $jobs);
+        $this->assertSame('19 8 * * *', $jobs[0]['schedule']);
 
-        // Other tests share the database, so find the run this one created
-        // rather than assuming it is the only one.
+        // The database is shared, so match only the run this test created.
         $runs = array_values(array_filter(
             $payload['runs'],
             fn ($row) => $row['run_id'] === intval($run->run_id)

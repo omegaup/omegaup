@@ -508,18 +508,14 @@ class Admin extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+
         return [
             'entrypoint' => 'admin_crons',
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleAdminCrons'
                 ),
-                'payload' => [
-                    'jobs' => self::cronJobsPayload(),
-                    'runs' => self::cronRunsPayload(
-                        \OmegaUp\DAO\CronRuns::getRecent(50)
-                    ),
-                ],
+                'payload' => self::apiGetCrons($r),
             ],
         ];
     }
