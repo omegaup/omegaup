@@ -90,15 +90,59 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload']['courses']['admin'];
 
-        // Only one course should be listed
+        // Only one course should be listed. The user is the course owner, so
+        // the owner role takes priority over the teaching assistant role.
         $this->assertCount(
             1,
-            $courses['filteredCourses']['teachingAssistant']['courses']
+            $courses['filteredCourses']['current']['courses']
         );
 
-        $this->assertEmpty($courses['filteredCourses']['current']['courses']);
+        $this->assertEmpty(
+            $courses['filteredCourses']['teachingAssistant']['courses']
+        );
         $this->assertEmpty($courses['filteredCourses']['past']['courses']);
         $this->assertEmpty($courses['filteredCourses']['archived']['courses']);
+    }
+
+    public function testOwnerWithTeachingAssistantRoleIsClassifiedAsAdmin() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        $adminLogin = self::login($admin);
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $ownerLogin = self::login($identity);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $ownerLogin
+        );
+
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $courses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $ownerLogin->auth_token,
+            ])
+        )['templateProperties']['payload']['courses']['admin'];
+
+        $this->assertCount(
+            1,
+            $courses['filteredCourses']['current']['courses']
+        );
+        $this->assertSame(
+            $courseData['course_alias'],
+            $courses['filteredCourses']['current']['courses'][0]['alias']
+        );
+        $this->assertEmpty(
+            $courses['filteredCourses']['teachingAssistant']['courses']
+        );
     }
 
     /**
