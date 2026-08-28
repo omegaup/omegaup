@@ -3,12 +3,13 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict
 
 import pytest
 
 from process_mysql_explain_logs import (
     AllowlistValidationError,
+    KnownQuery,
     build_inefficiency_key,
     build_query_family,
     compare_results_with_allowlist,
@@ -36,7 +37,7 @@ def _result(
 def _allowlist_entry(
     normalized_query: str,
     table: str,
-) -> Dict[str, Any]:
+) -> KnownQuery:
     return {
         'normalized_query': normalized_query,
         'table': table,
@@ -184,7 +185,7 @@ def test_log_allowlist_comparison_reports_new_results(
     detected = _result('1', 'SELECT * FROM Users', 'Users')
     comparison = compare_results_with_allowlist([detected], [])
 
-    with caplog.at_level(logging.WARNING):
+    with caplog.at_level(logging.INFO):
         log_allowlist_comparison(comparison)
 
     assert '0 known, 1 new, 0 allowlist entries not detected' in (
@@ -193,6 +194,10 @@ def test_log_allowlist_comparison_reports_new_results(
     assert 'New inefficient query for table Users: SELECT * FROM Users' in (
         caplog.messages
     )
+    assert [record.levelno for record in caplog.records] == [
+        logging.INFO,
+        logging.WARNING,
+    ]
 
 
 def test_deduplicate_results_uses_query_and_table() -> None:

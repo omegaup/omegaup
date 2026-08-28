@@ -16,6 +16,7 @@ from typing import (
     Dict,
     Set,
     NamedTuple,
+    TypedDict,
 )
 import configparser
 import re
@@ -42,12 +43,21 @@ class AllowlistValidationError(ValueError):
     '''Raised when the inefficient queries allowlist is not valid.'''
 
 
+class KnownQuery(TypedDict):
+    '''Validated entry from the inefficient queries allowlist.'''
+
+    normalized_query: str
+    table: str
+    issue: int
+    reason: str
+
+
 class AllowlistComparison(NamedTuple):
     '''Results grouped by their relationship with the allowlist.'''
 
     known_results: List[Dict[str, str]]
     new_results: List[Dict[str, str]]
-    not_detected_entries: List[Dict[str, Any]]
+    not_detected_entries: List[KnownQuery]
 
 
 def normalize_query(query: str) -> str:
@@ -96,7 +106,7 @@ def _get_non_empty_string(
     return value
 
 
-def load_allowlist(path: str) -> List[Dict[str, Any]]:
+def load_allowlist(path: str) -> List[KnownQuery]:
     '''Load and validate the inefficient queries allowlist.'''
     try:
         with open(path, 'r', encoding='utf-8') as allowlist_file:
@@ -138,7 +148,7 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
             'Allowlist field "entries" must be a list.'
         )
 
-    validated_entries: List[Dict[str, Any]] = []
+    validated_entries: List[KnownQuery] = []
     seen: Set[Tuple[str, str]] = set()
     for entry_number, entry in enumerate(entries, start=1):
         if not isinstance(entry, dict):
@@ -163,7 +173,7 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
             )
 
         table = _get_non_empty_string(entry, 'table', entry_number)
-        _get_non_empty_string(entry, 'reason', entry_number)
+        reason = _get_non_empty_string(entry, 'reason', entry_number)
 
         issue = entry['issue']
         if (
@@ -183,7 +193,12 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
                 f'{identity}.'
             )
         seen.add(identity)
-        validated_entries.append(entry)
+        validated_entries.append(KnownQuery(
+            normalized_query=normalized_query,
+            table=table,
+            issue=issue,
+            reason=reason,
+        ))
 
     return validated_entries
 
@@ -197,12 +212,12 @@ def build_inefficiency_key(
 
 def compare_results_with_allowlist(
     results: Iterable[Dict[str, str]],
-    allowlist: Iterable[Dict[str, Any]],
+    allowlist: Iterable[KnownQuery],
 ) -> AllowlistComparison:
     '''Group detected results according to their allowlist status.'''
     allowlist_entries = list(allowlist)
-    allowlist_by_key = {
-        (entry['normalized_query'], entry['table']): entry
+    allowlist_keys: Set[Tuple[str, str]] = {
+        (entry['normalized_query'], entry['table'])
         for entry in allowlist_entries
     }
     detected_keys: Set[Tuple[str, str]] = set()
@@ -212,7 +227,7 @@ def compare_results_with_allowlist(
     for result in results:
         key = build_inefficiency_key(result)
         detected_keys.add(key)
-        if key in allowlist_by_key:
+        if key in allowlist_keys:
             known_results.append(result)
         else:
             new_results.append(result)
@@ -230,7 +245,7 @@ def compare_results_with_allowlist(
 
 def log_allowlist_comparison(comparison: AllowlistComparison) -> None:
     '''Log a summary and the identity of each new inefficient result.'''
-    logging.warning(
+    logging.info(
         '%d known, %d new, %d allowlist entries not detected',
         len(comparison.known_results),
         len(comparison.new_results),
