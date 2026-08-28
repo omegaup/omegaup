@@ -31,6 +31,8 @@ class Admin extends \OmegaUp\Controllers\Controller {
         'danger',
     ];
 
+    const CRON_RUNS_LIMIT = 50;
+
     /**
      * Get stats for an overall platform report.
      *
@@ -464,6 +466,18 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     */
+    private static function cronsPayload(): array {
+        return [
+            'jobs' => self::cronJobsPayload(),
+            'runs' => self::cronRunsPayload(
+                \OmegaUp\DAO\CronRuns::getRecent(self::CRON_RUNS_LIMIT)
+            ),
+        ];
+    }
+
+    /**
      * Lists the registered cron jobs and their most recent runs.
      *
      * @return array{jobs: list<CronJob>, runs: list<CronRun>}
@@ -473,12 +487,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        return [
-            'jobs' => self::cronJobsPayload(),
-            'runs' => self::cronRunsPayload(
-                \OmegaUp\DAO\CronRuns::getRecent(50)
-            ),
-        ];
+        return self::cronsPayload();
     }
 
     /**
@@ -515,7 +524,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleAdminCrons'
                 ),
-                'payload' => self::apiGetCrons($r),
+                'payload' => self::cronsPayload(),
             ],
         ];
     }
