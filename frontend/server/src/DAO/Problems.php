@@ -485,7 +485,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $conditions = [
                 'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
             ];
-            $argsForQuery = [$query];
+            $argsForQuery = [Identities::escapeBooleanModeQuery($query)];
 
             if ($isNumericQuery) {
                 $conditions[] = 'p.problem_id = ?';
@@ -1310,7 +1310,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE)
             ';
-            $params[] = $query;
+            $params[] = Identities::escapeBooleanModeQuery($query);
         }
 
         /** @var int */

@@ -103,7 +103,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return $result;
     }
 
-    private static function escapeBooleanModeQuery(string $query): string {
+    public static function escapeBooleanModeQuery(string $query): string {
         return addcslashes($query, '+-<>()~*"\\');
     }
 
