@@ -15,10 +15,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="job in jobs" :key="job.name">
+          <tr v-for="job in scheduledJobs" :key="job.name">
             <td>{{ job.name }}</td>
             <td>
-              <code v-if="job.schedule">{{ job.schedule }}</code>
+              <template v-if="job.schedule">
+                <code>{{ job.schedule }}</code>
+                <small v-if="job.humanSchedule" class="d-block text-muted">{{
+                  job.humanSchedule
+                }}</small>
+              </template>
               <span v-else>—</span>
             </td>
             <td>
@@ -107,7 +112,101 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as time from '../../time';
+import * as ui from '../../ui';
 import { types } from '../../api_types';
+
+const CRON_FIELD_COUNT = 5;
+
+function numericField(field: string, min: number, max: number): number | null {
+  if (!/^\d+$/.test(field)) {
+    return null;
+  }
+  const value = Number(field);
+  return value >= min && value <= max ? value : null;
+}
+
+function formatTime(hour: number, minute: number): string {
+  return new Date(2024, 0, 1, hour, minute).toLocaleTimeString(T.locale, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function formatWeekday(dayOfWeek: number): string {
+  // Both 2024-01-07 and 2024-01-14 were Sundays, which is how cron's 0 and 7
+  // both land on it.
+  return new Date(Date.UTC(2024, 0, 7 + dayOfWeek)).toLocaleDateString(
+    T.locale,
+    { weekday: 'long', timeZone: 'UTC' },
+  );
+}
+
+// Describes the schedules the registry actually uses, and gives up on the rest
+// rather than guessing, in which case only the expression itself is shown.
+export function describeSchedule(schedule?: string | null): string | null {
+  if (!schedule) {
+    return null;
+  }
+  const fields = schedule.trim().split(/\s+/);
+  if (fields.length !== CRON_FIELD_COUNT) {
+    return null;
+  }
+  const [
+    minuteField,
+    hourField,
+    dayOfMonthField,
+    monthField,
+    dayOfWeekField,
+  ] = fields;
+  if (monthField !== '*') {
+    return null;
+  }
+  const everyMinutes = /^\*\/(\d+)$/.exec(minuteField);
+  if (
+    everyMinutes &&
+    hourField === '*' &&
+    dayOfMonthField === '*' &&
+    dayOfWeekField === '*'
+  ) {
+    return ui.formatString(T.cronControlPlaneScheduleEveryMinutes, {
+      minutes: everyMinutes[1],
+    });
+  }
+  const minute = numericField(minuteField, 0, 59);
+  if (minute === null) {
+    return null;
+  }
+  if (hourField === '*' && dayOfMonthField === '*' && dayOfWeekField === '*') {
+    return ui.formatString(T.cronControlPlaneScheduleHourly, {
+      minute: String(minute).padStart(2, '0'),
+    });
+  }
+  const hour = numericField(hourField, 0, 23);
+  if (hour === null) {
+    return null;
+  }
+  const timeOfDay = formatTime(hour, minute);
+  if (dayOfMonthField === '*' && dayOfWeekField === '*') {
+    return ui.formatString(T.cronControlPlaneScheduleDaily, {
+      time: timeOfDay,
+    });
+  }
+  const dayOfWeek = numericField(dayOfWeekField, 0, 7);
+  if (dayOfMonthField === '*' && dayOfWeek !== null) {
+    return ui.formatString(T.cronControlPlaneScheduleWeekly, {
+      weekday: formatWeekday(dayOfWeek),
+      time: timeOfDay,
+    });
+  }
+  const dayOfMonth = numericField(dayOfMonthField, 1, 31);
+  if (dayOfMonth !== null && dayOfWeekField === '*') {
+    return ui.formatString(T.cronControlPlaneScheduleMonthly, {
+      dayOfMonth: String(dayOfMonth),
+      time: timeOfDay,
+    });
+  }
+  return null;
+}
 
 @Component
 export default class Crons extends Vue {
@@ -116,6 +215,13 @@ export default class Crons extends Vue {
   @Prop({ default: () => [] }) runs!: types.CronRun[];
 
   expandedRunId: number | null = null;
+
+  get scheduledJobs(): (types.CronJob & { humanSchedule: string | null })[] {
+    return this.jobs.map((job) => ({
+      ...job,
+      humanSchedule: describeSchedule(job.schedule),
+    }));
+  }
 
   toggle(runId: number): void {
     this.expandedRunId = this.expandedRunId === runId ? null : runId;

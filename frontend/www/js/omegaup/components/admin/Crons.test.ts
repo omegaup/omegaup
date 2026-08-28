@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils';
 import T from '../../lang';
 import * as time from '../../time';
+import * as ui from '../../ui';
 
 import Crons from './Crons.vue';
 import { types } from '../../api_types';
@@ -39,13 +40,33 @@ const runs: types.CronRun[] = [
   },
 ];
 
+const timeAt = (hour: number, minute: number): string =>
+  new Date(2024, 0, 1, hour, minute).toLocaleTimeString(T.locale, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+const weekdayName = (dayOfWeek: number): string =>
+  new Date(Date.UTC(2024, 0, 7 + dayOfWeek)).toLocaleDateString(T.locale, {
+    weekday: 'long',
+    timeZone: 'UTC',
+  });
+
+const describedSchedule = (schedule: string | null): string | null => {
+  const wrapper = mount(Crons, {
+    propsData: { jobs: [{ ...jobs[0], schedule }], runs: [] },
+  });
+  const cell = wrapper.findAll('[data-cron-jobs] tbody tr td').at(1);
+  return cell.find('small').exists() ? cell.find('small').text() : null;
+};
+
 describe('Crons.vue', () => {
   it('Should show each job with the status of its latest run', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
     const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
     expect(cells.at(0).text()).toBe('update_ranks.py');
-    expect(cells.at(1).text()).toBe('19 8 * * *');
+    expect(cells.at(1).find('code').text()).toBe('19 8 * * *');
     expect(cells.at(2).text()).toBe('success');
     expect(cells.at(2).find('.badge-success').exists()).toBe(true);
     expect(cells.at(3).text()).toBe(time.formatDateTime(startedAt));
@@ -150,6 +171,54 @@ describe('Crons.vue', () => {
 
     expect(cells.at(2).text()).toBe('—');
     expect(cells.at(3).text()).toBe('—');
+  });
+
+  it('Should describe a daily schedule next to the expression', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const cell = wrapper.findAll('[data-cron-jobs] tbody tr td').at(1);
+
+    expect(cell.find('code').text()).toBe('19 8 * * *');
+    expect(cell.find('small').text()).toBe(
+      ui.formatString(T.cronControlPlaneScheduleDaily, { time: timeAt(8, 19) }),
+    );
+  });
+
+  it('Should describe weekly, monthly, hourly and interval schedules', () => {
+    expect(describedSchedule('30 4 * * 0')).toBe(
+      ui.formatString(T.cronControlPlaneScheduleWeekly, {
+        weekday: weekdayName(0),
+        time: timeAt(4, 30),
+      }),
+    );
+    expect(describedSchedule('0 5 1 * *')).toBe(
+      ui.formatString(T.cronControlPlaneScheduleMonthly, {
+        dayOfMonth: '1',
+        time: timeAt(5, 0),
+      }),
+    );
+    expect(describedSchedule('7 * * * *')).toBe(
+      ui.formatString(T.cronControlPlaneScheduleHourly, { minute: '07' }),
+    );
+    expect(describedSchedule('*/15 * * * *')).toBe(
+      ui.formatString(T.cronControlPlaneScheduleEveryMinutes, {
+        minutes: '15',
+      }),
+    );
+  });
+
+  it('Should read day 7 as Sunday, the same as day 0', () => {
+    expect(describedSchedule('30 4 * * 7')).toBe(
+      describedSchedule('30 4 * * 0'),
+    );
+  });
+
+  it('Should show only the expression for a schedule it cannot describe', () => {
+    expect(describedSchedule('19 8 * * 1-5')).toBeNull();
+    expect(describedSchedule('19 8 * 3 *')).toBeNull();
+    expect(describedSchedule('19 8 * *')).toBeNull();
+    expect(describedSchedule('99 8 * * *')).toBeNull();
+    expect(describedSchedule('19 44 * * *')).toBeNull();
+    expect(describedSchedule('@daily')).toBeNull();
   });
 
   it('Should take the newest run as the status of a job', () => {
