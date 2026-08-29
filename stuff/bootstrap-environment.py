@@ -19,7 +19,13 @@ import sys
 
 from typing import Any, BinaryIO, Dict, Mapping, ItemsView, Optional
 
-from dataset_generator.generate_synthetic_dataset import seed_synthetic
+try:
+    from dataset_generator.generate_synthetic_dataset import seed_synthetic
+    HAS_SYNTHETIC_DATASET = True
+except Exception:  # pylint: disable=broad-except
+    HAS_SYNTHETIC_DATASET = False
+    logging.warning(
+        'Synthetic dataset generator not available (missing dependencies)')
 
 import requests
 
@@ -216,6 +222,91 @@ def _run_script(path: str, args: argparse.Namespace, now: float) -> None:
                 _process_one_request(s, request, now)
 
 
+def _setup_development_quality_data(args: argparse.Namespace) -> None:
+    '''Sets up quality seals and tags for development.
+
+    This marks bootstrap problems with quality_seal=1 and assigns level tags
+    so they appear in problem collections immediately. This simulates what the
+    production aggregate_feedback cron job does.
+    '''
+    logging.info('Setting up development quality data...')
+
+    try:
+        import lib.db  # pylint: disable=import-outside-toplevel
+
+        db_args = lib.db.DatabaseConnectionArguments(
+            user=args.username or 'omegaup',
+            password=args.password or 'omegaup',
+            host='mysql',
+            database='omegaup',
+            mysql_config_file=args.mysql_config_file or '',
+            port=13306,
+        )
+
+        dbconn = lib.db.connect(db_args)
+
+        try:
+            with dbconn.cursor() as cur:
+                cur.execute("""
+                    UPDATE `Problems`
+                    SET `quality_seal` = 1,
+                        `quality` = 4.0,
+                        `difficulty` = CASE `alias`
+                            WHEN 'karel-helloworld' THEN 0.5
+                            WHEN 'sumas' THEN 1.0
+                            WHEN 'sololectura' THEN 1.5
+                            WHEN 'triangulos' THEN 2.0
+                            ELSE 2.0
+                        END
+                    WHERE `quality_seal` = 0
+                      AND `visibility` >= 1;
+                """)
+                cur.execute("""
+                    INSERT INTO `Problems_Tags`
+                        (`problem_id`, `tag_id`, `source`)
+                    SELECT p.`problem_id`, t.`tag_id`, 'quality'
+                    FROM `Problems` AS p
+                    JOIN `Tags` AS t ON (
+                        (p.`alias` = 'sumas' AND
+                         t.`name` = 'problemLevelBasicIntroductionTo'
+                                    'Programming')
+                        OR (p.`alias` = 'sololectura' AND
+                            t.`name` = 'problemLevelBasicIntroductionTo'
+                                       'Programming')
+                        OR (p.`alias` LIKE '%karel%' AND
+                            t.`name` = 'problemLevelBasicKarel')
+                    )
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM `Problems_Tags` AS pt
+                        WHERE pt.`problem_id` = p.`problem_id`
+                          AND pt.`tag_id` = t.`tag_id`
+                    );
+                """)
+                dbconn.conn.commit()
+
+        except Exception:  # pylint: disable=broad-except
+            logging.exception('Failed to setup development quality data')
+            dbconn.conn.rollback()
+            logging.warning(
+                'You can manually run: '
+                'docker compose exec mysql mysql -u omegaup '
+                '-pomegaup -D omegaup '
+                '-e "UPDATE Problems SET quality_seal=1 '
+                'WHERE quality_seal=0"'
+            )
+        finally:
+            dbconn.conn.close()
+
+    except ImportError:
+        logging.warning(
+            'Could not import lib.db for quality data setup. '
+            'Problem collections may appear empty. '
+            'Ensure mysql-connector-python is installed.'
+        )
+    except Exception:  # pylint: disable=broad-except
+        logging.exception('Unexpected error during quality data setup')
+
+
 def _purge_old_problems() -> None:
     logging.info('Purging old problems')
     # Removing directories requires the user to be in the 'www-data' group.
@@ -295,6 +386,11 @@ def _main() -> None:
     parser.add_argument("--ou-username", default=os.getenv("OMEGAUP_USERNAME"))
     parser.add_argument("--ou-password", default=os.getenv("OMEGAUP_PASSWORD"))
     parser.add_argument("--ou-token", default=os.getenv("OMEGAUP_TOKEN"))
+    parser.add_argument(
+        '--skip-dev-quality-setup',
+        action='store_true',
+        default=os.getenv('OMEGAUP_SKIP_DEV_SETUP', '').lower() == 'true',
+        help='Skip automatic quality seal setup for problem collections')
     args = parser.parse_args()
     now = time.time()
 
@@ -323,6 +419,13 @@ def _main() -> None:
                               ['migrate', '--development-environment'])
 
     if args.seed_mode == "synthetic":
+        if not HAS_SYNTHETIC_DATASET:
+            logging.error(
+                'Synthetic dataset mode requested but dependencies are '
+                'missing. Install with: pip3 install tqdm pyyaml'
+            )
+            sys.exit(1)
+
         seed_synthetic(
             Session,
             root=OMEGAUP_ROOT,
@@ -333,11 +436,18 @@ def _main() -> None:
             ou_password=args.ou_password,
             ou_token=args.ou_token,
         )
+        # Also setup quality data for synthetic mode
+        if not args.skip_dev_quality_setup:
+            _setup_development_quality_data(args)
         return
 
     for path in args.scripts:
         logging.info('Running script %s...', path)
         _run_script(path, args, now)
+
+    # Setup quality data after bootstrap scripts complete
+    if not args.skip_dev_quality_setup:
+        _setup_development_quality_data(args)
 
 
 if __name__ == '__main__':
