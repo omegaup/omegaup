@@ -40,6 +40,42 @@ const runs: types.CronRun[] = [
   },
 ];
 
+const recommendationModelRuns: types.RecommendationModelRun[] = [
+  {
+    created_at: startedAt,
+    map_score: 0.3419,
+    dataset_size: 12345,
+    rng_seed: 42,
+    published: true,
+  },
+  {
+    created_at: startedAt,
+    map_score: 0.2151,
+    dataset_size: 12345,
+    published: false,
+    skip_reason: 'MAP score 0.2151 below minimum 0.3000',
+  },
+];
+
+const asPercent = (score: number): string =>
+  score.toLocaleString(T.locale, {
+    style: 'percent',
+    maximumFractionDigits: 1,
+  });
+
+const modelRunCells = (skipReason?: string) => {
+  const wrapper = mount(Crons, {
+    propsData: {
+      jobs,
+      runs,
+      recommendationModelRuns: [
+        { ...recommendationModelRuns[1], skip_reason: skipReason },
+      ],
+    },
+  });
+  return wrapper.findAll('[data-cron-model-runs] tbody tr td');
+};
+
 const timeAt = (hour: number, minute: number): string =>
   new Date(2024, 0, 1, hour, minute).toLocaleTimeString(T.locale, {
     hour: '2-digit',
@@ -235,5 +271,81 @@ describe('Crons.vue', () => {
     expect(wrapper.findAll('[data-cron-jobs] tbody tr td').at(2).text()).toBe(
       'running',
     );
+  });
+
+  it('Should show one row per training run with its score and dataset size', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, recommendationModelRuns },
+    });
+    const rows = wrapper.findAll('[data-cron-model-runs] tbody tr');
+
+    expect(rows).toHaveLength(2);
+    const cells = rows.at(0).findAll('td');
+    expect(cells.at(0).text()).toBe(time.formatDateTime(startedAt));
+    expect(cells.at(1).find('code').text()).toBe('0.3419');
+    expect(cells.at(1).find('small').text()).toBe(asPercent(0.3419));
+    expect(cells.at(2).text()).toBe((12345).toLocaleString(T.locale));
+    expect(cells.at(2).attributes('title')).toBe('12345');
+    expect(cells.at(3).text()).toBe('42');
+    expect(cells.at(4).text()).toBe(T.cronControlPlaneModelPublishedYes);
+    expect(cells.at(4).find('.badge-success').exists()).toBe(true);
+    expect(cells.at(5).text()).toBe('—');
+  });
+
+  it('Should say in words why a model was not published', () => {
+    const cells = modelRunCells('MAP score 0.2151 below minimum 0.3000');
+
+    expect(cells.at(4).text()).toBe(T.cronControlPlaneModelPublishedNo);
+    expect(cells.at(4).find('.badge-secondary').exists()).toBe(true);
+    expect(cells.at(5).text()).toBe(
+      ui.formatString(T.cronControlPlaneModelSkipBelowMinimum, {
+        score: '0.2151',
+        minimum: '0.3000',
+      }),
+    );
+    // The sentence the job wrote stays reachable on the cell.
+    expect(cells.at(5).attributes('title')).toBe(
+      'MAP score 0.2151 below minimum 0.3000',
+    );
+  });
+
+  it('Should show the seed a run fixed, and say so when it fixed none', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, recommendationModelRuns },
+    });
+    const rows = wrapper.findAll('[data-cron-model-runs] tbody tr');
+
+    expect(rows.at(0).findAll('td').at(3).text()).toBe('42');
+    expect(rows.at(1).findAll('td').at(3).text()).toBe(
+      T.cronControlPlaneModelSeedUnset,
+    );
+  });
+
+  it('Should say in words that a model regressed against the last one', () => {
+    const cells = modelRunCells(
+      'MAP score 0.2151 regressed more than 0.0200 below the last published 0.3419',
+    );
+
+    expect(cells.at(5).text()).toBe(
+      ui.formatString(T.cronControlPlaneModelSkipRegressed, {
+        score: '0.2151',
+        regression: '0.0200',
+        previous: '0.3419',
+      }),
+    );
+  });
+
+  it('Should keep a reason it does not recognize as the job wrote it', () => {
+    const cells = modelRunCells('the grader ran out of disk');
+
+    expect(cells.at(5).text()).toBe('the grader ran out of disk');
+    expect(cells.at(5).attributes('title')).toBe('the grader ran out of disk');
+  });
+
+  it('Should show a placeholder when no model has been trained yet', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    expect(wrapper.find('[data-cron-model-runs]').exists()).toBe(false);
+    expect(wrapper.text()).toContain(T.cronControlPlaneModelNoRuns);
   });
 });
