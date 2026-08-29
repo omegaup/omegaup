@@ -6,6 +6,7 @@
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/setCronJobEnabled/`](#apiadminsetcronjobenabled)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
@@ -404,6 +405,23 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/setCronJobEnabled/`
+
+### Description
+
+Enables or disables a cron job. A disabled job skips its scheduled runs.
+
+### Parameters
+
+| Name      | Type     | Description | Required |
+| --------- | -------- | ----------- | -------- |
+| `enabled` | `bool`   |             | ✓        |
+| `name`    | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/admin/setMaintenanceMode/`
 
