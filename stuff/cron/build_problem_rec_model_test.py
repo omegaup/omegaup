@@ -228,6 +228,7 @@ class TestRecordModelRun(unittest.TestCase):
         '''A published run is stored with published set to 1.'''
         conn = _FakeConnection()
         config = build_problem_rec_model.TrainingConfig(train_fraction=0.8,
+                                                        rng_seed=7,
                                                         num_followups=3,
                                                         followup_decay=0.4)
 
@@ -245,7 +246,7 @@ class TestRecordModelRun(unittest.TestCase):
         query, params = conn.calls[0]
         self.assertIn('Recommendation_Model_Runs', query)
         self.assertEqual(params,
-                         (42, 0.51, 1234, 3, 0.4, 0.8, '/tmp/model.db', 1,
+                         (42, 0.51, 1234, 3, 0.4, 0.8, 7, '/tmp/model.db', 1,
                           None))
         self.assertEqual(conn.commits, 1)
 
@@ -266,8 +267,26 @@ class TestRecordModelRun(unittest.TestCase):
 
         _query, params = conn.calls[0]
         self.assertIsNone(params[0])
-        self.assertEqual(params[7], 0)
-        self.assertEqual(params[8], 'MAP score 0.1200 below minimum 0.3000')
+        self.assertEqual(params[8], 0)
+        self.assertEqual(params[9], 'MAP score 0.1200 below minimum 0.3000')
+
+    def test_record_stores_an_unset_seed_as_null(self) -> None:
+        '''A run without a fixed seed records NULL, not a made up seed.'''
+        conn = _FakeConnection()
+        config = build_problem_rec_model.TrainingConfig(rng_seed=None)
+
+        build_problem_rec_model.record_model_run(
+            cast(lib.db.Connection, conn),
+            cron_run_id=None,
+            config=config,
+            map_score=0.4,
+            dataset_size=10,
+            output_path='/tmp/model.db',
+            published=True,
+            skip_reason=None)
+
+        _query, params = conn.calls[0]
+        self.assertIsNone(params[6])
 
 
 class TestShouldPublish(unittest.TestCase):

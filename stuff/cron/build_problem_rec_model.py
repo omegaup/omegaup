@@ -250,7 +250,7 @@ class TrainingConfig:
     def __init__(
         self,
         train_fraction: float = _TRAIN_FRACTION,
-        rng_seed: int = 0,
+        rng_seed: Optional[int] = 0,
         num_followups: int = _NUM_FOLLOWUPS,
         followup_decay: float = _FOLLOWUP_DECAY,
     ):
@@ -444,12 +444,12 @@ def record_model_run(
             '''
             INSERT INTO `Recommendation_Model_Runs`
                 (`cron_run_id`, `map_score`, `dataset_size`, `num_followups`,
-                 `followup_decay`, `train_fraction`, `output_path`,
-                 `published`, `skip_reason`)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
+                 `followup_decay`, `train_fraction`, `rng_seed`,
+                 `output_path`, `published`, `skip_reason`)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);''',
             (cron_run_id, map_score, dataset_size, config.num_followups,
-             config.followup_decay, config.train_fraction, output_path,
-             1 if published else 0, skip_reason))
+             config.followup_decay, config.train_fraction, config.rng_seed,
+             output_path, 1 if published else 0, skip_reason))
     dbconn.conn.commit()
 
 
