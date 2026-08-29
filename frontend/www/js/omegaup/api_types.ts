@@ -1644,6 +1644,15 @@ export namespace types {
             return x;
           });
         })(x.problemHealthFindings);
+        x.recommendationModelRuns = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+            return x;
+          });
+        })(x.recommendationModelRuns);
         x.runs = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -3904,6 +3913,7 @@ export namespace types {
   export interface CronsDetailsPayload {
     jobs: types.CronJob[];
     problemHealthFindings: types.ProblemHealthFinding[];
+    recommendationModelRuns: types.RecommendationModelRun[];
     runs: types.CronRun[];
   }
 
@@ -4765,6 +4775,16 @@ export namespace types {
     score: number;
   }
 
+  export interface RecommendationModelRun {
+    created_at: Date;
+    dataset_size: number;
+    map_score: number;
+    model_run_id: number;
+    published: boolean;
+    rng_seed?: number;
+    skip_reason?: string;
+  }
+
   export interface Run {
     alias: string;
     classname: string;
@@ -5508,6 +5528,7 @@ export namespace messages {
   export type AdminGetCronsResponse = {
     jobs: types.CronJob[];
     problemHealthFindings: types.ProblemHealthFinding[];
+    recommendationModelRuns: types.RecommendationModelRun[];
     runs: types.CronRun[];
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
