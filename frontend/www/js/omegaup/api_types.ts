@@ -5532,6 +5532,8 @@ export namespace messages {
   };
   export type AdminRerunCronRequest = { [key: string]: any };
   export type AdminRerunCronResponse = { queued: boolean };
+  export type AdminSetCronJobEnabledRequest = { [key: string]: any };
+  export type AdminSetCronJobEnabledResponse = {};
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
   export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
@@ -6549,6 +6551,9 @@ export namespace controllers {
     rerunCron: (
       params?: messages.AdminRerunCronRequest,
     ) => Promise<messages.AdminRerunCronResponse>;
+    setCronJobEnabled: (
+      params?: messages.AdminSetCronJobEnabledRequest,
+    ) => Promise<messages.AdminSetCronJobEnabledResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;

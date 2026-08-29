@@ -159,6 +159,10 @@ export const Admin = {
     messages.AdminRerunCronRequest,
     messages.AdminRerunCronResponse
   >('/api/admin/rerunCron/'),
+  setCronJobEnabled: apiCall<
+    messages.AdminSetCronJobEnabledRequest,
+    messages.AdminSetCronJobEnabledResponse
+  >('/api/admin/setCronJobEnabled/'),
   setMaintenanceMode: apiCall<
     messages.AdminSetMaintenanceModeRequest,
     messages.AdminSetMaintenanceModeResponse
