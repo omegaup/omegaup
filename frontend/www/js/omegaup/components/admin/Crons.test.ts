@@ -60,6 +60,27 @@ const describedSchedule = (schedule: string | null): string | null => {
   return cell.find('small').exists() ? cell.find('small').text() : null;
 };
 
+const problemHealthFindings: types.ProblemHealthFinding[] = [
+  {
+    problem_id: 5,
+    alias: 'prob-verify-b',
+    title: 'Broken problem',
+    check_type: 'no_languages',
+    severity: 'error',
+    detail: 'the problem is public but has no enabled language',
+    first_detected_at: new Date(),
+  },
+  {
+    problem_id: 4,
+    alias: 'prob-verify-a',
+    title: 'Hard problem',
+    check_type: 'never_solved',
+    severity: 'warning',
+    detail: '30 submissions and no accepted solution yet',
+    first_detected_at: new Date(),
+  },
+];
+
 describe('Crons.vue', () => {
   it('Should show each job with the status of its latest run', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
@@ -97,6 +118,59 @@ describe('Crons.vue', () => {
     expect(phase.at(0).text()).toBe('update_users_stats');
     expect(phase.at(1).text()).toBe('success');
     expect(phase.at(2).text()).toBe('0.05s');
+  });
+
+  it('Should list the problems that need attention', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, problemHealthFindings },
+    });
+
+    const table = wrapper.find('[data-problem-health]');
+    expect(table.exists()).toBe(true);
+    expect(table.text()).toContain('Broken problem');
+    expect(table.text()).toContain(T.problemHealthCheckNoLanguages);
+    expect(table.text()).not.toContain('no_languages');
+    expect(table.text()).toContain(
+      '30 submissions and no accepted solution yet',
+    );
+    expect(table.find('.badge-danger').text()).toBe(
+      T.problemHealthSeverityError,
+    );
+    expect(table.find('.badge-warning').text()).toBe(
+      T.problemHealthSeverityWarning,
+    );
+  });
+
+  it('Should keep the raw check type reachable on the readable one', () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, problemHealthFindings },
+    });
+
+    const cell = wrapper.findAll('[data-problem-health] tbody tr td').at(1);
+    expect(cell.attributes('title')).toBe('no_languages');
+  });
+
+  it('Should show a check type it does not recognize as it came', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs,
+        runs,
+        problemHealthFindings: [
+          { ...problemHealthFindings[0], check_type: 'brand_new_check' },
+        ],
+      },
+    });
+
+    expect(wrapper.find('[data-problem-health]').text()).toContain(
+      'brand_new_check',
+    );
+  });
+
+  it('Should show a placeholder when no problem needs attention', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    expect(wrapper.find('[data-problem-health]').exists()).toBe(false);
+    expect(wrapper.text()).toContain(T.problemHealthNoFindings);
   });
 
   it('Should collapse an expanded run when it is clicked again', async () => {
