@@ -11,6 +11,7 @@ import logging
 import os
 import sys
 
+import enum
 from typing import List, NamedTuple, Sequence, cast
 
 import mysql.connector.cursor
@@ -31,11 +32,25 @@ _MIN_SUBMISSIONS_NEVER_SOLVED = 20
 _MIN_AGE_DAYS_NEVER_SOLVED = 7
 
 
+class CheckType(enum.Enum):
+    '''The checks that can flag a problem, as stored in `check_type`.'''
+    JUDGE_ERRORS = 'judge_errors'
+    NO_LANGUAGES = 'no_languages'
+    NEVER_SOLVED = 'never_solved'
+    DEPRECATED_PUBLIC = 'deprecated_public'
+
+
+class Severity(enum.Enum):
+    '''How bad a finding is, as stored in `severity`.'''
+    WARNING = 'warning'
+    ERROR = 'error'
+
+
 class Finding(NamedTuple):
     '''One detected problem.'''
     problem_id: int
-    check_type: str
-    severity: str
+    check_type: CheckType
+    severity: Severity
     detail: str
 
 
@@ -83,8 +98,8 @@ def find_judge_errors(
     return [
         Finding(
             problem_id=int(row['problem_id']),
-            check_type='judge_errors',
-            severity='error',
+            check_type=CheckType.JUDGE_ERRORS,
+            severity=Severity.ERROR,
             detail=(f'{int(row["error_count"])} of '
                     f'{int(row["submission_count"])} submissions in the last '
                     f'{window_hours}h ended in a judge or validator error'),
@@ -108,8 +123,8 @@ def find_problems_without_languages(
     return [
         Finding(
             problem_id=int(row['problem_id']),
-            check_type='no_languages',
-            severity='error',
+            check_type=CheckType.NO_LANGUAGES,
+            severity=Severity.ERROR,
             detail='the problem is public but has no enabled language',
         ) for row in cur.fetchall()
     ]
@@ -142,8 +157,8 @@ def find_never_solved(
     return [
         Finding(
             problem_id=int(row['problem_id']),
-            check_type='never_solved',
-            severity='warning',
+            check_type=CheckType.NEVER_SOLVED,
+            severity=Severity.WARNING,
             detail=(f'{int(row["submissions"])} submissions and no accepted '
                     f'solution yet'),
         ) for row in cur.fetchall()
@@ -165,8 +180,8 @@ def find_deprecated_but_public(
     return [
         Finding(
             problem_id=int(row['problem_id']),
-            check_type='deprecated_public',
-            severity='warning',
+            check_type=CheckType.DEPRECATED_PUBLIC,
+            severity=Severity.WARNING,
             detail='the problem is deprecated but still public',
         ) for row in cur.fetchall()
     ]
@@ -198,8 +213,9 @@ def record_findings(
                 `detail` = VALUES(`detail`),
                 `last_seen_at` = VALUES(`last_seen_at`),
                 `resolved_at` = NULL;''',
-            [(finding.problem_id, finding.check_type, finding.severity,
-              finding.detail, run_timestamp, run_timestamp)
+            [(finding.problem_id, finding.check_type.value,
+              finding.severity.value, finding.detail, run_timestamp,
+              run_timestamp)
              for finding in findings])
 
 
@@ -309,19 +325,19 @@ def main() -> None:
             # leave its findings unseen and resolve them as if they were fixed.
             findings: List[Finding] = []
             with dbconn.cursor(buffered=True, dictionary=True) as cur:
-                with cron_run.phase('judge_errors'):
+                with cron_run.phase(CheckType.JUDGE_ERRORS.value):
                     findings.extend(
                         find_judge_errors(cur, run_timestamp,
                                           args.judge_error_window_hours,
                                           args.min_judge_errors,
                                           args.min_judge_error_ratio))
-                with cron_run.phase('no_languages'):
+                with cron_run.phase(CheckType.NO_LANGUAGES.value):
                     findings.extend(find_problems_without_languages(cur))
-                with cron_run.phase('never_solved'):
+                with cron_run.phase(CheckType.NEVER_SOLVED.value):
                     findings.extend(
                         find_never_solved(cur, created_before,
                                           args.min_submissions_never_solved))
-                with cron_run.phase('deprecated_public'):
+                with cron_run.phase(CheckType.DEPRECATED_PUBLIC.value):
                     findings.extend(find_deprecated_but_public(cur))
 
             with cron_run.phase('apply_findings'):

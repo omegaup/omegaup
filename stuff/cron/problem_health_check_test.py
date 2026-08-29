@@ -213,8 +213,12 @@ class TestJudgeErrors(_Fixture):
 
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].problem_id, 7)
-        self.assertEqual(findings[0].check_type, 'judge_errors')
-        self.assertEqual(findings[0].severity, 'error')
+        self.assertEqual(
+            findings[0].check_type,
+            problem_health_check.CheckType.JUDGE_ERRORS)
+        self.assertEqual(
+            findings[0].severity,
+            problem_health_check.Severity.ERROR)
         self.assertEqual(findings[0].detail,
                          '3 of 5 submissions in the last 24h ended in a '
                          'judge or validator error')
@@ -390,8 +394,12 @@ class TestNoLanguages(_Fixture):
 
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].problem_id, 3)
-        self.assertEqual(findings[0].check_type, 'no_languages')
-        self.assertEqual(findings[0].severity, 'error')
+        self.assertEqual(
+            findings[0].check_type,
+            problem_health_check.CheckType.NO_LANGUAGES)
+        self.assertEqual(
+            findings[0].severity,
+            problem_health_check.Severity.ERROR)
 
     def test_a_problem_with_languages_is_healthy(self) -> None:
         '''The usual case reports nothing.'''
@@ -423,8 +431,12 @@ class TestNeverSolved(_Fixture):
 
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].problem_id, 5)
-        self.assertEqual(findings[0].check_type, 'never_solved')
-        self.assertEqual(findings[0].severity, 'warning')
+        self.assertEqual(
+            findings[0].check_type,
+            problem_health_check.CheckType.NEVER_SOLVED)
+        self.assertEqual(
+            findings[0].severity,
+            problem_health_check.Severity.WARNING)
         self.assertIn('42 submissions', findings[0].detail)
 
     def test_too_few_attempts_are_ignored(self) -> None:
@@ -493,7 +505,9 @@ class TestDeprecatedPublic(_Fixture):
 
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].problem_id, 11)
-        self.assertEqual(findings[0].check_type, 'deprecated_public')
+        self.assertEqual(
+            findings[0].check_type,
+            problem_health_check.CheckType.DEPRECATED_PUBLIC)
 
     def test_deprecated_and_private_is_healthy(self) -> None:
         '''Retiring a problem properly is not a finding.'''
@@ -518,8 +532,8 @@ class TestRecording(_Fixture):
         self.add_problem(4)
         self.finding = problem_health_check.Finding(
             problem_id=4,
-            check_type='never_solved',
-            severity='warning',
+            check_type=problem_health_check.CheckType.NEVER_SOLVED,
+            severity=problem_health_check.Severity.WARNING,
             detail='30 submissions and no accepted solution yet')
 
     def test_a_finding_is_stored(self) -> None:
@@ -529,8 +543,12 @@ class TestRecording(_Fixture):
         rows = self.open_findings()
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]['problem_id'], 4)
-        self.assertEqual(rows[0]['check_type'], 'never_solved')
-        self.assertEqual(rows[0]['severity'], 'warning')
+        self.assertEqual(
+            rows[0]['check_type'],
+            problem_health_check.CheckType.NEVER_SOLVED.value)
+        self.assertEqual(
+            rows[0]['severity'],
+            problem_health_check.Severity.WARNING.value)
         self.assertEqual(rows[0]['detail'], self.finding.detail)
         self.assertEqual(rows[0]['last_seen_at'], _NOW)
         self.assertIsNone(rows[0]['resolved_at'])
@@ -548,7 +566,9 @@ class TestRecording(_Fixture):
                              'SET `first_detected_at` = ?', (_ESTABLISHED,))
         self.db.conn.commit()
         later = _NOW + datetime.timedelta(days=1)
-        worse = self.finding._replace(severity='error', detail='31 now')
+        worse = self.finding._replace(
+            severity=problem_health_check.Severity.ERROR,
+            detail='31 now')
 
         problem_health_check.record_findings(self.dbconn, [worse], later)
 
@@ -556,7 +576,9 @@ class TestRecording(_Fixture):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]['first_detected_at'], _ESTABLISHED)
         self.assertEqual(rows[0]['last_seen_at'], later)
-        self.assertEqual(rows[0]['severity'], 'error')
+        self.assertEqual(
+            rows[0]['severity'],
+            problem_health_check.Severity.ERROR.value)
         self.assertEqual(rows[0]['detail'], '31 now')
 
     def test_a_recurrence_is_dated_from_the_new_incident(self) -> None:
@@ -603,7 +625,9 @@ class TestRecording(_Fixture):
     def test_only_findings_not_seen_again_are_resolved(self) -> None:
         '''What this run still detects stays open.'''
         self.add_problem(5)
-        gone = self.finding._replace(problem_id=5, check_type='no_languages')
+        gone = self.finding._replace(
+            problem_id=5,
+            check_type=problem_health_check.CheckType.NO_LANGUAGES)
         problem_health_check.record_findings(self.dbconn,
                                              [self.finding, gone], _NOW)
 
@@ -634,7 +658,9 @@ class TestRecording(_Fixture):
     def test_apply_findings_records_and_resolves_in_one_step(self) -> None:
         '''The two writes share the timestamp they are given.'''
         self.add_problem(5)
-        gone = self.finding._replace(problem_id=5, check_type='no_languages')
+        gone = self.finding._replace(
+            problem_id=5,
+            check_type=problem_health_check.CheckType.NO_LANGUAGES)
         problem_health_check.record_findings(self.dbconn, [gone], _NOW)
 
         later = _NOW + datetime.timedelta(days=1)
