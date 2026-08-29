@@ -296,6 +296,10 @@ export default class Login extends Vue {
   border-color: var(--btn-github-border-color--hover);
 }
 
+.github-login-btn:active {
+  color: var(--btn-github-font-color) !important;
+}
+
 .github-login-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
