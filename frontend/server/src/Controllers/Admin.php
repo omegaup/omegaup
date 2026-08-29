@@ -510,6 +510,44 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Queues a manual rerun of a registered cron job for a worker to pick up.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $name
+     */
+    public static function apiRerunCron(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $jobName = \OmegaUp\CronJobName::tryFrom($r->ensureString('name'));
+        if (is_null($jobName)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
+        // The dispatcher runs whatever is queued, so a job that is already
+        // waiting or in flight does not get a second row.
+        if (
+            !is_null(
+                \OmegaUp\DAO\CronRunRequests::getActiveByName($jobName->value)
+            )
+        ) {
+            return ['status' => 'ok'];
+        }
+        \OmegaUp\DAO\CronRunRequests::create(
+            new \OmegaUp\DAO\VO\CronRunRequests([
+                'name' => $jobName->value,
+                'requested_by' => $r->user->user_id,
+                'status' => \OmegaUp\CronRunRequestStatus::Pending->value,
+            ])
+        );
+        return ['status' => 'ok'];
+    }
+
+    /**
      * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
