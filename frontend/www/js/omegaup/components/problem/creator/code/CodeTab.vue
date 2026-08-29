@@ -259,6 +259,7 @@ export default class CodeTab extends Vue {
   }
 
   startIntroGuide() {
+    if (this.hideSaveButton) return;
     if (!this.$cookies.get('has-visited-code-tab')) {
       introJs()
         .setOptions({
