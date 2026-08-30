@@ -171,5 +171,35 @@ describe('ui', () => {
         sessionStorage.getItem('omegaup-pending-success-message'),
       ).toBeNull();
     });
+
+    it('does not throw when sessionStorage writes are blocked', () => {
+      const setItemSpy = jest
+        .spyOn(Storage.prototype, 'setItem')
+        .mockImplementation(() => {
+          throw new DOMException('blocked', 'SecurityError');
+        });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      expect(() => ui.persistSuccessMessage('Password changed')).not.toThrow();
+
+      setItemSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
+
+    it('does not throw when sessionStorage reads are blocked', () => {
+      const getItemSpy = jest
+        .spyOn(Storage.prototype, 'getItem')
+        .mockImplementation(() => {
+          throw new DOMException('blocked', 'SecurityError');
+        });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      notificationsStore.commit('hideNotification');
+
+      expect(() => ui.showPersistedSuccessMessage()).not.toThrow();
+      expect(notificationsStore.state.message).not.toBe('Password changed');
+
+      getItemSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
   });
 });
