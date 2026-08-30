@@ -89,15 +89,23 @@ class ProblemSearchBooleanModeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertContains('test-problem', $allAliases);
     }
 
-    public function testPlusInQueryStillMatches(): void {
-        $this->seedProblems();
+    /**
+     * A term preceded by a plus sign must not be treated as a required-term
+     * operator: the plus sign is escaped and the term is matched literally,
+     * so a problem that only contains the first term still shows up.
+     */
+    public function testPlusDoesNotActAsRequiredOperator(): void {
+        ['aclId' => $aclId] = $this->seedProblems();
 
-        $result = $this->searchProblems('+suma');
+        $this->createPublicProblem($aclId, 'alpha-solo', 'Alpha solo');
+        \OmegaUp\Test\Utils::commit();
+
+        $result = $this->searchProblems('alpha +beta');
         $aliases = array_map(
             fn ($problem) => $problem['alias'],
             $result['problems']
         );
-        $this->assertContains('suma-dos', $aliases);
+        $this->assertContains('alpha-solo', $aliases);
     }
 
     public function testMalformedBooleanQueriesDoNotError(): void {
