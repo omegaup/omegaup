@@ -684,7 +684,7 @@ nav.navbar {
     display: none;
   }
 
-  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+  .nav-problems .collapse-submenu:has(.btn[aria-expanded='true']) .collapse-links {
     display: block;
   }
 
@@ -692,7 +692,14 @@ nav.navbar {
     display: none;
   }
 
-  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+  .collapse-submenu .btn[aria-expanded='true']::after {
+    transform: rotate(0deg);
+  }
+  .collapse-submenu .btn::after {
+    transform: rotate(-90deg);
+    transition: transform 0.2s ease;
+  }
+  .nav-user .collapse-submenu:has(.btn[aria-expanded='true']) .collapse-links {
     display: block;
   }
 }
