@@ -29,11 +29,9 @@ FROM
       FROM
         `Submissions` AS `s`
       INNER JOIN
-        `Users` AS `u` ON `s`.`identity_id` = `u`.`main_identity_id`
-      INNER JOIN
-        `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+        `Users` AS `u` ON `u`.`main_identity_id` = `s`.`identity_id`
       WHERE
-        `r`.`verdict` = 'AC'
+        `s`.`verdict` = 'AC'
     )
   ) AS `activity`
 WHERE
