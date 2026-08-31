@@ -63,9 +63,9 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['visibility'])) {
-            $this->visibility = intval(
+            $this->visibility = is_scalar(
                 $data['visibility']
-            );
+            ) ? strval($data['visibility']) : '';
         }
         if (isset($data['title'])) {
             $this->title = is_scalar(
@@ -201,11 +201,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
     public $acl_id = null;
 
     /**
-     * -1 banned, 0 private, 1 public, 2 recommended
+     * -10 deleted, -3 private_banned, -2 public_banned, -1 private_warning, 0 private, 1 public_warning, 2 public, 3 promoted
      *
-     * @var int
+     * @var string
      */
-    public $visibility = 1;
+    public $visibility = '2';
 
     /**
      * [Campo no documentado]
