@@ -49,7 +49,7 @@ const props: types.ProblemFormPayload = {
     'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js':
       'C, C++, C#, Java, Kotlin, Python, Ruby, Pascal, Haskell, Lua, Go, Rust, JavaScript',
     'kj,kp': 'Karel',
-    rk: 'ReKarel',
+    rk: 'ReKarel 2.0.0',
     cat: T.wordsJustOutput,
     '': T.wordsNoSubmissions,
   },

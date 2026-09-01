@@ -314,7 +314,7 @@ If the user has a valid `auth_token`, creates a new problem which can later be a
     "source": string // Author or original contest
     $_FILES["problem_contents"]
     "validator": enum("remote","literal","token","token-caseless","token-numeric") // optional (default "token")
-    "languages": enum("c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb", "kj,kp,rk", "cat", "") // optional
+    "languages": enum("c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb", "kj,kp", "rk", "cat", "") // optional
     "validator_time_limit": int // optional (default 1000)
     "time_limit": int (ms) // optional (default 1000)
     "overall_wall_time_limit": int (ms) // optional (default 60000)

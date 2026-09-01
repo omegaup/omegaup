@@ -58,7 +58,11 @@ describe('Edit.vue', () => {
             clarificationsPageSize: 100,
             clarificationsPagerItems: [],
           },
-          allLanguages: { kp: 'Karel Pascal', kj: 'Karel Java', rk: 'ReKarel' },
+          allLanguages: {
+            kp: 'Karel Pascal',
+            kj: 'Karel Java',
+            rk: 'ReKarel 2.0.0',
+          },
           assignmentProblems: [],
           selectedAssignment: undefined,
           students: [],
