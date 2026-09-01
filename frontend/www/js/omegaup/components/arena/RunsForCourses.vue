@@ -116,6 +116,7 @@
                 <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
+                <option value="rk">ReKarel</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
@@ -858,7 +859,7 @@ export default class RunsForCourses extends Vue {
       return '';
     }
 
-    if (run.language == 'kj' || run.language == 'kp') {
+    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
       if (run.verdict == 'RTE' || run.verdict == 'RE') {
         return T.verdictHelpKarelRTE;
       } else if (run.verdict == 'TLE' || run.verdict == 'TO') {

@@ -447,7 +447,7 @@ int main() {
         problem: {
           ...problem,
           karel_problem: true,
-          languages: ['kp', 'kj'],
+          languages: ['kp', 'kj', 'rk'],
         },
         runDetailsData,
         user,

@@ -11,6 +11,12 @@
     "modelMapping": "",
     "language": "kj"
   },
+  "rk": {
+    "extension": "rk",
+    "name": "ReKarel",
+    "modelMapping": "",
+    "language": "rk"
+  },
   "c11-gcc": {
     "extension": "c",
     "name": "C11 (gcc 10.3)",
