@@ -1566,8 +1566,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var list<string> */
-        $aliases = json_decode($problems, true);
+        $decodedAliases = json_decode($problems, true);
+        if (!is_array($decodedAliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
+        /** @var list<string> $aliases */
+        $aliases = $decodedAliases;
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
@@ -1633,8 +1640,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /** @var list<string> */
-        $aliases = json_decode($assignments, true);
+        $decodedAliases = json_decode($assignments, true);
+        if (!is_array($decodedAliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
+        /** @var list<string> $aliases */
+        $aliases = $decodedAliases;
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
