@@ -23,7 +23,7 @@
           class="nav-link"
           data-tab-course
           :class="{ active: showTab === 'course' }"
-          @click="showTab = 'course'"
+          @click.prevent="switchTab('course')"
           >{{ T.courseEdit }}</a
         >
       </li>
@@ -33,7 +33,7 @@
           class="nav-link"
           data-tab-content
           :class="{ active: showTab === 'content' }"
-          @click="onSelectAssignmentTab"
+          @click.prevent="switchTab('content')"
           >{{ T.wordsContent }}</a
         >
       </li>
@@ -43,7 +43,7 @@
           class="nav-link"
           data-tab-admission-mode
           :class="{ active: showTab === 'admission-mode' }"
-          @click="showTab = 'admission-mode'"
+          @click.prevent="switchTab('admission-mode')"
           >{{ T.contestNewFormAdmissionMode }}</a
         >
       </li>
@@ -53,7 +53,7 @@
           class="nav-link"
           data-tab-students
           :class="{ active: showTab === 'students' }"
-          @click="showTab = 'students'"
+          @click.prevent="switchTab('students')"
           >{{ T.courseEditStudents }}</a
         >
       </li>
@@ -63,7 +63,7 @@
           class="nav-link"
           data-tab-admins
           :class="{ active: showTab === 'admins' }"
-          @click="showTab = 'admins'"
+          @click.prevent="switchTab('admins')"
           >{{ T.courseEditAdmins }}</a
         >
       </li>
@@ -73,7 +73,7 @@
           class="nav-link"
           data-tab-clone
           :class="{ active: showTab === 'clone' }"
-          @click="showTab = 'clone'"
+          @click.prevent="switchTab('clone')"
           >{{ T.courseEditClone }}</a
         >
       </li>
@@ -83,7 +83,7 @@
           class="nav-link"
           data-tab-archive
           :class="{ active: showTab === 'archive' }"
-          @click="showTab = 'archive'"
+          @click.prevent="switchTab('archive')"
           >{{ T.courseEditArchive }}</a
         >
       </li>
@@ -454,8 +454,22 @@ export default class CourseEdit extends Vue {
   }
 
   onSelectAssignmentTab(): void {
-    this.showTab = 'content';
-    this.onResetAssignmentForm();
+    this.switchTab('content');
+  }
+
+  switchTab(newTab: string): void {
+    if (
+      this.showTab === 'content' &&
+      (this.assignmentDetails as unknown as { hasUnsavedChanges?: boolean })
+        ?.hasUnsavedChanges &&
+      !window.confirm(T.courseUnsavedChangesWarning)
+    ) {
+      return;
+    }
+    this.showTab = newTab;
+    if (newTab === 'content') {
+      this.onResetAssignmentForm();
+    }
   }
 
   onArchiveCourse(archive: boolean): void {
