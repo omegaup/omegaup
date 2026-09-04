@@ -528,6 +528,39 @@ describe('Contest Test', () => {
     cy.logout();
   });
 
+  it('Should keep the submissions tab active when opening run details as contest admin', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(2);
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[1],
+    );
+    const contestant = [userLoginOptions[0].username];
+    const contestAdmin = userLoginOptions[1];
+
+    cy.login(contestAdmin);
+    contestPage.createContest(contestOptions, contestant);
+    cy.logout();
+
+    cy.login(userLoginOptions[0]);
+    cy.enterContest(contestOptions);
+    cy.createRunsInsideContest(contestOptions);
+    cy.logout();
+
+    cy.login(contestAdmin);
+    cy.visit(`arena/${contestOptions.contestAlias}`);
+    cy.get('a.nav-link[href="#runs"]').click();
+    cy.intercept({ method: 'POST', url: '/api/run/details/' }).as('runDetails');
+    cy.get('[data-runs-actions-button]').first().click();
+    cy.get('[data-runs-show-details-button]').first().click();
+    cy.wait('@runDetails').its('response.statusCode').should('eq', 200);
+    cy.location('hash').should('match', /^#runs\/all\/show-run:[0-9a-f]+/);
+    cy.location('hash').should('not.contain', '##runs');
+    cy.get('a.nav-link[href="#runs"]').should('have.class', 'active');
+    cy.get('[data-overlay]').should('exist');
+    cy.get('[data-run-details-view]').should('exist');
+    cy.get('[data-overlay-popup] button.close').click({ force: true });
+    cy.logout();
+  });
+
   it('Should disqualify and requalify the submission in the contest', () => {
     const userLoginOptions = loginPage.registerMultipleUsers(2);
     const contestOptions = contestPage.generateContestOptions(

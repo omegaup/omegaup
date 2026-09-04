@@ -2,7 +2,7 @@
   <div class="mt-2" data-runs>
     <slot name="title">
       <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+        <h1 class="text-center">{{ T.latestSubmissionsTitle }}</h1>
       </div>
     </slot>
     <div
@@ -116,6 +116,7 @@
                 <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
+                <option value="rk">ReKarel</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
@@ -132,14 +133,6 @@
                   "
                 ></omegaup-common-typeahead>
               </label>
-              <button
-                type="button"
-                class="close"
-                style="float: none"
-                @click="filterProblem = null"
-              >
-                &times;
-              </button>
             </template>
 
             <template v-if="showUser">
@@ -866,7 +859,7 @@ export default class RunsForCourses extends Vue {
       return '';
     }
 
-    if (run.language == 'kj' || run.language == 'kp') {
+    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
       if (run.verdict == 'RTE' || run.verdict == 'RE') {
         return T.verdictHelpKarelRTE;
       } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
@@ -1106,7 +1099,7 @@ export default class RunsForCourses extends Vue {
 
   onSubmit(): void {
     if (!this.canSubmit && this.nextSubmissionTimestamp) {
-      alert(
+      ui.warning(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(
             (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,

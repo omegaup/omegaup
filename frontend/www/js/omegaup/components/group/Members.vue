@@ -25,7 +25,7 @@
         </div>
       </form>
     </div>
-    <table class="table table-striped" data-table-members>
+    <table class="table table-striped d-none d-md-table" data-table-members>
       <thead>
         <tr>
           <th>{{ T.groupEditMembersCoder }}</th>
@@ -53,7 +53,10 @@
         </tr>
       </tbody>
     </table>
-    <table class="table table-striped responsive-table" data-table-identities>
+    <table
+      class="table table-striped responsive-table d-none d-md-table"
+      data-table-identities
+    >
       <thead>
         <tr>
           <th>{{ T.groupEditMembersCoder }}</th>
@@ -77,7 +80,101 @@
           <td>{{ identity.country }}</td>
           <td>{{ identity.state }}</td>
           <td>{{ identity.school }}</td>
-          <td>
+          <td class="actions-cell">
+            <div class="actions-wrapper">
+              <button
+                class="btn btn-link"
+                :title="T.groupEditMembersEdit"
+                @click="onEdit(identity)"
+              >
+                <font-awesome-icon :icon="['fas', 'edit']" />
+              </button>
+
+              <button
+                data-identity-change-password
+                class="btn btn-link"
+                :title="T.groupEditMembersChangePassword"
+                @click="onChangePass(identity.username)"
+              >
+                <font-awesome-icon :icon="['fas', 'lock']" />
+              </button>
+
+              <button
+                class="btn btn-link"
+                :title="T.groupEditMembersRemove"
+                @click="$emit('remove', identity.username)"
+              >
+                <font-awesome-icon :icon="['fas', 'trash-alt']" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Mobile Card Layout -->
+    <div class="d-md-none">
+      <!-- Members added from search -->
+      <div
+        v-for="identity in identities"
+        :key="identity.username"
+        class="card mb-3 shadow-sm"
+      >
+        <div
+          class="card-body d-flex justify-content-between align-items-center"
+        >
+          <div>
+            <strong class="text-muted d-block">
+              {{ T.groupEditMembersCoder }}
+            </strong>
+
+            <omegaup-user-username
+              class="h6 mb-0"
+              :classname="identity.classname"
+              :linkify="true"
+              :username="identity.username"
+            ></omegaup-user-username>
+          </div>
+
+          <button
+            class="btn btn-link text-primary"
+            :title="T.groupEditMembersRemove"
+            @click="$emit('remove', identity.username)"
+          >
+            <font-awesome-icon :icon="['fas', 'trash-alt']" />
+          </button>
+        </div>
+      </div>
+
+      <!-- CSV identities -->
+      <div
+        v-for="identity in identitiesCsv"
+        :key="'csv-' + identity.username"
+        class="card mb-3"
+      >
+        <div class="card-body">
+          <p>
+            <strong>{{ T.groupEditMembersCoder }}: </strong>
+            <omegaup-user-username
+              :classname="identity.classname"
+              :linkify="true"
+              :username="identity.username"
+            ></omegaup-user-username>
+          </p>
+
+          <p class="mb-1">
+            <strong>{{ T.wordsName }}:</strong> {{ identity.name }}
+          </p>
+          <p>
+            <strong>{{ T.profileCountry }}:</strong> {{ identity.country }}
+          </p>
+          <p>
+            <strong>{{ T.profileState }}:</strong> {{ identity.state }}
+          </p>
+          <p>
+            <strong>{{ T.profileSchool }}:</strong> {{ identity.school }}
+          </p>
+
+          <div class="d-flex justify-content-between mt-3">
             <button
               class="btn btn-link"
               :title="T.groupEditMembersEdit"
@@ -85,25 +182,26 @@
             >
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
+
             <button
-              data-identity-change-password
               class="btn btn-link"
               :title="T.groupEditMembersChangePassword"
               @click="onChangePass(identity.username)"
             >
               <font-awesome-icon :icon="['fas', 'lock']" />
             </button>
+
             <button
-              class="btn btn-link"
+              class="btn btn-link text-primary"
               :title="T.groupEditMembersRemove"
               @click="$emit('remove', identity.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+    </div>
     <omegaup-identity-edit
       v-if="showEditForm"
       :countries="countries"
@@ -151,7 +249,7 @@ library.add(faEdit, faLock, faTrashAlt);
 })
 export default class Members extends Vue {
   @Prop() identities!: types.Identity[];
-  @Prop() identitiesCsv!: types.Identity[];
+  @Prop({ default: () => [] }) identitiesCsv!: types.Identity[];
   @Prop() groupAlias!: string;
   @Prop() countries!: Array<dao.Countries>;
   @Prop() searchResultUsers!: types.ListItem[];
@@ -208,19 +306,25 @@ export default class Members extends Vue {
 </script>
 
 <style scoped lang="scss">
-@media (max-width: 576px) {
+@media (max-width: 768px) {
   .input {
     width: 100%;
     max-width: 100%;
     margin-top: 0.6rem;
   }
-  .responsive-table {
-    width: 100%;
-    overflow-x: auto;
-    display: block;
-  }
   .margin-phone {
     margin-top: 0.4rem !important;
   }
+}
+
+.actions-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.actions-cell {
+  white-space: nowrap;
 }
 </style>

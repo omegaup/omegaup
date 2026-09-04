@@ -55,6 +55,20 @@ export const runsStoreConfig = {
       state.runs.splice(0);
       state.index = {};
     },
+    appendRuns(state: RunsState, runs: types.Run[]) {
+      for (const run of runs) {
+        if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
+          Vue.set(
+            state.runs,
+            state.index[run.guid],
+            Object.assign({}, state.runs[state.index[run.guid]], run),
+          );
+        } else {
+          Vue.set(state.index, run.guid, state.runs.length);
+          state.runs.push(run);
+        }
+      }
+    },
     applyFilter(state: RunsState, filter: RunFilters) {
       state.filters = Object.assign(state.filters, filter);
     },

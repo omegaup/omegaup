@@ -31,6 +31,9 @@ OmegaUp.on('ready', () => {
       tab: window.location.hash
         ? window.location.hash.substr(1)
         : AvailableTabs.Teams,
+      teamGroup: {
+        ...payload.teamGroup,
+      },
       teamsIdentities: payload.identities,
       teamsMembers: payload.teamsMembers,
       userErrorRow: null,
@@ -38,6 +41,9 @@ OmegaUp.on('ready', () => {
       isLoading: false,
       searchResultSchools: searchResultSchools,
     }),
+    beforeDestroy() {
+      window.removeEventListener('hashchange', onHashChange);
+    },
     methods: {
       refreshTeamsList: (): void => {
         api.TeamsGroup.teams({ team_group_alias: payload.teamGroup.alias })
@@ -59,10 +65,10 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-teams-group-edit', {
         props: {
-          alias: payload.teamGroup.alias,
-          name: payload.teamGroup.name,
-          description: payload.teamGroup.description,
-          numberOfContestants: payload.teamGroup.numberOfContestants,
+          alias: this.teamGroup.alias,
+          name: this.teamGroup.name,
+          description: this.teamGroup.description,
+          numberOfContestants: this.teamGroup.numberOfContestants,
           maxNumberOfContestants: payload.maxNumberOfContestants,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
@@ -75,6 +81,10 @@ OmegaUp.on('ready', () => {
           isLoading: this.isLoading,
         },
         on: {
+          'update:tab': (newTab: AvailableTabs) => {
+            this.tab = newTab;
+            window.location.hash = `#${newTab}`;
+          },
           'update-teams-group': ({
             name,
             description,
@@ -91,6 +101,12 @@ OmegaUp.on('ready', () => {
               numberOfContestants,
             })
               .then(() => {
+                this.teamGroup = {
+                  ...this.teamGroup,
+                  name,
+                  description,
+                  numberOfContestants,
+                };
                 ui.success(T.teamsGroupEditGroupUpdated);
               })
               .catch(ui.apiError);
@@ -385,4 +401,17 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+  function onHashChange(): void {
+    const hash = window.location.hash.substring(1).split('#')[0];
+
+    if (!Object.values(AvailableTabs).includes(hash as AvailableTabs)) {
+      teamsGroupEdit.tab = AvailableTabs.Teams;
+      return;
+    }
+
+    teamsGroupEdit.tab = hash as AvailableTabs;
+  }
+
+  window.addEventListener('hashchange', onHashChange);
+  onHashChange();
 });

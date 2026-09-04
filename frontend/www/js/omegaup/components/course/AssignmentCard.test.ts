@@ -57,4 +57,53 @@ describe('AssignmentCard.vue', () => {
     expect(wrapper.text()).toContain(T.courseCardCourseResume);
     expect(wrapper.text()).not.toContain(`${studentProgress}%`);
   });
+
+  it('Should display due date when finish_time is set', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    const assignmentWithDeadline: types.CourseAssignment = {
+      ...assignment,
+      finish_time: futureDate,
+    };
+    const wrapper = mount(course_AssignmentCard, {
+      propsData: {
+        courseAlias: 'test-course',
+        assignment: assignmentWithDeadline,
+        studentProgress: 50,
+      },
+    });
+    expect(wrapper.text()).toContain(T.wordsDueDate);
+    expect(wrapper.find('.due-date').exists()).toBe(true);
+    expect(wrapper.find('.badge-danger').exists()).toBe(false);
+  });
+
+  it('Should not display due date when finish_time is undefined', () => {
+    const wrapper = mount(course_AssignmentCard, {
+      propsData: {
+        courseAlias: 'test-course',
+        assignment,
+        studentProgress: 50,
+      },
+    });
+    expect(wrapper.find('.due-date').exists()).toBe(false);
+  });
+
+  it('Should show overdue badge when finish_time is in the past', () => {
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+    const overdueAssignment: types.CourseAssignment = {
+      ...assignment,
+      finish_time: pastDate,
+    };
+    const wrapper = mount(course_AssignmentCard, {
+      propsData: {
+        courseAlias: 'test-course',
+        assignment: overdueAssignment,
+        studentProgress: 50,
+      },
+    });
+    expect(wrapper.text()).toContain(T.wordsDueDate);
+    expect(wrapper.find('.badge-danger').exists()).toBe(true);
+    expect(wrapper.text()).toContain(T.wordsOverdue);
+  });
 });

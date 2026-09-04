@@ -73,7 +73,7 @@ function parseUrlState(): {
     if (urlParams.get('page')) {
       const pageParam = urlParams.get('page');
       if (pageParam) {
-        page = parseInt(pageParam);
+        page = parseInt(pageParam, 10);
       }
     }
     if (urlParams.get('filter')) {
@@ -178,10 +178,16 @@ OmegaUp.on('ready', () => {
             } else {
               window.history.pushState({}, '', urlObj);
             }
-            await contestStore.dispatch('fetchContestList', {
-              requestParams: params,
-              name: params.tab_name,
-            });
+            if (params.page === 1) {
+              await contestStore.dispatch('fetchContestListAllTabs', {
+                requestParams: params,
+              });
+            } else {
+              await contestStore.dispatch('fetchContestList', {
+                requestParams: params,
+                name: params.tab_name,
+              });
+            }
           },
         },
       });

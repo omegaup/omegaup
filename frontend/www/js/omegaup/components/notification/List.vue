@@ -106,4 +106,16 @@ export default class NotificationList extends Vue {
 .list-leave-to {
   opacity: 0;
 }
+
+@media only screen and (max-width: 991px) {
+  .notification-dropdown {
+    position: fixed !important;
+    top: 60px !important; /* adjust if needed */
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+    min-width: unset !important;
+    max-width: unset !important;
+  }
+}
 </style>

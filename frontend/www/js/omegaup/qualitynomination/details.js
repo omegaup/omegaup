@@ -26,7 +26,7 @@ OmegaUp.on('ready', function () {
             alias: payload.problem.alias,
             title: payload.problem.title,
           },
-          qualitynomination_id: parseInt(payload.qualitynomination_id),
+          qualitynomination_id: parseInt(payload.qualitynomination_id, 10),
           reviewer: payload.reviewer,
           votes: payload.votes,
           initialRationale: payload.contents.rationale,

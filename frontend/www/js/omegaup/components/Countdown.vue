@@ -65,6 +65,13 @@ export default class Countdown extends Vue {
     this.$emit('finish');
   }
 
+  beforeDestroy() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = 0;
+    }
+  }
+
   mounted() {
     this.timerInterval = window.setInterval(
       () => (this.currentTime = Date.now()),

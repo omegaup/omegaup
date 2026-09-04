@@ -4,6 +4,7 @@ student feedback, runs the teaching assistant for
 that submission and then checks if the feedback is posted.
 """
 import logging
+import os
 from typing import Any
 import subprocess
 import pytest
@@ -211,19 +212,19 @@ def run_teaching_assistant(
 ) -> None:
     """Fixture to run the teaching assistant"""
     guid = add_student_feedback
+    env = os.environ.copy()
+    env["OMEGAUP_PASSWORD"] = TEACHER_PASSWORD
+    env["OMEGAUP_LLM_KEY"] = "omegaup"
     command = [
         "python", "teaching_assistant.py",
         "--skip-confirm",
         "--username", TEACHER_USERNAME,
-        "--password", TEACHER_PASSWORD,
         "--student_name", STUDENT_USERNAME,
-        "--key", "sk-27343f1eb8f64d238a39bebdbcff8d03",
         "--language", "English",
         "--course_alias", COURSE_ALIAS,
         "--assignment_alias", ASSIGNMENT_ALIAS,
         "--test_mode",
         "--llm", "omegaup",
-        "--key", "omegaup",
         "--submission_id_mode", "true",
         "--submission_id", guid,
         "--ta_feedback_indicator", "AI generated "
@@ -235,7 +236,8 @@ def run_teaching_assistant(
             check=True,
             timeout=60,
             capture_output=True,
-            text=True
+            text=True,
+            env=env
         )
         logging.info("STDOUT: %s", result.stdout)
         logging.info("STDERR: %s", result.stderr)

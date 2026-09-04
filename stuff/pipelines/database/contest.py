@@ -134,18 +134,20 @@ def get_users_ids(
     usernames: List[str]
 ) -> List[int]:
     '''Returns a list of ids of the contestants.'''
-    users_ids: List[int] = []
-    for username in usernames:
-        cur.execute('''
-            SELECT
-                user_id
-            FROM
-                Identities
-            WHERE
-                username = %s''', (username,))
-        result = cur.fetchone()
-        users_ids.append(result['user_id'])
-    return users_ids
+    if not usernames:
+        return []
+    placeholders = ', '.join(['%s'] * len(usernames))
+    cur.execute(f'''
+        SELECT
+            username,
+            user_id
+        FROM
+            Identities
+        WHERE
+            username IN ({placeholders})''', tuple(usernames))
+    results = cur.fetchall()
+    user_id_map = {row['username']: row['user_id'] for row in results}
+    return [user_id_map[username] for username in usernames]
 
 
 def get_contest_title(

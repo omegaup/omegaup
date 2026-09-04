@@ -1,7 +1,13 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
+  - [`/api/admin/getCrons/`](#apiadmingetcrons)
+  - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
+  - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -50,9 +56,11 @@
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
+  - [`/api/contest/listAllTabs/`](#apicontestlistalltabs)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
+  - [`/api/contest/problemChangeLogs/`](#apicontestproblemchangelogs)
   - [`/api/contest/problemClarifications/`](#apicontestproblemclarifications)
   - [`/api/contest/problems/`](#apicontestproblems)
   - [`/api/contest/publicDetails/`](#apicontestpublicdetails)
@@ -278,7 +286,9 @@
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
+  - [`/api/user/reportReadme/`](#apiuserreportreadme)
   - [`/api/user/revokeAPIToken/`](#apiuserrevokeapitoken)
+  - [`/api/user/saveReadme/`](#apiusersavereadme)
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
@@ -304,6 +314,78 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 # Admin
 
+Admin Controller
+
+## `/api/admin/getCronRun/`
+
+### Description
+
+Returns the detail of a single cron run.
+
+### Parameters
+
+| Name     | Type  | Description | Required |
+| -------- | ----- | ----------- | -------- |
+| `run_id` | `int` |             | ✓        |
+
+### Returns
+
+| Name  | Type            |
+| ----- | --------------- |
+| `run` | `types.CronRun` |
+
+**`types.CronRun` fields:**
+
+| Name               | Type                       | Required |
+| ------------------ | -------------------------- | -------- |
+| `duration_seconds` | `number`                   |          |
+| `error_text`       | `string`                   |          |
+| `finished_at`      | `Date`                     |          |
+| `hostname`         | `string`                   |          |
+| `name`             | `string`                   | ✓        |
+| `phases`           | `List[types.CronRunPhase]` | ✓        |
+| `rows_affected`    | `number`                   |          |
+| `run_id`           | `number`                   | ✓        |
+| `started_at`       | `Date`                     |          |
+| `status`           | `string`                   | ✓        |
+
+## `/api/admin/getCrons/`
+
+### Description
+
+Lists the registered cron jobs and their most recent runs.
+
+### Returns
+
+| Name   | Type                  |
+| ------ | --------------------- |
+| `jobs` | `List[types.CronJob]` |
+| `runs` | `List[types.CronRun]` |
+
+## `/api/admin/getMaintenanceMode/`
+
+### Description
+
+Get maintenance mode status
+
+### Returns
+
+```typescript
+types.MaintenanceModeStatus;
+```
+
+## `/api/admin/getSystemSettings/`
+
+### Description
+
+Gets the current system settings. Only available to system admins.
+
+### Returns
+
+| Name       | Type                                   |
+| ---------- | -------------------------------------- |
+| `settings` | `{ ephemeralGraderEnabled: boolean; }` |
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
@@ -322,6 +404,42 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/setMaintenanceMode/`
+
+### Description
+
+Set maintenance mode
+
+### Parameters
+
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `enabled`    | `null\|bool`   |             |          |
+| `message_en` | `null\|string` |             |          |
+| `message_es` | `null\|string` |             |          |
+| `message_pt` | `null\|string` |             |          |
+| `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
+
+## `/api/admin/updateSystemSettings/`
+
+### Description
+
+Updates system settings. Only available to system admins.
+
+### Parameters
+
+| Name                       | Type         | Description | Required |
+| -------------------------- | ------------ | ----------- | -------- |
+| `ephemeral_grader_enabled` | `null\|bool` |             |          |
+
+### Returns
+
+_Nothing_
 
 # AiEditorial
 
@@ -1143,24 +1261,74 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type                                        | Description | Required |
-| ---------------- | ------------------------------------------- | ----------- | -------- |
-| `page`           | `int`                                       |             | ✓        |
-| `page_size`      | `int`                                       |             | ✓        |
-| `query`          | `string`                                    |             | ✓        |
-| `tab_name`       | `string`                                    |             | ✓        |
-| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |          |
-| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |          |
-| `participating`  | `int\|null`                                 |             |          |
-| `recommended`    | `int\|null`                                 |             |          |
-| `sort_order`     | `null\|string`                              |             |          |
+| Name             | Type                                                                                | Description | Required |
+| ---------------- | ----------------------------------------------------------------------------------- | ----------- | -------- |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null`                                         |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`                                            |             |          |
+| `page`           | `int\|null`                                                                         |             |          |
+| `page_size`      | `int\|null`                                                                         |             |          |
+| `participating`  | `int\|null`                                                                         |             |          |
+| `query`          | `null\|string`                                                                      |             |          |
+| `recommended`    | `int\|null`                                                                         |             |          |
+| `sort_order`     | `'contestants'\|'duration'\|'ends'\|'none'\|'organizer'\|'signedup'\|'title'\|null` |             |          |
+| `tab_name`       | `'all'\|'current'\|'future'\|'past'\|null`                                          |             |          |
 
 ### Returns
 
-| Name                | Type                          |
-| ------------------- | ----------------------------- |
-| `number_of_results` | `number`                      |
-| `results`           | `List[types.ContestListItem]` |
+```typescript
+types.ContestListTabPayload;
+```
+
+## `/api/contest/listAllTabs/`
+
+### Description
+
+Returns paginated contest lists for current, past, and future in one API call.
+
+### Parameters
+
+| Name             | Type                                                                                | Description | Required |
+| ---------------- | ----------------------------------------------------------------------------------- | ----------- | -------- |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null`                                         |             |          |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`                                            |             |          |
+| `page`           | `int\|null`                                                                         |             |          |
+| `page_size`      | `int\|null`                                                                         |             |          |
+| `participating`  | `int\|null`                                                                         |             |          |
+| `query`          | `null\|string`                                                                      |             |          |
+| `recommended`    | `int\|null`                                                                         |             |          |
+| `sort_order`     | `'contestants'\|'duration'\|'ends'\|'none'\|'organizer'\|'signedup'\|'title'\|null` |             |          |
+| `tab_name`       | `'all'\|'current'\|'future'\|'past'\|null`                                          |             |          |
+
+### Returns
+
+| Name      | Type                          |
+| --------- | ----------------------------- |
+| `current` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
+
+| `future` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
+
+| `past` | `types.ContestListTabPayload` |
+
+**`types.ContestListTabPayload` fields:**
+
+| Name                | Type                          | Required |
+| ------------------- | ----------------------------- | -------- |
+| `number_of_results` | `number`                      | ✓        |
+| `results`           | `List[types.ContestListItem]` | ✓        |
 
 ## `/api/contest/listParticipating/`
 
@@ -1225,6 +1393,25 @@ Joins a contest - explicitly adds a identity to a contest.
 ### Returns
 
 _Nothing_
+
+## `/api/contest/problemChangeLogs/`
+
+### Description
+
+Returns the problem change log for a contest.
+Queries the Contest_Problem_Change_Log table directly to get the change history of problems in a contest, including additions, removals, and modifications.
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `contest_alias` | `string` |             | ✓        |
+
+### Returns
+
+| Name   | Type                                  |
+| ------ | ------------------------------------- |
+| `logs` | `List[types.ContestProblemChangeLog]` |
 
 ## `/api/contest/problemClarifications/`
 
@@ -1464,16 +1651,16 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `contest_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`        | `int\|null`                                                                                                                                                                                                         |             |          |
-| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`      | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `contest_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`        | `int\|null`                                                                                                                                                                                                               |             |          |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`      | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -2455,19 +2642,19 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                                                                                | Description | Required |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `assignment_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `course_alias`     | `string`                                                                                                                                                                                                            |             | ✓        |
-| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |          |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`           | `int\|null`                                                                                                                                                                                                         |             |          |
-| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |          |
-| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |          |
-| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`         | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name               | Type                                                                                                                                                                                                                      | Description | Required |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `course_alias`     | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`                 |             |          |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`           | `int\|null`                                                                                                                                                                                                               |             |          |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                                     |             |          |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                            |             |          |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`         | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -4333,15 +4520,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `offset`        | `int`                                                                                                                                                                                                               |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `rowcount`      | `int`                                                                                                                                                                                                               |             | ✓        |
-| `username`      | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `username`      | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -4721,9 +4908,19 @@ Details of a team group
 
 ### Returns
 
-| Name         | Type                                                                         |
-| ------------ | ---------------------------------------------------------------------------- |
-| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+| Name         | Type               |
+| ------------ | ------------------ |
+| `team_group` | `types.TeamsGroup` |
+
+**`types.TeamsGroup` fields:**
+
+| Name          | Type      | Required |
+| ------------- | --------- | -------- |
+| `alias`       | `string`  | ✓        |
+| `archived`    | `boolean` | ✓        |
+| `create_time` | `Date`    | ✓        |
+| `description` | `string`  |          |
+| `name`        | `string`  | ✓        |
 
 ## `/api/teamsGroup/list/`
 
@@ -4826,12 +5023,13 @@ Update an existing teams group
 
 ### Parameters
 
-| Name                  | Type        | Description | Required |
-| --------------------- | ----------- | ----------- | -------- |
-| `alias`               | `string`    |             | ✓        |
-| `description`         | `string`    |             | ✓        |
-| `name`                | `string`    |             | ✓        |
-| `numberOfContestants` | `int\|null` |             |          |
+| Name                  | Type         | Description | Required |
+| --------------------- | ------------ | ----------- | -------- |
+| `alias`               | `string`     |             | ✓        |
+| `description`         | `string`     |             | ✓        |
+| `name`                | `string`     |             | ✓        |
+| `archived`            | `bool\|null` |             |          |
+| `numberOfContestants` | `int\|null`  |             |          |
 
 ### Returns
 
@@ -5503,6 +5701,22 @@ Removes the role from the user.
 
 _Nothing_
 
+## `/api/user/reportReadme/`
+
+### Description
+
+Reports the README of a user's profile.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
 ## `/api/user/revokeAPIToken/`
 
 ### Description
@@ -5514,6 +5728,22 @@ Revokes an API token associated with the user.
 | Name   | Type     | Description                                                          | Required |
 | ------ | -------- | -------------------------------------------------------------------- | -------- |
 | `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/saveReadme/`
+
+### Description
+
+Saves (creates or updates) the README for the authenticated user's profile.
+
+### Parameters
+
+| Name     | Type           | Description | Required |
+| -------- | -------------- | ----------- | -------- |
+| `readme` | `null\|string` |             |          |
 
 ### Returns
 

@@ -20,24 +20,17 @@
         >
           {{ T.wordsContests }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="contests-items">
-            <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
-              {{ T.navViewContests }}
-            </a>
-            <template v-if="isMainUserIdentity">
-              <a class="dropdown-item" href="/scoreboardmerge/">
-                {{ T.contestsJoinScoreboards }}
-              </a>
-              <a
-                v-if="!isUnder13User"
-                class="dropdown-item"
-                href="/contest/new/"
-                data-nav-contests-create
-              >
-                {{ T.contestsCreate }}
-              </a>
-            </template>
+            <omegaup-navbar-item
+              v-for="(entry, index) in contestsEntries"
+              :key="`contests-item-${index}`"
+              :title="entry.title"
+              :description="entry.description"
+              :icon="entry.icon"
+              :href="entry.href"
+              v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+            />
           </slot>
         </div>
       </li>
@@ -46,6 +39,7 @@
           T.wordsContests
         }}</a>
       </li>
+
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-courses nav-item-align"
@@ -62,20 +56,17 @@
         >
           {{ T.navCourses }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="courses-items">
-            <a class="dropdown-item" href="/course/" data-nav-courses-all>
-              {{ T.navViewCourses }}
-            </a>
-            <template v-if="isMainUserIdentity && !isUnder13User">
-              <a
-                class="dropdown-item"
-                href="/course/new/"
-                data-nav-courses-create
-              >
-                {{ T.courseCreate }}
-              </a>
-            </template>
+            <omegaup-navbar-item
+              v-for="(entry, index) in coursesEntries"
+              :key="`courses-item-${index}`"
+              :title="entry.title"
+              :description="entry.description"
+              :icon="entry.icon"
+              :href="entry.href"
+              v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+            />
           </slot>
         </div>
       </li>
@@ -86,6 +77,7 @@
       >
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
+
       <li
         class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
@@ -101,60 +93,28 @@
         >
           {{ T.wordsProblems }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="problems-items">
-            <a
-              class="dropdown-item"
-              href="/problem/collection/"
-              data-nav-problems-collection
-              >{{ T.navViewProblems }}</a
-            >
-            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
-              T.navViewProblemsAll
-            }}</a>
-            <hr
-              style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
-            />
-            <a class="dropdown-item" href="/submissions/">{{
-              T.navViewLatestSubmissions
-            }}</a>
-            <template v-if="!isLoggedIn">
-              <a class="dropdown-item" href="/problem/creator/">{{
-                T.createZipFileForProblem
-              }}</a>
+            <template v-for="(entry, index) in problemsEntries">
+              <hr
+                v-if="entry.divider"
+                :key="`problems-divider-${index}`"
+                class="menu-divider"
+              />
+              <omegaup-navbar-item
+                v-else
+                :key="`problems-item-${index}`"
+                :title="entry.title"
+                :description="entry.description"
+                :icon="entry.icon"
+                :href="entry.href"
+                v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+              />
             </template>
-            <template v-else>
-              <form class="collapse-submenu">
-                <button
-                  type="button"
-                  class="dropdown-item dropdown-toggle"
-                  data-toggle="collapse"
-                  data-target=".collapse-links"
-                  data-nav-problems-create-options
-                  aria-expanded="false"
-                  aria-controls="collapse-links"
-                >
-                  {{ T.myproblemsListCreateProblem }}
-                </button>
-                <div class="collapse collapse-links pl-3">
-                  <a class="dropdown-item" href="/problem/creator/">{{
-                    T.myproblemsListCreateZipFileProblem
-                  }}</a>
-                  <a
-                    class="dropdown-item"
-                    href="/problem/new/"
-                    data-nav-problems-create
-                    >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
-                  >
-                </div>
-              </form>
-            </template>
-            <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
-              T.navQualityNominationQueue
-            }}</a>
           </slot>
         </div>
       </li>
+
       <li
         class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
@@ -169,28 +129,19 @@
         >
           {{ T.navRanking }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
-          <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
-          <a class="dropdown-item" href="/rank/compare/">{{
-            T.navCompareUsers
-          }}</a>
-          <a class="dropdown-item" href="/rank/authors/">{{
-            T.navAuthorRanking
-          }}</a>
-          <a class="dropdown-item" href="/rank/schools/">{{
-            T.navSchoolRanking
-          }}</a>
-          <a class="dropdown-item" href="/coderofthemonth/">{{
-            T.navCoderOfTheMonth
-          }}</a>
-          <a href="/coderofthemonth/female/" class="dropdown-item">{{
-            T.navCoderOfTheMonthFemale
-          }}</a>
-          <a class="dropdown-item" href="/schoolofthemonth/">{{
-            T.navSchoolOfTheMonth
-          }}</a>
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
+          <omegaup-navbar-item
+            v-for="(entry, index) in rankingEntries"
+            :key="`ranking-item-${index}`"
+            :title="entry.title"
+            :description="entry.description"
+            :icon="entry.icon"
+            :href="entry.href"
+            v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+          />
         </div>
       </li>
+
       <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
@@ -202,39 +153,24 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <a
-            class="dropdown-item"
-            href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
-            target="_blank"
-            >{{ T.navTutorials }}</a
-          >
-          <a
-            class="dropdown-item"
-            href="https://discord.com/invite/K3JFd9d3wk"
-            target="_blank"
-            >{{ T.navDiscord }}</a
-          >
-          <a
-            class="dropdown-item"
-            href="http://blog.omegaup.com/"
-            target="_blank"
-            >{{ T.navBlog }}</a
-          >
-          <a
-            class="dropdown-item text-wrap"
-            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view"
-            target="_blank"
-            >{{ T.navAlgorithmsBook }}</a
-          >
-          <a
-            class="dropdown-item text-wrap"
-            href="https://hdl.handle.net/11059/16567"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {{ T.navCompetitiveProgrammingDataStructuresBook }}
-          </a>
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
+          <template v-for="(entry, index) in helpEntries">
+            <hr
+              v-if="entry.divider"
+              :key="`help-divider-${index}`"
+              class="menu-divider"
+            />
+            <omegaup-navbar-item
+              v-else
+              :key="`help-item-${index}`"
+              :title="entry.title"
+              :description="entry.description"
+              :icon="entry.icon"
+              :href="entry.href"
+              :target="entry.target"
+              :rel="entry.rel"
+            />
+          </template>
         </div>
       </li>
     </ul>
@@ -245,8 +181,81 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import {
+  NavbarAccess,
+  NavbarMenuEntry,
+  visibleEntries,
+  contestsMenuEntries,
+  coursesMenuEntries,
+  problemsMenuEntries,
+  rankingMenuEntries,
+  helpMenuEntries,
+} from './navbarMenus';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faAward,
+  faBalanceScale,
+  faBook,
+  faBookmark,
+  faChalkboardTeacher,
+  faChartLine,
+  faClipboardCheck,
+  faCode,
+  faComments,
+  faDatabase,
+  faFileArchive,
+  faFlagCheckered,
+  faGraduationCap,
+  faHistory,
+  faLayerGroup,
+  faList,
+  faListOl,
+  faMedal,
+  faNewspaper,
+  faPen,
+  faPenNib,
+  faPlusCircle,
+  faRobot,
+  faSchool,
+  faTrophy,
+  faVideo,
+} from '@fortawesome/free-solid-svg-icons';
+import NavbarItem from './NavbarItem.vue';
 
-@Component
+library.add(
+  faAward,
+  faBalanceScale,
+  faBook,
+  faBookmark,
+  faChalkboardTeacher,
+  faChartLine,
+  faClipboardCheck,
+  faCode,
+  faComments,
+  faDatabase,
+  faFileArchive,
+  faFlagCheckered,
+  faGraduationCap,
+  faHistory,
+  faLayerGroup,
+  faList,
+  faListOl,
+  faMedal,
+  faNewspaper,
+  faPen,
+  faPenNib,
+  faPlusCircle,
+  faRobot,
+  faSchool,
+  faTrophy,
+  faVideo,
+);
+
+@Component({
+  components: {
+    'omegaup-navbar-item': NavbarItem,
+  },
+})
 export default class NavbarItems extends Vue {
   @Prop() omegaUpLockDown!: boolean;
   @Prop() inContest!: boolean;
@@ -258,12 +267,41 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
+
+  get access(): NavbarAccess {
+    return {
+      isLoggedIn: this.isLoggedIn,
+      isMainUserIdentity: this.isMainUserIdentity,
+      isUnder13User: this.isUnder13User,
+      isReviewer: this.isReviewer,
+    };
+  }
+
+  get contestsEntries(): NavbarMenuEntry[] {
+    return visibleEntries(contestsMenuEntries, this.access);
+  }
+
+  get coursesEntries(): NavbarMenuEntry[] {
+    return visibleEntries(coursesMenuEntries, this.access);
+  }
+
+  get problemsEntries(): NavbarMenuEntry[] {
+    return visibleEntries(problemsMenuEntries, this.access);
+  }
+
+  get rankingEntries(): NavbarMenuEntry[] {
+    return visibleEntries(rankingMenuEntries, this.access);
+  }
+
+  get helpEntries(): NavbarMenuEntry[] {
+    return visibleEntries(helpMenuEntries, this.access);
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 @media only screen and (max-width: 992px) {
-  .help-dropdown {
+  .navbar-item-dropdown {
     min-width: auto !important;
     width: auto !important;
     max-width: 85vw !important;
@@ -281,5 +319,11 @@ export default class NavbarItems extends Vue {
       display: block !important;
     }
   }
+}
+
+.menu-divider {
+  margin-top: 0em;
+  margin-bottom: 0em;
+  border-width: 2px;
 }
 </style>

@@ -21,6 +21,17 @@
             <span class="ml-2">{{ T.wordsExam }}</span>
           </template>
         </p>
+        <p v-if="assignment.finish_time" class="mb-0 mt-1 due-date">
+          <font-awesome-icon :icon="['fas', 'clock']" />
+          <span class="ml-1">{{
+            ui.formatString(T.assignmentCardDueDate, {
+              time: getFormattedTime(assignment.finish_time),
+            })
+          }}</span>
+          <span v-if="isOverdue" class="badge badge-danger ml-2">{{
+            T.wordsOverdue
+          }}</span>
+        </p>
       </div>
       <div>
         <a
@@ -70,6 +81,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
+import * as time from '../../time';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -77,10 +89,11 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faChalkboardTeacher,
+  faClock,
   faFileAlt,
   faListAlt,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faChalkboardTeacher, faFileAlt, faListAlt);
+library.add(faChalkboardTeacher, faClock, faFileAlt, faListAlt);
 
 @Component({
   components: {
@@ -95,6 +108,20 @@ export default class AssignmentCard extends Vue {
 
   T = T;
   ui = ui;
+
+  get isOverdue(): boolean {
+    if (!this.assignment.finish_time) {
+      return false;
+    }
+    return this.assignment.finish_time < new Date();
+  }
+
+  getFormattedTime(date: Date | null | undefined): string {
+    if (!date) {
+      return '—';
+    }
+    return time.formatDateTime(date);
+  }
 }
 </script>
 
@@ -104,6 +131,10 @@ export default class AssignmentCard extends Vue {
 .assignment-type {
   font-size: 1.05rem;
   font-weight: 600;
+}
+.due-date {
+  font-size: 0.9rem;
+  color: $omegaup-grey;
 }
 .progress-bar {
   background-color: $omegaup-yellow;

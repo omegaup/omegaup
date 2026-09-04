@@ -284,7 +284,7 @@ class Grader {
         ];
 
         foreach ($retryableErrors as $retryableError) {
-            if (strpos($errorMessage, $retryableError) !== false) {
+            if (str_contains($errorMessage, $retryableError)) {
                 return true;
             }
         }

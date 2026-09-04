@@ -17,6 +17,7 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
 
 BADGES_PATH = os.path.abspath(
     os.path.join(__file__, '..', '..', '..', 'frontend/badges'))
@@ -32,8 +33,9 @@ def get_all_owners(
               encoding='utf-8') as fd:
         query = fd.read()
     if current_timestamp is not None:
-        query = query.replace(
-            'NOW()', f"'{current_timestamp.strftime('%Y-%m-%d %H:%M:%S')}'")
+        # Bind the timestamp instead of splicing it into the query text.
+        cur_readonly.execute('SET @current_time = %s;', (current_timestamp,))
+        query = query.replace('NOW()', '@current_time')
     cur_readonly.execute(query)
     return set(row['user_id'] for row in cur_readonly)
 
@@ -43,13 +45,13 @@ def get_current_owners(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
 ) -> Set[int]:
     '''Returns a set of ids of current badge owners'''
-    cur_readonly.execute(f'''
+    cur_readonly.execute('''
         SELECT
             ub.user_id
         FROM
             Users_Badges ub
         WHERE
-            ub.badge_alias = '{badge}';''')
+            ub.badge_alias = %s;''', (badge,))
     return set(row['user_id'] for row in cur_readonly)
 
 
@@ -79,23 +81,50 @@ def save_new_owners(badge: str, users: Set[int],
 
 def process_badges(
     current_timestamp: Optional[datetime.datetime],
+    dbconn: lib.db.Connection,
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-) -> None:
-    '''Processes all badges'''
+) -> bool:
+    '''Processes all badges.
+
+    Returns True if at least one badge failed, False otherwise.
+    '''
     badges = [f.name for f in os.scandir(BADGES_PATH) if f.is_dir()]
+    has_failures = False
+    successful = 0
+    failed_badges = []
     for badge in badges:
         logging.info('==== Badge %s ====', badge)
         try:
-            all_owners = get_all_owners(badge, current_timestamp, cur_readonly)
+            all_owners = get_all_owners(badge, current_timestamp,
+                                        cur_readonly)
             current_owners = get_current_owners(badge, cur_readonly)
             new_owners = all_owners - current_owners
             logging.info('New owners: %s', new_owners)
             if new_owners:
                 save_new_owners(badge, new_owners, cur)
-        except:  # noqa: bare-except
+            dbconn.conn.commit()
+            successful += 1
+        except Exception:  # pylint: disable=broad-except
+            dbconn.conn.rollback()
+            has_failures = True
+            failed_badges.append(badge)
             logging.exception('Something went wrong with badge: %s.', badge)
-            raise
+    logging.info(
+        'assign_badges summary: total=%d successful=%d failed=%d',
+        len(badges),
+        successful,
+        len(failed_badges),
+        extra={
+            'badges_total': len(badges),
+            'badges_successful': successful,
+            'badges_failed': len(failed_badges),
+        },
+    )
+    if failed_badges:
+        logging.error('Badges that failed to process: %s',
+                      ', '.join(failed_badges))
+    return has_failures
 
 
 def main() -> None:
@@ -109,23 +138,38 @@ def main() -> None:
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-    dbconn_readonly = lib.db.connect_readonly(
-        lib.db.DatabaseConnectionArguments.from_args_readonly(args)) or dbconn
-    try:
-        with dbconn.cursor(buffered=True,
-                           dictionary=True) as cur, dbconn_readonly.cursor(
-                               buffered=True, dictionary=True) as cur_readonly:
-            process_badges(args.current_timestamp, cur, cur_readonly)
-        dbconn.conn.commit()
-    finally:
-        dbconn.conn.close()
-        logging.info('Finished')
+    has_failures = False
+    with lib.runner.run(parser.prog, args) as cron_run:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
+        dbconn_readonly = lib.db.connect_readonly(
+            lib.db.DatabaseConnectionArguments.from_args_readonly(
+                args)) or dbconn
+        try:
+            with dbconn.cursor(buffered=True,
+                               dictionary=True) as cur, (
+                                   dbconn_readonly.cursor(
+                                       buffered=True,
+                                       dictionary=True)) as cur_readonly:
+                with cron_run.phase('process_badges'):
+                    has_failures = process_badges(args.current_timestamp,
+                                                  dbconn, cur, cur_readonly)
+            dbconn.conn.commit()
+        finally:
+            dbconn.conn.close()
+            if dbconn_readonly is not dbconn:
+                dbconn_readonly.conn.close()
+            logging.info('Finished')
+        if has_failures:
+            cron_run.mark_failure()
+    if has_failures:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

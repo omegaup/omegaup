@@ -1,6 +1,6 @@
 <template>
-  <div class="card ranking-width">
-    <ul class="nav nav-tabs justify-content-arround" role="tablist">
+  <div class="card w-100">
+    <ul class="nav nav-tabs justify-content-around" role="tablist">
       <li v-for="tab in availableTabs" :key="tab.id" class="nav-item">
         <a
           :href="getTabName(tab)"
@@ -147,17 +147,18 @@ export default class CoderOfTheMonthList extends Vue {
   border-top-left-radius: 0rem;
   border-top-right-radius: 0rem;
 }
-.nav .nav-tabs {
+
+.nav-tabs {
   border-bottom: 0rem;
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .nav-link {
   font-weight: medium;
   letter-spacing: 0.022rem;
   padding: 0.65rem 1rem;
-}
-.ranking-width {
-  max-width: 55rem;
-  margin: 0 auto;
+  white-space: nowrap;
 }
 </style>

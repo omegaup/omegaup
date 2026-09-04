@@ -10,6 +10,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     protected $admin;
     protected $problemData;
     protected $identity;
+    protected $problemDataWithDiff;
 
     public function setUp(): void {
         parent::setUp();
@@ -25,6 +26,14 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             login: $adminLogin,
         );
 
+        // Get a problem with show_diff='all'
+        $this->problemDataWithDiff = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'show_diff' => 'all',
+            ]),
+            $adminLogin,
+        );
+
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $this->problemData,
@@ -35,6 +44,16 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'identity' => $this->identity
         ] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $this->contestData,
+            $this->identity
+        );
+
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $this->contestData['contest'],
+            $this->identity
+        );
     }
 
     private function assertCanSeeRunDetails(
@@ -134,12 +153,14 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * Download run details and assert the content of the output files is correct
+     */
     public function testDownload() {
-        $adminLogin = self::login($this->admin);
         $login = self::login($this->identity);
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $this->problemData,
+            $this->problemDataWithDiff,
             $this->identity,
             $login
         );
@@ -196,6 +217,80 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
             $this->assertSame($content, $fileContent);
         }
+    }
+
+    /**
+     * Download should be blocked when the problem has show_diff='none'
+     */
+    public function testDownloadBlockedWhenShowDiffNone() {
+        $login = self::login($this->identity);
+
+        // Default problem has show_diff='none'
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    /**
+     * During an active contest, download should be blocked even if the problem has show_diff='all'
+     */
+    public function testDownloadBlockedDuringActiveContest() {
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $this->problemDataWithDiff,
+            $this->contestData
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $this->problemDataWithDiff,
+            $this->contestData,
+            $this->identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 60);
+
+        $login = self::login($this->identity);
+
+        // During the active contest, download should be blocked
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+            'run_alias' => $runData['response']['guid'],
+            'auth_token' => $login->auth_token,
+            'show_diff' => true,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        $finishTime = $this->contestData['request']['finish_time'];
+        \OmegaUp\Time::setTimeForTesting($finishTime + 1);
+         $login = self::login($this->identity);
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+            'run_alias' => $runData['response']['guid'],
+            'auth_token' => $login->auth_token,
+            'show_diff' => true,
+            ]));
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // Expected — apiDownload always exits this way on success.
+        }
+        $zipContents = ob_end_clean();
+        $this->assertNotEmpty($zipContents);
     }
 
     /**

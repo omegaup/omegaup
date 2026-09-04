@@ -113,4 +113,35 @@ describe('Countdown.vue', () => {
     await jest.advanceTimersByTime(timeDelta);
     expect(wrapper.emitted('finish')).toBeDefined();
   });
+
+  it('Should clear interval when component is destroyed before countdown finishes', () => {
+    const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
+    const wrapper = shallowMount(omegaup_Countdown, {
+      propsData: {
+        targetTime: new Date(now + 60000),
+      },
+    });
+
+    expect((wrapper.vm as any).timerInterval).not.toBe(0);
+    wrapper.destroy();
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    expect((wrapper.vm as any).timerInterval).toBe(0);
+    clearIntervalSpy.mockRestore();
+  });
+
+  it('Should handle destroy gracefully when countdown has already finished', () => {
+    const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
+    const wrapper = shallowMount(omegaup_Countdown, {
+      propsData: {
+        targetTime: new Date(now - 5000),
+      },
+    });
+
+    // With fake timers, the watcher hasn't fired yet, so the interval
+    // is still active. beforeDestroy should clean it up.
+    wrapper.destroy();
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    expect((wrapper.vm as any).timerInterval).toBe(0);
+    clearIntervalSpy.mockRestore();
+  });
 });

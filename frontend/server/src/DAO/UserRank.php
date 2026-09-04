@@ -163,18 +163,16 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             WHERE
                 `ur`.`author_score` IS NOT NULL AND
                 `ur`.`author_ranking` IS NOT NULL AND
-                (
+                EXISTS (
                     SELECT
-                        COUNT(*)
+                        1
                     FROM
                         `Problems` `p`
                     INNER JOIN
                         `ACLs` `acl` ON `p`.`acl_id` = `acl`.`acl_id`
-                    INNER JOIN
-                        `Users` `u` ON `u`.`user_id` = `acl`.`owner_id`
                     WHERE
-                    `u`.`user_id` = `ur`.`user_id` AND `p`.`quality_seal` = 1
-                ) > 0
+                        `acl`.`owner_id` = `ur`.`user_id` AND `p`.`quality_seal` = 1
+                )
         ';
         $sqlCount = '
             SELECT

@@ -140,4 +140,34 @@ describe('Upload.vue', () => {
     expect(wrapper.emitted('read-csv')).toBeDefined();
     mockReadFileMethod.mockRestore();
   });
+
+  it('Should emit the updated contestants limit when reading a csv file', async () => {
+    const wrapper = mount(teamsgroup_Upload, {
+      propsData: {
+        numberOfContestants: 3,
+        searchResultUsers: [] as types.ListItem[],
+      },
+    });
+
+    await wrapper.setProps({
+      numberOfContestants: 5,
+    });
+
+    const validFile = new File([''], 'users.csv', { type: 'text/csv' });
+    const mockReadFileMethod = jest
+      .spyOn(wrapper.vm, 'readFile')
+      .mockImplementation(() => validFile);
+
+    await wrapper.find('input[type=file]').trigger('change');
+
+    expect(wrapper.emitted('read-csv')).toEqual([
+      [
+        expect.objectContaining({
+          file: validFile,
+          numberOfContestants: 5,
+        }),
+      ],
+    ]);
+    mockReadFileMethod.mockRestore();
+  });
 });

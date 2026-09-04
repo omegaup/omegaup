@@ -202,11 +202,16 @@ export default class GroupEdit extends Vue {
 
   @Watch('tab')
   onInitialTabChanged(newValue: AvailableTabs): void {
-    if (!Object.values(AvailableTabs).includes(this.tab)) {
+    if (!Object.values(AvailableTabs).includes(newValue)) {
       this.selectedTab = AvailableTabs.Members;
       return;
     }
     this.selectedTab = newValue;
+  }
+
+  @Watch('selectedTab')
+  onSelectedTabChanged(newValue: AvailableTabs): void {
+    this.$emit('update:tab', newValue);
   }
 
   @Watch('identities')

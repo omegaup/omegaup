@@ -106,6 +106,83 @@ describe('CollectionList.vue', () => {
     expect(radioInput2.checked).toBeFalsy();
   });
 
+  it('Should toggle problem tags visibility', async () => {
+    const wrapper = mount(problem_CollectionList, {
+      propsData: {
+        data: {
+          level: 'problemLevelBasicIntroductionToProgramming',
+          frequentTags: [] as types.TagWithProblemCount[],
+          publicTags: [],
+        },
+        problems: [
+          {
+            alias: 'Problem-1',
+            title: 'Problem 1',
+            difficulty: 2,
+            points: 100,
+            problem_id: 1,
+            quality: 2,
+            ratio: 0,
+            accepted: 0,
+            submissions: 0,
+            visibility: 2,
+            tags: [
+              {
+                name: 'problemTagMatrices',
+                source: 'owner',
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    // Toggle switch should display its label text
+    expect(wrapper.find('[data-problem-tags-toggle]').text()).toContain(
+      T.userEditShowProblemTags,
+    );
+    // Toggle is initially checked (tags visible)
+    const toggleInput = wrapper.find(
+      '[data-problem-tags-toggle] input[type="checkbox"]',
+    );
+    expect((toggleInput.element as HTMLInputElement).checked).toBe(true);
+    expect(wrapper.findAll('tbody a.badge').length).toBe(1);
+    // Check that header badges (tag classification indicators) are visible
+    expect(
+      wrapper.findAll('thead .badge.custom-badge-quality').length,
+    ).toBeGreaterThan(0);
+    expect(
+      wrapper.findAll('thead .badge.custom-badge-owner').length,
+    ).toBeGreaterThan(0);
+    expect(
+      wrapper.findAll('thead .badge.custom-badge-voted').length,
+    ).toBeGreaterThan(0);
+
+    // Click the checkbox to toggle off (hide tags)
+    await toggleInput.setChecked(false);
+    expect((toggleInput.element as HTMLInputElement).checked).toBe(false);
+    expect(wrapper.findAll('tbody a.badge').length).toBe(0);
+    // Check that header badges (tag classification indicators) are hidden
+    expect(wrapper.findAll('thead .badge.custom-badge-quality').length).toBe(0);
+    expect(wrapper.findAll('thead .badge.custom-badge-owner').length).toBe(0);
+    expect(wrapper.findAll('thead .badge.custom-badge-voted').length).toBe(0);
+
+    // Click the checkbox to toggle on (show tags)
+    await toggleInput.setChecked(true);
+    expect((toggleInput.element as HTMLInputElement).checked).toBe(true);
+    expect(wrapper.findAll('tbody a.badge').length).toBe(1);
+    // Check that header badges (tag classification indicators) are visible again
+    expect(
+      wrapper.findAll('thead .badge.custom-badge-quality').length,
+    ).toBeGreaterThan(0);
+    expect(
+      wrapper.findAll('thead .badge.custom-badge-owner').length,
+    ).toBeGreaterThan(0);
+    expect(
+      wrapper.findAll('thead .badge.custom-badge-voted').length,
+    ).toBeGreaterThan(0);
+  });
+
   it('Should handle empty list of problems in collection by level', async () => {
     const wrapper = mount(problem_CollectionList, {
       propsData: {

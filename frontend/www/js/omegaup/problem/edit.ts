@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     ui.success(T.problemEditUpdatedSuccessfully);
   }
   const solutions: types.Statements = {
-    [payload.statement?.language || 'es']: payload.solution?.markdown || '',
+    [payload.solution?.language || 'es']: payload.solution?.markdown || '',
   };
   const problemEdit = new Vue({
     el: '#main-container',
@@ -112,14 +112,24 @@ OmegaUp.on('ready', () => {
                 { quiet: true },
               )
                 .then((response) => {
-                  if (response.statement.language !== language) {
-                    response.statement.markdown = '';
-                  }
-                  statements[language] = response.statement.markdown;
-                  problemEdit.statement = response.statement;
+                  const statement = response.statement;
+                  const statementMarkdown =
+                    statement.language === language ? statement.markdown : '';
+                  statements[language] = statementMarkdown;
+                  problemEdit.statement = {
+                    ...statement,
+                    language,
+                    markdown: statementMarkdown,
+                  };
                 })
                 .catch((error) => {
                   if (error.httpStatusCode == 404) {
+                    statements[language] = '';
+                    problemEdit.statement = {
+                      ...problemEdit.statement,
+                      language,
+                      markdown: '',
+                    };
                     return;
                   }
                   ui.apiError(error);
@@ -127,7 +137,11 @@ OmegaUp.on('ready', () => {
             } else {
               problemEdit.solution.markdown = currentMarkdown;
               if (Object.prototype.hasOwnProperty.call(solutions, language)) {
-                problemEdit.solution.markdown = solutions[language];
+                problemEdit.solution = {
+                  ...problemEdit.solution,
+                  language,
+                  markdown: solutions[language],
+                };
                 return;
               }
               api.Problem.solution(
@@ -143,14 +157,23 @@ OmegaUp.on('ready', () => {
                     markdown: '',
                     images: {},
                   };
-                  if (solution.language !== language) {
-                    solution.markdown = '';
-                  }
-                  solutions[language] = solution.markdown;
-                  problemEdit.solution = solution;
+                  const solutionMarkdown =
+                    solution.language === language ? solution.markdown : '';
+                  solutions[language] = solutionMarkdown;
+                  problemEdit.solution = {
+                    ...solution,
+                    language,
+                    markdown: solutionMarkdown,
+                  };
                 })
                 .catch((error) => {
                   if (error.httpStatusCode == 404) {
+                    solutions[language] = '';
+                    problemEdit.solution = {
+                      ...problemEdit.solution,
+                      language,
+                      markdown: '',
+                    };
                     return;
                   }
                   ui.apiError(error);

@@ -53,11 +53,6 @@
     {% endif %}
     <main role="main" class="flex-grow-1{% if not fullWidth %} container-lg py-5 px-3 px-md-5{% endif %}">
       <div id="global-notifications" role="status" aria-live="polite" aria-atomic="false" aria-relevant="additions"></div>
-      {% if OMEGAUP_MAINTENANCE %}
-        <div id="announcement" class="alert alert-info mt-0">
-          {{ OMEGAUP_MAINTENANCE|raw }}
-        </div>
-      {% endif %}
 
       <script type="text/json" id="payload">{{ payload|json_encode|raw }}</script>
       {% entrypoint %}
@@ -67,8 +62,7 @@
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
-    {% jsInclude 'common_scroll_to_top' omitRuntime %}
-      <div id="scroll-to-top"></div>
+
     {% jsInclude 'common_footer' omitRuntime %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}
       <div id="common-footer"></div>

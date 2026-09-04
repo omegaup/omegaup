@@ -41,7 +41,12 @@ class Experiments {
     /**
      * An array with all the known experiments.
      */
+    const USER_README = 'user_readme';
+    const PROBLEM_CREATION_METHOD_SELECTOR = 'problem_creation_method_selector';
+
     private const KNOWN_EXPERIMENTS = [
+        self::USER_README,
+        self::PROBLEM_CREATION_METHOD_SELECTOR,
     ];
 
     /**
@@ -229,6 +234,14 @@ class Experiments {
             self::EXPERIMENT_PREFIX . strtoupper($name),
             $defines
         );
+    }
+
+    /**
+     * Resets the global instance so that it will be recreated on the next call
+     * to getInstance(). Useful in tests when experiment defines change.
+     */
+    public static function resetInstance(): void {
+        self::$_instance = null;
     }
 
     /**

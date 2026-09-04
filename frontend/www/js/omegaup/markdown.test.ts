@@ -10,10 +10,10 @@ describe('markdown', () => {
 
     it('Should handle templates', () => {
       expect(converter.makeHtml('{{libinteractive:download}}')).toEqual(
-        '<p><code class="libinteractive-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+        '<p><code class="libinteractive-download">📥</code></p>',
       );
       expect(converter.makeHtml('{{output-only:download}}')).toEqual(
-        '<p><code class="output-only-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+        '<p><code class="output-only-download">📥</code></p>',
       );
     });
 
