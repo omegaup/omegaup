@@ -22,6 +22,7 @@ import unittest
 from typing import Any, Dict, List, Optional, Tuple, cast
 from unittest import mock
 
+import lib.db
 from cron import cron_dispatcher
 from cron.cron_dispatcher import RequestStatus
 
@@ -521,6 +522,29 @@ class DbCommandArgsTest(unittest.TestCase):
         '''lib.db only reads the config file when --user is absent.'''
         with cron_dispatcher.db_command_args(self._args('hunter2')) as command:
             self.assertNotIn('--user', command)
+
+    def test_a_password_with_a_percent_sign_survives_the_round_trip(
+            self) -> None:
+        '''`%` is an escape to configparser's default interpolation.'''
+        password = 'pa%ss%(word)s'
+        with cron_dispatcher.db_command_args(
+                self._args(password)) as command:
+            config_file = command[command.index('--mysql-config-file') + 1]
+            captured: Dict[str, Any] = {}
+
+            def fake_connect(**kwargs: Any) -> Any:
+                captured.update(kwargs)
+                return mock.MagicMock()
+
+            with mock.patch('mysql.connector.connect', fake_connect):
+                lib.db.connect(
+                    lib.db.DatabaseConnectionArguments(
+                        host=None, user=None, password=None,  # type: ignore
+                        mysql_config_file=config_file,
+                        database='omegaup', port=13306))
+
+        self.assertEqual(captured['password'], password)
+        self.assertEqual(captured['user'], 'omegaup')
 
 
 class RunScriptTest(unittest.TestCase):
