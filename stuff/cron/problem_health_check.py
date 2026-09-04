@@ -64,7 +64,9 @@ def find_judge_errors(
     '''Finds problems that are failing to judge the submissions they get.
 
     Only judged submissions count, on both sides of the ratio: one still
-    waiting for a runner carries a verdict it was never given.
+    waiting for a runner carries a verdict it was never given. Only `normal`
+    ones count either, so a setter testing a broken validator against their
+    own problem does not report it as broken for everybody else.
 
     Both thresholds must hold: enough failures to rule out a one-off, and
     enough of the problem's own traffic to rule out a flaky submission.
@@ -83,7 +85,8 @@ def find_judge_errors(
             FROM `Submissions` `s`
             WHERE
                 `s`.`time` >= %s AND
-                `s`.`status` = 'ready'
+                `s`.`status` = 'ready' AND
+                `s`.`type` = 'normal'
             GROUP BY `s`.`problem_id`
             HAVING
                 `error_count` >= %s AND
@@ -139,28 +142,38 @@ def find_never_solved(
 
     Problems younger than the cutoff are skipped: a hard problem published
     this week has simply not had the time to be solved yet.
+
+    `Problems`.`submissions` counts every submission a problem ever took, of
+    every type, so the attempts are counted again over `normal` ones only.
+    The counter still narrows the candidates first, which it can do safely
+    because it never undercounts them.
     '''
     cur.execute(
         '''
         SELECT
             `p`.`problem_id`,
-            `p`.`submissions`
+            COUNT(*) AS `submission_count`
         FROM `Problems` `p`
+        INNER JOIN `Submissions` `s` ON `s`.`problem_id` = `p`.`problem_id`
         WHERE
             `p`.`visibility` >= %s AND
             `p`.`deprecated` = 0 AND
             `p`.`languages` <> '' AND
             `p`.`accepted` = 0 AND
             `p`.`submissions` >= %s AND
-            `p`.`creation_date` <= %s;''',
-        (PROBLEM_VISIBILITY_PUBLIC, min_submissions, created_before))
+            `p`.`creation_date` <= %s AND
+            `s`.`type` = 'normal'
+        GROUP BY `p`.`problem_id`
+        HAVING `submission_count` >= %s;''',
+        (PROBLEM_VISIBILITY_PUBLIC, min_submissions, created_before,
+         min_submissions))
     return [
         Finding(
             problem_id=int(row['problem_id']),
             check_type=CheckType.NEVER_SOLVED,
             severity=Severity.WARNING,
-            detail=(f'{int(row["submissions"])} submissions and no accepted '
-                    f'solution yet'),
+            detail=(f'{int(row["submission_count"])} submissions and no '
+                    f'accepted solution yet'),
         ) for row in cur.fetchall()
     ]
 
@@ -266,6 +279,38 @@ def apply_findings(
     return resolved
 
 
+def _positive_int(value: str) -> int:
+    '''Parses a threshold that stops meaning anything below one.'''
+    parsed = int(value)
+    if parsed < 1:
+        raise argparse.ArgumentTypeError(
+            f'expected an integer greater than 0, got {parsed}')
+    return parsed
+
+
+def _non_negative_int(value: str) -> int:
+    '''Parses a grace period, where zero is none rather than nonsense.'''
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError(
+            f'expected an integer of 0 or more, got {parsed}')
+    return parsed
+
+
+def _ratio(value: str) -> float:
+    '''Parses a fraction of a problem's submissions, in (0, 1].
+
+    A whole one is the strictest a share can be asked to get and a problem
+    can still reach it, but nothing above one is ever reachable, and zero
+    asks for no share at all.
+    '''
+    parsed = float(value)
+    if not 0 < parsed <= 1:
+        raise argparse.ArgumentTypeError(
+            f'expected a ratio greater than 0 and at most 1, got {parsed}')
+    return parsed
+
+
 def build_parser() -> argparse.ArgumentParser:
     '''Returns an argparse.ArgumentParser for this tool.'''
     parser = argparse.ArgumentParser(
@@ -276,28 +321,28 @@ def build_parser() -> argparse.ArgumentParser:
 
     thresholds = parser.add_argument_group('Thresholds')
     thresholds.add_argument('--judge-error-window-hours',
-                            type=int,
+                            type=_positive_int,
                             default=_JUDGE_ERROR_WINDOW_HOURS,
                             help='How far back to look for judge or '
                             'validator errors.')
     thresholds.add_argument('--min-judge-errors',
-                            type=int,
+                            type=_positive_int,
                             default=_MIN_JUDGE_ERRORS,
                             help='How many judge or validator errors a '
                             'problem needs in the window to count as a '
                             'finding.')
     thresholds.add_argument('--min-judge-error-ratio',
-                            type=float,
+                            type=_ratio,
                             default=_MIN_JUDGE_ERROR_RATIO,
                             help='Which fraction of a problem\'s submissions '
                             'in the window must have failed to be judged.')
     thresholds.add_argument('--min-submissions-never-solved',
-                            type=int,
+                            type=_positive_int,
                             default=_MIN_SUBMISSIONS_NEVER_SOLVED,
                             help='How many submissions a problem needs before '
                             'never having been solved counts as a finding.')
     thresholds.add_argument('--min-age-days-never-solved',
-                            type=int,
+                            type=_non_negative_int,
                             default=_MIN_AGE_DAYS_NEVER_SOLVED,
                             help='How old a problem must be before never '
                             'having been solved counts as a finding.')

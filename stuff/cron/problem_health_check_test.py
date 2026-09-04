@@ -10,6 +10,7 @@ query plans, and the `enum` columns, which SQLite stores as plain text.
 '''
 
 import datetime
+import io
 import os
 import re
 import sqlite3
@@ -47,7 +48,8 @@ CREATE TABLE `Submissions` (
     `problem_id` INTEGER NOT NULL,
     `verdict` TEXT NOT NULL,
     `status` TEXT NOT NULL DEFAULT 'ready',
-    `time` TEXT NOT NULL
+    `time` TEXT NOT NULL,
+    `type` TEXT DEFAULT 'normal'
 );
 CREATE TABLE `Problem_Health_Checks` (
     `check_id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -181,14 +183,22 @@ class _Fixture(unittest.TestCase):
                         verdict: str,
                         count: int,
                         when: datetime.datetime = _IN_WINDOW,
-                        status: str = 'ready') -> None:
-        '''Seeds `count` submissions on one problem.'''
+                        status: str = 'ready',
+                        submission_type: str = 'normal') -> None:
+        '''Seeds `count` submissions on one problem.
+
+        `Problems`.`submissions` moves with them, whatever their type, which
+        is what the site itself does with that counter.
+        '''
         for _ in range(count):
             self.db.conn.execute(
                 'INSERT INTO `Submissions` '
-                '(`problem_id`, `verdict`, `status`, `time`) '
-                'VALUES (?, ?, ?, ?)',
-                (problem_id, verdict, status, when))
+                '(`problem_id`, `verdict`, `status`, `time`, `type`) '
+                'VALUES (?, ?, ?, ?, ?)',
+                (problem_id, verdict, status, when, submission_type))
+        self.db.conn.execute(
+            'UPDATE `Problems` SET `submissions` = `submissions` + ? '
+            'WHERE `problem_id` = ?', (count, problem_id))
         self.db.conn.commit()
 
     def open_findings(self) -> List[Dict[str, Any]]:
@@ -358,6 +368,33 @@ class TestJudgeErrors(_Fixture):
         self.assertEqual(len(findings), 1)
         self.assertIn('3 of 3 submissions', findings[0].detail)
 
+    def test_a_setters_own_test_submissions_are_not_errors(self) -> None:
+        '''A setter debugging their validator is not a site-wide outage.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 8, submission_type='test')
+
+        self.assertEqual(
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
+
+    def test_disqualified_submissions_are_not_errors(self) -> None:
+        '''A disqualified submission no longer speaks for the problem.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 8, submission_type='disqualified')
+
+        self.assertEqual(
+            problem_health_check.find_judge_errors(self.cursor, _NOW), [])
+
+    def test_non_normal_submissions_do_not_pad_the_ratio(self) -> None:
+        '''Counting them in the denominator would hide a broken problem.'''
+        self.add_problem(7)
+        self.add_submissions(7, 'JE', 3)
+        self.add_submissions(7, 'AC', 27, submission_type='test')
+
+        findings = problem_health_check.find_judge_errors(self.cursor, _NOW)
+
+        self.assertEqual(len(findings), 1)
+        self.assertIn('3 of 3 submissions', findings[0].detail)
+
     def test_a_shorter_window_excludes_older_errors(self) -> None:
         '''The window the caller asks for is the one the query uses.'''
         self.add_problem(7)
@@ -424,7 +461,8 @@ class TestNeverSolved(_Fixture):
 
     def test_many_attempts_and_no_success_is_reported(self) -> None:
         '''A problem nobody solved is reported with how many tried.'''
-        self.add_problem(5, submissions=42, accepted=0)
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 42)
 
         findings = problem_health_check.find_never_solved(
             self.cursor, _CREATED_BEFORE)
@@ -441,7 +479,8 @@ class TestNeverSolved(_Fixture):
 
     def test_too_few_attempts_are_ignored(self) -> None:
         '''Below the threshold nobody has really tried yet.'''
-        self.add_problem(5, submissions=19, accepted=0)
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 19)
 
         self.assertEqual(
             problem_health_check.find_never_solved(self.cursor,
@@ -449,7 +488,8 @@ class TestNeverSolved(_Fixture):
 
     def test_a_solved_problem_is_healthy(self) -> None:
         '''One accepted solution proves the problem works.'''
-        self.add_problem(5, submissions=42, accepted=1)
+        self.add_problem(5, accepted=1)
+        self.add_submissions(5, 'WA', 42)
 
         self.assertEqual(
             problem_health_check.find_never_solved(self.cursor,
@@ -457,10 +497,8 @@ class TestNeverSolved(_Fixture):
 
     def test_a_brand_new_problem_is_given_time(self) -> None:
         '''A hard problem published yesterday is not yet a finding.'''
-        self.add_problem(5,
-                         submissions=42,
-                         accepted=0,
-                         creation_date=_BRAND_NEW)
+        self.add_problem(5, accepted=0, creation_date=_BRAND_NEW)
+        self.add_submissions(5, 'WA', 42)
 
         self.assertEqual(
             problem_health_check.find_never_solved(self.cursor,
@@ -468,7 +506,8 @@ class TestNeverSolved(_Fixture):
 
     def test_a_problem_with_no_languages_is_left_to_that_check(self) -> None:
         '''Nobody can solve it, and `no_languages` already reports it.'''
-        self.add_problem(5, submissions=42, accepted=0, languages='')
+        self.add_problem(5, accepted=0, languages='')
+        self.add_submissions(5, 'WA', 42)
 
         self.assertEqual(
             problem_health_check.find_never_solved(self.cursor,
@@ -476,8 +515,10 @@ class TestNeverSolved(_Fixture):
 
     def test_private_and_deprecated_problems_are_excluded(self) -> None:
         '''Only problems on offer to users are reported.'''
-        self.add_problem(5, visibility=0, submissions=42)
-        self.add_problem(6, deprecated=1, submissions=42)
+        self.add_problem(5, visibility=0)
+        self.add_submissions(5, 'WA', 42)
+        self.add_problem(6, deprecated=1)
+        self.add_submissions(6, 'WA', 42)
 
         self.assertEqual(
             problem_health_check.find_never_solved(self.cursor,
@@ -485,13 +526,64 @@ class TestNeverSolved(_Fixture):
 
     def test_the_threshold_is_honoured(self) -> None:
         '''A caller that lowers the threshold sees the finding.'''
-        self.add_problem(5, submissions=7, accepted=0)
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 7)
 
         self.assertEqual(
             len(
                 problem_health_check.find_never_solved(self.cursor,
                                                        _CREATED_BEFORE,
                                                        min_submissions=7)), 1)
+
+    def test_a_setters_own_test_submissions_are_not_attempts(self) -> None:
+        '''Nobody but the setter has tried it, so nobody has failed it.'''
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 42, submission_type='test')
+
+        self.assertEqual(
+            problem_health_check.find_never_solved(self.cursor,
+                                                   _CREATED_BEFORE), [])
+
+    def test_disqualified_submissions_are_not_attempts(self) -> None:
+        '''A disqualified submission is not evidence the problem is hard.'''
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 42, submission_type='disqualified')
+
+        self.assertEqual(
+            problem_health_check.find_never_solved(self.cursor,
+                                                   _CREATED_BEFORE), [])
+
+    def test_only_the_normal_attempts_are_counted(self) -> None:
+        '''The detail reports the attempts that count, not the traffic.'''
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 30)
+        self.add_submissions(5, 'WA', 30, submission_type='test')
+
+        findings = problem_health_check.find_never_solved(
+            self.cursor, _CREATED_BEFORE)
+
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].detail,
+                         '30 submissions and no accepted solution yet')
+
+    def test_test_submissions_cannot_carry_a_problem_over_the_line(
+            self) -> None:
+        '''The setter's own runs must not make five people look like many.'''
+        self.add_problem(5, accepted=0)
+        self.add_submissions(5, 'WA', 5)
+        self.add_submissions(5, 'WA', 30, submission_type='test')
+
+        self.assertEqual(
+            problem_health_check.find_never_solved(self.cursor,
+                                                   _CREATED_BEFORE), [])
+
+    def test_the_stored_counter_alone_is_not_a_finding(self) -> None:
+        '''The attempts are counted from the rows, not from the counter.'''
+        self.add_problem(5, submissions=42, accepted=0)
+
+        self.assertEqual(
+            problem_health_check.find_never_solved(self.cursor,
+                                                   _CREATED_BEFORE), [])
 
 
 class TestDeprecatedPublic(_Fixture):
@@ -733,6 +825,62 @@ class TestParser(unittest.TestCase):
 
         self.assertEqual(args.judge_error_window_hours, 6)
         self.assertEqual(args.min_judge_error_ratio, 0.75)
+
+    def assert_rejected(self, *argv: str) -> None:
+        '''Asserts the parser turns a value down instead of running on it.'''
+        with mock.patch('sys.stderr', new=io.StringIO()):
+            with self.assertRaises(SystemExit):
+                problem_health_check.build_parser().parse_args(list(argv))
+
+    def test_the_smallest_useful_thresholds_are_accepted(self) -> None:
+        '''One of anything is a threshold a run can still act on.'''
+        args = problem_health_check.build_parser().parse_args([
+            '--judge-error-window-hours', '1', '--min-judge-errors', '1',
+            '--min-submissions-never-solved', '1',
+        ])
+
+        self.assertEqual(args.judge_error_window_hours, 1)
+        self.assertEqual(args.min_judge_errors, 1)
+        self.assertEqual(args.min_submissions_never_solved, 1)
+
+    def test_a_whole_ratio_is_accepted(self) -> None:
+        '''Every submission failing is the strictest reachable share.'''
+        args = problem_health_check.build_parser().parse_args(
+            ['--min-judge-error-ratio', '1'])
+
+        self.assertEqual(args.min_judge_error_ratio, 1.0)
+
+    def test_no_grace_period_is_accepted(self) -> None:
+        '''Zero days asks for every problem, which is a real request.'''
+        args = problem_health_check.build_parser().parse_args(
+            ['--min-age-days-never-solved', '0'])
+
+        self.assertEqual(args.min_age_days_never_solved, 0)
+
+    def test_an_empty_window_is_rejected(self) -> None:
+        '''A window of nothing would report nothing and resolve the lot.'''
+        self.assert_rejected('--judge-error-window-hours', '0')
+        self.assert_rejected('--judge-error-window-hours', '-24')
+
+    def test_a_ratio_above_one_is_rejected(self) -> None:
+        '''No problem can fail more often than it is submitted to.'''
+        self.assert_rejected('--min-judge-error-ratio', '1.5')
+
+    def test_a_ratio_of_zero_or_less_is_rejected(self) -> None:
+        '''It asks for no share at all, leaving the count unguarded.'''
+        self.assert_rejected('--min-judge-error-ratio', '0')
+        self.assert_rejected('--min-judge-error-ratio', '-0.3')
+
+    def test_counting_thresholds_below_one_are_rejected(self) -> None:
+        '''Zero errors and zero attempts describe a healthy problem.'''
+        self.assert_rejected('--min-judge-errors', '0')
+        self.assert_rejected('--min-judge-errors', '-3')
+        self.assert_rejected('--min-submissions-never-solved', '0')
+        self.assert_rejected('--min-submissions-never-solved', '-20')
+
+    def test_a_negative_grace_period_is_rejected(self) -> None:
+        '''A cutoff in the future is not a number of days to wait.'''
+        self.assert_rejected('--min-age-days-never-solved', '-1')
 
 
 if __name__ == '__main__':
