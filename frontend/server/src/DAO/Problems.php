@@ -157,16 +157,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $usernames
         );
 
-        return array_map(
+        // Some identities are not linked to a Users row yet
+        // (`Identities.user_id` is nullable); those cannot own
+        // problems and must be skipped.
+        return array_values(array_map(
             fn($row) => intval($row['user_id']),
-            // Some identities are not linked to a Users row yet
-            // (`Identities.user_id` is nullable); those cannot own
-            // problems and must be skipped.
             array_filter(
                 $results,
                 fn($row) => !is_null($row['user_id'])
             )
-        );
+        ));
     }
 
     /**
