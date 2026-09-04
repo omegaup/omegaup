@@ -2,7 +2,7 @@
 import datetime
 import json
 import unittest
-from typing import Any, cast
+from typing import Any, Optional, cast
 from unittest import mock
 
 import mysql.connector.cursor
@@ -231,6 +231,47 @@ class ProcessBadgesTest(unittest.TestCase):
             [record.getMessage() for record in logs.records
              if record.msg.startswith('Badges that failed')],
             ['Badges that failed to process: brokenBadge'])
+
+
+class MainConnectionLifecycleTest(unittest.TestCase):
+    '''Tests that `assign_badges.main` closes every connection it opens.'''
+
+    def _run_main(self, dbconn: MockConnection,
+                  dbconn_readonly: Optional[MockConnection]) -> None:
+        '''Run `main()` with mocked connections and a no-op cron runner.'''
+        argv = ['assign_badges.py', '--no-track']
+        with mock.patch('sys.argv', argv), \
+             mock.patch('lib.db.connect',
+                        return_value=_as_conn(dbconn)), \
+             mock.patch('lib.db.connect_readonly',
+                        return_value=(_as_conn(dbconn_readonly)
+                                      if dbconn_readonly is not None
+                                      else None)), \
+             mock.patch.object(assign_badges, 'process_badges',
+                               return_value=False):
+            assign_badges.main()
+
+    def test_closes_a_distinct_readonly_connection(self) -> None:
+        '''A configured replica gets its own connection closed on exit.'''
+        dbconn = MockConnection(MockCursor())
+        dbconn_readonly = MockConnection(MockCursor())
+        self.assertIsNot(dbconn, dbconn_readonly)
+
+        with mock.patch.object(dbconn, 'close') as rw_close, \
+             mock.patch.object(dbconn_readonly, 'close') as ro_close:
+            self._run_main(dbconn, dbconn_readonly)
+
+        rw_close.assert_called_once()
+        ro_close.assert_called_once()
+
+    def test_no_double_close_when_readonly_falls_back(self) -> None:
+        '''Without a replica the single connection is closed exactly once.'''
+        dbconn = MockConnection(MockCursor())
+
+        with mock.patch.object(dbconn, 'close') as rw_close:
+            self._run_main(dbconn, None)
+
+        rw_close.assert_called_once()
 
 
 if __name__ == '__main__':
