@@ -108,8 +108,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
                 finally:
                     self._close_connection()
         if exc_value is None and self._forced_failure:
-            # Nothing was raised, so without this the process would exit 0 and
-            # the scheduler would read a failed run as a healthy one.
+            # Otherwise a failed run would still exit 0.
             raise SystemExit(1)
 
     @contextlib.contextmanager
@@ -148,9 +147,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         '''Records this run as failed even if nothing was raised.
 
         Jobs that report failures through a return value need this, otherwise
-        the run would be recorded as successful. The context manager exits with
-        a non zero status afterwards, so process level alerting agrees with the
-        row in `Cron_Runs`.
+        the run would be recorded as successful. Exits non zero afterwards.
         '''
         self._forced_failure = True
 

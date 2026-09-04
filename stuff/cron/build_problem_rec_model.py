@@ -32,10 +32,7 @@ import lib.runner  # pylint: disable=wrong-import-position
 # Default training parameters.
 _TRAIN_FRACTION = 0.8
 
-# A floor for an obviously broken model rather than a quality bar. MAP@k on
-# the checked in fixture is 0.19, so anything under this is not a model that
-# got worse, it is a model that stopped working. Recalibrate once there are
-# real runs recorded in `Recommendation_Model_Runs`.
+# A floor for a broken model, not a quality bar. MAP@k on the fixture is 0.19.
 _MIN_MAP_SCORE = 0.05
 _NUM_FOLLOWUPS = 3
 _FOLLOWUP_DECAY = 0.4
@@ -365,11 +362,8 @@ class Model:
         '''Scores the model with the standard ranking metrics.
 
         Replays every test user: after each solved problem the model is asked
-        for k recommendations and they are scored against the problems the
-        user really solved next. Returns precision@k, recall@k, MAP@k and
-        NDCG@k averaged over every such prediction. `map` is the one the
-        guardrail is calibrated against, the other three are recorded in the
-        log so a change in it can be explained.
+        for k recommendations and they are scored against what the user really
+        solved next. `map` is the score the guardrail uses.
         '''
         if k is None:
             k = self.config.num_followups
@@ -388,9 +382,7 @@ class Model:
                 expected = problems[i:i + k]
                 if not expected:
                     continue
-                # A prediction the model could not serve scores zero rather
-                # than leaving the denominator, otherwise a model that answers
-                # almost nothing reports near perfect numbers.
+                # An unanswerable prediction scores zero, it is not dropped.
                 predictions += 1
                 for name, metric_fn in metric_fns.items():
                     totals[name] += metric_fn(recs or [], expected, k) or 0.
@@ -435,9 +427,7 @@ def get_last_published_map(
 ) -> Optional[float]:
     '''Returns the MAP score of the model currently at `output_path`.
 
-    Scoped to one artifact on purpose. A run that wrote somewhere else, a
-    manual one against a scratch path for instance, never becomes the baseline
-    the production model has to beat.
+    Scoped to one artifact so a run that wrote elsewhere is never the baseline.
     '''
     with dbconn.cursor() as cur:
         cur.execute(

@@ -86,12 +86,7 @@ class TestModelEvaluation(unittest.TestCase):
                                places=4)
 
     def test_a_prediction_the_model_cannot_serve_scores_zero(self) -> None:
-        '''An unanswerable prediction stays in the denominator.
-
-        The model knows nothing about problem 9, so the second user's only
-        prediction gets no recommendations. Dropping it would leave the first
-        user's perfect prediction as the whole average.
-        '''
+        '''An unanswerable prediction stays in the denominator.'''
         runs = pd.DataFrame([(1, 1, 0), (1, 2, 1),
                              (2, 9, 0), (2, 8, 1)],
                             columns=['identity_id', 'problem_id', 'time'])
@@ -380,11 +375,7 @@ class TestGetLastPublishedMap(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_the_baseline_is_scoped_to_one_artifact(self) -> None:
-        '''A run that wrote somewhere else cannot become the baseline.
-
-        The runbook's deterministic command writes a scratch path, and without
-        this a high score from one of those would block real models.
-        '''
+        '''A run that wrote somewhere else cannot become the baseline.'''
         conn = _FakeConnection()
         conn.next_fetchone = (0.42,)
 
@@ -417,11 +408,7 @@ class TestTrainAndPublish(unittest.TestCase):
     '''Test what the guardrail is actually handed.'''
 
     def test_the_guardrail_scores_the_model_with_map(self) -> None:
-        '''The recorded score is MAP@k and not one of the other metrics.
-
-        The four metrics differ on the fixture, so a test that only checked it
-        was one of them would pass on any of them.
-        '''
+        '''The recorded score is MAP@k and not one of the other metrics.'''
         runs = build_problem_rec_model.load_sqlite(_TESTDATA)
         expected = build_problem_rec_model.Model(
             build_problem_rec_model.TrainingConfig(),
