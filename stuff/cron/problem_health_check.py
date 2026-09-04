@@ -147,21 +147,24 @@ def find_never_solved(
     '''
     cur.execute(
         '''
-        SELECT
-            `p`.`problem_id`,
-            COUNT(*) AS `submission_count`
-        FROM `Problems` `p`
-        INNER JOIN `Submissions` `s` ON `s`.`problem_id` = `p`.`problem_id`
-        WHERE
-            `p`.`visibility` >= %s AND
-            `p`.`deprecated` = 0 AND
-            `p`.`languages` <> '' AND
-            `p`.`accepted` = 0 AND
-            `p`.`submissions` >= %s AND
-            `p`.`creation_date` <= %s AND
-            `s`.`type` = 'normal'
-        GROUP BY `p`.`problem_id`
-        HAVING `submission_count` >= %s;''',
+        SELECT `problem_id`, `submission_count`
+        FROM (
+            SELECT
+                `p`.`problem_id` AS `problem_id`,
+                (SELECT COUNT(*)
+                 FROM `Submissions` `s`
+                 WHERE `s`.`problem_id` = `p`.`problem_id` AND
+                       `s`.`type` = 'normal') AS `submission_count`
+            FROM `Problems` `p`
+            WHERE
+                `p`.`visibility` >= %s AND
+                `p`.`deprecated` = 0 AND
+                `p`.`languages` <> '' AND
+                `p`.`accepted` = 0 AND
+                `p`.`submissions` >= %s AND
+                `p`.`creation_date` <= %s
+        ) `candidates`
+        WHERE `submission_count` >= %s;''',
         (PROBLEM_VISIBILITY_PUBLIC, min_submissions, created_before,
          min_submissions))
     return [
@@ -351,6 +354,9 @@ def main() -> None:
     with lib.runner.run(parser.prog, args) as cron_run:
         dbconn = lib.db.connect(
             lib.db.DatabaseConnectionArguments.from_args(args))
+        dbconn_readonly = lib.db.connect_readonly(
+            lib.db.DatabaseConnectionArguments.from_args_readonly(
+                args)) or dbconn
         try:
             # One clock for the whole run, read before any write, so a finding
             # stored now is never mistaken for one that went missing.
@@ -361,7 +367,8 @@ def main() -> None:
             # A check that raises must fail the run: skipping it would
             # leave its findings unseen and resolve them as if they were fixed.
             findings: List[Finding] = []
-            with dbconn.cursor(buffered=True, dictionary=True) as cur:
+            with dbconn_readonly.cursor(buffered=True,
+                                        dictionary=True) as cur:
                 with cron_run.phase(CheckType.JUDGE_ERRORS.value):
                     findings.extend(
                         find_judge_errors(cur, run_timestamp,
@@ -384,6 +391,8 @@ def main() -> None:
             logging.info('Found %d problems needing attention, resolved %d',
                          len(findings), resolved)
         finally:
+            if dbconn_readonly is not dbconn:
+                dbconn_readonly.conn.close()
             dbconn.conn.close()
             logging.info('Done')
 
