@@ -87,6 +87,19 @@ class TestModelEvaluation(unittest.TestCase):
         self.assertAlmostEqual(model.evaluate_metrics()['map'], 0.1939,
                                places=4)
 
+    def test_the_same_seed_gives_the_same_score(self) -> None:
+        '''A fixed seed is only reproducible if the row order is too.'''
+        first = build_problem_rec_model.load_sqlite(_TESTDATA)
+        second = build_problem_rec_model.load_sqlite(_TESTDATA)
+        self.assertTrue(first.equals(second))
+
+        config = build_problem_rec_model.TrainingConfig(rng_seed=7)
+        score = build_problem_rec_model.Model(
+            config, first).evaluate_metrics()['map']
+        again = build_problem_rec_model.Model(
+            config, second).evaluate_metrics()['map']
+        self.assertEqual(score, again)
+
     def test_a_prediction_the_model_cannot_serve_scores_zero(self) -> None:
         '''An unanswerable prediction stays in the denominator.'''
         runs = pd.DataFrame([(1, 1, 0), (1, 2, 1),

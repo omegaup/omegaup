@@ -136,7 +136,9 @@ def load_sqlite(database: str) -> pd.DataFrame:
                 identity_id,
                 problem_id
             FROM
-                Runs;
+                Runs
+            ORDER BY
+                rowid ASC;
             """, dbconn)
         logging.info('Found %d runs', len(runs))
         return runs
@@ -177,7 +179,8 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
                 s.problem_id
             ORDER BY
                 s.identity_id ASC,
-                `time` ASC;
+                `time` ASC,
+                s.problem_id ASC;
             """, dbconn.conn)
 
         # `time` only orders the rows, the rest of the script does not use it.
