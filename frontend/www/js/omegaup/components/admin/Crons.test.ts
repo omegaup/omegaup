@@ -166,6 +166,24 @@ describe('Crons.vue', () => {
     );
   });
 
+  it('Should keep a problem alias inside the arena url', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs,
+        runs,
+        problemHealthFindings: [
+          { ...problemHealthFindings[0], alias: '../../../evil', detail: null },
+        ],
+      },
+    });
+
+    const link = wrapper.find('[data-problem-health] tbody a');
+    expect(link.attributes('href')).toBe('/arena/problem/..%2F..%2F..%2Fevil/');
+    expect(
+      wrapper.findAll('[data-problem-health] tbody tr td').at(3).text(),
+    ).toBe('—');
+  });
+
   it('Should show a placeholder when no problem needs attention', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
 

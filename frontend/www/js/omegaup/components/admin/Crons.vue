@@ -126,9 +126,7 @@
             :key="`${finding.problem_id}-${finding.check_type}`"
           >
             <td>
-              <a :href="`/arena/problem/${finding.alias}/`">{{
-                finding.title
-              }}</a>
+              <a :href="problemUrl(finding.alias)">{{ finding.title }}</a>
             </td>
             <td :title="finding.check_type">
               {{ checkTypeLabel(finding.check_type) }}
@@ -138,7 +136,7 @@
                 severityLabel(finding.severity)
               }}</span>
             </td>
-            <td>{{ finding.detail }}</td>
+            <td>{{ finding.detail || '—' }}</td>
             <td>{{ formatDate(finding.first_detected_at) }}</td>
           </tr>
         </tbody>
@@ -279,6 +277,10 @@ export default class Crons extends Vue {
       return '';
     }
     return classes[status] || 'badge badge-light';
+  }
+
+  problemUrl(alias: string): string {
+    return `/arena/problem/${encodeURIComponent(alias)}/`;
   }
 
   checkTypeLabel(checkType: string): string {
