@@ -41,6 +41,15 @@ _STALE_PICK_ERROR = 'the dispatcher did not finish this run'
 _UNREGISTERED_ERROR = 'job is not registered'
 _SKIPPED_ERROR = 'the job did not run: it is disabled or already running'
 
+# Mirrors `\OmegaUp\CronJobName`; the test fails if the two ever drift.
+KNOWN_JOBS = frozenset({
+    'aggregate_feedback.py',
+    'assign_badges.py',
+    'build_problem_rec_model.py',
+    'problem_health_check.py',
+    'update_ranks.py',
+})
+
 
 class RequestStatus(enum.Enum):
     '''The states a rerun request can be in, as stored in `status`.
@@ -93,13 +102,13 @@ def get_registered_jobs(
 
 
 def is_launchable(name: str, registered: Set[str]) -> bool:
-    '''Whether a request names a registered script installed in this checkout.
+    '''Whether a request names a known script installed in this checkout.
 
-    `Cron_Jobs` is the registry `\\OmegaUp\\CronJobName` mirrors, so this is
-    the same allowlist the API validates against, and the filename check
-    keeps a tampered row from reaching anything else.
+    A launchable name has to be in the compiled-in allowlist, in the registry
+    and on disk, so a tampered `Cron_Jobs` row cannot reach anything else.
     '''
-    return (name in registered
+    return (name in KNOWN_JOBS
+            and name in registered
             and name.endswith('.py')
             and os.path.basename(name) == name
             and os.path.isfile(os.path.join(_CRON_DIR, name)))
