@@ -33,6 +33,18 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    private static function ensureCanManageCarouselItems(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
+        if (
+            \OmegaUp\Authorization::isSystemAdmin($identity) ||
+            \OmegaUp\Authorization::isSupportTeamMember($identity)
+        ) {
+            return;
+        }
+        throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+    }
+
     /**
      * Create a new Carousel Item
      *
@@ -49,9 +61,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        self::ensureCanManageCarouselItems($r->identity);
 
         $expiration = $r->ensureOptionalString('expiration_date');
         $isActive = $r->ensureOptionalBool('is_active');
@@ -85,9 +95,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        self::ensureCanManageCarouselItems($r->identity);
 
         $carouselItemId = $r->ensureInt('carousel_item_id');
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
@@ -122,9 +130,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        self::ensureCanManageCarouselItems($r->identity);
 
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
             $r->ensureInt('carousel_item_id')
@@ -157,7 +163,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * List Carousel Items (admin only)
+     * List Carousel Items (admin/support only)
      *
      * @omegaup-request-param bool $active_only
      *
@@ -165,9 +171,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        self::ensureCanManageCarouselItems($r->identity);
 
         $activeOnly = $r->ensureOptionalBool('active_only') ?? false;
         $items = $activeOnly
@@ -190,9 +194,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        self::ensureCanManageCarouselItems($r->identity);
 
         return [
             'templateProperties' => [

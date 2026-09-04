@@ -698,7 +698,7 @@ _Nothing_
 
 ### Description
 
-List Carousel Items (admin only)
+List Carousel Items (admin/support only)
 
 ### Parameters
 
