@@ -15,7 +15,7 @@ class ContestProblemChangeLog extends \OmegaUp\DAO\Base\ContestProblemChangeLog 
      * Uses the composite index `idx_contest_timestamp` for an
      * efficient index seek + ordered scan.
      *
-     * @return list<array{change_type: string, problem_alias: string, changed_by: string, timestamp: \OmegaUp\Timestamp}>
+    * @return list<array{change_type: string, changed_by: string, problem_alias: string, timestamp: \OmegaUp\Timestamp}>
      */
     public static function getByContestId(int $contestId): array {
         $sql = '
@@ -38,7 +38,7 @@ class ContestProblemChangeLog extends \OmegaUp\DAO\Base\ContestProblemChangeLog 
                 cl.timestamp ASC;
         ';
 
-        /** @var list<array{change_type: string, problem_alias: string, changed_by: string, timestamp: \OmegaUp\Timestamp}> */
+        /** @var list<array{change_type: string, changed_by: string, problem_alias: string, timestamp: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$contestId]

@@ -19,8 +19,8 @@
         :class="{ active: !index }"
       >
         <omegaup-homepage-slide
-          :title="slide.title[T.locale]"
-          :description="slide.description[T.locale]"
+          :title="slide.title[T.locale] || slide.title['es']"
+          :description="slide.description[T.locale] || slide.description['es']"
           :image-src="slide.image"
           :button="slide.button"
         ></omegaup-homepage-slide>

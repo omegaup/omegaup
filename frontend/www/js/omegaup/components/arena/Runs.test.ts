@@ -7,6 +7,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 
 import arena_Runs, { DisqualificationType } from './Runs.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
@@ -17,8 +18,8 @@ describe('Runs.vue', () => {
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
-    expect(wrapper.find('table tbody').text()).toBe('');
+    expect(wrapper.find('.card-header').text()).toBe(T.latestSubmissionsTitle);
+    expect(wrapper.findComponent(common_EmptyState).exists()).toBe(true);
   });
 
   it('Should handle runs', async () => {

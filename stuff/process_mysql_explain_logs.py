@@ -7,11 +7,30 @@ import logging
 import sys
 import os
 import csv
-from typing import Any, Iterable, Tuple, Optional, List, Dict
+from typing import Any, Iterable, Tuple, Optional, List, Dict, Set
+import configparser
 import re
 import mysql.connector
+import yaml
 from mysql.connector import Error  # type: ignore
 from tqdm import tqdm  # type: ignore
+
+
+ALLOWLIST_VERSION = 1
+ALLOWLIST_ENTRY_FIELDS = {
+    'normalized_query',
+    'table',
+    'issue',
+    'reason',
+}
+DEFAULT_ALLOWLIST_PATH = os.path.join(
+    os.path.dirname(__file__),
+    'inefficient_queries_allowlist.yml',
+)
+
+
+class AllowlistValidationError(ValueError):
+    '''Raised when the inefficient queries allowlist is not valid.'''
 
 
 def normalize_query(query: str) -> str:
@@ -21,11 +40,172 @@ def normalize_query(query: str) -> str:
     Replaces:
     - numbers with '?'
     - single-quoted and double-quoted strings with '?'
+    - consecutive whitespace with a single space
     '''
     query = re.sub(r'\b\d+\b', '?', query)
     query = re.sub(r"'[^']*'", '?', query)
     query = re.sub(r'"[^"]*"', '?', query)
-    return query
+    query = re.sub(r'\s+', ' ', query)
+    return query.strip()
+
+
+def build_query_family(normalized_query: str) -> str:
+    '''Return a broader representation used only to group CSV rows.'''
+    return re.sub(
+        r'\bIN\s*\(\s*\?(?:\s*,\s*\?)*\s*\)',
+        'IN (?)',
+        normalized_query,
+        flags=re.IGNORECASE,
+    )
+
+
+def _get_non_empty_string(
+    entry: Dict[str, Any],
+    field: str,
+    entry_number: int,
+) -> str:
+    '''Return a required string field from an allowlist entry.'''
+    value = entry.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise AllowlistValidationError(
+            f'Allowlist entry {entry_number} field "{field}" must be '
+            'a non-empty string.'
+        )
+    if value != value.strip():
+        raise AllowlistValidationError(
+            f'Allowlist entry {entry_number} field "{field}" must not '
+            'have leading or trailing whitespace.'
+        )
+    return value
+
+
+def load_allowlist(path: str) -> List[Dict[str, Any]]:
+    '''Load and validate the inefficient queries allowlist.'''
+    try:
+        with open(path, 'r', encoding='utf-8') as allowlist_file:
+            data = yaml.safe_load(allowlist_file)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            f'Allowlist file not found: {path}'
+        ) from exc
+    except yaml.YAMLError as exc:
+        raise AllowlistValidationError(
+            f'Invalid YAML in allowlist {path}: {exc}'
+        ) from exc
+
+    if not isinstance(data, dict):
+        raise AllowlistValidationError(
+            'Allowlist must be a mapping with "version" and "entries".'
+        )
+
+    expected_top_level_fields = {'version', 'entries'}
+    if set(data) != expected_top_level_fields:
+        raise AllowlistValidationError(
+            'Allowlist must contain exactly the fields "version" and '
+            '"entries".'
+        )
+
+    version = data['version']
+    if (
+        not isinstance(version, int)
+        or isinstance(version, bool)
+        or version != ALLOWLIST_VERSION
+    ):
+        raise AllowlistValidationError(
+            f'Allowlist version must be {ALLOWLIST_VERSION}.'
+        )
+
+    entries = data['entries']
+    if not isinstance(entries, list):
+        raise AllowlistValidationError(
+            'Allowlist field "entries" must be a list.'
+        )
+
+    validated_entries: List[Dict[str, Any]] = []
+    seen: Set[Tuple[str, str]] = set()
+    for entry_number, entry in enumerate(entries, start=1):
+        if not isinstance(entry, dict):
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} must be a mapping.'
+            )
+        if set(entry) != ALLOWLIST_ENTRY_FIELDS:
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} must contain exactly: '
+                'normalized_query, table, issue, reason.'
+            )
+
+        normalized_query = _get_non_empty_string(
+            entry,
+            'normalized_query',
+            entry_number,
+        )
+        if normalize_query(normalized_query) != normalized_query:
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} field '
+                '"normalized_query" must already be normalized.'
+            )
+
+        table = _get_non_empty_string(entry, 'table', entry_number)
+        _get_non_empty_string(entry, 'reason', entry_number)
+
+        issue = entry['issue']
+        if (
+            not isinstance(issue, int)
+            or isinstance(issue, bool)
+            or issue <= 0
+        ):
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} field "issue" must be '
+                'a positive integer.'
+            )
+
+        identity = (normalized_query, table)
+        if identity in seen:
+            raise AllowlistValidationError(
+                f'Allowlist entry {entry_number} duplicates the identity '
+                f'{identity}.'
+            )
+        seen.add(identity)
+        validated_entries.append(entry)
+
+    return validated_entries
+
+
+def build_inefficiency_key(
+    result: Dict[str, str],
+) -> Tuple[str, str]:
+    '''Return the stable identity of an inefficient EXPLAIN row.'''
+    return (result['Normalized Query'], result['Table'])
+
+
+def deduplicate_results(
+    results: Iterable[Dict[str, str]],
+) -> List[Dict[str, str]]:
+    '''Remove duplicate query-table results while preserving their order.'''
+    seen: Set[Tuple[str, str]] = set()
+    deduplicated: List[Dict[str, str]] = []
+    for result in results:
+        key = build_inefficiency_key(result)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduplicated.append(result)
+    return deduplicated
+
+
+def sort_results_for_csv(
+    results: Iterable[Dict[str, str]],
+) -> List[Dict[str, str]]:
+    '''Sort results so similar query families are adjacent in the CSV.'''
+    return sorted(
+        results,
+        key=lambda result: (
+            result['Query Family'],
+            result['Normalized Query'],
+            result['Table'],
+            int(result['Query ID']),
+        ),
+    )
 
 
 def create_connection(
@@ -38,24 +218,37 @@ def create_connection(
     """
     Open a MySQL Connection
     """
+    defaults: Dict[str, str] = {}
+    config_file = os.getenv('OMEGAUP_MYSQL_CONFIG_FILE')
+    if not config_file:
+        config_file = os.path.join(os.path.expanduser('~'), '.my.cnf')
+    if os.path.isfile(config_file):
+        parser = configparser.ConfigParser()
+        parser.read(config_file)
+        if parser.has_section('client'):
+            defaults = dict(parser['client'])
+
     host = os.getenv(
         'OMEGAUP_MYSQL_HOST',
-        os.getenv('MYSQL_HOST', host_name),
+        os.getenv('MYSQL_HOST', defaults.get('host', host_name)),
     )
     port = int(
         os.getenv(
             'OMEGAUP_MYSQL_PORT',
-            os.getenv('MYSQL_TCP_PORT', port),
+            os.getenv('MYSQL_TCP_PORT', defaults.get('port', port)),
         )
     )
-    user = os.getenv('OMEGAUP_MYSQL_USER', user_name)
+    user = os.getenv('OMEGAUP_MYSQL_USER', defaults.get('user', user_name))
     db = os.getenv(
         'OMEGAUP_MYSQL_DB',
         os.getenv('MYSQL_DATABASE', db_name),
     )
     pw_env = os.getenv(
         'OMEGAUP_MYSQL_PASSWORD',
-        os.getenv('MYSQL_ROOT_PASSWORD', user_password),
+        os.getenv(
+            'MYSQL_ROOT_PASSWORD',
+            defaults.get('password', user_password)
+        ),
     )
 
     try:
@@ -126,6 +319,7 @@ def explain_queries(
     try:
         for query in queries_list:
             query_text = query[0]
+            normalized_query = normalize_query(query_text)
             if query_text not in query_id_map:
                 query_id_map[query_text] = len(query_id_map) + 1
 
@@ -193,7 +387,8 @@ def explain_queries(
                     results.append({
                         "Query ID": str(query_id_map[query_text]),
                         "Query": query_text,
-                        "Normalized Query": normalize_query(query_text),
+                        "Normalized Query": normalized_query,
+                        "Query Family": build_query_family(normalized_query),
                         "Table": table_name,
                         "Type": str(row[type_idx]),
                         "Key": "" if key_val is None else str(key_val),
@@ -213,16 +408,7 @@ def explain_queries(
         cursor.close()
         progress_bar.close()
 
-    seen = set()
-    deduped: List[Dict[str, str]] = []
-    for rec in results:
-        dkey = rec["Normalized Query"]
-        if dkey in seen:
-            continue
-        seen.add(dkey)
-        deduped.append(rec)
-
-    return deduped
+    return deduplicate_results(results)
 
 
 def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
@@ -237,6 +423,7 @@ def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
             "Query ID",
             "Query",
             "Normalized Query",
+            "Query Family",
             "Table",
             "Type",
             "Key",
@@ -246,7 +433,7 @@ def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
         with open(path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerows(results)
+            writer.writerows(sort_results_for_csv(results))
         return path
     except Error as exc:
         logging.error("Failed to save CSV: %s", exc)
@@ -257,6 +444,12 @@ def _main() -> None:
     """
     Main function to handle the logic.
     """
+    try:
+        load_allowlist(DEFAULT_ALLOWLIST_PATH)
+    except (OSError, AllowlistValidationError) as exc:
+        logging.error('Failed to load allowlist: %s', exc)
+        sys.exit(1)
+
     connection = create_connection(
         host_name="mysql",
         port=13306,
@@ -281,7 +474,7 @@ def _main() -> None:
             try:
                 saved = save_to_csv(rows)
                 logging.warning(
-                    "%d inefficient queries; saved to %s",
+                    "%d inefficient query-table pairs; saved to %s",
                     len(rows),
                     saved
                 )

@@ -979,4 +979,197 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             $response[0]['participating']
         );
     }
+
+    public function testContestListOrderByContestants() {
+        $now = \OmegaUp\Time::get();
+        $contests = [];
+        foreach (['two', 'one', 'zero'] as $suffix) {
+            $contests[$suffix] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'public',
+                    'alias' => "contestants-{$suffix}",
+                    'startTime' => $now + 60 * 60,
+                    'finishTime' => $now + 2 * 60 * 60,
+                ])
+            );
+        }
+
+        ['identity' => $firstIdentity] =
+            \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $secondIdentity] =
+            \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contests['two'],
+            $firstIdentity
+        );
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contests['two'],
+            $secondIdentity
+        );
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contests['one'],
+            $firstIdentity
+        );
+
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request([
+                'sort_order' => 'contestants',
+                'page_size' => 3,
+                'tab_name' => 'future',
+            ])
+        );
+
+        $this->assertSame(
+            ['contestants-two', 'contestants-one', 'contestants-zero'],
+            array_column($response['results'], 'alias')
+        );
+        $this->assertSame(
+            [2, 1, 0],
+            array_column($response['results'], 'contestants')
+        );
+    }
+
+    public function testListAllTabsReturnsCurrentPastFuture() {
+        \OmegaUp\Test\Factories\Contest::createContest();
+        $response = \OmegaUp\Controllers\Contest::apiListAllTabs(
+            new \OmegaUp\Request(['page_size' => 50])
+        );
+        foreach (['current', 'past', 'future'] as $tab) {
+            $this->assertArrayHasKey($tab, $response);
+            $this->assertArrayHasKey('results', $response[$tab]);
+            $this->assertArrayHasKey('number_of_results', $response[$tab]);
+            $this->assertIsArray($response[$tab]['results']);
+        }
+    }
+
+    public function testPublicAdmissionModeForLoggedUserHonorsTabNameFutureAndPast() {
+        $currentContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'public']
+            )
+        );
+        $futureContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                [
+                    'admissionMode' => 'public',
+                    'finishTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
+                    'startTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
+                ]
+            )
+        );
+        $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                [
+                    'admissionMode' => 'public',
+                    'finishTime' => ($currentContestData['request']['start_time'] - (60 * 60 * 48)),
+                    'startTime' => ($currentContestData['request']['start_time'] - (60 * 60 * 49)),
+                ]
+            )
+        );
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $futureResponse = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'admission_mode' => 'public',
+            'page' => 1,
+            'page_size' => 50,
+            'tab_name' => 'future',
+        ]));
+        $this->assertArrayContainsInKey(
+            $futureResponse['results'],
+            'contest_id',
+            $futureContestData['contest']->contest_id
+        );
+        $this->assertArrayNotContainsInKey(
+            $futureResponse['results'],
+            'contest_id',
+            $currentContestData['contest']->contest_id
+        );
+        $this->assertArrayNotContainsInKey(
+            $futureResponse['results'],
+            'contest_id',
+            $pastContestData['contest']->contest_id
+        );
+
+        $pastResponse = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'admission_mode' => 'public',
+            'page' => 1,
+            'page_size' => 50,
+            'tab_name' => 'past',
+        ]));
+        $this->assertArrayContainsInKey(
+            $pastResponse['results'],
+            'contest_id',
+            $pastContestData['contest']->contest_id
+        );
+        $this->assertArrayNotContainsInKey(
+            $pastResponse['results'],
+            'contest_id',
+            $currentContestData['contest']->contest_id
+        );
+        $this->assertArrayNotContainsInKey(
+            $pastResponse['results'],
+            'contest_id',
+            $futureContestData['contest']->contest_id
+        );
+    }
+
+    public function testListAllTabsWithPublicAdmissionModeSplitsByTabForLoggedUser() {
+        $currentContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'public']
+            )
+        );
+        $futureContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                [
+                    'admissionMode' => 'public',
+                    'finishTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
+                    'startTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
+                ]
+            )
+        );
+        $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                [
+                    'admissionMode' => 'public',
+                    'finishTime' => ($currentContestData['request']['start_time'] - (60 * 60 * 48)),
+                    'startTime' => ($currentContestData['request']['start_time'] - (60 * 60 * 49)),
+                ]
+            )
+        );
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $response = \OmegaUp\Controllers\Contest::apiListAllTabs(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'admission_mode' => 'public',
+                'page' => 1,
+                'page_size' => 50,
+            ])
+        );
+
+        $this->assertSame(1, $response['current']['number_of_results']);
+        $this->assertSame(1, $response['future']['number_of_results']);
+        $this->assertSame(1, $response['past']['number_of_results']);
+        $this->assertArrayContainsInKey(
+            $response['current']['results'],
+            'contest_id',
+            $currentContestData['contest']->contest_id
+        );
+        $this->assertArrayContainsInKey(
+            $response['future']['results'],
+            'contest_id',
+            $futureContestData['contest']->contest_id
+        );
+        $this->assertArrayContainsInKey(
+            $response['past']['results'],
+            'contest_id',
+            $pastContestData['contest']->contest_id
+        );
+    }
 }

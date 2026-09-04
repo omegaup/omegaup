@@ -21,31 +21,6 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/ofmi.png',
-    title: {
-      en: 'Registration is now open!',
-      es: '¡Ya está abierta la convocatoria!',
-      pt: 'Inscrições abertas!',
-    },
-    description: {
-      en:
-        'Discover, learn, and participate in the community that drives female talent in programming. 5th Mexican Female Informatics Olympiad (OFMI).',
-      es:
-        'Descubre, aprende y participa en la comunidad que impulsa el talento femenino en la programación. 5ª Olimpiada Femenil Mexicana de Informática (OFMI).',
-      pt:
-        'Descubra, aprenda e participe da comunidade que impulsiona o talento feminino na programação. 5ª Olimpíada Feminina Mexicana de Informática (OFMI).',
-    },
-    button: {
-      text: {
-        en: 'View call',
-        es: 'Ver convocatoria',
-        pt: 'Ver convocatória',
-      },
-      href: 'https://ofmi.omegaup.com/convocatoria',
-      target: '_blank',
-    },
-  },
-  {
     image: '/media/homepage/carousel_slide_4.svg',
     title: {
       en: 'Start preparing with Intro OFMI',
@@ -117,6 +92,31 @@ const carouselConfig: {
         pt: 'Ir para o blog',
       },
       href: 'https://blog.omegaup.com/',
+      target: '_blank',
+    },
+  },
+  {
+    image: '/media/homepage/carousel_slide_UX_experience.png',
+    title: {
+      en: 'omegaUp UX experience',
+      es: 'Experiencia de usuario de omegaUp',
+      pt: 'Experiência de usuário de omegaUp',
+    },
+    description: {
+      en:
+        'Your opinion builds our community!\nAt omegaUp, our priority is you. We want to know what you love and what we can improve so that your learning experience is amazing.\nIt will only take 3 minutes.\nThanks for helping us grow!',
+      es:
+        '¡Tu opinión construye nuestra comunidad!\nEn omegaUp, nuestra prioridad eres tú. Queremos saber qué te encanta y qué podemos mejorar para que tu experiencia de aprendizaje sea increíble.\nSolo te tomará 3 minutos.\n¡Gracias por ayudarnos a crecer!',
+      pt:
+        'Sua opinião constrói nossa comunidade!\nNa omegaUp, nossa prioridade é você. Queremos saber o que você ama e o que podemos melhorar para que sua experiência de aprendizado seja incrível.\nLevará apenas 3 minutos.\nObrigado por nos ajudar a crescer!',
+    },
+    button: {
+      text: {
+        en: 'Click here to answer',
+        es: 'Haz clic aquí para responder',
+        pt: 'Clique aqui para responder',
+      },
+      href: 'https://forms.gle/q8fi19Y2qtPU3uVt6',
       target: '_blank',
     },
   },

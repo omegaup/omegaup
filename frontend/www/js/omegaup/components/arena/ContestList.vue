@@ -159,15 +159,14 @@
 
     <!-- Summary View (Horizontal Scrolling) -->
     <div v-if="!viewAllCategory">
+      <div v-if="visibleContestTabs.length === 0" class="empty-category">
+        {{ T.contestListEmpty }}
+      </div>
       <div
-        v-for="(tab, index) in [
-          ContestTab.Current,
-          ContestTab.Future,
-          ContestTab.Past,
-        ]"
+        v-for="(tab, index) in visibleContestTabs"
         :key="tab"
         class="mb-5 section-container"
-        :class="{ 'section-separator': index < 2 }"
+        :class="{ 'section-separator': index < visibleContestTabs.length - 1 }"
       >
         <div
           class="d-flex justify-content-between align-items-center mb-3 px-3"
@@ -197,13 +196,7 @@
             class="horizontal-scroll-container px-3 pb-3"
             @scroll="onScroll(tab)"
           >
-            <div
-              v-if="getContestsForTab(tab).length === 0"
-              class="text-muted font-italic ml-3"
-            >
-              {{ T.contestListEmpty }}
-            </div>
-            <div v-else class="d-flex">
+            <div class="d-flex">
               <div
                 v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
                 :key="contestItem.contest_id"
@@ -586,6 +579,7 @@ class ArenaContestList extends Vue {
     if (category) {
       this.currentTab = category;
       this.fetchInitialContests();
+      window.scrollTo(0, 0);
     } else {
       // Returning to summary, ensure we have data for all
       this.fetchInitialContests();
@@ -617,6 +611,12 @@ class ArenaContestList extends Vue {
       default:
         return [];
     }
+  }
+
+  get visibleContestTabs(): ContestTab[] {
+    return [ContestTab.Current, ContestTab.Future, ContestTab.Past].filter(
+      (tab) => this.getContestsForTab(tab).length > 0,
+    );
   }
 
   onSearchQuery() {
@@ -685,27 +685,27 @@ class ArenaContestList extends Vue {
   }
 
   scrollLeft(tab: ContestTab) {
-    const container = (this.$refs[
-      `scrollContainer_${tab}`
-    ] as HTMLElement[])[0];
+    const container = (this.$refs[`scrollContainer_${tab}`] as
+      | HTMLElement[]
+      | undefined)?.[0];
     if (container) {
       container.scrollBy({ left: -600, behavior: 'smooth' });
     }
   }
 
   scrollRight(tab: ContestTab) {
-    const container = (this.$refs[
-      `scrollContainer_${tab}`
-    ] as HTMLElement[])[0];
+    const container = (this.$refs[`scrollContainer_${tab}`] as
+      | HTMLElement[]
+      | undefined)?.[0];
     if (container) {
       container.scrollBy({ left: 600, behavior: 'smooth' });
     }
   }
 
   onScroll(tab: ContestTab) {
-    const container = (this.$refs[
-      `scrollContainer_${tab}`
-    ] as HTMLElement[])[0];
+    const container = (this.$refs[`scrollContainer_${tab}`] as
+      | HTMLElement[]
+      | undefined)?.[0];
     if (container) {
       this.$set(this.scrollPositions, tab, container.scrollLeft);
       this.$set(
@@ -734,8 +734,9 @@ class ArenaContestList extends Vue {
   }
 
   updated() {
-    // Recalculate scroll limits when DOM updates
-    [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach((tab) => {
+    // Recalculate scroll limits when DOM updates. Only iterate the tabs that
+    // are actually rendered; hidden (empty) tabs have no scrollContainer ref.
+    this.visibleContestTabs.forEach((tab) => {
       this.onScroll(tab);
     });
   }
