@@ -942,7 +942,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 FROM (
                     SELECT
                         c.course_id,
-                        0 AS role_priority
+                        3 AS role_priority
                     FROM
                         ACLs AS a
                     INNER JOIN
