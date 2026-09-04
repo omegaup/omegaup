@@ -2,6 +2,7 @@ import admin_Carousel from '../components/admin/Carousel.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
+import * as time from '../time';
 import T from '../lang';
 import Vue from 'vue';
 import { types } from '../api_types';
@@ -35,7 +36,7 @@ OmegaUp.on('ready', () => {
               link: item.link,
               button_title: item.button_title,
               expiration_date: item.expiration_date
-                ? item.expiration_date.toISOString()
+                ? time.formatDateTimeLocal(item.expiration_date)
                 : null,
               is_active: item.is_active,
             })
@@ -58,7 +59,7 @@ OmegaUp.on('ready', () => {
               link: item.link,
               button_title: item.button_title,
               expiration_date: item.expiration_date
-                ? item.expiration_date.toISOString()
+                ? time.formatDateTimeLocal(item.expiration_date)
                 : null,
               is_active: item.is_active,
             })
