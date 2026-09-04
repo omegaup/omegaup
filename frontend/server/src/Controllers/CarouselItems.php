@@ -13,21 +13,10 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * Helper function to transform CarouselItems DAO objects to API response format
      *
-     * @param \OmegaUp\DAO\VO\CarouselItems[] $items
-     * @param bool $activeOnly
+     * @param list<\OmegaUp\DAO\VO\CarouselItems> $items
      * @return list<CarouselItem>
      */
-    private static function transformCarouselItems(
-        array $items,
-        bool $activeOnly = false
-    ): array {
-        $filteredItems = $activeOnly
-            ? array_filter($items, fn($item) => $item->status === 'active')
-            : $items;
-
-        /** @var \OmegaUp\DAO\VO\CarouselItems[] $filteredItems */
-        $filteredItems = array_values($filteredItems);
-
+    private static function transformCarouselItems(array $items): array {
         /** @var list<CarouselItem> */
         return array_map(
             fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
@@ -40,7 +29,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                 'expiration_date' => $item->expiration_date,
                 'is_active' => $item->status === 'active',
             ],
-            $filteredItems
+            $items
         );
     }
 
@@ -186,10 +175,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             : \OmegaUp\DAO\Base\CarouselItems::getAll();
 
         return [
-            'carouselItems' => self::transformCarouselItems(
-                $items,
-                $activeOnly
-            ),
+            'carouselItems' => self::transformCarouselItems($items),
         ];
     }
 
@@ -212,8 +198,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'carouselItems' => self::transformCarouselItems(
-                        \OmegaUp\DAO\Base\CarouselItems::getAll(),
-                        false
+                        \OmegaUp\DAO\Base\CarouselItems::getAll()
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
