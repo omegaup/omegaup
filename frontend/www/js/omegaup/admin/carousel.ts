@@ -33,7 +33,7 @@ OmegaUp.on('ready', () => {
               excerpt: item.excerpt,
               image_url: item.image_url,
               link: item.link,
-              buttonTitle: item.button_title,
+              button_title: item.button_title,
               expiration_date: item.expiration_date
                 ? item.expiration_date.toISOString()
                 : null,
@@ -56,7 +56,7 @@ OmegaUp.on('ready', () => {
               excerpt: item.excerpt,
               image_url: item.image_url,
               link: item.link,
-              buttonTitle: item.button_title,
+              button_title: item.button_title,
               expiration_date: item.expiration_date
                 ? item.expiration_date.toISOString()
                 : null,

@@ -38,7 +38,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param string $buttonTitle
+     * @omegaup-request-param string $button_title
      * @omegaup-request-param string $excerpt
      * @omegaup-request-param null|string $expiration_date
      * @omegaup-request-param string $image_url
@@ -64,7 +64,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             'excerpt' => $r->ensureString('excerpt'),
             'image_url' => $r->ensureString('image_url'),
             'link' => $r->ensureString('link'),
-            'button_title' => $r->ensureString('buttonTitle'),
+            'button_title' => $r->ensureString('button_title'),
             'expiration_date' => is_null($expiration)
                 ? null
                 : new \OmegaUp\Timestamp(strtotime($expiration)),
@@ -110,7 +110,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param string $buttonTitle
+     * @omegaup-request-param string $button_title
      * @omegaup-request-param int $carousel_item_id
      * @omegaup-request-param string $excerpt
      * @omegaup-request-param null|string $expiration_date
@@ -139,7 +139,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         $carouselItem->excerpt = $r->ensureString('excerpt');
         $carouselItem->image_url = $r->ensureString('image_url');
         $carouselItem->link = $r->ensureString('link');
-        $carouselItem->button_title = $r->ensureString('buttonTitle');
+        $carouselItem->button_title = $r->ensureString('button_title');
 
         $carouselItem->expiration_date = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $r->ensureOptionalString('expiration_date')

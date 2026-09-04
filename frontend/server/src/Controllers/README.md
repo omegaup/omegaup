@@ -665,7 +665,7 @@ Create a new Carousel Item
 
 | Name              | Type           | Description | Required |
 | ----------------- | -------------- | ----------- | -------- |
-| `buttonTitle`     | `string`       |             | ✓        |
+| `button_title`    | `string`       |             | ✓        |
 | `excerpt`         | `string`       |             | ✓        |
 | `image_url`       | `string`       |             | ✓        |
 | `is_active`       | `bool`         |             | ✓        |
@@ -722,7 +722,7 @@ Update a Carousel Item
 
 | Name               | Type           | Description | Required |
 | ------------------ | -------------- | ----------- | -------- |
-| `buttonTitle`      | `string`       |             | ✓        |
+| `button_title`     | `string`       |             | ✓        |
 | `carousel_item_id` | `int`          |             | ✓        |
 | `excerpt`          | `string`       |             | ✓        |
 | `image_url`        | `string`       |             | ✓        |
