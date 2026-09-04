@@ -5,9 +5,11 @@ These are function-level unittests for the recommendation model builder.
 Integration tests should be done via a PHP entry point.
 '''
 
+import argparse
 import math
 import os.path
 import unittest
+from unittest import mock
 from typing import Any, Callable, cast, Dict, List, Optional, Tuple
 
 import pandas as pd  # type: ignore
@@ -67,18 +69,41 @@ class TestModelGeneration(unittest.TestCase):
 class TestModelEvaluation(unittest.TestCase):
     '''Test model evaluation.'''
     def test_build_model_from_sqlite(self) -> None:
-        '''Tests that a Model.evaluate() returns a decent value.'''
+        '''The fixture model clears the floor the guardrail applies.'''
         model = build_problem_rec_model.Model(
             build_problem_rec_model.TrainingConfig(),
             build_problem_rec_model.load_sqlite(_TESTDATA))
-        self.assertGreater(model.evaluate(), 0.3)
+        floor = build_problem_rec_model.build_parser().get_default(
+            'min_map_score')
+        self.assertGreater(model.evaluate_metrics()['map'], floor)
 
-    def test_evaluate_is_unchanged_for_the_fixture(self) -> None:
-        '''The published score bar is pinned to a known fixture value.'''
+    def test_map_is_unchanged_for_the_fixture(self) -> None:
+        '''The recorded score is pinned to a known fixture value.'''
         model = build_problem_rec_model.Model(
             build_problem_rec_model.TrainingConfig(),
             build_problem_rec_model.load_sqlite(_TESTDATA))
-        self.assertAlmostEqual(model.evaluate(), 0.3419, places=4)
+        self.assertAlmostEqual(model.evaluate_metrics()['map'], 0.1939,
+                               places=4)
+
+    def test_a_prediction_the_model_cannot_serve_scores_zero(self) -> None:
+        '''An unanswerable prediction stays in the denominator.
+
+        The model knows nothing about problem 9, so the second user's only
+        prediction gets no recommendations. Dropping it would leave the first
+        user's perfect prediction as the whole average.
+        '''
+        runs = pd.DataFrame([(1, 1, 0), (1, 2, 1),
+                             (2, 9, 0), (2, 8, 1)],
+                            columns=['identity_id', 'problem_id', 'time'])
+        model = build_problem_rec_model.Model(
+            build_problem_rec_model.TrainingConfig(train_fraction=0.5), runs)
+        model.model = {1: [(2, 1.)]}
+        model.test_ac_map = {1: [1, 2], 2: [9, 8]}
+
+        metrics = model.evaluate_metrics(k=1)
+
+        self.assertAlmostEqual(metrics['map'], 0.5)
+        self.assertAlmostEqual(metrics['precision'], 0.5)
 
     def test_evaluate_metrics_on_the_fixture(self) -> None:
         '''evaluate_metrics returns all four metrics inside [0, 1].'''
@@ -343,7 +368,7 @@ class TestGetLastPublishedMap(unittest.TestCase):
         conn = _FakeConnection()
         conn.next_fetchone = (0.42,)
         result = build_problem_rec_model.get_last_published_map(
-            cast(lib.db.Connection, conn))
+            cast(lib.db.Connection, conn), '/var/lib/omegaup/model.db')
         self.assertEqual(result, 0.42)
 
     def test_returns_none_when_no_published_model(self) -> None:
@@ -351,8 +376,87 @@ class TestGetLastPublishedMap(unittest.TestCase):
         conn = _FakeConnection()
         conn.next_fetchone = None
         result = build_problem_rec_model.get_last_published_map(
-            cast(lib.db.Connection, conn))
+            cast(lib.db.Connection, conn), '/var/lib/omegaup/model.db')
         self.assertIsNone(result)
+
+    def test_the_baseline_is_scoped_to_one_artifact(self) -> None:
+        '''A run that wrote somewhere else cannot become the baseline.
+
+        The runbook's deterministic command writes a scratch path, and without
+        this a high score from one of those would block real models.
+        '''
+        conn = _FakeConnection()
+        conn.next_fetchone = (0.42,)
+
+        build_problem_rec_model.get_last_published_map(
+            cast(lib.db.Connection, conn), '/var/lib/omegaup/model.db')
+
+        query, params = conn.calls[0]
+        self.assertIn('`output_path` = %s', query)
+        self.assertEqual(params, ('/var/lib/omegaup/model.db',))
+
+
+class _FakeCronRun:
+    '''Stands in for the runner while `train_and_publish` is exercised.'''
+
+    def __init__(self) -> None:
+        self.run_id: Optional[int] = None
+        self.rows_affected: Optional[int] = None
+        self.failed = False
+
+    def set_rows_affected(self, rows: int) -> None:
+        '''Records the dataset size the job reported.'''
+        self.rows_affected = rows
+
+    def mark_failure(self) -> None:
+        '''Records that the job reported a failure.'''
+        self.failed = True
+
+
+class TestTrainAndPublish(unittest.TestCase):
+    '''Test what the guardrail is actually handed.'''
+
+    def test_the_guardrail_scores_the_model_with_map(self) -> None:
+        '''The recorded score is MAP@k and not one of the other metrics.
+
+        The four metrics differ on the fixture, so a test that only checked it
+        was one of them would pass on any of them.
+        '''
+        runs = build_problem_rec_model.load_sqlite(_TESTDATA)
+        expected = build_problem_rec_model.Model(
+            build_problem_rec_model.TrainingConfig(),
+            runs).evaluate_metrics()
+        seen: Dict[str, float] = {}
+
+        def fake_should_publish(
+                score: float,
+                min_map_score: float,
+                last_published_map: Optional[float],
+                max_map_regression: float,
+        ) -> Tuple[bool, Optional[str]]:
+            del min_map_score, last_published_map, max_map_regression
+            seen['score'] = score
+            return False, 'not published by the test'
+
+        defaults = build_problem_rec_model.TrainingConfig()
+        args = argparse.Namespace(
+            train_fraction=defaults.train_fraction,
+            rng_seed=defaults.rng_seed,
+            num_followups=defaults.num_followups,
+            followup_decay=defaults.followup_decay,
+            output='/tmp/model.db', no_track=True,
+            min_map_score=0.05, max_map_regression=0.02)
+        cron_run = _FakeCronRun()
+
+        with mock.patch.object(build_problem_rec_model, 'should_publish',
+                               fake_should_publish):
+            build_problem_rec_model.train_and_publish(
+                cast(Any, cron_run), args, runs)
+
+        self.assertAlmostEqual(seen['score'], expected['map'], places=6)
+        for name in ('precision', 'recall', 'ndcg'):
+            self.assertNotAlmostEqual(seen['score'], expected[name], places=6)
+        self.assertTrue(cron_run.failed)
 
 
 if __name__ == '__main__':

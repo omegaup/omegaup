@@ -27,10 +27,9 @@ each solved problem the model is asked for `k` recommendations
 (`k = --num-followups`, 3 by default) and they are compared against the problems
 that user actually solved next.
 
-`Model.evaluate()` returns the single score that gets recorded as `map_score` and
-that the guardrail thresholds are calibrated against. `Model.evaluate_metrics()`
-breaks the same replay down into the four standard ranking metrics, which is what
-makes that single number auditable:
+`Model.evaluate_metrics()` scores that replay with the four standard ranking
+metrics. `map` is the one recorded as `map_score` and the one the guardrail
+compares; the other three are logged so a move in it can be explained:
 
 - **precision@k**: of the `k` problems recommended, how many were solved next.
 - **recall@k**: of the problems the user actually solved next, how many were
@@ -45,14 +44,28 @@ All four are logged on every run next to the MAP score, so a drop in `map_score`
 can be read against whether precision fell (the recommendations got worse) or
 only NDCG fell (the right problems are still there but ranked worse).
 
+A prediction the model cannot answer at all scores zero rather than being left
+out of the average, otherwise a model that answers almost nothing would report
+near perfect numbers on the little it does answer.
+
 ## The guardrail (write audit publish)
 
 A bad training run must never replace a good model. Before the new model is
 published it is audited:
 
-- if its MAP score is below `--min-map-score` (default 0.3) it is not saved;
+- if its MAP score is below `--min-map-score` (default 0.05) it is not saved;
 - if its MAP score regressed more than `--max-map-regression` (default 0.05)
-  below the last published model, it is not saved.
+  below the last published model **at the same `--output` path**, it is not
+  saved.
+
+`--min-map-score` is a floor for an obviously broken model, not a quality bar.
+MAP@k on the checked in fixture is 0.19, so the default sits well under a working
+model and the regression check is what carries the quality signal. Recalibrate it
+once there are real runs in `Recommendation_Model_Runs`.
+
+The baseline is scoped to the artifact being replaced so a run that wrote
+somewhere else, a manual one against a scratch path for instance, can never
+become the score a production model has to beat.
 
 When the audit fails the previous model file stays in place, the run is recorded
 as a failure with a `skip_reason`, and the cron exits non zero so the platform
@@ -85,7 +98,7 @@ Local dry run that reads from a sqlite fixture and records nothing:
 Force a deterministic run (useful for reproducing a score):
 
     python3 stuff/cron/build_problem_rec_model.py --output /tmp/model.db \
-        --rng-seed 0
+        --rng-seed 0 --no-track
 
 ## How to check on it
 

@@ -31,6 +31,12 @@ import lib.runner  # pylint: disable=wrong-import-position
 
 # Default training parameters.
 _TRAIN_FRACTION = 0.8
+
+# A floor for an obviously broken model rather than a quality bar. MAP@k on
+# the checked in fixture is 0.19, so anything under this is not a model that
+# got worse, it is a model that stopped working. Recalibrate once there are
+# real runs recorded in `Recommendation_Model_Runs`.
+_MIN_MAP_SCORE = 0.05
 _NUM_FOLLOWUPS = 3
 _FOLLOWUP_DECAY = 0.4
 
@@ -355,48 +361,15 @@ class Model:
             if problem_id not in banned_problems
         ][:k] or None
 
-    def evaluate(self, k: Optional[int] = None) -> float:
-        '''Compute a score about how good the model is.'''
-        if k is None:
-            k = self.config.num_followups
-        score = 0.
-        user_count = 0
-        for problems in self.test_ac_map.values():
-            num_problems = len(problems)
-            if num_problems <= 1:
-                continue
-
-            user_count += 1
-            cur_score = 0.
-            for i in range(1, num_problems):
-                recs = self.recommend(problems[i - 1], set(problems[:i - 1]),
-                                      k)
-                # TODO: Use mean_average_precision() instead of manually
-                #       computing something like it here.
-                if recs is None:
-                    continue
-                rank = 1
-                for predicted, expected in zip(recs, problems[i:i + k]):
-                    if predicted == expected:
-                        cur_score += 1. / rank
-                    rank += 1
-
-            score += cur_score / (num_problems - 1)
-
-        if not user_count:
-            # No test user solved more than one problem, so there is nothing
-            # to score against.
-            return 0.
-        return score / user_count
-
     def evaluate_metrics(self, k: Optional[int] = None) -> Dict[str, float]:
-        '''Break the model quality down into standard ranking metrics.
+        '''Scores the model with the standard ranking metrics.
 
         Replays every test user: after each solved problem the model is asked
         for k recommendations and they are scored against the problems the
         user really solved next. Returns precision@k, recall@k, MAP@k and
-        NDCG@k averaged over every such prediction, which is what makes the
-        single score from `evaluate()` auditable.
+        NDCG@k averaged over every such prediction. `map` is the one the
+        guardrail is calibrated against, the other three are recorded in the
+        log so a change in it can be explained.
         '''
         if k is None:
             k = self.config.num_followups
@@ -413,11 +386,14 @@ class Model:
                 recs = self.recommend(problems[i - 1], set(problems[:i - 1]),
                                       k)
                 expected = problems[i:i + k]
-                if not recs or not expected:
+                if not expected:
                     continue
+                # A prediction the model could not serve scores zero rather
+                # than leaving the denominator, otherwise a model that answers
+                # almost nothing reports near perfect numbers.
                 predictions += 1
                 for name, metric_fn in metric_fns.items():
-                    totals[name] += metric_fn(recs, expected, k) or 0.
+                    totals[name] += metric_fn(recs or [], expected, k) or 0.
         if not predictions:
             return {name: 0. for name in metric_fns}
         return {name: totals[name] / predictions for name in metric_fns}
@@ -453,16 +429,25 @@ def record_model_run(
     dbconn.conn.commit()
 
 
-def get_last_published_map(dbconn: lib.db.Connection) -> Optional[float]:
-    '''Returns the MAP score of the most recently published model, or None.'''
+def get_last_published_map(
+        dbconn: lib.db.Connection,
+        output_path: str,
+) -> Optional[float]:
+    '''Returns the MAP score of the model currently at `output_path`.
+
+    Scoped to one artifact on purpose. A run that wrote somewhere else, a
+    manual one against a scratch path for instance, never becomes the baseline
+    the production model has to beat.
+    '''
     with dbconn.cursor() as cur:
         cur.execute(
             '''
             SELECT `map_score`
             FROM `Recommendation_Model_Runs`
-            WHERE `published` = 1
+            WHERE `published` = 1 AND `output_path` = %s
             ORDER BY `created_at` DESC
-            LIMIT 1;''')
+            LIMIT 1;''',
+            (output_path,))
         row = cur.fetchone()
     if not row:
         return None
@@ -505,8 +490,8 @@ def train_and_publish(
                        rng_seed=args.rng_seed,
                        num_followups=args.num_followups,
                        followup_decay=args.followup_decay), runs)
-    score = model.evaluate()
     metrics = model.evaluate_metrics()
+    score = metrics['map']
     logging.info('Model MAP score: %f', score)
     logging.info(
         'Model ranking metrics at k=%d: precision=%.4f recall=%.4f '
@@ -520,7 +505,7 @@ def train_and_publish(
         lib.db.DatabaseConnectionArguments.from_args(args))
         if not args.no_track else None)
     try:
-        last_published_map = (get_last_published_map(dbconn)
+        last_published_map = (get_last_published_map(dbconn, args.output)
                               if dbconn is not None else None)
         published, skip_reason = should_publish(score, args.min_map_score,
                                                 last_published_map,
@@ -581,10 +566,11 @@ def build_parser() -> argparse.ArgumentParser:
                                'deterministically.')
     training_args.add_argument('--min-map-score',
                                type=float,
-                               default=0.3,
-                               help='Minimum MAP score to consider the '
-                               'training successful. Use to ensure we '
-                               'don\'t push bad models to prod.')
+                               default=_MIN_MAP_SCORE,
+                               help='Floor below which the model is treated '
+                               'as broken and is not published. This is not a '
+                               'quality bar, the regression check against the '
+                               'last published model is what carries that.')
     training_args.add_argument('--max-map-regression',
                                type=float,
                                default=0.05,

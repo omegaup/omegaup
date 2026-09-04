@@ -99,15 +99,18 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
             exc_type: Any,
             exc_value: Any,
             traceback: Any) -> None:
-        if not self._enabled:
-            return
-        try:
-            self._finish(exc_value)
-        finally:
+        if self._enabled:
             try:
-                self._release_lock()
+                self._finish(exc_value)
             finally:
-                self._close_connection()
+                try:
+                    self._release_lock()
+                finally:
+                    self._close_connection()
+        if exc_value is None and self._forced_failure:
+            # Nothing was raised, so without this the process would exit 0 and
+            # the scheduler would read a failed run as a healthy one.
+            raise SystemExit(1)
 
     @contextlib.contextmanager
     def phase(self, name: str) -> Iterator[None]:
@@ -145,7 +148,9 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         '''Records this run as failed even if nothing was raised.
 
         Jobs that report failures through a return value need this, otherwise
-        the run would be recorded as successful.
+        the run would be recorded as successful. The context manager exits with
+        a non zero status afterwards, so process level alerting agrees with the
+        row in `Cron_Runs`.
         '''
         self._forced_failure = True
 
