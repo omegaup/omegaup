@@ -1989,4 +1989,82 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
         }
     }
+
+    /**
+     * Regression test for #10160: authors that are not present in
+     * `User_Rank` (e.g. admins, users who only create problems, private
+     * users) must still filter the problem list correctly when used as
+     * the `author` parameter. The previous implementation queried
+     * `User_Rank` and silently dropped the filter when no rows matched.
+     */
+    public function testAuthorFilterWorksForUsersAbsentFromUserRank() {
+        // Author that has never solved a problem, so they will be
+        // missing from the denormalized `User_Rank` table.
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'author_without_solutions']
+            )
+        );
+        // A second author that has solved at least one problem, so they
+        // would be present in `User_Rank` and serve as a control.
+        ['identity' => $otherAuthor] = \OmegaUp\Test\Factories\User::createUser();
+        $otherRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            $otherAuthor
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($otherRunData);
+
+        $ownProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'author' => $author,
+            ])
+        );
+        $otherProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'author' => $otherAuthor,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'author' => 'author_without_solutions',
+            ])
+        );
+        $aliases = array_column($response['results'], 'alias');
+        $this->assertContains(
+            $ownProblem['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertNotContains(
+            $otherProblem['request']['problem_alias'],
+            $aliases
+        );
+    }
+
+    /**
+     * Regression test for #10160: when the `author` parameter refers to
+     * a username that does not exist in the platform, the problem list
+     * must be empty rather than silently returning every visible
+     * problem. The previous implementation queried `User_Rank` and the
+     * empty result caused the WHERE clause to be omitted entirely.
+     */
+    public function testAuthorFilterWithNonexistentUsernameReturnsEmpty() {
+        // Seed at least one visible problem so we can tell the filter
+        // is actually being applied rather than the platform having
+        // no problems at all.
+        \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'author' => 'definitely_does_not_exist',
+            ])
+        );
+        $this->assertEmpty($response['results']);
+    }
 }
