@@ -48,10 +48,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import homepageSlide from './Slide.vue';
-import * as api from '../../api';
 import { types } from '../../api_types';
 
 interface SlideData {
@@ -83,11 +82,13 @@ interface SlideData {
   },
 })
 export default class Carousel extends Vue {
-  T = T;
-  slides: SlideData[] = [];
+  @Prop({ default: () => [] }) carouselItems!: types.CarouselItem[];
 
-  mounted(): void {
-    this.loadCarouselItems();
+  T = T;
+  get slides(): SlideData[] {
+    return this.carouselItems
+      .map((item) => this.transformCarouselItem(item))
+      .filter((slide): slide is SlideData => slide !== null);
   }
 
   parseJsonField(field: string): { [key: string]: string } {
@@ -164,30 +165,6 @@ export default class Carousel extends Vue {
     }
 
     return slide;
-  }
-
-  loadCarouselItems(): void {
-    api.CarouselItems.list({
-      active_only: true,
-    })
-      .then((response) => {
-        const transformedSlides = response.carouselItems
-          .map((item) => this.transformCarouselItem(item))
-          .filter((slide): slide is SlideData => slide !== null);
-
-        // Reverse so newer items appear first (matching old behavior)
-        this.slides = transformedSlides.reverse();
-
-        // Fallback to empty array if no slides
-        if (this.slides.length === 0) {
-          this.slides = [];
-        }
-      })
-      .catch((error) => {
-        console.error('Error loading carousel items:', error);
-        // On error, set empty array (carousel won't display)
-        this.slides = [];
-      });
   }
 }
 </script>

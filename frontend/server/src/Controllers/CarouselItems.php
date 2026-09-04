@@ -208,4 +208,15 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'admin_carousel',
         ];
     }
+
+    /**
+     * Get active carousel items for homepage
+     *
+     * @return list<CarouselItem>
+     */
+    public static function getActiveCarouselItems(): array {
+        return self::transformCarouselItems(
+            \OmegaUp\DAO\CarouselItems::getActiveItems()
+        );
+    }
 }

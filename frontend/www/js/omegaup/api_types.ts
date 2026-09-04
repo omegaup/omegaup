@@ -1786,6 +1786,21 @@ export namespace types {
       elementId: string = 'payload',
     ): types.IndexPayload {
       return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
         x.coderOfTheMonthData = ((x) => {
           if (typeof x.all !== 'undefined' && x.all !== null)
             x.all = ((x) => {
@@ -4061,6 +4076,7 @@ export namespace types {
   }
 
   export interface IndexPayload {
+    carouselItems: types.CarouselItem[];
     coderOfTheMonthData: {
       all?: types.UserProfile;
       female?: types.UserProfile;
