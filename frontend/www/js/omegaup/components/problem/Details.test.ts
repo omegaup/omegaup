@@ -447,7 +447,7 @@ int main() {
         problem: {
           ...problem,
           karel_problem: true,
-          languages: ['kp', 'kj'],
+          languages: ['kp', 'kj', 'rk'],
         },
         runDetailsData,
         user,
@@ -464,5 +464,38 @@ int main() {
     });
 
     expect(wrapper.findComponent(arena_EphemeralGrader).exists()).toBe(false);
+    expect(wrapper.find('.karel-js-link a').attributes('href')).toBe(
+      '/rekarel/',
+    );
+    expect(wrapper.find('.karel-js-link a').text()).toContain(T.openInReKarel);
+  });
+
+  it('Should link legacy Karel problems to karel.js', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem: {
+          ...problem,
+          karel_problem: true,
+          languages: ['kp', 'kj'],
+        },
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.find('.karel-js-link a').attributes('href')).toBe(
+      '/karel.js/',
+    );
+    expect(wrapper.find('.karel-js-link a').text()).toContain(T.openInKarelJs);
   });
 });
