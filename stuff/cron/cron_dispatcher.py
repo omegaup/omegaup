@@ -10,12 +10,14 @@ import contextlib
 import json
 import logging
 import os
+import signal
 import subprocess
 import sys
 import tempfile
 
 import enum
-from typing import Callable, Iterator, List, NamedTuple, Optional, Set, Tuple
+from typing import (Any, Callable, Iterator, List, NamedTuple, Optional, Set,
+                    Tuple)
 
 import mysql.connector.cursor
 
@@ -32,6 +34,8 @@ _MAX_ERROR_LENGTH = 1000
 
 # A dispatcher that dies mid-run would otherwise leave the job unrunnable.
 STALE_PICK_HOURS = 6
+
+DEFAULT_RUN_TIMEOUT_SECONDS = STALE_PICK_HOURS * 3600
 
 _STALE_PICK_ERROR = 'the dispatcher did not finish this run'
 _UNREGISTERED_ERROR = 'job is not registered'
@@ -183,14 +187,31 @@ def run_script(
     args: argparse.Namespace,
     name: str,
 ) -> Tuple[int, Optional[str]]:
-    '''Runs a registered cron script as a subprocess.'''
+    '''Runs a registered cron script as a subprocess.
+
+    stderr goes to a file rather than a pipe and only its tail is read back,
+    so a job that writes gigabytes cannot grow the dispatcher.
+    '''
+    timeout = (getattr(args, 'run_timeout_seconds', None)
+               or DEFAULT_RUN_TIMEOUT_SECONDS)
     with db_command_args(args) as db_args:
         command = [sys.executable, os.path.join(_CRON_DIR, name)] + db_args
-        result = subprocess.run(command, check=False, capture_output=True,
-                                text=True)
-    if result.returncode == 0:
-        return (0, None)
-    return (result.returncode, (result.stderr or '')[-_MAX_ERROR_LENGTH:])
+        with tempfile.TemporaryFile() as stderr_file:
+            try:
+                result = subprocess.run(command, check=False,
+                                        stdin=subprocess.DEVNULL,
+                                        stdout=subprocess.DEVNULL,
+                                        stderr=stderr_file,
+                                        timeout=timeout)
+            except subprocess.TimeoutExpired:
+                logging.error('Rerun of %s timed out after %ds', name, timeout)
+                return (1, f'timed out after {timeout}s')
+            if result.returncode == 0:
+                return (0, None)
+            end = stderr_file.seek(0, os.SEEK_END)
+            stderr_file.seek(max(0, end - 4 * _MAX_ERROR_LENGTH))
+            tail = stderr_file.read().decode('utf-8', errors='replace')
+    return (result.returncode, tail[-_MAX_ERROR_LENGTH:])
 
 
 def _notify_requester(
@@ -302,14 +323,34 @@ def process_requests(
     return processed
 
 
+def install_signal_handlers() -> None:
+    '''Turns a stop signal into SystemExit so the credential file is removed.
+
+    The default SIGTERM disposition kills the process without unwinding, which
+    leaves the temporary `.cnf` holding the database password on disk.
+    '''
+    def _exit(signum: int, frame: Any) -> None:
+        del frame
+        sys.exit(128 + signum)
+
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        signal.signal(sig, _exit)
+
+
 def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(
         description='Dispatch manual cron rerun requests.')
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    parser.add_argument('--run-timeout-seconds',
+                        type=int,
+                        default=DEFAULT_RUN_TIMEOUT_SECONDS,
+                        help=('Seconds a single rerun may take before it is '
+                              'killed and recorded as failed'))
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
+    install_signal_handlers()
 
     logging.info('Started')
     dbconn = lib.db.connect(
