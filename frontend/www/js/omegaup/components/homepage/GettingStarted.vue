@@ -20,9 +20,7 @@
               {{ T.homepageCompeteSectionDescription }}
             </p>
             <div class="card-links">
-              <a class="card-link" href="/arena/">{{
-                T.buttonGoToContests
-              }}</a>
+              <a class="card-link" href="/arena/">{{ T.buttonGoToContests }}</a>
             </div>
           </div>
         </div>
@@ -83,9 +81,7 @@
               {{ T.homepageTeachSectionDescription }}
             </p>
             <div class="card-links">
-              <a class="card-link" href="/course/">{{
-                T.buttonGoToCourses
-              }}</a>
+              <a class="card-link" href="/course/">{{ T.buttonGoToCourses }}</a>
             </div>
           </div>
         </div>

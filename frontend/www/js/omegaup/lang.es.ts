@@ -901,6 +901,8 @@ const translations: { [key: string]: string; } = {
   homepageCompeteSectionTitle: "Compite",
   homepageCreateSectionDescription: "Organiza tu concurso con problemas que est\u00e1n disponibles en la plataforma o crea tus propios problemas",
   homepageCreateSectionTitle: "Crea",
+  homepageGetStartedTitle: "Primeros pasos con omegaUp",
+  homepageHowItWorks: "C\u00f3mo funciona",
   homepageSponsorsSectionTitle: "Gracias a nuestro Patrocinador",
   homepageTeachSectionDescription: "Sigue el progreso de tus estudiantes a trav\u00e9s de tareas y ex\u00e1menes que se eval\u00faan autom\u00e1ticamente",
   homepageTeachSectionTitle: "Ense\u00f1a",

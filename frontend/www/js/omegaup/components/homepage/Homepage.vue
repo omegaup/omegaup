@@ -102,7 +102,6 @@ import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import homepage_Testimonials from './Testimonials.vue';
-import homepage_Section from './Section.vue';
 import homepage_GettingStarted from './GettingStarted.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
@@ -119,7 +118,6 @@ Vue.use(VueCookies, { expires: -1 });
     'omegaup-school-rank': school_Rank,
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
-    'omegaup-section': homepage_Section,
     'omegaup-getting-started': homepage_GettingStarted,
     'omegaup-sponsors': homepage_Sponsors,
     'omegaup-cookie-accept-decline': homepage_Cookie,
