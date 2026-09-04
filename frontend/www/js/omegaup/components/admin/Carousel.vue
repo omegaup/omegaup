@@ -17,8 +17,7 @@
         <label class="mr-2 ml-3">{{ T.wordsStatus }}:</label>
         <select
           v-model="currentStatusFilter"
-          class="form-control d-inline-block"
-          style="width: auto"
+          class="form-control d-inline-block w-auto"
         >
           <option value="active">{{ T.carouselActive }}</option>
           <option value="archived">{{ T.carouselArchive }}</option>
@@ -65,7 +64,7 @@
                 v-if="item.image_url"
                 :src="item.image_url"
                 :alt="getMultilingualText(item.title, currentLanguage)"
-                style="max-width: 100px; max-height: 60px"
+                class="carousel-item-image"
               />
               <span v-else>{{ T.carouselNoImage }}</span>
             </td>
@@ -223,6 +222,18 @@
         </div>
       </form>
     </b-modal>
+    <b-modal
+      v-model="showArchiveModal"
+      :title="T.carouselDeleteConfirm"
+      :ok-title="T.carouselArchive"
+      :cancel-title="T.wordsCancel"
+      ok-variant="danger"
+      centered
+      @ok="archiveSelectedItem"
+      @hidden="resetArchiveModal"
+    >
+      {{ T.carouselDeleteMessage }}
+    </b-modal>
   </div>
 </template>
 
@@ -268,6 +279,8 @@ export default class Carousel extends Vue {
     excerpt: { en: '', es: '', pt: '' },
     button_title: { en: '', es: '', pt: '' },
   };
+  itemToArchive: types.CarouselItem | null = null;
+  showArchiveModal = false;
 
   getEmptyItem(): types.CarouselItem {
     return {
@@ -370,21 +383,21 @@ export default class Carousel extends Vue {
     this.showItemModal();
   }
 
-  async confirmDelete(item: types.CarouselItem): Promise<void> {
-    const confirmed = await (this as any).$bvModal?.msgBoxConfirm(
-      T.carouselDeleteMessage,
-      {
-        title: T.carouselDeleteConfirm,
-        okTitle: T.carouselArchive,
-        cancelTitle: T.wordsCancel,
-        okVariant: 'danger',
-        hideHeaderClose: false,
-        centered: true,
-      },
-    );
-    if (confirmed) {
-      this.$emit('delete-item', item.carousel_item_id);
+  confirmDelete(item: types.CarouselItem): void {
+    this.itemToArchive = item;
+    this.showArchiveModal = true;
+  }
+
+
+  archiveSelectedItem(): void {
+    if (!this.itemToArchive) {
+      return;
     }
+    this.$emit('delete-item', this.itemToArchive.carousel_item_id);
+  }
+
+  resetArchiveModal(): void {
+    this.itemToArchive = null;
   }
 
   saveItem(): void {
@@ -492,5 +505,10 @@ export default class Carousel extends Vue {
 <style scoped>
 .nav-tabs .nav-link {
   cursor: pointer;
+}
+
+.carousel-item-image {
+  max-width: 100px;
+  max-height: 60px;
 }
 </style>
