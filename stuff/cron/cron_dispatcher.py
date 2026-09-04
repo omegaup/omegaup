@@ -35,6 +35,7 @@ STALE_PICK_HOURS = 6
 
 _STALE_PICK_ERROR = 'the dispatcher did not finish this run'
 _UNREGISTERED_ERROR = 'job is not registered'
+_SKIPPED_ERROR = 'the job did not run: it is disabled or already running'
 
 
 class RequestStatus(enum.Enum):
@@ -263,6 +264,8 @@ def process_requests(
             continue
 
         previous_run_id = _latest_run_id(cur, request.name)
+        # Ends the read view, which REPEATABLE READ would otherwise reuse.
+        dbconn.conn.commit()
         logging.info('Running rerun of %s', request.name)
         try:
             returncode, error_text = run_command(args, request.name)
@@ -273,16 +276,24 @@ def process_requests(
                   if returncode == 0 else RequestStatus.FAILED)
         run_id = _latest_run_id(cur, request.name)
         if run_id == previous_run_id:
-            # The job was disabled or already running, so it produced no run.
             run_id = None
+            if status is RequestStatus.DONE:
+                # lib.runner exits 0 when it skips, so this never ran.
+                status = RequestStatus.FAILED
+                error_text = _SKIPPED_ERROR
 
         cur.execute(
             '''
             UPDATE Cron_Run_Requests
             SET status = %s, finished_at = NOW(), run_id = %s, error_text = %s
-            WHERE request_id = %s;''',
-            (status.value, run_id, error_text, request.request_id))
-        _notify_requester(cur, request.requested_by, request.name, status)
+            WHERE request_id = %s AND status = %s;''',
+            (status.value, run_id, error_text, request.request_id,
+             RequestStatus.PICKED.value))
+        if cur.rowcount == 1:
+            _notify_requester(cur, request.requested_by, request.name, status)
+        else:
+            logging.warning('Request %d was resolved by someone else',
+                            request.request_id)
         dbconn.conn.commit()
         processed += 1
 

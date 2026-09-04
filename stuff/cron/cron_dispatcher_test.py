@@ -3,6 +3,8 @@
 These use in-memory fakes so neither a real database nor a subprocess is
 required. The script under test is injected with a fake run command, so the
 tests exercise the request lifecycle (claim, run, record, notify) in isolation.
+The fake connection models InnoDB's REPEATABLE READ snapshot, so a lookup
+inside an open read view keeps answering with what the view captured.
 '''
 
 import argparse
@@ -19,6 +21,12 @@ RunResult = Tuple[int, Optional[str]]
 Params = Optional[Tuple[Any, ...]]
 
 _REGISTERED = ('update_ranks.py', 'assign_badges.py', 'aggregate_feedback.py')
+
+_NO_READ_VIEW = object()
+
+# Recorded in `calls` so a test can assert what happened between two queries.
+_COMMIT = 'COMMIT'
+_LAUNCH = 'LAUNCH'
 
 
 def _normalize(query: str) -> str:
@@ -47,7 +55,10 @@ class _FakeCursor:
             self._mode = 'run_id'
         elif 'picked_at = now()' in normalized:
             self._mode = None
-            self.rowcount = 1 if self._connection.claim_succeeds else 0
+            self.rowcount = self._connection.rowcount_for('claim')
+        elif 'run_id = %s, error_text = %s' in normalized:
+            self._mode = None
+            self.rowcount = self._connection.rowcount_for('finish')
         else:
             self._mode = None
 
@@ -62,36 +73,50 @@ class _FakeCursor:
     def fetchone(self) -> Optional[Dict[str, Any]]:
         '''Returns the scripted answer for the query that was just run.'''
         if self._mode == 'run_id':
-            return {'run_id': self._connection.next_run_id()}
+            return {'run_id': self._connection.select_max_run_id()}
         return None
 
 
 class _FakeConnection:
-    '''Minimal stand-in for lib.db.Connection.'''
+    '''Stand-in for lib.db.Connection with REPEATABLE READ semantics.
+
+    `Cron_Runs` starts at `previous_run_id`. The child cron commits `run_id`
+    from its own connection, so a read view opened before it started keeps
+    reporting the old value until this connection commits.
+    '''
 
     registered = _REGISTERED
 
     def __init__(self, pending: List[Dict[str, Any]],
                  run_id: Optional[int] = 7,
                  previous_run_id: Optional[int] = None,
-                 claim_succeeds: bool = True) -> None:
+                 losing_updates: Tuple[str, ...] = ()) -> None:
         self.pending = pending
         self.run_id = run_id
-        self.previous_run_id = previous_run_id
-        self.claim_succeeds = claim_succeeds
-        self.run_id_queries = 0
+        self.losing_updates = losing_updates
+        self.committed_run_id = previous_run_id
         self.calls: List[Tuple[str, Any]] = []
+        self._read_view: Any = _NO_READ_VIEW
         self.conn = self
 
-    def next_run_id(self) -> Optional[int]:
-        '''Answers the run_id lookups made before and after the script runs.'''
-        self.run_id_queries += 1
-        if self.run_id_queries % 2 == 1:
-            return self.previous_run_id
-        return self.run_id
+    def rowcount_for(self, update: str) -> int:
+        '''Whether a conditional UPDATE matched, as MySQL would report it.'''
+        return 0 if update in self.losing_updates else 1
+
+    def child_committed_a_run(self) -> None:
+        '''The child cron inserted its `Cron_Runs` row on its own session.'''
+        self.committed_run_id = self.run_id
+
+    def select_max_run_id(self) -> Optional[int]:
+        '''Answers a MAX(run_id) lookup from the open read view.'''
+        if self._read_view is _NO_READ_VIEW:
+            self._read_view = self.committed_run_id
+        return cast(Optional[int], self._read_view)
 
     def commit(self) -> None:
-        '''Commits are a no-op against the fakes.'''
+        '''Ends the transaction, and with it the read view.'''
+        self.calls.append((_COMMIT, None))
+        self._read_view = _NO_READ_VIEW
 
 
 def _matching(calls: List[Tuple[str, Any]], needle: str) -> List[Params]:
@@ -137,11 +162,21 @@ class CronDispatcherTest(unittest.TestCase):
         run_command: cron_dispatcher.RunCommand,
         **kwargs: Any,
     ) -> Tuple[int, _FakeConnection]:
+        produces_run = kwargs.pop('produces_run', True)
         connection = _FakeConnection(pending, **kwargs)
         cursor = _FakeCursor(connection)
+
+        def instrumented(args: argparse.Namespace, name: str) -> RunResult:
+            connection.calls.append((_LAUNCH, name))
+            try:
+                return run_command(args, name)
+            finally:
+                if produces_run:
+                    connection.child_committed_a_run()
+
         processed = cron_dispatcher.process_requests(
             connection, cursor, argparse.Namespace(),  # type: ignore
-            run_command=run_command)
+            run_command=instrumented)
         return processed, connection
 
     def test_records_successful_rerun(self) -> None:
@@ -169,6 +204,23 @@ class CronDispatcherTest(unittest.TestCase):
         self.assertEqual(user_id, 5)
         self.assertEqual(
             json.loads(contents)['status'], RequestStatus.DONE.value)
+
+    def test_ends_the_read_view_before_the_child_runs(self) -> None:
+        '''Without a commit the second lookup re-reads the same snapshot.
+
+        The child commits its `Cron_Runs` row on its own connection, so under
+        REPEATABLE READ the dispatcher only sees it if it ended the read view
+        the first lookup opened.
+        '''
+        _, connection = self._run(
+            [{'request_id': 1, 'name': 'update_ranks.py', 'requested_by': 5}],
+            _fake_run)
+
+        texts = [query for query, _ in connection.calls]
+        first_lookup = next(i for i, text in enumerate(texts)
+                            if 'MAX(run_id)' in text)
+        launched = texts.index(_LAUNCH)
+        self.assertIn(_COMMIT, texts[first_lookup:launched])
 
     def test_records_failed_rerun_with_error(self) -> None:
         '''A non-zero exit marks the request failed and stores the error.'''
@@ -198,7 +250,7 @@ class CronDispatcherTest(unittest.TestCase):
 
         processed, connection = self._run(
             [{'request_id': 8, 'name': 'update_ranks.py', 'requested_by': 5}],
-            fake_run)
+            fake_run, produces_run=False)
 
         self.assertEqual(processed, 1)
         params = _final_update(connection.calls)
@@ -237,6 +289,25 @@ class CronDispatcherTest(unittest.TestCase):
             _claim_update(connection.calls),
             (RequestStatus.PICKED.value, 9, RequestStatus.PENDING.value))
 
+    def test_finishes_only_a_request_that_is_still_picked(self) -> None:
+        '''The terminal UPDATE names the status it expects, like the claim.'''
+        _, connection = self._run(
+            [{'request_id': 9, 'name': 'update_ranks.py', 'requested_by': 5}],
+            _fake_run)
+
+        params = _final_update(connection.calls)
+        assert params is not None
+        self.assertEqual(params[3], 9)
+        self.assertEqual(params[4], RequestStatus.PICKED.value)
+
+    def test_does_not_notify_over_the_stale_reaper(self) -> None:
+        '''A request the reaper already failed keeps the reaper's verdict.'''
+        _, connection = self._run(
+            [{'request_id': 9, 'name': 'update_ranks.py', 'requested_by': 5}],
+            _fake_run, losing_updates=('finish',))
+
+        self.assertEqual(_notifications(connection.calls), [])
+
     def test_skips_request_claimed_by_another_dispatcher(self) -> None:
         '''A request another dispatcher already took is left alone.'''
         launched: List[str] = []
@@ -248,7 +319,7 @@ class CronDispatcherTest(unittest.TestCase):
 
         processed, connection = self._run(
             [{'request_id': 9, 'name': 'update_ranks.py', 'requested_by': 5}],
-            fake_run, claim_succeeds=False)
+            fake_run, losing_updates=('claim',))
 
         self.assertEqual(processed, 0)
         self.assertEqual(launched, [])
@@ -266,16 +337,22 @@ class CronDispatcherTest(unittest.TestCase):
               RequestStatus.PICKED.value,
               cron_dispatcher.STALE_PICK_HOURS)])
 
-    def test_no_run_link_when_the_job_produced_no_run(self) -> None:
-        '''A job that skipped itself is not linked to its previous run.'''
+    def test_a_job_that_never_ran_is_not_recorded_done(self) -> None:
+        '''lib.runner exits 0 when it skips, which is not a successful run.'''
         _, connection = self._run(
             [{'request_id': 5, 'name': 'update_ranks.py', 'requested_by': 5}],
-            _fake_run, run_id=7, previous_run_id=7)
+            _fake_run, produces_run=False, run_id=7, previous_run_id=7)
 
         params = _final_update(connection.calls)
         assert params is not None
-        self.assertEqual(params[0], RequestStatus.DONE.value)
+        self.assertEqual(params[0], RequestStatus.FAILED.value)
         self.assertIsNone(params[1])
+        self.assertEqual(
+            params[2],
+            'the job did not run: it is disabled or already running')
+        self.assertEqual(
+            json.loads(_notifications(connection.calls)[0][1])['status'],
+            RequestStatus.FAILED.value)
 
     def test_only_pending_requests_are_picked_up(self) -> None:
         '''The queue query asks for the pending status by name.'''
