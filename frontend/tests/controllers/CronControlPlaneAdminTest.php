@@ -302,16 +302,29 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($first->request_id, $second->request_id);
     }
 
-    public function testEveryJobNameTheApiAcceptsIsInTheRegistry() {
-        // apiRerunCron validates against CronJobName and the dispatcher only
-        // launches what Cron_Jobs lists, so the two have to agree.
+    public function testEveryJobNameTheApiAcceptsIsLaunchable() {
+        // The dispatcher needs the name in Cron_Jobs *and* a script on disk,
+        // so a case missing either is queued and then rejected.
         $registered = array_map(
             fn ($job) => $job->name,
             \OmegaUp\DAO\CronJobs::getAllOrdered()
         );
+        // problem_health_check.py is registered by migration 00279; its
+        // script lands with the job itself.
+        $scriptNotLandedYet = ['problem_health_check.py'];
 
+        $missing = [];
         foreach (\OmegaUp\CronJobName::cases() as $case) {
             $this->assertContains($case->value, $registered);
+            if (
+                !file_exists(
+                    __DIR__ . '/../../../stuff/cron/' . $case->value
+                )
+            ) {
+                $missing[] = $case->value;
+            }
         }
+
+        $this->assertSame([], array_diff($missing, $scriptNotLandedYet));
     }
 }

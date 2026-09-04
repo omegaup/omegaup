@@ -227,17 +227,20 @@ def _notify_requester(
 def _reject_request(
     dbconn: lib.db.Connection,
     cur: mysql.connector.cursor.MySQLCursorDict,
-    request_id: int,
+    request: RerunRequest,
     error_text: str,
 ) -> None:
-    '''Fails a request that must not be launched at all.'''
+    '''Fails a request that must not be launched at all, and says so.'''
     cur.execute(
         '''
         UPDATE Cron_Run_Requests
         SET status = %s, finished_at = NOW(), error_text = %s
         WHERE request_id = %s AND status = %s;''',
-        (RequestStatus.FAILED.value, error_text, request_id,
+        (RequestStatus.FAILED.value, error_text, request.request_id,
          RequestStatus.PENDING.value))
+    if cur.rowcount == 1:
+        _notify_requester(cur, request.requested_by, request.name,
+                          RequestStatus.FAILED)
     dbconn.conn.commit()
 
 
@@ -253,8 +256,7 @@ def process_requests(
     processed = 0
     for request in get_pending_requests(cur):
         if not is_launchable(request.name, registered):
-            _reject_request(dbconn, cur, request.request_id,
-                            _UNREGISTERED_ERROR)
+            _reject_request(dbconn, cur, request, _UNREGISTERED_ERROR)
             logging.warning('Skipped unregistered job %s', request.name)
             processed += 1
             continue
