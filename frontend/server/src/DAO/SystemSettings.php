@@ -43,11 +43,33 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
         string $key,
         bool $default = true
     ): bool {
+        $cache = new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key);
+        $cached = $cache->get();
+        if (!is_null($cached)) {
+            return intval($cached) === 1;
+        }
         $setting = self::getByKey($key);
         if (is_null($setting)) {
             return $default;
         }
-        return intval($setting->setting_value) === 1;
+        $value = intval($setting->setting_value) === 1;
+        // Store as int because Cache::get() treats a stored `false` as a miss.
+        $cache->set($value ? 1 : 0, timeout: 0);
+        return $value;
+    }
+
+    /**
+     * Drop the cached value for one or more settings so the next read hits the database.
+     *
+     * @param string ...$keys The setting keys to invalidate
+     */
+    public static function invalidateCache(string ...$keys): void {
+        foreach ($keys as $key) {
+            (new \OmegaUp\Cache(
+                \OmegaUp\Cache::SYSTEM_SETTINGS,
+                $key
+            ))->delete();
+        }
     }
 
     /**
@@ -59,19 +81,23 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function setBooleanSetting(
         string $key,
-        bool $value
+        bool $value,
+        bool $invalidateCache = true
     ): int {
-        $setting = self::getByKey($key);
-        if (is_null($setting)) {
-            $newSetting = new \OmegaUp\DAO\VO\SystemSettings([
-                'setting_key' => $key,
-                'setting_value' => $value ? '1' : '0',
-                'setting_description' => '',
-            ]);
-            return self::create($newSetting);
+        $sql = '
+            INSERT INTO `System_Settings` (`setting_key`, `setting_value`, `setting_description`)
+            VALUES (?, ?, ?) AS new
+            ON DUPLICATE KEY UPDATE `setting_value` = new.`setting_value`;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$key, $value ? '1' : '0', '']
+        );
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+        if ($invalidateCache) {
+            self::invalidateCache($key);
         }
-        $setting->setting_value = $value ? '1' : '0';
-        return self::update($setting);
+        return $affectedRows;
     }
 
     /**
@@ -85,11 +111,18 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
         string $key,
         string $default = ''
     ): string {
+        $cache = new \OmegaUp\Cache(\OmegaUp\Cache::SYSTEM_SETTINGS, $key);
+        $cached = $cache->get();
+        if (!is_null($cached)) {
+            return strval($cached);
+        }
         $setting = self::getByKey($key);
         if (is_null($setting)) {
             return $default;
         }
-        return strval($setting->setting_value);
+        $value = strval($setting->setting_value);
+        $cache->set($value, timeout: 0);
+        return $value;
     }
 
     /**
@@ -101,18 +134,22 @@ class SystemSettings extends \OmegaUp\DAO\Base\SystemSettings {
      */
     public static function setStringSetting(
         string $key,
-        string $value
+        string $value,
+        bool $invalidateCache = true
     ): int {
-        $setting = self::getByKey($key);
-        if (is_null($setting)) {
-            $newSetting = new \OmegaUp\DAO\VO\SystemSettings([
-                'setting_key' => $key,
-                'setting_value' => $value,
-                'setting_description' => '',
-            ]);
-            return self::create($newSetting);
+        $sql = '
+            INSERT INTO `System_Settings` (`setting_key`, `setting_value`, `setting_description`)
+            VALUES (?, ?, ?) AS new
+            ON DUPLICATE KEY UPDATE `setting_value` = new.`setting_value`;
+        ';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$key, $value, '']
+        );
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+        if ($invalidateCache) {
+            self::invalidateCache($key);
         }
-        $setting->setting_value = $value;
-        return self::update($setting);
+        return $affectedRows;
     }
 }

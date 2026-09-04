@@ -1,9 +1,13 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
+  - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
+  - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -312,6 +316,52 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 Admin Controller
 
+## `/api/admin/getCronRun/`
+
+### Description
+
+Returns the detail of a single cron run.
+
+### Parameters
+
+| Name     | Type  | Description | Required |
+| -------- | ----- | ----------- | -------- |
+| `run_id` | `int` |             | ✓        |
+
+### Returns
+
+| Name  | Type            |
+| ----- | --------------- |
+| `run` | `types.CronRun` |
+
+**`types.CronRun` fields:**
+
+| Name               | Type                       | Required |
+| ------------------ | -------------------------- | -------- |
+| `duration_seconds` | `number`                   |          |
+| `error_text`       | `string`                   |          |
+| `finished_at`      | `Date`                     |          |
+| `hostname`         | `string`                   |          |
+| `name`             | `string`                   | ✓        |
+| `phases`           | `List[types.CronRunPhase]` | ✓        |
+| `rows_affected`    | `number`                   |          |
+| `run_id`           | `number`                   | ✓        |
+| `started_at`       | `Date`                     |          |
+| `status`           | `string`                   | ✓        |
+
+## `/api/admin/getCrons/`
+
+### Description
+
+Lists the registered cron jobs and their most recent runs.
+
+### Returns
+
+| Name   | Type                  |
+| ------ | --------------------- |
+| `jobs` | `List[types.CronJob]` |
+| `runs` | `List[types.CronRun]` |
+
 ## `/api/admin/getMaintenanceMode/`
 
 ### Description
@@ -323,6 +373,18 @@ Get maintenance mode status
 ```typescript
 types.MaintenanceModeStatus;
 ```
+
+## `/api/admin/getSystemSettings/`
+
+### Description
+
+Gets the current system settings. Only available to system admins.
+
+### Returns
+
+| Name       | Type                                   |
+| ---------- | -------------------------------------- |
+| `settings` | `{ ephemeralGraderEnabled: boolean; }` |
 
 ## `/api/admin/platformReportStats/`
 
@@ -358,6 +420,22 @@ Set maintenance mode
 | `message_es` | `null\|string` |             |          |
 | `message_pt` | `null\|string` |             |          |
 | `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
+
+## `/api/admin/updateSystemSettings/`
+
+### Description
+
+Updates system settings. Only available to system admins.
+
+### Parameters
+
+| Name                       | Type         | Description | Required |
+| -------------------------- | ------------ | ----------- | -------- |
+| `ephemeral_grader_enabled` | `null\|bool` |             |          |
 
 ### Returns
 
@@ -1573,16 +1651,16 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `contest_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`        | `int\|null`                                                                                                                                                                                                         |             |          |
-| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`      | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `contest_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`        | `int\|null`                                                                                                                                                                                                               |             |          |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`      | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -2564,19 +2642,19 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                                                                                | Description | Required |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `assignment_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `course_alias`     | `string`                                                                                                                                                                                                            |             | ✓        |
-| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |          |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`           | `int\|null`                                                                                                                                                                                                         |             |          |
-| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |          |
-| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |          |
-| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`         | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name               | Type                                                                                                                                                                                                                      | Description | Required |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `course_alias`     | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`                 |             |          |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`           | `int\|null`                                                                                                                                                                                                               |             |          |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                                     |             |          |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                            |             |          |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`         | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -4442,15 +4520,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `offset`        | `int`                                                                                                                                                                                                               |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `rowcount`      | `int`                                                                                                                                                                                                               |             | ✓        |
-| `username`      | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `username`      | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 

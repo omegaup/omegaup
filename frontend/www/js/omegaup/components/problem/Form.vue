@@ -16,7 +16,13 @@
       </p>
     </div>
     <div class="card-body px-2 px-sm-4">
-      <form ref="form" method="POST" class="form" enctype="multipart/form-data">
+      <form
+        ref="form"
+        method="POST"
+        class="form"
+        enctype="multipart/form-data"
+        @submit="handleFormSubmit"
+      >
         <div class="accordion mb-3">
           <div class="card">
             <div class="card-header">
@@ -119,6 +125,19 @@
                     >
                       {{ T.openProblemCreator }}
                     </button>
+                    <input
+                      ref="creatorFileInput"
+                      name="problem_contents"
+                      type="file"
+                      accept=".zip"
+                      class="d-none"
+                      :data-problem-creator-zip-ready="
+                        creatorGeneratedZipBlob !== null &&
+                        !isGeneratingCreatorZip
+                          ? 'true'
+                          : 'false'
+                      "
+                    />
                   </div>
                   <div
                     v-if="currentCreationMethod === CreationMethods.Zip"
@@ -520,7 +539,15 @@
     >
       <div class="problem-creator-modal-content">
         <div class="problem-creator-modal-body">
-          <omegaup-problem-creator v-if="showProblemCreator" />
+          <omegaup-problem-creator
+            v-if="showProblemCreator"
+            ref="problemCreator"
+            :hide-header-actions="true"
+            :hide-save-buttons="true"
+            @download-zip-file="handleCreatorZipGeneration"
+            @download-input-file="$emit('download-input-file', $event)"
+            @show-update-success-message="$emit('show-update-success-message')"
+          />
         </div>
         <div class="problem-creator-modal-footer">
           <button
@@ -543,6 +570,8 @@ import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import problem_CreatorWrapper from './CreatorWrapper.vue';
 import T from '../../lang';
+import * as ui from '../../ui';
+import JSZip from 'jszip';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 import 'intro.js/introjs.css';
@@ -576,6 +605,8 @@ export default class ProblemForm extends Vue {
   @Ref('limits') limitsRef!: HTMLDivElement;
   @Ref('validation') validationRef!: HTMLButtonElement;
   @Ref('form') formRef!: HTMLFormElement;
+  @Ref('creatorFileInput') creatorFileInputRef!: HTMLInputElement;
+  @Ref('problemCreator') problemCreatorRef!: problem_CreatorWrapper;
 
   T = T;
   title = this.data.title;
@@ -607,63 +638,97 @@ export default class ProblemForm extends Vue {
   CreationMethods = CreationMethods;
   currentCreationMethod: CreationMethods = this.creationMethod;
   showProblemCreator = false;
+  creatorGeneratedZipBlob: Blob | null = null;
+  isGeneratingCreatorZip = false;
+  private createProblemIntro: ReturnType<typeof introJs> | null = null;
 
   mounted() {
-    const title = T.createProblemInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
-      introJs()
-        .setOptions({
+      this.$nextTick(() => {
+        const title = T.createProblemInteractiveGuideTitle;
+        const steps = [
+          {
+            title,
+            intro: T.createProblemInteractiveGuideWelcome,
+          },
+          {
+            element: document.querySelector('.introjs-title') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideProblemTitle,
+          },
+          {
+            element: document.querySelector('.introjs-short-title') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideShortTitle,
+          },
+          {
+            element: document.querySelector('.introjs-origin') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideOrigin,
+          },
+        ];
+
+        if (!this.isUpdate && this.showCreationMethodSelector) {
+          steps.push({
+            element: document.querySelector(
+              '.introjs-creation-method',
+            ) as Element,
+            title,
+            intro: T.createProblemInteractiveGuideCreationMethod,
+          });
+        }
+
+        const openCreatorElement = document.querySelector(
+          '.introjs-open-creator',
+        ) as Element | null;
+        if (openCreatorElement) {
+          steps.push({
+            element: openCreatorElement,
+            title,
+            intro: T.createProblemInteractiveGuideOpenCreator,
+          });
+        }
+
+        const fileElement = document.querySelector(
+          '.introjs-file',
+        ) as Element | null;
+        if (fileElement) {
+          steps.push({
+            element: fileElement,
+            title,
+            intro: T.createProblemInteractiveGuideFile,
+          });
+        }
+
+        steps.push(
+          {
+            element: document.querySelector(
+              '.introjs-tags-and-level',
+            ) as Element,
+            title,
+            intro: T.createProblemInteractiveGuideTagsAndLevel,
+          },
+          {
+            element: document.querySelector('.introjs-type') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideType,
+          },
+          {
+            element: document.querySelector('.introjs-validator') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideValidator,
+          },
+        );
+
+        this.createProblemIntro = introJs().setOptions({
           nextLabel: T.interactiveGuideNextButton,
           prevLabel: T.interactiveGuidePreviousButton,
           doneLabel: T.interactiveGuideDoneButton,
-          steps: [
-            {
-              title,
-              intro: T.createProblemInteractiveGuideWelcome,
-            },
-            {
-              element: document.querySelector('.introjs-title') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideProblemTitle,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-short-title',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuideShortTitle,
-            },
-            {
-              element: document.querySelector('.introjs-origin') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideOrigin,
-            },
-            {
-              element: document.querySelector('.introjs-file') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideFile,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-tags-and-level',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuideTagsAndLevel,
-            },
-            {
-              element: document.querySelector('.introjs-type') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideType,
-            },
-            {
-              element: document.querySelector('.introjs-validator') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideValidator,
-            },
-          ],
-        })
-        .start();
-      this.$cookies.set('has-visited-create-problem', true, -1);
+          steps,
+        });
+        this.createProblemIntro.start();
+        this.$cookies.set('has-visited-create-problem', true, -1);
+      });
     }
   }
 
@@ -672,11 +737,59 @@ export default class ProblemForm extends Vue {
   }
 
   openProblemCreatorModal(): void {
+    // Exit the intro tour so its tooltip doesn't float over the open modal.
+    this.createProblemIntro?.exit(true);
     this.showProblemCreator = true;
   }
 
   closeProblemCreatorModal(): void {
+    // Drafts are committed to the store and the zip is generated before
+    // hiding the modal because `v-if` destroys the creator component.
+    this.creatorGeneratedZipBlob = null;
+    this.problemCreatorRef?.saveDraft?.();
+    this.problemCreatorRef?.generateZip?.();
     this.showProblemCreator = false;
+  }
+
+  handleCreatorZipGeneration({ zipContent }: { zipContent: JSZip }): void {
+    this.isGeneratingCreatorZip = true;
+    zipContent
+      .generateAsync({ type: 'blob' })
+      .then((blob) => {
+        this.creatorGeneratedZipBlob = blob;
+        this.isGeneratingCreatorZip = false;
+      })
+      .catch(() => {
+        this.isGeneratingCreatorZip = false;
+      });
+  }
+
+  handleFormSubmit(ev: Event): void {
+    if (
+      this.isUpdate ||
+      !this.showCreationMethodSelector ||
+      this.currentCreationMethod !== CreationMethods.Creator
+    ) {
+      return;
+    }
+    if (this.isGeneratingCreatorZip) {
+      ev.preventDefault();
+      ui.error(T.problemCreatorGeneratingZip);
+      return;
+    }
+    if (!this.creatorGeneratedZipBlob || typeof DataTransfer !== 'function') {
+      ev.preventDefault();
+      ui.error(T.problemCreatorOpenBeforeSubmit);
+      return;
+    }
+    const file = new File(
+      [this.creatorGeneratedZipBlob],
+      `${this.alias || 'problem'}.zip`,
+      { type: 'application/zip' },
+    );
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    this.creatorFileInputRef.files = dataTransfer.files;
   }
 
   get howToWriteProblemLink(): string {
@@ -760,9 +873,40 @@ export default class ProblemForm extends Vue {
     this.problemLevel = levelTag;
   }
 
-  onUploadFile(ev: InputEvent): void {
+  async onUploadFile(ev: InputEvent): Promise<void> {
     const uploadedFile = ev.target as HTMLInputElement;
-    this.hasFile = uploadedFile.files !== null;
+    this.hasFile = uploadedFile.files !== null && uploadedFile.files.length > 0;
+    if (
+      !this.isUpdate &&
+      this.showCreationMethodSelector &&
+      this.currentCreationMethod === CreationMethods.Zip &&
+      uploadedFile.files?.length
+    ) {
+      await this.importZipIntoCreator(uploadedFile.files[0]);
+    }
+  }
+
+  async importZipIntoCreator(zipFile: File): Promise<void> {
+    // Only Creator-generated zips (with a cdp.data snapshot) can populate the
+    // Creator; other zips keep the plain upload flow. Standard omegaUp zips
+    // will be supported in a follow-up.
+    try {
+      const zipContent = await new JSZip().loadAsync(zipFile);
+      if (!zipContent.file('cdp.data')) {
+        return;
+      }
+    } catch {
+      return;
+    }
+    this.currentCreationMethod = CreationMethods.Creator;
+    this.creatorGeneratedZipBlob = null;
+    this.openProblemCreatorModal();
+    await this.$nextTick();
+    const success = await this.problemCreatorRef?.importZipFile?.(zipFile);
+    if (!success) {
+      this.showProblemCreator = false;
+      this.currentCreationMethod = CreationMethods.Zip;
+    }
   }
 
   onGenerateAlias(): void {

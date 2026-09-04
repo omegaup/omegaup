@@ -1602,6 +1602,32 @@ export namespace types {
       );
     }
 
+    export function CronsDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CronsDetailsPayload {
+      return ((x) => {
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+              x.finished_at = ((x: number) => new Date(x * 1000))(
+                x.finished_at,
+              );
+            if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+              x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function EmailEditDetailsPayload(
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
@@ -2675,6 +2701,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function ViewUnavailablePayload(
+      elementId: string = 'payload',
+    ): types.ViewUnavailablePayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -3130,6 +3164,7 @@ export namespace types {
     currentEmail: string;
     currentName?: string;
     currentUsername: string;
+    ephemeralGraderEnabled: boolean;
     gravatarURL128: string;
     gravatarURL51: string;
     inContest: boolean;
@@ -3777,6 +3812,38 @@ export namespace types {
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
     teachingAssistant: types.FilteredCourse[];
+  }
+
+  export interface CronJob {
+    description?: string;
+    enabled: boolean;
+    name: string;
+    schedule?: string;
+  }
+
+  export interface CronRun {
+    duration_seconds?: number;
+    error_text?: string;
+    finished_at?: Date;
+    hostname?: string;
+    name: string;
+    phases: types.CronRunPhase[];
+    rows_affected?: number;
+    run_id: number;
+    started_at?: Date;
+    status: string;
+  }
+
+  export interface CronRunPhase {
+    duration: number;
+    error_class?: string;
+    phase: string;
+    status: string;
+  }
+
+  export interface CronsDetailsPayload {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
   }
 
   export interface CurrentSession {
@@ -5315,6 +5382,10 @@ export namespace types {
     hasParentalVerificationToken: boolean;
     message: string;
   }
+
+  export interface ViewUnavailablePayload {
+    description: string;
+  }
 }
 
 // API messages
@@ -5337,8 +5408,21 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetCronRunRequest = { [key: string]: any };
+  export type _AdminGetCronRunServerResponse = any;
+  export type AdminGetCronRunResponse = { run?: types.CronRun };
+  export type AdminGetCronsRequest = { [key: string]: any };
+  export type _AdminGetCronsServerResponse = any;
+  export type AdminGetCronsResponse = {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
+  };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
+  export type AdminGetSystemSettingsRequest = { [key: string]: any };
+  export type AdminGetSystemSettingsResponse = {
+    settings: { ephemeralGraderEnabled: boolean };
+  };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5355,6 +5439,8 @@ export namespace messages {
   };
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
+  export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
+  export type AdminUpdateSystemSettingsResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6352,15 +6438,27 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getCronRun: (
+      params?: messages.AdminGetCronRunRequest,
+    ) => Promise<messages.AdminGetCronRunResponse>;
+    getCrons: (
+      params?: messages.AdminGetCronsRequest,
+    ) => Promise<messages.AdminGetCronsResponse>;
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
+    getSystemSettings: (
+      params?: messages.AdminGetSystemSettingsRequest,
+    ) => Promise<messages.AdminGetSystemSettingsResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;
+    updateSystemSettings: (
+      params?: messages.AdminUpdateSystemSettingsRequest,
+    ) => Promise<messages.AdminUpdateSystemSettingsResponse>;
   }
 
   export interface AiEditorial {
