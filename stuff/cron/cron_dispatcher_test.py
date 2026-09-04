@@ -353,12 +353,23 @@ class CronDispatcherTest(unittest.TestCase):
         '''Requests stuck in picked are released before anything else runs.'''
         _, connection = self._run([], _fake_run)
 
-        self.assertEqual(
-            _matching(connection.calls, 'date_sub'),
-            [(RequestStatus.FAILED.value,
-              'the dispatcher did not finish this run',
-              RequestStatus.PICKED.value,
-              cron_dispatcher.STALE_PICK_HOURS)])
+        self.assertIn(
+            (RequestStatus.FAILED.value,
+             'the dispatcher did not finish this run',
+             RequestStatus.PICKED.value,
+             cron_dispatcher.STALE_PICK_HOURS),
+            _matching(connection.calls, 'date_sub'))
+
+    def test_fails_requests_no_dispatcher_ever_picked_up(self) -> None:
+        '''A pending row nothing claimed would block the job forever.'''
+        _, connection = self._run([], _fake_run)
+
+        self.assertIn(
+            (RequestStatus.FAILED.value,
+             'no dispatcher picked up this run',
+             RequestStatus.PENDING.value,
+             cron_dispatcher.STALE_PENDING_HOURS),
+            _matching(connection.calls, 'date_sub'))
 
     def test_a_job_that_never_ran_is_not_recorded_done(self) -> None:
         '''lib.runner exits 0 when it skips, which is not a successful run.'''

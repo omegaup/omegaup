@@ -35,9 +35,13 @@ _MAX_ERROR_LENGTH = 1000
 # A dispatcher that dies mid-run would otherwise leave the job unrunnable.
 STALE_PICK_HOURS = 6
 
+# A request nothing claimed means no dispatcher was running when it was made.
+STALE_PENDING_HOURS = 1
+
 DEFAULT_RUN_TIMEOUT_SECONDS = STALE_PICK_HOURS * 3600
 
 _STALE_PICK_ERROR = 'the dispatcher did not finish this run'
+_STALE_PENDING_ERROR = 'no dispatcher picked up this run'
 _UNREGISTERED_ERROR = 'job is not registered'
 _SKIPPED_ERROR = 'the job did not run: it is disabled or already running'
 
@@ -118,7 +122,11 @@ def fail_stale_requests(
     dbconn: lib.db.Connection,
     cur: mysql.connector.cursor.MySQLCursorDict,
 ) -> None:
-    '''Releases requests left behind by a dispatcher that died mid-run.'''
+    '''Releases requests no dispatcher is going to finish.
+
+    Either status blocks `getActiveByName`, so an abandoned row leaves the
+    job's Rerun button dead until something resolves it.
+    '''
     cur.execute(
         '''
         UPDATE
@@ -130,6 +138,17 @@ def fail_stale_requests(
             AND picked_at < DATE_SUB(NOW(), INTERVAL %s HOUR);''',
         (RequestStatus.FAILED.value, _STALE_PICK_ERROR,
          RequestStatus.PICKED.value, STALE_PICK_HOURS))
+    cur.execute(
+        '''
+        UPDATE
+            Cron_Run_Requests
+        SET
+            status = %s, finished_at = NOW(), error_text = %s
+        WHERE
+            status = %s
+            AND requested_at < DATE_SUB(NOW(), INTERVAL %s HOUR);''',
+        (RequestStatus.FAILED.value, _STALE_PENDING_ERROR,
+         RequestStatus.PENDING.value, STALE_PENDING_HOURS))
     dbconn.conn.commit()
 
 
