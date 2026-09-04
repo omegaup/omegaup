@@ -10,6 +10,7 @@ inside an open read view keeps answering with what the view captured.
 import argparse
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -30,6 +31,7 @@ Params = Optional[Tuple[Any, ...]]
 _REGISTERED = ('update_ranks.py', 'assign_badges.py', 'aggregate_feedback.py')
 
 _STUFF_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+_OMEGAUP_ROOT = os.path.dirname(_STUFF_DIR)
 
 _NO_READ_VIEW = object()
 
@@ -441,6 +443,27 @@ class IsLaunchableTest(unittest.TestCase):
         '''Only python scripts are ever launched.'''
         self.assertFalse(
             cron_dispatcher.is_launchable('testdata.db', {'testdata.db'}))
+
+    def test_rejects_a_tampered_registry_row(self) -> None:
+        '''The registry is not the allowlist, so a row alone is not enough.'''
+        for name in ('cron_dispatcher.py', 'conftest.py',
+                     'update_ranks_test.py'):
+            self.assertFalse(
+                cron_dispatcher.is_launchable(name, {name}), name)
+
+
+class KnownJobsTest(unittest.TestCase):
+    '''Tests that the python allowlist matches the PHP enum.'''
+
+    def test_matches_the_php_enum(self) -> None:
+        '''`CronJobName` is the source of truth; this fails when they drift.'''
+        path = os.path.join(
+            _OMEGAUP_ROOT, 'frontend/server/src/CronJobName.php')
+        with open(path, encoding='utf-8') as f:
+            source = f.read()
+        cases = set(re.findall(r"case\s+\w+\s*=\s*'([^']*)';", source))
+
+        self.assertEqual(cases, set(cron_dispatcher.KNOWN_JOBS))
 
 
 class RequestStatusTest(unittest.TestCase):
