@@ -248,7 +248,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Even problems could be solved using Karel, odd ones don't
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
-        $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
+        $karel_problem = 'kj,kp,rk,cpp11-gcc,c11-gcc'; // Karel problems should allow kj, kp AND rk extensions
         $tags = [
             'problemTagArrays',
             'problemTagBigData',
@@ -345,7 +345,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => $tags[0],
-            'programming_languages' => 'kp,kj',
+            'programming_languages' => 'kp,kj,rk',
         ]));
         $this->assertCount(3, $response['results']);
 
@@ -357,7 +357,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => $tags[0],
-            'programming_languages' => 'kp,kj',
+            'programming_languages' => 'kp,kj,rk',
             'difficulty_range' => '0,3',
             'order_by' => 'submissions',
         ]));
@@ -719,6 +719,26 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        // Grant access through all three permission paths simultaneously:
+        // ownership, a direct admin role, and an admin role through a group.
+        \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $authorLogin->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
+            'usernameOrEmail' => $identity->username,
+        ]));
+
+        $adminedProblems = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
+            $identity->identity_id,
+            1,
+            10
+        );
+        $this->assertSame(1, $adminedProblems['count']);
+        $this->assertCount(1, $adminedProblems['problems']);
+        $this->assertSame(
+            $problemDataPrivate['problem']->problem_id,
+            $adminedProblems['problems'][0]->problem_id
+        );
+
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
@@ -733,6 +753,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'alias',
             $alias
         );
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'page_size' => 1,
+            ])
+        );
+        $nextPage = end($response['pagerItems']);
+        $this->assertSame('disabled', $nextPage['class']);
     }
 
     /**
