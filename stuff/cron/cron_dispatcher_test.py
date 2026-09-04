@@ -10,9 +10,16 @@ inside an open read view keeps answering with what the view captured.
 import argparse
 import json
 import os
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import textwrap
 import unittest
 
 from typing import Any, Dict, List, Optional, Tuple, cast
+from unittest import mock
 
 from cron import cron_dispatcher
 from cron.cron_dispatcher import RequestStatus
@@ -21,6 +28,8 @@ RunResult = Tuple[int, Optional[str]]
 Params = Optional[Tuple[Any, ...]]
 
 _REGISTERED = ('update_ranks.py', 'assign_badges.py', 'aggregate_feedback.py')
+
+_STUFF_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 _NO_READ_VIEW = object()
 
@@ -478,6 +487,180 @@ class DbCommandArgsTest(unittest.TestCase):
         '''lib.db only reads the config file when --user is absent.'''
         with cron_dispatcher.db_command_args(self._args('hunter2')) as command:
             self.assertNotIn('--user', command)
+
+
+class RunScriptTest(unittest.TestCase):
+    '''Tests that launch a real child process.'''
+
+    def setUp(self) -> None:
+        self._tmpdir = tempfile.mkdtemp(prefix='cron_dispatcher_test_')
+        self.addCleanup(shutil.rmtree, self._tmpdir, True)
+        patcher = mock.patch.object(cron_dispatcher, '_CRON_DIR', self._tmpdir)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _script(self, body: str) -> str:
+        name = 'child.py'
+        with open(os.path.join(self._tmpdir, name), 'w',
+                  encoding='utf-8') as f:
+            f.write(textwrap.dedent(body))
+        return name
+
+    @staticmethod
+    def _args(timeout: Optional[int] = None) -> argparse.Namespace:
+        return argparse.Namespace(host='localhost', port=13306,
+                                  database='omegaup', user=None,
+                                  password=None, mysql_config_file=None,
+                                  run_timeout_seconds=timeout)
+
+    def test_kills_a_child_that_never_finishes(self) -> None:
+        '''A hung job must not hold the request open until the reaper.'''
+        name = self._script('''
+            import time
+            time.sleep(120)
+        ''')
+
+        returncode, error_text = cron_dispatcher.run_script(
+            self._args(timeout=1), name)
+
+        self.assertEqual(returncode, 1)
+        self.assertEqual(error_text, 'timed out after 1s')
+
+    def test_gives_the_child_no_stdin(self) -> None:
+        '''An inherited stdin lets a child block on a prompt forever.'''
+        name = self._script('''
+            import sys
+            sys.stderr.write('STDIN=%r' % sys.stdin.read())
+            sys.exit(1)
+        ''')
+
+        _, error_text = cron_dispatcher.run_script(self._args(60), name)
+
+        self.assertEqual(error_text, "STDIN=''")
+
+    def test_never_pipes_the_child_output(self) -> None:
+        '''A pipe means the dispatcher buffers everything the child writes.'''
+        name = self._script('''
+            import sys
+            sys.exit(0)
+        ''')
+        captured: Dict[str, Any] = {}
+        real_run = subprocess.run
+
+        def recording_run(*args: Any, **kwargs: Any) -> Any:
+            captured.update(kwargs)
+            # pylint: disable=subprocess-run-check
+            return real_run(*args, **kwargs)
+
+        with mock.patch('subprocess.run', recording_run):
+            cron_dispatcher.run_script(self._args(60), name)
+
+        self.assertIs(captured['stdin'], subprocess.DEVNULL)
+        self.assertIs(captured['stdout'], subprocess.DEVNULL)
+        self.assertNotIn(captured['stderr'],
+                         (subprocess.PIPE, subprocess.STDOUT, None))
+        self.assertNotIn('capture_output', captured)
+        self.assertEqual(captured['timeout'], 60)
+
+    def test_keeps_only_the_tail_of_a_noisy_child(self) -> None:
+        '''Child output is never buffered whole, so only the tail survives.'''
+        name = self._script('''
+            import sys
+            sys.stderr.write('x' * 200000)
+            sys.stderr.write('THE-VERY-END')
+            sys.exit(3)
+        ''')
+
+        returncode, error_text = cron_dispatcher.run_script(
+            self._args(60), name)
+
+        assert error_text is not None
+        self.assertEqual(returncode, 3)
+        self.assertEqual(len(error_text), 1000)
+        self.assertTrue(error_text.endswith('THE-VERY-END'))
+
+    def test_survives_invalid_utf8_on_stderr(self) -> None:
+        '''Undecodable bytes must not turn into a spurious failure.'''
+        name = self._script(r'''
+            import sys
+            sys.stderr.buffer.write(b'bad \xff\xfe bytes')
+            sys.exit(4)
+        ''')
+
+        returncode, error_text = cron_dispatcher.run_script(
+            self._args(60), name)
+
+        assert error_text is not None
+        self.assertEqual(returncode, 4)
+        self.assertIn('bad', error_text)
+
+    def test_discards_child_stdout(self) -> None:
+        '''stdout is captured and never read, so it is not captured at all.'''
+        name = self._script('''
+            import sys
+            sys.stdout.write('y' * 100000)
+            sys.stderr.write('only this')
+            sys.exit(5)
+        ''')
+
+        returncode, error_text = cron_dispatcher.run_script(
+            self._args(60), name)
+
+        self.assertEqual(returncode, 5)
+        self.assertEqual(error_text, 'only this')
+
+
+_SIGTERM_CHILD = '''
+import argparse, os, sys, time
+sys.path.insert(0, {stuff!r})
+from cron import cron_dispatcher
+
+cron_dispatcher.install_signal_handlers()
+args = argparse.Namespace(host='localhost', port=13306, database='omegaup',
+                          user='omegaup', password='hunter2',
+                          mysql_config_file=None)
+with cron_dispatcher.db_command_args(args) as command:
+    print(command[command.index('--mysql-config-file') + 1], flush=True)
+    time.sleep(120)
+'''
+
+
+class SignalHandlerTest(unittest.TestCase):
+    '''Tests that the credential file does not outlive the dispatcher.'''
+
+    def test_sigterm_removes_the_credential_file(self) -> None:
+        '''SIGTERM is the normal systemd and kubernetes stop path.'''
+        with subprocess.Popen(
+                [sys.executable, '-c',
+                 _SIGTERM_CHILD.format(stuff=_STUFF_DIR)],
+                stdout=subprocess.PIPE, text=True) as child:
+            try:
+                assert child.stdout is not None
+                config_file = child.stdout.readline().strip()
+                self.assertTrue(os.path.exists(config_file), config_file)
+
+                child.send_signal(signal.SIGTERM)
+                child.wait(timeout=30)
+
+                self.assertFalse(os.path.exists(config_file), config_file)
+            finally:
+                if child.poll() is None:
+                    child.kill()
+
+    def test_installs_handlers_for_both_stop_signals(self) -> None:
+        '''SIGINT gets the same treatment as SIGTERM.'''
+        previous = [signal.getsignal(signal.SIGTERM),
+                    signal.getsignal(signal.SIGINT)]
+        try:
+            cron_dispatcher.install_signal_handlers()
+            for sig in (signal.SIGTERM, signal.SIGINT):
+                handler = signal.getsignal(sig)
+                self.assertTrue(callable(handler), sig)
+                with self.assertRaises(SystemExit):
+                    handler(sig, None)  # type: ignore
+        finally:
+            signal.signal(signal.SIGTERM, previous[0])
+            signal.signal(signal.SIGINT, previous[1])
 
 
 if __name__ == '__main__':
