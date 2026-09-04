@@ -143,10 +143,7 @@ def find_never_solved(
     Problems younger than the cutoff are skipped: a hard problem published
     this week has simply not had the time to be solved yet.
 
-    `Problems`.`submissions` counts every submission a problem ever took, of
-    every type, so the attempts are counted again over `normal` ones only.
-    The counter still narrows the candidates first, which it can do safely
-    because it never undercounts them.
+    `Problems`.`submissions` counts every type, so normal ones are recounted.
     '''
     cur.execute(
         '''
@@ -298,12 +295,7 @@ def _non_negative_int(value: str) -> int:
 
 
 def _ratio(value: str) -> float:
-    '''Parses a fraction of a problem's submissions, in (0, 1].
-
-    A whole one is the strictest a share can be asked to get and a problem
-    can still reach it, but nothing above one is ever reachable, and zero
-    asks for no share at all.
-    '''
+    '''Parses a fraction of a problem's submissions, in (0, 1].'''
     parsed = float(value)
     if not 0 < parsed <= 1:
         raise argparse.ArgumentTypeError(
