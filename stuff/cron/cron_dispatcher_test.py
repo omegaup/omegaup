@@ -277,7 +277,19 @@ class CronDispatcherTest(unittest.TestCase):
             _matching(connection.calls, 'error_text = %s where request_id'),
             [(RequestStatus.FAILED.value, 'job is not registered', 3,
               RequestStatus.PENDING.value)])
-        self.assertEqual(_notifications(connection.calls), [])
+
+    def test_tells_the_requester_the_job_was_rejected(self) -> None:
+        '''A rejection is the only feedback the admin gets, so it is sent.'''
+        _, connection = self._run(
+            [{'request_id': 3, 'name': 'rm_rf.py', 'requested_by': 1}],
+            _fake_run)
+
+        notifications = _notifications(connection.calls)
+        self.assertEqual(len(notifications), 1)
+        user_id, contents = notifications[0]
+        self.assertEqual(user_id, 1)
+        self.assertEqual(
+            json.loads(contents)['status'], RequestStatus.FAILED.value)
 
     def test_claims_only_a_request_that_is_still_pending(self) -> None:
         '''The claim names the status it expects, so two cannot both win.'''
