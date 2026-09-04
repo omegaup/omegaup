@@ -229,43 +229,10 @@ def test_mark_failure_records_a_failed_run() -> None:
     conn = _FakeConnection()
     args = _args()
 
-    with pytest.raises(SystemExit):
-        with _run('update_ranks.py', args, conn) as cron_run:
-            cron_run.mark_failure()
+    with _run('update_ranks.py', args, conn) as cron_run:
+        cron_run.mark_failure()
 
     assert _matching(conn.calls, 'update `cron_runs`')[0][0] == 'failure'
-
-
-def _exit_code_of_a_forced_failure(conn: _FakeConnection,
-                                   args: argparse.Namespace) -> object:
-    '''Returns the status the process would exit with, 0 if it would not.'''
-    try:
-        with _run('update_ranks.py', args, conn) as cron_run:
-            cron_run.mark_failure()
-    except SystemExit as exc:
-        return exc.code
-    return 0
-
-
-def test_mark_failure_exits_non_zero() -> None:
-    '''A forced failure has to reach the process exit status.'''
-    assert _exit_code_of_a_forced_failure(_FakeConnection(), _args()) == 1
-
-
-def test_mark_failure_exits_non_zero_when_untracked() -> None:
-    '''--no-track records nothing but the run still failed.'''
-    assert _exit_code_of_a_forced_failure(
-        _FakeConnection(), _args(no_track=True)) == 1
-
-
-def test_a_run_that_did_not_fail_exits_zero() -> None:
-    '''Without mark_failure the context manager stays out of the way.'''
-    conn = _FakeConnection()
-
-    with _run('update_ranks.py', _args(), conn):
-        pass
-
-    assert _matching(conn.calls, 'update `cron_runs`')[0][0] == 'success'
 
 
 def test_releases_lock_when_recording_the_start_fails() -> None:

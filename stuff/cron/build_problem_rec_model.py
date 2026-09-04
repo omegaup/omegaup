@@ -473,8 +473,11 @@ def train_and_publish(
         cron_run: lib.runner.CronRun,
         args: argparse.Namespace,
         runs: pd.DataFrame,
-) -> None:
-    '''Trains, publishes if it passes the guardrail, and records the run.'''
+) -> bool:
+    '''Trains, publishes if it passes the guardrail, and records the run.
+
+    Returns whether the guardrail held the model back.
+    '''
     model = Model(
         TrainingConfig(train_fraction=args.train_fraction,
                        rng_seed=args.rng_seed,
@@ -515,6 +518,7 @@ def train_and_publish(
                              output_path=args.output,
                              published=published,
                              skip_reason=skip_reason)
+        return not published
     finally:
         if dbconn is not None:
             dbconn.conn.close()
@@ -594,6 +598,7 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
+    has_failures = False
     with lib.runner.run(parser.prog, args) as cron_run:
         try:
             with cron_run.phase('load_runs'):
@@ -608,12 +613,14 @@ def main() -> None:
                     runs = runs[:args.num_rows]
 
             with cron_run.phase('train_model'):
-                train_and_publish(cron_run, args, runs)
+                has_failures = train_and_publish(cron_run, args, runs)
         except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update recommendation model.')
             raise
         finally:
             logging.info('Done')
+    if has_failures:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

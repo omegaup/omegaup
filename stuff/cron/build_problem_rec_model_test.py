@@ -7,7 +7,9 @@ Integration tests should be done via a PHP entry point.
 
 import argparse
 import math
+import os
 import os.path
+import tempfile
 import unittest
 from unittest import mock
 from typing import Any, Callable, cast, Dict, List, Optional, Tuple
@@ -437,13 +439,33 @@ class TestTrainAndPublish(unittest.TestCase):
 
         with mock.patch.object(build_problem_rec_model, 'should_publish',
                                fake_should_publish):
-            build_problem_rec_model.train_and_publish(
+            has_failures = build_problem_rec_model.train_and_publish(
                 cast(Any, cron_run), args, runs)
 
         self.assertAlmostEqual(seen['score'], expected['map'], places=6)
         for name in ('precision', 'recall', 'ndcg'):
             self.assertNotAlmostEqual(seen['score'], expected[name], places=6)
         self.assertTrue(cron_run.failed)
+        self.assertTrue(has_failures)
+
+    def test_a_published_model_is_not_a_failure(self) -> None:
+        '''A run that publishes reports nothing for main to exit on.'''
+        runs = build_problem_rec_model.load_sqlite(_TESTDATA)
+        defaults = build_problem_rec_model.TrainingConfig()
+        args = argparse.Namespace(
+            train_fraction=defaults.train_fraction,
+            rng_seed=defaults.rng_seed,
+            num_followups=defaults.num_followups,
+            followup_decay=defaults.followup_decay,
+            output=os.path.join(tempfile.mkdtemp(), 'model.db'),
+            no_track=True, min_map_score=0., max_map_regression=1.)
+        cron_run = _FakeCronRun()
+
+        has_failures = build_problem_rec_model.train_and_publish(
+            cast(Any, cron_run), args, runs)
+
+        self.assertFalse(has_failures)
+        self.assertFalse(cron_run.failed)
 
 
 if __name__ == '__main__':
