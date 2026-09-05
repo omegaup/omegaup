@@ -65,7 +65,7 @@ describe('Crons.vue', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
     const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
-    expect(cells.at(0).text()).toContain('Update rankings');
+    expect(cells.at(0).text()).toContain(T.cronControlPlaneJobUpdateRanks);
     expect(cells.at(1).find('code').text()).toBe('19 8 * * *');
     expect(cells.at(1).text()).toContain('08:19');
     expect(cells.at(2).text()).toBe('success');
@@ -81,7 +81,9 @@ describe('Crons.vue', () => {
 
     expect(rows).toHaveLength(2);
     expect(rows.at(0).findAll('td').at(1).text()).toContain('update_ranks.py');
-    expect(rows.at(0).findAll('td').at(1).text()).toContain('Update rankings');
+    expect(rows.at(0).findAll('td').at(1).text()).toContain(
+      T.cronControlPlaneJobUpdateRanks,
+    );
     expect(rows.at(0).find('.badge-success').text()).toBe('success');
     expect(
       rows.at(0).findAll('td').at(3).find('span').attributes('title'),
@@ -105,7 +107,21 @@ describe('Crons.vue', () => {
     await wrapper.find('[data-cron-filter-status]').setValue('failure');
     const rows = wrapper.findAll('[data-cron-runs] tbody tr');
     expect(rows.length).toBe(1);
-    expect(rows.at(0).text()).toContain('Award badges');
+    expect(rows.at(0).text()).toContain(T.cronControlPlaneJobAssignBadges);
+  });
+
+  it('Should clear a job filter whose job is gone after a refresh', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    await wrapper.find('[data-cron-filter-job]').setValue('update_ranks.py');
+    expect(wrapper.findAll('[data-cron-runs] tbody tr').length).toBe(1);
+
+    await wrapper.setProps({ jobs: [] });
+
+    expect(
+      (wrapper.find('[data-cron-filter-job]').element as HTMLSelectElement)
+        .value,
+    ).toBe('');
+    expect(wrapper.findAll('[data-cron-runs] tbody tr').length).toBe(2);
   });
 
   it('Should show phase detail when a run is expanded', async () => {
@@ -264,7 +280,7 @@ describe('Crons.vue', () => {
 
     const cell = wrapper.find('[data-cron-jobs] tbody tr td');
     expect(cell.find('code').text()).toBe('update_ranks.py');
-    expect(cell.find('small').text()).toBe('Update rankings');
+    expect(cell.find('small').text()).toBe(T.cronControlPlaneJobUpdateRanks);
   });
 
   it('Should show an empty state when there are no runs', () => {

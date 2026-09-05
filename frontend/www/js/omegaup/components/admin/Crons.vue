@@ -278,7 +278,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { VBTooltipPlugin } from 'bootstrap-vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -385,12 +385,12 @@ library.add(faInfoCircle);
 Vue.use(VBTooltipPlugin);
 
 const JOB_TITLES: Record<string, string> = {
-  'update_ranks.py': 'Update rankings',
-  'assign_badges.py': 'Award badges',
-  'aggregate_feedback.py': 'Aggregate problem feedback',
-  'build_problem_rec_model.py': 'Train recommendation model',
-  'plagiarism_detector.py': 'Detect plagiarism',
-  'problem_health_check.py': 'Check problem health',
+  'update_ranks.py': T.cronControlPlaneJobUpdateRanks,
+  'assign_badges.py': T.cronControlPlaneJobAssignBadges,
+  'aggregate_feedback.py': T.cronControlPlaneJobAggregateFeedback,
+  'build_problem_rec_model.py': T.cronControlPlaneJobBuildProblemRecModel,
+  'plagiarism_detector.py': T.cronControlPlaneJobPlagiarismDetector,
+  'problem_health_check.py': T.cronControlPlaneJobProblemHealthCheck,
 };
 
 @Component({
@@ -413,6 +413,14 @@ export default class Crons extends Vue {
         (!this.filterJob || run.name === this.filterJob) &&
         (!this.filterStatus || run.status === this.filterStatus),
     );
+  }
+
+  @Watch('jobs')
+  onJobsChanged(jobs: types.CronJob[]): void {
+    // A refresh can drop the job the filter names, leaving it silently on.
+    if (this.filterJob && !jobs.some((job) => job.name === this.filterJob)) {
+      this.filterJob = '';
+    }
   }
 
   get scheduledJobs(): (types.CronJob & { humanSchedule: string | null })[] {
