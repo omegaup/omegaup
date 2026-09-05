@@ -19,6 +19,7 @@ module.exports = {
       './frontend/www/js/omegaup/omegaup-legacy.js',
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
+    admin_carousel: './frontend/www/js/omegaup/admin/carousel.ts',
     admin_crons: './frontend/www/js/omegaup/admin/crons.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.ts',
     admin_settings: './frontend/www/js/omegaup/admin/settings.ts',

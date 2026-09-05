@@ -25,7 +25,6 @@
   - [`/api/carouselItems/create/`](#apicarouselitemscreate)
   - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
   - [`/api/carouselItems/list/`](#apicarouselitemslist)
-  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
   - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
@@ -666,9 +665,10 @@ Create a new Carousel Item
 
 | Name              | Type           | Description | Required |
 | ----------------- | -------------- | ----------- | -------- |
-| `buttonTitle`     | `string`       |             | ✓        |
+| `button_title`    | `string`       |             | ✓        |
 | `excerpt`         | `string`       |             | ✓        |
 | `image_url`       | `string`       |             | ✓        |
+| `is_active`       | `bool`         |             | ✓        |
 | `link`            | `string`       |             | ✓        |
 | `status`          | `bool`         |             | ✓        |
 | `title`           | `string`       |             | ✓        |
@@ -698,19 +698,13 @@ _Nothing_
 
 ### Description
 
-List all Carousel Items (admin only)
+List Carousel Items (admin/support only)
 
-### Returns
+### Parameters
 
-```typescript
-types.CarouselItemListPayload;
-```
-
-## `/api/carouselItems/listActive/`
-
-### Description
-
-List all active Carousel Items (homepage)
+| Name          | Type   | Description | Required |
+| ------------- | ------ | ----------- | -------- |
+| `active_only` | `bool` |             | ✓        |
 
 ### Returns
 
@@ -728,14 +722,15 @@ Update a Carousel Item
 
 | Name               | Type           | Description | Required |
 | ------------------ | -------------- | ----------- | -------- |
-| `buttonTitle`      | `string`       |             | ✓        |
+| `button_title`     | `string`       |             | ✓        |
 | `carousel_item_id` | `int`          |             | ✓        |
 | `excerpt`          | `string`       |             | ✓        |
 | `image_url`        | `string`       |             | ✓        |
+| `is_active`        | `bool`         |             | ✓        |
 | `link`             | `string`       |             | ✓        |
-| `status`           | `bool`         |             | ✓        |
 | `title`            | `string`       |             | ✓        |
 | `expiration_date`  | `null\|string` |             |          |
+| `status`           | `bool\|null`   |             |          |
 
 ### Returns
 

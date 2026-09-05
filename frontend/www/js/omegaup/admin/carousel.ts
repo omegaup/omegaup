@@ -1,0 +1,90 @@
+import admin_Carousel from '../components/admin/Carousel.vue';
+import { OmegaUp } from '../omegaup';
+import * as api from '../api';
+import * as ui from '../ui';
+import * as time from '../time';
+import T from '../lang';
+import Vue from 'vue';
+import { types } from '../api_types';
+
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import { ModalPlugin } from 'bootstrap-vue';
+Vue.use(ModalPlugin);
+
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.CarouselManagementPayload();
+
+  const adminCarousel = new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-admin-carousel': admin_Carousel,
+    },
+    data: () => ({
+      carouselItems: payload.carouselItems,
+    }),
+    render: function (createElement) {
+      return createElement('omegaup-admin-carousel', {
+        props: {
+          carouselItems: this.carouselItems,
+        },
+        on: {
+          'create-item': (item: types.CarouselItem): void => {
+            api.CarouselItems.create({
+              title: item.title,
+              excerpt: item.excerpt,
+              image_url: item.image_url,
+              link: item.link,
+              button_title: item.button_title,
+              expiration_date: item.expiration_date
+                ? time.formatDateTimeLocal(item.expiration_date)
+                : null,
+              is_active: item.is_active,
+            })
+              .then(() => {
+                ui.success(T.carouselItemCreated);
+                adminCarousel.carouselItems = [...adminCarousel.carouselItems];
+                return api.CarouselItems.list({});
+              })
+              .then((response) => {
+                adminCarousel.carouselItems = response.carouselItems;
+              })
+              .catch(ui.apiError);
+          },
+          'update-item': (item: types.CarouselItem): void => {
+            api.CarouselItems.update({
+              carousel_item_id: item.carousel_item_id,
+              title: item.title,
+              excerpt: item.excerpt,
+              image_url: item.image_url,
+              link: item.link,
+              button_title: item.button_title,
+              expiration_date: item.expiration_date
+                ? time.formatDateTimeLocal(item.expiration_date)
+                : null,
+              is_active: item.is_active,
+            })
+              .then(() => {
+                ui.success(T.carouselItemUpdated);
+                return api.CarouselItems.list({});
+              })
+              .then((response) => {
+                adminCarousel.carouselItems = response.carouselItems;
+              })
+              .catch(ui.apiError);
+          },
+          'delete-item': (carouselItemId: number): void => {
+            api.CarouselItems.delete({ carousel_item_id: carouselItemId })
+              .then(() => {
+                ui.success(T.carouselItemArchived);
+                return api.CarouselItems.list({});
+              })
+              .then((response) => {
+                adminCarousel.carouselItems = response.carouselItems;
+              })
+              .catch(ui.apiError);
+          },
+        },
+      });
+    },
+  });
+});
