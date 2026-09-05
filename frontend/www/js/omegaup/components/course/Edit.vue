@@ -460,7 +460,7 @@ export default class CourseEdit extends Vue {
   switchTab(newTab: string): void {
     if (
       this.showTab === 'content' &&
-      (this.assignmentDetails as unknown as { hasUnsavedChanges?: boolean })
+      ((this.assignmentDetails as unknown) as { hasUnsavedChanges?: boolean })
         ?.hasUnsavedChanges &&
       !window.confirm(T.courseUnsavedChangesWarning)
     ) {
