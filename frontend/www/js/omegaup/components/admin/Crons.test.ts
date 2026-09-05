@@ -285,6 +285,19 @@ describe('Crons.vue', () => {
     expect(emitted?.[0]).toEqual([{ name: 'update_ranks.py', enabled: false }]);
   });
 
+  it('Should leave the switch showing the job until the server agrees', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    const toggle = wrapper.find('[data-cron-enabled]');
+    await toggle.setChecked(false);
+
+    // The click asked for false, but jobs still says true, so it stays true.
+    expect((toggle.element as HTMLInputElement).checked).toBe(true);
+    expect(wrapper.emitted('set-enabled')?.[0]).toEqual([
+      { name: 'update_ranks.py', enabled: false },
+    ]);
+  });
+
   it('Should emit rerun with the job name when the button is clicked', async () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
 
