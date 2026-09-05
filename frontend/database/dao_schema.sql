@@ -402,6 +402,27 @@ CREATE TABLE `Cron_Jobs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Run_Requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL COMMENT 'Nombre del script cuya reejecución se solicita',
+  `requested_by` int DEFAULT NULL COMMENT 'El administrador que la solicitó, NULL si su cuenta ya no existe',
+  `status` enum('pending','picked','done','failed') NOT NULL DEFAULT 'pending' COMMENT 'pending mientras espera al despachador, picked mientras corre',
+  `requested_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `picked_at` datetime DEFAULT NULL COMMENT 'Cuando el despachador tomó la solicitud',
+  `finished_at` datetime DEFAULT NULL COMMENT 'Cuando terminó la ejecución, haya salido bien o mal',
+  `run_id` int DEFAULT NULL COMMENT 'La ejecución que produjo, NULL si no llegó a correr o si el historial ya se purgó',
+  `error_text` text COMMENT 'El final de stderr cuando la ejecución falló',
+  PRIMARY KEY (`request_id`),
+  KEY `idx_cron_run_requests_status` (`status`),
+  KEY `idx_cron_run_requests_name` (`name`),
+  KEY `fk_crr_requested_by` (`requested_by`),
+  KEY `fk_crr_run_id` (`run_id`),
+  CONSTRAINT `fk_crr_requested_by` FOREIGN KEY (`requested_by`) REFERENCES `Users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_crr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Cron_Runs` (`run_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Solicitudes de reejecución manual de trabajos cron';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Cron_Runs` (
   `run_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'Nombre del script (parser.prog). Denormalizado a propósito: el historial se registra aunque el trabajo no esté en Cron_Jobs y sobrevive a renombres o borrados del registro',
@@ -1064,6 +1085,25 @@ CREATE TABLE `QualityNominations` (
   CONSTRAINT `fk_qn_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_qn_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='La cola de nominación a promoción / democión de problemas';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Recommendation_Model_Runs` (
+  `model_run_id` int NOT NULL AUTO_INCREMENT,
+  `cron_run_id` int DEFAULT NULL COMMENT 'La ejecución de cron que entrenó este modelo, NULL si se corrió a mano',
+  `map_score` double NOT NULL COMMENT 'MAP@k sobre los usuarios de prueba, la medida con la que se compara contra el último modelo publicado',
+  `dataset_size` int NOT NULL COMMENT 'Cuántos envíos aceptados se usaron para entrenar',
+  `num_followups` int NOT NULL COMMENT 'Parámetro de entrenamiento: cuántos problemas siguientes se consideran por usuario',
+  `followup_decay` double NOT NULL COMMENT 'Parámetro de entrenamiento: qué tan rápido pierde peso cada problema siguiente',
+  `train_fraction` double NOT NULL COMMENT 'Parámetro de entrenamiento: qué fracción de los usuarios se usa para entrenar',
+  `rng_seed` int DEFAULT NULL COMMENT 'Parámetro de entrenamiento: la semilla con la que se partieron los usuarios entre entrenamiento y prueba, NULL si no se fijó ninguna',
+  `output_path` varchar(255) DEFAULT NULL COMMENT 'Dónde quedó el modelo entrenado',
+  `published` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Si este modelo reemplazó al que estaba en uso',
+  `skip_reason` varchar(255) DEFAULT NULL COMMENT 'Por qué no se publicó, NULL si sí se publicó',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`model_run_id`),
+  KEY `idx_rec_model_runs_published_created` (`published`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Historial de entrenamientos del modelo de recomendación de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
