@@ -235,6 +235,72 @@ def test_mark_failure_records_a_failed_run() -> None:
     assert _matching(conn.calls, 'update `cron_runs`')[0][0] == 'failure'
 
 
+def test_mark_failure_records_error_text() -> None:
+    '''A reason passed to mark_failure is stored as the run's error_text.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        cron_run.mark_failure('training score was too low')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert len(updates) == 1
+    status, _duration, _rows, _phases, error_text, _run_id = updates[0]
+    assert status == 'failure'
+    assert error_text == 'training score was too low'
+
+
+def test_mark_failure_without_reason_still_writes_error_text() -> None:
+    '''A bare mark_failure does not leave error_text as NULL.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        cron_run.mark_failure()
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert len(updates) == 1
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] is not None
+
+
+def test_mark_failure_inside_phase_marks_the_phase_failed() -> None:
+    '''A phase that calls mark_failure is recorded as a failed phase.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('load_runs'):
+            pass
+        with cron_run.phase('train_model'):
+            cron_run.mark_failure('accuracy was too low')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'load_runs'
+    assert phases[0]['status'] == 'success'
+    assert phases[1]['phase'] == 'train_model'
+    assert phases[1]['status'] == 'failure'
+    assert updates[0][4] == 'accuracy was too low'
+
+
+def test_mark_failure_outside_phase_keeps_phases_successful() -> None:
+    '''A mark_failure outside any phase does not touch finished phases.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('process_badges'):
+            pass
+        cron_run.mark_failure('failed to process some badges')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'process_badges'
+    assert phases[0]['status'] == 'success'
+    assert updates[0][4] == 'failed to process some badges'
+
+
 def test_releases_lock_when_recording_the_start_fails() -> None:
     '''A failure between the lock and the start row still frees the lock.'''
     conn = _FakeConnection(fail_on='insert into `cron_runs`')
