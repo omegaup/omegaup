@@ -722,6 +722,7 @@ const translations: { [key: string]: string; } = {
   courseTabsEmptyEnrolledCourses: "You are not registered in any course",
   courseTabsEmptyFinishedCourses: "There aren't finished courses",
   courseUnarchivedSuccess: "Course unarchived successfully.",
+  courseUnsavedChangesWarning: "You have unsaved changes. Are you sure you want to leave this page?",
   courseUpdateAlreadyHasRuns: "The duration can't be changed once a solution has been judged.",
   courseWithoutProblems: "Without problems",
   createContestInteractiveGuideContestTitle: "Choose the title of your contest",
