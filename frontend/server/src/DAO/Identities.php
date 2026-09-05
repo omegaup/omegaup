@@ -83,7 +83,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 relevance DESC
             LIMIT
                 ?;";
-        $escapedUsernameOrName = self::escapeBooleanModeQuery($usernameOrName);
+        $escapedUsernameOrName = \OmegaUp\DAO\DAO::escapeBooleanModeQuery(
+            $usernameOrName
+        );
         $args = [
             $escapedUsernameOrName,
             $escapedUsernameOrName,
@@ -101,10 +103,6 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ];
         }
         return $result;
-    }
-
-    private static function escapeBooleanModeQuery(string $query): string {
-        return addcslashes($query, '+-<>()~*"\\');
     }
 
     public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {
