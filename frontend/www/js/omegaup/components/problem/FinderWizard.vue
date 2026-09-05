@@ -81,7 +81,7 @@ import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 // https://www.npmjs.com/package/vue-js-toggle-button
 import { ToggleButton } from 'vue-js-toggle-button';
 // https://github.com/voerro/vue-tagsinput
-import VoerroTagsInput from '@voerro/vue-tagsinput';
+import VoerroTagsInput from '../common/VoerroTagsInput.vue';
 import '@voerro/vue-tagsinput/dist/style.css';
 // https://nightcatsama.github.io/vue-slider-component/
 import VueSlider from 'vue-slider-component';
