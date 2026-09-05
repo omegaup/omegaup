@@ -57,25 +57,24 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * The teaching assistant in a course should not see duplicated courses,
-     * even if this user was added to the course as participant.
+     * A course owner who is also a teaching assistant should see the course
+     * listed only once, with the owner role taking priority over the
+     * teaching assistant role.
      */
-    public function testListNonDuplicatedCoursesMineForTeachingAssistant() {
+    public function testOwnerWithTeachingAssistantRoleIsClassifiedAsAdmin() {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $adminLogin = self::login($admin);
 
-        // create normal user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $teachingAssistantLogin = self::login($identity);
+        $ownerLogin = self::login($identity);
 
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
-            $teachingAssistantLogin
+            $ownerLogin
         );
 
-        // admin is able to add a teaching assistant
         \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -86,17 +85,21 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $courses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
             new \OmegaUp\Request([
-                'auth_token' => $teachingAssistantLogin->auth_token,
+                'auth_token' => $ownerLogin->auth_token,
             ])
         )['templateProperties']['payload']['courses']['admin'];
 
-        // Only one course should be listed
         $this->assertCount(
             1,
+            $courses['filteredCourses']['current']['courses']
+        );
+        $this->assertSame(
+            $courseData['course_alias'],
+            $courses['filteredCourses']['current']['courses'][0]['alias']
+        );
+        $this->assertEmpty(
             $courses['filteredCourses']['teachingAssistant']['courses']
         );
-
-        $this->assertEmpty($courses['filteredCourses']['current']['courses']);
         $this->assertEmpty($courses['filteredCourses']['past']['courses']);
         $this->assertEmpty($courses['filteredCourses']['archived']['courses']);
     }
@@ -131,6 +134,90 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(
             1,
             $courses['filteredCourses']['current']['courses']
+        );
+    }
+
+    public function testListCoursesMineForGroupTeachingAssistant() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            owner: $courseData['admin']
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identity
+        );
+
+        \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($courseData['admin'])->auth_token,
+                'group' => $groupData['request']['alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $courses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($identity)->auth_token,
+            ])
+        )['templateProperties']['payload']['courses']['admin'];
+
+        $this->assertCount(
+            1,
+            $courses['filteredCourses']['teachingAssistant']['courses']
+        );
+        $this->assertSame(
+            $courseData['course_alias'],
+            $courses['filteredCourses']['teachingAssistant']['courses'][0]['alias']
+        );
+        $this->assertEmpty($courses['filteredCourses']['current']['courses']);
+    }
+
+    public function testAdminRoleTakesPriorityOverGroupTeachingAssistantRole() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $adminLogin = self::login($courseData['admin']);
+        \OmegaUp\Controllers\Course::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $identity->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            owner: $courseData['admin']
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identity
+        );
+        \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $courseData['admin']
+                )->auth_token,
+                'group' => $groupData['request']['alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $courses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($identity)->auth_token,
+            ])
+        )['templateProperties']['payload']['courses']['admin'];
+
+        $this->assertCount(
+            1,
+            $courses['filteredCourses']['current']['courses']
+        );
+        $this->assertSame(
+            $courseData['course_alias'],
+            $courses['filteredCourses']['current']['courses'][0]['alias']
+        );
+        $this->assertEmpty(
+            $courses['filteredCourses']['teachingAssistant']['courses']
         );
     }
 
