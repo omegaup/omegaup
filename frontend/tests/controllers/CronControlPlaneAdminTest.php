@@ -277,6 +277,28 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testRerunCronRejectsADisabledJob() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $name = \OmegaUp\CronJobName::UpdateRanks->value;
+        $job = \OmegaUp\DAO\CronJobs::getByName($name);
+        $job->enabled = false;
+        \OmegaUp\DAO\CronJobs::update($job);
+
+        try {
+            \OmegaUp\Controllers\Admin::apiRerunCron(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+            ]));
+            $this->fail('Should not have queued a disabled job');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+        }
+        $this->assertNull(
+            \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+        );
+    }
+
     public function testRerunCronDoesNotQueueDuplicates() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);

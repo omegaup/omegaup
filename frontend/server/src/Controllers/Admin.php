@@ -528,6 +528,15 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 'name'
             );
         }
+        // The runner skips a disabled job, so the rerun could only be recorded
+        // as failed. Say so now instead of queueing it.
+        $job = \OmegaUp\DAO\CronJobs::getByName($jobName->value);
+        if (is_null($job) || !$job->enabled) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
         // The dispatcher runs whatever is queued, so a job that is already
         // waiting or in flight does not get a second row.
         if (
