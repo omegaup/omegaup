@@ -80,6 +80,18 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
 
     /**
      * Get tag distribution for problems solved by an identity.
+     * Returns the FULL list of public, non-meta tags sorted by count descending.
+     *
+     * @return list<array{name: string, count: int}>
+     */
+    public static function getTagsDistributionForSolvedProblemsAll(
+        int $identityId
+    ): array {
+        return self::getTagsDistributionForSolvedProblemsRows($identityId);
+    }
+
+    /**
+     * Get tag distribution for problems solved by an identity.
      * Returns tags sorted by count descending.
      * If there are more than $maxTags, the remaining tags are grouped under 'Others'.
      *
@@ -88,6 +100,41 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
     public static function getTagsDistributionForSolvedProblems(
         int $identityId,
         int $maxTags = 10
+    ): array {
+        $allTags = self::getTagsDistributionForSolvedProblemsRows($identityId);
+
+        // If there are fewer or equal tags than the limit, return as is
+        if (count($allTags) <= $maxTags) {
+            return $allTags;
+        }
+
+        // Take the top N tags and group the rest under 'Others'
+        $topTags = array_slice($allTags, 0, $maxTags);
+        $remainingTags = array_slice($allTags, $maxTags);
+
+        $othersCount = 0;
+        foreach ($remainingTags as $tag) {
+            $othersCount += $tag['count'];
+        }
+
+        if ($othersCount > 0) {
+            $topTags[] = [
+                'name' => 'Others',
+                'count' => $othersCount,
+            ];
+        }
+
+        return $topTags;
+    }
+
+    /**
+     * Internal: returns the full rowset for a solved-problem tag distribution.
+     * Shared by the capped (with 'Others' grouping) and full (no grouping) callers.
+     *
+     * @return list<array{name: string, count: int}>
+     */
+    private static function getTagsDistributionForSolvedProblemsRows(
+        int $identityId
     ): array {
         $sql = "
             SELECT
@@ -125,33 +172,12 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
         ";
 
         /** @var list<array{count: int, name: string}> */
-        $allTags = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
         );
 
-        // If there are fewer or equal tags than the limit, return as is
-        if (count($allTags) <= $maxTags) {
-            return $allTags;
-        }
-
-        // Take the top N tags and group the rest under 'Others'
-        $topTags = array_slice($allTags, 0, $maxTags);
-        $remainingTags = array_slice($allTags, $maxTags);
-
-        $othersCount = 0;
-        foreach ($remainingTags as $tag) {
-            $othersCount += $tag['count'];
-        }
-
-        if ($othersCount > 0) {
-            $topTags[] = [
-                'name' => 'Others',
-                'count' => $othersCount,
-            ];
-        }
-
-        return $topTags;
+        return $rows;
     }
 
     public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {

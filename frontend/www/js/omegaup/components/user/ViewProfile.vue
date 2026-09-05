@@ -280,6 +280,7 @@
                   <div class="col-lg-6 mb-3">
                     <omegaup-tags-solved-chart
                       :tags="profileStatistics.tags"
+                      :tags-full="profileStatistics.tagsFull"
                     ></omegaup-tags-solved-chart>
                   </div>
                 </div>
