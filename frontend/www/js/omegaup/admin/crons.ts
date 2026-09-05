@@ -36,8 +36,10 @@ OmegaUp.on('ready', () => {
           }) => {
             api.Admin.setCronJobEnabled({ name, enabled })
               .then(() => {
+                app.jobs = app.jobs.map((job) =>
+                  job.name === name ? { ...job, enabled } : job,
+                );
                 ui.success(T.cronControlPlaneEnabledUpdated);
-                refresh();
               })
               .catch(ui.apiError);
           },
@@ -54,14 +56,35 @@ OmegaUp.on('ready', () => {
     },
   });
 
+  let latestRefresh = 0;
+  let refreshing = false;
+
   function refresh(): void {
+    if (refreshing) {
+      return;
+    }
+    refreshing = true;
+    const sequence = ++latestRefresh;
     api.Admin.getCrons()
       .then((response) => {
+        // A slower earlier request must not land on top of a newer one.
+        if (sequence !== latestRefresh) {
+          return;
+        }
         app.jobs = response.jobs;
         app.runs = response.runs;
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        refreshing = false;
+      });
   }
 
-  window.setInterval(refresh, REFRESH_INTERVAL_MS);
+  const timer = window.setInterval(() => {
+    if (document.hidden) {
+      return;
+    }
+    refresh();
+  }, REFRESH_INTERVAL_MS);
+  window.addEventListener('beforeunload', () => window.clearInterval(timer));
 });

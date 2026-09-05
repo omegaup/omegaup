@@ -102,7 +102,9 @@
                   type="checkbox"
                   :checked="job.enabled"
                   data-cron-enabled
-                  @change="setEnabled(job.name, $event.target.checked)"
+                  @change="
+                    setEnabled(job.name, $event.target.checked, $event.target)
+                  "
                 />
                 <label
                   class="custom-control-label"
@@ -441,7 +443,9 @@ export default class Crons extends Vue {
     this.$emit('rerun', name);
   }
 
-  setEnabled(name: string, enabled: boolean): void {
+  setEnabled(name: string, enabled: boolean, input: HTMLInputElement): void {
+    // The switch shows job.enabled, so put it back and let the reply move it.
+    input.checked = !enabled;
     this.$emit('set-enabled', { name, enabled });
   }
 
