@@ -238,7 +238,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -253,6 +253,11 @@ interface MultilingualData {
   button_title: { [key: string]: string };
 }
 
+interface ModalRef {
+  show(): void;
+  hide(): void;
+}
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -260,6 +265,8 @@ interface MultilingualData {
 })
 export default class Carousel extends Vue {
   @Prop() carouselItems!: types.CarouselItem[];
+  @Ref('carouselItemModal') readonly carouselItemModal!: ModalRef;
+  @Ref('carouselForm') readonly carouselForm!: HTMLFormElement;
 
   T = T;
   time = time;
@@ -296,7 +303,7 @@ export default class Carousel extends Vue {
   }
 
   showItemModal(): void {
-    (this.$refs.carouselItemModal as any)?.show();
+    this.carouselItemModal.show();
   }
 
   openCreateModal(): void {
@@ -388,7 +395,6 @@ export default class Carousel extends Vue {
     this.showArchiveModal = true;
   }
 
-
   archiveSelectedItem(): void {
     if (!this.itemToArchive) {
       return;
@@ -423,7 +429,7 @@ export default class Carousel extends Vue {
     } else {
       this.$emit('create-item', this.currentItem);
     }
-    (this.$refs.carouselItemModal as any)?.hide();
+    this.carouselItemModal.hide();
   }
 
   resetModalState(): void {
@@ -437,11 +443,10 @@ export default class Carousel extends Vue {
     };
   }
 
-  onItemModalOk(evt: any): void {
-    const form = this.$refs.carouselForm as HTMLFormElement | undefined;
-    if (form && !form.checkValidity()) {
+  onItemModalOk(evt: Event): void {
+    if (!this.carouselForm.checkValidity()) {
       evt.preventDefault();
-      form.reportValidity();
+      this.carouselForm.reportValidity();
       return;
     }
     this.saveItem();
