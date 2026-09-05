@@ -1519,6 +1519,8 @@ const translations: { [key: string]: string; } = {
   problemLevelIntermediateDataStructuresAndAlgorithms: "Nivel Intermedio: Estructuras de datos y Algoritmos",
   problemLevelIntermediateMathsInProgramming: "Nivel Intermedio: Matem\u00e1ticas en la programaci\u00f3n",
   problemLevelUpdated: "El nivel del problema fue actualizado.",
+  problemListEmptyDescription: "Crea tu primer problema para comenzar a usarlo en tus cursos, concursos o compartirlo con otros.",
+  problemListEmptyTitle: "A\u00fan no tienes ning\u00fan problema",
   problemListShowAdminProblems: "Tambi\u00e9n muestra problemas que administro",
   problemListShowAdminProblemsAndDeleted: "Tambi\u00e9n muestra problemas que administro y problemas eliminados",
   problemNew: "Crear problema",
