@@ -5650,6 +5650,7 @@ Get profile statistics including solved problems by difficulty and tags distribu
 | `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
 | `solved`     | `number`                                                              |
 | `tags`       | `List[{ count: number; name: string; }]`                              |
+| `tagsFull`   | `List[{ count: number; name: string; }]`                              |
 
 ## `/api/user/removeExperiment/`
 

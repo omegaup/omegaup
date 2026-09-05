@@ -6386,6 +6386,7 @@ export namespace messages {
     };
     solved: number;
     tags: { count: number; name: string }[];
+    tagsFull: { count: number; name: string }[];
   };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};

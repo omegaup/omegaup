@@ -2382,7 +2382,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>, tagsFull: list<array{name: string, count: int}>}
      *
      * @omegaup-request-param null|string $username
      */
@@ -2414,6 +2414,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
             $identity->identity_id
         );
+        $tagsFullDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblemsAll(
+            $identity->identity_id
+        );
 
         return [
             'solved' => $difficultyStats['total'],
@@ -2425,6 +2428,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'unlabelled' => $difficultyStats['unlabelled'],
             ],
             'tags' => $tagsDistribution,
+            'tagsFull' => $tagsFullDistribution,
         ];
     }
 
