@@ -4,6 +4,7 @@ import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 import * as api from '../api';
+import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
@@ -76,6 +77,8 @@ OmegaUp.on('ready', () => {
         props: {
           problems: payload.problems,
           loggedIn: payload.loggedIn,
+          adminCourses: payload.adminCourses,
+          adminContests: payload.adminContests,
           selectedTags: payload.selectedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
@@ -120,6 +123,50 @@ OmegaUp.on('ready', () => {
               .then((data) => {
                 data.results.push({ key: query, value: query });
                 this.searchResultProblems = data.results;
+              })
+              .catch(ui.apiError);
+          },
+          'add-to-course': ({
+            problemAlias,
+            courseAlias,
+            assignmentAlias,
+          }: {
+            problemAlias: string;
+            courseAlias: string;
+            assignmentAlias: string;
+          }) => {
+            api.Course.addProblem({
+              course_alias: courseAlias,
+              problem_alias: problemAlias,
+              assignment_alias: assignmentAlias,
+            })
+              .then((data) => {
+                if (data.solutionStatus === 'not_found') {
+                  ui.success(T.problemAddedToCourseSuccess);
+                } else {
+                  ui.warning(T.warningPublicSolution);
+                }
+              })
+              .catch(ui.apiError);
+          },
+          'add-to-contest': ({
+            problemAlias,
+            contestAlias,
+          }: {
+            problemAlias: string;
+            contestAlias: string;
+          }) => {
+            api.Contest.addProblem({
+              contest_alias: contestAlias,
+              problem_alias: problemAlias,
+              points: 100,
+            })
+              .then((data) => {
+                if (data.solutionStatus === 'not_found') {
+                  ui.success(T.problemAddedToContestSuccess);
+                } else {
+                  ui.warning(T.warningPublicSolution);
+                }
               })
               .catch(ui.apiError);
           },
