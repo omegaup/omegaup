@@ -339,11 +339,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (is_null($teamGroup->alias)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'groupNotFound'
-            );
-        }
         $encodedTeamIdentities = $r->ensureString('team_identities');
 
         /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
