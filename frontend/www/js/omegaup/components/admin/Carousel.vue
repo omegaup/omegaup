@@ -19,9 +19,9 @@
           v-model="currentStatusFilter"
           class="form-control d-inline-block w-auto"
         >
-          <option value="active">{{ T.carouselActive }}</option>
-          <option value="archived">{{ T.carouselArchive }}</option>
-          <option value="all">{{ T.wordsAll }}</option>
+          <option value="active">{{ T.carouselStatusActive }}</option>
+          <option value="archived">{{ T.carouselStatusArchived }}</option>
+          <option value="all">{{ T.carouselStatusAll }}</option>
         </select>
         <button
           class="btn btn-primary float-right"
