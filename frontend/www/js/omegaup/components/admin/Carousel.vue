@@ -50,11 +50,11 @@
             v-for="item in filteredCarouselItems"
             :key="item.carousel_item_id"
           >
-            <td>{{ getMultilingualText(item.title, currentLanguage) }}</td>
+            <td>{{ getMultilingualText(currentLanguage, item.title) }}</td>
             <td>
               {{
                 truncateText(
-                  getMultilingualText(item.excerpt, currentLanguage),
+                  getMultilingualText(currentLanguage, item.excerpt),
                   50,
                 )
               }}
@@ -63,7 +63,7 @@
               <img
                 v-if="item.image_url"
                 :src="item.image_url"
-                :alt="getMultilingualText(item.title, currentLanguage)"
+                :alt="getMultilingualText(currentLanguage, item.title)"
                 class="carousel-item-image"
               />
               <span v-else>{{ T.carouselNoImage }}</span>
@@ -74,7 +74,7 @@
               </a>
             </td>
             <td>
-              {{ getMultilingualText(item.button_title, currentLanguage) }}
+              {{ getMultilingualText(currentLanguage, item.button_title) }}
             </td>
             <td>
               {{
@@ -298,7 +298,6 @@ export default class Carousel extends Vue {
       image_url: '',
       link: '',
       button_title: '',
-      expiration_date: undefined,
       is_active: true,
     };
   }
@@ -343,7 +342,7 @@ export default class Carousel extends Vue {
     return this.carouselItems;
   }
 
-  parseJsonField(field: string | undefined): { [key: string]: string } {
+  parseJsonField(field?: string): { [key: string]: string } {
     if (!field) {
       return { en: '', es: '', pt: '' };
     }
@@ -368,7 +367,7 @@ export default class Carousel extends Vue {
     return JSON.stringify(data);
   }
 
-  getMultilingualText(field: string | undefined, lang: string): string {
+  getMultilingualText(lang: string, field?: string): string {
     const parsed = this.parseJsonField(field);
     return parsed[lang] || parsed.en || '';
   }
@@ -422,7 +421,7 @@ export default class Carousel extends Vue {
     if (this.expirationDateInput) {
       this.currentItem.expiration_date = new Date(this.expirationDateInput);
     } else {
-      this.currentItem.expiration_date = undefined;
+      delete this.currentItem.expiration_date;
     }
 
     if (this.isEditing) {
