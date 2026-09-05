@@ -104,6 +104,44 @@
           </template>
         </tbody>
       </table>
+
+      <h5 class="mt-4">{{ T.problemHealthHeading }}</h5>
+      <table
+        v-if="problemHealthFindings.length"
+        class="table table-sm table-hover"
+        data-problem-health
+      >
+        <thead>
+          <tr>
+            <th>{{ T.problemHealthProblem }}</th>
+            <th>{{ T.problemHealthCheckType }}</th>
+            <th>{{ T.problemHealthSeverity }}</th>
+            <th>{{ T.problemHealthDetail }}</th>
+            <th>{{ T.problemHealthSince }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="finding in problemHealthFindings"
+            :key="`${finding.problem_id}-${finding.check_type}`"
+          >
+            <td>
+              <a :href="problemUrl(finding.alias)">{{ finding.title }}</a>
+            </td>
+            <td :title="finding.check_type">
+              {{ checkTypeLabel(finding.check_type) }}
+            </td>
+            <td>
+              <span :class="severityClass(finding.severity)">{{
+                severityLabel(finding.severity)
+              }}</span>
+            </td>
+            <td>{{ finding.detail || '—' }}</td>
+            <td>{{ formatDate(finding.first_detected_at) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <span v-else>{{ T.problemHealthNoFindings }}</span>
     </div>
   </div>
 </template>
@@ -213,6 +251,8 @@ export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
+  @Prop({ default: () => [] })
+  problemHealthFindings!: types.ProblemHealthFinding[];
 
   expandedRunId: number | null = null;
 
@@ -237,6 +277,36 @@ export default class Crons extends Vue {
       return '';
     }
     return classes[status] || 'badge badge-light';
+  }
+
+  problemUrl(alias: string): string {
+    return `/arena/problem/${encodeURIComponent(alias)}/`;
+  }
+
+  checkTypeLabel(checkType: string): string {
+    const labels: Record<string, string> = {
+      judge_errors: T.problemHealthCheckJudgeErrors,
+      no_languages: T.problemHealthCheckNoLanguages,
+      never_solved: T.problemHealthCheckNeverSolved,
+      deprecated_public: T.problemHealthCheckDeprecatedPublic,
+    };
+    return labels[checkType] || checkType;
+  }
+
+  severityLabel(severity: string): string {
+    const labels: Record<string, string> = {
+      error: T.problemHealthSeverityError,
+      warning: T.problemHealthSeverityWarning,
+    };
+    return labels[severity] || severity;
+  }
+
+  severityClass(severity: string): string {
+    const classes: Record<string, string> = {
+      error: 'badge badge-danger',
+      warning: 'badge badge-warning',
+    };
+    return classes[severity] || 'badge badge-light';
   }
 
   // runs arrive newest first.

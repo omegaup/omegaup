@@ -353,14 +353,16 @@ Returns the detail of a single cron run.
 
 ### Description
 
-Lists the registered cron jobs and their most recent runs.
+Lists the registered cron jobs, their most recent runs and the open
+problem health findings.
 
 ### Returns
 
-| Name   | Type                  |
-| ------ | --------------------- |
-| `jobs` | `List[types.CronJob]` |
-| `runs` | `List[types.CronRun]` |
+| Name                    | Type                               |
+| ----------------------- | ---------------------------------- |
+| `jobs`                  | `List[types.CronJob]`              |
+| `problemHealthFindings` | `List[types.ProblemHealthFinding]` |
+| `runs`                  | `List[types.CronRun]`              |
 
 ## `/api/admin/getMaintenanceMode/`
 
