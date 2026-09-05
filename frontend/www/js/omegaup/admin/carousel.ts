@@ -75,7 +75,7 @@ OmegaUp.on('ready', () => {
           'delete-item': (carouselItemId: number): void => {
             api.CarouselItems.delete({ carousel_item_id: carouselItemId })
               .then(() => {
-                ui.success(T.carouselItemDeleted);
+                ui.success(T.carouselItemArchived);
                 return api.CarouselItems.list({});
               })
               .then((response) => {
