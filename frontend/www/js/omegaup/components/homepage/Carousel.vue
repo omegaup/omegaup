@@ -85,6 +85,7 @@ export default class Carousel extends Vue {
   @Prop({ default: () => [] }) carouselItems!: types.CarouselItem[];
 
   T = T;
+
   get slides(): SlideData[] {
     return this.carouselItems
       .map((item) => this.transformCarouselItem(item))
@@ -175,5 +176,30 @@ export default class Carousel extends Vue {
 .carousel {
   background: var(--homepage-carousel-background-color) !important;
   color: var(--homepage-carousel-font-color);
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  top: auto;
+  bottom: 20px;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.25);
+  opacity: 0.9;
+}
+
+.carousel-control-prev {
+  left: 10px;
+}
+
+.carousel-control-next {
+  right: 10px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 20px;
+  height: 20px;
 }
 </style>
