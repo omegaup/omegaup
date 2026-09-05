@@ -7,7 +7,16 @@ import logging
 import sys
 import os
 import csv
-from typing import Any, Iterable, Tuple, Optional, List, Dict, Set
+from typing import (
+    Any,
+    Iterable,
+    Tuple,
+    Optional,
+    List,
+    Dict,
+    Set,
+    NamedTuple,
+)
 import configparser
 import re
 import mysql.connector
@@ -31,6 +40,14 @@ DEFAULT_ALLOWLIST_PATH = os.path.join(
 
 class AllowlistValidationError(ValueError):
     '''Raised when the inefficient queries allowlist is not valid.'''
+
+
+class AllowlistComparison(NamedTuple):
+    '''Results grouped by their relationship with the allowlist.'''
+
+    known_results: List[Dict[str, str]]
+    new_results: List[Dict[str, str]]
+    not_detected_entries: List[Dict[str, Any]]
 
 
 def normalize_query(query: str) -> str:
@@ -176,6 +193,60 @@ def build_inefficiency_key(
 ) -> Tuple[str, str]:
     '''Return the stable identity of an inefficient EXPLAIN row.'''
     return (result['Normalized Query'], result['Table'])
+
+
+def compare_results_with_allowlist(
+    results: Iterable[Dict[str, str]],
+    allowlist: Iterable[Dict[str, Any]],
+) -> AllowlistComparison:
+    '''Group detected results according to their allowlist status.'''
+    allowlist_entries = list(allowlist)
+    allowlist_by_key = {
+        (entry['normalized_query'], entry['table']): entry
+        for entry in allowlist_entries
+    }
+    detected_keys: Set[Tuple[str, str]] = set()
+    known_results: List[Dict[str, str]] = []
+    new_results: List[Dict[str, str]] = []
+
+    for result in results:
+        key = build_inefficiency_key(result)
+        detected_keys.add(key)
+        if key in allowlist_by_key:
+            known_results.append(result)
+        else:
+            new_results.append(result)
+
+    not_detected_entries = [
+        entry for entry in allowlist_entries
+        if (entry['normalized_query'], entry['table']) not in detected_keys
+    ]
+    return AllowlistComparison(
+        known_results=known_results,
+        new_results=new_results,
+        not_detected_entries=not_detected_entries,
+    )
+
+
+def log_allowlist_comparison(comparison: AllowlistComparison) -> None:
+    '''Log a summary and the identity of each new inefficient result.'''
+    logging.warning(
+        '%d known, %d new, %d allowlist entries not detected',
+        len(comparison.known_results),
+        len(comparison.new_results),
+        len(comparison.not_detected_entries),
+    )
+    for result in comparison.new_results:
+        logging.warning(
+            'New inefficient query for table %s: %s',
+            result['Table'],
+            result['Normalized Query'],
+        )
+
+
+def get_comparison_exit_code(comparison: AllowlistComparison) -> int:
+    '''Return a failing exit code when new inefficiencies are detected.'''
+    return 1 if comparison.new_results else 0
 
 
 def deduplicate_results(
@@ -445,7 +516,7 @@ def _main() -> None:
     Main function to handle the logic.
     """
     try:
-        load_allowlist(DEFAULT_ALLOWLIST_PATH)
+        allowlist = load_allowlist(DEFAULT_ALLOWLIST_PATH)
     except (OSError, AllowlistValidationError) as exc:
         logging.error('Failed to load allowlist: %s', exc)
         sys.exit(1)
@@ -483,7 +554,10 @@ def _main() -> None:
         else:
             logging.warning("0 inefficient queries")
 
-        sys.exit(0)
+        comparison = compare_results_with_allowlist(rows, allowlist)
+        log_allowlist_comparison(comparison)
+
+        sys.exit(get_comparison_exit_code(comparison))
     finally:
         connection.close()
 
