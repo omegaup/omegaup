@@ -98,6 +98,7 @@
             </td>
             <td>
               <button
+                v-if="!isItemArchived(item)"
                 class="btn btn-sm btn-danger"
                 @click.prevent="confirmDelete(item)"
               >
