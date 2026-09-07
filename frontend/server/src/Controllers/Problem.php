@@ -119,7 +119,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     const SOURCE_EXTENSIONS = [
-        'py', 'cpp', 'c', 'java', 'kp', 'kj', 'in', 'out',
+        'py', 'cpp', 'c', 'java', 'kp', 'kj', 'rk', 'in', 'out',
     ];
 
     // Number of rows shown in problems list
@@ -1725,7 +1725,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 true
             );
-        } elseif (!empty(array_intersect(['kp', 'kj'], $languages))) {
+        } elseif (!empty(array_intersect(['kp', 'kj', 'rk'], $languages))) {
             \OmegaUp\Controllers\Problem::addTag(
                 'problemRestrictedTagKarel',
                 true,
@@ -3007,12 +3007,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             explode(',', $problem->languages)
         );
         $response['accepts_submissions'] = !empty($response['languages']);
-        $response['karel_problem'] = count(
+        $legacyKarelLanguages = count(
             array_intersect(
                 $response['languages'],
                 ['kp', 'kj']
             )
-        ) === 2;
+        );
+        $response['karel_problem'] = (
+            $legacyKarelLanguages === 2 ||
+            in_array('rk', $response['languages'], true)
+        );
         $response['limits'] = [
             'input_limit' => ($response['input_limit'] / 1024) . ' KiB',
             'memory_limit' => (
@@ -3975,7 +3979,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $onlyKarel = $r->ensureOptionalBool('only_karel');
         if ($onlyKarel) {
-            $programmingLanguages = ['kp', 'kj'];
+            $programmingLanguages = ['kp', 'kj', 'rk'];
         } elseif (!empty($programmingLanguageParam)) {
             $programmingLanguages = explode(
                 ',',
@@ -4885,12 +4889,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'problem' => [
                 'alias' => $details['alias'],
-                'karel_problem' => count(
-                    array_intersect(
-                        $details['languages'],
-                        ['kp', 'kj']
-                    )
-                ) === 2,
+                'karel_problem' => (
+                    count(
+                        array_intersect(
+                            $details['languages'],
+                            ['kp', 'kj']
+                        )
+                    ) === 2 ||
+                    in_array('rk', $details['languages'], true)
+                ),
                 'commit' => $details['commit'],
                 'languages' => $details['languages'],
                 'preferred_language' => $details['preferred_language'] ?? null,
@@ -5362,6 +5369,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $sortedLanguages
             ) => 'C, C++, C#, Java, Kotlin, Python, Ruby, Pascal, Haskell, Lua, Go, Rust, JavaScript',
             'kj,kp' => 'Karel',
+            'rk' => 'ReKarel',
             'cat' => \OmegaUp\Translations::getInstance($identity)->get(
                 'wordsJustOutput'
             ),
