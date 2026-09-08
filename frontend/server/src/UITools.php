@@ -49,6 +49,27 @@ class UITools {
     }
 
     /**
+     * If user is not logged in, is not an admin, and is not part of support,
+     * redirect to home page.
+     */
+    public static function redirectIfNoAdminOrSupport(): void {
+        $session = \OmegaUp\Controllers\Session::getCurrentSession();
+        if (
+            $session['is_admin'] ||
+            (
+                !is_null($session['identity']) &&
+                \OmegaUp\Authorization::isSupportTeamMember(
+                    $session['identity']
+                )
+            )
+        ) {
+            return;
+        }
+        header('Location: /');
+        die();
+    }
+
+    /**
      * @return array{twig: \Twig\Environment, twigContext: array<string, mixed>}
      */
     public static function getTwigInstance() {
