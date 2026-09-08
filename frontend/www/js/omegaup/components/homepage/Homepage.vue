@@ -1,6 +1,6 @@
 <template>
   <div>
-    <omegaup-carousel></omegaup-carousel>
+    <omegaup-carousel :carousel-items="carouselItems"></omegaup-carousel>
     <div
       v-if="
         coderOfTheMonthFemale ||
@@ -131,6 +131,7 @@ export default class Homepage extends Vue {
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
   @Prop() isUnder13User!: boolean;
+  @Prop({ default: () => [] }) carouselItems!: types.CarouselItem[];
 
   T = T;
   cookieClickedAccept() {
