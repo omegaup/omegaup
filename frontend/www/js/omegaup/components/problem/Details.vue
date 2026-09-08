@@ -46,14 +46,8 @@
         ></omegaup-problem-settings-summary>
 
         <div v-if="problem.karel_problem" class="karel-js-link my-3">
-          <a
-            class="p-3"
-            :href="`/karel.js/${
-              problem.sample_input ? `#mundo:${problem.sample_input}` : ''
-            }`"
-            target="_blank"
-          >
-            {{ T.openInKarelJs }}
+          <a class="p-3" :href="karelIdeUrl" target="_blank">
+            {{ openInKarelIdeText }}
             <font-awesome-icon :icon="['fas', 'external-link-alt']" />
           </a>
         </div>
@@ -531,6 +525,24 @@ export default class ProblemDetails extends Vue {
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
+
+  get isReKarelProblem(): boolean {
+    const languages = this.languages ?? this.problem.languages;
+    return languages.includes('rk');
+  }
+
+  get karelIdeUrl(): string {
+    if (this.isReKarelProblem) {
+      return '/rekarel/';
+    }
+    return `/karel.js/${
+      this.problem.sample_input ? `#mundo:${this.problem.sample_input}` : ''
+    }`;
+  }
+
+  get openInKarelIdeText(): string {
+    return this.isReKarelProblem ? T.openInReKarel : T.openInKarelJs;
+  }
 
   get shouldShowEphemeralGrader(): boolean {
     return !this.problem.karel_problem && this.ephemeralGraderEnabled;

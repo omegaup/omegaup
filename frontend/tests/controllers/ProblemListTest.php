@@ -248,7 +248,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Even problems could be solved using Karel, odd ones don't
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
-        $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
+        $karel_problem = 'kj,kp,rk,cpp11-gcc,c11-gcc'; // Karel problems should allow kj, kp AND rk extensions
         $tags = [
             'problemTagArrays',
             'problemTagBigData',
@@ -345,7 +345,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => $tags[0],
-            'programming_languages' => 'kp,kj',
+            'programming_languages' => 'kp,kj,rk',
         ]));
         $this->assertCount(3, $response['results']);
 
@@ -357,7 +357,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => $tags[0],
-            'programming_languages' => 'kp,kj',
+            'programming_languages' => 'kp,kj,rk',
             'difficulty_range' => '0,3',
             'order_by' => 'submissions',
         ]));
