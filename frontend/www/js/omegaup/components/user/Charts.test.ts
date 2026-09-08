@@ -325,7 +325,6 @@ describe('Charts.vue', () => {
     // (emptyPeriodRunCount, emptyGroupedPeriods) by reference at lines 197–198.
     // Two instances share the same object, so B's computation overwrites A's
     // cached result. Fix: clone the objects before use.
-    // TODO(#9779): Remove .skip once the bug is fixed.
     it('[Bug 2] each instance should have isolated normalizedPeriodRunCounts', () => {
       // Mount instance A with sample data
       const dataA = freshData();
