@@ -377,11 +377,24 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         }
         return base64_encode($output);
     }
-
+    /**
+     * Returns the ordinal suffix (st/nd/rd/th) for a given place number,
+     * e.g. 1 -> "st", 2 -> "nd", 3 -> "rd", 4 -> "th", 11 -> "th".
+     *
+     * Numbers ending in 11, 12, or 13 always use "th", regardless of
+     * hundreds/thousands digits (11, 12, 13, 111, 112, 113, 211, 212,
+     * 213, ...). This is checked via $n % 100 rather than $n directly,
+     * since checking $n directly only caught literal 11-13 and
+     * incorrectly fell through to "st"/"nd"/"rd" for 111, 112, 113, etc.
+     *
+     * @see CertificatesTest::testGetPlaceSuffixTeensException() in
+     *      frontend/tests/controllers/CertificatesTest.php for the
+     *      regression test covering this fix.
+     */
     public static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
-
-        if ($n >= 11 && $n <= 13) {
+        
+        if ($n % 100 >= 11 && $n % 100 <= 13) {
             return $translator->get('certificatePdfContestPlaceTh');
         }
 

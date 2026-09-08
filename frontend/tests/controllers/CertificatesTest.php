@@ -414,4 +414,46 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    /**
+     * getPlaceSuffix() should append the correct ordinal suffix
+     * (st/nd/rd/th) for a contest placement number.
+     *
+     * The test forces English via the "lang" request var and resets the
+     * Translations singleton, because in Spanish (the default test
+     * locale) all four ordinal suffixes collapse to the same string
+     * ("° lugar"), which would make this bug undetectable.
+     */
+    public function testGetPlaceSuffixTeensException() {
+        // In Spanish, all four ordinal suffixes collapse to the same text ("° lugar").
+        // So this bug is literally invisible to a test that only compares Spanish output.
+        $_REQUEST['lang'] = 'en';
+        $reflection = new \ReflectionClass(\OmegaUp\Translations::class);
+        $instanceProperty = $reflection->getProperty('_instance');
+        $instanceProperty->setAccessible(true);
+        $instanceProperty->setValue(null, null);
+
+        $translator = \OmegaUp\Translations::getInstance();
+        $th = $translator->get('certificatePdfContestPlaceTh');
+        $st = $translator->get('certificatePdfContestPlaceSt');
+        $nd = $translator->get('certificatePdfContestPlaceNd');
+        $rd = $translator->get('certificatePdfContestPlaceRd');
+
+        // Numbers ending in 11, 12, or 13 (in any hundred) must always use "th"
+        $this->assertSame($th, \OmegaUp\Controllers\Certificate::getPlaceSuffix(11));
+        $this->assertSame($th, \OmegaUp\Controllers\Certificate::getPlaceSuffix(12));
+        $this->assertSame($th, \OmegaUp\Controllers\Certificate::getPlaceSuffix(13));
+        $this->assertSame($th, \OmegaUp\Controllers\Certificate::getPlaceSuffix(111));
+        $this->assertSame($th, \OmegaUp\Controllers\Certificate::getPlaceSuffix(112));
+        $this->assertSame($th, \OmegaUp\Controllers\Certificate::getPlaceSuffix(113));
+
+        // Regular numbers should still follow st/nd/rd/th correctly
+        $this->assertSame($st, \OmegaUp\Controllers\Certificate::getPlaceSuffix(1));
+        $this->assertSame($st, \OmegaUp\Controllers\Certificate::getPlaceSuffix(101));
+        $this->assertSame($nd, \OmegaUp\Controllers\Certificate::getPlaceSuffix(2));
+        $this->assertSame($nd, \OmegaUp\Controllers\Certificate::getPlaceSuffix(102));
+        $this->assertSame($rd, \OmegaUp\Controllers\Certificate::getPlaceSuffix(3));
+        $this->assertSame($rd, \OmegaUp\Controllers\Certificate::getPlaceSuffix(103));
+        $this->assertSame($st, \OmegaUp\Controllers\Certificate::getPlaceSuffix(21));
+    }
 }
