@@ -301,6 +301,47 @@ def test_mark_failure_outside_phase_keeps_phases_successful() -> None:
     assert updates[0][4] == 'failed to process some badges'
 
 
+def test_mark_failure_before_nested_phase_keeps_parent_marked() -> None:
+    '''A forced failure before a nested phase still marks the parent phase.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('outer'):
+            cron_run.mark_failure('outer data was incomplete')
+            with cron_run.phase('inner'):
+                pass
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'inner'
+    assert phases[0]['status'] == 'success'
+    assert phases[1]['phase'] == 'outer'
+    assert phases[1]['status'] == 'failure'
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'outer data was incomplete'
+
+
+def test_mark_failure_in_nested_phase_marks_only_the_inner_phase() -> None:
+    '''A forced failure inside a nested phase marks that phase alone.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('outer'):
+            with cron_run.phase('inner'):
+                cron_run.mark_failure('inner validation failed')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'inner'
+    assert phases[0]['status'] == 'failure'
+    assert phases[1]['phase'] == 'outer'
+    assert phases[1]['status'] == 'success'
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'inner validation failed'
+
+
 def test_releases_lock_when_recording_the_start_fails() -> None:
     '''A failure between the lock and the start row still frees the lock.'''
     conn = _FakeConnection(fail_on='insert into `cron_runs`')

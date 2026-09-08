@@ -58,7 +58,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._forced_failure = False
         self._failure_reason: Optional[str] = None
         self._phase_depth = 0
-        self._active_phase_forced = False
+        self._phase_forced: List[bool] = []
 
     @property
     def _lock_name(self) -> str:
@@ -114,7 +114,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         status = 'success'
         error_class: Optional[str] = None
         self._phase_depth += 1
-        self._active_phase_forced = False
+        self._phase_forced.append(False)
         try:
             yield
         except BaseException as exc:
@@ -124,9 +124,9 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         finally:
             self._phase_depth -= 1
             duration = round(time.monotonic() - start, 3)
-            if status == 'success' and self._active_phase_forced:
+            phase_forced = self._phase_forced.pop()
+            if status == 'success' and phase_forced:
                 status = 'failure'
-            self._active_phase_forced = False
             self._phases.append({
                 'phase': name,
                 'status': status,
@@ -157,7 +157,7 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         if reason is not None:
             self._failure_reason = reason
         if self._phase_depth > 0:
-            self._active_phase_forced = True
+            self._phase_forced[-1] = True
 
     def _is_disabled(self) -> bool:
         '''Whether the registry disabled this job. Unregistered jobs run.'''
