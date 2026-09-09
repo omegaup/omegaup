@@ -348,12 +348,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
-        bool $matchAnyLanguage,
         ?array $difficultyRange,
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        bool $matchAnyLanguage = false
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,

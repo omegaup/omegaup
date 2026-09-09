@@ -4216,12 +4216,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $minVisibility,
             $requireAllTags,
             $programmingLanguages,
-            $matchAnyLanguage,
             $difficultyRange,
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors
+            $authors,
+            $matchAnyLanguage
         );
         return [
             'total' => $count,
