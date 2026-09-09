@@ -163,6 +163,8 @@ def main() -> None:
             dbconn.conn.commit()
         finally:
             dbconn.conn.close()
+            if dbconn_readonly is not dbconn:
+                dbconn_readonly.conn.close()
             logging.info('Finished')
         if has_failures:
             cron_run.mark_failure()

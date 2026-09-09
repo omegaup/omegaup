@@ -8,4 +8,4 @@ The evaluation environment consists of **Virtual Machines** Standard_A1_v2 on Az
   * ruby 2.1.5 (rb)
   * lua 5.2 (lua)
   * ghc 7.8.4 (hs)
-  * karel.js (kp, kj)
+  * karel.js (kp, kj) and ReKarel 2.0.0 (rk)
