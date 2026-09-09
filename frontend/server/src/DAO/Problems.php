@@ -151,12 +151,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // `author=` filter to silently drop for everyone else.
         $sql = "SELECT user_id FROM Identities WHERE username IN ({$placeholders}) AND user_id IS NOT NULL";
 
+        /** @var list<array{user_id: int|null}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $usernames
+        );
+
         return array_map(
             fn($row) => intval($row['user_id']),
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $usernames
-            )
+            $results
         );
     }
 
