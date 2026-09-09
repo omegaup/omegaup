@@ -348,6 +348,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
+        bool $matchAnyLanguage,
         ?array $difficultyRange,
         bool $onlyQualitySeal,
         ?string $level,
@@ -397,11 +398,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
-        /** @var list<array{0: string, 1: list<string>}> */
-        foreach ($programmingLanguages as $programmingLanguage) {
+        if (!empty($programmingLanguages)) {
             $clauses[] = [
-                'FIND_IN_SET(?, p.languages) > 0',
-                [$programmingLanguage],
+                '(' . implode(
+                    ' ' . ($matchAnyLanguage ? 'OR' : 'AND') . ' ',
+                    array_fill(
+                        0,
+                        count($programmingLanguages),
+                        'FIND_IN_SET(?, p.languages) > 0'
+                    )
+                ) . ')',
+                $programmingLanguages,
             ];
         }
 
