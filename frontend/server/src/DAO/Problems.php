@@ -149,24 +149,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // `User_Rank` is a denormalized cache populated only from users
         // with at least one AC solution, so querying it here caused the
         // `author=` filter to silently drop for everyone else.
-        $sql = "SELECT user_id FROM Identities WHERE username IN ({$placeholders})";
+        $sql = "SELECT user_id FROM Identities WHERE username IN ({$placeholders}) AND user_id IS NOT NULL";
 
-        /** @var list<array{user_id: int|null}> */
-        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            $usernames
-        );
-
-        // Some identities are not linked to a Users row yet
-        // (`Identities.user_id` is nullable); those cannot own
-        // problems and must be skipped.
-        return array_values(array_map(
+        return array_map(
             fn($row) => intval($row['user_id']),
-            array_filter(
-                $results,
-                fn($row) => !is_null($row['user_id'])
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $usernames
             )
-        ));
+        );
     }
 
     /**

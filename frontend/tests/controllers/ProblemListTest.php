@@ -2005,25 +2005,21 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'author_without_solutions']
             )
         );
-        // A second author that has solved at least one problem, so they
-        // would be present in `User_Rank` and serve as a control.
+        // A second author with a promoted problem of their own so the
+        // test detects a silently dropped `author` filter: if the filter
+        // is dropped, both problems leak into the results.
         ['identity' => $otherAuthor] = \OmegaUp\Test\Factories\User::createUser();
-        $otherRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            \OmegaUp\Test\Factories\Problem::createProblem(),
-            $otherAuthor
+        $otherProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'author' => $otherAuthor,
+            ])
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($otherRunData);
 
         $ownProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'promoted',
                 'author' => $author,
-            ])
-        );
-        $otherProblem = \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 'promoted',
-                'author' => $otherAuthor,
             ])
         );
 
