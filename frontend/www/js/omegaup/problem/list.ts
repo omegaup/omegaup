@@ -13,6 +13,7 @@ OmegaUp.on('ready', () => {
   let columnName = 'problem_id';
   let language = 'all';
   let onlyQualitySeal = false;
+  let solvedStatus = 'all';
   let query: null | string = null;
   let tag: string[] = [];
   if (queryString) {
@@ -42,6 +43,15 @@ OmegaUp.on('ready', () => {
       const onlyQualitySealParam = urlParams.get('only_quality_seal');
       if (onlyQualitySealParam) {
         onlyQualitySeal = onlyQualitySealParam === 'true';
+      }
+    }
+    if (urlParams.get('solved_status')) {
+      const solvedStatusParam = urlParams.get('solved_status');
+      if (
+        solvedStatusParam &&
+        ['all', 'solved', 'attempted', 'unsolved'].includes(solvedStatusParam)
+      ) {
+        solvedStatus = solvedStatusParam;
       }
     }
     if (urlParams.get('tag[]')) {
@@ -84,6 +94,7 @@ OmegaUp.on('ready', () => {
           keyword: payload.keyword,
           tags: payload.tags,
           onlyQualitySeal: onlyQualitySeal,
+          solvedStatus: solvedStatus,
           sortOrder: sortOrder,
           columnName: columnName,
           searchResultProblems: this.searchResultProblems,
@@ -105,6 +116,7 @@ OmegaUp.on('ready', () => {
               query: query ?? '',
               only_quality_seal: onlyQualitySeal,
               order_by: columnName,
+              solved_status: solvedStatus,
               sort_order: sortOrder,
               tag,
             };

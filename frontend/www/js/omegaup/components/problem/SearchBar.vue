@@ -52,6 +52,22 @@
           </select>
         </label>
       </div>
+      <div v-if="loggedIn" class="form-group mr-2">
+        <label>
+          {{ T.wordsFilterByStatus }}
+          <select
+            v-model="currentSolvedStatus"
+            data-filter-status
+            name="solved_status"
+            class="ml-2 form-control"
+          >
+            <option value="all">{{ T.wordsAll }}</option>
+            <option value="solved">{{ T.problemStatusSolved }}</option>
+            <option value="attempted">{{ T.problemStatusAttempted }}</option>
+            <option value="unsolved">{{ T.problemStatusUnattempted }}</option>
+          </select>
+        </label>
+      </div>
       <div class="form-group mr-2">
         <label class="ml-4 large:ml-0">
           <input
@@ -98,12 +114,15 @@ export default class ProblemSearchBar extends Vue {
   @Prop() languages!: string[];
   @Prop() onlyQualitySeal!: boolean;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop({ default: false }) loggedIn!: boolean;
+  @Prop({ default: 'all' }) solvedStatus!: string;
 
   T = T;
 
   currentKeyword: types.ListItem = { key: this.keyword, value: this.keyword };
   currentLanguage = this.language;
   currentOnlyQualitySeal = this.onlyQualitySeal;
+  currentSolvedStatus = this.solvedStatus;
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;

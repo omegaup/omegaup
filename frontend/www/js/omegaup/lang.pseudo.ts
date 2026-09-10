@@ -2316,6 +2316,7 @@ const translations: { [key: string]: string; } = {
   wordsFilterByProblem: "(Fi173r by pr0b13m)",
   wordsFilterBySchool: "(Fi173r by my 5ch001)",
   wordsFilterByState: "(Fi173r by my 57a73)",
+  wordsFilterByStatus: "(Fi173r by 57a7u5)",
   wordsGender: "(G3nd3r)",
   wordsGenderDecline: "(Pr3f3r n07 70 5ay)",
   wordsGenderFemale: "(F3ma13)",

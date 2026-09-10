@@ -21,6 +21,8 @@
         :tags="tags"
         :only-quality-seal="onlyQualitySeal"
         :search-result-problems="searchResultProblems"
+        :logged-in="loggedIn"
+        :solved-status="solvedStatus"
         @update-search-result-problems="
           (query) => $emit('update-search-result-problems', query)
         "
@@ -92,6 +94,7 @@ export default class List extends Vue {
   @Prop() column!: string;
   @Prop() tags!: string[];
   @Prop() onlyQualitySeal!: boolean;
+  @Prop({ default: 'all' }) solvedStatus!: string;
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
