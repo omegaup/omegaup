@@ -174,8 +174,8 @@
             >
               {{ T.wordsCancel }}
             </button></template
-          ></omegaup-course-assignment-details
-        >
+          >
+        </omegaup-course-assignment-details>
       </div>
 
       <div
@@ -454,22 +454,23 @@ export default class CourseEdit extends Vue {
   }
 
   onSelectAssignmentTab(): void {
-    this.switchTab('content');
+    this.showTab = 'content';
+    this.onResetAssignmentForm();
   }
 
-  switchTab(newTab: string): void {
+  switchTab(tab: string): void {
     if (
       this.showTab === 'content' &&
-      ((this.assignmentDetails as unknown) as { hasUnsavedChanges?: boolean })
-        ?.hasUnsavedChanges &&
+      (this.assignmentDetails as any)?.hasUnsavedChanges &&
       !window.confirm(T.courseUnsavedChangesWarning)
     ) {
       return;
     }
-    this.showTab = newTab;
-    if (newTab === 'content') {
-      this.onResetAssignmentForm();
+    if (tab === 'content') {
+      this.onSelectAssignmentTab();
+      return;
     }
+    this.showTab = tab;
   }
 
   onArchiveCourse(archive: boolean): void {

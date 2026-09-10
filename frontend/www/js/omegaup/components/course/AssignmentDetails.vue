@@ -404,6 +404,43 @@ export default class CourseAssignmentDetails extends Vue {
     this.unlimitedDuration = !this.assignment.finish_time;
   }
 
+  get hasUnsavedChanges(): boolean {
+    if (this.assignmentFormMode === omegaup.AssignmentFormMode.New) {
+      const hasProblems =
+        (this.scheduledProblemList?.problems?.length ?? 0) > 0;
+      const hasInputs = Boolean(this.name || this.description || this.alias);
+      return hasProblems || hasInputs;
+    }
+    return false;
+  }
+
+  @Watch('hasUnsavedChanges')
+  onHasUnsavedChangesChanged(newValue: boolean): void {
+    if (newValue) {
+      window.addEventListener('beforeunload', this.onBeforeUnload);
+    } else {
+      window.removeEventListener('beforeunload', this.onBeforeUnload);
+    }
+  }
+
+  mounted(): void {
+    if (this.hasUnsavedChanges) {
+      window.addEventListener('beforeunload', this.onBeforeUnload);
+    }
+  }
+
+  beforeDestroy(): void {
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
+  }
+
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.hasUnsavedChanges) {
+      return;
+    }
+    event.preventDefault();
+    event.returnValue = '';
+  }
+
   @Watch('show')
   onShowChanged(): void {
     this.reset();
