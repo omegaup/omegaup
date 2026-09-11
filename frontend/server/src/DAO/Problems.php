@@ -352,7 +352,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        ?string $solvedStatus
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -478,6 +479,34 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $conditions,
                 $difficultyBounds,
             ];
+        }
+
+        if (
+            !is_null($solvedStatus)
+            && $solvedStatus !== 'all'
+            && !is_null($identityId)
+            && !is_null($userId)
+        ) {
+            $solvedExists = 'EXISTS (SELECT 1 FROM Submissions ss WHERE ss.problem_id = p.problem_id AND ss.identity_id = ? AND ss.verdict = \'AC\' AND ss.type = \'normal\')';
+            $submittedExists = 'EXISTS (SELECT 1 FROM Submissions ss WHERE ss.problem_id = p.problem_id AND ss.identity_id = ? AND ss.type = \'normal\')';
+            $forfeitedExists = 'NOT EXISTS (SELECT 1 FROM Problems_Forfeited pf WHERE pf.problem_id = p.problem_id AND pf.user_id = ?)';
+            $ownedExists = 'NOT EXISTS (SELECT 1 FROM ACLs acl_own WHERE acl_own.acl_id = p.acl_id AND acl_own.owner_id = ?)';
+            if ($solvedStatus === 'solved') {
+                $clauses[] = [
+                    '(' . $solvedExists . ' AND ' . $forfeitedExists . ' AND ' . $ownedExists . ')',
+                    [$identityId, $userId, $userId],
+                ];
+            } elseif ($solvedStatus === 'attempted') {
+                $clauses[] = [
+                    '(' . $submittedExists . ' AND NOT ' . $solvedExists . ' AND ' . $forfeitedExists . ' AND ' . $ownedExists . ')',
+                    [$identityId, $identityId, $userId, $userId],
+                ];
+            } elseif ($solvedStatus === 'unsolved') {
+                $clauses[] = [
+                    'NOT ' . $submittedExists,
+                    [$identityId],
+                ];
+            }
         }
 
         if (!is_null($query) && $query !== '') {
@@ -919,7 +948,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql = "
             SELECT
                 {$fields},
-                SUM(s.verdict = 'AC') AS solved_count
+                SUM(s.verdict = 'AC' AND s.type = 'normal') AS solved_count
             FROM
                 Submissions s
             INNER JOIN
