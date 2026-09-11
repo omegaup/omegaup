@@ -87,7 +87,6 @@
             :navbar-section="navbarSection"
           >
           </omegaup-navbar-items>
-          <!-- in lockdown or contest mode there is no left navbar -->
 
           <div class="d-flex px-3 justify-content-between">
             <ul
@@ -222,41 +221,28 @@
                       href="/dependents"
                       >{{ T.navDependents }}</a
                     >
-                    <form v-if="!isUnder13User" class="collapse-submenu">
-                      <div class="btn-group">
-                        <a
-                          class="dropdown-item"
-                          href="/profile/#created-content"
-                          >{{ T.navMyContent }}</a
-                        >
-                        <button
-                          type="button"
-                          class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
-                          data-toggle="collapse"
-                          data-target=".collapse-links"
-                          aria-expanded="false"
-                          aria-controls="collapse-links"
-                        ></button>
-                      </div>
-                      <div class="collapse collapse-links pl-3">
-                        <a class="dropdown-item" href="/problem/mine">{{
-                          T.navMyProblems
-                        }}</a>
-                        <a
-                          class="dropdown-item"
-                          href="/course/mine"
-                          data-nav-courses-mine
-                          >{{ T.navMyCourses }}</a
-                        >
-                        <a
-                          class="dropdown-item"
-                          href="/contest/mine"
-                          data-nav-user-contests
-                          >{{ T.navMyContests }}</a
-                        >
-                      </div>
-                    </form>
-
+                    <template v-if="!isUnder13User">
+                      <a
+                        class="dropdown-item"
+                        href="/profile/#created-content"
+                        >{{ T.navMyContent }}</a
+                      >
+                      <a class="dropdown-item" href="/problem/mine">{{
+                        T.navMyProblems
+                      }}</a>
+                      <a
+                        class="dropdown-item"
+                        href="/course/mine"
+                        data-nav-courses-mine
+                        >{{ T.navMyCourses }}</a
+                      >
+                      <a
+                        class="dropdown-item"
+                        href="/contest/mine"
+                        data-nav-user-contests
+                        >{{ T.navMyContests }}</a
+                      >
+                    </template>
                     <a
                       class="dropdown-item"
                       href="/group/"
@@ -274,7 +260,6 @@
                     }}</a>
                   </template>
                   <div class="dropdown-divider"></div>
-                  <!-- Logout button for desktop - navbar menu -->
                   <a
                     class="dropdown-item"
                     href="#"
@@ -294,7 +279,6 @@
               </li>
             </ul>
 
-            <!-- Logout button for mobile -->
             <a
               v-if="isLoggedIn"
               class="navbar justify-content-end d-lg-none align-items-start pt-4 d-flex align-items-center"
@@ -309,7 +293,6 @@
           </div>
         </div>
 
-        <!-- Logout button for desktop - navbar -->
         <a
           v-if="isLoggedIn"
           class="navbar justify-content-end d-none d-lg-block order-1 align-items-center"
@@ -619,10 +602,6 @@ nav.navbar {
     color: var(--header-navbar-primary-link-color);
   }
 
-  .collapse-submenu .btn:focus {
-    box-shadow: 0 0 0 0;
-  }
-
   .dropdown-menu {
     overflow-y: auto;
     max-height: 75vh;
@@ -646,55 +625,6 @@ nav.navbar {
 
 .navbar-brand {
   padding-bottom: 1.25rem !important;
-}
-
-@media (min-width: 992px) {
-  .dropdown {
-    position: relative;
-  }
-
-  .dropdown::before {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 0;
-    height: 10px;
-    width: 100%;
-  }
-
-  .navbar-nav:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
-    display: block;
-  }
-
-  .navbar-right:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
-    display: block;
-  }
-
-  .dropdown.show > .dropdown-menu {
-    display: block !important;
-  }
-
-  .navbar-collapse:has(.dropdown.show)
-    .dropdown:not(.show):hover
-    > .dropdown-menu {
-    display: none !important;
-  }
-
-  .nav-problems .collapse-links {
-    display: none;
-  }
-
-  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
-    display: block;
-  }
-
-  .nav-user .collapse-links {
-    display: none;
-  }
-
-  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
-    display: block;
-  }
 }
 
 .progress {
