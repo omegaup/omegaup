@@ -331,6 +331,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @return array{status: string, submissionFeedback: null|\OmegaUp\DAO\VO\SubmissionFeedback, submissionFeedbackThread: null|\OmegaUp\DAO\VO\SubmissionFeedbackThread}
      */
     public static function apiSetFeedback(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $guid = $r->ensureString('guid');
 
@@ -518,6 +519,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiSetFeedbackList(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $guid = $r->ensureString('guid');
 
