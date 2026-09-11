@@ -385,6 +385,18 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'remove-problem': (problemAlias: string) => {
+            const problemTitle =
+              this.problems.find((problem) => problem.alias === problemAlias)
+                ?.title ?? problemAlias;
+            if (
+              !window.confirm(
+                ui.formatString(T.contestAddproblemProblemConfirmRemove, {
+                  problem: problemTitle,
+                }),
+              )
+            ) {
+              return;
+            }
             api.Contest.removeProblem({
               contest_alias: payload.details.alias,
               problem_alias: problemAlias,
