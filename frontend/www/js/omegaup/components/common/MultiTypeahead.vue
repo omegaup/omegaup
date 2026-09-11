@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import VoerroTagsInput from '@voerro/vue-tagsinput';
+import VoerroTagsInput from './VoerroTagsInput.vue';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
 import { types } from '../../api_types';

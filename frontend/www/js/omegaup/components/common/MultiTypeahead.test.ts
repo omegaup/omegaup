@@ -1,4 +1,4 @@
-import VoerroTagsInput from '@voerro/vue-tagsinput';
+import VoerroTagsInput from './VoerroTagsInput.vue';
 import { mount } from '@vue/test-utils';
 import Vue from 'vue';
 import common_MultiTypeahead from './MultiTypeahead.vue';
