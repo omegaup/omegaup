@@ -22,11 +22,13 @@ div[data-overlay-popup] {
   height: fit-content;
   max-height: 90%;
   margin: auto;
-  border: 2px solid var(--overlay-popup-border-color);
-  padding: 1em;
+  border: 1px solid var(--overlay-popup-border-color);
+  padding: var(--overlay-popup-padding);
   position: absolute;
   overflow-y: auto;
   overflow-x: hidden;
+  border-radius: var(--overlay-popup-radius);
+  box-shadow: var(--overlay-popup-shadow);
   top: 0;
   bottom: 0;
   left: 0;
@@ -38,12 +40,21 @@ div[data-overlay-popup] {
     position: -webkit-sticky;
     top: 0;
     z-index: 100;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
     background-color: transparent;
     border: none;
-    font-size: 110%;
+    color: var(--overlay-popup-close-color);
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, transform 0.15s ease;
 
     &:hover {
       background-color: var(--overlay-popup-close-background-color--hover);
+      transform: scale(1.05);
     }
   }
 }
