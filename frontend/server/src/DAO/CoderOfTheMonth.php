@@ -66,6 +66,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         // This query should be always synchronized with the one in the cron
         // update_ranks.py, specifically in the function get_last_12_coders_of_the_month.
+        // Uses LEFT JOIN to pre-computed "selected months" instead of correlated NOT EXISTS
+        // for better performance (index idx_category_time_selected).
         $sql = "
           SELECT
               cm.time,
@@ -80,24 +82,21 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
               Identities i ON i.identity_id = u.main_identity_id
           LEFT JOIN
-              Emails e ON e.user_id = u.user_id
+              Emails e ON e.email_id = u.main_email_id
           LEFT JOIN
               User_Rank ur ON ur.user_id = cm.user_id
+          LEFT JOIN (
+              SELECT time, category
+              FROM Coder_Of_The_Month
+              WHERE selected_by IS NOT NULL
+                  AND category = ?
+                  AND time <= ?
+              GROUP BY time, category
+          ) selected_months
+              ON selected_months.time = cm.time AND selected_months.category = cm.category
           WHERE
               (cm.selected_by IS NOT NULL
-              OR (
-                  cm.`ranking` = 1 AND
-                  NOT EXISTS (
-                      SELECT
-                          *
-                      FROM
-                          Coder_Of_The_Month
-                      WHERE
-                          time = cm.time AND
-                          selected_by IS NOT NULL AND
-                          category = ?
-                  )
-              ))
+              OR (cm.`ranking` = 1 AND selected_months.time IS NULL))
               AND cm.category = ?
               AND cm.time <= ?
           ORDER BY
@@ -107,7 +106,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
       /** @var list<array{classname: string, country_id: string, email: null|string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$category, $category, $date]
+            [$category, $date, $category, $date]
         );
     }
 

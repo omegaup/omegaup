@@ -76,6 +76,8 @@ def get_last_12_coders_of_the_month(
 
     # Note: This query should be always syncronized with the one in the
     # function getCodersOfTheMonth located in the /DAO/CoderOfTheMonth.php file
+    # Uses LEFT JOIN to pre-computed "selected months" instead of correlated
+    # NOT EXISTS for better performance (index idx_category_time_selected).
     sql = '''
           SELECT
               cm.time,
@@ -90,24 +92,23 @@ def get_last_12_coders_of_the_month(
           INNER JOIN
               Identities i ON i.identity_id = u.main_identity_id
           LEFT JOIN
-              Emails e ON e.user_id = u.user_id
+              Emails e ON e.email_id = u.main_email_id
           LEFT JOIN
               User_Rank ur ON ur.user_id = cm.user_id
+          LEFT JOIN (
+              SELECT time, category
+              FROM Coder_Of_The_Month
+              WHERE selected_by IS NOT NULL
+                  AND category = %s
+                  AND time <= %s
+                  AND time > DATE_SUB(%s, INTERVAL 12 MONTH)
+              GROUP BY time, category
+          ) selected_months
+              ON selected_months.time = cm.time
+              AND selected_months.category = cm.category
           WHERE
               (cm.selected_by IS NOT NULL
-              OR (
-                  cm.`ranking` = 1 AND
-                  NOT EXISTS (
-                      SELECT
-                          *
-                      FROM
-                          Coder_Of_The_Month
-                      WHERE
-                          time = cm.time AND
-                          selected_by IS NOT NULL AND
-                          category = %s
-                  )
-              ))
+              OR (cm.`ranking` = 1 AND selected_months.time IS NULL))
               AND cm.category = %s
               AND cm.time <= %s
               AND cm.time > DATE_SUB(%s, INTERVAL 12 MONTH)
@@ -116,9 +117,17 @@ def get_last_12_coders_of_the_month(
           LIMIT
               0, 12;
     '''
-    cur_readonly.execute(sql, (category, category,
-                               first_day_of_current_month,
-                               first_day_of_current_month))
+    cur_readonly.execute(
+        sql,
+        (
+            category,
+            first_day_of_current_month,
+            first_day_of_current_month,
+            category,
+            first_day_of_current_month,
+            first_day_of_current_month,
+        ),
+    )
 
     coders = []
     for row in cur_readonly.fetchall():
