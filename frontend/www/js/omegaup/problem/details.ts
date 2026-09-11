@@ -2,6 +2,7 @@ import Vue from 'vue';
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
+import { pushLocationHash } from '../location';
 import {
   getOptionsFromLocation,
   getProblemAndRunDetails,
@@ -93,6 +94,10 @@ OmegaUp.on('ready', async () => {
       isBookmarked: payload.isBookmarked,
       isLoadingBookmark: false,
     }),
+    // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
+    beforeDestroy() {
+      window.removeEventListener('hashchange', onHashChange);
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
@@ -377,7 +382,10 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
+            problemDetailsView.activeTab = tabName;
+            if (window.location.hash !== `#${tabName}`) {
+              pushLocationHash(`#${tabName}`);
+            }
           },
           'redirect-login-page': () => {
             window.location.href = `/login/?redirect=${encodeURIComponent(
@@ -600,4 +608,11 @@ OmegaUp.on('ready', async () => {
   ) {
     problemDetailsView.popupDisplayed = PopupDisplayed.Promotion;
   }
+
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('/')[0];
+    problemDetailsView.activeTab = hash || 'problems';
+  };
+
+  window.addEventListener('hashchange', onHashChange);
 });
