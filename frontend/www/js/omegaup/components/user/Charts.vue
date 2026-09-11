@@ -194,8 +194,12 @@ export default class UserCharts extends Vue {
       'month',
       'year',
     ];
-    const response: NormalizedPeriodRunCounts = emptyPeriodRunCount;
-    const runsByVerdict: GroupedVerdicts = emptyGroupedPeriods;
+    const response: NormalizedPeriodRunCounts = JSON.parse(
+      JSON.stringify(emptyPeriodRunCount),
+    );
+    const runsByVerdict: GroupedVerdicts = JSON.parse(
+      JSON.stringify(emptyGroupedPeriods),
+    );
     for (const period of periods) {
       response[period] = {
         categories: Object.keys(runs[period]),
