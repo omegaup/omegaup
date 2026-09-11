@@ -480,6 +480,20 @@ class TestTrainAndPublish(unittest.TestCase):
         self.assertFalse(has_failures)
         self.assertFalse(cron_run.failed)
 
+    def test_main_exits_nonzero_when_model_is_rejected(self) -> None:
+        '''main() raises SystemExit(1) when the guardrail holds the model.'''
+        argv = [
+            'build_problem_rec_model',
+            '--sqlite-database', _TESTDATA,
+            '--output', os.path.join(tempfile.mkdtemp(), 'model.db'),
+            '--no-track',
+            '--min-map-score', '0.99',
+        ]
+        with mock.patch('sys.argv', argv):
+            with self.assertRaises(SystemExit) as ctx:
+                build_problem_rec_model.main()
+            self.assertEqual(ctx.exception.code, 1)
+
 
 if __name__ == '__main__':
     unittest.main()
