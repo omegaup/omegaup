@@ -35,6 +35,7 @@ class MockCursor:
         self._position = 0
         self._warnings: List[SqlWarning] = list(warnings or [])
         self.calls: List[Tuple[str, Any]] = []
+        self.lastrowid: Optional[int] = None
 
     def execute(self, sql: str, params: Any = None) -> None:
         '''Record the call and resolve a result set from the script.'''
