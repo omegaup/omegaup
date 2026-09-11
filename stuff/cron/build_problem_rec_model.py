@@ -412,10 +412,11 @@ def main() -> None:
                     # Save current model
                     model.save(args.output)
                 else:
-                    logging.error(
+                    reason = (
                         'Model NOT saved. Resulting accuracy was too low: '
-                        '%f below %f', score, args.min_map_score)
-                    cron_run.mark_failure()
+                        '%f below %f' % (score, args.min_map_score))
+                    logging.error('%s', reason)
+                    cron_run.mark_failure(reason)
         except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to update recommendation model.')
             raise
