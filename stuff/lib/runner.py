@@ -112,6 +112,11 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         error_class: Optional[str] = None
         try:
             yield
+        except SystemExit as exc:
+            if exc.code not in (None, 0):
+                status = 'failure'
+                error_class = 'SystemExit'
+            raise
         except BaseException as exc:
             status = 'failure'
             error_class = type(exc).__name__

@@ -273,3 +273,104 @@ def test_releases_lock_when_finishing_fails() -> None:
             pass
 
     assert _matching(conn.calls, 'release_lock')
+
+
+def test_clean_exit_records_success() -> None:
+    '''A body that finishes without raising is recorded as success.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with _run('update_ranks.py', _args(), conn):
+        pass
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert len(updates) == 1
+    status, _duration, _rows, _phases, error_text, _run_id = updates[0]
+    assert status == 'success'
+    assert error_text is None
+
+
+def test_system_exit_zero_records_success() -> None:
+    '''sys.exit(0) in the body is recorded as a successful run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit) as excinfo:
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit(0)
+
+    assert excinfo.value.code == 0
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'success'
+    assert updates[0][4] is None
+
+
+def test_system_exit_none_records_success() -> None:
+    '''A bare sys.exit() in the body is recorded as a successful run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit) as excinfo:
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit()
+
+    assert excinfo.value.code is None
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'success'
+    assert updates[0][4] is None
+
+
+def test_system_exit_nonzero_records_failure() -> None:
+    '''sys.exit(1) in the body is recorded as a failed run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit(1)
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'SystemExit: 1'
+
+
+def test_system_exit_with_message_records_failure() -> None:
+    '''sys.exit with a message in the body is recorded as a failed run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit('boom')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'SystemExit: boom'
+
+
+def test_clean_system_exit_inside_phase_records_phase_success() -> None:
+    '''sys.exit(0) inside a phase records the phase itself as a success.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn) as run:
+            with run.phase('update_users_stats'):
+                raise SystemExit(0)
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'update_users_stats'
+    assert phases[0]['status'] == 'success'
+    assert phases[0]['error_class'] is None
+
+
+def test_failed_system_exit_inside_phase_records_phase_failure() -> None:
+    '''sys.exit(1) inside a phase records the phase as a failure.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn) as run:
+            with run.phase('update_users_stats'):
+                raise SystemExit(1)
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['status'] == 'failure'
+    assert phases[0]['error_class'] == 'SystemExit'
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'SystemExit: 1'
