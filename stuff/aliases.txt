@@ -1,0 +1,4 @@
+colas
+filas
+pilas
+sumas

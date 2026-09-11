@@ -9,6 +9,10 @@
 .pytest_cache/
 .mypy_cache/
 .cache
+
+# API tokens
+.token
+stuff/.token
 tags
 nohup.out
 tags
