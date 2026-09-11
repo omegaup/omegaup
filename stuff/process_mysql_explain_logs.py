@@ -7,7 +7,17 @@ import logging
 import sys
 import os
 import csv
-from typing import Any, Iterable, Tuple, Optional, List, Dict, Set
+from typing import (
+    Any,
+    Iterable,
+    Tuple,
+    Optional,
+    List,
+    Dict,
+    Set,
+    NamedTuple,
+    TypedDict,
+)
 import configparser
 import re
 import mysql.connector
@@ -31,6 +41,23 @@ DEFAULT_ALLOWLIST_PATH = os.path.join(
 
 class AllowlistValidationError(ValueError):
     '''Raised when the inefficient queries allowlist is not valid.'''
+
+
+class KnownQuery(TypedDict):
+    '''Validated entry from the inefficient queries allowlist.'''
+
+    normalized_query: str
+    table: str
+    issue: int
+    reason: str
+
+
+class AllowlistComparison(NamedTuple):
+    '''Results grouped by their relationship with the allowlist.'''
+
+    known_results: List[Dict[str, str]]
+    new_results: List[Dict[str, str]]
+    not_detected_entries: List[KnownQuery]
 
 
 def normalize_query(query: str) -> str:
@@ -79,7 +106,7 @@ def _get_non_empty_string(
     return value
 
 
-def load_allowlist(path: str) -> List[Dict[str, Any]]:
+def load_allowlist(path: str) -> List[KnownQuery]:
     '''Load and validate the inefficient queries allowlist.'''
     try:
         with open(path, 'r', encoding='utf-8') as allowlist_file:
@@ -121,7 +148,7 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
             'Allowlist field "entries" must be a list.'
         )
 
-    validated_entries: List[Dict[str, Any]] = []
+    validated_entries: List[KnownQuery] = []
     seen: Set[Tuple[str, str]] = set()
     for entry_number, entry in enumerate(entries, start=1):
         if not isinstance(entry, dict):
@@ -146,7 +173,7 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
             )
 
         table = _get_non_empty_string(entry, 'table', entry_number)
-        _get_non_empty_string(entry, 'reason', entry_number)
+        reason = _get_non_empty_string(entry, 'reason', entry_number)
 
         issue = entry['issue']
         if (
@@ -166,7 +193,12 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
                 f'{identity}.'
             )
         seen.add(identity)
-        validated_entries.append(entry)
+        validated_entries.append(KnownQuery(
+            normalized_query=normalized_query,
+            table=table,
+            issue=issue,
+            reason=reason,
+        ))
 
     return validated_entries
 
@@ -176,6 +208,55 @@ def build_inefficiency_key(
 ) -> Tuple[str, str]:
     '''Return the stable identity of an inefficient EXPLAIN row.'''
     return (result['Normalized Query'], result['Table'])
+
+
+def compare_results_with_allowlist(
+    results: Iterable[Dict[str, str]],
+    allowlist: Iterable[KnownQuery],
+) -> AllowlistComparison:
+    '''Group detected results according to their allowlist status.'''
+    allowlist_entries = list(allowlist)
+    allowlist_keys: Set[Tuple[str, str]] = {
+        (entry['normalized_query'], entry['table'])
+        for entry in allowlist_entries
+    }
+    detected_keys: Set[Tuple[str, str]] = set()
+    known_results: List[Dict[str, str]] = []
+    new_results: List[Dict[str, str]] = []
+
+    for result in results:
+        key = build_inefficiency_key(result)
+        detected_keys.add(key)
+        if key in allowlist_keys:
+            known_results.append(result)
+        else:
+            new_results.append(result)
+
+    not_detected_entries = [
+        entry for entry in allowlist_entries
+        if (entry['normalized_query'], entry['table']) not in detected_keys
+    ]
+    return AllowlistComparison(
+        known_results=known_results,
+        new_results=new_results,
+        not_detected_entries=not_detected_entries,
+    )
+
+
+def log_allowlist_comparison(comparison: AllowlistComparison) -> None:
+    '''Log a summary and the identity of each new inefficient result.'''
+    logging.info(
+        '%d known, %d new, %d allowlist entries not detected',
+        len(comparison.known_results),
+        len(comparison.new_results),
+        len(comparison.not_detected_entries),
+    )
+    for result in comparison.new_results:
+        logging.warning(
+            'New inefficient query for table %s: %s',
+            result['Table'],
+            result['Normalized Query'],
+        )
 
 
 def deduplicate_results(
@@ -445,7 +526,7 @@ def _main() -> None:
     Main function to handle the logic.
     """
     try:
-        load_allowlist(DEFAULT_ALLOWLIST_PATH)
+        allowlist = load_allowlist(DEFAULT_ALLOWLIST_PATH)
     except (OSError, AllowlistValidationError) as exc:
         logging.error('Failed to load allowlist: %s', exc)
         sys.exit(1)
@@ -482,6 +563,9 @@ def _main() -> None:
                 logging.error("Failed to save CSV: %s", exc)
         else:
             logging.warning("0 inefficient queries")
+
+        comparison = compare_results_with_allowlist(rows, allowlist)
+        log_allowlist_comparison(comparison)
 
         sys.exit(0)
     finally:
