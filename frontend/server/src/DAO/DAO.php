@@ -92,4 +92,8 @@ final class DAO {
             )
         );
     }
+
+    public static function escapeBooleanModeQuery(string $query): string {
+        return addcslashes($query, '+-<>()~*"\\');
+    }
 }

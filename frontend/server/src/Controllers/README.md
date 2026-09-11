@@ -26,7 +26,6 @@
   - [`/api/carouselItems/create/`](#apicarouselitemscreate)
   - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
   - [`/api/carouselItems/list/`](#apicarouselitemslist)
-  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
   - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
@@ -678,9 +677,10 @@ Create a new Carousel Item
 
 | Name              | Type           | Description | Required |
 | ----------------- | -------------- | ----------- | -------- |
-| `buttonTitle`     | `string`       |             | ✓        |
+| `button_title`    | `string`       |             | ✓        |
 | `excerpt`         | `string`       |             | ✓        |
 | `image_url`       | `string`       |             | ✓        |
+| `is_active`       | `bool`         |             | ✓        |
 | `link`            | `string`       |             | ✓        |
 | `status`          | `bool`         |             | ✓        |
 | `title`           | `string`       |             | ✓        |
@@ -710,19 +710,13 @@ _Nothing_
 
 ### Description
 
-List all Carousel Items (admin only)
+List Carousel Items (admin/support only)
 
-### Returns
+### Parameters
 
-```typescript
-types.CarouselItemListPayload;
-```
-
-## `/api/carouselItems/listActive/`
-
-### Description
-
-List all active Carousel Items (homepage)
+| Name          | Type   | Description | Required |
+| ------------- | ------ | ----------- | -------- |
+| `active_only` | `bool` |             | ✓        |
 
 ### Returns
 
@@ -740,14 +734,15 @@ Update a Carousel Item
 
 | Name               | Type           | Description | Required |
 | ------------------ | -------------- | ----------- | -------- |
-| `buttonTitle`      | `string`       |             | ✓        |
+| `button_title`     | `string`       |             | ✓        |
 | `carousel_item_id` | `int`          |             | ✓        |
 | `excerpt`          | `string`       |             | ✓        |
 | `image_url`        | `string`       |             | ✓        |
+| `is_active`        | `bool`         |             | ✓        |
 | `link`             | `string`       |             | ✓        |
-| `status`           | `bool`         |             | ✓        |
 | `title`            | `string`       |             | ✓        |
 | `expiration_date`  | `null\|string` |             |          |
+| `status`           | `bool\|null`   |             |          |
 
 ### Returns
 
@@ -1663,16 +1658,16 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `contest_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`        | `int\|null`                                                                                                                                                                                                         |             |          |
-| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`      | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `contest_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`        | `int\|null`                                                                                                                                                                                                               |             |          |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`      | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -2654,19 +2649,19 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                                                                                | Description | Required |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `assignment_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `course_alias`     | `string`                                                                                                                                                                                                            |             | ✓        |
-| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |          |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`           | `int\|null`                                                                                                                                                                                                         |             |          |
-| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |          |
-| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |          |
-| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`         | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name               | Type                                                                                                                                                                                                                      | Description | Required |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `course_alias`     | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`                 |             |          |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`           | `int\|null`                                                                                                                                                                                                               |             |          |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                                     |             |          |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                            |             |          |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`         | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -4532,15 +4527,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `offset`        | `int`                                                                                                                                                                                                               |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `rowcount`      | `int`                                                                                                                                                                                                               |             | ✓        |
-| `username`      | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `username`      | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
