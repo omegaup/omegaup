@@ -63,7 +63,7 @@ jobs:
                           `Invalid MAX_OPEN_ASSIGNMENTS value: "${process.env.MAX_OPEN_ASSIGNMENTS}". Must be a positive integer.`
                         );
                       }
-
+                      
                       // Ignore bot comments
                       if (comment.user.type === "Bot") {
                         console.log("Ignoring bot comment");
@@ -372,3 +372,5 @@ jobs:
                           );
                         }
                       }
+
+

@@ -31,7 +31,10 @@ div[data-overlay-popup] {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: -1;
+  /* The overlay component uses a very large z-index for the backdrop.
+      Ensure the popup itself is above that backdrop so it becomes visible
+      and interactive to end-to-end tests and assistive technologies. */
+  z-index: 9999999;
 
   button.close {
     position: sticky;
