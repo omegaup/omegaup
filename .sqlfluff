@@ -1,0 +1,22 @@
+[sqlfluff]
+dialect = mysql
+
+# Exclude unnecessary quoting rule since omegaUp uses backticks extensively.
+# Also exclude some strict layout rules (LT02, LT09) to avoid excessive noise on existing standard queries.
+exclude_rules = RF06,LT02,LT09
+
+max_line_length = 120
+
+[sqlfluff:indentation]
+# Standardize on 2 spaces for indentation
+tab_space_size = 2
+indent_unit = space
+
+[sqlfluff:rules:capitalisation.keywords]
+# Enforce uppercase for SQL keywords (SELECT, FROM, WHERE)
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.identifiers]
+# Enforce lowercase for table and column names
+# consistent instead of lower, to avoid fighting existing camelCase/PascalCase tables
+capitalisation_policy = consistent
