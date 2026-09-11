@@ -292,6 +292,34 @@
                   ></omegaup-common-grader-status>
                 </div>
               </li>
+              <li
+                v-if="isAdmin || isSupportTeamMember"
+                class="nav-item dropdown d-none d-lg-flex align-items-center"
+                data-nav-operations-dashboard
+              >
+                <a
+                  class="nav-link px-2 dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  :title="T.omegaupTitleAdminOperations"
+                >
+                  <font-awesome-icon :icon="['fas', 'cog']" />
+                </a>
+                <div
+                  class="dropdown-menu dropdown-menu-right fullwidth-mobile-fit-lg navbar-item-dropdown"
+                >
+                  <omegaup-navbar-item
+                    :title="T.omegaupTitleAdminOperations"
+                    :description="T.omegaupOperationsDashboardDescription"
+                    :icon="['fas', 'cog']"
+                    href="/admin/operations/"
+                    data-nav-operations-dashboard-link
+                  />
+                </div>
+              </li>
             </ul>
 
             <!-- Logout button for mobile -->
@@ -308,7 +336,6 @@
             </a>
           </div>
         </div>
-
         <!-- Logout button for desktop - navbar -->
         <a
           v-if="isLoggedIn"
@@ -377,9 +404,10 @@ import { AvailableTabs } from '../login/Signin.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUser, faCog } from '@fortawesome/free-solid-svg-icons';
 import LogoutConfirmation from './LogoutConfirmation.vue';
-library.add(faSignOutAlt, faUser);
+import NavbarItem from './NavbarItem.vue';
+library.add(faSignOutAlt, faUser, faCog);
 
 export const EventBus = new Vue();
 
@@ -393,6 +421,7 @@ export const EventBus = new Vue();
     'omegaup-user-objectives-questions': user_objectives_questions,
     'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
+    'omegaup-navbar-item': NavbarItem,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-logout-confirmation': LogoutConfirmation,
   },
@@ -409,6 +438,7 @@ export default class Navbar extends Vue {
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
   @Prop() isAdmin!: boolean;
+  @Prop() isSupportTeamMember!: boolean;
   @Prop() isMainUserIdentity!: boolean;
   @Prop() lockDownImage!: string;
   @Prop() navbarSection!: string;
@@ -569,6 +599,10 @@ export default class Navbar extends Vue {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+[data-nav-operations-dashboard] > a {
+  font-size: 1.4rem;
 }
 
 nav.navbar {
