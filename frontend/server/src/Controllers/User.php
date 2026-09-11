@@ -2647,7 +2647,8 @@ class User extends \OmegaUp\Controllers\Controller {
                     ) ? $state->country_id : null,
                     'state_id' => !is_null($state) ? $state->state_id : null,
                     'auth_token' => $r['auth_token'],
-                ])
+                ]),
+                internal: true
             );
             $newSchoolId = $response['school_id'];
         }
