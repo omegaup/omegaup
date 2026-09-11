@@ -297,6 +297,7 @@ def test_system_exit_zero_records_success() -> None:
         with _run('update_ranks.py', _args(), conn):
             raise SystemExit(0)
 
+    assert isinstance(excinfo.value, SystemExit)
     assert excinfo.value.code == 0
     updates = _matching(conn.calls, 'update `cron_runs`')
     assert updates[0][0] == 'success'
@@ -311,6 +312,7 @@ def test_system_exit_none_records_success() -> None:
         with _run('update_ranks.py', _args(), conn):
             raise SystemExit()
 
+    assert isinstance(excinfo.value, SystemExit)
     assert excinfo.value.code is None
     updates = _matching(conn.calls, 'update `cron_runs`')
     assert updates[0][0] == 'success'
