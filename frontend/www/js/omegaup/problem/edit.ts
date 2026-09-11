@@ -41,6 +41,9 @@ OmegaUp.on('ready', () => {
       searchResultUsers: [] as types.ListItem[],
       searchResultGroups: [] as types.ListItem[],
     }),
+    beforeDestroy() {
+      window.removeEventListener('hashchange', onHashChange);
+    },
     methods: {
       refreshProblemAdmins: (): void => {
         api.Problem.admins({ problem_alias: payload.alias })
@@ -354,4 +357,12 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  // Handle browser back/forward navigation for hash-based tabs
+  function onHashChange(): void {
+    const hash = window.location.hash.substring(1).split('#')[0];
+    problemEdit.$data.initialTab = hash || 'edit';
+  }
+
+  window.addEventListener('hashchange', onHashChange);
 });
