@@ -118,6 +118,17 @@ export const Admin = {
     messages._AdminGetCronsServerResponse,
     messages.AdminGetCronsResponse
   >('/api/admin/getCrons/', (x) => {
+    x.problemHealthFindings = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.first_detected_at = ((x: number) => new Date(x * 1000))(
+          x.first_detected_at,
+        );
+        return x;
+      });
+    })(x.problemHealthFindings);
     x.runs = ((x) => {
       if (!Array.isArray(x)) {
         return x;
