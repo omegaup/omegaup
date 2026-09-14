@@ -272,10 +272,11 @@
                     </div>
                   </div>
                   <template v-if="descriptionEditMode">
-                    <div
-                      ref="descriptionButtonBar"
-                      class="wmd-button-bar"
-                    ></div>
+                    <omegaup-markdown-toolbar
+                      :get-textarea="getDescriptionInput"
+                      :hide-image="true"
+                      @input="description = $event"
+                    ></omegaup-markdown-toolbar>
                     <textarea
                       ref="descriptionInput"
                       v-model="description"
@@ -940,9 +941,8 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { isValidAlias } from '../../validators';
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
-import * as markdownModule from '../../markdown';
 import omegaup_Markdown from '../Markdown.vue';
+import MarkdownToolbar from '../MarkdownToolbar.vue';
 library.add(fas);
 
 Vue.use(VueCookies, { expires: -1 });
@@ -1099,8 +1099,6 @@ const MAX_LENGTH = {
 
 const DANGER_THRESHOLD_PERCENTAGE = 0.8;
 
-const markdownConverter = new markdownModule.Converter({ preview: true });
-
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -1109,6 +1107,7 @@ const markdownConverter = new markdownModule.Converter({ preview: true });
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown-toolbar': MarkdownToolbar,
     Multiselect,
   },
   directives: {
@@ -1116,9 +1115,7 @@ const markdownConverter = new markdownModule.Converter({ preview: true });
   },
 })
 export default class Form extends Vue {
-  @Ref() readonly descriptionButtonBar!: HTMLDivElement;
   @Ref() readonly descriptionInput!: HTMLTextAreaElement;
-  markdownEditor: Markdown.Editor | null = null;
   T = T;
   ScoreMode = ScoreMode;
   PresetType = PresetType;
@@ -1190,20 +1187,6 @@ export default class Form extends Vue {
   currentPreset: PresetType | null = null;
 
   mounted() {
-    this.markdownEditor = new Markdown.Editor(
-      markdownConverter.converter,
-      '-description',
-      {
-        panels: {
-          buttonBar: this.descriptionButtonBar,
-          preview: null,
-          input: this.descriptionInput,
-        },
-      },
-    );
-    this.markdownEditor.run();
-    this.removeImageButton();
-
     const title = T.createContestInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
       introJs()
@@ -1262,47 +1245,8 @@ export default class Form extends Vue {
     }
   }
 
-  @Watch('descriptionEditMode')
-  onDescriptionEditModeChange(newValue: boolean): void {
-    if (newValue) {
-      this.$nextTick(() => {
-        this.markdownEditor = new Markdown.Editor(
-          markdownConverter.converter,
-          '-description',
-          {
-            panels: {
-              buttonBar: this.descriptionButtonBar,
-              preview: null,
-              input: this.descriptionInput,
-            },
-          },
-        );
-        this.markdownEditor.run();
-        this.removeImageButton();
-      });
-    }
-  }
-
-  removeImageButton(): void {
-    const imageButton = this.descriptionButtonBar.querySelector(
-      '[id^="wmd-image-button"]',
-    );
-    if (imageButton) {
-      imageButton.remove();
-    }
-    this.descriptionInput.addEventListener(
-      'keydown',
-      (event: KeyboardEvent) => {
-        if (
-          (event.ctrlKey || event.metaKey) &&
-          event.key.toLowerCase() === 'g'
-        ) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-        }
-      },
-      true,
-    );
+  getDescriptionInput(): HTMLTextAreaElement | null {
+    return this.descriptionInput || null;
   }
 
   @Watch('invalidParameterName')
@@ -1608,11 +1552,6 @@ export default class Form extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
-@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
-
-.wmd-button-bar {
-  background-color: var(--wmd-button-bar-background-color);
-}
 
 .wmd-input {
   min-height: 120px;

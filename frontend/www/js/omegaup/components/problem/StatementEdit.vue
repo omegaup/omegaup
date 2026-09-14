@@ -25,7 +25,10 @@
       </div>
       <div class="row">
         <div class="col-md-6 d-flex flex-column">
-          <div ref="markdownButtonBar" class="wmd-button-bar"></div>
+          <omegaup-markdown-toolbar
+            :get-textarea="getMarkdownInput"
+            @input="currentMarkdown = $event"
+          ></omegaup-markdown-toolbar>
           <textarea
             ref="markdownInput"
             v-model="currentMarkdown"
@@ -107,24 +110,19 @@ import { Vue, Component, Emit, Prop, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
-import * as markdown from '../../markdown';
 
 import user_Username from '../user/Username.vue';
 import ProblemMarkdown from './ProblemMarkdown.vue';
-
-const markdownConverter = new markdown.Converter({
-  preview: true,
-});
+import MarkdownToolbar from '../MarkdownToolbar.vue';
 
 @Component({
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-markdown': ProblemMarkdown,
+    'omegaup-markdown-toolbar': MarkdownToolbar,
   },
 })
 export default class ProblemStatementEdit extends Vue {
-  @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
   @Prop() alias!: string;
   @Prop() title!: string;
@@ -141,17 +139,9 @@ export default class ProblemStatementEdit extends Vue {
   currentMarkdown = this.statement.markdown;
   errors: string[] = [];
   statements: types.Statements = {};
-  markdownEditor: Markdown.Editor | null = null;
 
-  mounted(): void {
-    this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
-      panels: {
-        buttonBar: this.markdownButtonBar,
-        preview: null,
-        input: this.markdownInput,
-      },
-    });
-    this.markdownEditor.run();
+  getMarkdownInput(): HTMLTextAreaElement | null {
+    return this.markdownInput || null;
   }
 
   getLanguageNameText(language: string): string {
@@ -210,18 +200,8 @@ export default class ProblemStatementEdit extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
-
-.wmd-preview,
-.wmd-button-bar {
-  background-color: var(--wmd-button-bar-background-color);
-}
 
 .row {
-  .wmd-button-bar {
-    flex-shrink: 0;
-  }
-
   .wmd-input {
     flex: 1;
     min-height: 400px;

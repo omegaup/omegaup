@@ -16,7 +16,7 @@ describe('SolutionTab.vue', () => {
       store,
     });
 
-    const markdownButtons = wrapper.find('div.wmd-button-bar');
+    const markdownButtons = wrapper.find('omegaup-markdown-toolbar-stub');
     expect(markdownButtons.exists()).toBe(true);
 
     const textArea = wrapper.find('textarea.wmd-input');
