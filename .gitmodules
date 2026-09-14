@@ -1,4 +1,0 @@
-[submodule "frontend/www/js/pagedown"]
-	path = frontend/www/third_party/js/pagedown
-	url = https://github.com/omegaup/pagedown.git
-	shallow = true

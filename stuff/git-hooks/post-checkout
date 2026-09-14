@@ -10,11 +10,6 @@ OLD_HEAD="${1}"
 NEW_HEAD="${2}"
 CHANGING_BRANCHES="${3}"
 
-# Try to avoid having dirty git submodules when checking out branches.
-if ! git diff-tree -r --quiet "${OLD_HEAD}" "${NEW_HEAD}" | grep -q ^:160000; then
-	git submodule update --recursive
-fi
-
 # Whenever composer.lock is changed, `composer install` needs to be run.
 if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- composer.lock; then
 	if [[ -x /usr/bin/composer ]]; then

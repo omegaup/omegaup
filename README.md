@@ -53,12 +53,9 @@ Para configurar el entorno de desarrollo localmente, consulta la [Guía de Confi
 ### Inicio Rápido
 
 ```bash
-# Clonar con submódulos
-git clone --recurse-submodules https://github.com/TU_USUARIO/omegaup
+# Clonar el repositorio
+git clone https://github.com/TU_USUARIO/omegaup
 cd omegaup
-
-# Si ya clonaste sin submódulos, inicialízalos:
-git submodule update --init --recursive
 
 # Instalar dependencias y ejecutar pruebas
 yarn install
@@ -82,12 +79,9 @@ To set up the development environment locally, see the [Development Environment 
 ### Quick Start
 
 ```bash
-# Clone with submodules
-git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
+# Clone the repository
+git clone https://github.com/YOURUSERNAME/omegaup
 cd omegaup
-
-# If you already cloned without submodules, initialize them:
-git submodule update --init --recursive
 
 # Install dependencies and run tests
 yarn install
@@ -177,12 +171,9 @@ Para configurar o ambiente de desenvolvimento localmente, consulte o [Guia de Co
 ### Início Rápido
 
 ```bash
-# Clonar com submódulos
-git clone --recurse-submodules https://github.com/SEUUSUARIO/omegaup
+# Clonar o repositório
+git clone https://github.com/SEUUSUARIO/omegaup
 cd omegaup
-
-# Se você já clonou sem submódulos, inicialize-os:
-git submodule update --init --recursive
 
 # Instalar dependências e executar testes
 yarn install
@@ -238,12 +229,9 @@ Per configurare l'ambiente di sviluppo localmente, consulta la [Guida alla Confi
 ### Avvio Rapido
 
 ```bash
-# Clonare con i submodule
-git clone --recurse-submodules https://github.com/TUONOMEUTENTE/omegaup
+# Clonare il repository
+git clone https://github.com/TUONOMEUTENTE/omegaup
 cd omegaup
-
-# Se hai già clonato senza submodule, inizializzali:
-git submodule update --init --recursive
 
 # Installare le dipendenze ed eseguire i test
 yarn install
