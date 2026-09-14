@@ -12,6 +12,7 @@ namespace OmegaUp;
 enum CronJobName: string {
     case AggregateFeedback = 'aggregate_feedback.py';
     case AssignBadges = 'assign_badges.py';
+    case BuildProblemRecModel = 'build_problem_rec_model.py';
     case ProblemHealthCheck = 'problem_health_check.py';
     case UpdateRanks = 'update_ranks.py';
 }
