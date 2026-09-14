@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@latest
+
+      - name: Install geckodriver
+        uses: browser-actions/setup-geckodriver@latest
+
+      - name: Install JavaScript dependencies
+        run: npm install
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user setuptools
+          python3 -m pip install --user wheel
+          python3 -m pip install --user -r requirements.txt
+
+      - name: Run karel.js tests
+        run: npm test
+
+      - name: Run Webdriver tests
+        run: python3 -m pytest test/ --browser=firefox --browser=chrome
+
+      - name: Build C++ karel
+        run: |
+          sudo apt-get install llvm
+          (cd cpp && make karel)
+
+      - name: Run karel tests
+        run: (cd cpp && make test)
+
+  lint:
+    runs-on: ubuntu-22.04
+
+    env:
+      HOOK_TOOLS_VERSION: 20200816
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Get docker container
+        run: docker pull omegaup/hook_tools:${{ env.HOOK_TOOLS_VERSION }}
+
+      - name: Run linters
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --volume "${PWD}:/src" \
+            omegaup/hook_tools:${{ env.HOOK_TOOLS_VERSION }} validate --all

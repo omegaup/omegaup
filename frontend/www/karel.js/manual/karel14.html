@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8" />
+    <title>La sentencia define-nueva-instruccion/como &nbsp;</title>
+  </head>
+  <body style="background-image: url(./workbook.gif);">
+    <center>
+      <h2>La función si-es-cero</h2>
+    </center>
+    <p>
+      La última función en Karel, es la función si-es-cero, que nos ayuda a
+      saber si un número es cero. Devuelve verdadero si el número es cero y
+      falso si no lo es.
+    </p>
+    <p>
+      Es evidente de que si ponemos "si-es-cero(0)" no es muy útil, ya que
+      sabemos perfectamente que cero es cero ( :S ). Sin embargo es muy útil
+      cuando se está manejando parámetros. Por ejemplo, queremos hacer una
+      instrucción que avance "n" lugares, pero si el parámetro es cero, gire a
+      la izquierda.
+    </p>
+    <p>Por razones didácticas, en esta ocasión te daremos la solución:</p>
+    <p>...</p>
+    <p>define-nueva-instruccion avanza-si-no-es-cero (n) como inicio</p>
+    <p>&nbsp;&nbsp;&nbsp;si si-es-cero (n) entonces inicio</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gira-izquierda;</p>
+    <p>&nbsp;&nbsp;&nbsp;fin</p>
+    <p>&nbsp;&nbsp;&nbsp;sino inicio</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repetir n veces inicio</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avanza;</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fin;</p>
+    <p>&nbsp;&nbsp;&nbsp;fin;</p>
+    <p>fin;</p>
+    <p>...</p>
+    <p>Ahora si, te toca a ti:</p>
+    <p>
+      <strong>Ejercicio 11:</strong> Define una nueva instrucción que haga que
+      Karel ponga "n" zumbadores en donde se encuentra, pero si "n" es cero,
+      recoja 1 zumbador.
+    </p>
+    <p></p>
+    <center>
+      <h2>La función si-es-cero</h2>
+      <h2 align="left"><a href="Karel.html">Regresar</a></h2>
+    </center>
+  </body>
+</html>

@@ -1,0 +1,118 @@
+iniciar-programa
+    define-nueva-instruccion media-vuelta como inicio
+        repetir 2 veces gira-izquierda;
+    fin;
+    define-nueva-instruccion topa-pared como inicio
+        mientras frente-libre hacer avanza;
+    fin;
+    define-nueva-instruccion gira-derecha como inicio
+        repetir 3 veces gira-izquierda;
+    fin;
+    define-nueva-instruccion siguiente-zumbador como inicio
+        avanza;
+        mientras no-junto-a-zumbador hacer avanza;
+    fin;
+    define-nueva-instruccion sur como inicio
+        mientras no-orientado-al-sur hacer gira-izquierda;
+    fin;
+    define-nueva-instruccion ve-a-inicio como inicio
+        sur;
+        topa-pared;
+        gira-derecha;
+        topa-pared;
+        media-vuelta;
+    fin;
+    define-nueva-instruccion cuenta-linea como inicio
+        si frente-libre entonces inicio
+           si junto-a-zumbador entonces inicio
+               avanza;
+               cuenta-linea;
+               deja-zumbador;
+           fin sino inicio
+               avanza;
+               cuenta-linea;
+           fin;
+        fin sino inicio
+           media-vuelta;
+           topa-pared;
+           gira-izquierda;
+        fin;
+    fin;
+    define-prototipo-instruccion es-mejor(n);
+    define-nueva-instruccion incrementa(n) como inicio
+        si junto-a-zumbador entonces inicio
+            coge-zumbador;
+            incrementa(sucede(n));
+        fin sino inicio
+            deja-zumbador;
+            avanza;
+            es-mejor(n);
+        fin;
+    fin;
+    define-nueva-instruccion es-mejor(n) como inicio
+        repetir n veces inicio
+            si junto-a-zumbador entonces inicio
+                coge-zumbador;
+            fin;
+        fin;
+        si junto-a-zumbador entonces inicio
+            media-vuelta;
+            siguiente-zumbador;
+            coge-zumbador;
+            media-vuelta;
+            siguiente-zumbador;
+            incrementa(n);
+        fin sino inicio
+            si frente-libre entonces inicio
+                avanza;
+                es-mejor(n);
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion maximo como inicio
+        deja-zumbador;
+        avanza;
+        es-mejor(0);
+    fin;
+    define-nueva-instruccion cuenta como inicio
+        mientras frente-libre hacer inicio
+            gira-izquierda;
+            cuenta-linea;
+            avanza;
+        fin;
+        media-vuelta;
+        maximo;
+    fin;
+    define-nueva-instruccion ve-a-lugar2 como inicio
+        si no-junto-a-zumbador entonces inicio
+            avanza;
+            ve-a-lugar2;
+            avanza;
+        fin sino inicio
+            ve-a-inicio;
+            gira-izquierda;
+        fin;
+    fin;
+    define-nueva-instruccion ve-a-lugar como inicio
+        si no-junto-a-zumbador entonces inicio
+            avanza;
+            ve-a-lugar;
+            avanza;
+        fin sino inicio
+            topa-pared;
+            gira-izquierda;
+            ve-a-lugar2;
+            gira-derecha;
+        fin;
+    fin;
+    inicia-ejecucion
+        repetir 3 veces gira-izquierda;
+        cuenta;
+        media-vuelta;
+        topa-pared;
+        gira-izquierda;
+        cuenta;
+        ve-a-inicio;
+        ve-a-lugar;
+    termina-ejecucion
+finalizar-programa

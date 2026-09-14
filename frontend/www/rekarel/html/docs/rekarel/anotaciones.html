@@ -1,0 +1,81 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Anotaciones</h1>
+
+<p>Puedes agregar anotaciones en el código, las cuales son utilizadas por el IDE de ReKarel para modificar el comportamiento de este. Estas se reconocen por estar ubicadas en un comentario e iniciar con el símbolo <code>@</code>.</p>
+
+<p>Es importante destacar que las anotaciones modifican el comportamiento del IDE y <b>no</b> de Karel el robot, es decir, estás no forman parte del lenguaje ni se usan para que Karel resuelva tareas.</p>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="autoskip" data-toc="AutoSkip o saltatela" data-toc-depth="1"></a>
+</div>
+<h2>AutoSkip o saltatela</h2>
+<p>La anotación <code>@autoSkip</code> o <code>@saltatela</code> marca funciones como auto-saltables, por lo que la ejecución del código se las saltará de forma automática. Veamos un ejemplo:</p>
+
+<ul class="nav nav-tabs" id="auto-skip-Tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="auto-skip-java-tab" data-bs-toggle="tab"
+            data-bs-target="#auto-skip-java-tab-pane" type="button" role="tab" aria-controls="auto-skip-java-tab-pane"
+            aria-selected="true">Java</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="auto-skip-pascal-tab" data-bs-toggle="tab"
+            data-bs-target="#auto-skip-pascal-tab-pane" type="button" role="tab" aria-controls="auto-skip-pascal-tab-pane"
+            aria-selected="false">Pascal</button>
+    </li>
+</ul>
+<div class="tab-content mb-2" id="auto-skip-TabContent">
+    <div class="tab-pane fade show active" id="auto-skip-java-tab-pane" role="tabpanel" aria-labelledby="auto-skip-java-tab"
+        tabindex="0">
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis"> class program </span>{
+    <span class="text-success-emphasis">//</span> <span class="text-info-emphasis">@autoSkip</span>
+    <span class="text-primary-emphasis">define </span> giraDerecha () <span class="text-danger-emphasis"> {</span> 
+        <span class="text-info-emphasis">turnleft</span>(); 
+        <span class="text-info-emphasis">turnleft</span>(); 
+        <span class="text-info-emphasis">turnleft</span>(); 
+    <span class="text-danger-emphasis">}</span> 
+
+    <span class="text-danger-emphasis">program ()</span><span class="text-danger-emphasis"> {</span> 
+        giraDerecha(); 
+        <span class="text-info-emphasis">turnoff</span>();
+    <span class="text-danger-emphasis">} </span>
+<span class="text-danger-emphasis">}</span> 
+</pre>
+</code>
+
+    </div>
+    <div class="tab-pane fade" id="auto-skip-pascal-tab-pane" role="tabpanel" aria-labelledby="auto-skip-pascal-tab"
+        tabindex="0">
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-success-emphasis">{</span> <span class="text-info-emphasis">@saltatela</span> <span class="text-success-emphasis">}</span>
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> gira-derecha <span class="text-primary-emphasis">como</span> 
+    <span class="text-danger-emphasis">inicio</span> 
+        <span class="text-info-emphasis">gira-izquierda;</span> 
+        <span class="text-info-emphasis">gira-izquierda;</span> 
+        <span class="text-info-emphasis">gira-izquierda;</span> 
+    <span class="text-danger-emphasis">fin;</span> 
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span> 
+        gira-derecha; 
+        <span class="text-info-emphasis">apagate;</span> 
+    <span class="text-danger-emphasis">termina-ejecucion </span>
+<span class="text-danger-emphasis">finalizar-programa</span> 
+</pre>
+</code>
+
+    </div>
+</div>
+
+<p>Si ejecutamos este código, vemos como nunca entra a la función y se comporta de forma similar a como si fuera una instrucción incluida por defecto en el lenguaje.</p>
+
+@@include("../footer.html")

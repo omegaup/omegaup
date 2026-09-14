@@ -1,0 +1,40 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Mientras</h1>
+<p>La sentencia <span class="text-info">mientras</span> permite a Karel repetir una instrucción o bloque múltiples veces mientras se cumple el código.</p>
+
+<p>A continuación se muestra la estructura de la sentencia mientras. Lo que hace, es repetir una instrucción si se cumpla la condición <b>al inicio</b> de una iteración.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">mientras</span> <span class="text-warning-emphasis">CONDICION</span> <span
+    class="text-primary-emphasis">hacer</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<p>Es importante entender que como se ejecuta un ciclo mientras es de la siguiente forma:</p>
+<ol>
+    <li>Revisar la condición, y de cumplirse, pasar al paso 2, si no al paso 4</li>
+    <li>Ejecutar la instrucción</li>
+    <li>Regresar al paso 1.</li>
+    <li>Terminar el ciclo</li>
+</ol>
+
+<p>Entonces, lo que se debe entender es que la condición es revisada únicamente antes de cada iteración, por lo que si la condición se vuelve falsa temporalmente en partes intermedias de la ejecución del ciclo y al final se vuelve otra vez cierta, esto no detiene el ciclo.</p>
+
+<p>Por ejemplo, un código que avance hasta una pared se ve de la siguiente manera</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">mientras</span> <span class="text-warning-emphasis">frente-libre</span> <span
+    class="text-primary-emphasis">hacer</span>
+<span class="text-danger-emphasis">inicio</span>
+    <span class="text-info-emphasis">avanza</span>;
+<span class="text-danger-emphasis">fin</span>;
+</pre>
+</code>
+@@include("../footer.html")

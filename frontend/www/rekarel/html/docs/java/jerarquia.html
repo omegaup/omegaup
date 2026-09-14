@@ -1,0 +1,51 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Jerarquía de operaciones</h1>
+<p>A continuación se muestra la jerarquía de operaciones y la asociatividad.</p>
+<p>La tabla esta ordenada de mayor precedencia a menor</p>
+
+
+<table class="table table-striped">
+    <tr>
+        <th>Precedencia</th><th>Operador</th><th>Asociatividad</th>
+    </tr>
+    <tr>
+        <td>1</td><td>!</td><td>Derecha</td>
+    </tr>
+    <tr>
+        <td>2</td><td>&lt; &lt;=</td><td>Ninguna</td>
+    </tr>
+    <tr>
+        <td>3</td><td>==</td><td>Ninguna</td>
+    </tr>
+    <tr>
+        <td>4</td><td>&&</td><td>Izquierda</td>
+    </tr>
+    <tr>
+        <td>5</td><td>||</td><td>Izquierda</td>
+    </tr>
+</table>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="parentesis" data-toc="Paréntesis" data-toc-depth="1"></a>
+</div>
+<h2>Paréntesis</h2>
+
+<p>Se puede utilizar paréntesis para especificar el orden de operaciones, de forma que puedes hacer algo como <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">(a || b) == c</span>.</p>
+
+<p>En general, aunque existe un orden jerárquico especificado arriba, se recomienda el uso de paréntesis para evitar errores y hacer el código legible, especialmente si se están mezclando <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">||</span> con <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">&&</span></p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="ascociatividad" data-toc="Asociatividad" data-toc-depth="1"></a>
+</div>
+<h2>Asociatividad</h2>
+<p>La asociatividad representa como se interpretan los operadores.</p>
+
+<p>Por ejemplo, el operador <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">||</span> tiene asociatvidad izquierda, por lo que <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">a || b || c</span> se interpreta como <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">(a || b) || c</span>. Mientras tanto, el operador <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">!</span> tiene asociatividad derecha, por lo que <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">!!!a</span> se interpreta como <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">!(!(!a))</span></p>
+
+<p>Los operadores sin asociatividad dan errores de compilación si se usan varios operadores consecutivos. Por ejemplo, lo siguiente no está permitido <span class="text-bg-danger border rounded ps-1 pe-1 text-nowrap">a == b == c</span><i class="bi bi-x text-danger h5"></i>.</p>
+
+@@include("../footer.html")

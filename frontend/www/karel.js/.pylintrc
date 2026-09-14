@@ -1,0 +1,5 @@
+[MESSAGES CONTROL]
+disable=invalid-name,too-few-public-methods,relative-beyond-top-level,import-self
+
+[DESIGN]
+max-attributes=20

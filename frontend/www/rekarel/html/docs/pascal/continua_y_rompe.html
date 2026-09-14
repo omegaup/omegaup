@@ -1,0 +1,82 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Sentencia continúa y rompe</h1>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p>Existen dos sentencias para controlar el flujo de un ciclo desde su interior, estas son la sentencia <span class="text-primary-emphasis">continue</span> y <span class="text-primary-emphasis">rompe</span>.</p>
+
+<p>Debido a que estas sentencias controlan el flujo del ciclo en el que estén, solo pueden ser usadas desde el interior de un ciclo. Si se intentan utilizar afuera de algún ciclo, dará error de compilación. Se pueden usar en ambos ciclo, <a href="sentencia_repetir.html">repetir</a> y <a href="sentencia_mientras.html">mientras</a>.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="continua" data-toc="Continua" data-toc-depth="1"></a>
+</div>
+<h2>Continua</h2>
+<p>Esta sentencia permite saltarse directamente al inicio de la siguiente iteración del ciclo.</p>
+
+<p>Veamos un ejemplo, el siguiente código avanza y recoge los zumbadores hasta llegar a una pared</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        <span class="text-primary-emphasis">mientras</span> <span class="text-warning-emphasis">frente-libre</span> <span class="text-primary-emphasis">hacer</span>
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">junto-a-zumbador</span> <span class="text-primary-emphasis">entonces</span>
+            <span class="text-danger-emphasis">inicio</span>
+                <span class="text-info-emphasis">coge-zumbador</span>;
+                <span class="text-primary-emphasis">continua</span>;
+            <span class="text-danger-emphasis">fin</span>;
+            <span class="text-info-emphasis">avanza</span>;
+        <span class="text-danger-emphasis">fin</span>;
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/ciclos/continue.png" alt="Quita todos los zumbadores hasta la pared" class="img-thumbnail">
+</div>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="rompe" data-toc="Rompe" data-toc-depth="1"></a>
+</div>
+<h2>Rompe</h2>
+<p>Esta sentencia termina el ciclo que se esta ejecutando. Una vez se ejecuta, ya no habrá más iteraciones del ciclo</p>
+
+<p>Veamos un ejemplo, el siguiente código avanza hasta que llegue a la pared o hasta que llegue a un zumbador</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        <span class="text-primary-emphasis">mientras</span> <span class="text-warning-emphasis">frente-libre</span> <span class="text-primary-emphasis">hacer</span>
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">junto-a-zumbador</span> <span class="text-primary-emphasis">entonces</span>
+            <span class="text-danger-emphasis">inicio</span>
+                <span class="text-primary-emphasis">rompe</span>;
+            <span class="text-danger-emphasis">fin</span>;
+            <span class="text-info-emphasis">avanza</span>;
+        <span class="text-danger-emphasis">fin</span>;
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/ciclos/break1.png" alt="No hay zumbadores, avanza hasta la pared" class="img-thumbnail">
+</div>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/ciclos/break2.png" alt="Se detiene en un zumbador antes de la pared" class="img-thumbnail">
+</div>
+
+@@include("../footer.html")

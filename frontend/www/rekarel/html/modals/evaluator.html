@@ -1,0 +1,178 @@
+<div id="evaluatorModal" class="modal fade" tabindex="-1" aria-labelledby="evaluatorModal" aria-hidden="true">
+    <form id="evaluatorForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Evaluador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container ">
+
+                        <h5>Despliega</h5>
+                        <P>Representa que condiciones Karel evalúa al final de su ejecución, como queden los siguientes estados es importante para la solución.</P>
+                        <div class="row m-2">
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="evaluatePosition">
+                                <label class="form-check-label" for="evaluatePosition">Posición final</label>
+                            </div>
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="evaluateOrientation">
+                                <label class="form-check-label" for="evaluateOrientation">Orientación final</label>
+                            </div>
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="evaluateBag">
+                                <label class="form-check-label" for="evaluateBag">Mochila final</label>
+                            </div>
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="evaluateUniverse">
+                                <label class="form-check-label" for="evaluateUniverse">Zumbadores del mundo final</label>
+                            </div>
+                        </div>
+                        
+                        <h5>Contar instrucciones</h5>
+                        <P>La cantidad de instrucciones ejecutadas es importante para la solución final.</P>
+                        
+                        <div class="row m-2">
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="countMoves">
+                                <label class="form-check-label" for="countMoves">Avanza (move)</label>
+                            </div>
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="countTurns">
+                                <label class="form-check-label" for="countTurns">Gira izquierda (turnleft)</label>
+                            </div>
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="countPicks">
+                                <label class="form-check-label" for="countPicks">Coge zumbador (pickbeeper)</label>
+                            </div>
+                            <div class="form-check form-switch col">
+                                <input class="form-check-input" type="checkbox" id="countPuts">
+                                <label class="form-check-label" for="countPuts">Deja zumbador (putbeeper)</label>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#evaluatorAdvanced" aria-expanded="false" aria-controls="evaluatorAdvanced">
+                            Mostrar/Ocultar opciones avanzadas
+                        </button>
+                        <div class="collapse m-0 p-0" id="evaluatorAdvanced">
+                            <h5>Límites de ejecución</h5>
+                            <P>Determina los límites de la ejecución</P>
+                            
+                            <div class="row m-2">
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxInstructions">Número máximo de instrucciones</label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxInstructions" min="1">
+                                    </div>
+                                </div>                     
+                                
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxStack">
+                                            Límite de llamadas simultaneas en la pila
+                                            <span title="Cantidad de llamadas simultaneas en la pila, independiente del número de parámetros">
+                                                <i class="bi bi-question-circle"></i>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxStack" min="1">
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            
+                            
+                            <div class="row m-2">
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxCallParam">Número máximo de parámetros en una función</label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxCallParam" min="0">
+                                    </div>
+                                </div>                     
+                                
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="stackMemory">
+                                            Memoria máxima del stack
+                                            <span title="Cada llamada consume max(1, Num. de parámetros) memoria de la pila">
+                                                <i class="bi bi-question-circle"></i>
+                                            </span>
+                                        </label>
+                                        
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="stackMemory" min="0">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <p class="ms-2 ps-1">Para los siguientes, -1 significa infinito </p>
+                            <div class="row m-2">
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxMove">Número máximo de avanza (move)</label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxMove" min="-1">
+                                    </div>
+                                </div>   
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxTurnLeft">Número máximo de gira-izquierda (turnleft)</label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxTurnLeft" min="-1">
+                                    </div>
+                                </div>   
+                            </div>
+
+                            
+                            <div class="row m-2">
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxPickBuzzer">Número máximo de coge-zumbador (pickbeeper)</label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxPickBuzzer" min="-1">
+                                    </div>
+                                </div>   
+                                <div class="col border rounded p-0 ms-1 me-1">
+                                    <div>
+                                        <label class="bg-body-secondary p-1 w-100" for="maxLeaveBuzzer">Número máximo de deja-zumbador (putbeeper)</label>
+                                    </div>
+                                    <div>
+                                        <input class="w-100 bg-body form-control border border-0" type="number" id="maxLeaveBuzzer" min="-1">
+                                    </div>
+                                </div>   
+                            </div>
+                            <h5>Versión objetivo de XML</h5>
+                            <p>Determina la versión objetivo del XML</p>
+                            <div class="row m-2">
+                                <select class="form-select" aria-label="Tipo de interfaz" name="interface" id="targetVersionEval">
+                                    <option value="1.0">1.0 (Completa retrocompatibilidad, 16-bit zumbadores en la salida)</option>
+                                    <option value="1.1">1.1 (Alta retrocompatibilidad, 32-bit zumbadores en la salida)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-bs-dialog="none">
+                        Aceptar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-dialog="none">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,78 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Sentencia continue y break</h1>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Java 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p>Existen dos sentencias para controlar el flujo de un ciclo desde su interior, estas son la sentencia <span class="text-primary-emphasis">continue</span> y <span class="text-primary-emphasis">break</span>.</p>
+
+<p>Debido a que estas sentencias controlan el flujo del ciclo en el que estén, solo pueden ser usadas desde el interior de un ciclo. Si se intentan utilizar afuera de algún ciclo, dará error de compilación. Se pueden usar en ambos ciclo, <a href="sentencia_iterate.html">iterate</a> y <a href="sentencia_while.html">while</a>.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="continue" data-toc="Continue" data-toc-depth="1"></a>
+</div>
+<h2>Continue</h2>
+<p>Esta sentencia permite saltarse directamente al inicio de la siguiente iteración del ciclo.</p>
+
+<p>Veamos un ejemplo, el siguiente código avanza y recoge los zumbadores hasta llegar a una pared</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class</span> program {    
+    <span class="text-primary-emphasis">program</span> () {
+        <span class="text-primary-emphasis">while</span> (<span class="text-warning-emphasis">frontIsClear</span>) {
+            <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">nextToABeeper</span>) {
+                <span class="text-info-emphasis">pickbeeper</span>();
+                <span class="text-primary-emphasis">continue</span>;
+            }
+            <span class="text-info-emphasis">move</span>();
+        }
+    }
+}
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/ciclos/continue.png" alt="Quita todos los zumbadores hasta la pared" class="img-thumbnail">
+</div>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="break" data-toc="Break" data-toc-depth="1"></a>
+</div>
+<h2>Break</h2>
+<p>Esta sentencia termina el ciclo que se esta ejecutando. Una vez se ejecuta, ya no habrá más iteraciones del ciclo</p>
+
+<p>Veamos un ejemplo, el siguiente código avanza hasta que llegue a la pared o hasta que llegue a un zumbador</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class</span> program {    
+    <span class="text-primary-emphasis">program</span> () {
+        <span class="text-primary-emphasis">while</span> (<span class="text-warning-emphasis">frontIsClear</span>) {
+            <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">nextToABeeper</span>) {
+                <span class="text-primary-emphasis">break</span>;
+            }
+            <span class="text-info-emphasis">move</span>();
+        }
+    }
+}
+</pre>
+</code>
+
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/ciclos/break1.png" alt="No hay zumbadores, avanza hasta la pared" class="img-thumbnail">
+</div>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/ciclos/break2.png" alt="Se detiene en un zumbador antes de la pared" class="img-thumbnail">
+</div>
+
+@@include("../footer.html")

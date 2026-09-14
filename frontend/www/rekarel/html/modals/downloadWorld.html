@@ -1,0 +1,55 @@
+<div id="downloadWorldModal" class="modal fade" tabindex="-1" aria-labelledby="downloadWorldModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Descargar mundo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <ul class="nav nav-tabs" id="worldsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="input-tab" data-bs-toggle="tab"
+                            data-bs-target="#world-input-tab-pane" type="button" role="tab" aria-controls="world-input-tab-pane"
+                            aria-selected="true">Entrada.in</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="ouput-tab" data-bs-toggle="tab"
+                            data-bs-target="#world-output-tab-pane" type="button" role="tab" aria-controls="world-output-tab-pane"
+                            aria-selected="false">Salida.out</button>
+                    </li>
+                </ul>
+                <div class="tab-content mb-2" id="worldsTabContent">
+                    <div class="tab-pane fade show active" id="world-input-tab-pane" role="tabpanel" aria-labelledby="input-tab"
+                        tabindex="0">
+                        <textarea id="worldDataIn" class="form-control" rows="10" readonly></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="world-output-tab-pane" role="tabpanel" aria-labelledby="output-tab"
+                        tabindex="0">
+                        <textarea id="worldDataOut" class="form-control" rows="10" readonly></textarea>
+                    </div>
+                    <p id="wrongWorldName" class="text-danger" hidden><i class="bi bi-exclamation-diamond-fill"></i> El
+                        mombre del archivo solo puede tener letras, números y puntos</p>
+                    <input type="text" name="worldName" id="worldName" value="mundo" class="w-100 mt-2">
+                    
+                </div>
+
+                <div class="d-flex justify-content-around">
+
+                    <a  type="button" id="downloadWorldIn" class="btn btn-primary">
+                        Descargar mundo.in
+                    </a>
+                    <a type="button" id="downloadWorldOut" class="btn btn-primary">
+                        Descargar mundo.out
+                    </a>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-dialog="none">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

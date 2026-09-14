@@ -1,0 +1,58 @@
+class program {
+
+void regresa(){
+    turnleft();
+    turnleft();
+    while(frontIsClear)
+        move();
+    turnleft();
+    turnleft();
+}
+
+program() {
+    while(notFacingEast)
+        turnleft();
+    if(frontIsClear){
+        move();
+        if(frontIsClear){
+            move();
+            putbeeper();
+        }
+    }
+    while(frontIsClear){
+        iterate(2){
+            if(frontIsClear){
+                move();
+            }
+        }
+        if(frontIsClear){
+            move();
+            putbeeper();
+        }
+    }
+    regresa();
+    iterate(3){
+        if(frontIsClear){
+            move();
+        }
+    }
+    if(frontIsClear){
+        move();
+        putbeeper();
+    }
+    while(frontIsClear){
+        iterate(4){
+            if(frontIsClear){
+                move();
+            }
+        }
+        if(frontIsClear){
+            move();
+            putbeeper();
+        }
+    }
+    regresa();
+    turnoff();
+}
+
+}

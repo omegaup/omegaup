@@ -1,0 +1,48 @@
+class program {
+
+void mueveBeeper(){
+                pickbeeper();
+                iterate(11){
+                    move();
+                }
+                putbeeper();
+                turnleft();
+                turnleft();
+                iterate(11){
+                    move();
+                }
+                turnleft();
+                turnleft();
+}
+
+void cosa(){
+    iterate(10){
+
+        iterate(10){
+            while(notFacingEast()){
+                turnleft();
+            }
+            while(nextToABeeper()){
+                mueveBeeper();
+            }
+            move();
+        }
+        while(notFacingWest()){
+            turnleft();
+        }
+        iterate(10){
+            move();
+        }
+        while(notFacingNorth()){
+            turnleft();
+        }
+        move();
+    }
+}
+
+program() {
+    cosa();
+    turnoff();
+}
+
+}

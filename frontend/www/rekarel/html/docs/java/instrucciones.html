@@ -1,0 +1,67 @@
+@@include("../header.html")
+<h1>Instrucciones</h1>
+<p>Las instrucciones son los comandos que Karel puede realizar.</p>
+
+<table class="table">
+    <tr>
+        <th>Comando</th>
+        <th>Efecto</th>
+    </tr>
+    <tr>
+        <td>move();</td>
+        <td>Karel se desplaza a la siguiente casilla.</td>
+    </tr>
+    <tr>
+        <td>turnleft();</td>
+        <td>Karel gira 90° grados en sentido contra-horario</td>
+    </tr>
+    <tr>
+        <td>pickbeeper();</td>
+        <td>Karel recoge un zumbador de la casilla donde se encuentra y lo guarda en su mochila</td>
+    </tr>
+    <tr>
+        <td>putbeeper();</td>
+        <td>Karel deja un zumbador de su mochila en la casilla donde se encuentra</td>
+    </tr>
+    <tr>
+        <td>turnoff();</td>
+        <td>Karel termina la ejecución del programa, no ejecutará más comandos después de este</td>
+    </tr>
+    <tr>
+        <td>return();</td>
+        <td>Termina la llamada a una función. Si no estamos en ninguna función, entonces es idéntico
+            a un apagate;</td>
+    </tr>
+</table>
+
+<h3 class="mt-4">
+    Errores de ejecución
+</h3>
+<p>Cuando Karel realiza una operación prohibida, surgirá un <b>error de ejecución</b>. Cuando esto
+    sucede, Karel detiene la ejecución de forma incorrecta, por lo que es importante no cometer
+    estos errores.</p>
+<table class="table">
+    <tr>
+        <th>Comando</th>
+        <th>Error</th>
+        <th>Motivo</th>
+    </tr>
+    <tr>
+        <td>move();</td>
+        <td>Karel ha chocado con un muro.</td>
+        <td>Intentar avanzar con un muro enfrente de Karel.</td>
+    </tr>
+    <tr>
+        <td>pickbeeper();</td>
+        <td>Karel intento recoger un zumbador de donde no hay.</td>
+        <td>Intentar de recoger un zumbador en una casilla con 0 zumbadores</td>
+    </tr>
+    <tr>
+        <td>putbeeper();</td>
+        <td>Karel intento dejar un zumbador, pero su mochila esta vacía.</td>
+        <td>Intentar dejar un zumbador con 0 zumbadores en la mochila</td>
+    </tr>
+</table>
+<p>Es importante destacar que un programa que termina en error de ejecución es considerado
+    incorrecto.</p>
+@@include("../footer.html")

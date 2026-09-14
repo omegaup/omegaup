@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "allowJs": true,
+      "module": "es6",
+      "esModuleInterop": true,
+      "target": "es6",
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "outDir": "dist/",
+      "types": ["jest"]
+    },
+    "lib": ["es2015"],
+    "include": [
+      "./src/**/*"
+    ]
+  }

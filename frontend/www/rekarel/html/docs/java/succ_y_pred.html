@@ -1,0 +1,119 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="sucede" data-toc="Sucede (Succ)" data-toc-depth="1"></a>
+</div>
+<h1>Sucede</h1>
+
+
+<p>El operador <b>succ</b> recibe un valor numérico y calcula ese valor más uno.</p>
+
+<p>Por ejemplo, el siguiente código deja 5 zumbadores, porque 4 + 1 = 5</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">iterate</span> (succ(<span class="text-warning-emphasis">4</span>)) 
+    <span class="text-info-emphasis">putbeeper</span>();
+</pre>
+</code>
+
+
+<p>También se puede cambiar con parámetros. Una cosa importante a notar, el operador <b>nunca</b> modifica el valor de un parámetro. </p>
+
+<p>Por ejemplo, el código de abajo produce la siguiente imagen:</p>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/help_sucede.png" alt="" class="img-thumbnail">
+</div>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class program</span><span class="text-danger-emphasis"> {</span> 
+    <span class="text-primary-emphasis">define</span> deja(<span class="text-warning-emphasis">n</span>) <span class="text-danger-emphasis"> {</span>
+        <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">n</span>) 
+<pre style="display: inline;">            </pre>putbeeper();
+    <span class="text-danger-emphasis">}</span>
+
+    <span class="text-primary-emphasis">define</span> funcion(<span class="text-warning-emphasis">n</span>) <span class="text-danger-emphasis"> {</span>
+        deja(<span class="text-warning-emphasis">n</span>);
+        move();
+        deja(succ(<span class="text-warning-emphasis">n</span>));
+        move();
+        deja(<span class="text-warning-emphasis">n</span>);
+    <span class="text-danger-emphasis">}</span>
+
+    <span class="text-danger-emphasis">program ()</span> <span class="text-danger-emphasis"> {</span>
+        funcion(<span class="text-warning-emphasis">5</span>);
+        turnoff();
+    <span class="text-danger-emphasis">}</span>
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="precede" data-toc="Precede (Pred)" data-toc-depth="1"></a>
+</div>
+<h1>Precede</h1>
+
+<p>El operador <b>pred</b> recibe un valor numérico y calcula ese valor menos uno.</p>
+
+<p>Un ejemplo abajo:</p>
+
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/help_precede.png" alt="" class="img-thumbnail">
+</div>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class program</span><span class="text-danger-emphasis"> {</span> 
+    <span class="text-primary-emphasis">define</span> deja(<span class="text-warning-emphasis">n</span>) <span class="text-danger-emphasis"> {</span>
+        <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">n</span>) 
+<pre style="display: inline;">            </pre>putbeeper();
+    <span class="text-danger-emphasis">}</span>
+
+    <span class="text-primary-emphasis">define</span> funcion(<span class="text-warning-emphasis">n</span>) <span class="text-danger-emphasis"> {</span>
+        deja(<span class="text-warning-emphasis">n</span>);
+        move();
+        deja(pred(pred(<span class="text-warning-emphasis">n</span>)));
+        move();
+        deja(pred(<span class="text-warning-emphasis">n</span>));
+    <span class="text-danger-emphasis">}</span>
+
+    <span class="text-danger-emphasis">program()</span><span class="text-danger-emphasis"> {</span>
+        funcion(<span class="text-warning-emphasis">5</span>);
+        turnoff();
+    <span class="text-danger-emphasis">}</span>
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="literal" data-toc="Segundo parámetro" data-toc-depth="1"></a>
+</div>
+<h1>Segundo parámetro</h1>
+
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Java 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+<p>Ambos, sucede y precede pueden recibir un segundo parámetro para especificar cuanto tienen que sumar o restar.</p>
+
+<p>Veamos dos ejemplos válidos:</p>
+<ul>
+    <li>succ(<span class="text-warning-emphasis">n</span>, <span class="text-warning-emphasis">3</span>) Calcula n + 3</li>
+    <li>pred(<span class="text-warning-emphasis">4</span>, <span class="text-warning-emphasis">8</span>) Calcula 4 - 8</li>
+</ul>
+
+<p>Este segundo parámetro debe ser un número, no puede ser una variable, parámetro, etc. Por lo tanto, los siguientes ejemplos no són validos:</p>
+<ul></ul>
+    <li>succ(<span class="text-warning-emphasis">n</span>, <span class="text-warning-emphasis">n</span>) <i class="bi bi-x text-danger h5"></i></li>
+    <li>pred(<span class="text-warning-emphasis">4</span>, <span class="text-warning-emphasis">beepersOnFloor</span>) <i class="bi bi-x text-danger h5"></i></li>
+    <li>pred(<span class="text-warning-emphasis">4</span>, succ(<span class="text-warning-emphasis">3</span>)) <i class="bi bi-x text-danger h5"></i></li>
+</ul>
+
+
+
+
+@@include("../footer.html")

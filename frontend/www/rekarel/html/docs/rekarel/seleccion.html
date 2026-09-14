@@ -1,0 +1,85 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Selección</h1>
+
+<p>La selección es una región rectangular de casillas en el mundo, la puedes distinguir por el borde azul y sus coordenadas marcadas en las barras laterales</p>
+
+<div class="figure">
+    <img src="@@webRoot/../img/docs/selection/elements.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+<p>Las operaciones que Karel puede realizar son ejecutadas en esta selección.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="principal_secundaria" data-toc="Esquina principal y secundaria" data-toc-depth="1"></a>
+</div>
+<h2>Esquina principal y secundaria</h2>
+
+<p>La selección se determina a través de dos casillas, la esquina principal y la opuesta a esta, la esquina secundaria.</p>
+
+<p>Podemos distinguir la esquina principal porque tiene un punto en el borde.</p>
+
+<div class="figure">
+    <img src="@@webRoot/../img/docs/selection/principal.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+<p>Esta esquina es en la que se colocará Karel cuando se efectúe una operación que lo mueva.</p>
+
+<p>La esquina secundaria es la esquina opuesta a la principal.</p>
+
+<div class="figure">
+    <img src="@@webRoot/../img/docs/selection/secondary.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="modos_seleccion" data-toc="Modos de selección" data-toc-depth="1"></a>
+</div>
+<h2>Modo de selección</h2>
+
+<p>ReKarel ofrece dos modos de selección para ajustarse a los diferentes dispositivos de entrada.</p>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="arrastrar" data-toc="Arrastrar" data-toc-depth="2"></a>
+</div>
+<h3>Modo arrastrar</h3>
+
+<div class="alert alert-info">Este es el modo por defecto. Recomendado para usuarios que usen <b>ratón</b></div>
+
+<p>Al pulsar el clic se coloca la esquina principal en la casilla donde este el cursor y al soltar el clic la esquina secundaria se coloca donde este el cursor; permitiendo efectivamente hacer una selección con clic y arrastre del ratón.</p>
+
+<div class="figure">
+    <img src="@@webRoot/../img/click-arrastra.png" alt="" class="figure-img img-fluid rounded">
+    <figcaption class="figure-caption">1- Presionar Clic<br>2- Arrastra<br>3- Soltar clic</figcaption>
+</div>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="alternar" data-toc="Alternar" data-toc-depth="2"></a>
+</div>
+<h3>Modo Alternar</h3>
+<div class="alert alert-info">Modo recomendado para entradas <b>táctiles</b>. Se cambia automáticamente a este modo dependiendo de la <a href="configuracion.html#seleccion">configuración</a>.</div>
+
+<p>Para hacer una selección en este modo, primero se da clic en la casilla que se desee que sea la esquina secundaria y luego en la esquina principal</p>
+
+<p>Concretamente, en este modo, al dar clic en una casilla está se convierte en la esquina principal. La casilla que antes era la esquina principal se convierte en la secundaria.</p>
+
+
+<div class="figure">
+    <img src="@@webRoot/../img/docs/selection/alternate.png" alt="" class="figure-img img-fluid rounded">
+    <figcaption class="figure-caption">1- Clic (tap)<br>2- Clic (tap)</figcaption>
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="uso_teclado" data-toc="Uso con teclado" data-toc-depth="1"></a>
+</div>
+<h2>Uso con teclado</h2>
+
+<p>Independiente a los modos de selección, se pueden usar diferentes atajos de teclado: Las flechas del teclado, las flechas y la tecla shift al mismo tiempo, shift y clic.</p>
+
+<p>Lee más <a href="atajos.html#seleccion">aquí</a>.</p>
+
+@@include("../footer.html")

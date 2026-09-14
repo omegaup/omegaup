@@ -1,0 +1,141 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Configuración</h1>
+<p>ReKarel tiene diferentes modos de opciones de configuración, a continuación se explican cada una</p>
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="general" data-toc="General" data-toc-depth="1"></a>
+</div>
+<h2>General</h2>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="vista" data-toc="Vista" data-toc-depth="2"></a>
+</div>
+<h3>Vista</h3>
+<p>Controla la preferencia de vista de la aplicación.</p>
+
+<ul>
+    <li><b>Automático (Responsivo):</b> La vista cambia dependiendo del tamaño de la pantalla</li>
+    <li><b>Vista de escritorio:</b> Un formato con la pantalla divida horizontalmente entre el código y el mundo. Ideal para pantallas grandes y horizontales.</li>
+    <li><b>Vista de celular</b> Un formato diseñado para pantallas pequeñas y verticales, como la de un celular.</li>
+</ul>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="tema" data-toc="Tema" data-toc-depth="2"></a>
+</div>
+<h3>Tema</h3>
+<p>Controla si la aplicación esta en cual tema.</p>
+
+<ul>
+    <li><b>Usar el tema del sistema:</b> Usa el tema preferido por el navegador o sistema operativo. Si este no esta disponible, usa el Tema claro por defecto.</li>
+    <li><b>Tema claro:</b> Fondos blancos e iluminados.</li>
+    <li><b>Tema oscuro:</b> Fondos negros y oscuros.</li>
+</ul>
+
+<p><b>Nota:</b> Esta configuración no afecta al mundo de Karel, ya que este tiene su propio menú de configuración.</p>
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="codigo" data-toc="Editor de código" data-toc-depth="1"></a>
+</div>
+<h2>Editor del código fuente</h2>
+<p>Controla la configuración del editor de código</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="fuente" data-toc="Tamaño de la fuente" data-toc-depth="2"></a>
+</div>
+<h3>Tamaño de la fuente</h3>
+<p>Controla el tamaño de la fuente, el valor por defecto es <b>12pt</b>.</p>
+
+<p>Esta configuración se puede editar rápidamente presionando: </p>
+<ul>
+    <li>
+        <span class="bg-secondary-subtle border rounded ps-1 pe-1 text-secondary-emphasis">
+            <small>ctrl</small>
+        </span>
+        <span>+</span>
+        <span class="bg-secondary-subtle border rounded ps-1 pe-1 me-2 text-secondary-emphasis">
+            <small>K</small>
+        </span>
+        <span> Para reducir el tamaño de la fuente</span>
+    </li>
+    <li>
+        <span class="bg-secondary-subtle border rounded ps-1 pe-1 text-secondary-emphasis">
+            <small>ctrl</small>
+        </span>
+        <span>+</span>
+        <span class="bg-secondary-subtle border rounded ps-1 pe-1 me-2 text-secondary-emphasis">
+            <small>L</small>
+        </span>
+        <span> Para aumentar el tamaño de la fuente</span>
+    </li>
+</ul>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="estilo" data-toc="Estilo" data-toc-depth="2"></a>
+</div>
+<h3>Estilo</h3>
+
+<p>Controla el tema del editor, cambiando el resaltado de sintaxis, color de fondo, etc.</p>
+
+<ul>
+    <li><i class="bi bi-moon-fill"></i><b>Karel.js</b>: Tema inspirado por Karel.js.</li>
+    <li><i class="bi bi-moon-fill"></i><b>ReKarel</b>: Tema que utiliza los colores de la documentación de ReKarel.</li>
+    <li><b>Sepia</b>: Disfruta de los tonos sepia.</li>
+    <li><b>Omi Karel</b>: Regresa a la nostalgia azul con los colores de la versión original de Karel Omi.</li>
+    <li><i class="bi bi-moon-fill"></i><b>Code</b>: Inspirado en VSCode.</li>
+</ul>
+
+<p>Los temas marcados con una luna <i class="bi bi-moon-fill"></i> cambian dependiendo de si se usa el Tema claro o el Tema oscuro</p>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="cerrar_auto" data-toc="Cerrar paréntesis y llaves auto." data-toc-depth="2"></a>
+</div>
+<h3>Cerrar paréntesis y llaves automáticamente</h3>
+
+<p>Si activado, al abrir un paréntesis  o una llave <code>(</code>, <code>[</code>, <code>{</code>, se escribe automáticamente el cierre.</p>
+    
+<p>Si se tiene una selección al abrir una llave, esta es rodeada.</p>
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="mundo" data-toc="Editor del mundo" data-toc-depth="1"></a>
+</div>
+<h2>Editor del mundo</h2>
+<p>Controla el comportamiento del editor del mundo</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="seleccion" data-toc="Cambiar auto. el modo de selección" data-toc-depth="2"></a>
+</div>
+<h3>Cambiar automáticamente el modo de selección</h3>
+<p>Si <b>activado</b>, cambia automáticamente al modo <a href="seleccion.html#alternar">alternar</a> si detecta entrada táctil.</p>
+
+<p>Por defecto, esta activado</p>
+
+<hr>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="ejecucion" data-toc="Ejecución" data-toc-depth="1"></a>
+</div>
+<h2>Ejecución</h2>
+<p>Controla el comportamiento de la ejecución.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="limite_normal" data-toc="Límite de inst. en modo normal" data-toc-depth="2"></a>
+</div>
+<h3>Límite de instrucciones en modo normal:</h3>
+<p>La cantidad de instrucciones que se requieren para que se pase del modo normal de ejecución al <a href="modos_de_ejecucion.html#rapido">modo rápido</a>.</p>
+
+<p>Valor defecto: 200,000</p>
+
+<div class="alert alert-warning"><b>Advertencia:</b> Colocar valores muy grandes aquí puede provocar que la aplicación tenga periodos extensos donde no la aplicación no es responsiva.</div>
+@@include("../footer.html")

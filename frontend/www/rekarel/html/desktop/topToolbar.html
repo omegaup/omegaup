@@ -1,0 +1,90 @@
+<div class="border-bottom bg-body p-1">
+    <div class="container-md">
+        <div class="btn-toolbar m-1 gap-2">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    title="Regresa el mundo a su estado original" id="desktopResetKarel">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    title="Compila el programa" id="desktopCompileKarel">
+                    <i class="bi bi-microsoft"></i>
+                </button>
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    title="Ejecuta el programa" id="dekstopRunKarel">
+                    <i class="bi bi-play-fill"></i>
+                </button>
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    id="desktopStepProgram" title="Avanza un paso el programa, entra a funciones">
+                    @@include('../svg/stepOn.svg')
+                </button>
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    id="desktopStepOverProgram" title="Avanza un paso el programa, se salta funciones">
+                    @@include('../svg/stepOver.svg')
+                </button>
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    id="desktopStepOutProgram" title="Ejecuta hasta salir de la función actual">
+                    @@include('../svg/stepOff.svg')
+                </button>
+                <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+                    title="Ver resultado" id="desktopFutureProgram">
+                    <i class="bi bi-eye-fill"></i>
+                </button>
+            </div>
+
+            <div class="input-group" role="group" aria-label="Basic example">
+                <div class="input-group-text bg-body border-secondary ps-2 pe-2"
+                    title="Tiempo de espera entre instrucción e instruccion en milisegundos">
+                    <small class="d-none d-md-inline">
+                        <label for="delayPanel" >Retraso (ms)</label>
+                    </small>
+                    <i class="bi bi-watch d-block d-md-none"></i>
+                </div>
+                <input type="number" id="delayPanel" class="form-control border-secondary" min="0"
+                    value="300" max="3000">
+                <button type="button" class="btn btn-body p-1 ps-1 pe-1 border-secondary d-none d-sm-inline"
+                    id="removeDelayBtn" title="Reducir el retraso en 50ms">
+                    <i class="bi bi-dash"></i>
+                </button>
+                <button type="button" class="btn btn-body p-1 ps-1 pe-1 border-secondary d-none d-sm-inline"
+                    id="addDelayBtn" title="Aumentar el retraso en 50ms">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+
+            <div class="input-group" role="group" aria-label="Basic example">
+                <div class="input-group-text bg-body border-secondary ps-2 pe-2"
+                    title="Zumbadores en Karel">
+                    <small class="d-none d-md-inline"><label for="beeperBag"> Mochila</label></small>                    
+                    <i class="bi bi-backpack-fill d-block d-md-none"></i>
+                </div>
+                <div class="collapse collapse-horizontal show" id="beeperInputCollapse">
+                    <input type="number" id="beeperBag" class="form-control border-secondary rounded-0"
+                        aria-label="" min="0" value="0">
+                </div>
+                <button type="button" class="btn btn-body p-1 ps-3 pe-3 border-secondary"
+                    id="infiniteBeepersBtn" title="Activar/desactivar zumbadores infinitos">
+                    <i class="bi bi-infinity"></i>
+                </button>
+            </div>
+            <!-- OLD FILAS AND COLUMNAS
+            <div class="input-group" role="group" aria-label="Basic example">
+                <div class="input-group-text bg-body border-secondary ps-2 pe-2"
+                    title="Alto del mundo">
+                    <small>Filas</small>
+                </div>
+                <input type="number" id="toolbarRows" class="form-control border-secondary" min="1"
+                    value="100">
+                <div class="input-group-text bg-body border-secondary ps-2 pe-2"
+                    title="Ancho del mundo">
+                    <small>Columnas</small>
+                </div>
+                <input type="number" id="toolbarCols" class="form-control border-secondary" min="1"
+                    value="100">
+
+            </div> -->
+        </div>
+    </div>
+</div>

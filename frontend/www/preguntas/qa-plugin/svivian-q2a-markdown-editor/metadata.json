@@ -1,0 +1,13 @@
+{
+	"name": "Markdown Editor",
+	"uri": "https://github.com/svivian/q2a-markdown-editor",
+	"description": "Markdown editor plugin for simple text-based markup",
+	"version": "2.5.1",
+	"date": "2016-06-21",
+	"author": "Scott Vivian",
+	"author_uri": "http://codelair.com",
+	"license": "GPLv3",
+	"update_uri": "https://raw.githubusercontent.com/svivian/q2a-markdown-editor/master/metadata.json",
+	"min_q2a": "1.6",
+	"min_php": "5.4"
+}

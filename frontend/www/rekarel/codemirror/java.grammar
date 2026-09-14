@@ -1,0 +1,244 @@
+@top Script  {
+   ImportList? Class ProgramClass ScriptBlock
+}
+
+
+ImportList {
+    ImportList ImportStatement 
+    | ImportStatement
+}
+
+ImportStatement {
+    Import (Identifier | Modules) "." (Identifier | Modules) ";"
+}
+
+ScriptBlock {
+    Start inner End
+}
+
+inner {
+    Function* main
+}
+
+Function {
+    DefineType Identifier "("FunctionParams?")" Block 
+}
+
+FunctionParams {
+    FunctionParams comma Identifier
+    | Identifier
+}
+
+main {
+    ProgramMain "(" ")" Block
+
+}
+
+Block {
+    Start InnerBlock End
+}
+
+InnerBlock {
+    expression*
+}
+
+expression {
+    call ";" 
+    | Block 
+    | WhileStatement 
+    | IterateStatement 
+    | IfStatement 
+    | Continue ";"
+    | Break  ";"
+    | ReturnStatement ";"
+    |  ";"
+}
+
+call {
+    (BuiltIn | Identifier) "("CallParams?")"
+}
+
+CallParams {
+    CallParams comma NumericTerm
+    | NumericTerm
+}
+
+BuiltIn {
+    @specialize<Identifier, "move"> |
+    @specialize<Identifier, "turnleft"> |
+    @specialize<Identifier, "putbeeper"> |
+    @specialize<Identifier, "pickbeeper"> |
+    @specialize<Identifier, "turnoff">
+}
+
+BooleanHeader {
+     "(" BooleanTerm ")"
+}
+WhileStatement {
+    While BooleanHeader expression
+}
+
+IterateStatement {
+    Iterate "(" NumericTerm ")" expression
+}
+
+ReturnStatement {
+    Return ( "(" ")" )?
+    | Return term
+}
+
+Return { @specialize<Identifier, "return"> }
+
+@precedence {
+    binaryLogic @left,
+    else,
+    expression
+
+}
+
+
+
+IfStatement {
+    If BooleanHeader expression (!else elseStatement)?
+    
+}
+
+elseStatement {
+    Else expression
+}
+
+
+
+term {
+    term !binaryLogic binaryOperator term
+    | Not term
+    | "(" term ")"
+    | clause 
+}
+
+binaryOperator {
+    Or | And | LT | LTE | COMP
+}
+
+
+clause { IFZ | IFINF | BoolFunc ("(" ")")? | (Identifier | Globals) | numeric | call }
+
+
+numeric {
+    Number | numberFunction
+}
+
+BooleanTerm { term }
+NumericTerm { term }
+
+numberFunction {(Succ | Pred)"(" NumericTerm ( comma Number )? ")" }
+
+Succ { @specialize<Identifier, "succ"> }
+Pred { @specialize<Identifier, "pred"> }
+
+
+Continue { @specialize<Identifier, "continue"> }
+Break { @specialize<Identifier, "break"> }
+
+BoolFunc {
+    @specialize<Identifier, "nextToABeeper"> |
+    @specialize<Identifier, "notNextToABeeper"> |
+    @specialize<Identifier, "frontIsClear"> |
+    @specialize<Identifier, "leftIsClear"> |
+    @specialize<Identifier, "rightIsClear"> |
+    @specialize<Identifier, "frontIsBlocked"> |
+    @specialize<Identifier, "leftIsBlocked"> |
+    @specialize<Identifier, "rightIsBlocked"> |
+    @specialize<Identifier, "facingNorth"> |
+    @specialize<Identifier, "facingSouth"> |
+    @specialize<Identifier, "facingEast"> |
+    @specialize<Identifier, "facingWest"> |
+    @specialize<Identifier, "notFacingNorth"> |
+    @specialize<Identifier, "notFacingSouth"> |
+    @specialize<Identifier, "notFacingEast"> |
+    @specialize<Identifier, "notFacingWest"> |
+    @specialize<Identifier, "anyBeepersInBeeperBag"> |    
+    @specialize<Identifier, "noBeepersInBeeperBag">
+}
+
+IFZ {
+    Ifzero { @specialize<Identifier, "iszero">  } "(" NumericTerm ")"
+}
+IFINF {
+    Ifinfinite { @specialize<Identifier, "isinfinite">  } "(" NumericTerm ")"
+}
+
+Start[closedBy="End"] {
+    start
+}
+
+End[openedBy="Start"] {
+    end
+}
+
+ProgramClass { program }
+ProgramMain { program }
+
+
+While { @specialize<Identifier, "while"> }
+If { @specialize<Identifier, "if"> }
+Else { @specialize<Identifier, "else"> }
+Iterate { @specialize<Identifier, "iterate"> }
+
+Globals {
+    @specialize<Identifier, "true">
+    | @specialize<Identifier, "false">
+    | @specialize<Identifier, "beepersOnFloor">
+    | @specialize<Identifier, "beepersInBeeperBag">
+    | @specialize<Identifier, "currentRow">
+    | @specialize<Identifier, "currentColumn">
+}
+
+Modules {    
+    @specialize<Identifier, "rekarel">
+    | @specialize<Identifier, "globals">
+}
+
+
+@tokens {
+  space { @whitespace+ }
+  Class { "class" }
+  program { "program" }
+  Identifier { $[a-zA-Z]$[a-zA-Z0-9_]*}
+  Number { $[0-9]+ }
+  DefineType { "define"|"void"|"int"|"bool" }
+  Or { "||" }
+  And { "&&" }
+  Not { "!" }
+  LT { "<" }
+  LTE { "<=" }
+  COMP { "==" }
+  Import { "import" }
+  comma { "," }
+  start { "{" }
+  end { "}" }
+  
+
+
+}
+
+@skip { space | Comment | BlockComment }
+@skip { } {
+  BlockComment { "/*" (Annotation | blockCommentContent | blockCommentNewline)* blockCommentEnd }
+}
+
+@local tokens {
+  blockCommentEnd { "*/" }
+  blockCommentNewline { "\n" }
+  Annotation { "@" @asciiLetter* }
+  @else blockCommentContent
+}
+ @skip {} {
+    Comment { "//" (Annotation2 | commentContent)* commentEnd}
+ }
+
+ @local tokens {
+    commentEnd { "\n" }
+    Annotation2 { "@" @asciiLetter* }
+    @else commentContent
+  }

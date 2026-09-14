@@ -1,0 +1,322 @@
+:root[data-bs-theme="light"]
+ {
+    --action: #06c;
+    --flow: rgb(138, 75, 167);
+    --keyword: rgb(10, 140, 40);
+    --kw-gutter-size: 30px;
+    --omegaup-blue: #678dd7;
+    --editor-font-size: medium;
+    --waffle-color: #0d6dfd;
+    --editor-color: var(--bs-body-color);
+    --editor-background: var(--bs-body-bg);
+    --editor-gutter-bg: var(--bs-secondary-bg);
+    --editor-gutter: var(--bs-emphasis-color);
+}
+
+:root[data-bs-theme="dark"]
+{
+    --action: #06c;
+    --flow: rgb(138, 75, 167);
+    --keyword: rgb(10, 140, 40);
+    --kw-gutter-size: 30px;
+    --omegaup-blue: #183060;
+    --editor-font-size: medium;
+    --waffle-color: #0d6dfd;
+    --editor-color: var(--bs-body-color);
+    --editor-background: var(--bs-body-bg);
+    --editor-gutter-bg: var(--bs-secondary-bg);
+    --editor-gutter: var(--bs-emphasis-color);
+}
+
+.text-emphasis {
+    color: var(--bs-emphasis-color);
+}
+
+.cm-editor .cm-content {
+    font-size: var(--editor-font-size);    
+    color: var(--editor-color); 
+}
+
+.cm-editor  {
+    background-color: var(--editor-background);
+}
+.cm-editor .cm-gutter {
+    font-size: var(--editor-font-size);
+    color: var(--bs-emphasis-color);
+    background-color: var(--editor-gutter-bg);
+    color: var(--editor-gutter);
+}
+
+
+.btn-body {
+    --bs-btn-bg: rgba(var(--bs-body-bg-rgb), var(--bs-bg-opacity)) !important;
+    --bs-btn-hover-bg: var(--bs-secondary-bg) !important;
+  }
+
+
+
+html,
+body {
+    height: 100%;
+}
+
+#beeperBag,
+#toolbarRows,
+#toolbarCols,
+#delayPanel {
+    width: 9ch;
+}
+
+#pascalActions,
+#pascalFlow {
+    overflow-x: scroll;
+
+}
+
+.bg-darkgray {
+    background-color: #466aaf;
+}
+
+.bg-omega {
+    background-color: var(--omegaup-blue);
+}
+
+.text-shadow {
+    text-shadow: 0px 0px 2px silver;
+
+}
+
+
+.fillPanel {
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+
+.bg-flow {
+    background-color: var(--flow);
+    color: white;
+}
+
+.bg-action {
+    background-color: var(--flow);
+    color: white;
+}
+
+.bg-keyword {
+    background-color: var(--keyword);
+    color: white;
+}
+
+
+body {
+    overflow: hidden;
+}
+
+.splitter-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+}
+
+#editor,
+.CodeMirror {
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro,
+        monospace;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.breakpoints {
+    width: 0.8em;
+    font-size: 0.5em;
+}
+
+.breakpoint {
+    color: #822;
+    font-size: 0.4em;
+}
+
+
+
+.input-prepend {
+    margin-top: 10px;
+}
+
+#mensajes {
+    overflow-y: scroll;
+    padding: 0 10px 10px 10px;
+}
+
+#pila {
+    overflow-y: scroll;
+    padding: 0 10px 10px 10px;
+}
+
+pre.error-popup {
+    display: none;
+    position: absolute;
+    left: 3em;
+    top: 1em;
+    border: 1px solid #000;
+    background: #ff8;
+    width: 30em;
+    z-index: 10;
+    padding: 5px;
+    white-space: normal;
+}
+
+.error:hover .error-popup {
+    display: block;
+}
+
+.parse-error {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QsEBjIX8OiuEwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAgSURBVAjXPcixAQAwDMMgnP9/VrcyIgqVcGrIBh38rD25RQ/6x3pUhQAAAABJRU5ErkJggg==);
+    background-repeat: repeat-x;
+    background-position: 0 100%;
+}
+
+.karel-current-line {
+    background: rgba(255, 255, 0, 0.8);
+}
+
+.ace_gutter-cell.ace_breakpoint {
+    border-radius: 20px 0px 0px 20px;
+    box-shadow: 0px 0px 1px 1px red inset;
+}
+
+.dropdown {
+    z-index: 1000;
+}
+
+.gutter {
+    background-color: var(--bs-secondary);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+}
+
+.gutter.gutter-horizontal {
+    background-image: url('../img/vertical.png');
+    cursor: col-resize;
+}
+
+.gutter.gutter-vertical {
+    background-image: url('../img/horizontal.png');
+    cursor: row-resize;
+}
+
+.split {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+.split.split-horizontal,
+.gutter.gutter-horizontal {
+    height: 100%;
+    float: left;
+}
+
+
+/* CM Editor */
+.cm-editor {
+    height: 100%;
+}
+
+/* World Editor*/
+.world-canvas {
+    z-index: 0;
+}
+
+/* Waffle */
+.waffle-element {
+    z-index: 1;
+}
+
+.waffle-sphere {
+    width: 6px;
+    height: 6px;;
+    background-color: var(--waffle-color); /* You can change the color */
+    border-radius: 50%; /* This creates a circular shape */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3); /* Optional: adds a shadow for depth */
+}
+
+.z-index-2 {
+    z-index: 2;
+}
+
+.waffle-border {
+    border: solid 0px var(--waffle-color);
+    cursor: grab;
+    opacity: 0.8;
+}
+
+.kw-gutter-width {
+    width: var(--kw-gutter-size);
+    max-width: var(--kw-gutter-size);
+    min-width: var(--kw-gutter-size);
+}
+
+.kw-gutter-height {
+    height: var(--kw-gutter-size);
+    max-height: var(--kw-gutter-size);
+    min-height: var(--kw-gutter-size);
+}
+
+.input-field {
+    border: 1px inset #ccc;
+    background-color: white;
+    color: #666;
+}
+
+.input-field input {
+    border: none;
+    padding: 0;
+    outline: none;
+    background-color: transparent;
+}
+
+@media (max-width: 1199px) {
+    .visible-lg {
+        display: none;
+    }
+}
+
+@media (max-width: 979px) {
+    .hidden-mobile {
+        display: none;
+    }
+}
+
+
+
+.toast-danger {
+    color: #fff!important;
+    background-color: RGBA(var(--bs-danger-rgb), 0.8)!important;
+}
+
+.toast-success {
+    color: #fff!important;
+    background-color: RGBA(var(--bs-success-rgb), 0.8)!important;
+}
+
+.toast-primary {
+    color: #fff!important;
+    background-color: RGBA(var(--bs-primary-rgb), 0.85)!important;
+}
+
+#desktopConsole > :first-child {
+    font-weight: bold;
+}

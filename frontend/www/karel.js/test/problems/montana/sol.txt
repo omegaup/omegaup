@@ -1,0 +1,71 @@
+class program {
+	
+	void whileMove()
+    {
+    	while(frontIsClear)
+        	move();
+	}
+    
+    void turn(n)
+    {
+    	iterate(n)
+        	turnleft();
+	}
+    
+    void getHeight()
+    {
+    	if(frontIsClear)
+        {
+        	turn(1);
+        	whileMove();
+            while(nextToABeeper)
+            	pickbeeper();
+            turn(2);
+            whileMove();
+            turn(1);
+        	move();
+            getHeight();
+            putbeeper();
+        }
+	}
+    
+    void checkPos()
+    {
+    	if(nextToABeeper)
+        {
+            pickbeeper();
+            turn(2);
+            whileMove();
+            turn(1);
+            getHeight();
+        }
+	}
+    
+    void findTop()
+    {
+    	turn(1);
+        while(frontIsClear)
+        {
+        	checkPos();
+            if(frontIsClear)
+              move();
+            else
+                turnoff();
+		}
+        checkPos();
+        turn(2);
+        whileMove();
+        turn(1);
+        move();
+        findTop();
+	}
+    
+    program () {
+    	while(nextToABeeper)
+        	pickbeeper();
+        whileMove();
+        turn(2);
+        findTop();
+        turnoff();
+    }
+}

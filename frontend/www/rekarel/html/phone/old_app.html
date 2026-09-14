@@ -1,0 +1,155 @@
+<div id="phoneView" class="p-0 m-0 position-absolute mh-100 h-100 ">
+    <div class="d-flex flex-column h-100 mh-100">
+
+        <div id="mainPanel" class="overflow-hidden flex-grow-1">
+            <div class="d-flex flex-column h-100">
+                <div class="btn-toolbar d-flex justify-content-around border-bottom">
+
+                    <button id="codeEdit" class="btn">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button id="codeAction" class="btn text-primary">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </button>
+                    <button id="codeFlow" class="btn">
+                        <i class="bi bi-option"></i>
+                    </button>
+                    <button id="codeKeyword" class="btn">
+                        <i class="bi bi-key-fill"></i>
+                    </button>
+                </div>
+                <div id="editToolbar" class="btn-toolbar d-flex justify-content-around p-1"
+                    style="box-shadow: 0 30px 40px rgba(0,0,0,.1);">
+                    <div class="dropdown">
+                        <button class="btn btn-success dropdown-toggle" type="button"
+                            id="phoneDropwDownFile" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-archive "></i>
+                        </button>
+
+                        <ul class="dropdown-menu  mb-1">
+                            <li>
+                                <button id="newJavaCodeBtn" class="dropdown-item">
+                                    <i class="bi bi-file-earmark-plus"></i> Nuevo Java
+                                </button>
+                            </li>
+                            <li><button id="newPascalCodeBtn" class="dropdown-item">
+                                    <i class="bi bi-file-earmark-plus"></i> Nuevo Pascal</button>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-folder2-open"></i> Abrir
+                                    código</a>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                    data-bs-target="#saveCodeModal">
+                                    <i class="bi bi-box-arrow-down"></i> Descargar
+                                    código
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="btn-group mb-1">
+                        <button id="codeUndo" class="btn btn-secondary border-end">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                        <button id="codeRedo" class="btn btn-secondary border-start">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="pascalAction" class="btn-toolbar d-flex flex-nowrap p-1  overflow-auto w-100 "
+                    style="box-shadow: 0 30px 40px rgba(0,0,0,.1);">
+                    <button id="pAvanza" class="btn btn-primary me-1 mb-1 ">Avanza</button>
+                    <button id="pGira" class="btn btn-primary me-1 mb-1">Izquierda</button>
+                    <button id="pCoge" class="btn btn-primary me-1 mb-1">Coge</button>
+                    <button id="pDeja" class="btn btn-primary me-1 mb-1">Deja</button>
+                    <button id="pLlama" class="btn btn-primary me-1 mb-1">Llamar</button>
+                    <button id="pApagate" class="btn btn-primary me-1 mb-1">Apagate</button>
+                    <button id="pSalir" class="btn btn-primary me-1 mb-1">Salir</button>
+                </div>
+
+                <div id="pascalFlow" class="btn-toolbar d-flex flex-nowrap p-1  overflow-auto w-100"
+                    style="box-shadow: 0 30px 40px rgba(0,0,0,.1);">
+                    <button class="btn bg-action me-1 mb-1 ">Si</button>
+                    <button class="btn bg-action me-1 mb-1 text-nowrap">Si-No</button>
+                    <button class="btn bg-action me-1 mb-1">Repetir</button>
+                    <button class="btn bg-action me-1 mb-1">Mientras</button>
+                    <button class="btn bg-action me-1 mb-1 text-nowrap">Nueva-Instrucción</button>
+                    <button class="btn bg-action me-1 mb-1">inicio</button>
+                    <button class="btn bg-action me-1 mb-1">fin</button>
+                    <button class="btn bg-action me-1 mb-1">;</button>
+                </div>
+
+
+                <div id="pascalKeyword" class="btn-toolbar d-flex flex-nowrap p-1  overflow-auto w-100"
+                    style="box-shadow: 0 30px 40px rgba(0,0,0,.1);">
+                    <button class="btn bg-keyword me-1 mb-1 ">Prototipo</button>
+                    <button class="btn bg-keyword me-1 mb-1">Comentario</button>
+                    <button class="btn bg-keyword me-1 mb-1 text-nowrap">Iniciar-Programa</button>
+                    <button class="btn bg-keyword me-1 mb-1 text-nowrap">Finalizar-programa</button>
+                    <button class="btn bg-keyword me-1 mb-1 text-nowrap">Inicia-ejecucion</button>
+                    <button class="btn bg-keyword me-1 mb-1 text-nowrap">Termina-ejecucion</button>
+                    <button class="btn bg-keyword me-1 mb-1">inicio</button>
+                    <button class="btn bg-keyword me-1 mb-1">fin</button>
+                    <button class="btn bg-keyword me-1 mb-1">;</button>
+                </div>
+                <div class="btn-toolbar d-flex justify-content-around border-bottom bg-light p-1">
+                    <button type="button" class="btn btn-info" title="Compila el programa">
+                        <i class="bi bi-microsoft"></i>
+                    </button>
+                    <div class="btn-group">
+                        <button id="upLine" class="btn btn-primary border-end">
+                            <i class="bi bi-caret-up-fill"></i>
+                        </button>
+                        <button id="downLine" class="btn  btn-primary border-start">
+                            <i class="bi bi-caret-down-fill"></i>
+                        </button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button id="codeUnindent" class="btn  btn-secondary border-end">
+                            <i class="bi bi-unindent"></i>
+                        </button>
+                        <button id="codeIndent" class="btn btn-secondary border-start">
+                            <i class="bi bi-indent"></i>
+                        </button>
+                    </div>
+
+                    <button id="ctrlZ" class="btn  btn-success">
+                        <i class="bi bi-plus-circle"></i>
+                    </button>
+                    <button id="ctrlY" class="btn   btn-danger">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+
+                </div>
+                <div class="position-relative w-100 flex-grow-1">
+                    <div id="phoneEditor" class="position-absolute overflow-hidden fillPanel">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="phoneToolbar" class="btn-toolbar border-top p-1 m-2">
+            <div class="d-flex w-100 justify-content-around">
+                <button id="codeTabBtn" class="btn text-primary"><span class="h3"><i
+                            class="bi bi-card-text"></i></span></button>
+
+                <button id="worldTabBtn" class="btn"><span class="h3"><i
+                            class="bi bi-globe-americas"></i></span></button>
+
+                <button id="execTabBtn" class="btn"><span class="h3"><i
+                            class="bi bi-play-circle"></i></span></button>
+
+                <button class="btn" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                    <span class="h3"><i class="bi bi-gear-fill"></i></span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>

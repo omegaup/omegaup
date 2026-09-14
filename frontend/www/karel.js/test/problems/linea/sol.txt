@@ -1,0 +1,13 @@
+iniciar-programa
+    inicia-ejecucion
+        mientras algun-zumbador-en-la-mochila y frente-libre hacer inicio
+        	deja-zumbador;
+            avanza;
+        fin;
+        
+        si algun-zumbador-en-la-mochila entonces
+        	deja-zumbador;
+        
+        apagate;
+    termina-ejecucion
+finalizar-programa

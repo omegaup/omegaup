@@ -1,0 +1,100 @@
+#!/usr/bin/env node
+
+"use strict";
+
+const program = require('commander');
+const fs = require('fs');
+const version = require('../package.json').version;
+const { karel, util } = require('../js/index.js');
+
+function readStdin() {
+  return new Promise(function(resolve, reject) {
+    let chunks = [];
+    process.stdin
+      .setEncoding('utf-8')
+      .on('data', chunk => chunks.push(chunk))
+      .on('end', chunk => resolve(chunks.join('')));
+  });
+}
+
+program
+.version(version);
+
+program
+.command('compile <sourcefile>')
+.description('Compiles source file')
+.option('-o, --output [outputfile]', 'Specifies the output file (default sourcefile.kx)')
+  .action(function(sourcefile, options){
+    var path = require('path');
+    if (!options.output) {
+      options.output = path.parse(sourcefile).name + '.kx';
+    }
+
+    var file = fs.readFileSync(sourcefile, {encoding: 'utf-8'});
+    var compiled = karel.compile(file);
+
+    fs.writeFileSync(options.output, JSON.stringify(compiled));
+  });
+
+program
+.command('run <filename>')
+.option('--debug','enables debug output')
+.description('runs file')
+.action(function(filename, options){
+  var file = fs.readFileSync(filename, {encoding: 'utf-8'});
+  var compiled = null;
+  if (filename.endsWith('.kx')) {
+    compiled = JSON.parse(file);
+  } else {
+    compiled = karel.compile(file);
+  }
+  var DOMParser = require('xmldom').DOMParser;
+  readStdin()
+    .then(stdin => {
+      var worldXml = new DOMParser().parseFromString(stdin, 'text/xml');
+      var world = new karel.World(100, 100);
+      world.load(worldXml);
+      if (options.debug) {
+        world.runtime.debug = true;
+        world.runtime.addEventListener('debug', function(ev) {
+          console.log(ev.debugType, ev.message);
+        });
+      }
+      world.runtime.load(compiled);
+      while (world.runtime.step());
+      console.log(world.output());
+    });
+});
+
+program
+.command('draw')
+.description('Reads a world .in from stdin and renders it as a png.')
+.option('-o, --output <outputfile>', 'output file. Default is world.png', 'world.png')
+.option('-r, --run <sourcefile>', 'run a karel program before rendering the world')
+.option('-w, --width <width>', 'width to draw, in cells')
+.option('-h, --height <height>', 'height to draw, in cells')
+.action(function(options){
+  readStdin()
+    .then(stdin => {
+      return util.Draw(stdin, options.output, options);
+    });
+});
+
+program
+.command('convert <mdo> <kec>')
+.description('Converts a .kec with its .mdo into a karel.js XML.')
+.action(function(mdoPath, kecPath){
+  process.stdout.write(util.ImportMdoKec(mdoPath, kecPath).save());
+});
+
+program
+.command('detect-language')
+.description('Reads a karel program from stdin and guesses its language.')
+.action(function(){
+  readStdin().then(code => karel.detectLanguage(code))
+             .then(language => console.log(language));
+});
+
+program.parse(process.argv);
+
+// vim: set expandtab:ts=2:sw=2

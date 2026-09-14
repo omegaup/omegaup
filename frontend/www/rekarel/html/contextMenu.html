@@ -1,0 +1,188 @@
+<div id="contextMenuDiv" class="dropend position-absolute d-none d-md-block" style="top: 0px; left: 0px; width: 0px; height: 0px;">
+    <button id="contextMenuToggler" type="button" class="p-0 m-0 h-0 w-0 position-absolute"
+        data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"
+        style="visibility: hidden; overflow: hidden; max-width: 0px; max-height: 0px; z-index: -1">
+        Menu contextual
+    </button>
+    <ul class=" dropdown-menu ">
+        <li>
+            <div class="dropend">
+                <button type="button" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <!-- Karel-up.svg -->
+                    <i class="text-primary h-auto w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-arrow-up" viewBox="0 0 16 16">
+                            <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+                                d="m 8,0.6640625 c 0.00276,0 -6.2505726,6.2982652 -6.2519531,6.296875 -4.423e-4,-4.454e-4 2.2613062,1.6e-4 4.0058593,0 V 15.535156 H 10.246094 V 6.9609375 c 1.744553,1.6e-4 4.006301,-4.454e-4 4.005859,0 C 14.250573,6.9623277 7.9972389,0.6640625 8,0.6640625 Z" />
+                        </svg>
+                    </i>
+                    Situar a Karel
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item dropdown-item-action" id="contextKarelNorth">
+                            <!-- Karel-up.svg -->
+                            <i class="text-primary h-auto w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-arrow-up" viewBox="0 0 16 16">
+                                    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+                                        d="m 8,0.6640625 c 0.00276,0 -6.2505726,6.2982652 -6.2519531,6.296875 -4.423e-4,-4.454e-4 2.2613062,1.6e-4 4.0058593,0 V 15.535156 H 10.246094 V 6.9609375 c 1.744553,1.6e-4 4.006301,-4.454e-4 4.005859,0 C 14.250573,6.9623277 7.9972389,0.6640625 8,0.6640625 Z" />
+                                </svg>
+                            </i>
+                            Situar Karel al norte
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item dropdown-item-action" id="contextKarelEast">
+                            <!-- Karel-right.svg -->
+                            <i class="text-primary h-auto w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-arrow-up" viewBox="0 0 16 16">
+                                    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+                                        d="m 15.435547,8.0996093 c 0,0.00276 -6.2982655,-6.2505726 -6.2968753,-6.2519531 4.454e-4,-4.423e-4 -1.6e-4,2.2613062 0,4.0058593 H 0.5644532 v 4.4921875 h 8.5742185 c -1.6e-4,1.744553 4.454e-4,4.006301 0,4.005859 -0.00139,-0.0014 6.2968753,-6.2547138 6.2968753,-6.2519527 z" />
+                                </svg>
+                            </i>
+                            Situar Karel al este
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item dropdown-item-action" id="contextKarelSouth">
+                            <!-- Karel-down.svg -->
+                            <i class="text-primary h-auto w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-arrow-up" viewBox="0 0 16 16">
+                                    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+                                        d="m 7.9999999,15.535156 c -0.00276,0 6.2505721,-6.2982655 6.2519531,-6.2968753 4.42e-4,4.454e-4 -2.261306,-1.6e-4 -4.005859,0 V 0.6640622 H 5.7539062 v 8.5742185 c -1.744553,-1.6e-4 -4.006301,4.454e-4 -4.005859,0 0.0014,-0.00139 6.2547138,6.2968753 6.2519527,6.2968753 z" />
+                                </svg>
+                            </i>
+                            Situar Karel al sur
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item dropdown-item-action" id="contextKarelWest">
+                            <!-- Karel-left.svg -->
+                            <i class="text-primary h-auto w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-arrow-up" viewBox="0 0 16 16">
+                                    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+                                        d="m 0.5644532,8.0996089 c 0,-0.00276 6.2982655,6.2505721 6.2968753,6.2519531 -4.454e-4,4.42e-4 1.6e-4,-2.261306 0,-4.005859 H 15.435547 V 5.8535152 H 6.8613285 c 1.6e-4,-1.744553 -4.454e-4,-4.006301 0,-4.005859 0.00139,0.0014 -6.2968753,6.2547138 -6.2968753,6.2519527 z" />
+                                </svg>
+                            </i>
+                            Situar Karel al oeste
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <div class="dropend">
+                <button type="button" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="bi bi-1-square-fill text-success"></i>
+                    Zumbadores
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" id="contextAddBeeper">
+                            <i class="bi bi-1-square-fill text-success"></i> Agregar
+                            uno
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextDecrementBeeper">
+                            <i class="bi bi-1-square-fill text-danger"></i> Quitar
+                            uno
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextSetAmmount" data-bs-toggle="modal"
+                            data-bs-target="#ammountModal">
+                            <i class="bi bi-123 text-info"></i> Elegir cantidad
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextSetInfinite">
+                            <i class="bi bi-infinity text-warning"></i> Infinitos
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextRemoveAll">
+                            <i class="bi bi-slash-circle-fill text-danger"></i>
+                            Quitar todos
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextRandomBeeper">                            
+                            <i class="bi bi-dice-6-fill text-primary"></i>
+                            Aleatorios
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <div class="dropend">
+                <button type="button" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="bi bi-border"></i> Colocar paredes
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" id="contextNorthWall">
+                            <i class="bi bi-border-top"></i> Pared norte
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextEastWall">
+                            <i class="bi bi-border-right"></i> Pared este
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextSouthWall">
+                            <i class="bi bi-border-bottom"></i> Pared sur
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextWestWall">
+                            <i class="bi bi-border-left"></i> Pared oeste
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextOuterWall">
+                            <i class="bi bi-border-outer"></i> Rodear cuadrado
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li>
+            <div class="dropend">
+                <button type="button" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="bi bi-flag-fill"></i> Evaluar casillas
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="cellImportanceDesktop" data-popper-placement="top-start" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(0px, -40px, 0px);">
+                    <li>
+                        <button class="dropdown-item" id="contextEvaluateCell">
+                            <i class="bi bi-flag-fill text-warning"></i> Evaluar
+                            casilla
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" id="contextIgnoreCell">
+                            <i class="bi bi-flag-fill text-secondary"></i> Ignorar
+                            casilla
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+        </li>
+
+    </ul>
+</div>

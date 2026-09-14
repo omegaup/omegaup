@@ -1,0 +1,107 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Globales</h1>
+<a class="badge text-bg-secondary rounded-pill text-decoration-none" title="Requiere importar rekarel.globals"
+    href="import.html">
+    import rekarel.globals
+</a>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Java 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p><a href="import.html">Importando</a> la librería <em class="text-warning-emphasis">rekarel.globals</em>, uno puede obtener acceso a varias globales
+    descritas abajo.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>beepersInBeeperBag</td>
+            <td>Numérica</td>
+            <td>Igual a la cantidad de zumbadores en la mochila de Karel.</td>
+        </tr>
+        <tr>
+            <td>beepersOnFloor</td>
+            <td>Numérica</td>
+            <td>Igual a la cantidad de zumbadores en la casilla donde se encuentra Karel.</td>
+        </tr>
+        <tr>
+            <td>currentRow</td>
+            <td>Numérica</td>
+            <td>Igual al número de fila en el que este Karel.</td>
+        </tr>
+        <tr>
+            <td>currentColumn</td>
+            <td>Numérica</td>
+            <td>Igual al número de columna en el que este Karel.</td>
+        </tr>
+        <tr>
+            <td>true</td>
+            <td>Condición</td>
+            <td>Siempre es verdadera.</td>
+        </tr>
+        <tr>
+            <td>false</td>
+            <td>Condición</td>
+            <td>Siempre es falsa.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="ejemplo" data-toc="Ejemplo" data-toc-depth="1"></a>
+</div>
+<h2>Ejemplo</h2>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">import</span> <span class="text-warning-emphasis">rekarel</span>.<span class="text-warning-emphasis">globals</span>;
+<span class="text-danger-emphasis">class</span> program <span class="text-danger-emphasis">{</span>
+    <span class="text-primary-emphasis">program</span> () <span class="text-danger-emphasis">{</span>
+        <span class="text-success-emphasis">// Deja todos los zumbadores de la mochila</span>
+        <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">beepersInBeeperBag</span>)
+            <span class="text-info-emphasis">putbeeper</span>();
+        <span class="text-success-emphasis">// Nunca se ejecuta, por lo que no hay un error de ejecución</span>
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">false</span>)
+            <span class="text-info-emphasis">putbeeper</span>();
+        <span class="text-info-emphasis">move</span>();
+        <span class="text-success-emphasis">// Gira tantas veces como zumbadores en el piso</span>
+        <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">beepersOnFloor</span>)
+            <span class="text-info-emphasis">turnleft</span>();
+        <span class="text-info-emphasis">move</span>();
+        <span class="text-success-emphasis">//Este ciclo se ejecuta siempre, hasta que no sea detenido desde adentro con un break o similar</span>
+        <span class="text-primary-emphasis">while</span> (<span class="text-warning-emphasis">true</span>) <span class="text-danger-emphasis">{</span>
+            <span class="text-primary-emphasis">if</span>(<span class="text-warning-emphasis">nextToABeeper</span>) <span class="text-danger-emphasis">{</span>
+                <span class="text-primary-emphasis">break</span>;
+            <span class="text-danger-emphasis">}</span>
+            <span class="text-info-emphasis">move</span>();
+        <span class="text-danger-emphasis">}</span>
+        <span class="text-info-emphasis">move</span>();
+        <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">currentRow</span>) <span class="text-danger-emphasis">{</span>
+            <span class="text-info-emphasis">pickbeeper</span>();
+        <span class="text-danger-emphasis">}</span>
+        <span class="text-info-emphasis">move</span>();
+        <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">currentColumn</span>) <span class="text-danger-emphasis">{</span>
+            <span class="text-info-emphasis">pickbeeper</span>();
+        <span class="text-danger-emphasis">}</span>
+        <span class="text-info-emphasis">turnoff</span>();
+    <span class="text-danger-emphasis">}</span>
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/globals/example.png" alt="Deja un solo zumbador" class="img-thumbnail">
+</div>
+
+@@include("../footer.html")

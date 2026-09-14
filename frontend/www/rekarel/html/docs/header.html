@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación</title>
+    <link rel="shortcut icon" href="@@webRoot/../img/karel-up.svg" type="image/x-icon">
+    <link rel="stylesheet" href="@@webRoot/../css/docsStyle.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- TODO: Move this into a stylesheet -->
+</head>
+
+<body data-bs-theme="light" data-root="@@webRoot">
+    <div class="sticky-top shadow-sm bg-body-tertiary">
+        <nav class="navbar">
+            <div class="container-md">
+                <a class="navbar-brand" href="@@webRoot">Documentación ReKarel</a>
+                <div class="d-inline ms-auto me-2 form-check form-switch">
+                    <label class="form-check-label" for="dayLightSet">
+                        <i class="bi bi-brightness-high-fill" id="dayLightIcon"></i>
+                        <span class="visually-hidden">Modo claro o oscuro</span>
+                    </label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="dayLightSet" title="Intercambiar el modo oscuro y claro">
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
+                    aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Navegación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body ps-0 pe-0" id="nav_list">
+                        <ul class="navbar-nav justify-content-end flex-grow-1">
+                            <li class="nav-item" id="intro_nav">
+                                <a class="nav-link active ps-3 pe-3" aria-current="page"
+                                    href="@@webRoot/">Introducción</a>
+                            </li>
+                            <!-- #region rekarel-->
+                            <li class="nav-item" data-end-crumb="rekarel">
+                                <a class="nav-link active ps-3 pe-3" aria-current="page"
+                                    href="@@webRoot/rekarel/">ReKarel</a>
+                            </li>
+                            <li class="nav-item">
+                                <div class="collapse bg-secondary-subtle" data-crumb="rekarel">
+                                    <ul class="dropdown-menu d-block bg-secondary-subtle border-0 rounded-0">
+                                        <li data-end-crumb="seleccion">
+                                            <a class="dropdown-item ps-3 pe-3" href="@@webRoot/rekarel/seleccion.html">Selección</a>
+                                        </li>
+                                        <li data-end-crumb="atajos">
+                                            <a class="dropdown-item ps-3 pe-3" href="@@webRoot/rekarel/atajos.html">Atajos de teclado</a>
+                                        </li>
+                                        <li data-end-crumb="modos_de_ejecucion">
+                                            <a class="dropdown-item ps-3 pe-3" href="@@webRoot/rekarel/modos_de_ejecucion.html">Modos de ejecución</a>
+                                        </li>
+                                        <li data-end-crumb="configuracion">
+                                            <a class="dropdown-item ps-3 pe-3" href="@@webRoot/rekarel/configuracion.html">Configuración</a>
+                                        </li> 
+                                        <li data-end-crumb="anotaciones">
+                                            <a class="dropdown-item ps-3 pe-3" href="@@webRoot/rekarel/anotaciones.html">Anotaciones</a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li data-end-crumb="migrar">
+                                            <a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/rekarel/migrar.html">Migrar desde Karel.js</a>
+                                        </li>
+                                        <li data-end-crumb="comparativa">
+                                            <a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/rekarel/comparativa.html">Comparativa con
+                                                Karel.js</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- #endregion -->
+                            <!-- #region Java-->
+                            <li class="nav-item" data-end-crumb="java">
+                                <a class="nav-link active ps-3 pe-3" aria-current="page"
+                                    href="@@webRoot/java/">Java</a>
+                            </li>
+                            <li class="nav-item">
+                                <div class="collapse bg-secondary-subtle" data-crumb="java">
+                                    <ul class="dropdown-menu d-block bg-secondary-subtle border-0 rounded-0">
+                                        <li data-end-crumb="instrucciones"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/instrucciones.html">Instrucciones</a>
+                                        </li>
+                                        <li data-end-crumb="sentencia_if"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/sentencia_if.html">Sentencia if</a>
+                                        </li>
+                                        <li data-end-crumb="condiciones"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/condiciones.html">Condiciones</a>
+                                        </li>
+                                        <li data-end-crumb="operador_logico"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/operador_logico.html">Operador lógico</a>
+                                        </li>
+                                        <li data-end-crumb="operador_comparativo"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/operador_comparativo.html">Operador
+                                                comparativo</a>
+                                        </li>
+                                        <li data-end-crumb="jerarquia"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/jerarquia.html">Jerarquía de operaciones</a>
+                                        </li>
+                                        <li data-end-crumb="sentencia_iterate"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/sentencia_iterate.html">Sentencia iterate</a>
+                                        </li>
+                                        <li data-end-crumb="sentencia_while"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/sentencia_while.html">Sentencia while</a>
+                                        </li>
+                                        <li data-end-crumb="continue_y_break"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/continue_y_break.html">Sentencia continue y break</a>
+                                        </li>
+                                        <li data-end-crumb="funciones"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/funciones.html">Funciones</a>
+                                        </li>
+                                        <li data-end-crumb="succ_y_pred"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/succ_y_pred.html">Succ y pred</a>
+                                        </li>                                        
+                                        <li data-end-crumb="import"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/import.html">Import</a>
+                                        </li>
+                                        <li data-end-crumb="globales"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/java/globales.html">Globales</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- #endregion -->
+                             <!-- #region Pascal-->
+                            <li class="nav-item" data-end-crumb="pascal">
+                                <a class="nav-link active ps-3 pe-3" aria-current="page"
+                                    href="@@webRoot/pascal/">Pascal</a>
+                            </li>
+                            <li class="nav-item">
+                                <div class="collapse bg-secondary-subtle" data-crumb="pascal">
+                                    <ul class="dropdown-menu d-block bg-secondary-subtle border-0 rounded-0">
+                                        <li data-end-crumb="instrucciones"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/instrucciones.html">Instrucciones</a>
+                                        </li>
+                                        <li data-end-crumb="sentencia_si"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/sentencia_si.html">Sentencia si</a>
+                                        </li>
+                                        <li data-end-crumb="condiciones"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/condiciones.html">Condiciones</a>
+                                        </li>
+                                        <li data-end-crumb="operador_logico"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/operador_logico.html">Operador lógico</a>
+                                        </li>
+                                        <li data-end-crumb="operador_comparativo"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/operador_comparativo.html">Operador
+                                                comparativo</a>
+                                        </li>
+                                        <li data-end-crumb="jerarquia"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/jerarquia.html">Jerarquía de operaciones</a>
+                                        </li>
+                                        <li data-end-crumb="sentencia_repetir"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/sentencia_repetir.html">Sentencia repetir</a>
+                                        </li>
+                                        <li data-end-crumb="sentencia_mientras"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/sentencia_mientras.html">Sentencia mientras</a>
+                                        </li>
+                                        <li data-end-crumb="continua_y_rompe"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/continua_y_rompe.html">Sentencia continua y rompe</a>
+                                        </li>
+                                        <li data-end-crumb="funciones"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/funciones.html">Funciones</a>
+                                        </li>
+                                        <li data-end-crumb="sucede_y_precede"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/sucede_y_precede.html">Sucede y precede</a>
+                                        </li>
+                                        <li data-end-crumb="usa"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/usa.html">Usa</a>
+                                        </li>
+                                        <li data-end-crumb="globales"><a class="dropdown-item ps-3 pe-3"
+                                                href="@@webRoot/pascal/globales.html">Globales</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- #endregion -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <nav aria-label="breadcrumb" class="bg-body-secondary">
+            <div class="container-md">
+                <ol class="breadcrumb breadcrumb-chevron p-2 pb-1 pt-1" id="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@@webRoot/" class="link-body-emphasis text-decoration-none"><i
+                                class="bi bi-house-door-fill"></i></a>
+                    </li>
+                </ol>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container-xl pt-4">
+        <div class="row">
+            <div class="col-12 col-lg-2 ">
+                <div class="position-sticky bottom-0 toc-container">
+                    <span class="h4">Contenido</span>
+                    <nav>
+                        <ul id="toc"></ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-12 col-lg-9 col-xl-10">

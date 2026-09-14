@@ -1,0 +1,28 @@
+<div id="resizeWorldModal" class="modal fade" tabindex="-1" aria-labelledby="resizeWorldModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cambiar el tamaño del mundo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body row">
+                <div class="mb-2">
+                    <p class="text-danger mt-2" id="resizeError" hidden><i class="bi bi-exclamation-diamond-fill"></i>El área del mundo debe estar entre 1 y 4,000,000.</p>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-text bg-body-secondary border-secondary col-sm-12 col-md-4">Filas</div>
+                    <input type="number"  min="1" max="1000" name="rowField" id="rowField" value="100" class="col-sm-12 col-md-8  form-control border-secondary">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-text bg-body-secondary border-secondary col-sm-12 col-md-4">Columnas</div>
+                    <input type="number"  min="1" max="1000" name="columnField" id="columnField" value="100" class="col-sm-12 col-md-8 form-control border-secondary">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Canelar</button>
+                <a href="#" class="btn btn-primary" id="resizeBtn" data-bs-dismiss="modal">Aplicar</a>
+            </div>
+        </div>
+    </div>
+
+</div>

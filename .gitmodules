@@ -1,22 +1,4 @@
-[submodule "frontend/www/karel.js"]
-	path = frontend/www/karel.js
-	url = https://github.com/omegaup/karel.js.git
-[submodule "q2a"]
-	path = frontend/www/preguntas
-	url = https://github.com/omegaup/question2answer.git
-[submodule "frontend/www/third_party/js/iso-3166-2.js"]
-	path = frontend/www/third_party/js/iso-3166-2.js
-	url = https://github.com/omegaup/iso-3166-2.js
-[submodule "frontend/www/js/mathjax"]
-	path = frontend/www/third_party/js/mathjax
-	url = https://github.com/mathjax/MathJax.git
 [submodule "frontend/www/js/pagedown"]
 	path = frontend/www/third_party/js/pagedown
 	url = https://github.com/omegaup/pagedown.git
 	shallow = true
-[submodule "okfn/csv.js"]
-	path = frontend/www/third_party/js/csv.js
-	url = https://github.com/okfn/csv.js/
-[submodule "frontend/www/rekarel"]
-	path = frontend/www/rekarel
-	url = https://github.com/kishtarn555/ReKarel

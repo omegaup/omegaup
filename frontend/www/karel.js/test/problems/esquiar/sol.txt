@@ -1,0 +1,54 @@
+iniciar-programa
+    { vamos a usar la variable |dirección| para saber hacia donde tenemos
+      que ir en el paso diagonal. si |dirección| es 0, vamos hacia el este,
+      si es 1, vamos al oeste. }
+    define-nueva-instrucción paso-diagonal(dirección) como inicio
+        { si ya había un zumbador aquí, sólo deja uno. }
+        si no junto-a-zumbador entonces deja-zumbador;
+        deja-zumbador;
+        
+        { tenemos que ver al sur al inicio del paso diagonal. }
+        mientras no-orientado-al-sur hacer gira-izquierda;
+        
+        { puede ser que lleguemos a la orilla de abajo del mundo. }
+        si no frente-libre entonces apagate;
+        
+        { mitad del paso diagonal. aquí debemos estar viendo hacia abajo. }
+        avanza;
+        { aquí el problema dice que nunca habrán zumbadores. }
+        deja-zumbador;
+        deja-zumbador;
+        
+        { aquí es donde usamos |dirección| para saber en qué dirección mirar. }
+        si si-es-cero(dirección) entonces inicio
+            mientras no-orientado-al-este hacer gira-izquierda;
+        fin si-no inicio
+            mientras no-orientado-al-oeste hacer gira-izquierda;
+        fin;
+        
+        { podemos chocar con una pared de un lado. apaguémonos antes de chocar. }
+        si no frente-libre entonces apagate;
+        avanza;
+        
+        { listo, terminamos el paso diagonal. ahora hay que ver si tenemos que
+          cambiar de dirección o no. }
+        si junto-a-zumbador entonces inicio
+            { estamos encima de un zumbador. hay que cambiar |dirección|. }
+            si si-es-cero(dirección) entonces inicio
+                paso-diagonal(1);
+            fin si-no inicio
+                paso-diagonal(0);
+            fin;
+        fin si-no inicio
+            { |dirección| se queda igual. }
+            paso-diagonal(dirección);
+        fin;
+    fin;
+    
+    inicia-ejecución
+        { solamente tenemos que llamar paso-diagonal() una vez. 
+          paso-diagonal() va a llamarse a sí misma hasta que lleguemos a una
+          pared. }
+        paso-diagonal(0);
+    termina-ejecución
+finalizar-programa

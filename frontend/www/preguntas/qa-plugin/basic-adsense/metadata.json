@@ -1,0 +1,11 @@
+{
+	"name": "Basic AdSense",
+	"description": "Provides a basic widget for displaying Google Adsense ads",
+	"version": "1.0",
+	"date": "2011-03-27",
+	"author": "Question2Answer",
+	"author_uri": "http://www.question2answer.org",
+	"license": "GPLv2",
+	"min_q2a": "1.4",
+	"load_order": "after_db_init"
+}

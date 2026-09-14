@@ -1,0 +1,112 @@
+<ejecucion>
+	<condiciones instruccionesMaximasAEjecutar="10000000" longitudStack="65000"></condiciones>
+	<mundos>
+		<mundo nombre="mundo_0" ancho="100" alto="100">
+			<monton x="1" y="1" zumbadores="1"></monton>
+			<monton x="2" y="1" zumbadores="1"></monton>
+			<monton x="3" y="1" zumbadores="1"></monton>
+			<monton x="4" y="1" zumbadores="1"></monton>
+			<monton x="5" y="1" zumbadores="1"></monton>
+			<monton x="6" y="1" zumbadores="1"></monton>
+			<monton x="7" y="1" zumbadores="1"></monton>
+			<monton x="8" y="1" zumbadores="1"></monton>
+			<monton x="9" y="1" zumbadores="1"></monton>
+			<monton x="10" y="1" zumbadores="1"></monton>
+			<monton x="11" y="1" zumbadores="1"></monton>
+			<monton x="12" y="1" zumbadores="1"></monton>
+			<monton x="13" y="1" zumbadores="1"></monton>
+			<monton x="14" y="1" zumbadores="1"></monton>
+			<monton x="15" y="1" zumbadores="1"></monton>
+			<monton x="16" y="1" zumbadores="1"></monton>
+			<monton x="17" y="1" zumbadores="1"></monton>
+			<monton x="18" y="1" zumbadores="1"></monton>
+			<monton x="19" y="1" zumbadores="1"></monton>
+			<monton x="20" y="1" zumbadores="1"></monton>
+			<monton x="21" y="1" zumbadores="1"></monton>
+			<monton x="22" y="1" zumbadores="1"></monton>
+			<monton x="23" y="1" zumbadores="1"></monton>
+			<monton x="24" y="1" zumbadores="1"></monton>
+			<monton x="25" y="1" zumbadores="1"></monton>
+			<monton x="26" y="1" zumbadores="1"></monton>
+			<monton x="27" y="1" zumbadores="1"></monton>
+			<monton x="28" y="1" zumbadores="1"></monton>
+			<monton x="29" y="1" zumbadores="1"></monton>
+			<monton x="30" y="1" zumbadores="1"></monton>
+			<monton x="31" y="1" zumbadores="1"></monton>
+			<monton x="32" y="1" zumbadores="1"></monton>
+			<monton x="33" y="1" zumbadores="1"></monton>
+			<monton x="34" y="1" zumbadores="1"></monton>
+			<monton x="35" y="1" zumbadores="1"></monton>
+			<monton x="36" y="1" zumbadores="1"></monton>
+			<monton x="37" y="1" zumbadores="1"></monton>
+			<monton x="38" y="1" zumbadores="1"></monton>
+			<monton x="39" y="1" zumbadores="1"></monton>
+			<monton x="40" y="1" zumbadores="1"></monton>
+			<monton x="41" y="1" zumbadores="1"></monton>
+			<monton x="42" y="1" zumbadores="1"></monton>
+			<monton x="43" y="1" zumbadores="1"></monton>
+			<monton x="44" y="1" zumbadores="1"></monton>
+			<monton x="45" y="1" zumbadores="1"></monton>
+			<monton x="46" y="1" zumbadores="1"></monton>
+			<monton x="47" y="1" zumbadores="1"></monton>
+			<monton x="48" y="1" zumbadores="1"></monton>
+			<monton x="49" y="1" zumbadores="1"></monton>
+			<monton x="50" y="1" zumbadores="1"></monton>
+			<monton x="51" y="1" zumbadores="1"></monton>
+			<monton x="52" y="1" zumbadores="1"></monton>
+			<monton x="53" y="1" zumbadores="1"></monton>
+			<monton x="54" y="1" zumbadores="1"></monton>
+			<monton x="55" y="1" zumbadores="1"></monton>
+			<monton x="56" y="1" zumbadores="1"></monton>
+			<monton x="57" y="1" zumbadores="1"></monton>
+			<monton x="58" y="1" zumbadores="1"></monton>
+			<monton x="59" y="1" zumbadores="1"></monton>
+			<monton x="60" y="1" zumbadores="1"></monton>
+			<monton x="61" y="1" zumbadores="1"></monton>
+			<monton x="62" y="1" zumbadores="1"></monton>
+			<monton x="63" y="1" zumbadores="1"></monton>
+			<monton x="64" y="1" zumbadores="1"></monton>
+			<monton x="65" y="1" zumbadores="1"></monton>
+			<monton x="66" y="1" zumbadores="1"></monton>
+			<monton x="67" y="1" zumbadores="1"></monton>
+			<monton x="68" y="1" zumbadores="1"></monton>
+			<monton x="69" y="1" zumbadores="1"></monton>
+			<monton x="70" y="1" zumbadores="1"></monton>
+			<monton x="71" y="1" zumbadores="1"></monton>
+			<monton x="72" y="1" zumbadores="1"></monton>
+			<monton x="73" y="1" zumbadores="1"></monton>
+			<monton x="74" y="1" zumbadores="1"></monton>
+			<monton x="75" y="1" zumbadores="1"></monton>
+			<monton x="76" y="1" zumbadores="1"></monton>
+			<monton x="77" y="1" zumbadores="1"></monton>
+			<monton x="78" y="1" zumbadores="1"></monton>
+			<monton x="79" y="1" zumbadores="1"></monton>
+			<monton x="80" y="1" zumbadores="1"></monton>
+			<monton x="81" y="1" zumbadores="1"></monton>
+			<monton x="82" y="1" zumbadores="1"></monton>
+			<monton x="83" y="1" zumbadores="1"></monton>
+			<monton x="84" y="1" zumbadores="1"></monton>
+			<monton x="85" y="1" zumbadores="1"></monton>
+			<monton x="86" y="1" zumbadores="1"></monton>
+			<monton x="87" y="1" zumbadores="1"></monton>
+			<monton x="88" y="1" zumbadores="1"></monton>
+			<monton x="89" y="1" zumbadores="1"></monton>
+			<monton x="90" y="1" zumbadores="1"></monton>
+			<monton x="91" y="1" zumbadores="1"></monton>
+			<monton x="92" y="1" zumbadores="1"></monton>
+			<monton x="93" y="1" zumbadores="1"></monton>
+			<monton x="94" y="1" zumbadores="1"></monton>
+			<monton x="95" y="1" zumbadores="1"></monton>
+			<monton x="96" y="1" zumbadores="1"></monton>
+			<monton x="97" y="1" zumbadores="1"></monton>
+			<monton x="98" y="1" zumbadores="1"></monton>
+			<monton x="99" y="1" zumbadores="1"></monton>
+			<monton x="100" y="1" zumbadores="1"></monton>
+		</mundo>
+	</mundos>
+	<programas tipoEjecucion="CONTINUA" intruccionesCambioContexto="1" milisegundosParaPasoAutomatico="0">
+		<programa nombre="p1" ruta="{$2$}" mundoDeEjecucion="mundo_0" xKarel="1" yKarel="1" direccionKarel="NORTE" mochilaKarel="0">
+			<despliega tipo="ORIENTACION"></despliega>
+		</programa>
+	</programas>
+</ejecucion>

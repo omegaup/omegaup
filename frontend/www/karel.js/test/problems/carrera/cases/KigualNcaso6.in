@@ -1,0 +1,46 @@
+<ejecucion>
+	<condiciones instruccionesMaximasAEjecutar="10000000000" longitudStack="65000"></condiciones>
+	<mundos>
+		<mundo nombre="mundo_0" ancho="100" alto="100">
+			<monton x="1" y="1" zumbadores="32"></monton>
+			<monton x="10" y="7" zumbadores="85"></monton>
+			<monton x="11" y="7" zumbadores="14"></monton>
+			<monton x="12" y="7" zumbadores="84"></monton>
+			<monton x="9" y="8" zumbadores="87"></monton>
+			<monton x="10" y="8" zumbadores="12"></monton>
+			<monton x="12" y="8" zumbadores="13"></monton>
+			<monton x="13" y="8" zumbadores="86"></monton>
+			<monton x="8" y="9" zumbadores="89"></monton>
+			<monton x="9" y="9" zumbadores="11"></monton>
+			<monton x="13" y="9" zumbadores="12"></monton>
+			<monton x="14" y="9" zumbadores="88"></monton>
+			<monton x="7" y="10" zumbadores="91"></monton>
+			<monton x="8" y="10" zumbadores="9"></monton>
+			<monton x="14" y="10" zumbadores="10"></monton>
+			<monton x="15" y="10" zumbadores="90"></monton>
+			<monton x="7" y="11" zumbadores="7"></monton>
+			<monton x="15" y="11" zumbadores="8"></monton>
+			<monton x="7" y="12" zumbadores="93"></monton>
+			<monton x="8" y="12" zumbadores="5"></monton>
+			<monton x="14" y="12" zumbadores="6"></monton>
+			<monton x="15" y="12" zumbadores="92"></monton>
+			<monton x="8" y="13" zumbadores="95"></monton>
+			<monton x="9" y="13" zumbadores="3"></monton>
+			<monton x="13" y="13" zumbadores="4"></monton>
+			<monton x="14" y="13" zumbadores="94"></monton>
+			<monton x="9" y="14" zumbadores="97"></monton>
+			<monton x="10" y="14" zumbadores="1"></monton>
+			<monton x="12" y="14" zumbadores="2"></monton>
+			<monton x="13" y="14" zumbadores="96"></monton>
+			<monton x="10" y="15" zumbadores="1"></monton>
+			<monton x="11" y="15" zumbadores="99"></monton>
+			<monton x="12" y="15" zumbadores="1"></monton>
+			<posicionDump x="1" y="1" />
+		</mundo>
+	</mundos>
+	<programas tipoEjecucion="CONTINUA" intruccionesCambioContexto="1" milisegundosParaPasoAutomatico="0">
+		<programa nombre="p1" ruta="{$2$}" mundoDeEjecucion="mundo_0" xKarel="1" yKarel="1" direccionKarel="NORTE" mochilaKarel="INFINITO">
+			<despliega tipo="MUNDO"></despliega>
+		</programa>
+	</programas>
+</ejecucion>

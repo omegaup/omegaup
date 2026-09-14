@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script type="text/javascript">
+      function parentPostMessage(id, data, error) {
+        var message = JSON.stringify({ id: id, data: data, error: error });
+        return parent.postMessage(message, '*');
+      }
+      (function () {
+        if (!window.Worker) {
+          parentPostMessage(void 0, void 0, 'WebWorkers unsupported');
+          return;
+        }
+        var pending = {};
+        var SandboxedWorker = function (id, options) {
+          this.id = id;
+          this.options = {
+            timeout: 0,
+          };
+          if (!options) {
+            options = {};
+          }
+          for (var prop in options) {
+            if (!options.hasOwnProperty(prop)) continue;
+            this.options[prop] = options[prop];
+          }
+          this.worker = null;
+          this.timer = null;
+          return this;
+        };
+        SandboxedWorker.prototype = {
+          constructor: SandboxedWorker,
+          report: function (data, error) {
+            parentPostMessage(this.id, data, error);
+          },
+          run: function () {
+            var self = this;
+            if (self.options.timeout) {
+              self.timer = setTimeout(function () {
+                self.terminate();
+                self.report(void 0, 'timeout');
+              }, self.options.timeout);
+            }
+            self.worker = new window.Worker('js/worker.js');
+            self.worker.addEventListener('message', function (message) {
+              var data = JSON.parse(message.data);
+              self.report(data.data, data.error);
+            });
+            self.worker.postMessage(JSON.stringify(self.options.input));
+          },
+          terminate: function () {
+            if (!this.worker) {
+              return;
+            }
+            if (this.timer) {
+              clearTimeout(this.timer);
+            }
+            this.timer = null;
+            this.worker.onmessage = null;
+            this.worker.terminate();
+            this.worker = null;
+            delete pending[this.id];
+          },
+        };
+        return window.addEventListener('message', function (message) {
+          var data = JSON.parse(message.data);
+          if (data.command === 'run') {
+            if (data.id in pending) {
+              parentPostMessage(data.id, void 0, 'running');
+              return;
+            }
+            var sw = new SandboxedWorker(data.id, data.options);
+            pending[data.id] = sw;
+            sw.run();
+          } else if (data.command === 'terminate') {
+            if (!(data.id in pending)) {
+              parentPostMessage(data.id, void 0, 'terminated');
+              return;
+            }
+            pending[data.id].terminate();
+          }
+        });
+      }.call(this));
+    </script>
+    <title></title>
+  </head>
+  <body></body>
+</html>

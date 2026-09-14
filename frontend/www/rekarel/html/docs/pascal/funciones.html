@@ -1,0 +1,258 @@
+@@include("../header.html")
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Funciones</h1>
+
+<p>Una funcion en Karel es una instruccion definida por el usuario que puede ser llamada en cualquier momento. Se colocan despues de <span class="text-danger-emphasis">iniciar-programa</span> y arriba del bloque de <span class="text-danger-emphasis">ejecución</span>.</p>
+
+
+<p>Tienen la siguiente estructura</p>
+
+
+<code class="text-body">
+    <pre class="border p-2">
+<span class="text-primary-emphasis">define-nueva-instruccion</span> NOMBRE <span class="text-primary-emphasis">como</span>
+    <span class="text-info-emphasis">INSTRUCCION;</span>
+</pre>    
+</code>
+
+
+
+<p>A continuación se muestra un ejemplo de una función que gira a la derecha</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> gira-derecha <span class="text-primary-emphasis">como</span> 
+    <span class="text-danger-emphasis">inicio</span> 
+        <span class="text-info-emphasis">gira-izquierda;</span> 
+        <span class="text-info-emphasis">gira-izquierda;</span> 
+        <span class="text-info-emphasis">gira-izquierda;</span> 
+    <span class="text-danger-emphasis">fin;</span> 
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span> 
+        gira-derecha; 
+        <span class="text-info-emphasis">apagate;</span> 
+    <span class="text-danger-emphasis">termina-ejecucion </span>
+<span class="text-danger-emphasis">finalizar-programa</span> 
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="alias_define" data-toc="Alias (define)" data-toc-depth="2"></a>
+</div>
+<h3>Alias (define)</h3>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p>Puedes usar el alias <span class="text-primary-emphasis">define</span> en vez de <span class="text-primary-emphasis">define-nueva-instruccion</span>.</p>
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define</span> gira-derecha <span class="text-primary-emphasis">como</span> 
+<span class="text-danger-emphasis">inicio</span> 
+    <span class="text-info-emphasis">gira-izquierda;</span> 
+    <span class="text-info-emphasis">gira-izquierda;</span> 
+    <span class="text-info-emphasis">gira-izquierda;</span> 
+<span class="text-danger-emphasis">fin;</span> 
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="parametros" data-toc="Parámetros" data-toc-depth="1"></a>
+</div>
+<h2>Parámetros</h2>
+
+<p>Las funciones pueden recibir parámetros numéricos que pueden ser usados dentro de la función para cambiar su comportamiento, llevar una cuenta, etc.</p>
+
+<p>Los parámetros se especifican después del nombre de la función:</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define</span> NOMBRE (<span class="text-warning-emphasis">PARAMETROS</span>) <span class="text-primary-emphasis">como</span>
+    <span class="text-secondary">INSTRUCCION</span>;
+</pre>
+</code>
+
+<p>Veamos un ejemplo, donde creemos una función que deje tantos zumbadores como se pase en el parámetro</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-primary-emphasis">define</span> dejaZumbadores (cantidad) <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>
+        <span class="text-primary-emphasis">repetir</span> cantidad <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">deja-zumbador</span>;
+    <span class="text-danger-emphasis">fin;</span>   
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        dejaZumbadores(<span class="text-warning-emphasis">3</span>);
+        <span class="text-info-emphasis">move</span>();
+        dejaZumbadores(<span class="text-warning-emphasis">5</span>);
+        <span class="text-info-emphasis">move</span>();
+        dejaZumbadores(<span class="text-warning-emphasis">2</span>);
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/funciones/parametros.png" alt="Deja 3, 5 y 2" class="img-thumbnail">
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="multiples" data-toc="Múltiples parámetros" data-toc-depth="2"></a>
+</div>
+<h3>Múltiples parámetros</h3>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+<p>Una función puede recibir más de un parámetro, cada parámetro debe estar separado por comas tanto en la definición de la función como en la llamada, veamos un ejemplo:</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-primary-emphasis">define</span> avanzaDejaAvanza (pasos1, cantidad, pasos2) <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>
+        <span class="text-primary-emphasis">repetir</span> pasos1 <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">avanza</span>;
+        
+        <span class="text-primary-emphasis">repetir</span> cantidad <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">deja-zumbador</span>;
+
+        <span class="text-primary-emphasis">repetir</span> pasos2 <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">avanza</span>;
+
+        <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        avanzaDejaAvanza(<span class="text-warning-emphasis">2</span>, <span class="text-warning-emphasis">8</span>, <span class="text-warning-emphasis">1</span>);    
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/funciones/multiple.png" alt="Avanza 2, deja 8 y avanza" class="img-thumbnail">
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="retorno" data-toc="Valor de retorno" data-toc-depth="1"></a>
+</div>
+<h2>Valor de retorno</h2>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+<p>Las funciones en Karel además pueden tener un valor de retorno, este puede ser una cantidad numérica o una condición booleana.</p>
+
+<p>Para usar un valor de retorno necesitamos cambiar la definición de la instrucción para que incluya el tipo de dato a ser retornado por la función:</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">TIPO</span> NOMBRE <span class="text-primary-emphasis">como</span> 
+    <span class="text-secondary">INSTRUCCIONES</span>;
+</pre>
+</code>
+
+O con parámetros:
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">TIPO</span> NOMBRE <span class="text-primary-emphasis">como</span>
+    <span class="text-secondary">INSTRUCCION</span>;
+</pre>
+</code>
+
+<p>Una vez se especifica el tipo, se retorna el valor usando la sentencia <span class="bg-secondary-subtle border rounded ps-1 pe-1 text-nowrap"><span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">valor</span>;</span>. Todo los flujos de la función deben retornar un valor.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="entero" data-toc="Entero" data-toc-depth="2"></a>
+</div>
+<h3>Valor de retorno entero</h3>
+
+<p>Para retornar un tipo entero basta con definir la instrucción de tipo <span class="text-primary-emphasis">define-cálculo</span>.</p>
+
+<p>Veamos un ejemplo de un código que se orienta al norte.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-success-emphasis">{ Calcula cuantos giros se necesitan para orientarse al norte }</span>
+    <span class="text-primary-emphasis">define-calculo</span> alNorte <span class="text-primary-emphasis">como</span>    
+    <span class="text-danger-emphasis">inicio</span>
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">orientado-al-norte</span> <span class="text-primary-emphasis">entonces</span>
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">0</span>;
+        <span class="text-danger-emphasis">fin</span>;
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">orientado-al-este</span> <span class="text-primary-emphasis">entonces</span>        
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">1</span>;
+        <span class="text-danger-emphasis">fin</span>;
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">orientado-al-sur</span> <span class="text-primary-emphasis">entonces</span>        
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">2</span>;
+        <span class="text-danger-emphasis">fin</span>;
+        <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">3</span>;
+    <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span> 
+        <span class="text-success-emphasis">{ Usa la llamada como un número, gira tantas veces como retorne alNorte }</span>
+        <span class="text-primary-emphasis">repetir</span> alNorte <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">gira-izquierda</span>;
+        
+    <span class="text-danger-emphasis">termina-ejecucion</span> 
+<span class="text-danger-emphasis">finalizar-programa</span> 
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="bool" data-toc="Booleano" data-toc-depth="2"></a>
+</div>
+<h3>Valor de retorno booleano</h3>
+
+<p>Para retornar un tipo booleano, es decir, que sea verdadero o falso, se usa el tipo <span class="text-primary-emphasis">define-condición</span>.</p>
+
+<p>Veamos un ejemplo de un código quita los zumbadores si estos son 1, 3 o 5.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">usa</span> <span class="text-warning-emphasis">rekarel</span>.<span class="span text-warning-emphasis">globales</span>;
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-success-emphasis">{ Determina si el suelo tiene 1, 3 o 5 zumbadores }</span>
+    <span class="text-primary-emphasis">define-condicion</span> revisa <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> == <span class="text-warning-emphasis">1</span> <span class="text-primary-emphasis">entonces</span>
+            <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">verdadero</span>;
+        
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> == <span class="text-warning-emphasis">3</span> <span class="text-primary-emphasis">entonces</span>
+            <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">verdadero</span>;
+        
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> == <span class="text-warning-emphasis">5</span> <span class="text-primary-emphasis">entonces</span>
+            <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">verdadero</span>;
+        
+        <span class="text-primary-emphasis">regresa</span> <span class="text-warning-emphasis">falso</span>;
+    <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        <span class="text-success-emphasis">{ Quita los zumbadores validos }</span>
+        <span class="text-primary-emphasis">si</span> revisa <span class="text-primary-emphasis">entonces</span>
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">mientras</span> <span class="text-warning-emphasis">junto-a-zumbador</span> <span class="text-primary-emphasis">hacer</span>
+                <span class="text-info-emphasis">coge-zumbador</span>;
+        <span class="text-danger-emphasis">fin</span>;
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="prototipo" data-toc="Prototipo" data-toc-depth="1"></a>
+</div>
+<h2>Prototipo</h2>
+
+<div class="alert alert-danger"><b>Aviso:</b> A partir de ReKarel Pascal 2.0.0, los prototipos son opcionales y se consideran <b>deprecados</b>, por lo que no son explicados en esta documentación. Pero se mantienen con motivos de compatibilidad.</div>
+
+@@include("../footer.html")

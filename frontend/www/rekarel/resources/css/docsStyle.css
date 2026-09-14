@@ -1,0 +1,52 @@
+[data-bs-theme="light"]
+.nav-active-head {
+    box-shadow: 0 4px 2px -2px rgb(155, 154, 154);
+    z-index: 2;
+}
+
+[data-bs-theme="dark"]
+.nav-active-head {
+    box-shadow: 0 4px 2px -2px rgb(5, 5, 5);
+    z-index: 2;
+}
+
+.breadcrumb-chevron {
+    --bs-breadcrumb-divider: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d'%3E%3Cpath fill-rule='evenodd' d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    gap: .5rem;
+}
+
+.toc-container {
+    top: 8rem;    
+    max-height: calc(100vh - 9rem);
+    overflow-y: auto;
+}
+
+.toc-container ul {
+    list-style: none
+}
+.toc-container ul li {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.toc-container a {
+    border-left: 5px solid var(--bs-secondary-color);
+    padding-left: 5px;
+    text-decoration: none;
+    color: var(--bs-body-color)
+}
+
+.toc-container a {
+    text-decoration: none;
+    color: var(--bs-body-color)
+}
+.toc-container a:hover {
+    text-decoration: underline;
+    color: var(--bs-body-color)
+}
+
+
+[data-toc] {
+    top: -7rem;
+    position:absolute;
+}

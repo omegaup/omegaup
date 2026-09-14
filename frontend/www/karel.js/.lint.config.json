@@ -1,0 +1,22 @@
+{
+	"lint": {
+		"javascript": {
+			"whitelist": [
+				".*\\.js$"
+			],
+			"blacklist": [
+				"^test/problems/.*",
+				"^js/karel(java|ruby|pascal).js$",
+				"^lib/.*"
+			]
+		},
+		"html": {
+			"whitelist": [
+				".*\\.html$"
+			],
+			"blacklist": [
+				"^test/problems/.*"
+			]
+		}
+	}
+}

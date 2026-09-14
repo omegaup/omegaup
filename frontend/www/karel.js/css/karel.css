@@ -1,0 +1,14 @@
+.cm-s-karel span.cm-keyword {color: rgb(147, 15, 128); }
+.cm-s-karel span.cm-indent {color: rgb(60, 76, 114); }
+.cm-s-karel span.cm-dedent {color: rgb(60, 76, 114); }
+.cm-s-karel span.cm-atom {color: rgb(6, 150, 14);}
+.cm-s-karel span.cm-number {color: rgb(0, 0, 205);}
+.cm-s-karel span.cm-def {color: rgb(0, 0, 162);}
+.cm-s-karel span.cm-variable {color: black; }
+.cm-s-karel span.cm-operator {color: rgb(104, 118, 135);}
+.cm-s-karel span.cm-comment {color: rgb(35, 110, 36); font-style: italic;}
+.cm-s-karel span.cm-builtin {color: rgb(49, 132, 149);}
+.cm-s-karel span.cm-error {color: #f00;}
+
+.cm-s-karel .CodeMirror-activeline-background {background: #e8f2ff !important;}
+.cm-s-karel .CodeMirror-matchingbracket {outline:1px solid grey;color:black !important;background:yellow;}

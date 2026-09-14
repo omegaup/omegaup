@@ -1,0 +1,75 @@
+class program {
+
+void Girar(n) {
+    iterate(n) turnleft();
+}
+
+void Explota(n) {
+    if (!iszero(n) &&
+        nextToABeeper) {
+        pickbeeper();
+        Explota(pred(n));
+        putbeeper();
+    } else if (iszero(n) &&
+        notNextToABeeper) {
+        turnleft();             
+    }
+}
+
+void DarPasoAdelante() {
+    if (frontIsBlocked) {
+        if (facingEast) {
+            turnleft();
+            if (frontIsBlocked)
+                turnoff();
+            else move();
+            turnleft();
+        } else {
+            Girar(3);
+            if (frontIsBlocked)
+                turnoff();
+            else move();
+            Girar(3);
+        }
+    } else move();
+}
+
+void RecorrerMundo(n) {
+    if (nextToABeeper) {
+        Explota(n);
+        if (facingNorth ||
+            facingSouth) {
+            turnoff();
+        }
+        Explota(pred(n));
+        if (facingNorth ||
+            facingSouth) {
+            turnleft();
+            if (frontIsClear) {
+                move();
+                turnoff();
+            }
+            Girar(2);
+        }
+        Explota(succ(n));
+        if (facingNorth ||
+            facingSouth) {
+            Girar(3);
+            if (frontIsClear) {
+                move();
+                turnoff();
+            }
+        }
+    }
+    DarPasoAdelante();
+    RecorrerMundo(succ(n));
+}
+
+program() {
+    while (notFacingEast)
+        turnleft();
+    RecorrerMundo(0);
+    turnoff();
+}
+
+}

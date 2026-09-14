@@ -1,0 +1,111 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Globales</h1>
+<a class="badge text-bg-secondary rounded-pill text-decoration-none" title="Requiere importar rekarel.globals"
+    href="usa.html">
+    usa rekarel.globals
+</a>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p><a href="usa.html">Importando</a> la librería <em class="text-warning-emphasis">rekarel.globals</em>, uno puede obtener acceso a varias globales
+    descritas abajo.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>zumbadores-en-la-mochila</td>
+            <td>Numérica</td>
+            <td>Igual a la cantidad de zumbadores en la mochila de Karel.</td>
+        </tr>
+        <tr>
+            <td>zumbadores-del-piso</td>
+            <td>Numérica</td>
+            <td>Igual a la cantidad de zumbadores en la casilla donde se encuentra Karel.</td>
+        </tr>
+        <tr>
+            <td>fila-actual</td>
+            <td>Numérica</td>
+            <td>Igual al número de fila en el que este Karel.</td>
+        </tr>
+        <tr>
+            <td>columna-actual</td>
+            <td>Numérica</td>
+            <td>Igual al número de columna en el que este Karel.</td>
+        </tr>
+        <tr>
+            <td>verdadero</td>
+            <td>Condición</td>
+            <td>Siempre es verdadera.</td>
+        </tr>
+        <tr>
+            <td>falso</td>
+            <td>Condición</td>
+            <td>Siempre es falsa.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="ejemplo" data-toc="Ejemplo" data-toc-depth="1"></a>
+</div>
+<h2>Ejemplo</h2>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">usa</span> <span class="text-warning-emphasis">rekarel</span>.<span class="text-warning-emphasis">globales</span>;
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        <span class="text-success-emphasis">{ Deja todos los zumbadores de la mochila }</span>
+        <span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">zumbadores-en-la-mochila</span> <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">deja-zumbador</span>;
+        
+        <span class="text-success-emphasis">{ Nunca se ejecuta, por lo que no hay un error de ejecución }</span>
+        <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">falso</span> <span class="text-primary-emphasis">entonces</span>
+            <span class="text-info-emphasis">deja-zumbador</span>;
+        
+        <span class="text-info-emphasis">avanza</span>;
+        
+        <span class="text-success-emphasis">{ Gira tantas veces como zumbadores en el piso }</span>
+        <span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">gira-izquierda</span>;
+        
+        <span class="text-info-emphasis">avanza</span>;
+        
+        <span class="text-success-emphasis">{ Este ciclo se ejecuta siempre, hasta que no sea detenido desde adentro con un rompe o similar }</span>
+        <span class="text-primary-emphasis">mientras</span> <span class="text-warning-emphasis">verdadero</span> <span class="text-primary-emphasis">hacer</span>
+        <span class="text-danger-emphasis">inicio</span>
+            <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">junto-a-zumbador</span> <span class="text-primary-emphasis">entonces</span>
+                <span class="text-primary-emphasis">rompe</span>;
+            <span class="text-info-emphasis">avanza</span>;
+        <span class="text-danger-emphasis">fin</span>;
+        <span class="text-info-emphasis">avanza</span>;
+        <span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">fila-actual</span> <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">coge-zumbador</span>;
+        <span class="text-info-emphasis">avanza</span>;
+        <span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">columna-actual</span> <span class="text-primary-emphasis">veces</span>
+            <span class="text-info-emphasis">coge-zumbador</span>;
+        
+        <span class="text-info-emphasis">apagate</span>;
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/globals/example.png" alt="Deja un solo zumbador" class="img-thumbnail">
+</div>
+
+@@include("../footer.html")

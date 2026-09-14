@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8" />
+    <title>La sentencia define-nueva-instruccion/como &nbsp;</title>
+  </head>
+  <body style="background-image: url(./workbook.gif);">
+    <center>
+      <h2>La sentencia void</h2>
+    </center>
+    Hasta ahora, le hemos dicho a Karel exactamente lo que tenía que hacer&nbsp;
+    tal como necesitábamos que lo hiciese. Esto funciona bien, pero te pudiste
+    haber dado cuenta de que siempre se utilizan secuencias de sentencias
+    similares. Un ejemplo es cuando Karel tiene que girar a la derecha, y
+    nosotros le decimos " turnleft(); turnleft(); turnleft(); ". ¿No sería más
+    fácil si le pudiéramos decir simplemente "turnright()" ?.
+    <p>
+      En otras palabras, diciendo "turnright(); " Karel giraría tres veces hacia
+      la izquierda para alcanzar nuestro objetivo. Es posible. ¿Estás
+      suficientemente motivado para aprender una nueva sentencia?
+    </p>
+    <p>
+      Una de las razones de crear nuevas instrucciones, es por evitar escribir
+      tanto. Otra es para documentar mejor cual es nuestro objetivo, cuando
+      nosotros mismos u otra persona lee el programa. Como te estarás dando
+      cuenta, programar es una tarea extremadamente compleja, y ¡necesitamos
+      toda la ayuda necesaria para hacer las cosas correctamente !
+    </p>
+    <p>
+      Las sentencia <strong>void</strong> (que también se puede escribir como
+      <strong>define</strong>) está situada en un sitio especial dentro de un
+      programa de Karel, justo después de la sentencia "class program {". El
+      siguiente es un programa válido para Karel:
+    </p>
+    <p>
+      &nbsp;
+      <center>
+        <img alt="" border="1" src="image023b.jpg" />
+      </center>
+    </p>
+    <p>
+      Puedes definir cualquier número de instrucciones nuevas, y después usarlas
+      en el programa donde las necesites. Las instrucciones nuevas pueden
+      contener sentencias de control, si es necesario. Date cuenta de que la
+      nueva instrucción puede también usar una instrucción definida previamente.
+      El ejercicio 5 podría haberse escrito:&nbsp;
+    </p>
+    <p>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <center>
+        <img alt="" border="1" src="image024b.jpg" />
+      </center>
+    </p>
+    <p>
+      Date cuenta de como la instrucción iterate acaba moviendo a Karel una
+      esquina hacia adelante, sin tener en cuenta en nẃ de zumbadores. Si haces
+      esto 14 veces, ¡estarás en casa !
+    </p>
+    <p>
+      <strong>Ejercicio 7:</strong> Re-escribe el programa para el ejercicio 4,
+      pero esta vez puede no haber un zumbador en cada esquina. Guarda tu
+      programa con el nombre <tt>diagonal2.txt</tt>. &nbsp; La nueva&nbsp;
+      instrucción debería coger un zumbador en la posición actual, si es que lo
+      hay. Deberías usar esta instrucción para coger todos los zumbadores
+      mientras Karel va a su casa en diagonal. Asegurate de que tienes el mundo
+      <tt>diagonal.mdo</tt> cargado para probar tu programa. Karel debería
+      finalizar en la esquina de la 1ªCalle con la 1ªAvenida, con todos los
+      zumbadores que ha ido cogiendo por el camino, y apagarse.
+    </p>
+    <p>
+      <strong>Ejercicio 8:</strong> Escribe un programa que ayude a Karel a
+      escapar de un laberinto que no contiene islas (cuadrados aislados). La
+      salida del laberinto está marcada ubicando un zumbador en la primera
+      esquina que está fuera del laberinto, al lado del muro de la derecha. Una
+      forma de resolver este problema es hacer que Karel avance a lo largo del
+      laberinto siguiendo el muro de su derecha ( imagina que está tocando el
+      muro y que nunca puede despegar su mano de él). En la siguiente imagen hay
+      un ejemplo de un laberinto del cual debería ser capaz de salir (no olvides
+      que tu programa debería funcionar en todos los laberintos, no solo en el
+      de la imagen). Guarda tu programa con el nombre <tt>laberinto.txt</tt>.
+      Esto parece muy, muy complicado. ¿Puedes darnos un mundo de ejemplo?
+    </p>
+    <p>
+      Aquí tienes un mundo inicial de ejemplo. La línea roja muestra el camino
+      que debería seguir Karel para este mundo. Recuerda que no sabes de
+      antemano donde estarán los muros.&nbsp;
+    </p>
+    <p>
+      &nbsp;
+      <center>
+        <img alt="" border="1" src="image026.jpg" />
+      </center>
+    </p>
+    <p>
+      Podría hacerse más fácil si definieras unas pocas nuevas instrucciones que
+      hicieran parte del trabajo. Aquí tenéis un ejemplo:
+    </p>
+    <p>...</p>
+    <p>void sigueMuroDereha() {</p>
+    <p>&nbsp;&nbsp; /*pon tu código aquí*/</p>
+    <p>}</p>
+    <p>...</p>
+    <p>
+      Esta instrucción hace que Karel avance correctamente hacia el siguiente
+      segmento de muro. Los diagramas de abajo muestran las 4 situaciones, Karel
+      podría estar en cualquier punto del laberinto. Si
+      <strong>sigueMuroDerecha()</strong> resuelve correctamente los 4 casos,
+      entonces has solucionado la parte principal del problema. También deberías
+      definir <strong>turnright()</strong>.
+    </p>
+    <p>
+      Para probar tu programa crea un mundo como el del ejemplo y guárdalo con
+      el nombre <tt>laberinto.mdo</tt>. Una vez te funcione el programa para
+      este mundo, prueba a modificarlo añadiéndo o quitando muros. ¿Realiza
+      Karel la tarea bien <strong>en todos los casos</strong>?
+    </p>
+    <p></p>
+    <center>
+      <table border="2">
+        <tr>
+          <td>
+            <img
+              alt=""
+              border="0"
+              height="199"
+              src="image028.jpg"
+              width="198"
+            />
+          </td>
+          <td>
+            <img
+              alt=""
+              border="0"
+              height="199"
+              src="image032.jpg"
+              width="199"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <center>
+              Situaciones iniciales
+            </center>
+          </td>
+          <td>
+            <center>
+              Movimientos respectivos
+            </center>
+          </td>
+        </tr>
+      </table>
+    </center>
+    <p></p>
+    <center>
+      <h2>La sentencia void</h2>
+      <h2 align="left"><a href="KarelJAVA.html">Regresar</a></h2>
+    </center>
+  </body>
+</html>

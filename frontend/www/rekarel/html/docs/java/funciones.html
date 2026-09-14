@@ -1,0 +1,222 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Funciones</h1>
+
+<p>Una funcion en Karel es una instruccion definida por el usuario que puede ser llamada en cualquier momento. Se colocan despues de <span class="text-danger-emphasis">class program {</span> y arriba del bloque de <span class="text-danger-emphasis">program()</span>.</p>
+
+
+<p>Tienen la siguiente estructura</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define </span> NOMBRE <span class="text-primary-emphasis"> () </span> <span class="text-danger-emphasis"> {</span>
+    <span class="text-secondary-emphasis">INSTRUCCIONES</span>
+<span class="text-danger-emphasis"> }</span>
+</pre>    
+</code>
+
+<p>A continuación se muestra un ejemplo de una función que gira a la derecha</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis"> class program </span>{
+    <span class="text-primary-emphasis">define </span> giraDerecha () <span class="text-danger-emphasis"> {</span> 
+        <span class="text-info-emphasis">turnleft</span>(); 
+        <span class="text-info-emphasis">turnleft</span>(); 
+        <span class="text-info-emphasis">turnleft</span>(); 
+    <span class="text-danger-emphasis">}</span> 
+
+    <span class="text-danger-emphasis">program ()</span><span class="text-danger-emphasis"> {</span> 
+        giraDerecha(); 
+        <span class="text-info-emphasis">turnoff</span>() 
+    <span class="text-danger-emphasis">} </span>
+<span class="text-danger-emphasis">}</span> 
+</pre>
+</code>
+
+<p>Alternativamente, se puede usar la palabra clave <span class="text-primary-emphasis">void</span> en vez de <span class="text-primary-emphasis">define</span></span></p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">void </span> NOMBRE <span class="text-primary-emphasis"> () </span> <span class="text-danger-emphasis"> {</span>
+    <span class="text-secondary-emphasis">INSTRUCCIONES</span>
+<span class="text-danger-emphasis"> }</span>
+</pre>
+</code>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="parametros" data-toc="Parámetros" data-toc-depth="1"></a>
+</div>
+<h2>Parámetros</h2>
+<p>Las funciones pueden recibir parámetros numéricos que pueden ser usados dentro de la función para cambiar su comportamiento, llevar una cuenta, etc.</p>
+
+<p>Los parámetros se especifican después del nombre de la función:</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define</span> NOMBRE (<span class="text-warning-emphasis">PARAMETROS</span>) {
+    <span class="text-secondary">INSTRUCCIONES</span>
+}
+</pre>
+</code>
+
+<p>Veamos un ejemplo, donde creemos una función que deje tantos zumbadores como se pase en el parámetro</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class</span> program {
+    <span class="text-primary-emphasis">void</span> dejaZumbadores (cantidad) {
+        <span class="text-primary-emphasis">iterate</span> (cantidad) {
+            <span class="text-info-emphasis">putbeeper</span>();
+        }
+    }
+    <span class="text-primary-emphasis">program</span> () {
+        dejaZumbadores(<span class="text-warning-emphasis">3</span>);
+        <span class="text-info-emphasis">move</span>();
+        dejaZumbadores(<span class="text-warning-emphasis">5</span>);
+        <span class="text-info-emphasis">move</span>();
+        dejaZumbadores(<span class="text-warning-emphasis">2</span>);
+    }
+}
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/funciones/parametros.png" alt="Deja 3, 5 y 2" class="img-thumbnail">
+</div>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="multiples" data-toc="Múltiples parámetros" data-toc-depth="2"></a>
+</div>
+<h3>Múltiples parámetros</h3>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Java 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+<p>Una función puede recibir más de un parámetro, cada parámetro debe estar separado por comas tanto en la definición de la función como en la llamada, veamos un ejemplo:</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class</span> program {
+    <span class="text-primary-emphasis">void</span> avanzaDejaAvanza (pasos1, cantidad, pasos2) {
+        <span class="text-primary-emphasis">iterate</span> (pasos1) {
+            <span class="text-info-emphasis">move</span>();
+        }
+        <span class="text-primary-emphasis">iterate</span> (cantidad) {
+            <span class="text-info-emphasis">putbeeper</span>();
+        }
+        <span class="text-primary-emphasis">iterate</span> (pasos2) {
+            <span class="text-info-emphasis">move</span>();
+        }
+    }
+    <span class="text-primary-emphasis">program</span> () {
+        avanzaDejaAvanza(<span class="text-warning-emphasis">2</span>, <span class="text-warning-emphasis">8</span>, <span class="text-warning-emphasis">1</span>);
+    }
+}
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/funciones/multiple.png" alt="Avanza 2, deja 8 y avanza" class="img-thumbnail">
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="retorno" data-toc="Valor de retorno" data-toc-depth="1"></a>
+</div>
+<h2>Valor de retorno</h2>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Java 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+<p>Las funciones en Karel además pueden tener un valor de retorno, este puede ser una cantidad numérica o una condición booleana.</p>
+
+<p>Para usar un valor de retorno necesitamos cambiar la definición de la instrucción para que incluya el tipo de dato a ser retornado por la función:</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">TIPO</span> NOMBRE (<span class="text-warning-emphasis">[PARAMETROS]</span>) {
+    <span class="text-secondary">INSTRUCCIONES</span>
+}
+</pre>
+</code>
+
+<p>Una vez se especifica el tipo, se retorna el valor usando la sentencia <span class="bg-secondary-subtle border rounded ps-1 pe-1 text-nowrap"><span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">valor</span>;</span>. Todo los flujos de la función deben retornar un valor.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="entero" data-toc="Entero" data-toc-depth="2"></a>
+</div>
+<h3>Valor de retorno entero</h3>
+
+<p>Para retornar un tipo entero basta con definir la instrucción de tipo <span class="text-primary-emphasis">int</span>.</p>
+
+<p>Veamos un ejemplo de un código que se orienta al norte.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">class</span> program {
+    <span class="text-success-emphasis">// Calcula cuantos giros se necesitan para orientarse al norte</span>
+    <span class="text-primary-emphasis">int</span> alNorte() {
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">facingNorth</span>) {
+            <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">0</span>;
+        }
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">facingEast</span>) {
+            <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">1</span>;
+        }
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">facingSouth</span>) {
+            <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">2</span>;
+        }
+        <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">3</span>;
+    }
+    <span class="text-primary-emphasis">program</span> () {
+        <span class="text-success-emphasis">// Usa la llamada como un número, gira tantas veces como retorne alNorte</span>
+        <span class="text-primary-emphasis">iterate</span> (alNorte()) {
+            <span class="text-info-emphasis">turnleft</span>();
+        }
+    }
+}
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="bool" data-toc="Booleano" data-toc-depth="2"></a>
+</div>
+<h3>Valor de retorno booleano</h3>
+
+<p>Para retornar un tipo booleano, es decir, que sea verdadero o falso, se usa el tipo <span class="text-primary-emphasis">bool</span>.</p>
+
+<p>Veamos un ejemplo de un código quita los zumbadores si estos son 1, 3 o 5.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">import</span> <span class="text-warning-emphasis">rekarel</span>.<span class="span text-warning-emphasis">globals</span>;
+<span class="text-danger-emphasis">class</span> program {
+    <span class="text-success-emphasis">// Determina si el suelo tiene 1, 3 o 5 zumbadores</span>
+    <span class="text-primary-emphasis">bool</span> revisa() {
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">beepersOnFloor</span> == <span class="text-warning-emphasis">1</span>) {
+            <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">true</span>;
+        }
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">beepersOnFloor</span> == <span class="text-warning-emphasis">3</span>) {
+            <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">true</span>;
+        }
+        <span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">beepersOnFloor</span> == <span class="text-warning-emphasis">5</span>) {
+            <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">true</span>;
+        }
+        <span class="text-primary-emphasis">return</span> <span class="text-warning-emphasis">false</span>;
+    }
+    <span class="text-primary-emphasis">program</span> () {
+        <span class="text-success-emphasis">// Quita los zumbadores validos</span>
+        <span class="text-primary-emphasis">if</span> (revisa()) {
+            <span class="text-primary-emphasis">while</span>(<span class="text-warning-emphasis">nextToABeeper</span> )
+                <span class="text-info-emphasis">pickbeeper</span>();
+        }
+    }
+}
+</pre>
+</code>
+@@include("../footer.html")

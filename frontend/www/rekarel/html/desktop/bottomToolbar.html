@@ -1,0 +1,258 @@
+<div class="bg-body btn-toolbar d-flex p-2 gap-2 border-bottom flex-shrink-0">
+
+    <div class="btn-group" role="group">
+        <div class="btn-group" aria-labelledby="selectionMode" title="Cambiar el modo de selección">
+            <a class="dropdown-toggle btn btn-body border-secondary" href="#"
+                id="selectionMode" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-mouse2" id="inputModeIndicator"></i>
+            </a>
+            <ul class="dropdown-menu"
+                aria-labelledby="selectionMode">
+                <li >
+                    <p class="h6 ms-2 me-2">Modo de selección</p>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="dragSelectionMode" title="Recomendado para ratón">
+                        <i class="bi bi-mouse2"></i> Arrastrar
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="alternateSelectionMode"  title="Recomendado para touch">
+                        <i class="bi bi-hand-index-thumb"></i> Alternar
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="btn-group dropup" title="Cambiar zumbadores">
+        <div class="btn-group" aria-labelledby="beeperManipulationDesktop">
+            <a class="dropdown-toggle btn btn-body border-secondary" href="#"
+                id="beeperManipulationDesktop" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-1-square-fill text-success"></i>
+            </a>
+            <ul class="dropdown-menu"
+                aria-labelledby="beeperManipulationDesktop">
+                <li>
+                    <button class="dropdown-item" id="desktopAddBeeper">
+                        <i class="bi bi-1-square-fill text-success"></i> Agregar
+                        uno (E)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopDecrementBeeper">
+                        <i class="bi bi-1-square-fill text-danger"></i> Quitar
+                        uno (Q)
+                    </button>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopSetAmmount"
+                        data-bs-toggle="modal" data-bs-target="#ammountModal">
+                        <i class="bi bi-123 text-info"></i> Elegir cantidad (C)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopSetInfinite">
+                        <i class="bi bi-infinity text-warning"></i> Infinitos
+                        (T)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopRemoveAll">
+                        <i class="bi bi-slash-circle-fill text-danger"></i>
+                        Quitar todos (0)
+                    </button>
+                </li>
+                
+                <li>
+                    <button class="dropdown-item" id="desktopRandomBeeper">
+                        <i class="bi bi-dice-6-fill text-primary"></i>
+                        Aleatorio (R)
+                    </button>
+                </li>
+
+            </ul>
+        </div>
+        <div class="btn-group dropup" aria-labelledby="orientationEditorDesktop"
+            title="Situar a Karel">
+            <a class="dropdown-toggle btn btn-body border-secondary" href="#"
+                id="orientationEditorDesktop" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- Karel-up.svg -->
+                <i class="text-primary h-auto w-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                        height="16" fill="currentColor" class="bi bi-arrow-up"
+                        viewBox="0 0 16 16">
+                        <path xmlns="http://www.w3.org/2000/svg"
+                            fill-rule="evenodd"
+                            d="m 8,0.6640625 c 0.00276,0 -6.2505726,6.2982652 -6.2519531,6.296875 -4.423e-4,-4.454e-4 2.2613062,1.6e-4 4.0058593,0 V 15.535156 H 10.246094 V 6.9609375 c 1.744553,1.6e-4 4.006301,-4.454e-4 4.005859,0 C 14.250573,6.9623277 7.9972389,0.6640625 8,0.6640625 Z" />
+                    </svg>
+                </i>
+            </a>
+            <ul class="dropdown-menu"
+                aria-labelledby="orientationEditorDesktop">
+                <li>
+                    <button class="dropdown-item" id="desktopKarelNorth">
+                        <!-- Karel-up.svg -->
+                        <i class="text-primary h-auto w-auto">
+                            @@include('../svg/karelUp.svg')
+                        </i>
+                        Situar Karel al norte (G)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopKarelEast">
+                        <!-- Karel-right.svg -->
+                        <i class="text-primary h-auto w-auto">
+                            @@include('../svg/karelRight.svg')
+                        </i>
+                        Situar Karel al este (G)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopKarelSouth">
+                        <!-- Karel-down.svg -->
+                        <i class="text-primary h-auto w-auto">
+                            @@include('../svg/karelDown.svg')
+                        </i>
+                        Situar Karel al sur (G)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopKarelWest">
+                        <!-- Karel-left.svg -->
+                        <i class="text-primary h-auto w-auto">
+                            @@include('../svg/karelLeft.svg')
+                        </i>
+                        Situar Karel al oeste (G)
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="btn-group" aria-labelledby="wallEditDesktop"
+            title="Colocar paredes">
+            <a class="dropdown-toggle btn btn-body border-secondary" href="#"
+                id="wallEditDesktop" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="bi bi-border"></i>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="wallEditDesktop">
+                <li>
+                    <button class="dropdown-item" id="desktopNorthWall">
+                        <i class="bi bi-border-top"></i> Pared norte (W)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopEastWall">
+                        <i class="bi bi-border-right"></i> Pared este (D)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopSouthWall">
+                        <i class="bi bi-border-bottom"></i> Pared sur (S)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" class="dropdown-item"
+                        id="desktopWestWall">
+                        <i class="bi bi-border-left"></i> Pared oeste (A)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" class="dropdown-item"
+                        id="desktopOuterWall">
+                        <i class="bi bi-border-outer"></i> Rodear cuadrado (X)
+                    </button>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+            title="Ir al origen (1,1)" id="desktopGoHome">
+            <i class="bi bi-house-door-fill"></i>
+        </button>
+        <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+            title="Ir a Karel" id="desktopGoKarel">
+            @@include('../svg/karelUp.svg')
+        </button>
+
+        <button id="desktopGoSelection" type="button"
+            class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+            title="Ir al cursor">
+            <i class="bi bi-cursor-fill"></i>
+        </button>
+    </div>
+    <!-- <div class="btn-group">
+        <button class="btn border-secondary">
+            <i class="bi bi-caret-left-fill"></i>
+        </button>
+        <button class="btn border-secondary">
+            <i class="bi bi-caret-right-fill"></i>
+        </button>
+    </div>
+    <div class="btn-group">
+        <button class="btn border-secondary">
+            <i class="bi bi-caret-up-fill"></i>
+        </button>
+        <button class="btn border-secondary">
+            <i class="bi bi-caret-down-fill"></i>
+        </button>
+    </div> -->
+
+    <div class="btn-group">
+        <button class="btn btn-secondary" title="Reducir zoom" id="removeZoomBtn">
+            <i class="bi bi-zoom-out"></i>
+        </button>
+        <button class="btn btn-secondary" title="Aumentar zoom" id="addZoomBtn">
+            <i class="bi bi-zoom-in"></i>
+        </button>
+    </div>
+    <div class="btn-group">
+        <div class="btn-group" aria-labelledby="cellImportanceDesktop">
+            <a class="dropdown-toggle btn btn-body border-secondary" href="#"
+                id="cellImportanceDesktop" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                title="Determina si casillas son evaluadas y exportadas en la salida">
+                <i class="bi bi-flag-fill"></i>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="cellImportanceDesktop">
+                <li>
+                    <button class="dropdown-item" id="desktopEvaluateCell">
+                        <i class="bi bi-flag-fill text-warning"></i> Evaluar
+                        casilla (Z)
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="desktopIgnoreCell">
+                        <i class="bi bi-flag-fill text-secondary" ></i> Ignorar
+                        casilla (V)
+                    </button>
+                </li>
+
+            </ul>
+        </div>
+        <a class="btn btn-body border-secondary" href="#" id="evaluatorBtnDesktop"
+                role="button" data-bs-toggle="modal" aria-expanded="false" data-bs-target="#evaluatorModal"
+            title="Cambia las condiciones que Karel exporta al evaluador">
+                <i class="bi bi-list-check"></i> <span class="d-none d-lg-inline">Evaluador</span>
+        </a>
+    </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+            title="Deshacer cambio" id="desktopUndo">
+            <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+        <button type="button" class="btn btn-body p-1 ps-2 pe-2 border-secondary"
+            title="Rehacer cambio" id="desktopRedo">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
+</div>

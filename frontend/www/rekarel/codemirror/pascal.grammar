@@ -1,0 +1,280 @@
+@top Script {
+    ImportList? StartProgram functionList?   Execution EndProgram
+}
+
+ImportList {
+    ImportStatement+
+}
+
+ImportStatement {
+    Import (Identifier| Modules) "." (Identifier| Modules) ";"
+}
+
+functionList {
+    (Function | Prototype) +
+}
+
+
+Function {
+    DefineType Identifier As expression | DefineType Identifier "(" FunctionParams ")" As expression ";"
+}
+
+Prototype {
+    PrototipoType Identifier ";"  |  PrototipoType Identifier "(" FunctionParams ")" ";"    
+}
+
+
+FunctionParams {
+    FunctionParams comma Identifier
+    | Identifier
+}
+
+Execution {
+    StartExecution expressionList EndExecution
+}
+
+
+WhileStatement {
+    While BooleanTerm Do
+    expression
+}
+
+IterateStatement {
+    Iterate  NumericTerm  Times
+    expression
+}
+
+IfStatement {
+    If BooleanTerm Then expression (!sino Else expression)?
+    
+}
+
+Block {
+    Begin expressionList End
+}
+
+expression {
+    call
+    |  WhileStatement
+    | IterateStatement
+    | IfStatement 
+    | Block
+    | Continue
+    | Break
+    | ReturnStatement
+}
+
+expressionList {
+    genExpr | expressionList ";"  genExpr
+}
+
+genExpr {
+    expression | ""
+}
+
+
+call {
+    BuiltIn | Identifier | parameteredCall
+}
+
+parameteredCall {
+    Identifier "(" CallParams ")"
+}
+
+CallParams {
+    NumericTerm (comma NumericTerm)*
+}
+
+
+BooleanTerm { term }
+NumericTerm { term }
+
+
+Succ { @specialize<Identifier, "sucede"> }
+Pred { @specialize<Identifier, "precede"> }
+
+@precedence { sino,binaryLogic @left}
+
+IFZ {
+    Ifzero "(" NumericTerm ")"
+}
+IFINF {
+    Ifinfinite "(" NumericTerm ")"
+}
+
+BuiltIn {
+    @specialize<Identifier, "avanza"> |
+    @specialize<Identifier, "gira-izquierda"> |
+    @specialize<Identifier, "deja-zumbador"> |
+    @specialize<Identifier, "coge-zumbador"> |
+    @specialize<Identifier, "apagate">
+}
+
+BoolFunc {
+    @specialize<Identifier, "junto-a-zumbador"> |
+    @specialize<Identifier, "no-junto-a-zumbador"> |
+    @specialize<Identifier, "frente-libre"> |
+    @specialize<Identifier, "izquierda-libre"> |
+    @specialize<Identifier, "derecha-libre"> |
+    @specialize<Identifier, "frente-bloqueado"> |
+    @specialize<Identifier, "izquierda-bloqueada"> |
+    @specialize<Identifier, "derecha-bloqueada"> |
+    @specialize<Identifier, "orientado-al-norte"> |
+    @specialize<Identifier, "orientado-al-sur"> |
+    @specialize<Identifier, "orientado-al-este"> |
+    @specialize<Identifier, "orientado-al-oeste"> |
+    @specialize<Identifier, "no-orientado-al-norte"> |
+    @specialize<Identifier, "no-orientado-al-sur"> |
+    @specialize<Identifier, "no-orientado-al-este"> |
+    @specialize<Identifier, "no-orientado-al-oeste"> |
+    @specialize<Identifier, "algun-zumbador-en-la-mochila"> |    
+    @specialize<Identifier, "ningun-zumbador-en-la-mochila">
+}
+
+binaryOperator { Or | And | LTE | LT | COMP }
+
+
+term {
+    term !binaryLogic binaryOperator term
+    | Not term
+    | "(" term ")"
+    | clause 
+}
+
+clause { IFZ | IFINF | BoolFunc | (Identifier | Globals) | numeric | parameteredCall }
+
+
+numeric {
+    Number | numberFunction
+}
+
+numberFunction {(Succ | Pred)"(" NumericTerm ( comma Number )? ")" }
+
+Begin[closedBy="End"] {
+    start
+}
+
+End[openedBy="Begin"] {
+    end
+}
+
+ReturnStatement { Return term?}
+
+While { @specialize<Identifier, "mientras"> }
+Do { @specialize<Identifier, "hacer"> }
+Then { @specialize<Identifier, "entonces"> }
+Times { @specialize<Identifier, "veces"> }
+If { @specialize<Identifier, "si"> }
+Else { @specialize<Identifier, "sino"> |  @specialize<Identifier, "si-no"> }
+As { @specialize<Identifier, "como">}
+Iterate { @specialize<Identifier, "repetir"> }
+start { @specialize<Identifier, "inicio"> }
+end { @specialize<Identifier, "fin"> }
+StartProgram { @specialize<Identifier, "iniciar-programa"> }
+EndProgram { @specialize<Identifier, "finalizar-programa"> }
+StartExecution { 
+    @specialize<Identifier, "inicia-ejecucion"> 
+    | @specialize<Identifier, "inicia-ejecución"> 
+}
+EndExecution { 
+    @specialize<Identifier, "termina-ejecucion">
+    | @specialize<Identifier, "termina-ejecución">
+ }
+Ifzero { 
+    @specialize<Identifier, "si-es-cero">
+    |  @specialize<Identifier, "es-cero">
+ }
+ 
+Ifinfinite { 
+    @specialize<Identifier, "es-infinito">
+ }
+DefineType { 
+    @specialize<Identifier, "define-nueva-instruccion">
+    | @specialize<Identifier, "define-condicion">  
+    | @specialize<Identifier, "define-calculo">  
+    | @specialize<Identifier, "define">  
+
+    | @specialize<Identifier, "define-nueva-instrucción"> 
+    | @specialize<Identifier, "define-condición">  
+    | @specialize<Identifier, "define-cálculo">  
+}
+PrototipoType { 
+    @specialize<Identifier, "define-prototipo-instruccion"> 
+    | @specialize<Identifier, "define-prototipo-calculo"> 
+    | @specialize<Identifier, "define-prototipo-condicion"> 
+
+    | @specialize<Identifier, "define-prototipo-instrucción">  
+    | @specialize<Identifier, "define-prototipo-cálculo"> 
+    | @specialize<Identifier, "define-prototipo-condición">
+}
+
+And { 
+    @specialize<Identifier, "y">
+    | @specialize<Identifier, "e">
+ }
+Not { @specialize<Identifier, "no"> }
+Or { 
+    @specialize<Identifier, "o">
+    | @specialize<Identifier, "u">
+}
+
+Import { @specialize<Identifier, "usa"> }
+Continue { 
+    @specialize<Identifier, "continua"> 
+    | @specialize<Identifier, "continúa"> 
+}
+Break { @specialize<Identifier, "rompe"> }
+Return { @specialize<Identifier, "regresa"> | @specialize<Identifier, "sal-de-instruccion"> }
+
+Globals {
+    @specialize<Identifier, "verdadero">
+    | @specialize<Identifier, "falso">
+    | @specialize<Identifier, "zumbadores-del-piso">
+    | @specialize<Identifier, "zumbadores-en-la-mochila">
+    | @specialize<Identifier, "fila-actual">
+    | @specialize<Identifier, "columna-actual">
+}
+
+Modules {
+    
+    @specialize<Identifier, "rekarel">
+    | @specialize<Identifier, "globales">
+}
+
+@tokens {
+    space { @whitespace+ }
+    Identifier { $[A-Za-zÀ-ÖØ-öø-ÿ_]$[A-Za-zÀ-ÖØ-öø-ÿ0-9_-]*}
+    comma { "," }
+    LT { "<" }
+    LTE { "<=" }
+    COMP { "==" }
+    Number { $[0-9]+}
+}
+
+
+
+
+@skip {space | BlockComment | BlockComment2 }
+
+@skip { } {
+  BlockComment { "{" (Annotation | blockCommentContent | blockCommentNewline)* blockCommentEnd }
+}
+
+@local tokens {
+  blockCommentEnd { "}" }
+  blockCommentNewline { "\n" }
+  Annotation { "@" @asciiLetter* }
+  @else blockCommentContent
+}
+
+
+@skip { } {
+  BlockComment2 { "(*" (Annotation2 | blockCommentContent2 | blockCommentNewline2)* blockCommentEnd2 }
+}
+
+@local tokens {
+  blockCommentEnd2 { "*)" }
+  blockCommentNewline2 { "\n" }
+  Annotation2 { "@" @asciiLetter* }
+  @else blockCommentContent2
+}

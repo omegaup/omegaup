@@ -145,7 +145,7 @@ export default class ProblemMarkdown extends Vue {
       ) as HTMLScriptElement | null;
       if (!scriptElement) {
         scriptElement = document.createElement('script');
-        scriptElement.src = '/third_party/js/mathjax/es5/tex-svg.js';
+        scriptElement.src = '/js/dist/mathjax/tex-svg.js';
         scriptElement.id = 'MathJax-script';
         document.head.appendChild(scriptElement);
       }

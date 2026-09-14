@@ -1,0 +1,45 @@
+iniciar-programa
+	define-nueva-instruccion derecha como
+    inicio
+    	gira-izquierda;
+        gira-izquierda;
+        gira-izquierda;
+    fin;
+    define-nueva-instruccion media-vuelta como
+    inicio
+    	si orientado-al-norte y derecha-libre entonces
+        inicio
+        	derecha;
+            avanza;
+            derecha;
+        fin
+        sino
+        inicio
+        	si orientado-al-sur y izquierda-libre entonces
+            inicio
+            	gira-izquierda;
+                avanza;
+                gira-izquierda;
+            fin
+            sino
+            	apagate;            
+        fin;
+    fin;
+    define-nueva-instruccion ve como
+	inicio
+    	si junto-a-zumbador entonces
+        	coge-zumbador
+        sino
+        	deja-zumbador;
+        si frente-libre entonces
+        	avanza
+        sino
+        	media-vuelta;
+        ve;
+    fin;
+    
+    
+    inicia-ejecucion
+        ve;
+    termina-ejecucion
+finalizar-programa
