@@ -61,9 +61,7 @@ describe('MarkdownToolbar.vue', () => {
 
     await wrapper.find('[data-markdown-toolbar-bold]').trigger('click');
 
-    expect((wrapper.vm as any).text).toBe(
-      'Live Preview Test **strong text**',
-    );
+    expect((wrapper.vm as any).text).toBe('Live Preview Test **strong text**');
   });
 
   it('wraps the current selection in bold markers', async () => {

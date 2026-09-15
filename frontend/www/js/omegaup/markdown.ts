@@ -91,7 +91,10 @@ function sanitizeTag(tag: string): string {
       );
     },
   );
-  if (anyChange && (anchorWhitelist.test(encoded) || imgSrcWhitelist.test(encoded))) {
+  if (
+    anyChange &&
+    (anchorWhitelist.test(encoded) || imgSrcWhitelist.test(encoded))
+  ) {
     return encoded;
   }
   return '';
@@ -128,7 +131,10 @@ function balanceTags(html: string): string {
     let match = -1;
     if (!/^<\//.test(tag)) {
       for (let ntag = ctag + 1; ntag < tagcount; ntag++) {
-        if (!tagpaired[ntag] && (tags as RegExpMatchArray)[ntag] == '</' + tagname + '>') {
+        if (
+          !tagpaired[ntag] &&
+          (tags as RegExpMatchArray)[ntag] == '</' + tagname + '>'
+        ) {
           match = ntag;
           break;
         }
@@ -162,10 +168,16 @@ function unescapeCharacters(text: string): string {
 }
 
 function highlightCode(contents: string, language: string | null): string {
-  if (language && Object.prototype.hasOwnProperty.call(languageMapping, language)) {
+  if (
+    language &&
+    Object.prototype.hasOwnProperty.call(languageMapping, language)
+  ) {
     language = languageMapping[language];
   }
-  if (language && Object.prototype.hasOwnProperty.call(Prism.languages, language)) {
+  if (
+    language &&
+    Object.prototype.hasOwnProperty.call(Prism.languages, language)
+  ) {
     return Prism.highlight(contents, Prism.languages[language], language);
   }
   return contents
@@ -487,9 +499,7 @@ export class Converter {
           .map((line: string) => {
             const m = line.match(/(\\\||[^|])+/g);
             if (!m) return '';
-            return m.map((value: string) =>
-              value.trim().replace(/\\\|/g, '|'),
-            );
+            return m.map((value: string) => value.trim().replace(/\\\|/g, '|'));
           });
 
         if (cells.length < 2) {
@@ -539,11 +549,7 @@ export class Converter {
           for (let i = 0; i < cells.length; i++) {
             html += '<tr>\n';
             const row = cells[i];
-            for (
-              let j = 0;
-              j < Math.min(alignment.length, row.length);
-              j++
-            ) {
+            for (let j = 0; j < Math.min(alignment.length, row.length); j++) {
               html +=
                 alignedTag('td', alignment[j]) +
                 this.md.renderInline(row[j]) +
@@ -620,7 +626,13 @@ export class Converter {
               in: `{{examples/${exampleFilename}.in}}`,
               out: `{{examples/${exampleFilename}.out}}`,
             };
-            if (settings?.cases.hasOwnProperty(exampleFilename)) {
+            if (
+              settings?.cases &&
+              Object.prototype.hasOwnProperty.call(
+                settings.cases,
+                exampleFilename,
+              )
+            ) {
               exampleFile = settings.cases[exampleFilename];
             }
             result += `<td><pre>${escapeSample(exampleFile['in'])}</pre></td>`;

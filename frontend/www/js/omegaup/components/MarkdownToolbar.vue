@@ -15,6 +15,7 @@
       :aria-label="button.title"
       @click.prevent="onButtonClick(button)"
     >
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <span class="markdown-toolbar-icon" v-html="button.icon"></span>
     </button>
   </div>
@@ -190,9 +191,10 @@ export default class MarkdownToolbar extends Vue {
     const value = el.value;
     const selected = value.slice(start, end);
     const inner = selected || placeholder;
-    const next = `${value.slice(0, start)}${prefix}${inner}${suffix}${value.slice(
-      end,
-    )}`;
+    const next = `${value.slice(
+      0,
+      start,
+    )}${prefix}${inner}${suffix}${value.slice(end)}`;
     const selStart = start + prefix.length;
     this.commit(next, selStart, selStart + inner.length);
   }
@@ -229,8 +231,12 @@ export default class MarkdownToolbar extends Vue {
     }
     const start = el.selectionStart;
     const value = el.value;
-    const rule = `${start > 0 && value[start - 1] !== '\n' ? '\n' : ''}----------\n`;
-    const next = `${value.slice(0, start)}${rule}${value.slice(el.selectionEnd)}`;
+    const rule = `${
+      start > 0 && value[start - 1] !== '\n' ? '\n' : ''
+    }----------\n`;
+    const next = `${value.slice(0, start)}${rule}${value.slice(
+      el.selectionEnd,
+    )}`;
     const caret = start + rule.length;
     this.commit(next, caret, caret);
   }
@@ -290,6 +296,7 @@ export default class MarkdownToolbar extends Vue {
   height: 20px;
 }
 
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .markdown-toolbar-icon ::v-deep svg {
   display: block;
 }

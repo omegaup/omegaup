@@ -86,8 +86,11 @@ describe('Problem creator Test', () => {
           'Live Preview Test',
         );
 
-        // Click Bold button and verify live preview updates
-        cy.get('[data-markdown-toolbar-bold]').click();
+        // Click Bold on the statement toolbar. Both statement and solution
+        // tabs keep a MarkdownToolbar in the DOM (bootstrap-vue b-tab).
+        cy.get(
+          '[data-statement-markdown-toolbar] [data-markdown-toolbar-bold]',
+        ).click();
         cy.get('[data-problem-creator-editor-markdown]').should(
           'contain.value',
           '**strong text**',

@@ -4,6 +4,7 @@
       <div class="row">
         <div class="col-md-6 d-flex flex-column">
           <omegaup-markdown-toolbar
+            data-statement-markdown-toolbar
             :get-textarea="getMarkdownInput"
             @input="currentMarkdown = $event"
           ></omegaup-markdown-toolbar>
