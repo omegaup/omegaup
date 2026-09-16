@@ -268,6 +268,7 @@ Cypress.Commands.add(
 Cypress.Commands.add('enterContest', ({ contestAlias }) => {
   cy.visit(`arena/${contestAlias}`);
   cy.get('button[data-start-contest]').click();
+  cy.get('[data-navbar-problem]', { timeout: 20000 }).should('be.visible');
 });
 
 Cypress.Commands.add(
@@ -278,8 +279,24 @@ Cypress.Commands.add(
       if (!problem) {
         return;
       }
-      cy.visit(`/arena/${contestAlias}/#problems`);
-      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+      // Skip a full reload on the first problem when enterContest already
+      // opened the arena. Reloading the same contest races SingleTabEnforcer
+      // (BroadcastChannel pong from the page being unloaded) and hides the
+      // problem navbar. Later problems still visit so each gets a fresh
+      // per-problem submission cooldown.
+      cy.location('pathname').then((pathname) => {
+        if (
+          !pathname.includes(`/arena/${contestAlias}`) ||
+          String(idx) !== '0'
+        ) {
+          cy.visit(`/arena/${contestAlias}/#problems`);
+        }
+      });
+      cy.get(`a[data-problem="${problem.problemAlias}"]`, {
+        timeout: 20000,
+      })
+        .should('be.visible')
+        .click();
 
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));

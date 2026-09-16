@@ -79,18 +79,29 @@ fi
 python3 -m pip install -r /opt/omegaup/stuff/requirements.txt
 python3 -m pip install -r /opt/omegaup/stuff/ai_editorial_worker/requirements.txt
 
+# Prefer ~/.my.cnf, then the repo copy. On macOS bind-mounts, HOME is often
+# / so the image copy at /.my.cnf may be missing or unreadable for UID_GID.
+MYSQL_CNF="${HOME}/.my.cnf"
+if [[ ! -r "${MYSQL_CNF}" ]]; then
+  if [[ -r /opt/omegaup/stuff/docker/my.cnf ]]; then
+    MYSQL_CNF=/opt/omegaup/stuff/docker/my.cnf
+  elif [[ -r /.my.cnf ]]; then
+    MYSQL_CNF=/.my.cnf
+  fi
+fi
+
 # Ensure that the database version is up to date.
-if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exists ; then
-  mysql --defaults-file="${HOME}/.my.cnf" \
+if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${MYSQL_CNF}" exists ; then
+  mysql --defaults-file="${MYSQL_CNF}" \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
-  mysql --defaults-file="${HOME}/.my.cnf" \
+  mysql --defaults-file="${MYSQL_CNF}" \
     -e 'GRANT ALL PRIVILEGES ON `omegaup-test%`.* TO "omegaup"@"%";'
   /opt/omegaup/stuff/bootstrap-environment.py \
-    --mysql-config-file="${HOME}/.my.cnf" \
+    --mysql-config-file="${MYSQL_CNF}" \
     --purge --verbose --root-url=http://localhost:8001/
 else
   /opt/omegaup/stuff/db-migrate.py \
-    --mysql-config-file="${HOME}/.my.cnf" migrate
+    --mysql-config-file="${MYSQL_CNF}" migrate
 fi
 
 # If this is a local-backend build, ensure that the built omegaup-gitserver is

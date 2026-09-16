@@ -60,8 +60,10 @@ export class SingleTabEnforcer {
   private readonly contestAlias: string;
   private readonly onBlocked: (message: string) => void;
   private isBlocked: boolean = false;
+  private isUnloading: boolean = false;
   private readonly channelName: string;
   private beforeUnloadHandler: (() => void) | null = null;
+  private pageHideHandler: (() => void) | null = null;
 
   constructor(options: SingleTabEnforcerOptions) {
     this.contestAlias = options.contestAlias;
@@ -106,6 +108,14 @@ export class SingleTabEnforcer {
         this.handleMessage(event.data);
       };
 
+      // Close the channel on same-window navigation before the next
+      // document can ping. beforeunload alone races with Cypress/Chrome
+      // in-tab visits of the same contest.
+      this.pageHideHandler = () => {
+        this.destroy();
+      };
+      window.addEventListener('pagehide', this.pageHideHandler);
+
       // Send a ping to detect existing tabs (response arrives asynchronously)
       this.sendPing();
     } catch (error) {
@@ -119,9 +129,10 @@ export class SingleTabEnforcer {
    */
   private handleMessage(message: TabMessage): void {
     if (message.type === 'ping') {
-      // Only respond if this tab is not blocked - blocked tabs should not
-      // claim to be active participants
-      if (!this.isBlocked) {
+      // Only respond if this tab is still the active participant. Do not
+      // pong while unloading, or a same-window reload is treated as a
+      // second tab.
+      if (!this.isBlocked && !this.isUnloading) {
         this.sendPong();
       }
     } else if (message.type === 'pong') {
@@ -179,6 +190,7 @@ export class SingleTabEnforcer {
    * Removes the beforeunload listener if one was registered.
    */
   public destroy(): void {
+    this.isUnloading = true;
     if (this.channel) {
       this.channel.close();
       this.channel = null;
@@ -186,6 +198,10 @@ export class SingleTabEnforcer {
     if (this.beforeUnloadHandler) {
       window.removeEventListener('beforeunload', this.beforeUnloadHandler);
       this.beforeUnloadHandler = null;
+    }
+    if (this.pageHideHandler) {
+      window.removeEventListener('pagehide', this.pageHideHandler);
+      this.pageHideHandler = null;
     }
   }
 
