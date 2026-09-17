@@ -414,7 +414,7 @@ class _FakeCronRun:
         '''Records the dataset size the job reported.'''
         self.rows_affected = rows
 
-    def mark_failure(self) -> None:
+    def mark_failure(self, reason: Optional[str] = None) -> None:
         '''Records that the job reported a failure.'''
         self.failed = True
 

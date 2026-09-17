@@ -462,13 +462,13 @@ def should_publish(
     '''
     if score < min_map_score:
         return False, (
-            f'MAP score {score:.4f} below minimum {min_map_score:.4f}')
+            'MAP score %.4f below minimum %.4f' % (score, min_map_score))
     if (last_published_map is not None
             and score < last_published_map - max_map_regression):
         return False, (
-            f'MAP score {score:.4f} regressed more than '
-            f'{max_map_regression:.4f} below the last published '
-            f'{last_published_map:.4f}')
+            'MAP score %.4f regressed more than '
+            '%.4f below the last published '
+            '%.4f' % (score, max_map_regression, last_published_map))
     return True, None
 
 
@@ -510,7 +510,7 @@ def train_and_publish(
             model.save(args.output)
         else:
             logging.error('Model NOT saved. %s', skip_reason)
-            cron_run.mark_failure()
+            cron_run.mark_failure(skip_reason)
 
         if dbconn is not None:
             record_model_run(dbconn,
