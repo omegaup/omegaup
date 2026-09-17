@@ -235,6 +235,113 @@ def test_mark_failure_records_a_failed_run() -> None:
     assert _matching(conn.calls, 'update `cron_runs`')[0][0] == 'failure'
 
 
+def test_mark_failure_records_error_text() -> None:
+    '''A reason passed to mark_failure is stored as the run's error_text.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        cron_run.mark_failure('training score was too low')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert len(updates) == 1
+    status, _duration, _rows, _phases, error_text, _run_id = updates[0]
+    assert status == 'failure'
+    assert error_text == 'training score was too low'
+
+
+def test_mark_failure_without_reason_still_writes_error_text() -> None:
+    '''A bare mark_failure does not leave error_text as NULL.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        cron_run.mark_failure()
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert len(updates) == 1
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] is not None
+
+
+def test_mark_failure_inside_phase_marks_the_phase_failed() -> None:
+    '''A phase that calls mark_failure is recorded as a failed phase.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('load_runs'):
+            pass
+        with cron_run.phase('train_model'):
+            cron_run.mark_failure('accuracy was too low')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'load_runs'
+    assert phases[0]['status'] == 'success'
+    assert phases[1]['phase'] == 'train_model'
+    assert phases[1]['status'] == 'failure'
+    assert updates[0][4] == 'accuracy was too low'
+
+
+def test_mark_failure_outside_phase_keeps_phases_successful() -> None:
+    '''A mark_failure outside any phase does not touch finished phases.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('process_badges'):
+            pass
+        cron_run.mark_failure('failed to process some badges')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'process_badges'
+    assert phases[0]['status'] == 'success'
+    assert updates[0][4] == 'failed to process some badges'
+
+
+def test_mark_failure_before_nested_phase_keeps_parent_marked() -> None:
+    '''A forced failure before a nested phase still marks the parent phase.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('outer'):
+            cron_run.mark_failure('outer data was incomplete')
+            with cron_run.phase('inner'):
+                pass
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'inner'
+    assert phases[0]['status'] == 'success'
+    assert phases[1]['phase'] == 'outer'
+    assert phases[1]['status'] == 'failure'
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'outer data was incomplete'
+
+
+def test_mark_failure_in_nested_phase_marks_only_the_inner_phase() -> None:
+    '''A forced failure inside a nested phase marks that phase alone.'''
+    conn = _FakeConnection()
+    args = _args()
+
+    with _run('update_ranks.py', args, conn) as cron_run:
+        with cron_run.phase('outer'):
+            with cron_run.phase('inner'):
+                cron_run.mark_failure('inner validation failed')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'inner'
+    assert phases[0]['status'] == 'failure'
+    assert phases[1]['phase'] == 'outer'
+    assert phases[1]['status'] == 'success'
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'inner validation failed'
+
+
 def test_releases_lock_when_recording_the_start_fails() -> None:
     '''A failure between the lock and the start row still frees the lock.'''
     conn = _FakeConnection(fail_on='insert into `cron_runs`')
@@ -273,3 +380,112 @@ def test_releases_lock_when_finishing_fails() -> None:
             pass
 
     assert _matching(conn.calls, 'release_lock')
+
+
+def test_clean_exit_records_success() -> None:
+    '''A body that finishes without raising is recorded as success.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with _run('update_ranks.py', _args(), conn):
+        pass
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert len(updates) == 1
+    status, _duration, _rows, _phases, error_text, _run_id = updates[0]
+    assert status == 'success'
+    assert error_text is None
+
+
+def test_system_exit_zero_records_success() -> None:
+    '''sys.exit(0) in the body is recorded as a successful run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    caught: Optional[SystemExit] = None
+    try:
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit(0)
+    except SystemExit as exc:
+        caught = exc
+
+    assert caught is not None
+    assert caught.code == 0
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'success'
+    assert updates[0][4] is None
+
+
+def test_system_exit_none_records_success() -> None:
+    '''A bare sys.exit() in the body is recorded as a successful run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    caught: Optional[SystemExit] = None
+    try:
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit()
+    except SystemExit as exc:
+        caught = exc
+
+    assert caught is not None
+    assert caught.code is None
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'success'
+    assert updates[0][4] is None
+
+
+def test_system_exit_nonzero_records_failure() -> None:
+    '''sys.exit(1) in the body is recorded as a failed run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit(1)
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'SystemExit: 1'
+
+
+def test_system_exit_with_message_records_failure() -> None:
+    '''sys.exit with a message in the body is recorded as a failed run.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn):
+            raise SystemExit('boom')
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'SystemExit: boom'
+
+
+def test_clean_system_exit_inside_phase_records_phase_success() -> None:
+    '''sys.exit(0) inside a phase records the phase itself as a success.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn) as run:
+            with run.phase('update_users_stats'):
+                raise SystemExit(0)
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['phase'] == 'update_users_stats'
+    assert phases[0]['status'] == 'success'
+    assert phases[0]['error_class'] is None
+
+
+def test_failed_system_exit_inside_phase_records_phase_failure() -> None:
+    '''sys.exit(1) inside a phase records the phase as a failure.'''
+    conn = _FakeConnection(lock_acquired=True)
+
+    with pytest.raises(SystemExit):
+        with _run('update_ranks.py', _args(), conn) as run:
+            with run.phase('update_users_stats'):
+                raise SystemExit(1)
+
+    updates = _matching(conn.calls, 'update `cron_runs`')
+    phases = json.loads(updates[0][3])
+    assert phases[0]['status'] == 'failure'
+    assert phases[0]['error_class'] == 'SystemExit'
+    assert updates[0][0] == 'failure'
+    assert updates[0][4] == 'SystemExit: 1'
