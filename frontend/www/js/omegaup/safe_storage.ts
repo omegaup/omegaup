@@ -42,3 +42,40 @@ export class SafeStorage {
     }
   }
 }
+
+export class SafeSessionStorage {
+  static setItem(key: string, value: string): boolean {
+    try {
+      sessionStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      if (e instanceof DOMException) {
+        if (e.name === 'QuotaExceededError') {
+          console.warn('sessionStorage quota exceeded');
+        } else if (e.name === 'SecurityError') {
+          console.warn('sessionStorage not available (private browsing mode)');
+        }
+      }
+      return false;
+    }
+  }
+
+  static getItem(key: string): string | null {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (e) {
+      console.warn('sessionStorage read failed:', e);
+      return null;
+    }
+  }
+
+  static removeItem(key: string): boolean {
+    try {
+      sessionStorage.removeItem(key);
+      return true;
+    } catch (e) {
+      console.warn('sessionStorage remove failed:', e);
+      return false;
+    }
+  }
+}
