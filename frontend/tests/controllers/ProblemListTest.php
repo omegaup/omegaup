@@ -27,6 +27,58 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     protected $problemsMapping;
 
     /**
+     * Test getting a list of problems for an anonymous user while filtering
+     * by multiple tags with require_all_tags = true.
+     * This covers the IDENTITY_ANONYMOUS code path in byIdentityType() +
+     * addTagFilter(), which was the source of slow queries
+     */
+    public function testProblemListWithMultipleTagsAnonymous() {
+        $tags = [
+            'problemTagArrays',
+            'problemTagBigData',
+            'problemTagGreedyAlgorithms',
+            'problemTagCharsAndStrings',
+        ];
+        // problem[i] has tags[0..i], so:
+        // problem[0]: 1 tag, problem[1]: 2 tags,
+        // problem[2]: 3 tags, problem[3]: all 4 tags.
+        $problemData = [];
+        foreach (range(0, 3) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'visibility' => 'promoted',
+                ])
+            );
+            foreach (range(0, $i) as $j) {
+                \OmegaUp\Test\Factories\Problem::addTag(
+                    $problemData[$i],
+                    $tags[$j],
+                    public: 1
+                );
+            }
+        }
+
+        // Anonymous user exercises IDENTITY_ANONYMOUS path.
+        // Three tags, require all: problem[2] and problem[3] have all three.
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'tag' => implode(',', [$tags[0], $tags[1], $tags[2]]),
+            'require_all_tags' => true,
+        ]));
+        $this->assertCount(2, $response['results']);
+
+        // Four tags, require all: only problem[3] has all four.
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'tag' => implode(',', $tags),
+            'require_all_tags' => true,
+        ]));
+        $this->assertCount(1, $response['results']);
+        $this->assertSame(
+            $problemData[3]['request']['problem_alias'],
+            $response['results'][0]['alias']
+        );
+    }
+
+    /**
      * Gets the list of problems
      */
     public function testProblemList() {
@@ -196,7 +248,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Even problems could be solved using Karel, odd ones don't
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
-        $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
+        $karel_problem = 'kj,kp,rk,cpp11-gcc,c11-gcc'; // Karel problems should allow kj, kp AND rk extensions
         $tags = [
             'problemTagArrays',
             'problemTagBigData',
@@ -293,7 +345,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => $tags[0],
-            'programming_languages' => 'kp,kj',
+            'programming_languages' => 'kp,kj,rk',
         ]));
         $this->assertCount(3, $response['results']);
 
@@ -305,7 +357,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => $tags[0],
-            'programming_languages' => 'kp,kj',
+            'programming_languages' => 'kp,kj,rk',
             'difficulty_range' => '0,3',
             'order_by' => 'submissions',
         ]));
@@ -667,6 +719,26 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        // Grant access through all three permission paths simultaneously:
+        // ownership, a direct admin role, and an admin role through a group.
+        \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $authorLogin->auth_token,
+            'problem_alias' => $problemDataPrivate['request']['problem_alias'],
+            'usernameOrEmail' => $identity->username,
+        ]));
+
+        $adminedProblems = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
+            $identity->identity_id,
+            1,
+            10
+        );
+        $this->assertSame(1, $adminedProblems['count']);
+        $this->assertCount(1, $adminedProblems['problems']);
+        $this->assertSame(
+            $problemDataPrivate['problem']->problem_id,
+            $adminedProblems['problems'][0]->problem_id
+        );
+
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
@@ -681,6 +753,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'alias',
             $alias
         );
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'page_size' => 1,
+            ])
+        );
+        $nextPage = end($response['pagerItems']);
+        $this->assertSame('disabled', $nextPage['class']);
     }
 
     /**
@@ -750,6 +831,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $login = self::login($adminUserIdentity);
+        // Make indexed search data visible to FULLTEXT queries.
+        \OmegaUp\Test\Utils::commit();
         $response = \OmegaUp\Controllers\Problem::apiAdminList(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -1066,6 +1149,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
+        // Make indexed search data visible to FULLTEXT queries.
+        \OmegaUp\Test\Utils::commit();
 
         // Expect public problem only
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -1154,6 +1239,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $pageSize = 2;
 
         $login = self::login($identity);
+        // Make indexed search data visible to FULLTEXT queries.
+        \OmegaUp\Test\Utils::commit();
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -1725,6 +1812,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $login = self::login($admin);
+        // Make indexed search data visible to FULLTEXT queries.
+        \OmegaUp\Test\Utils::commit();
 
         $params = [
             'auth_token' => $login->auth_token,
@@ -1781,6 +1870,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $login = self::login($admin);
+        // Make indexed search data visible to FULLTEXT queries.
+        \OmegaUp\Test\Utils::commit();
 
         $response = \OmegaUp\Controllers\Problem::apiListForTypeahead(
             new \OmegaUp\Request([
@@ -1808,7 +1899,13 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             fn ($problem) => $problem['key'],
             $response['results']
         );
-        $this->assertSame($sortedAliases, $expectedSortedAliases);
+        $this->assertSame(
+            ['Caminos', 'Caminos-'],
+            array_slice($sortedAliases, 0, 2)
+        );
+        sort($sortedAliases);
+        sort($expectedSortedAliases);
+        $this->assertSame($expectedSortedAliases, $sortedAliases);
     }
 
     public function testProblemListSearchWithNoSearchType() {

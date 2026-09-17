@@ -159,15 +159,14 @@
 
     <!-- Summary View (Horizontal Scrolling) -->
     <div v-if="!viewAllCategory">
+      <div v-if="visibleContestTabs.length === 0" class="empty-category">
+        {{ T.contestListEmpty }}
+      </div>
       <div
-        v-for="(tab, index) in [
-          ContestTab.Current,
-          ContestTab.Future,
-          ContestTab.Past,
-        ]"
+        v-for="(tab, index) in visibleContestTabs"
         :key="tab"
         class="mb-5 section-container"
-        :class="{ 'section-separator': index < 2 }"
+        :class="{ 'section-separator': index < visibleContestTabs.length - 1 }"
       >
         <div
           class="d-flex justify-content-between align-items-center mb-3 px-3"
@@ -197,13 +196,7 @@
             class="horizontal-scroll-container px-3 pb-3"
             @scroll="onScroll(tab)"
           >
-            <div
-              v-if="getContestsForTab(tab).length === 0"
-              class="text-muted font-italic ml-3"
-            >
-              {{ T.contestListEmpty }}
-            </div>
-            <div v-else class="d-flex">
+            <div class="d-flex">
               <div
                 v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
                 :key="contestItem.contest_id"
@@ -223,32 +216,29 @@
                   <template #text-contest-date>
                     <b-card-text v-if="tab === ContestTab.Current">
                       <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.finish_time)">
-                        {{
-                          ui.formatString(T.contestEndTime, {
-                            endDate: finishContestDate(contestItem),
-                          })
-                        }}
+                      <a
+                        :href="getTimeLink(contestItem.finish_time)"
+                        :title="exactContestDateTime(contestItem.finish_time)"
+                      >
+                        {{ currentContestDate(contestItem) }}
                       </a>
                     </b-card-text>
                     <b-card-text v-else-if="tab === ContestTab.Future">
                       <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{
-                          ui.formatString(T.contestStartTime, {
-                            startDate: startContestDate(contestItem),
-                          })
-                        }}
+                      <a
+                        :href="getTimeLink(contestItem.start_time)"
+                        :title="exactContestDateTime(contestItem.start_time)"
+                      >
+                        {{ futureContestDate(contestItem) }}
                       </a>
                     </b-card-text>
                     <b-card-text v-else-if="tab === ContestTab.Past">
                       <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{
-                          ui.formatString(T.contestStartedTime, {
-                            startedDate: startContestDate(contestItem),
-                          })
-                        }}
+                      <a
+                        :href="getTimeLink(contestItem.finish_time)"
+                        :title="exactContestDateTime(contestItem.finish_time)"
+                      >
+                        {{ pastContestDate(contestItem) }}
                       </a>
                     </b-card-text>
                   </template>
@@ -364,32 +354,29 @@
               <template #text-contest-date>
                 <b-card-text v-if="viewAllCategory === ContestTab.Current">
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{
-                      ui.formatString(T.contestEndTime, {
-                        endDate: finishContestDate(contestItem),
-                      })
-                    }}
+                  <a
+                    :href="getTimeLink(contestItem.finish_time)"
+                    :title="exactContestDateTime(contestItem.finish_time)"
+                  >
+                    {{ currentContestDate(contestItem) }}
                   </a>
                 </b-card-text>
                 <b-card-text v-else-if="viewAllCategory === ContestTab.Future">
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartTime, {
-                        startDate: startContestDate(contestItem),
-                      })
-                    }}
+                  <a
+                    :href="getTimeLink(contestItem.start_time)"
+                    :title="exactContestDateTime(contestItem.start_time)"
+                  >
+                    {{ futureContestDate(contestItem) }}
                   </a>
                 </b-card-text>
                 <b-card-text v-else-if="viewAllCategory === ContestTab.Past">
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartedTime, {
-                        startedDate: startContestDate(contestItem),
-                      })
-                    }}
+                  <a
+                    :href="getTimeLink(contestItem.finish_time)"
+                    :title="exactContestDateTime(contestItem.finish_time)"
+                  >
+                    {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
               </template>
@@ -478,6 +465,7 @@ const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
 
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
@@ -591,6 +579,7 @@ class ArenaContestList extends Vue {
     if (category) {
       this.currentTab = category;
       this.fetchInitialContests();
+      window.scrollTo(0, 0);
     } else {
       // Returning to summary, ensure we have data for all
       this.fetchInitialContests();
@@ -622,6 +611,12 @@ class ArenaContestList extends Vue {
       default:
         return [];
     }
+  }
+
+  get visibleContestTabs(): ContestTab[] {
+    return [ContestTab.Current, ContestTab.Future, ContestTab.Past].filter(
+      (tab) => this.getContestsForTab(tab).length > 0,
+    );
   }
 
   onSearchQuery() {
@@ -690,27 +685,27 @@ class ArenaContestList extends Vue {
   }
 
   scrollLeft(tab: ContestTab) {
-    const container = (this.$refs[
-      `scrollContainer_${tab}`
-    ] as HTMLElement[])[0];
+    const container = (this.$refs[`scrollContainer_${tab}`] as
+      | HTMLElement[]
+      | undefined)?.[0];
     if (container) {
       container.scrollBy({ left: -600, behavior: 'smooth' });
     }
   }
 
   scrollRight(tab: ContestTab) {
-    const container = (this.$refs[
-      `scrollContainer_${tab}`
-    ] as HTMLElement[])[0];
+    const container = (this.$refs[`scrollContainer_${tab}`] as
+      | HTMLElement[]
+      | undefined)?.[0];
     if (container) {
       container.scrollBy({ left: 600, behavior: 'smooth' });
     }
   }
 
   onScroll(tab: ContestTab) {
-    const container = (this.$refs[
-      `scrollContainer_${tab}`
-    ] as HTMLElement[])[0];
+    const container = (this.$refs[`scrollContainer_${tab}`] as
+      | HTMLElement[]
+      | undefined)?.[0];
     if (container) {
       this.$set(this.scrollPositions, tab, container.scrollLeft);
       this.$set(
@@ -739,8 +734,9 @@ class ArenaContestList extends Vue {
   }
 
   updated() {
-    // Recalculate scroll limits when DOM updates
-    [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach((tab) => {
+    // Recalculate scroll limits when DOM updates. Only iterate the tabs that
+    // are actually rendered; hidden (empty) tabs have no scrollContainer ref.
+    this.visibleContestTabs.forEach((tab) => {
       this.onScroll(tab);
     });
   }
@@ -785,12 +781,20 @@ class ArenaContestList extends Vue {
     }, 1000);
   }
 
-  finishContestDate(contest: types.ContestListItem): string {
-    return contest.finish_time.toLocaleDateString();
+  currentContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForCurrentContest(contest.finish_time);
   }
 
-  startContestDate(contest: types.ContestListItem): string {
-    return contest.start_time.toLocaleDateString();
+  futureContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForFutureContest(contest.start_time);
+  }
+
+  pastContestDate(contest: types.ContestListItem): string {
+    return time.getDisplayForPastContest(contest.finish_time);
+  }
+
+  exactContestDateTime(date: Date): string {
+    return `${time.formatDateForContest(date)}, ${date.toLocaleTimeString()}`;
   }
 
   getTimeLink(time: Date): string {

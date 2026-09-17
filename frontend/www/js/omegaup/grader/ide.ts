@@ -9,11 +9,12 @@ import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.FullIDEPayload();
+
   document.body.style.padding = '0';
   const main = document.querySelector('main') as HTMLElement;
   main.style.flex = '1 1 auto';
 
-  const payload = types.payloadParsers.FullIDEPayload();
   const acceptedLanguages = payload.acceptedLanguages;
   const preferredLanguage = payload.preferredLanguage || acceptedLanguages[0];
 

@@ -17,7 +17,7 @@ describe('RunsForCourses.vue', () => {
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
+    expect(wrapper.find('.card-header').text()).toBe(T.latestSubmissionsTitle);
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 

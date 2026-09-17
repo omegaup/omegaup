@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: omegaUp Discord
+    url: https://discord.gg/K3JFd9d3wk
+    about: Discuss your idea or report and get feedback before opening an issue.
+  - name: GitHub Discussions
+    url: https://github.com/omegaup/omegaup/discussions
+    about: General questions, follow-ups, and community discussion.

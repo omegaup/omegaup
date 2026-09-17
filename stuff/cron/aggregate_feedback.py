@@ -15,6 +15,7 @@ import logging
 import operator
 import os
 import sys
+import time
 from typing import (DefaultDict, Dict, Mapping, NamedTuple, Optional, Sequence,
                     Tuple, Set)
 
@@ -26,15 +27,16 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+import lib.runner  # pylint: disable=wrong-import-position
+from cron.constants import (  # pylint: disable=wrong-import-position
+    QUALITYNOMINATION_QUESTION_CHANGE_ID,
+)
 
 CONFIDENCE = 10
 MIN_POINTS = 10
 PROBLEM_TAG_VOTE_MIN_PROPORTION = 0.25
 MAX_NUM_TOPICS = 5
 VOTES_NUM = 5
-
-# Before this id the questions were different
-QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
 
 # SQL Queries
 GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
@@ -258,6 +260,8 @@ def get_most_voted_tags(problem_tag_votes: Mapping[str, float],
 
     if problem_tag_votes_n < MIN_POINTS:
         return None
+    if not problem_tag_votes:
+        return None
     maximum = problem_tag_votes[max(problem_tag_votes,
                                     key=lambda x: problem_tag_votes.get(x, 0))]
     final_tags = [tag for (tag, votes) in problem_tag_votes.items()
@@ -308,7 +312,7 @@ def replace_voted_tags(dbconn: lib.db.Connection,
             finally:
                 dbconn.conn.get_warnings = get_warnings
             dbconn.conn.commit()
-    except:  # noqa: bare-except
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to replace voted tags')
         dbconn.conn.rollback()
 
@@ -392,6 +396,7 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
     attempted_problems = 0
     successful_problems = 0
     failed_problems = 0
+    start_time = time.monotonic()
 
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
@@ -420,11 +425,17 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                         problem_id)
 
     logging.info(
-        'Finished aggregating feedback: '
-        'attempted=%d successful=%d failed=%d',
+        'aggregate_feedback summary: attempted=%d successful=%d failed=%d',
         attempted_problems,
         successful_problems,
-        failed_problems)
+        failed_problems,
+        extra={
+            'problems_attempted': attempted_problems,
+            'problems_successful': successful_problems,
+            'problems_failed': failed_problems,
+            'duration_ms': round((time.monotonic() - start_time) * 1000),
+        },
+    )
 
 
 def aggregate_reviewers_feedback_for_problem(
@@ -505,13 +516,42 @@ def aggregate_reviewers_feedback(
     Updates the quality_seal field on Problems table and updates the
     problem level tag.
     '''
+    attempted_problems = 0
+    successful_problems = 0
+    failed_problems = 0
+
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'quality_tag';""")
         for (problem_id, ) in cur.fetchall():
-            aggregate_reviewers_feedback_for_problem(dbconn, problem_id)
-        dbconn.conn.commit()
+            attempted_problems += 1
+            try:
+                aggregate_reviewers_feedback_for_problem(
+                    dbconn, problem_id)
+                dbconn.conn.commit()
+                successful_problems += 1
+            except Exception:  # pylint: disable=broad-except
+                failed_problems += 1
+                logging.exception(
+                    'Failed to aggregate reviewer feedback for '
+                    'problem %d. '
+                    'Continuing with remaining problems.',
+                    problem_id)
+                try:
+                    dbconn.conn.rollback()
+                except Exception:  # pylint: disable=broad-except
+                    logging.exception(
+                        'Failed to rollback transaction for '
+                        'problem %d',
+                        problem_id)
+
+    logging.info(
+        'Finished aggregating reviewer feedback: '
+        'attempted=%d successful=%d failed=%d',
+        attempted_problems,
+        successful_problems,
+        failed_problems)
 
 
 def get_last_friday() -> datetime.date:
@@ -608,40 +648,51 @@ def main() -> None:
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    lib.runner.configure_parser(parser)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(lib.db.DatabaseConnectionArguments.from_args(args))
-    try:
+    has_failures = False
+    with lib.runner.run(parser.prog, args) as cron_run:
+        dbconn = lib.db.connect(
+            lib.db.DatabaseConnectionArguments.from_args(args))
         try:
-            aggregate_reviewers_feedback(dbconn)
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to calculate problem quality seal and category.')
-            raise
+            try:
+                with cron_run.phase('aggregate_reviewers_feedback'):
+                    aggregate_reviewers_feedback(dbconn)
+            except Exception:  # pylint: disable=broad-except
+                logging.exception(
+                    'Failed to calculate problem quality seal and category.')
+                has_failures = True
 
-        try:
-            aggregate_feedback(dbconn)
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to aggregate feedback and update problem tags.')
-            raise
+            try:
+                with cron_run.phase('aggregate_feedback'):
+                    aggregate_feedback(dbconn)
+            except Exception:  # pylint: disable=broad-except
+                logging.exception(
+                    'Failed to aggregate feedback and update problem tags.')
+                has_failures = True
 
-        try:
-            # Problem of the week HAS to be computed AFTER feedback has been
-            # aggregated. It uses difficulty tags computed from feedback to
-            # pick a problem of the given difficulty.
-            update_problem_of_the_week(dbconn, "easy")
-            # TODO(heduenas): Compute "hard" problem of the week when we get
-            # enough feedback records.
-        except:  # noqa: bare-except
-            logging.exception('Failed to update problem of the week')
-            raise
-    finally:
-        dbconn.conn.close()
-        logging.info('Done')
+            try:
+                # Problem of the week HAS to be computed AFTER feedback has
+                # been aggregated. It uses difficulty tags computed from
+                # feedback to pick a problem of the given difficulty.
+                with cron_run.phase('update_problem_of_the_week'):
+                    update_problem_of_the_week(dbconn, "easy")
+                # TODO(heduenas): Compute "hard" problem of the week when we
+                # get enough feedback records.
+            except Exception:  # pylint: disable=broad-except
+                logging.exception('Failed to update problem of the week')
+                has_failures = True
+        finally:
+            dbconn.conn.close()
+            logging.info('Done')
+        if has_failures:
+            cron_run.mark_failure()
+    if has_failures:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

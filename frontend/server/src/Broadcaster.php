@@ -10,6 +10,39 @@ class Broadcaster {
         $this->log = \Monolog\Registry::omegaup()->withName('broadcaster');
     }
 
+    public function broadcastContestProblemChange(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Problems $problem,
+        int $userId,
+        string $changeType
+    ): void {
+        try {
+            $message = json_encode([
+                'message' => '/contest/problem/update/',
+                'type' => $changeType,
+                'contest_alias' => $contest->alias,
+                'problem_alias' => $problem->alias,
+            ]);
+
+            $this->log->debug("Sending update $message");
+            \OmegaUp\Grader::getInstance()->broadcast(
+                contestAlias: $contest->alias,
+                problemsetId: $contest->problemset_id,
+                problemAlias: null,
+                message: $message,
+                public: true,
+                username: null,
+                userId: -1,
+                userOnly: false
+            );
+        } catch (\Exception $e) {
+            $this->log->error(
+                'Failed to send to broadcaster',
+                ['exception' => $e]
+            );
+        }
+    }
+
     public function broadcastClarification(
         \OmegaUp\DAO\VO\Clarifications $clarification,
         \OmegaUp\DAO\VO\Problems $problem,
@@ -63,7 +96,7 @@ class Broadcaster {
     ): void {
         if (
             !is_null($clarification->answer) ||
-                !$problem->email_clarifications
+            !$problem->email_clarifications
         ) {
             return;
         }

@@ -89,6 +89,9 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
         $params = [$email];
         /** @var null|array{email: null|string, email_id: int, user_id: int|null} */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
         return new \OmegaUp\DAO\VO\Emails($row);
     }
 }

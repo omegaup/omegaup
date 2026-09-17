@@ -10,9 +10,9 @@
     >
     </textarea>
     <div v-else class="form-control contestants">
-      <span href="#" class="edit-icon" @click.prevent="isFocused = true">{{
+      <a href="#" class="edit-icon" @click.prevent="isFocused = true">{{
         T.wordsEdit
-      }}</span>
+      }}</a>
       <div class="users-list">
         <div v-for="user in usersList" :key="user" class="users-list__item">
           <span
