@@ -435,7 +435,7 @@ def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
             writer.writeheader()
             writer.writerows(sort_results_for_csv(results))
         return path
-    except Error as exc:
+    except OSError as exc:
         logging.error("Failed to save CSV: %s", exc)
         return None
 
