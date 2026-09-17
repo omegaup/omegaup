@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 '''Unit tests for the MySQL EXPLAIN log processor.'''
 
+import logging
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 import pytest
 
@@ -13,6 +14,7 @@ from process_mysql_explain_logs import (
     deduplicate_results,
     load_allowlist,
     normalize_query,
+    save_to_csv,
     sort_results_for_csv,
 )
 
@@ -325,3 +327,43 @@ entries:
 
     with pytest.raises(AllowlistValidationError, match='duplicates'):
         load_allowlist(str(allowlist))
+
+
+def test_save_to_csv_returns_none_when_makedirs_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''A filesystem error in os.makedirs is reported, not raised.'''
+    def _fail_makedirs(*args: Any, **kwargs: Any) -> None:
+        raise PermissionError('Permission denied')
+
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.os.makedirs',
+        _fail_makedirs,
+    )
+
+    results = [_result('1', 'SELECT * FROM Users', 'Users')]
+    with caplog.at_level(logging.ERROR):
+        assert save_to_csv(results) is None
+
+    assert 'Failed to save CSV' in caplog.text
+
+
+def test_save_to_csv_returns_none_when_open_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''A filesystem error while writing the file is reported, not raised.'''
+    monkeypatch.chdir(tmp_path)
+
+    def _fail_open(*args: Any, **kwargs: Any) -> Any:
+        raise PermissionError('Permission denied')
+
+    monkeypatch.setattr('builtins.open', _fail_open)
+
+    results = [_result('1', 'SELECT * FROM Users', 'Users')]
+    with caplog.at_level(logging.ERROR):
+        assert save_to_csv(results) is None
+
+    assert 'Failed to save CSV' in caplog.text
