@@ -263,5 +263,141 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ),
             $placeSuffix
         );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(101);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceSt'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(102);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceNd'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(103);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceRd'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(104);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(111);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(112);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(113);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(121);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceSt'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(122);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceNd'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(123);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceRd'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(200);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(211);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(212);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(213);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(1011);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(1012);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
+
+        $placeSuffix = \OmegaUp\Controllers\Certificate::getPlaceSuffix(1013);
+        $this->assertSame(
+            $translator->get(
+                'certificatePdfContestPlaceTh'
+            ),
+            $placeSuffix
+        );
     }
 }
