@@ -98,6 +98,61 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testGroupRolesAppearsInSystemRoles() {
+        // Create the target user whose roles we'll inspect
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create an admin to perform privileged operations
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($admin);
+
+        // Create a group and add the target user to it
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            $admin,
+            null,
+            null,
+            null,
+            $adminLogin
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identity,
+            $adminLogin
+        );
+
+        // Assign the Reviewer system role to the group
+        \OmegaUp\DAO\GroupRoles::create(new \OmegaUp\DAO\VO\GroupRoles([
+            'group_id' => $groupData['group']->group_id,
+            'role_id'  => \OmegaUp\Authorization::REVIEWER_ROLE,
+            'acl_id'   => \OmegaUp\Authorization::SYSTEM_ACL,
+        ]));
+
+        // getUserDetailsForTypeScript must include the group-inherited role
+        [
+            'systemRoles' => $systemRoles,
+        ] = \OmegaUp\Controllers\User::getUserDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'username'   => $identity->username,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertContains('Reviewer', $systemRoles);
+
+        // apiExtraInformation must also surface the group-inherited role
+        ['identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        $supportLogin = self::login($supportIdentity);
+
+        $extraInfo = \OmegaUp\Controllers\User::apiExtraInformation(
+            new \OmegaUp\Request([
+                'auth_token'      => $supportLogin->auth_token,
+                'usernameOrEmail' => $identity->username,
+            ])
+        );
+
+        $this->assertContains('Reviewer', $extraInfo['roles']);
+    }
+
     public function testPreviouslyAddedRoles() {
         $username = 'testuserrole';
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
