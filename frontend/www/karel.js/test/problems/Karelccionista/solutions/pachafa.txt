@@ -1,0 +1,64 @@
+iniciar-programa
+    define-nueva-instruccion gira(n) como inicio
+    	repetir n veces gira-izquierda;        
+    fin;
+    
+    define-nueva-instruccion mavanza(n) como inicio
+    	repetir n veces avanza;
+    fin;
+    
+    
+    define-nueva-instruccion segundocero como inicio 
+    	avanza;
+        si junto-a-zumbador entonces inicio 
+        	coge-zumbador;
+            si no junto-a-zumbador entonces inicio
+            	gira-izquierda;
+                apagate;
+            fin;
+        fin;     
+        si frente-libre entonces segundocero;
+    fin;
+    
+    define-nueva-instruccion primercero como inicio 
+    	avanza;
+        si junto-a-zumbador entonces inicio 
+        	coge-zumbador;
+            si no junto-a-zumbador entonces sal-de-instruccion;
+        fin;     
+        si frente-libre entonces primercero
+        sino inicio
+        	gira-izquierda;
+            apagate;
+        fin;
+    fin;
+    
+    
+    define-nueva-instruccion resuelve(n) como inicio
+    	repetir n veces inicio
+        	gira(2);
+        	primercero;
+            si frente-libre entonces segundocero;
+            gira(2);
+            mavanza(n);
+        fin;
+        mientras no orientado-al-norte hacer gira-izquierda;
+        apagate;
+    fin;
+    
+    define-nueva-instruccion cuenta(n) como inicio
+    	si junto-a-zumbador y frente-libre entonces inicio
+        	avanza;
+            cuenta(sucede(n));
+        fin sino inicio
+        	resuelve(n);
+        fin;        
+    fin;
+    
+    inicia-ejecucion
+        gira(3);
+        cuenta(0);
+        
+        apagate;
+    termina-ejecucion
+finalizar-programa

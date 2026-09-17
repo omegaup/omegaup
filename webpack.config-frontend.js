@@ -146,6 +146,11 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
+          // Served at /js/dist/mathjax/tex-svg.js (gitignored output dir).
+          from: path.resolve(__dirname, './node_modules/mathjax/es5'),
+          to: path.resolve(__dirname, './frontend/www/js/dist/mathjax'),
+        },
+        {
           from: './frontend/badges/**/query.sql',
           to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
           transform(content, filepath) {

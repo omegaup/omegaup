@@ -1,0 +1,106 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicia" data-toc-depth="1"></a>
+</div>
+<h1>Migración desde Karel.js</h1>
+<hr>
+<p class="alert alert-info">Esta página está dirigida a aquellos que vienen de Karel.js y ya saben usar Karel.js</p>
+
+<p>ReKarel esta altamente inspirado por Karel.js, por lo que la migración no implica muchos cambios.</p>
+
+<p>Hay algunas diferencias importantes que son necesarias conocer para poder usar ReKarel.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="mundo" data-toc="El mundo" data-toc-depth="1"></a>
+</div>
+<h3>El mundo</h3>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="edicion" data-toc="Edición" data-toc-depth="3"></a>
+</div>
+<h4>Edición</h4>
+<p>Editar un mundo funciona significativamente diferente. La edición de este está basado en programas como excel o spreadsheets.</p>
+
+<p>Uno selecciona una área ya sea, dando clic en una celda y arrastrando el clic hasta otra, o dando clic en una celda y shift+clic en otra.</p>
+
+
+<div class="figure">
+    <img src="../../img/click-arrastra.png" alt="" class="figure-img img-fluid rounded">
+    <figcaption class="figure-caption">1- Presionar Clic<br>2- Arrastra<br>3- Soltar clic</figcaption>
+</div>
+
+
+<p>Una vez seleccionada, puedes cambiar esa área seleccionada usando la barra de herramientas.</p>
+
+<div class="figure">
+    <img src="../../img/toolbar.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+<p> Alternativamente, puedes utilizar los atajos de teclado. <b>Es muy recomendable</b> usar los atajos de teclado. Puedes leer más de los atajos en la sección de atajos, o viendo la letra entre paréntesis en las opciones de la barra de herramientas.</p>
+
+<div class="figure">
+    <img src="../../img/hotkeys.png" alt="" class="figure-img img-fluid rounded">
+    <figcaption class="figure-caption">Aquí se muestra la guía de atajo resaltado</figcaption>
+</div>
+
+<p>También puedes usar clic derecho para obtener el menu contextual</p>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="tamano" data-toc="Cambiar el tamaño" data-toc-depth="2"></a>
+</div>
+<h4>Cambiar el tamaño del mundo</h4>
+Para cambiar el tamaño del mundo, esto se hace desde el menú del mundo.
+
+
+<div class="figure">
+    <img src="../../img/resize.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="navegacion" data-toc="Navegación" data-toc-depth="2"></a>
+</div>
+<h4>Navegación</h4>
+
+La navegación es ligeramente diferente que en Karel.js, para desplazarte en esta versión debes usar el scroll o los botones de navegación.
+
+<div class="figure">
+    <img src="../../img/navegacion.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="ejecucion" data-toc="Ejecución" data-toc-depth="1"></a>
+</div>
+<h2>Ejecución</h2>
+
+<p>La ejecución de ReKarel es casi idéntica a Karel.js, tanto, que hay algunos botones compartidos en las dos versiones.</p>
+
+
+<div class="figure">
+    <img src="../../img/exec_share.png" alt="" class="figure-img img-fluid rounded">
+</div>
+
+<p>Pero lo que cambia es la ejecución paso a paso, ya que ReKarel ofrece tres opciones, donde Karel.js solo ofrece la primera.</p>
+
+
+<div class="figure">
+    <img src="../../img/exec_diff.png" alt="" class="figure-img img-fluid rounded">
+</div>
+<ol>
+<li><b>Avanza y entra:</b> esta es idéntica al "paso a paso" de Karel.js, avanza un paso el programa y entra a funciones.</li>
+<li><b>Avanza y salta:</b> esta avanza un paso el programa, pero si la instrucción es una llamada a una función, Karel ejecuta rápidamente esa función sin mostrarte lo que hace paso a paso.</li>
+<li><b>Sal de instrucción:</b> Ejecuta el código hasta salir de la función actual.</li>
+</ol>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="otras" data-toc="Otras diferencias" data-toc-depth="1"></a>
+</div>
+
+<h2>Otras diferencias</h2>
+<p>Las diferencias anteriores son las más importantes entre Karel.js y ReKarel, hay algunas otras diferencias menores, como mejoras menores y menús diferentes, pero estos no son esenciales para el uso de la aplicación, te recomendamos leer más de la documentación para saber más.</p>
+
+@@include("../footer.html")

@@ -1,0 +1,52 @@
+<div id="randomBeepersModal" class="modal fade" tabindex="-1" aria-labelledby="randomBeepersModal" aria-hidden="true">
+    <form id="randomBeepersForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rango de zumbadores aleatorios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container ">
+                        <p>El rango es inclusivo, es decir, genera el mínimo y maximo</p>
+
+                        <div class="row m-2">
+                            <div class="col border rounded p-0 ms-1 me-1">
+                                <div>
+                                    <label class="bg-body-secondary p-1 w-100" for="minimumRandomBeepers">Mínimo de zumbadores</label>
+                                </div>
+                                <div>
+                                    <input class="w-100 bg-body form-control border border-0" type="number"
+                                        id="minimumRandomBeepers" min="0">
+                                </div>
+                            </div>
+
+                            
+                            <div class="col border rounded p-0 ms-1 me-1">
+                                <div>
+                                    <label class="bg-body-secondary p-1 w-100" for="maximumRandomBeepers">Máximo de zumbadores</label>
+                                </div>
+                                <div>
+                                    <input class="w-100 bg-body form-control border border-0" type="number"
+                                        id="maximumRandomBeepers" min="0">
+                                </div>
+                            </div>
+
+                        </div>
+                        
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-bs-dialog="none">
+                        Aceptar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-dialog="none">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

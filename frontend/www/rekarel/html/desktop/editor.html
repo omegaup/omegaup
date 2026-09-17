@@ -1,0 +1,57 @@
+<div class="split split-horizontal" id="splitter-left-pane">
+    <div class="split content" id="splitter-left-top-pane">
+
+
+    </div>
+    <div class="split content tabbable flex-grow-1" id="splitter-left-bottom-pane">
+
+
+        <!-- Only required for left/right tabs -->
+        <div class="d-flex flex-column h-100 w-100" id="stateConsole">
+            <ul class="nav nav-tabs bg-body" id="ExecData" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="consoleTab-tab"
+                        data-bs-toggle="tab" data-bs-target="#consoleTab" type="button"
+                        role="tab" aria-controls="consoleTab" aria-selected="true"
+                        title="Ve mensajes de Karel">
+                        <span class="badge rounded-pill bg-primary" id="consoleMessageCount">0</span>
+                        Mensajes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pilaTab-tab" data-bs-toggle="tab"
+                        data-bs-target="#pilaTab" type="button" role="tab"
+                        aria-controls="pilaTab" aria-selected="false"
+                        title="Revisa la pila de llamadas">
+                        <i class="bi bi-stack"></i> Pila
+                    </button>
+                </li>
+                <li class="nav-item ms-auto p-2">
+                    <button class="btn p-1 btn-danger"
+                        title="Quitar todos los mensajes de la consola"
+                        id="desktopClearConsole">
+                        <small>
+                            <i class="bi bi-trash-fill"></i>
+                        </small>
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content flex-grow-1 overflow-auto bg-body" id="ExecDataContent">
+                <div class="tab-pane fade show active p-2 "
+                    id="consoleTab" role="tabpanel" aria-labelledby="consoleTab-tab">
+                    <div class="d-flex flex-column flex-grow-1 overflow-auto"
+                        id="desktopConsole">
+                        <div><span class="text-info ">¡Bienvenido!</span> 
+                        </div>
+
+                    </div>
+                </div>
+                <div class="tab-pane fade flex-column" id="pilaTab" role="tabpanel"
+                    aria-labelledby="pilaTab-tab">
+                    <div id="lastReturn" class="bg-secondary-subtle p-2"></div>
+                    <div id="stackPanel" class="flex-grow-1  p-2 "></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

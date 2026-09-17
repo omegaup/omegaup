@@ -1,0 +1,79 @@
+{
+  "name": "karel",
+  "version": "1.1.0",
+  "description": "Compilador y evaluador de Karel en javascript",
+  "main": "js/index.js",
+  "scripts": {
+    "start": "electron index.js",
+    "test": "mocha",
+    "clean": "rm -rf ./dist",
+    "clean:win": "rm -rf ./dist/win",
+    "clean:osx": "rm -rf ./dist/osx",
+    "clean:linux": "rm -rf ./dist/linux",
+    "pack": "npm run clean && npm run pack:linux && npm run pack:osx && npm run pack:win",
+    "pack:osx": "npm run clean:osx && ./node_modules/electron-packager/bin/electron-packager.js . --out=dist/osx --platform=darwin --arch=x64 --icon=img/osx_icon.icns --ignore=dist --ignore=Gruntfile.js --ignore='\\.yml' --ignore=webpack.config.js --ignore=test",
+    "pack:win": "npm run clean:win && ./node_modules/electron-packager/bin/electron-packager.js . \"karel.js\" --out=dist/win --platform=win32 --arch=ia32 --icon=img/win_icon.ico --ignore=dist --ignore=Gruntfile.js --ignore='\\.yml' --ignore=webpack.config.js --ignore=test",
+    "pack:linux": "npm run clean:linux && ./node_modules/electron-packager/bin/electron-packager.js . --out=dist/linux --platform=linux --arch=x64 --icon=img --ignore=dist --ignore=Gruntfile.js --ignore='\\.yml' --ignore=webpack.config.js --ignore=test",
+    "build": "npm run clean && npm run build:bundle && npm run build:linux && npm run build:win",
+    "build:bundle": "./node_modules/webpack/bin/webpack.js",
+    "build:osx": "npm run pack:osx && ./node_modules/electron-builder/out/cli/cli.js --mac --prepackaged=dist/osx",
+    "build:win": "npm run pack:win && ./node_modules/electron-builder/out/cli/cli.js --win --prepackaged=dist/win --ia32",
+    "build:linux": "npm run pack:linux && ./node_modules/electron-builder/out/cli/cli.js --linux --prepackaged=dist/linux"
+  },
+  "build": {
+    "electronVersion": "10.1.1",
+    "appId": "com.omegaup.karel",
+    "mac": {
+      "icon": "img/osx_icon.icns"
+    },
+    "win": {
+      "icon": "img/win_icon.ico"
+    },
+    "linux": {
+      "icon": "img",
+      "maintainer": "lhchavez <lhchavez@omegaup.com>"
+    }
+  },
+  "bin": {
+    "kareljs": "./cmd/kareljs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/omegaup/karel.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omegaup/karel.js/issues"
+  },
+  "author": "omegaUp",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "commander": "^6.2.1",
+    "ts-loader": "^9.5.1",
+    "xmldom": "^0.5.0"
+  },
+  "keywords": [
+    "karel"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "babel-loader": "^8.3.0",
+    "electron": "^15.5.7",
+    "electron-builder": "^22.14.13",
+    "electron-packager": "^15.5.2",
+    "grunt": "^1.6.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-uglify": "^2.3.0",
+    "grunt-jison": "^1.3.3",
+    "jison": "^0.4.18",
+    "mocha": "^8.4.0",
+    "node-loader": "^1.0.3",
+    "shebang-loader": "0.0.1",
+    "tmp": "0.0.31",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

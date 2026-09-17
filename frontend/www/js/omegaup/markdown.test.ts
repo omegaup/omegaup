@@ -75,9 +75,9 @@ describe('markdown', () => {
         converter.makeHtml(`<figure class="video_container">
            <iframe src="https://www.youtube.com/embed/enMumwvLAug" frameborder="0" allowfullscreen="true"> </iframe>
          </figure>`),
-      ).toEqual(`<p><figure class="video_container">
+      ).toEqual(`<figure class="video_container">
            <iframe src="https://www.youtube.com/embed/enMumwvLAug" frameborder="0" allowfullscreen="true"> </iframe>
-         </figure></p>`);
+         </figure>`);
     });
 
     it('Should handle valid iframe tag with extra attributes', () => {
@@ -85,15 +85,15 @@ describe('markdown', () => {
         converter.makeHtml(`<figure class="video_container">
            <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
         </figure>`),
-      ).toEqual(`<p><figure class="video_container">
+      ).toEqual(`<figure class="video_container">
            <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
-        </figure></p>`);
+        </figure>`);
     });
 
     it('Should handle details/summary tags', () => {
       expect(
         converter.makeHtml('<details><summary>SPOILER</summary>Hi</details>'),
-      ).toEqual('<p><details><summary>SPOILER</summary>Hi</details></p>');
+      ).toEqual('<details><summary>SPOILER</summary>Hi</details>');
     });
 
     it('Should handle sample I/O tables', () => {
@@ -114,7 +114,6 @@ Explicación
 Case #2: 15
 ||end`),
       ).toEqual(`<h1>Ejemplo</h1>
-
 <table class="sample_io">
 <thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead>
 <tbody><tr><td><pre>1
@@ -166,7 +165,6 @@ Tags <b>hello</b>
 0
 ||end`),
       ).toEqual(`<h1>Ejemplo</h1>
-
 <table class="sample_io">
 <thead><tr><th>Entrada</th><th>Salida</th></tr></thead>
 <tbody><tr><td><pre>5 5 2
@@ -274,7 +272,6 @@ Tags <b>hello</b>
           },
         ),
       ).toEqual(`<h1>Ejemplo</h1>
-
 <table class="sample_io">
 <thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead>
 <tbody><tr><td><pre>hello</pre></td><td><pre>world</pre></td><td><p>yes</p></td></tr>
@@ -395,9 +392,8 @@ Tags &lt;b&gt;hello&lt;/b&gt;
 </tr>
 </tbody>
 </table>
-
 <blockquote>
-  <p>bar</p>
+<p>bar</p>
 </blockquote>`);
 
       expect(
@@ -456,7 +452,7 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       );
       // Fewer than three backticks is not enough.
       expect(converter.makeHtml('``\nfoo\n``')).toEqual(
-        '<p><code>\nfoo\n</code></p>',
+        '<p><code>foo</code></p>',
       );
       // The closing code fence must use the same character as the opening
       // fence.
@@ -511,7 +507,7 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       );
       // Code fences (opening and closing) cannot contain internal spaces.
       expect(converter.makeHtml('``` ```\naaa')).toEqual(
-        '<p><code></code>\naaa</p>',
+        '<p><code> </code>\naaa</p>',
       );
       expect(converter.makeHtml('~~~~~~\naaa\n~~~ ~~')).toEqual(
         '<p>~~~~~~\naaa\n~~~ ~~</p>',
@@ -520,12 +516,12 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       // followed directly by paragraphs, without a blank line
       // between.
       expect(converter.makeHtml('foo\n```\nbar\n```\nbaz')).toEqual(
-        '<p>foo</p>\n\n<pre><code>bar\n</code></pre>\n\n<p>baz</p>',
+        '<p>foo</p>\n<pre><code>bar\n</code></pre>\n<p>baz</p>',
       );
       // Other blocks can also occur before and after fenced code
       // blocks without an intervening blank line.
       expect(converter.makeHtml('foo\n---\n~~~\nbar\n~~~\n# baz')).toEqual(
-        '<h2>foo</h2>\n\n<pre><code>bar\n</code></pre>\n\n<h1>baz</h1>',
+        '<h2>foo</h2>\n<pre><code>bar\n</code></pre>\n<h1>baz</h1>',
       );
       // An info string can be provided after the opening code fence.
       // Although this spec doesn’t mandate any particular treatment

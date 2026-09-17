@@ -64,12 +64,16 @@ describe('Problem creator Test', () => {
         cy.get('[data-problem-creator-editor-markdown]').type('Hello omegaUp!');
         cy.get('[data-problem-creator-save-markdown]').click();
         cy.get('[data-problem-creator-previewer-markdown]').should(
-          'have.html',
-          '<h1>Previsualización</h1>\n\n<p>Hello omegaUp!</p>',
+          'contain.html',
+          '<h1>Previsualización</h1>',
+        );
+        cy.get('[data-problem-creator-previewer-markdown]').should(
+          'contain.html',
+          '<p>Hello omegaUp!</p>',
         );
       });
 
-      it(`Should support Live Preview and Pagedown controls - ${mode.name}`, () => {
+      it(`Should support Live Preview and Markdown toolbar controls - ${mode.name}`, () => {
         mode.visit();
         cy.get('[data-problem-creator-tab="statement"]').click();
 
@@ -82,8 +86,11 @@ describe('Problem creator Test', () => {
           'Live Preview Test',
         );
 
-        // Click Bold button and verify live preview updates
-        cy.get('#wmd-bold-button').click();
+        // Click Bold on the statement toolbar. Both statement and solution
+        // tabs keep a MarkdownToolbar in the DOM (bootstrap-vue b-tab).
+        cy.get(
+          '[data-statement-markdown-toolbar] [data-markdown-toolbar-bold]',
+        ).click();
         cy.get('[data-problem-creator-editor-markdown]').should(
           'contain.value',
           '**strong text**',
@@ -104,8 +111,12 @@ describe('Problem creator Test', () => {
         );
         cy.get('[data-problem-creator-solution-save-markdown]').click();
         cy.get('[data-problem-creator-solution-previewer-markdown]').should(
-          'have.html',
-          '<h1>Previsualización</h1>\n\n<p>Hello <strong>solution</strong>!</p>',
+          'contain.html',
+          '<h1>Previsualización</h1>',
+        );
+        cy.get('[data-problem-creator-solution-previewer-markdown]').should(
+          'contain.html',
+          '<p>Hello <strong>solution</strong>!</p>',
         );
       });
 

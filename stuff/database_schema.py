@@ -244,11 +244,11 @@ def main() -> None:
     root = git_tools.root_dir()
     modified_files = get_modified_files(root)
 
-    for line in modified_files:
-        if not line.strip():
+    # get_modified_files() already returns NUL-split paths. Do not split on
+    # spaces: vendored trees can contain names like "3 y 5" or "mundo (1).in".
+    for filename in modified_files:
+        if not filename.strip():
             continue
-
-        [filename] = line.split(maxsplit=1)
 
         check_extra_validations(filename)
 

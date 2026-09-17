@@ -34,14 +34,8 @@ Log out and log back in so you can start running docker commands.
 After installing docker, fork the [omegaup/omegaup](https://github.com/omegaup/omegaup) repository, clone it to an empty directory
 
 ```shell
-git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
+git clone https://github.com/YOURUSERNAME/omegaup
 cd omegaup
-```
-
-Once you have cloned the repository, inside the directory run:
-
-```
-git submodule update --init --recursive
 ```
 
 and then, only needed the first time, or when the following command complains in the same directory (`omegaup/`) run:
@@ -90,7 +84,7 @@ docker exec -it omegaup-frontend-1 /bin/bash
 
 ## Running Tests Locally
 
-If you want to run the JavaScript/TypeScript tests locally (outside of Docker), you need to ensure all third-party dependencies are properly initialized.
+If you want to run the JavaScript/TypeScript tests locally (outside of Docker), install Node.js and Yarn, then run `yarn install`.
 
 ### Prerequisites
 
@@ -111,47 +105,22 @@ If you want to run the JavaScript/TypeScript tests locally (outside of Docker), 
 
 ### Setup Steps
 
-1. **Initialize Git Submodules**
-
-   The project uses git submodules for third-party JavaScript libraries located in `frontend/www/third_party/js/`. These must be initialized before running tests:
-
-   ```shell
-   git submodule update --init --recursive
-   ```
-
-   This command downloads the following required dependencies:
-
-   - `pagedown` - Markdown editor library
-   - `iso-3166-2.js` - Country/region codes
-   - `csv.js` - CSV parsing library
-   - `mathjax` - Math rendering library
-
-2. **Install Node Dependencies**
+1. **Install Node Dependencies**
 
    ```shell
    yarn install
    ```
 
-3. **Run Tests**
+2. **Run Tests**
 
    ```shell
    yarn test
    ```
 
-### Common Issues
-
-If you encounter errors like `Cannot find module '@/third_party/js/pagedown/Markdown.Converter.js'`, it means the git submodules were not initialized. Run:
-
-```shell
-git submodule update --init --recursive
-```
-
 ### Quick Start (Fresh Clone)
 
-For a fresh clone, use this single command to clone with all submodules:
-
 ```shell
-git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
+git clone https://github.com/YOURUSERNAME/omegaup
 cd omegaup
 yarn install
 yarn test
@@ -358,7 +327,7 @@ su - <your-username>
 ```bash
 mkdir -p ~/workspace         # e.g. ~/dev
 cd ~/workspace
-git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
+git clone https://github.com/YOURUSERNAME/omegaup
 cd omegaup
 ```
 

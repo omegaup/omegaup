@@ -1,0 +1,11 @@
+{
+	"name": "reCAPTCHA",
+	"description": "Provides support for reCAPTCHA captchas",
+	"version": "2.0",
+	"date": "2014-12-20",
+	"author": "Question2Answer",
+	"author_uri": "http://www.question2answer.org",
+	"license": "GPLv2",
+	"min_q2a": "1.7",
+	"load_order": "after_db_init"
+}

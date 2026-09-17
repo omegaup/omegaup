@@ -1,0 +1,89 @@
+<ejecucion>
+	<condiciones instruccionesMaximasAEjecutar="10000000" longitudStack="65000">
+    <comando nombre="AVANZA" maximoNumeroDeEjecuciones="32" />
+  </condiciones>
+  <mundos>
+		<mundo nombre="mundo_0" ancho="100" alto="100">
+			<monton x="2" y="1" zumbadores="10"></monton>
+			<monton x="3" y="1" zumbadores="13"></monton>
+			<monton x="4" y="1" zumbadores="18"></monton>
+			<monton x="5" y="1" zumbadores="13"></monton>
+			<monton x="6" y="1" zumbadores="9"></monton>
+			<monton x="7" y="1" zumbadores="14"></monton>
+			<monton x="8" y="1" zumbadores="14"></monton>
+			<monton x="9" y="1" zumbadores="14"></monton>
+			<monton x="10" y="1" zumbadores="14"></monton>
+			<monton x="1" y="2" zumbadores="17"></monton>
+			<monton x="2" y="2" zumbadores="16"></monton>
+			<monton x="3" y="2" zumbadores="15"></monton>
+			<monton x="4" y="2" zumbadores="14"></monton>
+			<monton x="5" y="2" zumbadores="13"></monton>
+			<monton x="6" y="2" zumbadores="12"></monton>
+			<monton x="7" y="2" zumbadores="11"></monton>
+			<monton x="8" y="2" zumbadores="10"></monton>
+			<monton x="9" y="2" zumbadores="9"></monton>
+			<monton x="10" y="2" zumbadores="15"></monton>
+			<monton x="1" y="3" zumbadores="24"></monton>
+			<monton x="2" y="3" zumbadores="23"></monton>
+			<monton x="3" y="3" zumbadores="27"></monton>
+			<monton x="4" y="3" zumbadores="20"></monton>
+			<monton x="5" y="3" zumbadores="21"></monton>
+			<monton x="6" y="3" zumbadores="22"></monton>
+			<monton x="7" y="3" zumbadores="23"></monton>
+			<monton x="8" y="3" zumbadores="24"></monton>
+			<monton x="9" y="3" zumbadores="25"></monton>
+			<monton x="10" y="3" zumbadores="30"></monton>
+			<monton x="1" y="4" zumbadores="40"></monton>
+			<monton x="2" y="4" zumbadores="39"></monton>
+			<monton x="3" y="4" zumbadores="38"></monton>
+			<monton x="4" y="4" zumbadores="37"></monton>
+			<monton x="5" y="4" zumbadores="36"></monton>
+			<monton x="6" y="4" zumbadores="35"></monton>
+			<monton x="7" y="4" zumbadores="34"></monton>
+			<monton x="8" y="4" zumbadores="33"></monton>
+			<monton x="9" y="4" zumbadores="32"></monton>
+			<monton x="10" y="4" zumbadores="31"></monton>
+			<monton x="1" y="5" zumbadores="41"></monton>
+			<monton x="2" y="5" zumbadores="42"></monton>
+			<monton x="3" y="5" zumbadores="43"></monton>
+			<monton x="4" y="5" zumbadores="44"></monton>
+			<monton x="5" y="5" zumbadores="45"></monton>
+			<monton x="6" y="5" zumbadores="46"></monton>
+			<monton x="7" y="5" zumbadores="47"></monton>
+			<monton x="8" y="5" zumbadores="48"></monton>
+			<monton x="9" y="5" zumbadores="49"></monton>
+			<monton x="10" y="5" zumbadores="50"></monton>
+			<monton x="1" y="6" zumbadores="60"></monton>
+			<monton x="2" y="6" zumbadores="59"></monton>
+			<monton x="3" y="6" zumbadores="58"></monton>
+			<monton x="4" y="6" zumbadores="57"></monton>
+			<monton x="5" y="6" zumbadores="56"></monton>
+			<monton x="6" y="6" zumbadores="55"></monton>
+			<monton x="7" y="6" zumbadores="54"></monton>
+			<monton x="8" y="6" zumbadores="53"></monton>
+			<monton x="9" y="6" zumbadores="52"></monton>
+			<monton x="10" y="6" zumbadores="51"></monton>
+			<pared x1="10" y1="0" y2="1"></pared>
+			<pared x1="10" y1="1" y2="2"></pared>
+			<pared x1="10" y1="2" y2="3"></pared>
+			<pared x1="10" y1="3" y2="4"></pared>
+			<pared x1="10" y1="4" y2="5"></pared>
+			<pared x1="0" y1="6" x2="1"></pared>
+			<pared x1="1" y1="6" x2="2"></pared>
+			<pared x1="2" y1="6" x2="3"></pared>
+			<pared x1="3" y1="6" x2="4"></pared>
+			<pared x1="4" y1="6" x2="5"></pared>
+			<pared x1="5" y1="6" x2="6"></pared>
+			<pared x1="6" y1="6" x2="7"></pared>
+			<pared x1="7" y1="6" x2="8"></pared>
+			<pared x1="8" y1="6" x2="9"></pared>
+			<pared x1="9" y1="6" x2="10"></pared>
+			<pared x1="10" y1="5" y2="6"></pared>
+		</mundo>
+	</mundos>
+	<programas tipoEjecucion="CONTINUA" intruccionesCambioContexto="1" milisegundosParaPasoAutomatico="0">
+		<programa nombre="p1" ruta="{$2$}" mundoDeEjecucion="mundo_0" xKarel="1" yKarel="1" direccionKarel="ESTE" mochilaKarel="0">
+			<despliega tipo="POSICION"></despliega>
+		</programa>
+	</programas>
+</ejecucion>

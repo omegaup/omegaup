@@ -1,0 +1,82 @@
+class program {
+
+void VolteeseJoven(n) {
+    iterate(n) turnleft();
+}
+
+void TodoDerechoJoven() {
+    while (frontIsClear) move();
+}
+
+void EncuentreUnBeeperJoven() {
+    while (notNextToABeeper &&
+        frontIsClear) move();
+}
+
+void RegreseseJoven() {
+    VolteeseJoven(2);
+    TodoDerechoJoven();
+}
+
+void OrdeneloJoven() {
+    if (nextToABeeper) {
+        pickbeeper();
+        OrdeneloJoven();
+        if (facingEast) move();
+        else VolteeseJoven(3);
+    } else {
+        RegreseseJoven();
+        VolteeseJoven(3);
+        move();
+    }
+}
+
+void AhoritaNoJoven() {
+    while (nextToABeeper &&
+        frontIsClear) move();
+    if (frontIsClear) {
+        EncuentreUnBeeperJoven();
+        if (nextToABeeper) {
+            RegreseseJoven();
+            turnleft(); move();
+        } else {
+            RegreseseJoven();
+            turnleft(); move();
+            VolteeseJoven(2);
+            turnoff();
+        }
+    } else {
+        RegreseseJoven();
+        turnleft(); move();
+        VolteeseJoven(2);
+        turnoff();
+    }
+}
+
+program() {
+    VolteeseJoven(3);
+    while (frontIsClear) {     
+        EncuentreUnBeeperJoven();
+        if (notNextToABeeper) {
+            RegreseseJoven();
+            VolteeseJoven(3);
+            move(); VolteeseJoven(3);
+            EncuentreUnBeeperJoven();
+            AhoritaNoJoven();
+        } else {
+            OrdeneloJoven();
+            if (nextToABeeper) {
+                RegreseseJoven();
+                turnleft(); move();
+            } else {
+                putbeeper();
+                RegreseseJoven();
+                turnleft(); move();
+                turnleft();
+            }
+        }
+    }
+    turnoff();
+}
+
+}

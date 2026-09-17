@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Condiciones que puede detectar Karel</title>
+  </head>
+  <body style="background-image: url('workbook.gif');">
+    <center>
+      <h2>Condiciones que puede detectar Karel</h2>
+    </center>
+    <p>
+      Date cuenta de que la condición orientado-al-sur, en el fragmento de
+      programa de la página del si /entonces
+    </p>
+    <p>...</p>
+    <p>si orientado-al-sur entonces inicio</p>
+    <p>&nbsp;&nbsp; gira-izquierda;</p>
+    <p>&nbsp;&nbsp; gira-izquierda;</p>
+    <p>&nbsp;&nbsp; gira-izquierda;</p>
+    <p>fin ;</p>
+    <p>...</p>
+    <p>
+      La condición es una función de la situación actual de Karel, a medida que
+      se ejecuta el programa. Si Karel está actualmente orientado hacia el Sur,
+      el valor de la función orientado-al-sur será verdadero, y el conjunto de
+      sentencias entre el par inicio/fin, se ejecutará. De otra manera, el valor
+      orientado-al-sur será falso y el bloque de sentencias se saltará. Karel
+      comprende cualquier función booleana que comprueba su situación actual.
+      Aquí hay un listado:
+    </p>
+    <strong>
+      <center>
+        <table border="2">
+          <tr>
+            <td width="148">frente-libre</td>
+            <td width="218">junto-a-zumbador</td>
+            <td width="165">orientado-al-este</td>
+          </tr>
+          <tr>
+            <td>frente-bloqueado</td>
+            <td>no-junto-a-zumbador</td>
+            <td>orientado-al-oeste</td>
+          </tr>
+          <tr>
+            <td>izquierda-libre</td>
+            <td>algun-zumbador-en-la-mochila</td>
+            <td>no-orientado-al-norte</td>
+          </tr>
+          <tr>
+            <td>izquierda-bloqueada</td>
+            <td>ningun-zumbador-en-la-mochila</td>
+            <td>no-orientado-al-sur</td>
+          </tr>
+          <tr>
+            <td>derecha-libre</td>
+            <td>orientado-al-norte</td>
+            <td>no-orientado-al-este</td>
+          </tr>
+          <tr>
+            <td>derecha-bloqueada</td>
+            <td>orientado-al-sur</td>
+            <td>no-orientado-al-oeste</td>
+          </tr>
+        </table>
+      </center></strong
+    >
+    <p>
+      "libre" significa que no hay ningún muro, mientras que "bloqueado"
+      significa que hay un muro en esa dirección. Karel puede detectar si hay o
+      no algún zumbador en la esquina en la que se encuentra actualmente, así
+      como detectar si tiene algún zumbador en la mochila o no. También tiene
+      una brújula para detectar hacia qué dirección está orientado.
+    </p>
+    <p>
+      Por si fuera poco podemos unir dos o más funciones booleanas con los
+      operadores lógicos Y, O, y NO.
+    </p>
+    <p>
+      Podemos ver la síntaxis de los operadores y sus valores con las siguientes
+      tablas:
+    </p>
+    <h3 align="center">Operador "y"</h3>
+    <p align="center">Síntaxis: función-booleana1 y función-booleana2</p>
+    <p></p>
+    <div align="center">
+      <table border="2">
+        <tr>
+          <td width="176"><strong>Valor de la función 1</strong></td>
+          <td width="176"><strong>Valor de la función 2</strong></td>
+          <td width="176"><strong>Resultado final</strong></td>
+        </tr>
+        <tr>
+          <td>falso</td>
+          <td>falso</td>
+          <td>falso</td>
+        </tr>
+        <tr>
+          <td>falso</td>
+          <td>verdadero</td>
+          <td>falso</td>
+        </tr>
+        <tr>
+          <td>verdadero</td>
+          <td>falso</td>
+          <td>falso</td>
+        </tr>
+        <tr>
+          <td>verdadero</td>
+          <td>verdadero</td>
+          <td>verdadero</td>
+        </tr>
+      </table>
+      <h3 align="center">Operador "o"</h3>
+      <p align="center">Síntaxis: función-booleana1 o función-booleana2</p>
+      <p></p>
+      <div align="center">
+        <table border="2">
+          <tr>
+            <td width="176"><strong>Valor de la función 1</strong></td>
+            <td width="176"><strong>Valor de la función 2</strong></td>
+            <td width="176"><strong>Resultado final</strong></td>
+          </tr>
+          <tr>
+            <td>falso</td>
+            <td>falso</td>
+            <td>falso</td>
+          </tr>
+          <tr>
+            <td>falso</td>
+            <td>verdadero</td>
+            <td>verdadero</td>
+          </tr>
+          <tr>
+            <td>verdadero</td>
+            <td>falso</td>
+            <td>verdadero</td>
+          </tr>
+          <tr>
+            <td>verdadero</td>
+            <td>verdadero</td>
+            <td>verdadero</td>
+          </tr>
+        </table>
+        <h3 align="center">Operador "no"</h3>
+        <p align="center">Síntaxis: no función-booleana</p>
+        <p></p>
+        <div align="center">
+          <table border="2">
+            <tr>
+              <td width="176"><strong>Valor de la función</strong></td>
+              <td width="176"><strong>Resultado final</strong></td>
+            </tr>
+            <tr>
+              <td>falso</td>
+              <td>verdadero</td>
+            </tr>
+            <tr>
+              <td>verdadero</td>
+              <td>falso</td>
+            </tr>
+          </table>
+          <p align="left">
+            Los operadores "y" y "o" se aplican sobre dos funciones y el
+            operador "no" solo sobre una. Lo mejor de los operadores lógicos es
+            que si ponemos dentro de un par de paréntesis las funciones con el
+            operador lógico, entonces toda la operación se vuelve una función
+            booleana, por lo que podemos aplicar más operadores lógicos sobre
+            ella. ¿No quedó claro? Revisa estos ejemplos:
+          </p>
+          <p align="center">
+            (orientado-al-norte o orientado-al-sur) y frente-libre
+          </p>
+          <p align="center">
+            (no (frente-bloqueado y junto-a-zumbador)) o orientado-al-este
+          </p>
+          <p align="center">no (junto-a-zumbador y frente-libre)</p>
+          <p align="left">
+            Ten mucho cuidado de colocar bien los paréntesis, ya que si no lo
+            haces, no te marcará error, pero seguramente hará algo extraño que
+            tu no quieres que haga.
+          </p>
+        </div>
+      </div>
+    </div>
+    <p>
+      Por ejemplo, si queremos que Karel avance si está viendo al norte y el
+      frente esté libre, podemos hacer lo siguiente:<br />
+      ...
+    </p>
+    <p>si orientado-al-norte y frente-libre entonces inicio</p>
+    <p>&nbsp;&nbsp;&nbsp;avanza;</p>
+    <p>fin;</p>
+    <p>...</p>
+    <p>
+      <strong>Ejercicio 3 :</strong> &nbsp; Escribe un programa de Karel que
+      haga que Karel esté orientado al Norte, desde cualquier dirección inicial,
+      y a continuación se apague. Debería terminar en la misma intersección en
+      la que empezó.
+    </p>
+    <p>¿Alguna sugerencia?</p>
+    <p>
+      En un mundo nuevo inserta el ejemplo visto arriba para el caso en que
+      Karel está orientado hacia el Sur. Pero, ¿qué ocurre cuando no está
+      orientado hacia el Sur?. ¡Podría estar también orientado hacia el Norte o
+      el Este !. Entonces necesitas dos sentencias
+      <strong>si</strong> adicionales, en las cuales se especifique que es lo
+      que debe hacer Karel en esas situaciones.
+    </p>
+    <p>
+      Modifica el mundo inicial de Karel para probar cualquiera de las 4
+      direcciones de inicio, y para cada una de ellas vuelve a ejecutar el
+      programa.
+    </p>
+    <p>
+      En esta sección hemos visto como usar las sentencias de control para
+      adaptar Karel a cada situación.
+    </p>
+    <center>
+      <h2>
+        <p>Condiciones que puede detectar Karel</p>
+        <p align="left"><a href="Karel.html">Regresar</a></p>
+      </h2>
+    </center>
+  </body>
+</html>

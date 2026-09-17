@@ -1,0 +1,445 @@
+iniciar-programa
+    define-nueva-instruccion norte como inicio
+    	mientras no-orientado-al-norte hacer gira-izquierda;
+    fin;
+    define-nueva-instruccion sur como inicio
+    	mientras no-orientado-al-sur hacer gira-izquierda;
+    fin;
+    define-nueva-instruccion oeste como inicio
+    	mientras no-orientado-al-oeste hacer gira-izquierda;
+    fin;
+    define-nueva-instruccion este como inicio
+    	mientras no-orientado-al-este hacer gira-izquierda;
+    fin;
+    define-nueva-instruccion media-vuelta como inicio
+    	gira-izquierda;
+        gira-izquierda;
+    fin;
+    define-nueva-instruccion gira-derecha como inicio
+    	gira-izquierda;
+        gira-izquierda;
+        gira-izquierda;
+    fin;
+    define-nueva-instruccion topa-pared como inicio
+    	mientras frente-libre hacer avanza;
+    fin;
+    define-nueva-instruccion coge-todo como inicio
+    	mientras junto-a-zumbador hacer coge-zumbador;
+    fin;
+    define-nueva-instruccion sube-tres como inicio
+    	norte;
+        avanza;
+        avanza;
+        avanza;
+        gira-izquierda;
+        topa-pared;
+        media-vuelta;
+    fin;
+    define-nueva-instruccion baja-tres como inicio
+    	sur;
+        avanza;
+        si frente-libre entonces inicio
+        	avanza;
+            avanza;
+            gira-izquierda;
+            topa-pared;
+            media-vuelta;
+        fin sino inicio
+        	media-vuelta;
+            avanza;
+            media-vuelta;
+        fin;
+    fin;
+    define-nueva-instruccion baja-tres-mejor como inicio
+    	sur;
+        repetir 3 veces avanza;
+        si frente-libre entonces inicio
+            este;
+            topa-pared;
+            media-vuelta;
+        fin sino inicio
+        	norte;
+            repetir 3 veces avanza;
+        fin;
+    fin;
+    define-nueva-instruccion busca-pista como inicio
+    	avanza;
+        mientras no-junto-a-zumbador hacer inicio
+        	si frente-libre entonces inicio
+            	avanza;
+            fin sino inicio
+            	media-vuelta;
+                topa-pared;
+                gira-izquierda;
+                avanza;
+                gira-izquierda;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion busca-siguiente como inicio
+    	norte;
+        si frente-libre entonces inicio 
+        	avanza; 
+        	si no-junto-a-zumbador entonces inicio
+        		media-vuelta;
+            	avanza;
+            	media-vuelta;
+        	fin;
+        fin;
+        repetir 3 veces inicio
+          si no-junto-a-zumbador entonces inicio
+              gira-izquierda;
+              si frente-libre entonces inicio
+                 avanza;
+                 si no-junto-a-zumbador entonces inicio
+                    media-vuelta;
+                    avanza;
+                    media-vuelta;
+                 fin;
+              fin;
+          fin;
+        fin;
+    fin;
+    
+    define-nueva-instruccion ve-a-inicio como inicio
+    	sur;
+        topa-pared;
+        gira-derecha;
+        topa-pared;
+        norte;
+    fin;
+    define-nueva-instruccion recoge-pista como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            recoge-pista;
+            deja-zumbador;
+        fin sino inicio
+        	busca-siguiente;
+            si junto-a-zumbador entonces inicio
+            	recoge-pista;
+                si frente-libre entonces inicio
+                	avanza;
+                fin sino inicio
+                	sube-tres;
+                fin;
+            fin sino inicio
+            	ve-a-inicio;
+                avanza;
+                gira-derecha;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion divide(n) como inicio
+    	mientras junto-a-zumbador hacer inicio
+          repetir n veces inicio
+              si junto-a-zumbador entonces inicio
+                  coge-zumbador;
+                  este;
+                  avanza;
+                  deja-zumbador;
+                  media-vuelta;
+                  avanza;
+              fin;
+          fin;
+          si junto-a-zumbador entonces inicio
+              coge-zumbador;
+              este;
+              avanza;
+              coge-todo;
+              avanza;
+              deja-zumbador;
+              media-vuelta;
+              avanza;
+              avanza;
+          fin;
+       fin;
+    fin;
+    define-nueva-instruccion medir(n) como inicio
+    	oeste;
+        si frente-libre entonces inicio
+        	avanza;
+            medir(sucede(n));
+     	fin sino inicio
+        	baja-tres;
+            si orientado-al-oeste entonces inicio
+            	medir(sucede(n));
+            fin sino inicio
+        		sur;
+            	avanza;
+            	divide(n);
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion suma(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            suma(sucede(n));
+            deja-zumbador;
+        fin sino inicio
+        	repetir n veces deja-zumbador;
+            si frente-libre entonces inicio
+            	avanza;
+            fin sino inicio
+            	sube-tres;
+            fin;
+            si junto-a-zumbador entonces inicio
+            	suma(0);
+            fin sino inicio
+            	ve-a-inicio;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion multiplica2(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            multiplica2(n);
+            repetir n veces deja-zumbador;
+        fin sino inicio
+        	ve-a-inicio;
+        fin;
+    fin;
+    define-nueva-instruccion multiplica(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            multiplica(sucede(n));
+        fin sino inicio
+        	este;
+            avanza;
+            avanza;
+            multiplica2(n);
+        fin;
+    fin;
+    define-nueva-instruccion suma-todo como inicio
+    	norte;
+        avanza;
+        este;
+        suma(0);
+        multiplica(0);
+    fin;
+    define-nueva-instruccion copia(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            copia(sucede(n));
+            deja-zumbador;
+        fin sino inicio
+        	repetir n veces deja-zumbador;
+            si frente-libre entonces inicio
+            	avanza;
+                copia(0);
+                si frente-libre entonces inicio
+                	avanza;
+                fin sino inicio
+                	sube-tres;
+                fin;
+            fin sino inicio
+            	baja-tres;
+                si orientado-al-oeste entonces inicio
+            		copia(0);
+                    si frente-libre entonces inicio
+                    	avanza;
+                    fin sino inicio
+                    	sube-tres;
+                    fin;
+                fin sino inicio
+                	oeste;
+	                media-vuelta;
+                	mientras junto-a-zumbador hacer inicio
+                    	si frente-libre entonces inicio
+                        	avanza;
+                        fin sino inicio
+                        	sube-tres;
+                        fin;
+                    fin;
+                fin;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion mueve-inicio como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            mueve-inicio;
+            si frente-libre entonces inicio
+            	avanza;
+            fin sino inicio
+            	sube-tres;
+            fin;
+        fin sino inicio
+        	ve-a-inicio;
+            avanza;
+            avanza;
+            gira-derecha;
+        fin;
+    fin;
+    define-nueva-instruccion recorre(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            recorre(sucede(n));
+            deja-zumbador;
+        fin sino inicio
+        	repetir n veces deja-zumbador;
+            si frente-libre entonces inicio
+            	avanza;
+                recorre(0);
+                si frente-libre entonces inicio
+                    avanza;
+                fin sino inicio
+                    sube-tres;
+                fin;
+            fin sino inicio
+            	baja-tres;
+                si orientado-al-oeste entonces inicio
+                	recorre(0);
+                	si frente-libre entonces inicio
+                    	avanza;
+                    fin sino inicio
+                    	sube-tres;
+                    fin;
+                fin sino inicio
+            		ve-a-inicio;
+                	gira-derecha;
+                	avanza;
+                	mueve-inicio;
+                fin;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion duplica como inicio
+    	avanza;
+        este;
+        mientras junto-a-zumbador hacer inicio
+        	si frente-libre entonces inicio
+            	avanza;
+            fin sino inicio
+            	sube-tres;
+            fin;
+        fin;
+        media-vuelta;
+        si frente-libre entonces inicio
+        	avanza;
+        fin sino inicio
+        	baja-tres;
+        fin;
+        copia(0);
+        media-vuelta;
+        recorre(0);
+    fin;
+    define-nueva-instruccion bsuma2 como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            bsuma2;
+            deja-zumbador;
+        fin sino inicio
+        	avanza;
+            avanza;
+        fin;
+    fin;
+    define-nueva-instruccion bresta2 como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            bresta2;
+            coge-zumbador;
+        fin sino inicio
+        	avanza;
+        fin;
+    fin;
+    define-nueva-instruccion bsuma como inicio
+    	sur;
+        avanza;
+        avanza;
+        norte;
+        bsuma2;
+    fin;
+    define-nueva-instruccion bresta como inicio
+    	sur;
+        avanza;
+        norte;
+        bresta2;
+    fin;
+    define-nueva-instruccion copia-derecha(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            copia-derecha(sucede(n));
+            deja-zumbador;
+        fin sino inicio
+        	repetir n veces deja-zumbador;
+        	este;
+            si frente-libre entonces inicio
+            	avanza;
+            fin sino inicio
+            	sube-tres;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion barrido como inicio
+    	ve-a-inicio;
+        avanza;
+        avanza;
+        avanza;
+        bsuma;
+        bresta;
+        mientras junto-a-zumbador hacer inicio
+        	copia-derecha(0);
+            bsuma;
+            bresta;
+        fin;
+    fin;
+    define-nueva-instruccion maximo(n) como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            maximo(sucede(n));
+        fin sino inicio
+        	si frente-libre entonces inicio
+        		avanza;
+            	repetir n veces inicio
+            		si junto-a-zumbador entonces inicio
+                		coge-zumbador;
+                	fin;
+            	fin;
+            	repetir n veces deja-zumbador;
+            fin sino inicio
+            	baja-tres-mejor;
+                si orientado-al-oeste entonces inicio
+	                repetir n veces inicio
+    	        		si junto-a-zumbador entonces inicio
+        	        		coge-zumbador;
+            	    	fin;
+            		fin;
+            		repetir n veces deja-zumbador;
+                fin sino inicio
+                	repetir n veces deja-zumbador;
+                fin;
+            fin;
+        fin;
+    fin;
+    define-nueva-instruccion mejor como inicio
+    	oeste;
+        mientras orientado-al-oeste hacer inicio
+        	maximo(0);
+        fin;
+        oeste;
+    fin;
+    define-nueva-instruccion agrega-ultimo como inicio
+    	si junto-a-zumbador entonces inicio
+        	coge-zumbador;
+            agrega-ultimo;
+            deja-zumbador;
+        fin sino inicio
+        	sur;
+            avanza;
+            avanza;
+            avanza;
+        fin;
+    fin;
+    inicia-ejecucion
+        norte;
+        busca-pista;
+        recoge-pista;
+        medir(0);
+        suma-todo;
+        duplica;
+        barrido;
+        mejor;
+        agrega-ultimo;
+        apagate;
+    termina-ejecucion
+finalizar-programa

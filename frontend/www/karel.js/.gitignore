@@ -1,0 +1,16 @@
+*.geany
+*.pyc
+dist/
+env/
+*driver.log
+karel.js-*.tgz
+karel.js.zip
+node_modules
+karel-distrib.js
+karel-distrib.min.js
+test/.cache/
+test/results/
+test/**/*.png
+
+cpp/sol.kx
+cpp/karel

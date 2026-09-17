@@ -1,0 +1,3 @@
+[submodule "markdown-editor"]
+	path = qa-plugin/svivian-q2a-markdown-editor
+	url = https://github.com/svivian/q2a-markdown-editor.git

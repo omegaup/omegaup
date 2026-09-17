@@ -1,0 +1,336 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Operadores lógicos</h1>
+<p>Karel dispone de varios operadores lógicos que puede utilizar para la creación de condiciones más avanzadas</p>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="y" data-toc="Operador y" data-toc-depth="1"></a>
+</div>
+<h2>Operador y</h2>
+<p>El operador <span class="text-primary-emphasis">y</span> junta combina dos condiciones en una que es cierta solo
+    cuando ambas lo sean.</p>
+
+
+<p>Por ejemplo, si tenemos el siguiente pseudo-código, entonces la condicional se comportará de acuerdo a la tabla de
+    abajo</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">condicion1</span> <span
+        style="color:#77a1d5">y</span> <span class="text-warning-emphasis">condicion2</span> <span
+        class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<table class="table table-dark table-striped">
+    <tr>
+        <th>Condicion1</th>
+        <th>Condicion2</th>
+        <th>Condicion1 <span style="color:#77a1d5">y</span> Condicion2</th>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Falso</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Verdadero</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Falso</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Verdadero</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+</table>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="cortocircuito_y" data-toc="Cortocircuito" data-toc-depth="2"></a>
+</div>
+<h3>Evaluación de cortocircuito</h3>
+<p>El operador <span style="color:#77a1d5" class="border ps-1 pe-1 bg-secondary-subtle rounded">y</span> emplea evaluación de cortocircuito, es decir, si el primer termino da falso, ya no se evalúa el segundo.</p>
+
+<p>Veamos un ejemplo:</p>
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">usa</span> rekarel.globales;
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-primary-emphasis">define-condicion</span> dejaVerdadero <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>        
+        <span class="text-info-emphasis">deja-zumbador</span>;
+        <span class="text-primary-emphasis">regresa</span> verdadero;    
+    <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-primary-emphasis">define-condicion</span> dejaFalso <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>        
+        <span class="text-info-emphasis">deja-zumbador</span>;
+        <span class="text-primary-emphasis">regresa</span> falso;    
+    <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        <span class="text-primary-emphasis">si</span> dejaFalso <span style="color:#77a1d5">y</span> dejaVerdadero <span class="text-primary-emphasis">entonces</span>
+            <span class="text-info-emphasis">avanza</span>;        
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+<p>Produce el siguiente efecto (ve como nunca se llamó a la función <em>dejaVerdadero</em>):</p>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/logic/and_shortcircuit.png" alt="Deja un solo zumbador" class="img-thumbnail">
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="alias_y" data-toc="Alias" data-toc-depth="2"></a>
+</div>
+<h3>Alias</h3>
+<p>El operador <code>y</code> puede ser escrito como <span style="color:#77a1d5" class="border ps-1 pe-1 bg-secondary-subtle rounded">y</span> o alternativamente como <span style="color:#77a1d5" class="border ps-1 pe-1 bg-secondary-subtle rounded">e</span>.</p>
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="o" data-toc="Operador o" data-toc-depth="1"></a>
+</div>
+<h2>Operador o</h2>
+<p>El operador <span class="text-primary-emphasis">o</span> junta combina dos condiciones en una que es cierta al menos
+    una de ellas lo sean.</p>
+
+
+<p>Por ejemplo, si tenemos el siguiente pseudo-código, entonces la condicional se comportará de acuerdo a la tabla de
+    abajo</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">condicion1</span> <span
+    style="color:#77a1d5">o</span> <span class="text-warning-emphasis">condicion2</span> <span
+    class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<table class="table table-dark table-striped">
+    <tr>
+        <th>Condicion1</th>
+        <th>Condicion2</th>
+        <th>Condicion1 <span style="color:#77a1d5">o</span> Condicion2</th>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Falso</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Verdadero</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Falso</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Verdadero</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+</table>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="cortocircuito_o" data-toc="Cortocircuito" data-toc-depth="2"></a>
+</div>
+<h3>Evaluación de cortocircuito</h3>
+<p>El operador <span style="color:#77a1d5" class="border ps-1 pe-1 bg-secondary-subtle rounded">o</span> emplea evaluación de cortocircuito, es decir, si el primer termino da verdadero, ya no se evalúa el segundo.</p>
+
+<p>Veamos un ejemplo:</p>
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-danger-emphasis">usa</span> rekarel.globales;
+<span class="text-danger-emphasis">iniciar-programa</span>
+    <span class="text-primary-emphasis">define-condicion</span> dejaVerdadero <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>        
+        <span class="text-info-emphasis">deja-zumbador</span>;
+        <span class="text-primary-emphasis">regresa</span> verdadero;    
+    <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-primary-emphasis">define-condicion</span> dejaFalso <span class="text-primary-emphasis">como</span>
+    <span class="text-danger-emphasis">inicio</span>        
+        <span class="text-info-emphasis">deja-zumbador</span>;
+        <span class="text-primary-emphasis">regresa</span> falso;    
+    <span class="text-danger-emphasis">fin</span>;
+
+    <span class="text-danger-emphasis">inicia-ejecucion</span>
+        <span class="text-primary-emphasis">si</span> dejaVerdadero <span style="color:#77a1d5">o</span> dejaFalso <span class="text-primary-emphasis">entonces</span>
+            <span class="text-info-emphasis">avanza</span>;        
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+<span class="text-danger-emphasis">finalizar-programa</span>
+</pre>
+</code>
+
+<div class="text-center mb-3">
+    <img src="@@webRoot/../img/docs/logic/or_shortcircuit.png" alt="Deja un solo zumbador" class="img-thumbnail">
+</div>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="alias_o" data-toc="Alias" data-toc-depth="2"></a>
+</div>
+<h3>Alias</h3>
+<p>El operador <code>o</code> puede ser escrito como <span style="color:#77a1d5" class="border ps-1 pe-1 bg-secondary-subtle rounded">o</span> o alternativamente como <span style="color:#77a1d5" class="border ps-1 pe-1 bg-secondary-subtle rounded">u</span>.</p>
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="igualdad" data-toc="Igual que (==)" data-toc-depth="1"></a>
+</div>
+<h2>Igual que (==)</h2>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<div class="alert alert-info">
+    El operador igual que también funciona con cantidades enteras, si estás buscando información de esto puedes leer más <a href="operador_comparativo.html#igual_que">aquí</a>.
+</div>
+
+<p>El operador igual que, que se escribe <span class="text-primary-emphasis">==</span>, combina dos condiciones en una que es cierta si ambas condiciones son verdaderas o ambas son falsas.</p>
+
+
+<p>Por ejemplo, si tenemos el siguiente pseudo-código, entonces la condicional se comportará de acuerdo a la tabla de
+    abajo</p>
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">condicion1</span> <span
+    style="color:#77a1d5">==</span> <span class="text-warning-emphasis">condicion2</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<table class="table table-dark table-striped">
+    <tr>
+        <th>Condicion1</th>
+        <th>Condicion2</th>
+        <th>Condicion1 <span style="color:#77a1d5">==</span> Condicion2</th>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Falso</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Verdadero</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Falso</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Verdadero</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+</table>
+
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="no" data-toc="Operador no" data-toc-depth="1"></a>
+</div>
+<h2>Operador no</h2>
+<p>El operador <span class="text-primary-emphasis">no</span> niega la siguiente condición</p>
+
+
+<p>Por ejemplo, si tenemos el siguiente pseudo-código, entonces la condicional se comportará de acuerdo a la tabla de
+    abajo</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> <span style="color:#77a1d5">no</span> <span
+class="text-warning-emphasis">condicion</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<table class="table table-dark table-striped">
+    <tr>
+        <th>Condicion</th>
+        <th><span style="color:#77a1d5">no</span> Condicion</th>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+</table>
+
+<hr>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="parentesis" data-toc="Paréntesis" data-toc-depth="1"></a>
+</div>
+<h2>Paréntesis</h2>
+<p>Se pueden utilizar paréntesis para cambiar el orden de los operadores o aclarar la condición</p>
+
+<p>Por ejemplo, podemos hacer una condicion que se ejecute unicamente cuando exactamente una de dos condiciones sea cierta. Podemos lograr esto revisando que se cumpla al menos una de las condiciones y que no se cumplan ambas, lo cual en código se ve de la siguiente manera:</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> (<span class="text-warning-emphasis">condicion1</span> <span
+    style="color:#77a1d5">o</span> <span class="text-warning-emphasis">condicion2</span>) <span
+    style="color:#77a1d5">y</span> <span
+    style="color:#77a1d5">no</span> (<span class="text-warning-emphasis">condicion1</span> <span
+    style="color:#77a1d5">y</span> <span class="text-warning-emphasis">condicion2</span>) <span
+    class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<table class="table table-dark table-striped">
+    <tr>
+        <th>Condicion1</th>
+        <th>Condicion2</th>
+        <th>Resultado</th>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Falso</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Falso</td>
+        <td>Verdadero</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Falso</td>
+        <td>Verdadero, <b>sí</b> se ejecuta el condicional</td>
+    </tr>
+    <tr>
+        <td>Verdadero</td>
+        <td>Verdadero</td>
+        <td>Falso, <b>no</b> se ejecuta el condicional</td>
+    </tr>
+</table>
+@@include("../footer.html")

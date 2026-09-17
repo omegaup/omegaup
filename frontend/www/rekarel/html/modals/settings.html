@@ -1,0 +1,122 @@
+<div id="settingsModal" class="modal fade" tabindex="-1" aria-labelledby="settingsModal" aria-hidden="true">
+    <form id="settingsForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Configuración</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container ">
+
+                        <h5>General</h5>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label>Vista:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <select class="form-select" aria-label="Tipo de interfaz" name="interface" id="settingsInterface">
+                                    <option value="auto">Automático (Responsivo)</option>
+                                    <option value="desktop">Vista de escritorio</option>
+                                    <option value="mobile">Vista de celular</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label>Tema:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <select class="form-select" aria-label="Tipo de interfaz" name="theme" id="settingsTheme">
+                                    <option value="system">Usar tema del sistema</option>
+                                    <option value="light">Tema claro</option>
+                                    <option value="dark">Tema oscuro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <h5>Editor del código</h5>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label>Tamaño de fuente:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="12 pts..."
+                                        aria-label="Username" aria-describedby="basic-addon1" name="fontSize"
+                                        min="7" max="30" value="12" id="settingsFontSize">
+                                    <span class="input-group-text" id="basic-addon1">pt</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label>Estilo:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <select class="form-select" aria-label="Tipo de interfaz" name="editorStyle" id="settingsStyle">
+                                    <option value="classic">Karel.js</option>
+                                    <option value="rekarel">ReKarel</option>
+                                    <option value="sepia">Sepia</option>
+                                    <option value="omi">Omi Karel</option>
+                                    <option value="code">Code</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label title="Cierra llaves y paréntesis automáticamente cuando escribes los de apertura" for="settingsAutoCloseBracket">Cerrar paréntesis y llaves automáticamente:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="settingsAutoCloseBracket">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h5>Editor del mundo</h5>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label title="Cambiar el modo cuando se detecte una entrada táctil">Cambiar automáticamente el modo de selección:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="settingsAutoInputMode">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h5>Ejecución</h5>
+                        <div class="row m-2">
+                            <div class="col-sm-12 col-md-4 col-lg-3">
+                                <label>Límite de instrucciones en modo normal:</label>
+                            </div>
+                            <div class="col-sm-12 col-md-8 col-lg-6">
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="12 pts..."
+                                        aria-label="Username" aria-describedby="basic-addon1" name="fontSize"
+                                        min="1" value="200000" id="settingsSlowModeLimit">
+                                </div>
+                            </div>
+                            <p id="slowModeWarning" class="text-warning"><i class="bi bi-exclamation-diamond-fill"></i> Poner un número muy grande hará que la aplicación se pueda congelar por mucho tiempo durante un paso.</p>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-warning">
+                        Aplicar
+                    </button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-bs-dialog="none">
+                        Aceptar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-dialog="none">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

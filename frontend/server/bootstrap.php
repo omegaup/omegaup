@@ -37,6 +37,9 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         exit;
     }
     require_once(__DIR__ . '/config.php');
+    if (is_file(__DIR__ . '/config.docker.php')) {
+        require_once(__DIR__ . '/config.docker.php');
+    }
     require_once(__DIR__ . '/config.default.php');
 }
 

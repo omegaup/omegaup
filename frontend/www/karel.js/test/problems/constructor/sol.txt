@@ -1,0 +1,41 @@
+iniciar-programa
+    define-nueva-instruccion construir como inicio
+       mientras junto-a-zumbador hacer inicio
+          coge-zumbador;
+       fin;
+       mientras algun-zumbador-en-la-mochila hacer inicio
+          deja-zumbador;
+          si frente-libre entonces inicio
+             avanza;
+          fin;
+       fin;
+       repetir 2 veces inicio
+          gira-izquierda;
+       fin;
+       mientras frente-libre hacer inicio
+          avanza;
+       fin;
+    fin;
+    inicia-ejecucion
+		gira-izquierda;
+		gira-izquierda;
+		gira-izquierda;
+		mientras no-junto-a-zumbador hacer inicio
+			avanza;
+		fin;
+        
+        gira-izquierda;
+        mientras junto-a-zumbador hacer inicio
+           construir;
+           gira-izquierda;
+           si frente-libre entonces inicio
+              avanza;
+           fin
+           sino inicio
+               apagate;
+           fin;
+           gira-izquierda;
+        fin;
+        apagate;
+    termina-ejecucion
+finalizar-programa

@@ -1,0 +1,38 @@
+{
+  "name": "csv.js",
+  "version": "1.0.0",
+  "description": "Simple javascript CSV library focused on the browser with **zero dependencies**.",
+  "main": "csv.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "karma start",
+    "start": "node ./node_modules/webpack/bin/webpack.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/okfn/csv.js.git"
+  },
+  "author": "OKFN",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/okfn/csv.js/issues"
+  },
+  "homepage": "https://github.com/okfn/csv.js#readme",
+  "devDependencies": {
+    "gulp-uglify": "^1.5.3",
+    "jasmine-core": "^2.4.1",
+    "jasmine-webpack-plugin": "^0.1.1",
+    "karma": "^0.13.22",
+    "karma-jasmine": "^1.0.2",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-spec-reporter": "0.0.26",
+    "karma-webpack": "^1.7.0",
+    "phantomjs-prebuilt": "^2.1.7",
+    "webpack": "^1.13.1"
+  },
+  "peerDependencies": {
+    "jquery": ">=2.2.4"
+  }
+}

@@ -27,7 +27,7 @@ WORKDIR /opt/omegaup
 # Clone the repository (matches existing omegaup pattern)
 ARG BRANCH=release
 ENV BRANCH=$BRANCH
-RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
+RUN git clone --branch=${BRANCH} --depth=1 https://github.com/omegaup/omegaup .
 
 # Install Python dependencies (use requirements.txt from the cloned repo)
 RUN python3 -m pip install -r stuff/ai_editorial_worker/requirements.txt

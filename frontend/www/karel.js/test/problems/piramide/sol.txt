@@ -1,0 +1,47 @@
+class program {
+
+    void east()
+    {
+    	while(notFacingEast)
+        	turnleft();
+    }
+    
+    void south()
+    {
+    	while(notFacingSouth)
+        	turnleft();
+    }
+    
+    void findWall()
+    {
+    	while(frontIsClear)
+        	move();
+    }
+    
+    void checkStep()
+    {
+    	move();
+        east();
+        move();
+        if(frontIsBlocked)
+        {
+        	turnleft();
+        }else
+        {
+        	south();
+        }
+    }
+
+    program () {
+        east();
+        findWall();
+        turnleft();
+        
+        while(facingNorth)
+        {
+        	checkStep();
+        }
+        
+        turnoff();
+    }
+}

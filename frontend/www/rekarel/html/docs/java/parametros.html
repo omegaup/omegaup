@@ -1,0 +1,70 @@
+@@include("../header.html")
+<h1>Parámetros</h1>
+<p>Un parámetro es una variable numérica que una función puede recibir.</p>
+
+<p>Para permitir que una función reciba un parámetro, después de su nombre escribimos el parámetro entre paréntesis el nombre del parámetro</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define</span> <span>NOMBRE (<span class="text-warning-emphasis">parametro</span>)</span> <span class="text-danger-emphasis"> {</span>
+    <span class="text-info-emphasis">INSTRUCCION</span><br>
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+<p>Ahora podemos llamar a la función y pasar un valor numérico a la llamada, para eso, escribimos el valor al momento de hacer una llamada entre paréntesis, por ejemplo:</p>
+
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define</span> <span>gira (<span class="text-warning-emphasis">n</span>)</span> <span class="text-danger-emphasis"> {</span>
+    <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">n</span>) <span class="text-danger-emphasis">{</span>
+        <span class="text-info-emphasis">turnleft</span>();
+    <span class="text-danger-emphasis">}</span> 
+<span class="text-danger-emphasis">}</span>
+
+<span class="text-danger-emphasis">program</span>()<span class="text-danger-emphasis"> {</span> 
+    <span class="text-success-emphasis">{ Llama a la funcion gira, y pasa el valor de 3. }</span>
+    gira(<span class="text-warning-emphasis">3</span>);
+    <span class="text-info-emphasis">turnoff</span>();
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+<h2>Ejemplo</h2>
+
+<p>Un código que toma todos los zumbadores de la imagen puede ser el siguiente:</p>
+
+<div class="text-center mb-3">
+<img src="@@webRoot/../img/help_maze.png" alt="" class="img-thumbnail">
+</div>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define</span> <span>gira (<span class="text-warning-emphasis">n</span>)</span> <span class="text-danger-emphasis">{</span>
+    <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">n</span>)
+        <span class="text-info-emphasis">turnleft</span>();
+<span class="text-danger-emphasis">}</span>
+
+<span class="text-primary-emphasis">define</span> <span>daPasos (<span class="text-warning-emphasis">n</span>)</span> <span class="text-danger-emphasis">{</span>
+    <span class="text-primary-emphasis">iterate</span> (<span class="text-warning-emphasis">n</span>)
+        <span class="text-info-emphasis">move</span>();
+<span class="text-danger-emphasis">}</span>
+
+<span class="text-danger-emphasis">program ()</span> <span class="text-danger-emphasis">{</span>
+    daPasos(<span class="text-warning-emphasis">2</span>);
+    pickbeeper();
+    gira(<span class="text-warning-emphasis">3</span>);
+    daPasos(<span class="text-warning-emphasis">2</span>);
+    gira(<span class="text-warning-emphasis">1</span>);
+    daPasos(<span class="text-warning-emphasis">1</span>);
+    pickbeeper();
+    gira(<span class="text-warning-emphasis">2</span>);
+    daPasos(<span class="text-warning-emphasis">3</span>);
+    pickbeeper();
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+@@include("../footer.html")

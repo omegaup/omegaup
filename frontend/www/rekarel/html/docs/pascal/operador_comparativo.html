@@ -1,0 +1,111 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Operadores de comparación</h1>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p>Karel cuenta con tres operadores de comparaciones que le permite comparar valores en condicionales.</p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="menor_que" data-toc="Menor que (&lt;)" data-toc-depth="1"></a>
+</div>
+<h2>Menor que (&lt;)</h2>
+
+<p>El operador menor que <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">&lt;</span> permite comparar dos cantidades numéricas. Obtiene cierto si la primera cantidad es menor que la segunda.</p>
+
+<p>Veamos unos ejemplos</p>
+
+<code class="text-body" >
+<pre class="border p-2">
+<span class="text-success-emphasis">{ Verdadero, ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">3</span> <span style="color:#77a1d5">&lt;</span> <span class="text-warning-emphasis">5</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Falso, no ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">6</span> <span style="color:#77a1d5">&lt;</span> <span class="text-warning-emphasis">2</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Falso, no ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">4</span> <span style="color:#77a1d5">&lt;</span> <span class="text-warning-emphasis">4</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Se pueden usar valores numericos mas complejos }</span>
+<span class="text-success-emphasis">{ Revisa que la cantidad de zumbadores en el suelo sea menor que el parametro n + 4 }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> <span style="color:#77a1d5">&lt;</span> sucede(<span class="text-warning-emphasis">n</span>, <span class="text-warning-emphasis">4</span>) <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+</pre>
+</code>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="menor_igual_que" data-toc="Menor o igual que (&lt;=)" data-toc-depth="1"></a>
+</div>
+<h2>Menor o igual que (&lt;=)</h2>
+
+<p>El operador menor o igual que que <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">&lt;=</span> permite comparar dos cantidades numéricas. Obtiene cierto si la primera cantidad es menor que la segunda o también si tienen el mismo valor.</p>
+
+<p>Veamos unos ejemplos</p>
+
+<code class="text-body" >
+<pre class="border p-2">
+<span class="text-success-emphasis">{ Verdadero, ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">3</span> <span style="color:#77a1d5">&lt;=</span> <span class="text-warning-emphasis">5</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Falso, no ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">6</span> <span style="color:#77a1d5">&lt;=</span> <span class="text-warning-emphasis">2</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Verdadero, ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">4</span> <span style="color:#77a1d5">&lt;=</span> <span class="text-warning-emphasis">4</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Se pueden usar valores numericos mas complejos }</span>
+<span class="text-success-emphasis">{ Revisa que la cantidad de zumbadores en el suelo sea menor o igual que el parametro n + 4 }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> <span style="color:#77a1d5">&lt;=</span> sucede(<span class="text-warning-emphasis">n</span>, <span class="text-warning-emphasis">4</span>) <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+</pre>
+</code>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="igual_que" data-toc="Igual que (==)" data-toc-depth="1"></a>
+</div>
+<h2>Igual que (==)</h2>
+<div class="alert alert-info">
+    El operador igual que también funciona con condiciones, si estás buscando información de esto puedes leer más <a href="operador_logico.html#igualdad">aquí</a>.
+</div>
+
+<p>El operador igual que que <span class="text-bg-secondary border rounded ps-1 pe-1 text-nowrap">==</span> permite comparar dos valores. Obtiene cierto si el primer valor es igual que el segundo valor.</p>
+
+<p>Al igual que los otros dos operadores de comparación, este puede comparar cantidades contra cantidades, pero también condiciones contra condiciones. Los dos valores deben ser del mismo tipo, no puede comparar cantidades contra condiciones</p>
+
+<p>Veamos unos ejemplos numéricos:</p>
+
+<code class="text-body" >
+<pre class="border p-2">
+<span class="text-success-emphasis">{ Verdadero, ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">3</span> <span style="color:#77a1d5">==</span> <span class="text-warning-emphasis">3</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+
+<span class="text-success-emphasis">{ Falso, no ejecuta el avanza }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">6</span> <span style="color:#77a1d5">==</span> <span class="text-warning-emphasis">2</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+<span class="text-success-emphasis">{ Se pueden usar valores numéricos mas complejos }</span>
+<span class="text-success-emphasis">{ Revisa que la cantidad de zumbadores en el suelo sea igual que el parametro n + 4 }</span>
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">zumbadores-del-piso</span> <span style="color:#77a1d5">==</span> sucede(<span class="text-warning-emphasis">n</span>, <span class="text-warning-emphasis">4</span>) <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+
+</pre>
+</code>
+
+
+@@include("../footer.html")

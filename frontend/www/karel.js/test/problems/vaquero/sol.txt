@@ -1,0 +1,126 @@
+class program {
+
+void voltea(){
+	iterate(2){
+		turnleft();
+	}
+}
+
+void giraDerecha(){
+	voltea();
+	turnleft();
+}
+
+void ponPalo(){
+	if (notNextToABeeper()){
+		putbeeper();
+		putbeeper();
+	}
+}
+
+void esVaca(){
+	pickbeeper();
+	if (nextToABeeper()){
+		putbeeper();
+	}
+}
+
+void buscarVaca(){
+	while(iszero(0)){
+		if (nextToABeeper()){
+			esVaca();
+			if (notNextToABeeper()){
+				putbeeper();
+				return();
+			}
+		}
+		while(frontIsClear()){
+			move();
+			if (nextToABeeper()){
+				esVaca();
+				if (notNextToABeeper()){
+					putbeeper();
+					return();
+				}
+			}
+		}
+		voltea();
+		while(frontIsClear()){
+			move();
+		}
+		turnleft();
+		if (frontIsClear()){
+			move();
+			turnleft();
+		}else{
+			return();
+		}
+	}
+}
+
+void avanzaCasilla(){
+	if (frontIsClear()){
+		move();
+	}else{
+		voltea();
+		while(frontIsClear()){
+			move();
+		}
+		turnleft();
+		if (frontIsClear()){
+			move();
+			turnleft();
+		}else{
+			return();
+		}
+	}
+}
+
+void ponBarda(){
+	if (frontIsClear()){
+		move();
+		ponPalo();
+		turnleft();
+		if (frontIsClear()){
+			move();
+			ponPalo();
+			voltea();
+			move();
+		 }else{
+			 voltea();
+		 }
+		 if (frontIsClear()){
+			move();
+			ponPalo();
+			voltea();
+			move();
+		 }else{
+			 voltea();
+		 }
+		 turnleft();
+		 move();
+		 turnleft();
+	}else{
+		giraDerecha();
+	}
+}
+
+void ponCerca(){
+	iterate(4){
+		ponBarda();
+	}
+}
+
+program() {
+	while(iszero(0)){
+		buscarVaca();
+		if (facingEast()){
+			turnoff();
+		}else{
+			ponCerca();
+			avanzaCasilla();
+		}
+	}
+}
+
+}

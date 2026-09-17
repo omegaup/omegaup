@@ -1,0 +1,33 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Repetir</h1>
+<p>La sentencia <span class="text-info">repetir</span> permite a Karel repetir una instrucción o bloque múltiples veces.</p>
+
+<p>A continuación se muestra la estructura de la sentencia repetir. Lo que hace, es repetir una instrucción el número de veces indicado.</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">NÚMERO</span> <span
+    class="text-primary-emphasis">veces</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<p>Por ejemplo, un código que avance 14 veces se vería de la siguiente manera</p>
+
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">14</span> <span
+    class="text-primary-emphasis">veces</span>
+<span class="text-danger-emphasis">inicio</span>
+    <span class="text-info-emphasis">avanza;</span>
+<span class="text-danger-emphasis">fin;</span>
+</pre>
+</code>
+
+@@include("../footer.html")

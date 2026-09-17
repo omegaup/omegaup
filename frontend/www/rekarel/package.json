@@ -1,0 +1,47 @@
+{
+  "name": "@rekarel/ide",
+  "version": "1.3.3",
+  "description": "Rework of omegaup's [Karel.js](https://github.com/omegaup/karel.js).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:source": "npx tsc && rollup --config",
+    "build": "npx gulp clean-webapp && npm run build:source && npx gulp",
+    "lezer_java": "npx lezer-generator .\\codemirror\\java.grammar -o .\\src\\js\\lezer_java.js ",
+    "lezer_pascal": "npx lezer-generator .\\codemirror\\pascal.grammar -o .\\src\\js\\lezer_pascal.js "
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "Hector Fernando Ricardez Lara",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "@lezer/generator": "^1.2.2",
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/jest": "^29.5.14",
+    "@types/jquery": "^3.5.14",
+    "cypress": "^13.15.1",
+    "gulp": "^5.0.0",
+    "gulp-file-include": "^2.3.0",
+    "gulp-insert": "^0.5.0",
+    "gulp-replace": "^1.1.4",
+    "jison": "^0.4.17",
+    "rollup": "^3.29.2",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@codemirror/history": "^0.19.2",
+    "@codemirror/lang-javascript": "^6.1.7",
+    "@lezer/highlight": "^1.1.4",
+    "@rekarel/binary": "^1.0.0",
+    "@rekarel/core": "^3.0.1",
+    "@types/bootstrap": "^5.2.6",
+    "@xmldom/xmldom": "^0.8.10",
+    "codemirror": "^6.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-html-minifier-terser": "^7.1.0",
+    "split.js": "^1.6.5"
+  }
+}

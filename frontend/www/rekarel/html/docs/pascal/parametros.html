@@ -1,0 +1,114 @@
+@@include("../header.html")
+<h2>Parámetros</h2>
+<p>Un parámetro es una variable numérica que una función puede recibir.</p>
+
+<p>Para permitir que una función reciba un parámetro, después de su nombre escribimos el parámetro entre paréntesis el nombre del parámetro</p>
+
+<div class="border ms-2 p-2 mb-4">
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> <span>funcion (<span class="text-warning-emphasis">parametro</span>)</span>
+    <span class="text-primary-emphasis">como</span>
+    <br>
+    <pre style="display: inline;">    </pre><span class="text-info-emphasis">INSTRUCCION</span>
+</div>
+
+<p>Ahora podemos llamar a la función y pasar un valor numérico a la llamada, para eso, escribimos el valor al momento de hacer una llamada entre paréntesis, por ejemplo:</p>
+
+
+
+<div class="border ms-2 p-2 mb-4">
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> <span>gira (<span class="text-warning-emphasis">n</span>)</span>
+    <span class="text-primary-emphasis">como</span>
+    <br>
+    <span class="text-danger-emphasis">inicio</span>
+    <br>
+        <pre style="display: inline;">    </pre><span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">n</span> <span
+        class="text-primary-emphasis">veces</span>
+        <br>
+        <pre style="display: inline;">    </pre><span class="text-danger-emphasis">inicio</span>
+        <br>
+        <pre style="display: inline;">        </pre><span class="text-info-emphasis">gira-izquierda;</span>
+        <br>
+        <pre style="display: inline;">    </pre><span class="text-danger-emphasis">fin;</span>    
+    <br>
+    <span class="text-danger-emphasis">fin;</span>
+    <br>
+    <br>    
+    <span class="text-danger-emphasis">inicia-ejecucion</span> <br>
+    <pre style="display: inline;">    </pre><span class="text-success-emphasis">{ Llama a la funcion gira, y pasa el valor de 3. }</span> <br>
+    <pre style="display: inline;">    </pre>gira(<span class="text-warning-emphasis">3</span>);    <br>
+    <pre style="display: inline;">    </pre>apagate;    <br>
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+</div>
+
+<h3>Ejemplo</h3>
+
+<p>Un código que toma todos los zumbadores de la imagen puede ser el siguiente:</p>
+
+<div class="text-center mb-3">
+<img src="@@webRoot/../img/help_maze.png" alt="" class="img-thumbnail">
+</div>
+
+
+<div class="border ms-2 p-2 mb-4">
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> <span>gira (<span class="text-warning-emphasis">n</span>)</span>
+    <span class="text-primary-emphasis">como</span>
+    <br>
+    <span class="text-danger-emphasis">inicio</span>
+    <br>
+        <pre style="display: inline;">    </pre><span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">n</span> <span
+        class="text-primary-emphasis">veces</span>
+        <br>
+        <pre style="display: inline;">        </pre><span class="text-info-emphasis">gira-izquierda;</span>
+    <br>
+    <span class="text-danger-emphasis">fin;</span>
+    <br>
+    <br>    
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> <span>da-pasos (<span class="text-warning-emphasis">n</span>)</span>
+    <span class="text-primary-emphasis">como</span>
+    <br>
+    <span class="text-danger-emphasis">inicio</span>
+    <br>
+        <pre style="display: inline;">    </pre><span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">n</span> <span
+        class="text-primary-emphasis">veces</span>
+        <br>
+        <pre style="display: inline;">        </pre><span class="text-info-emphasis">avanza;</span>
+    <br>
+    <span class="text-danger-emphasis">fin;</span>
+    <br>
+    <br>
+    <span class="text-danger-emphasis">inicia-ejecucion</span> <br>
+    <pre style="display: inline;">    </pre>da-pasos(<span class="text-warning-emphasis">2</span>);    <br>
+    <pre style="display: inline;">    </pre>coge-zumbador; <br>
+    <pre style="display: inline;">    </pre>gira(<span class="text-warning-emphasis">3</span>); <br>
+    <pre style="display: inline;">    </pre>da-pasos(<span class="text-warning-emphasis">2</span>); <br>
+    <pre style="display: inline;">    </pre>gira(<span class="text-warning-emphasis">1</span>); <br>
+    <pre style="display: inline;">    </pre>da-pasos(<span class="text-warning-emphasis">1</span>); <br>
+    <pre style="display: inline;">    </pre>coge-zumbador; <br>
+    <pre style="display: inline;">    </pre>gira(<span class="text-warning-emphasis">2</span>); <br>
+    <pre style="display: inline;">    </pre>da-pasos(<span class="text-warning-emphasis">3</span>); <br>
+    <pre style="display: inline;">    </pre>coge-zumbador; <br>
+    <span class="text-danger-emphasis">termina-ejecucion</span>
+</div>
+
+
+<h3>Prototipo</h3>
+
+<p>El parámetro debe ser especificado en el prototipo.</p>
+<div class="border ms-2 p-2 mb-4">
+    <span class="text-primary-emphasis">define-prototipo-instruccion</span> <span>gira (<span class="text-warning-emphasis">n</span>);</span>
+    <br>
+    <span>...</span>
+    <br>
+    <span class="text-primary-emphasis">define-nueva-instruccion</span> <span>gira (<span class="text-warning-emphasis">n</span>)</span>
+    <span class="text-primary-emphasis">como</span>
+    <br>
+    <span class="text-danger-emphasis">inicio</span>
+    <br>
+        <pre style="display: inline;">    </pre><span class="text-primary-emphasis">repetir</span> <span class="text-warning-emphasis">n</span> <span
+        class="text-primary-emphasis">veces</span>
+        <br>
+        <pre style="display: inline;">        </pre><span class="text-info-emphasis">gira-izquierda;</span>
+    <br>
+    <span class="text-danger-emphasis">fin;</span>
+</div>
+@@include("../footer.html")

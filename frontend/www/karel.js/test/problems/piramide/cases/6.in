@@ -1,0 +1,31 @@
+<ejecucion>
+	<condiciones instruccionesMaximasAEjecutar="10000000" longitudStack="65000"></condiciones>
+	<mundos>
+		<mundo nombre="mundo_0" ancho="100" alto="100">
+			<pared x1="90" y1="0" y2="1"></pared>
+			<pared x1="90" y1="1" x2="91"></pared>
+			<pared x1="98" y1="1" x2="99"></pared>
+			<pared x1="99" y1="0" y2="1"></pared>
+			<pared x1="91" y1="1" y2="2"></pared>
+			<pared x1="91" y1="2" x2="92"></pared>
+			<pared x1="97" y1="2" x2="98"></pared>
+			<pared x1="98" y1="1" y2="2"></pared>
+			<pared x1="92" y1="2" y2="3"></pared>
+			<pared x1="92" y1="3" x2="93"></pared>
+			<pared x1="96" y1="3" x2="97"></pared>
+			<pared x1="97" y1="2" y2="3"></pared>
+			<pared x1="93" y1="3" y2="4"></pared>
+			<pared x1="93" y1="4" x2="94"></pared>
+			<pared x1="95" y1="4" x2="96"></pared>
+			<pared x1="96" y1="3" y2="4"></pared>
+			<pared x1="94" y1="4" y2="5"></pared>
+			<pared x1="94" y1="5" x2="95"></pared>
+			<pared x1="95" y1="4" y2="5"></pared>
+		</mundo>
+	</mundos>
+	<programas tipoEjecucion="CONTINUA" intruccionesCambioContexto="1" milisegundosParaPasoAutomatico="0">
+		<programa nombre="p1" ruta="{$2$}" mundoDeEjecucion="mundo_0" xKarel="1" yKarel="1" direccionKarel="ESTE" mochilaKarel="0">
+			<despliega tipo="POSICION"></despliega>
+		</programa>
+	</programas>
+</ejecucion>

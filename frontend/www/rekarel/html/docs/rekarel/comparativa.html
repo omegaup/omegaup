@@ -1,0 +1,407 @@
+@@include("../header.html")
+<h1>Comparación contra Karel.js</h1>
+
+<p class="text-secondary"><b>Última actualización</b> 29 Sep 2024 <br> (Karel 1.2.8 vs ReKarel 1.0.0-beta.2.1) </p>
+
+<p>A continuación se muestra una lista de comparativa contra Karel.js. A diferencia de la guía de migración, aquí no se
+    entra en mucho detalle en como trabajar al rededor de estas diferencias, pero se muestran más de estas.</p>
+
+<p>Como nota, esta sección puede quedar
+    desactualizada debido a que ReKarel y Karel.js se actualizan a diferentes velocidades que está página.</p>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Karel.js</th>
+            <th scope="col">ReKarel</th>
+            <th scope="col">Notas</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="table-danger">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="lenguaje" data-toc="Lenguaje" data-toc-depth="1"></a>
+                </div>
+                Lenguaje (<i class="bi bi-exclamation-circle-fill"></i> Breaking change)
+            </th>
+        </tr>
+        <tr>
+            <td>Karel.js usa Karel Java 1 y Karel Pascal 1</td>
+            <td>ReKarel utiliza ReKarel Java 2.0.0 y ReKarel Pascal 2.0.0</td>
+            <td>Pueden ver los cambios de java <a href="@@webRoot/java/cambios.html">aquí</a><br>Los de pascal <a href="@@webRoot/pascal/cambios.html">aquí</a></td>
+        </tr>
+        <tr class="table-primary">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="mundo" data-toc="Editor del mundo" data-toc-depth="1"></a>
+                </div>
+                Editor del mundo
+            </th>
+        </tr>
+        <tr>
+            <td>Karel mueve la vista con clic y arraste y flechitas</td>
+            <td>ReKarel utiliza el scroll del navegador, lo que le da compatibilidad con touch</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel edita de celda en celda</td>
+            <td>ReKarel usa una selección</td>
+            <td>Shift+tecla es similar a Karel.js</td>
+        </tr>
+        <tr>
+            <td>El editor de Karel tiene mejor UX cuando solo usas el ratón</td>
+            <td>El editor de ReKarel tiene mejor UX si se utiliza el ratón junto con los atajos del teclado</td>
+            <td> Creo que esto significa una curva un poco más empinada de aprendizaje, pero que permite más</td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>ReKarel ofrece dos modos de selección optimizados para el uso de mouse y touchscreen</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js ofrece atajos de teclado para colocar zumbadores</td>
+            <td>ReKarel ofrece atajos de teclados de paredes, zumbadores, mover Karel, desplegar</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>ReKarel permite modificar el zoom con botones y pinch-zoom en entradas táctiles</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>Permite deshacer y rehacer los últimos cambios al mundo</td>
+            <td> El historial de ReKarel es limitado según cuantas casillas afecten los cambios, el último cambio siempre se puede deshacer </td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>ReKarel permite configurar completamente el color del mundo de Karel y ofrece temas predefinidos como modo obscuro</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>Karel.js al presionar r coloca entre 1 y 100 zumbadores de forma aleatoria</td>
+            <td>ReKarel permite configurar el rango</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>Karel.js pierde calidad al aumentar el zoom del navegador</td>
+            <td>ReKarel incrementa la resolución del mundo para que siempre se vea bien, incluso con zoom del navegador</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td>Puedes configurar los límites de instrucciones y tamaño del stack</td>
+            <td> Hay un error heredado desde Karel.js que hace que los límites de instrucciones no se guarden en el mundo.in que descargues</td>
+        </tr>
+
+        <tr class="table-primary">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="codigo" data-toc="Editor del código" data-toc-depth="1"></a>
+                </div>
+                Editor del código
+            </th>
+        </tr>
+        <tr>
+            <td>Karel.js usa Codemirror 5</td>
+            <td>ReKarel usa Codemirror 6</td>
+            <td>Esto mejora la experiencia táctil</td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>ReKarel ofrece cambiar el tamaño del código, incluyendo atajos de teclado</td>
+            <td>Si necesitas esto, pero no puedes migrar. Puedes lograr lo mismo en Karel.js con extensiones que carguen CSS personalizado</td>
+        </tr>
+        <tr>
+            <td>Soporte del navegador de ctrl+f</td>
+            <td>Agrega un panel de buscar y reemplazar accesible por ctrl+f</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>Da soporte a ctrl+d y multi cursor con alt+clic</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>Resalta la pareja de llaves seleccionada, incluyendo inicio y fin en pascal</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>Auto indenta</td>
+            <td>El autoindentado de ReKarel aun no es perfecto</td>
+        </tr>
+        <tr>
+            <td>Karel.js provee syntax highlight basado en palabras claves, es decir, las mismas palabras siempre se
+                colorean del mismo color</td>
+            <td>ReKarel usa Lezer para hacer syntax highlight, una palabra clave en el lugar incorrecto no sé colorea
+            </td>
+            <td>Esto permite detectar errores más rápido</td>
+        </tr>
+        <tr>
+            <td>Karel.js muestra los tabs como flechas</td>
+            <td>ReKarel no muestra los tabs como flechas</td>
+            <td>En la experiencia del creador de ReKarel, estas confunden a los estudiantes</td>
+        </tr>
+        <tr>
+            <td>Karel.js ofrece 50 temas para el editor de código</td>
+            <td>ReKarel ofrece 5 temas para el editor del código, 3 de estos tienen variantes en el modo oscuro</td>
+            <td> Para los que extrañen el azul de KarelOmi </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td>ReKarel puede cambiar el lenguaje del código entre Java y Pascal</td>
+            <td> Aunque se borran los comentarios</td>
+        </tr>
+
+        <tr class="table-primary">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="ejecucion" data-toc="Ejecución" data-toc-depth="1"></a>
+                </div>
+                Ejecución
+            </th>
+        </tr>
+        <tr>
+            <td>Karel.js ofrece ejecutar el código paso a paso</td>
+            <td>ReKarel ofrece ejecutar el código paso a paso, saltarse una llamada a una función o salir de la función actual</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js se congela hasta terminar la ejecución de Karel cuando se ve al futuro</td>
+            <td>ReKarel muestra un throbber después de 1 segundo de ejecución que ayuda al usuario saber que ReKarel no está congelado</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js no actualiza la pila si se ve al futuro y no hay breakpoints</td>
+            <td>ReKarel sí actualiza la pila si se ve al futuro aunque no haya breakpoints</td>
+            <td>Esto es para que sea más fácil depurar si hay un error de ejecución, aunque hace más lento la ejecución en esta condición, para esto el siguiente punto.</td>
+        </tr>
+        <tr>
+            <td>Si se ejecuta al futuro y hay breakpoints, Karel.js siempre actualiza la pila</td>
+            <td>ReKarel deja de actualizar la pila si se ejecutan muchas instrucciones</td>
+            <td>Ya que actualizar el DOM es significativamente lento. Por defecto se activa esto con 200,000 instrucciones, pero se puede configurar </td>
+        </tr>
+        
+        <tr>
+            <td>Si se termina en error, te muestra un mensaje en consola</td>
+            <td>Si se termina en error, te muestra un mensaje en consola y el mundo cambia de color</td>
+            <td>Al enseñar Karel al inicio, el creador de ReKarel notó que los estudiantes no se dan cuenta cuando su mundo termina en error</td>
+        </tr>
+        <tr>
+            <td>Al ejecutar paso a paso, Karel.js solo se detiene en la condición del ciclo mientras/while una vez</td>
+            <td>Al ejecutar paso a paso, ReKarel se detiene en la condición del ciclo mientras/while cada vez que se evalúa</td>
+            <td>Esto afecta el paso a paso y los breakpoints, no afecta al conteo de instrucciones para límite de instrucciones excedido, ambos Karel cuentan igual</td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td>Agrega <span>@saltatela</span> o <span>@autoSkip</span> en comentario arriba de la definición de una función para que la ejecución con retraso se la salte automáticamente</td>
+            <td>
+                Ejemplo <br>
+                <span>// @autoSkip</span><br>
+                <span>void giraDerecha()</span>
+                <span>[...]</span>
+            </td>
+        </tr>
+
+        <tr class="table-warning">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="compatibilidad" data-toc="Compatibilidad" data-toc-depth="1"></a>
+                </div>
+                Compatibilidad
+            </th>
+        </tr>
+
+        <tr>
+            <td>Karel.js es compatible con navegadores antiguos como IE</td>
+            <td>ReKarel no es compatible con navegadores antiguos</td>
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>Karel.js usa Codemirror 5</td>
+            <td>ReKarel usa CodeMirror 6</td>
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>Karel.js usa Split.js aprox 1.0.6 (66076e5)</td>
+            <td>ReKarel usa Split.js 1.6.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js usa Bootstrap v2.3.2</td>
+            <td>ReKarel usa Bootstrap v5.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js usa Jquery v1.12.0</td>
+            <td>ReKarel usa Jquery v3.6.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js usa Jison 0.4.18 </td>
+            <td>ReKarel usa Jison 0.4.17</td>
+            <td>Ups, aquí hay un downgrade accidental</td>
+        </tr>
+        
+        <tr class="table-danger">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="errores" data-toc="Errores" data-toc-depth="1"></a>
+                </div>
+                Errores
+            </th>
+        </tr>
+
+        <tr>
+            <td class="text-decoration-line-through">Karel.js tiene un error al cambiar el retraso de ejecución mientras
+                esta en pausa</td>
+            <td> ReKarel no tiene este error </td>
+            <td>Arreglado en la version 1.2 (Jun 17, 2024) <br> Uno de los motivos de crear ReKarel fue arreglar este bug :P</td>
+        </tr>
+        <tr>
+            <td class="text-decoration-line-through">Karel.js tiene un error al crear un nuevo mundo que duplica las
+                llamadas en la pila recursiva</td>
+            <td> ReKarel no tiene este error </td>
+            <td>Arreglado en la version 1.2.8 (Jul 6, 2024) <br> Al momento de escribir esto el Host oficial está en la
+                1.2.7 </td>
+        </tr>
+        <tr>
+            <td>Karel.js tiene un error al recargar la pestaña actual y reiniciar el mundo, este se pierde</td>
+            <td> ReKarel no tiene este error </td>
+            <td>Ambos Karel guardan el código y el mundo en la sesión actual (pestaña del navegador) al compilar el código</td>
+        </tr>
+        <tr>
+            <td>Karel.js esconde la barra de control si la pantalla no es lo suficientemente ancha</td>
+            <td> ReKarel no tiene este error </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Karel.js no tiene este error</td>
+            <td class="text-decoration-line-through">ReKarel tiene algunos problemas de syntax highlight </td>
+            <td> Ver <a href="https://github.com/kishtarn555/ReKarel/issues/25">issue</a> en github </td>
+        </tr>
+        
+        
+        <tr>
+            <td> Karel.js ha sido usado por más gente y más tiempo, lo que implica que sus errores son conocidos </td>
+            <td> ReKarel aún está en pre-release y no ha tenido tanto uso por terceros, lo que conlleva un riesgo de errores desconocidos </td>
+            <td> Dicho eso, ReKarel se creó en parte para arreglar errores conocidos en Karel.js. <br> Puedes ver <a href="https://github.com/kishtarn555/ReKarel/issues/">github</a> para ver cuales errores se han identificado actualmente en ReKarel</td>
+        </tr>
+        
+        <tr class="table-primary">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="miscelaneo" data-toc="Misceláneo" data-toc-depth="1"></a>
+                </div>
+                Misceláneo
+            </th>
+        </tr>
+        <tr>
+            <td> Karel.js siempre descarga los archivos con un nombre predefinido </td>
+            <td> Puedes cambiar el nombre del archivo a descargar </td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Soporta modo oscuro </td>
+            <td> Puedes cambiar el modo en la configuración</td>
+        </tr>
+        <tr>
+            <td> Karel.js tiene soporte para importar MDO/KEC </td>
+            <td> - </td>
+            <td> En el futuro, ReKarel piensa incorporar esto </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Desde configuración se puede cambiar el layout a uno vertical </td>
+            <td> Diseñado para celulares, todavía requiere mejoras </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Revisa la versión actual de ReKarel desde la sección de acerca </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Da clic en la linea del error en la consola para ir a él </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Da clic la línea desde que se llamó un función en la pila para ir a está </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> No pregunta y borra la información directamente al crear un nuevo mundo o código</td>
+            <td> Pregunta si estás seguro de crear un nuevo código o nuevo mundo </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Abrir un mundo .in ofrece filtro para buscar solo .in </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Abrir un código ofrece un filtro para buscar solo .kj y .kp </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> Al descargar un código, te sugiere guardarlo con .kj o .kp dependiendo el lenguaje </td>
+            <td> Esto se podría mejorar ya que solo lo hace la primera vez que presionas descargar código </td>
+        </tr>
+        <tr>
+            <td> Cambiar el tamaño del mundo se hace desde la barra de control </td>
+            <td>  Cambiar el tamaño del mundo se hace desde el menú mundo </td>
+            <td> Esto es porque hacer un mundo pequeño puede ser muy destructivo, queremos que el usuario lo haga conscientemente</td>
+        </tr>
+
+        <tr class="table-primary">
+            <th colspan="3">
+                <div class="position-relative visually-hidden">
+                    <a href="#" tabindex="-1" class="visually-hidden" id="documentacion" data-toc="Documentación" data-toc-depth="1"></a>
+                </div>
+                Documentación
+            </th>
+        </tr>        
+        <tr>
+            <td> La documentación es de Karel.exe, no de Karel.js </td>
+            <td> La documentación fue hecha desde cero para ReKarel </td>
+            <td> </td>
+        </tr>     
+        <tr>
+            <td> La documentación tiene ejercicios para el lector y está redactada como un tutorial de Karel</td>
+            <td> La documentación esta redactada para consultar dudas rápidas, como olvidar todas las condiciones que Karel puede revisar o como se escribe alguna keyword. Aunque tiene ejemplos para explicar los temas y podría funcionar como un tutorial muy limitado </td>
+            <td> En la sección de ayuda se dan enlaces a cursos de omegaup de Karel</td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> Los códigos ejemplo tienen syntax highlight </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> Karel.js tiene un tutorial de recursión para contar</td>
+            <td> - </td>
+            <td> Si la comunidad lo quiere, lo puedo agregar, pero se sentía un poco como tutorial de un tema y no documentación del lenguaje </td>
+        </tr>
+        <tr>
+            <td> - </td>
+            <td> En la documentación de Pascal, se explica que es un prototipo </td>
+            <td>  </td>
+        </tr>
+        <tr>
+            <td> Técnicamente tiene, pero de KarelOmi </td>
+            <td> Documentación incompleta de ReKarel </td>
+            <td> Al momento de escribir esto, solo tiene una información de migración desde Karel.js a ReKarel </td>
+        </tr>
+    </tbody>
+</table>
+@@include("../footer.html")

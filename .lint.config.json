@@ -28,7 +28,10 @@
 			],
 			"denylist": [
 				".*third_party.*",
-				".*\\.py$"
+				".*\\.py$",
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*"
 			]
 		},
 		"php": {
@@ -36,7 +39,10 @@
 				"^frontend/.*\\.php$"
 			],
 			"denylist": [
-				".*third_party.*"
+				".*third_party.*",
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*"
 			]
 		},
 		"javascript": {
@@ -48,7 +54,10 @@
 			],
 			"denylist": [
 				".*third_party.*",
-				".*js/omegaup/lang\\..*"
+				".*js/omegaup/lang\\..*",
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*"
 			]
 		},
 		"eslint": {
@@ -61,7 +70,10 @@
 				".*js/omegaup/lang\\..*",
 				".*third_party.*",
 				"frontend/www/.*\\.d\\.ts$",
-				"frontend/www/js/omegaup/api_types.ts"
+				"frontend/www/js/omegaup/api_types.ts",
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*"
 			]
 		},
 		"style": {
@@ -90,7 +102,10 @@
 			],
 			"denylist": [
 				".*third_party.*",
-				".*js/omegaup/lang\\..*"
+				".*js/omegaup/lang\\..*",
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*"
 			]
 		},
 		"vue": {
@@ -100,6 +115,12 @@
 			"stylelint": true,
 			"allowlist": [
 				"frontend/www/.*\\.vue$"
+			],
+			"denylist": [
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*",
+				"frontend/www/third_party/.*"
 			]
 		},
 		"python": {
@@ -111,7 +132,11 @@
 			],
 			"denylist": [
 				"bin/karel_mdo_convert.py",
-				"frontend/tests/ui/integration-test.py"
+				"frontend/tests/ui/integration-test.py",
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*",
+				"frontend/www/third_party/.*"
 			]
 		},
 		"api": {
@@ -139,6 +164,12 @@
 			"allowlist": [
 				"^frontend/www/js/.*\\.(js|ts|vue)$",
 				"^frontend/templates/.*\\.tpl$"
+			],
+			"denylist": [
+				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
+				"frontend/www/preguntas/.*",
+				"frontend/www/third_party/.*"
 			]
 		}
 	}

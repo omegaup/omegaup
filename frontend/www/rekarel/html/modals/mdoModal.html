@@ -1,0 +1,27 @@
+<div id="mdoModal" class="modal fade" tabindex="-1" aria-labelledby="mdoModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Importar MDO/KEC</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2">
+                    <label for="mdoFile" class="form-label">MDO</label> 
+                    <span class="text-danger" id="mdoMissing" hidden><i class="bi bi-exclamation-diamond-fill"></i> El archivo MDO es necesario</span>
+                    <input type="file" name="mdoFile" id="mdoFile" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label for="kecFile" class="form-label">KEC (Opcional)</label>
+                    <input type="file" name="kecFile" id="kecFile" class="form-control">
+                </div>
+                <p class="text-danger mt-2" id="mdoError" hidden><i class="bi bi-exclamation-diamond-fill"></i> Error leyendo los archivos, asegúrate de que sean válidos.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary" id="importMdoBtn">Importar</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Canelar</button>
+            </div>
+        </div>
+    </div>
+
+</div>

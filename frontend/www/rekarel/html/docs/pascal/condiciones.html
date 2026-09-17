@@ -1,0 +1,169 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="condiciones" data-toc="Condiciones" data-toc-depth="1"></a>
+</div>
+<h1>Condiciones que Karel puede revisar</h1>
+<p>Aquí hay una lista de las condiciones que Karel puede revisar</p>
+<table class="table table-dark table-striped">
+    <tr>
+        <th>Condicion</th>
+        <th>Descripción</th>
+    </tr>
+    <tr>
+        <td>frente-libre</td>
+        <td>Verdadero si no hay pared enfrente de Karel</td>
+    </tr>
+    <tr>
+        <td>izquierda-libre</td>
+        <td>Verdadero si no hay pared a la izquierda de Karel</td>
+    </tr>
+    <tr>
+        <td>derecha-libre</td>
+        <td>Verdadero si no hay pared a la derecha de Karel</td>
+    </tr>
+    <tr>
+        <td>frente-bloqueado</td>
+        <td>Verdadero si sí hay pared enfrente de Karel</td>
+    </tr>
+    <tr>
+        <td>izquierda-bloqueada</td>
+        <td>Verdadero si sí hay pared a la izquierda de Karel</td>
+    </tr>
+    <tr>
+        <td>derecha-bloqueada</td>
+        <td>Verdadero si sí hay pared a la derecha de Karel</td>
+    </tr>
+    <tr>
+        <td>junto-a-zumbador</td>
+        <td>Verdadero si en la casilla donde Karel está al menos un zumbador</td>
+    </tr>
+    <tr>
+        <td>no-junto-a-zumbador</td>
+        <td>Verdadero si en la casilla donde Karel no hay ningún zumbador</td>
+    </tr>
+    <tr>
+        <td>algun-zumbador-en-la-mochila</td>
+        <td>Verdadero si la mochila de Karel tiene uno o más zumbadores</td>
+    </tr>
+    <tr>
+        <td>ningun-zumbador-en-la-mochila</td>
+        <td>Verdadero si la mochila de Karel tiene cero zumbadores</td>
+    </tr>
+    <tr>
+        <td>orientado-al-norte</td>
+        <td>Verdadero si Karel esta orientado al norte (arriba).</td>
+    </tr>
+    <tr>
+        <td>orientado-al-este</td>
+        <td>Verdadero si Karel esta orientado al este (derecha).</td>
+    </tr>
+    <tr>
+        <td>orientado-al-sur</td>
+        <td>Verdadero si Karel esta orientado al sur (abajo).</td>
+    </tr>
+    <tr>
+        <td>orientado-al-oeste</td>
+        <td>Verdadero si Karel esta orientado al oeste (izquierda).</td>
+    </tr>
+    <tr>
+        <td>no-orientado-al-norte</td>
+        <td>Verdadero si Karel esta orientado en cualquier dirección <b>excepto</b> el norte.</td>
+    </tr>
+    <tr>
+        <td>no-orientado-al-este</td>
+        <td>Verdadero si Karel esta orientado en cualquier dirección <b>excepto</b> el este.</td>
+    </tr>
+    <tr>
+        <td>no-orientado-al-sur</td>
+        <td>Verdadero si Karel esta orientado en cualquier dirección <b>excepto</b> el sur.</td>
+    </tr>
+    <tr>
+        <td>no-orientado-al-oeste</td>
+        <td>Verdadero si Karel esta orientado en cualquier dirección <b>excepto</b> el oeste.</td>
+    </tr>
+</table>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="es_infinito" data-toc="Si es infinito (isinfinite)" data-toc-depth="1"></a>
+</div>
+<h2>Si es infinito (es-infinito)</h2>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Standard 2.3">
+    Desde ReKarel 2.3
+</span>
+
+<p>Otra condición que podemos revisar es: <b>es-infinito</b>, esta recibe un parámetro numérico. La condición
+    se verdadera cuando el valor que recibe es infinito.</p>
+
+<h5>Ejemplo 1</h5>
+<a class="badge text-bg-secondary rounded-pill text-decoration-none" title="Requiere importar rekarel.globals"
+    href="usa.html">
+    usa rekarel.globals
+</a>
+
+<p>Este código solo se avanza si Karel tiene infinitos zumbadores.</p>
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">es-infinito</span>(<span class="text-info-emphasis">zumbadores-en-la-mochila</span>) <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza</span>;
+</pre>
+</code>
+
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="es_cero" data-toc="Es cero" data-toc-depth="1"></a>
+</div>
+<h2>Es cero</h2>
+<div class="alert alert-warning"><b>Aviso:</b> Esta condición se mantiene para maximizar la retro compatibilidad y es considerada <b>obsoleta</b>, pues se recomienda usar <a href="operador_comparativo.html">comparadores</a>.</div>
+<p>Otra condición que podemos revisar es: <b>es-cero</b>, esta recibe un parámetro. La condición
+    es verdadera cuando el valor que recibe es cero.</p>
+
+<p><b>Nota:</b> <code>si-es-cero</code> es equivalente a <code>es-cero</code>. La diferencia es que <code>es-cero</code> fue introducido en ReKarel Pascal 2.0.0</p>
+
+<h5>Ejemplo 1</h5>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">es-cero(0)</span> <span class="text-primary-emphasis">entonces</span>
+    <span class="text-info-emphasis">avanza;</span>
+</pre>
+</code>
+
+<h5>Ejemplo 2</h5>
+
+<p>Una funcion que solo avanza si recibe 0 de argumento</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">define-nueva-instruccion</span> <span>funcion (n)</span> <span class="text-primary-emphasis">como</span>
+<span class="text-danger-emphasis">inicio</span>
+    <span class="text-primary-emphasis">si</span> <span class="text-warning-emphasis">es-cero(<span class="text-info">n</span>)</span> <span class="text-primary-emphasis">entonces</span>
+        <span class="text-info-emphasis">avanza;</span>
+<span class="text-danger-emphasis">fin;</span>
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="otras" data-toc="Otras condiciones" data-toc-depth="1"></a>
+</div>
+<h2>Otras condiciones</h2>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Pascal 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+<p>También hay otras condiciones que Karel puede comprobar, cada una tiene las cuales son descritas brevemente a continuación.</p>
+
+<h3>Globales</h3>
+<a class="badge text-bg-secondary rounded-pill text-decoration-none" title="Requiere usa rekarel.globales" href="usa.html">
+    usa rekarel.globales
+</a>
+<p>Si importas rekarel.globales, puedes usar las condiciones <span class="text-info-emphasis">verdadero</span> y <span class="text-info-emphasis">falso</span>, la primera siempre es verdadera y la segunda siempre falsa.</p>
+
+<p>Lee más acerca de las globales <a href="globales.html">aquí</a>.</p>
+
+<h3>Comparaciones</h3>
+<p>Puedes utilizar la comparación "igual que" <span class="text-bg-secondary rounded">==</span>, "menor que" <span class="text-bg-secondary rounded">&lt;</span> o "menor igual que" <span class="text-bg-secondary rounded">&lt;=</span></p>
+
+
+<p>Lee más acerca de las comparaciones <a href="operador_comparativo.html">aquí</a>.</p>
+
+@@include("../footer.html")

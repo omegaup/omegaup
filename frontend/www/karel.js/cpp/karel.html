@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      // Check for wasm support.
+      if (!('WebAssembly' in window)) {
+        alert('you need a browser with wasm support enabled :(');
+      }
+      var Module = {
+        noExitRuntime: true,
+        preRun: [
+          function () {
+            var enc = new TextEncoder('utf-8');
+            var program = [
+              ['LINE', 13],
+              ['LOAD', 0],
+              ['CALL', 100, 'turnright'],
+              ['LINE', 13],
+              ['LINE', 15],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['ROTL'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['OR'],
+              ['JZ', 72],
+              ['LINE', 16],
+              ['WORLDBUZZERS'],
+              ['NOT'],
+              ['JZ', 4],
+              ['LINE', 17],
+              ['BAGBUZZERS'],
+              ['EZ', 'BAGUNDERFLOW'],
+              ['LEAVEBUZZER'],
+              ['LINE', 19],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['JZ', 9],
+              ['LINE', 20],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['EZ', 'WALL'],
+              ['FORWARD'],
+              ['JMP', 47],
+              ['LINE', 22],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['ROTL'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['JZ', 33],
+              ['LINE', 23],
+              ['LEFT'],
+              ['LINE', 24],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['EZ', 'WALL'],
+              ['FORWARD'],
+              ['LINE', 25],
+              ['LEFT'],
+              ['LINE', 26],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['JZ', 9],
+              ['LINE', 26],
+              ['WORLDWALLS'],
+              ['ORIENTATION'],
+              ['MASK'],
+              ['AND'],
+              ['NOT'],
+              ['EZ', 'WALL'],
+              ['FORWARD'],
+              ['JMP', -15],
+              ['LINE', 27],
+              ['LOAD', 0],
+              ['CALL', 108, 'halfturn'],
+              ['LINE', 27],
+              ['JMP', 6],
+              ['LINE', 29],
+              ['BAGBUZZERS'],
+              ['EZ', 'BAGUNDERFLOW'],
+              ['LEAVEBUZZER'],
+              ['LINE', 30],
+              ['HALT'],
+              ['JMP', -85],
+              ['LINE', 35],
+              ['WORLDBUZZERS'],
+              ['NOT'],
+              ['JZ', 4],
+              ['LINE', 36],
+              ['BAGBUZZERS'],
+              ['EZ', 'BAGUNDERFLOW'],
+              ['LEAVEBUZZER'],
+              ['LINE', 40],
+              ['HALT'],
+              ['LINE', 1],
+              ['LINE', 2],
+              ['LEFT'],
+              ['LINE', 3],
+              ['LEFT'],
+              ['LINE', 4],
+              ['LEFT'],
+              ['RET'],
+              ['LINE', 7],
+              ['LINE', 8],
+              ['LEFT'],
+              ['LINE', 9],
+              ['LEFT'],
+              ['RET'],
+            ];
+            var programTypedArray = enc.encode(JSON.stringify(program));
+            var programBuf = Module._malloc(
+              programTypedArray.length * programTypedArray.BYTES_PER_ELEMENT,
+            );
+            Module.HEAPU8.set(programTypedArray, programBuf);
+            console.log('compiling...');
+            if (!Module._compile(programBuf)) {
+              Module._free(programBuf);
+              console.error('Failed to compile');
+              return;
+            }
+            Module._free(programBuf);
+            console.log('done!');
+
+            var width = 5;
+            var height = 5;
+            var buzzersPtr = Module._malloc(width * height * 2);
+            var buzzers = new Uint16Array(
+              Module.HEAPU16.buffer,
+              buzzersPtr,
+              width * height,
+            );
+            var wallsPtr = Module._malloc(width * height);
+            var walls = new Uint8Array(
+              Module.HEAPU8.buffer,
+              wallsPtr,
+              width * height,
+            );
+            function coordinates(x, y) {
+              return y * width + x;
+            }
+            for (var x = 0; x < width; x++) {
+              for (var y = 0; y < height; y++) {
+                buzzers[coordinates(x, y)] = 0;
+                walls[coordinates(x, y)] = 0;
+              }
+            }
+            for (var x = 0; x < width; x++) {
+              walls[coordinates(x, 0)] |= 1 << 0x3;
+              walls[coordinates(x, height - 1)] |= 1 << 0x1;
+            }
+            for (var y = 0; y < height; y++) {
+              walls[coordinates(0, y)] |= 1 << 0x0;
+              walls[coordinates(width - 1, y)] |= 1 << 0x2;
+            }
+
+            var runtimePtr = Module._malloc(15 * 4);
+            var runtime = new Uint32Array(
+              Module.HEAPU32.buffer,
+              runtimePtr,
+              15,
+            );
+            runtime[0] = 1; // orientation
+            runtime[1] = 0; // x
+            runtime[2] = 0; // y
+            runtime[3] = 65535; // bag
+            runtime[4] = 0; // line
+            runtime[5] = 10000000; // instruction_limit
+            runtime[6] = 65000; // stack_limit
+            runtime[7] = 0; // forward_count
+            runtime[8] = 0; // left_count
+            runtime[9] = 0; // leavebuzzer_count
+            runtime[10] = 0; // pickbuzzer_count
+            runtime[11] = width; // width
+            runtime[12] = height; // height
+            runtime[13] = buzzersPtr; // buzzers
+            runtime[14] = wallsPtr; // walls
+
+            console.log('before', runtime, buzzers);
+            var runResult = Module._run(runtimePtr);
+            if (runResult != 0) {
+              console.log('Run failed with result', runResult);
+            }
+            console.log('after', runtime, buzzers);
+          },
+        ],
+      };
+    </script>
+    <title></title>
+  </head>
+  <body>
+    <script src="karel.js"></script>
+  </body>
+</html>

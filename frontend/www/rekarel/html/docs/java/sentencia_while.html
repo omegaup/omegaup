@@ -1,0 +1,33 @@
+@@include("../header.html")<h1>While</h1>
+<p>La sentencia <span class="text-info">while</span> permite a Karel repetir una instrucción o bloque múltiples veces mientras se cumple el código.</p>
+
+<p>A continuación se muestra la estructura de la sentencia while. Lo que hace, es repetir una instrucción si se cumpla la condición <b>al inicio</b> de una iteración.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">while</span> (<span class="text-warning-emphasis">CONDICION</span>)
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<p>Es importante entender que como se ejecuta un ciclo while es de la siguiente forma:</p>
+<ol>
+    <li>Revisar la condición, y de cumplirse, pasar al paso 2, si no al paso 4</li>
+    <li>Ejecutar la instrucción</li>
+    <li>Regresar al paso 1.</li>
+    <li>Terminar el ciclo</li>
+</ol>
+
+<p>Entonces, lo que se debe entender es que la condición es revisada únicamente antes de cada iteración, por lo que si la condición se vuelve falsa temporalmente en partes intermedias de la ejecución del ciclo y al final se vuelve otra vez cierta, esto no detiene el ciclo.</p>
+
+<p>Por ejemplo, un código que avance hasta una pared se ve de la siguiente manera</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">while</span> (<span class="text-warning-emphasis">frontIsClear</span>) <span class="text-danger-emphasis"> {</span>
+    <span class="text-info-emphasis">move</span>();
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+@@include("../footer.html")

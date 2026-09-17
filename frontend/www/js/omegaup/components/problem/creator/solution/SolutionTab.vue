@@ -3,11 +3,11 @@
     <div class="card-body">
       <div class="row">
         <div class="col-md-6 d-flex flex-column">
-          <div
-            ref="markdownButtonBar"
-            class="wmd-button-bar"
+          <omegaup-markdown-toolbar
             data-solution-markdown-toolbar
-          ></div>
+            :get-textarea="getMarkdownInput"
+            @input="currentSolutionMarkdown = $event"
+          ></omegaup-markdown-toolbar>
           <textarea
             ref="markdownInput"
             v-model="currentSolutionMarkdown"
@@ -46,8 +46,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
-import * as markdown from '../../../../markdown';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
 import { TabIndex } from '../Tabs.vue';
@@ -55,19 +53,16 @@ import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 import ProblemMarkdown from '../../ProblemMarkdown.vue';
+import MarkdownToolbar from '../../../MarkdownToolbar.vue';
 Vue.use(VueCookies, { expires: -1 });
-
-const markdownConverter = new markdown.Converter({
-  preview: true,
-});
 
 @Component({
   components: {
     'omegaup-markdown': ProblemMarkdown,
+    'omegaup-markdown-toolbar': MarkdownToolbar,
   },
 })
 export default class SolutionTab extends Vue {
-  @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
   @Prop({ default: T.problemCreatorEmpty })
@@ -77,7 +72,6 @@ export default class SolutionTab extends Vue {
 
   T = T;
   ui = ui;
-  markdownEditor: Markdown.Editor | null = null;
 
   currentSolutionMarkdownInternal: string = T.problemCreatorEmpty;
 
@@ -102,15 +96,8 @@ export default class SolutionTab extends Vue {
     }
   }
 
-  mounted(): void {
-    this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
-      panels: {
-        buttonBar: this.markdownButtonBar,
-        preview: null,
-        input: this.markdownInput,
-      },
-    });
-    this.markdownEditor.run();
+  getMarkdownInput(): HTMLTextAreaElement | null {
+    return this.markdownInput || null;
   }
 
   updateMarkdown() {
@@ -170,18 +157,8 @@ export default class SolutionTab extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../../../sass/main.scss';
-@import '../../../../../../third_party/js/pagedown/demo/browser/demo.css';
-
-.wmd-preview,
-.wmd-button-bar {
-  background-color: var(--wmd-button-bar-background-color);
-}
 
 .row {
-  .wmd-button-bar {
-    flex-shrink: 0;
-  }
-
   .wmd-input {
     flex: 1;
     min-height: 400px;

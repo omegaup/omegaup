@@ -1,0 +1,120 @@
+<div id="karelStyleModal" class="modal fade" tabindex="-1" aria-labelledby="ammountModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Estilo del mundo de Karel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <h3>Estilos predefinidos</h3>
+                        <div class="row">
+                            <div class="col">
+
+                                <select class="form-select" id="karelStylePreset">
+                                    <option value="current">- Estilo actual-</option>
+                                    <option value="default">Por defecto</option>
+                                    <option value="clean">Clean</option>
+                                    <option value="dark">Oscuro</option>
+                                    <option value="contrast">Contraste</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <a href="#" class="btn btn-info" id="karelStyleLoadPresetBtn">Cargar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h3><label for="karelStyleJSON">Importar/exportar estilos</label></h3>
+                        <div class="row me-2 ms-2">
+                        <input type="text" name="form-control" id="karelStyleJSON">
+                        </div>
+                        <div class="row p-2">
+                            <div class="input-group">
+                                <a href="#" class="btn btn-info" id="karelStyleImport">Importar</a>
+                                <a href="#" class="btn btn-danger" id="karelStyleExport">Exportar</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h3>Editar el Estilo</h3>
+                    </div>
+                    <div class="mb-3">
+                        <label for="disabledColor" class="form-label">Disabled Color</label>
+                        <input type="color" id="disabledColor" class="form-control color-input" value="#4f4f4f">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exportCellBackgroundColor" class="form-label">Export Cell Background Color</label>
+                        <input type="color" id="exportCellBackgroundColor" class="form-control color-input" value="#f5f7a8">
+                    </div>
+                    <div class="mb-3">
+                        <label for="karelColor" class="form-label">Karel Color</label>
+                        <input type="color" id="karelColor" class="form-control color-input" value="#3E6AC1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gridBackgroundColor" class="form-label">Grid Background Color</label>
+                        <input type="color" id="gridBackgroundColor" class="form-control color-input" value="#f8f9fA">
+                    </div>
+                    <div class="mb-3">
+                        <label for="errorGridBackgroundColor" class="form-label">Error Grid Background Color</label>
+                        <input type="color" id="errorGridBackgroundColor" class="form-control color-input" value="#f5d5d5">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gridBorderColor" class="form-label">Grid Border Color</label>
+                        <input type="color" id="gridBorderColor" class="form-control color-input" value="#c4c4c4">
+                    </div>
+                    <div class="mb-3">
+                        <label for="errorGridBorderColor" class="form-label">Error Grid Border Color</label>
+                        <input type="color" id="errorGridBorderColor" class="form-control color-input" value="#a8838f">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gutterBackgroundColor" class="form-label">Gutter Background Color</label>
+                        <input type="color" id="gutterBackgroundColor" class="form-control color-input" value="#e6e6e6">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gutterColor" class="form-label">Gutter Color</label>
+                        <input type="color" id="gutterColor" class="form-control color-input" value="#444444">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gutterSelectionBackgroundColor" class="form-label">Gutter Selected Background Color</label>
+                        <input type="color" id="gutterSelectionBackgroundColor" class="form-control color-input" value="#e6e6e6">
+                    </div>
+                    <div class="mb-3">
+                        <label for="gutterSelectionColor" class="form-label">Gutter Selected Color</label>
+                        <input type="color" id="gutterSelectionColor" class="form-control color-input" value="#444444">
+                    </div>
+                    <div class="mb-3">
+                        <label for="beeperBackgroundColor" class="form-label">Beeper Background Color</label>
+                        <input type="color" id="beeperBackgroundColor" class="form-control color-input" value="#0ADB23">
+                    </div>
+                    <div class="mb-3">
+                        <label for="beeperColor" class="form-label">Beeper Color</label>
+                        <input type="color" id="beeperColor" class="form-control color-input" value="#000000">
+                    </div>
+                    <div class="mb-3">
+                        <label for="wallColor" class="form-label">Wall Color</label>
+                        <input type="color" id="wallColor" class="form-control color-input" value="#000000">
+                    </div>
+                    <div class="mb-3">
+                        <label for="waffleColor" class="form-label">Selection Color</label>
+                        <input type="color" id="waffleColor" class="form-control color-input" value="#000000">
+                    </div>
+                </form>
+
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-dialog="none">
+                    Cancelar
+                </button>
+
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-dialog="none"
+                    id="setKarelStyleBtn">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

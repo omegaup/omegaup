@@ -1,0 +1,6 @@
+iniciar-programa
+  inicia-ejecucion
+    mientras no-junto-a-zumbador hacer avanza;
+    apagate;
+  termina-ejecucion
+finalizar-programa

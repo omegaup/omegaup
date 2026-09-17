@@ -1,0 +1,54 @@
+iniciar-programa
+    define-nueva-instruccion girar(n) como inicio
+        repetir n veces inicio
+            gira-izquierda;
+        fin;
+    fin;
+
+    define-nueva-instruccion intentar(n) como inicio
+        si no si-es-cero(n) entonces inicio
+            deja-zumbador;
+            si frente-libre entonces inicio
+                avanza;
+                intentar(precede(n));
+                girar(2);
+                avanza;
+                girar(2);
+            fin sino inicio
+                gira-izquierda;
+                si frente-libre entonces inicio
+                    avanza;
+                    intentar(precede(n));
+                    girar(2);
+                    avanza;
+                    gira-izquierda;
+                fin sino inicio
+                    girar(2);
+                    avanza;
+                    intentar(precede(n));
+                    girar(2);
+                    avanza;
+                    girar(3);
+                fin;
+            fin;
+            coge-zumbador;
+        fin sino inicio
+            si junto-a-zumbador entonces inicio
+                apagate;
+            fin;
+        fin;
+    fin;
+    
+    define-nueva-instruccion incrementar(n) como inicio
+        repetir 4 veces inicio
+            gira-izquierda;
+            intentar(n);
+        fin;
+        incrementar(sucede(n));
+    fin;
+
+    inicia-ejecucion
+        coge-zumbador;
+        incrementar(1);
+    termina-ejecucion
+finalizar-programa

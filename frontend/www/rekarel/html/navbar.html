@@ -1,0 +1,164 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-omega p-0">
+    <div class="container">
+        <a class="navbar-brand" href="#">ReKarel</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Mundo
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="#" id="newWorldBtn"><i class="bi bi-plus-square"></i>
+                                Nuevo</a>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-bs-toggle="modal"
+                                data-bs-target="#resizeWorldModal">
+                                <i class="bi bi-bounding-box-circles"></i>
+                                Cambiar tamaño del mundo
+                            </button>
+                        </li>
+                        <li><a class="dropdown-item" id="openWorldInBtn" data-bs-toggle="modal" 
+                            data-bs-target="#openWorldModal" href="#"><i
+                                    class="bi bi-file-earmark-image"></i> Abrir
+                                mundo.in</a></li>
+                        <li><a class="dropdown-item" data-bs-toggle="modal" 
+                            data-bs-target="#mdoModal" href="#"><i
+                                    class="bi bi-file-earmark-arrow-down"></i>
+                                Importar MDO/KEC
+                            </a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-bs-toggle="modal"
+                                data-bs-target="#downloadWorldModal">
+                                <i class="bi bi-box-arrow-down"></i>
+                                Descargar mundo
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-bs-toggle="modal"
+                                data-bs-target="#shareWorldModal">
+                                <i class="bi bi-link-45deg"></i>
+                                Compartir mundo
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCodeLink"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Código
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownCodeLink">
+                        <li>
+                            <button id="newJavaCodeNavBtn" class="dropdown-item">
+                                <i class="bi bi-file-earmark-plus"></i> Nuevo Java
+                            </button>
+                        </li>
+                        <li>
+                            <button id="newPascalCodeNavBtn" class="dropdown-item">
+                                <i class="bi bi-file-earmark-plus"></i> Nuevo Pascal
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" id ="openCodeBtn"><i class="bi bi-folder2-open"></i>
+                                Abrir
+                                código</a>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                data-bs-target="#saveCodeModal">
+                                <i class="bi bi-box-arrow-down"></i> Descargar
+                                código
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item"  id="java2pascalBtn">
+                                <i class="bi bi-file-ppt"></i> Cambiar a Pascal
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item"  id="pascal2javaBtn">
+                                <i class="bi bi-filetype-java"></i> Cambiar a Java
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOptionsLink"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Opciones
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownOptionsLink">
+                        <li>
+                            <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                data-bs-target="#settingsModal">
+                                <i class="bi bi-gear-fill"></i> Configuración
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                data-bs-target="#karelStyleModal">
+                                <i class="bi bi-palette-fill"></i> Estilo Karel
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                data-bs-target="#randomBeepersModal">
+                                <i class="bi bi-dice-6-fill"></i> Conf. de zumbadores aleatorios
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownHelp"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Ayuda
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownHelp">
+                        <li>
+                            <a class="dropdown-item" href="docs" target="_blank"><i
+                                    class="bi bi-book"></i> Documentación</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item"
+                                href="https://omegaup.com/course/IntroduccionaKarel/" target="_blank"><i
+                                    class="bi bi-journal-text"></i> Curso Karel Java</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item"
+                                href="https://omegaup.com/course/omiags-curso-karel/" target="_blank"><i
+                                    class="bi bi-journal-text"></i> Curso Karel Pascal</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                data-bs-target="#aboutModal">
+                                <i class="bi bi-info-circle"></i>
+                                Acerca de
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

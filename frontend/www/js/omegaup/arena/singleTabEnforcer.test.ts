@@ -165,6 +165,32 @@ describe('SingleTabEnforcer', () => {
     enforcer.destroy();
     expect(MockBroadcastChannel.instances).toHaveLength(0);
   });
+
+  it('should not block a same-window reload after pagehide', () => {
+    const onBlocked1 = jest.fn();
+    const onBlocked2 = jest.fn();
+
+    const enforcer1 = new SingleTabEnforcer({
+      contestAlias: 'test-contest',
+      onBlocked: onBlocked1,
+    });
+    enforcer1.init();
+
+    window.dispatchEvent(new Event('pagehide'));
+
+    const enforcer2 = new SingleTabEnforcer({
+      contestAlias: 'test-contest',
+      onBlocked: onBlocked2,
+    });
+    enforcer2.init();
+    jest.runAllTimers();
+
+    expect(enforcer1.blocked).toBe(false);
+    expect(enforcer2.blocked).toBe(false);
+    expect(onBlocked2).not.toHaveBeenCalled();
+
+    enforcer2.destroy();
+  });
 });
 
 describe('enforceSingleTab', () => {

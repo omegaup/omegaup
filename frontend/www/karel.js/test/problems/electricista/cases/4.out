@@ -1,0 +1,19 @@
+<resultados>
+	<mundos>
+		<mundo nombre="mundo_0">
+			<linea fila="10" compresionDeCeros="true">(3) 1 (5) 1 (7) 1 1 </linea>
+			<linea fila="9" compresionDeCeros="true">(3) 1 1 (6) 1 (8) 1 </linea>
+			<linea fila="8" compresionDeCeros="true">(3) 1 (5) 1 (7) 1 1 </linea>
+			<linea fila="7" compresionDeCeros="true">(3) 1 1 (6) 1 (8) 1 </linea>
+			<linea fila="6" compresionDeCeros="true">(3) 1 (5) 1 (7) 1 1 </linea>
+			<linea fila="5" compresionDeCeros="true">(3) 1 1 (6) 1 (8) 1 </linea>
+			<linea fila="4" compresionDeCeros="true">(3) 1 (5) 1 (7) 1 1 </linea>
+			<linea fila="3" compresionDeCeros="true">(3) 1 1 (6) 1 (8) 1 </linea>
+			<linea fila="2" compresionDeCeros="true">(3) 1 (5) 1 (7) 1 1 </linea>
+			<linea fila="1" compresionDeCeros="true">(3) 1 1 (6) 1 (8) 1 </linea>
+		</mundo>
+	</mundos>
+	<programas>
+		<programa nombre="p1" resultadoEjecucion="FIN PROGRAMA"/>
+	</programas>
+</resultados>

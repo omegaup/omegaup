@@ -1,0 +1,45 @@
+<div class="d-none d-flex flex-column flex-grow-1 m-0 p-0 position-relative" id="phoneView">    
+    <div class="splitter-container d-flex">
+        <div class="position-relative flex-grow-1 flex-shrink-1">
+            <div class="splitter-container">
+                <div id="mobileCodePanel" class="split split-vertical"></div>
+                <div id="mobileWorldPanel" class="split split-vertical">
+                    
+                    
+                    <div id="mobileWorldPane" class="w-100 h-100 d-flex flex-column position-relative">
+                        <div class="d-flex position-relative right-0 top-0 w-100 bg-body-secondary flex-nowrap">
+                            <div class="d-flex" role="group" aria-label="Basic example">
+                                <div class="input-group-text bg-body border-secondary ps-2 pe-2 rounded-start rounded-0"
+                                    title="Zumbadores en Karel">
+                                    <small class="d-none d-md-inline"><label for="phoneBeeperBag"> Mochila</label></small>                    
+                                    <i class="bi bi-backpack-fill d-block d-md-none"></i>
+                                </div>
+                                <div class="collapse collapse-horizontal show" id="beeperInputPhoneCollapse">
+                                    <input type="number" id="phoneBeeperBag" class="form-control border-secondary rounded-0"
+                                        aria-label="" min="0" value="0">
+                                </div>
+                                <button type="button" class="btn btn-body p-1 ps-3 pe-3 border-secondary rounded-end rounded-0"
+                                    id="phoneInfiniteBeepersBtn" title="Activar/desactivar zumbadores infinitos">
+                                    <i class="bi bi-infinity"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="btn-group dropup  ms-auto" id="phoneZoomDropdown">
+                                <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-zoom-in"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li>
+                                    <input type="range" class="form-range" id="phoneZoom" min="0" max="100">
+                                  </li>
+                                </ul>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="mobileStatePanel" class="split split-vertical"></div>
+            </div>
+        </div>  
+        @@include('./sideToolbar.html')
+    </div>
+</div>

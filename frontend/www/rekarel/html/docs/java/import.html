@@ -1,0 +1,36 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Import</h1>
+<span class="badge text-bg-info rounded-pill" title="Esta funcionalidad esta disponible desde ReKarel Java 2.0.0">
+    Desde ReKarel 2.0.0
+</span>
+
+<p>ReKarel es capar de importar librerías internas para incrementar las funciones que Karel puede realizar. </p>
+
+<p>Para importar una librería, en la parte más superior del código se debe escribir <code>import</code> seguido del nombre de la librería, el cual tiene un formato de <code>namespace</code>.<code>paquete</code> </p>
+
+<p>Veamos un ejemplo:</p>
+
+
+<code class="text-body" >
+<pre class="border p-2">
+<span class="text-danger-emphasis">import</span> <span class="text-warning-emphasis">rekarel</span>.<span class="text-warning-emphasis">globals</span>;
+<span class="text-danger-emphasis">class</span> program <span class="text-danger-emphasis">{</span>
+    <span class="text-primary-emphasis">program</span> () <span class="text-danger-emphasis">{</span>
+        <span class="text-info-emphasis">turnoff</span>();
+    <span class="text-danger-emphasis">}</span>
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="disponibles" data-toc="Librerías disponibles" data-toc-depth="1"></a>
+</div>
+<h2>Librerías disponibles</h2>
+
+<p>Actualmente la única librería disponible es <a href="globales.html">rekarel.globales</a></p>
+
+@@include("../footer.html")

@@ -1,0 +1,68 @@
+<div class="split split-horizontal" id="splitter-right-pane">
+    <div class="w-100 h-100 d-flex flex-column position-relative" id="desktopWorldSlot">
+        <div class="overflow-hidden flex-grow-1 flex-shrink-1 position-relative" id="worldPane">
+            <div id="worldContainer" class="w-100 h-100 overflow-scroll"
+                style="height: 0px;">
+                <div id="waffleContainer" class="h-0 w-0">
+                    <div class="box-select position-absolute" style="
+                    top:10px;
+                    left: 56px;" id="desktopBoxSelect">
+                        <div class="position-absolute waffle-element waffle-sphere" name = "cursor"></div>
+                        <div class="position-absolute waffle-border waffle-element"
+                            name="left" style="
+                        min-width: 0px;
+                        min-height: 28px;
+                        max-width: 0px;
+                        max-height: 28px;
+                        top: 0px;
+                        left: 0px;
+                        border-left-width: 2px;
+                        "></div>
+                        <div class="position-absolute waffle-border waffle-element"
+                            name="top" style="
+                        min-width: 28px;
+                        min-height: 0px;
+                        max-width: 28px;
+                        max-height: 0px;
+                        top: 0px;
+                        left: 0px;
+                        border-top-width: 2px;
+                        "></div>
+                        <div class="position-absolute waffle-border waffle-element"
+                            name="bottom" style="
+                        min-width: 28px;
+                        min-height: 0px;
+                        max-width: 28px;
+                        max-height: 0px;
+                        top: 28px;
+                        left: 0px;
+                        border-top-width: 2px;
+                        "></div>
+                        <div class="position-absolute waffle-border waffle-element"
+                            name="right" style="
+                        min-width: 0px;
+                        min-height: 28px;
+                        max-width: 0px;
+                        max-height: 28px;
+                        top: 0px;
+                        left: 28px;
+                        border-left-width: 2px;
+                        "></div>
+                    </div>
+                </div>
+
+                <canvas id="worldCanvas"
+                    class="position-sticky top-0 start-0 world-canvas"
+                    style="  touch-action: pan-x pan-y;"
+                    tabindex="0"
+                ></canvas>
+                <div id="worldScrolledContainerVertical"
+                    style="height:3000px;width:1px;"></div>
+                <div id="worldScrolledContainerHorizontal"
+                    style="height:1px;width:3000px;"></div>
+
+            </div>
+        </div>
+        @@include('./bottomToolbar.html')
+    </div>
+</div>

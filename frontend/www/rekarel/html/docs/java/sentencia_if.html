@@ -1,0 +1,64 @@
+@@include("../header.html")
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="inicio" data-toc="Inicio" data-toc-depth="1"></a>
+</div>
+<h1>Condicionales If</h1>
+<p>Las condicionales permiten a Karel ejecutar cierto código dependiendo de una condición.</p>
+
+<h2>Condicional sencillo</h2>
+<p>El primer condicional es el sencillo, este ejecuta una <span class="text-info-emphasis">INSTRUCCION</span>
+    dependiendo si se cumple una <span class="text-warning-emphasis">CONDICION</span>. Si la condición no se cumple, la
+    instrucción
+    es simplemente saltada.</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">CONDICION</span>)
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<p>Por ejemplo, el siguiente código solo avanza si enfrente de Karel no hay una pared, si el frente
+    de Karel esta libre:</p>
+    
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">frontIsClear</span>)
+    <span class="text-info-emphasis">avanza;</span>
+</pre>
+</code>
+
+<p>Puedes revisar la lista completa de condiciones completa <a class="text-info" href="#"
+        onclick="showNav('v-pills-conditions')">aquí</a></p>
+
+<div class="position-relative visually-hidden">
+    <a href="#" tabindex="-1" class="visually-hidden" id="else" data-toc="Sino (else)" data-toc-depth="1"></a>
+</div>
+<h2>Else</h2>
+<p>Podemos hacer que la sentencia ejecute una instrucción si se cumple la condicion y si no, que
+    ejecute otra. Esto lo hacemo usando el else</p>
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">CONDICION</span>)
+    <span class="text-info-emphasis">INSTRUCCION</span>
+<span class="text-primary-emphasis">else</span>
+    <span class="text-info-emphasis">INSTRUCCION</span>
+</pre>
+</code>
+
+<p>Por ejemplo, el siguiente código solo avanza si enfrente de Karel no hay una pared, si no da
+    media vuelta:</p>
+
+<code class="text-body">
+<pre class="border p-2">
+<span class="text-primary-emphasis">if</span> (<span class="text-warning-emphasis">frontIsClear</span>)
+    <span class="text-info-emphasis">move</span>();
+<span class="text-primary-emphasis">else</span> <span class="text-danger-emphasis">{</span>
+    <span class="text-info-emphasis">turnleft</span>();
+    <span class="text-info-emphasis">turnleft</span>();
+<span class="text-danger-emphasis">}</span>
+</pre>
+</code>
+
+@@include("../footer.html")
