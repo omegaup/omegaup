@@ -404,6 +404,55 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test that the only_karel filter returns all Karel problems, including
+     * legacy problems (which allow kp and kj) and ReKarel problems (which only
+     * allow rk).
+     */
+    public function testOnlyKarelFilterReturnsLegacyAndReKarelProblems() {
+        $legacy = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'languages' => 'kp,kj',
+            ])
+        );
+        $rekarel = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'languages' => 'rk',
+            ])
+        );
+        $nonKarel = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'languages' => 'cpp11-gcc',
+            ])
+        );
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'auth_token' => self::login($identity)->auth_token,
+            'only_karel' => true,
+        ]));
+
+        $aliases = array_map(
+            fn (array $problem) => $problem['alias'],
+            $response['results']
+        );
+        $this->assertContains(
+            $legacy['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertContains(
+            $rekarel['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertNotContains(
+            $nonKarel['request']['problem_alias'],
+            $aliases
+        );
+    }
+    /**
      * Tests problem lists when searching by tag when tags are not public.
      */
     public function testProblemListWithPrivateTags() {
