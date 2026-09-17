@@ -26,6 +26,63 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
     protected $problemsMapping;
 
+    /** @var list<string> */
+    private const SOLVED_STATUS_VALUES = ['all', 'solved', 'attempted', 'unsolved'];
+
+    /**
+     * Forces the type of an already created submission to the given value.
+     */
+    private function setSubmissionType(
+        string $guid,
+        string $type
+    ): void {
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $submission->type = $type;
+        \OmegaUp\DAO\Submissions::update($submission);
+    }
+
+    /**
+     * Creates a promoted problem owned by $identity when $own is true.
+     *
+     * @return array{problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
+     */
+    private function createPromotedProblem(
+        \OmegaUp\DAO\VO\Identities $identity,
+        bool $own = false
+    ): array {
+        $params = new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'promoted',
+        ]);
+        if ($own) {
+            $params->author = $identity;
+        }
+        return \OmegaUp\Test\Factories\Problem::createProblem($params);
+    }
+
+    /**
+     * Returns the aliases in apiList() results for a given solved_status.
+     *
+     * @return list<string>
+     */
+    private function listAliasesForStatus(
+        string $solvedStatus,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'solved_status' => $solvedStatus,
+            'rowcount' => 1000,
+        ]));
+        return array_map(
+            fn ($problem) => $problem['alias'],
+            $response['results']
+        );
+    }
+
     /**
      * Test getting a list of problems for an anonymous user while filtering
      * by multiple tags with require_all_tags = true.
@@ -1460,6 +1517,183 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     );
             }
         }
+    }
+
+    /**
+     * Verifies that the solved_status filter returns the expected problem
+     * sets, including the forfeited and own-problem exclusions shared with
+     * the solved list, and that the attempted definition ranks a non-normal
+     * AC submission as attempted rather than solved.
+     */
+    public function testSolvedStatusFilter() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $solvedProblemData = $this->createPromotedProblem($identity);
+        $ownProblemData = $this->createPromotedProblem($identity, true);
+        $forfeitedProblemData = $this->createPromotedProblem($identity);
+        $attemptedProblemData = $this->createPromotedProblem($identity);
+        $unattemptedProblemData = $this->createPromotedProblem($identity);
+
+        $solvedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $solvedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($solvedRun);
+
+        $ownRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $ownProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($ownRun);
+
+        $forfeitedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $forfeitedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($forfeitedRun);
+        \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
+            'user_id' => $user->user_id,
+            'problem_id' => $forfeitedProblemData['problem']->problem_id,
+        ]));
+
+        $attemptedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $attemptedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($attemptedRun, '0.0', 'WA');
+        $attemptedRunTest = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $attemptedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($attemptedRunTest);
+        $this->setSubmissionType(
+            $attemptedRunTest['response']['guid'],
+            'test'
+        );
+
+        $solvedAliases = $this->listAliasesForStatus('solved', $identity);
+        $this->assertContains(
+            $solvedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $ownProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $forfeitedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $attemptedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $unattemptedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+
+        $attemptedAliases = $this->listAliasesForStatus('attempted', $identity);
+        $this->assertContains(
+            $attemptedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $ownProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $forfeitedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $solvedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $unattemptedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+
+        $unattemptedAliases = $this->listAliasesForStatus(
+            'unsolved',
+            $identity
+        );
+        $this->assertContains(
+            $unattemptedProblemData['request']['problem_alias'],
+            $unattemptedAliases
+        );
+        $this->assertNotContains(
+            $solvedProblemData['request']['problem_alias'],
+            $unattemptedAliases
+        );
+        $this->assertNotContains(
+            $attemptedProblemData['request']['problem_alias'],
+            $unattemptedAliases
+        );
+
+        $allAliases = $this->listAliasesForStatus('all', $identity);
+        foreach (self::SOLVED_STATUS_VALUES as $status) {
+            $statusAliases = $this->listAliasesForStatus($status, $identity);
+            foreach ($statusAliases as $statusAlias) {
+                $this->assertContains(
+                    $statusAlias,
+                    $allAliases,
+                    "solved_status=$status returned an alias not in the full list"
+                );
+            }
+        }
+
+        $overlap = array_intersect(
+            $solvedAliases,
+            $attemptedAliases
+        );
+        $this->assertEmpty(
+            $overlap,
+            'solved and attempted sets must not overlap'
+        );
+    }
+
+    /**
+     * Verifies that a problem whose only AC submission has a non-normal type
+     * is counted as attempted (not solved) by both apiList() with
+     * solved_status=solved / attempted, matching the solved query's
+     * type = 'normal' condition.
+     */
+    public function testAttemptedAndSolvedTypeConsistency() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = $this->createPromotedProblem($identity);
+
+        $waRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($waRun, '0.0', 'WA');
+
+        $acRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($acRun);
+        $this->setSubmissionType(
+            $acRun['response']['guid'],
+            'test'
+        );
+
+        $solvedAliases = $this->listAliasesForStatus('solved', $identity);
+        $this->assertNotContains(
+            $problemData['request']['problem_alias'],
+            $solvedAliases
+        );
+
+        $attemptedAliases = $this->listAliasesForStatus(
+            'attempted',
+            $identity
+        );
+        $this->assertContains(
+            $problemData['request']['problem_alias'],
+            $attemptedAliases
+        );
     }
 
     /**

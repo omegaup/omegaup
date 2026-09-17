@@ -2316,6 +2316,7 @@ const translations: { [key: string]: string; } = {
   wordsFilterByProblem: "Filter by problem",
   wordsFilterBySchool: "Filter by my school",
   wordsFilterByState: "Filter by my state",
+  wordsFilterByStatus: "Filter by status",
   wordsGender: "Gender",
   wordsGenderDecline: "Prefer not to say",
   wordsGenderFemale: "Female",
