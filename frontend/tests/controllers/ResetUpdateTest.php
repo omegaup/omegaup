@@ -116,4 +116,35 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identity->password = $new_password;
         self::login($identity);
     }
+
+    public function testShouldRefuseReusingResetToken() {
+        $user_data = \OmegaUp\Test\Factories\User::generateUser();
+        $r = new \OmegaUp\Request(['email' => $user_data['email']]);
+        $create_response = \OmegaUp\Controllers\Reset::apiCreate($r);
+        $reset_token = $create_response['token'];
+        $user_data['reset_token'] = $reset_token;
+
+        $new_password = 'newpassword';
+        $user_data['password'] = $new_password;
+        $user_data['password_confirmation'] = $new_password;
+        $r = new \OmegaUp\Request($user_data);
+
+        \OmegaUp\Controllers\Reset::apiUpdate($r);
+
+        // Verify that the reset token has been cleared in the database
+        $user = \OmegaUp\DAO\Users::findByEmail($user_data['email']);
+        $this->assertNotNull($user);
+        $this->assertNull($user->reset_digest);
+        $this->assertNull($user->reset_sent_at);
+
+        // Attempting to reuse the same reset token must fail with invalidResetToken
+        try {
+            $user_data['password'] = 'anotherPassword';
+            $user_data['password_confirmation'] = 'anotherPassword';
+            \OmegaUp\Controllers\Reset::apiUpdate(new \OmegaUp\Request($user_data));
+            $this->fail('Reusing reset token should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
+            $this->assertSame('invalidResetToken', $expected->getMessage());
+        }
+    }
 }
