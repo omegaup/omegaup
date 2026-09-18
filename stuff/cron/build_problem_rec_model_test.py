@@ -409,6 +409,7 @@ class _FakeCronRun:
         self.run_id: Optional[int] = None
         self.rows_affected: Optional[int] = None
         self.failed = False
+        self.failure_reason: Optional[str] = None
 
     def set_rows_affected(self, rows: int) -> None:
         '''Records the dataset size the job reported.'''
@@ -417,6 +418,7 @@ class _FakeCronRun:
     def mark_failure(self, reason: Optional[str] = None) -> None:
         '''Records that the job reported a failure.'''
         self.failed = True
+        self.failure_reason = reason
 
 
 class TestTrainAndPublish(unittest.TestCase):
