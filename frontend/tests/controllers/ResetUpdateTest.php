@@ -141,7 +141,11 @@ class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             $user_data['password'] = 'anotherPassword';
             $user_data['password_confirmation'] = 'anotherPassword';
-            \OmegaUp\Controllers\Reset::apiUpdate(new \OmegaUp\Request($user_data));
+            \OmegaUp\Controllers\Reset::apiUpdate(
+                new \OmegaUp\Request(
+                    $user_data
+                )
+            );
             $this->fail('Reusing reset token should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $this->assertSame('invalidResetToken', $expected->getMessage());
