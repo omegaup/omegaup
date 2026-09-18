@@ -5,6 +5,7 @@
   - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
+  - [`/api/admin/operationsSummary/`](#apiadminoperationssummary)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
@@ -384,6 +385,17 @@ Gets the current system settings. Only available to system admins.
 | Name       | Type                                   |
 | ---------- | -------------------------------------- |
 | `settings` | `{ ephemeralGraderEnabled: boolean; }` |
+
+## `/api/admin/operationsSummary/`
+
+### Description
+
+### Returns
+
+| Name          | Type           |
+| ------------- | -------------- |
+| `generatedAt` | `number`       |
+| `modules`     | `List[string]` |
 
 ## `/api/admin/platformReportStats/`
 

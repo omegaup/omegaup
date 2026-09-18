@@ -3218,6 +3218,7 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isSupportTeamMember: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
     maintenanceMessage?: types.MaintenanceMessage;
@@ -5470,6 +5471,11 @@ export namespace messages {
   export type AdminGetSystemSettingsResponse = {
     settings: { ephemeralGraderEnabled: boolean };
   };
+  export type AdminOperationsSummaryRequest = { [key: string]: any };
+  export type AdminOperationsSummaryResponse = {
+    generatedAt: number;
+    modules: string[];
+  };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -6494,6 +6500,9 @@ export namespace controllers {
     getSystemSettings: (
       params?: messages.AdminGetSystemSettingsRequest,
     ) => Promise<messages.AdminGetSystemSettingsResponse>;
+    operationsSummary: (
+      params?: messages.AdminOperationsSummaryRequest,
+    ) => Promise<messages.AdminOperationsSummaryResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
