@@ -160,14 +160,14 @@ def main() -> None:
                 with cron_run.phase('process_badges'):
                     has_failures = process_badges(args.current_timestamp,
                                                   dbconn, cur, cur_readonly)
+                    if has_failures:
+                        cron_run.mark_failure('some badges failed to process')
             dbconn.conn.commit()
         finally:
             dbconn.conn.close()
             if dbconn_readonly is not dbconn:
                 dbconn_readonly.conn.close()
             logging.info('Finished')
-        if has_failures:
-            cron_run.mark_failure()
     if has_failures:
         sys.exit(1)
 
