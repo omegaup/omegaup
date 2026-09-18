@@ -24,7 +24,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * @return list<\OmegaUp\DAO\VO\Courses>
      */
-    public static function findByName(string $name): array {
+    public static function findByExactName(string $name): array {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
             'c'
@@ -669,7 +669,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 gi.group_id = ?
             ORDER BY
-                i.name, i.username
+                COALESCE(i.name, i.username), i.username
             LIMIT ?, ?';
 
         /** @var list<array{classname: string, country_id: null|string, identity_id: int, name: null|string, username: string}> */
@@ -942,7 +942,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 FROM (
                     SELECT
                         c.course_id,
-                        0 AS role_priority
+                        3 AS role_priority
                     FROM
                         ACLs AS a
                     INNER JOIN

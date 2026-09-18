@@ -8,7 +8,7 @@ from typing import Dict, List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
-from utils import (
+from cron.utils import (
     UserProblems,
     UserRank,
     get_first_day_of_next_month,
