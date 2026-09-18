@@ -56,6 +56,9 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._rows_affected: Optional[int] = None
         self._start_monotonic = 0.0
         self._forced_failure = False
+        self._failure_reason: Optional[str] = None
+        self._phase_depth = 0
+        self._phase_forced: List[bool] = []
 
     @property
     def _lock_name(self) -> str:
@@ -110,14 +113,25 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         start = time.monotonic()
         status = 'success'
         error_class: Optional[str] = None
+        self._phase_depth += 1
+        self._phase_forced.append(False)
         try:
             yield
+        except SystemExit as exc:
+            if exc.code not in (None, 0):
+                status = 'failure'
+                error_class = 'SystemExit'
+            raise
         except BaseException as exc:
             status = 'failure'
             error_class = type(exc).__name__
             raise
         finally:
+            self._phase_depth -= 1
             duration = round(time.monotonic() - start, 3)
+            phase_forced = self._phase_forced.pop()
+            if status == 'success' and phase_forced:
+                status = 'failure'
             self._phases.append({
                 'phase': name,
                 'status': status,
@@ -136,13 +150,19 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         '''Records how many rows the job wrote.'''
         self._rows_affected = rows
 
-    def mark_failure(self) -> None:
+    def mark_failure(self, reason: Optional[str] = None) -> None:
         '''Records this run as failed even if nothing was raised.
 
         Jobs that report failures through a return value need this, otherwise
-        the run would be recorded as successful.
+        the run would be recorded as successful. When called inside a phase,
+        that phase is recorded as failed too. `reason` is stored as the run's
+        `error_text` so operators can tell forced failures from exceptions.
         '''
         self._forced_failure = True
+        if reason is not None:
+            self._failure_reason = reason
+        if self._phase_depth > 0:
+            self._phase_forced[-1] = True
 
     def _is_disabled(self) -> bool:
         '''Whether the registry disabled this job. Unregistered jobs run.'''
@@ -186,11 +206,17 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
     def _finish(self, exc_value: Any) -> None:
         if self._connection is None or self._run_id is None:
             return
+        if isinstance(exc_value, SystemExit) and exc_value.code in (None, 0):
+            exc_value = None
         failed = exc_value is not None or self._forced_failure
         status = 'failure' if failed else 'success'
         error_text: Optional[str] = None
         if exc_value is not None:
             error_text = f'{type(exc_value).__name__}: {exc_value}'
+        elif self._failure_reason is not None:
+            error_text = self._failure_reason
+        elif failed:
+            error_text = 'marked as failed by the job'
         duration = round(time.monotonic() - self._start_monotonic, 3)
         phases = json.dumps(self._phases) if self._phases else None
         with self._connection.cursor() as cur:
