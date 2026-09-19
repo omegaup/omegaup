@@ -222,6 +222,7 @@
                       >{{ T.navDependents }}</a
                     >
                     <template v-if="!isUnder13User">
+                      <div class="dropdown-divider"></div>
                       <a
                         class="dropdown-item"
                         href="/profile/#created-content"
@@ -242,6 +243,7 @@
                         data-nav-user-contests
                         >{{ T.navMyContests }}</a
                       >
+                      <div class="dropdown-divider"></div>
                     </template>
                     <a
                       class="dropdown-item"
@@ -625,6 +627,39 @@ nav.navbar {
 
 .navbar-brand {
   padding-bottom: 1.25rem !important;
+}
+
+@media (min-width: 992px) {
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    height: 10px;
+    width: 100%;
+  }
+
+  .navbar-nav:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+
+  .navbar-right:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown.show > .dropdown-menu {
+    display: block !important;
+  }
+
+  .navbar-collapse:has(.dropdown.show)
+    .dropdown:not(.show):hover
+    > .dropdown-menu {
+    display: none !important;
+  }
 }
 
 .progress {
