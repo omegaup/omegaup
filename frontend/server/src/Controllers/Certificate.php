@@ -378,10 +378,14 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return base64_encode($output);
     }
 
-    public static function getPlaceSuffix(int $n): string {
-        $translator = \OmegaUp\Translations::getInstance();
+    public static function getPlaceSuffix(
+        int $n,
+        ?\OmegaUp\Translations $translator = null
+    ): string {
+        $translator ??= \OmegaUp\Translations::getInstance();
 
-        if ($n >= 11 && $n <= 13) {
+        $mod100 = $n % 100;
+        if ($mod100 >= 11 && $mod100 <= 13) {
             return $translator->get('certificatePdfContestPlaceTh');
         }
 
@@ -407,7 +411,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $placeNumber = intval($certificateData['contest_place']);
             $title = \OmegaUp\ApiUtils::convertUTFToISO(
                 $placeNumber
-                . self::getPlaceSuffix($placeNumber)
+                . self::getPlaceSuffix($placeNumber, $translator)
             );
         } else {
             $title = \OmegaUp\ApiUtils::convertUTFToISO(
