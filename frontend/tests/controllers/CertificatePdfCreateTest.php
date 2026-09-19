@@ -210,10 +210,38 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
         int $place,
         string $expectedSuffixKey
     ) {
-        $translator = \OmegaUp\Translations::getInstance();
-        $this->assertSame(
-            $translator->get($expectedSuffixKey),
-            \OmegaUp\Controllers\Certificate::getPlaceSuffix($place)
-        );
+        $originalAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
+        $originalRequestLang = $_REQUEST['lang'] ?? null;
+        try {
+            $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
+            $_REQUEST['lang'] = 'en';
+            $translator = \OmegaUp\Translations::getInstance(lang: 'en');
+            $this->assertNotSame(
+                $translator->get('certificatePdfContestPlaceSt'),
+                $translator->get('certificatePdfContestPlaceTh')
+            );
+            $this->assertSame(
+                $translator->get($expectedSuffixKey),
+                \OmegaUp\Controllers\Certificate::getPlaceSuffix(
+                    $place,
+                    $translator
+                )
+            );
+            $this->assertSame(
+                $translator->get($expectedSuffixKey),
+                \OmegaUp\Controllers\Certificate::getPlaceSuffix($place)
+            );
+        } finally {
+            if (is_null($originalRequestLang)) {
+                unset($_REQUEST['lang']);
+            } else {
+                $_REQUEST['lang'] = $originalRequestLang;
+            }
+            if (is_null($originalAcceptLanguage)) {
+                unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            } else {
+                $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $originalAcceptLanguage;
+            }
+        }
     }
 }
