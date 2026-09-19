@@ -104,6 +104,49 @@
           </template>
         </tbody>
       </table>
+
+      <h5 class="mt-4">{{ T.cronControlPlaneModelHeading }}</h5>
+      <p class="small text-muted">{{ T.cronControlPlaneModelScoreInfo }}</p>
+      <table
+        v-if="recommendationModelRuns.length"
+        class="table table-sm"
+        data-cron-model-runs
+      >
+        <thead>
+          <tr>
+            <th>{{ T.cronControlPlaneStarted }}</th>
+            <th>{{ T.cronControlPlaneModelScore }}</th>
+            <th>{{ T.cronControlPlaneModelDataset }}</th>
+            <th>{{ T.cronControlPlaneModelSeed }}</th>
+            <th>{{ T.cronControlPlaneModelPublished }}</th>
+            <th>{{ T.cronControlPlaneModelSkipReason }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(modelRun, index) in recommendationModelRuns" :key="index">
+            <td>{{ formatDate(modelRun.created_at) }}</td>
+            <td>
+              <code>{{ formatMapScore(modelRun.map_score) }}</code>
+              <small class="d-block text-muted">{{
+                describeMapScore(modelRun.map_score)
+              }}</small>
+            </td>
+            <td :title="String(modelRun.dataset_size)">
+              {{ formatCount(modelRun.dataset_size) }}
+            </td>
+            <td>{{ seedLabel(modelRun.rng_seed) }}</td>
+            <td>
+              <span :class="publishedClass(modelRun.published)">{{
+                publishedLabel(modelRun.published)
+              }}</span>
+            </td>
+            <td :title="modelRun.skip_reason">
+              {{ skipReasonLabel(modelRun.skip_reason) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <span v-else>{{ T.cronControlPlaneModelNoRuns }}</span>
     </div>
   </div>
 </template>
@@ -208,11 +251,19 @@ export function describeSchedule(schedule?: string | null): string | null {
   return null;
 }
 
+// The two reasons the training job can write for holding a model back. It
+// writes them in English with the scores inside, so the dashboard matches them
+// to say the same thing in the reader's language.
+const BELOW_MINIMUM = /^MAP score (\d+\.\d+) below minimum (\d+\.\d+)$/;
+const REGRESSED = /^MAP score (\d+\.\d+) regressed more than (\d+\.\d+) below the last published (\d+\.\d+)$/;
+
 @Component
 export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
+  @Prop({ default: () => [] })
+  recommendationModelRuns!: types.RecommendationModelRun[];
 
   expandedRunId: number | null = null;
 
@@ -262,6 +313,65 @@ export default class Crons extends Vue {
 
   formatRows(rows: number | null | undefined): string {
     return typeof rows === 'number' ? String(rows) : '—';
+  }
+
+  formatMapScore(score: number): string {
+    return score.toFixed(4);
+  }
+
+  // The score is a fraction of a perfect ranking, so a percentage is the form
+  // it can be read at a glance. The exact value stays in the cell next to it.
+  describeMapScore(score: number): string {
+    return score.toLocaleString(T.locale, {
+      style: 'percent',
+      maximumFractionDigits: 1,
+    });
+  }
+
+  formatCount(count: number): string {
+    return count.toLocaleString(T.locale);
+  }
+
+  // A run with no seed split its users differently every time, so saying so is
+  // the point rather than leaving the cell blank.
+  seedLabel(seed?: number | null): string {
+    return typeof seed === 'number'
+      ? String(seed)
+      : T.cronControlPlaneModelSeedUnset;
+  }
+
+  publishedLabel(published: boolean): string {
+    return published
+      ? T.cronControlPlaneModelPublishedYes
+      : T.cronControlPlaneModelPublishedNo;
+  }
+
+  publishedClass(published: boolean): string {
+    return published ? 'badge badge-success' : 'badge badge-secondary';
+  }
+
+  // Anything the job writes that is not one of the two known reasons is shown
+  // as it wrote it, and the sentence itself stays on the cell either way.
+  skipReasonLabel(skipReason?: string | null): string {
+    if (!skipReason) {
+      return '—';
+    }
+    const belowMinimum = BELOW_MINIMUM.exec(skipReason);
+    if (belowMinimum) {
+      return ui.formatString(T.cronControlPlaneModelSkipBelowMinimum, {
+        score: belowMinimum[1],
+        minimum: belowMinimum[2],
+      });
+    }
+    const regressed = REGRESSED.exec(skipReason);
+    if (regressed) {
+      return ui.formatString(T.cronControlPlaneModelSkipRegressed, {
+        score: regressed[1],
+        regression: regressed[2],
+        previous: regressed[3],
+      });
+    }
+    return skipReason;
   }
 }
 </script>
