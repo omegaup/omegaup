@@ -15,13 +15,14 @@ describe('AddStudents.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.courseEditAddStudentsAdd);
+    expect(wrapper.find('form').exists()).toBe(false);
     const emptyState = wrapper.findComponent(common_EmptyState);
     expect(emptyState.exists()).toBe(true);
     expect(emptyState.props('title')).toBe(T.courseStudentsEmptyTitle);
     expect(emptyState.props('description')).toBe(
       T.courseStudentsEmptyDescription,
     );
+    expect(emptyState.props('buttonText')).toBe(T.courseEditAddStudentsAdd);
   });
 
   it('Should handle students list and requests list', () => {
