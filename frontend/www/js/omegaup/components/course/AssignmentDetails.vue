@@ -405,13 +405,39 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   get hasUnsavedChanges(): boolean {
-    if (this.assignmentFormMode === omegaup.AssignmentFormMode.New) {
-      const hasProblems =
-        (this.scheduledProblemList?.problems?.length ?? 0) > 0;
-      const hasInputs = Boolean(this.name || this.description || this.alias);
-      return hasProblems || hasInputs;
+    if (this.assignmentFormMode === omegaup.AssignmentFormMode.Default) {
+      return false;
     }
-    return false;
+
+    const isNew = this.assignmentFormMode === omegaup.AssignmentFormMode.New;
+
+    const formFieldsChanged =
+      this.name !== (this.assignment.name || '') ||
+      this.description !== (this.assignment.description || '') ||
+      this.alias !== (this.assignment.alias || '') ||
+      this.assignmentType !== (this.assignment.assignment_type || 'homework') ||
+      this.unlimitedDuration !== !this.assignment.finish_time ||
+      (this.startTime &&
+        this.assignment.start_time &&
+        this.startTime.getTime() !== this.assignment.start_time.getTime()) ||
+      (this.finishTime &&
+        this.assignment.finish_time &&
+        this.finishTime.getTime() !== this.assignment.finish_time.getTime());
+
+    const hasScheduledProblems =
+      (this.scheduledProblemList?.problems?.length ?? 0) > 0;
+    const hasAssignmentProblems = (this.assignmentProblems?.length ?? 0) > 0;
+
+    if (isNew) {
+      return (
+        formFieldsChanged ||
+        hasScheduledProblems ||
+        hasAssignmentProblems ||
+        Boolean(this.name || this.description || this.alias)
+      );
+    }
+
+    return formFieldsChanged;
   }
 
   @Watch('hasUnsavedChanges')
