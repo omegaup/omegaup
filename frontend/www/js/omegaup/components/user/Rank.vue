@@ -226,9 +226,8 @@ library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
 
 import { getBlogUrl } from '../../urlHelper';
 
-// Import Bootstrap and BootstrapVue CSS files (order is important: base before overrides)
+// Bootstrap CSS is loaded globally; keep BootstrapVue CSS until those components are replaced.
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'bootstrap/dist/css/bootstrap.css';
 // Import Only Required Plugins
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);

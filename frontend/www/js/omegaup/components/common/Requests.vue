@@ -87,7 +87,6 @@ import T from '../../lang';
 import * as time from '../../time';
 import omegaup_Username from '../user/Username.vue';
 
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import { FormInputPlugin, ModalPlugin } from 'bootstrap-vue';

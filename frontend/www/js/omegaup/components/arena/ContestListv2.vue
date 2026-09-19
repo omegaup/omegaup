@@ -423,9 +423,8 @@ import * as time from '../../time';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
+// Bootstrap CSS is loaded globally; keep BootstrapVue CSS until those components are replaced.
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'bootstrap/dist/css/bootstrap.css';
 
 // Import Only Required Plugins
 import { library } from '@fortawesome/fontawesome-svg-core';

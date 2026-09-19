@@ -140,8 +140,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
+// Bootstrap CSS is loaded globally; keep BootstrapVue CSS until those components are replaced.
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import { ButtonPlugin, DropdownPlugin, LayoutPlugin } from 'bootstrap-vue';

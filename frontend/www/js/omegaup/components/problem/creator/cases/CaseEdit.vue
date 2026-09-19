@@ -489,7 +489,6 @@ import {
   FontAwesomeLayers,
   FontAwesomeLayersText,
 } from '@fortawesome/vue-fontawesome';
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { BNavItemDropdown, FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
 import { fas } from '@fortawesome/free-solid-svg-icons';

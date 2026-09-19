@@ -83,8 +83,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
+// Bootstrap CSS is loaded globally; keep BootstrapVue CSS until those components are replaced.
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins

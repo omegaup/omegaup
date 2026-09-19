@@ -74,8 +74,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
+// Bootstrap CSS is loaded globally; keep BootstrapVue CSS until those components are replaced.
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins

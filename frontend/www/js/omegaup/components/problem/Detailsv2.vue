@@ -139,7 +139,6 @@ import omegaup_Overlay from '../Overlay.vue';
 import user_Username from '../user/Username.vue';
 
 import { BootstrapVue } from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 Vue.use(BootstrapVue);
 

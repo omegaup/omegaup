@@ -101,7 +101,6 @@ import omegaup_Countdown from '../Countdown.vue';
 import { omegaup } from '../../omegaup';
 import { getExternalUrl } from '../../urlHelper';
 
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import { LayoutPlugin, CollapsePlugin } from 'bootstrap-vue';

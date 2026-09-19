@@ -133,8 +133,7 @@ import {
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 import { getBlogUrl } from '../../urlHelper';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
+// Bootstrap CSS is loaded globally; keep BootstrapVue CSS until those components are replaced.
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
