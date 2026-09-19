@@ -62,6 +62,17 @@ class ZipToCdpConverter{
         $rgxStatement = '/^statements\/(en|es|pt)\.markdown$/';
         $rgxSolutions = '/^solutions\/(en|es|pt)\.markdown$/';
 
+        /**
+         * Help static analyzers understand variables captured by the closure below.
+         *
+         * @var string $rgxStatement
+         * @var string $rgxSolutions
+         * @var \ZipArchive $zip
+         * @var string $languagePreference
+         * @var string|null $currentStatementLanguage
+         * @var string|null $currentSolutionLanguage
+         */
+
         $currentStatementLanguage = null;
         $currentSolutionLanguage = null;
 
@@ -70,6 +81,8 @@ class ZipToCdpConverter{
             /**
              * @param string $fileName
              */
+            // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+            /** @psalm-suppress UndefinedVariable */
             function (string $fileName) use (
                 &$cdp,
                 $rgxStatement,
@@ -77,7 +90,7 @@ class ZipToCdpConverter{
                 $zip,
                 $languagePreference,
                 &$currentStatementLanguage,
-                &$currentSolutionLanguage,
+                &$currentSolutionLanguage
             ) {
                 \OmegaUp\Validators::validateZipFilePath($fileName);
 
