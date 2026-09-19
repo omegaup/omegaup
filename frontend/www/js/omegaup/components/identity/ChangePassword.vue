@@ -14,14 +14,14 @@
           $emit('emit-change-password', newPassword, newPasswordRepeat)
         "
       >
-        <div class="form-row">
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+        <div class="row">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.username }}
               <input class="form-control" :disabled="true" :value="username" />
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditChangePasswordNewPassword }}
               <omegaup-password-input
@@ -30,7 +30,7 @@
               />
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditChangePasswordRepeatNewPassword }}
               <omegaup-password-input
@@ -40,7 +40,7 @@
             </label>
           </div>
         </div>
-        <div class="form-group float-right">
+        <div class="mb-3 float-end">
           <button
             class="btn btn-primary"
             type="submit"
@@ -49,7 +49,7 @@
             {{ T.wordsSaveChanges }}
           </button>
           <button
-            class="btn btn-secondary ml-2"
+            class="btn btn-secondary ms-2"
             type="reset"
             @click="$emit('emit-cancel')"
           >

@@ -1,13 +1,13 @@
 <template>
   <div :class="['h-100', 'd-flex', 'flex-column', theme]">
     <div
-      class="editor-toolbar d-flex align-items-center justify-content-between p-1 form-inline"
+      class="editor-toolbar d-flex align-items-center justify-content-between p-1 d-flex align-items-center"
     >
       <div class="d-flex align-items-center">
-        <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
+        <label class="me-1 mb-0 p-1">{{ T.fontSize }}</label>
         <select
           v-model="selectedFontSize"
-          class="custom-select-sm"
+          class="form-select-sm"
           @change="onFontSizeChange"
         >
           <option v-for="size in fontSizes" :key="size" :value="size">

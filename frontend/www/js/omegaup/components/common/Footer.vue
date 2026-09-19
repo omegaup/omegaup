@@ -2,7 +2,7 @@
   <footer class="common-footer text-center mt-5">
     <div class="container-xl">
       <div class="footer-navigation d-lg-flex align-items-start py-5 m-auto">
-        <div class="footer-brand mb-4 mb-lg-0 max-width-logo">
+        <div class="footer-brand mb-4 mb-lg-0 max-collapse-horizontal-logo">
           <img
             class="footer-logo d-block mx-auto mb-1 mt-n6"
             width="120"
@@ -139,7 +139,7 @@
         <ul
           class="mb-2 m-md-0 list-unstyled d-flex justify-content-around d-md-inline-flex order-md-12"
         >
-          <li class="pr-2">
+          <li class="pe-2">
             <a :href="CodeofConductPolicyURL" target="_blank">
               {{ T.frontPageFooterCodeConduct }}
             </a>

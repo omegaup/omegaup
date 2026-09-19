@@ -53,7 +53,7 @@
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.Ends"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestOrderByEnds }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -64,7 +64,7 @@
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.Title"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestOrderByTitle }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -75,7 +75,7 @@
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.Duration"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestOrderByDuration }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -86,7 +86,7 @@
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.Organizer"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestOrderByOrganizer }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -97,7 +97,7 @@
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.Contestants"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestOrderByContestants }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -108,13 +108,13 @@
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.SignedUp"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestOrderBySignedUp }}</b-dropdown-item
               >
             </b-dropdown>
             <b-dropdown
               ref="dropdownFilterBy"
-              class="mr-0"
+              class="me-0"
               no-caret
               data-dropdown-filter
             >
@@ -126,7 +126,7 @@
                 <font-awesome-icon
                   v-if="currentFilter === ContestFilter.All"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestFilterByAll }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -137,7 +137,7 @@
                 <font-awesome-icon
                   v-if="currentFilter === ContestFilter.SignedUp"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestFilterBySignedUp }}</b-dropdown-item
               >
               <b-dropdown-item
@@ -148,7 +148,7 @@
                 <font-awesome-icon
                   v-if="currentFilter === ContestFilter.OnlyRecommended"
                   icon="check"
-                  class="mr-1"
+                  class="me-1"
                 />{{ T.contestFilterByRecommended }}</b-dropdown-item
               >
             </b-dropdown>
@@ -200,7 +200,7 @@
               <div
                 v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
                 :key="contestItem.contest_id"
-                class="mr-3"
+                class="me-3"
                 style="min-width: 300px; max-width: 300px"
               >
                 <omegaup-contest-card :contest="contestItem">
@@ -304,7 +304,7 @@
       <div class="d-flex align-items-center mb-4 px-3">
         <b-button
           variant="outline-secondary"
-          class="mr-3"
+          class="me-3"
           :title="T.wordsBack"
           @click="setViewAll(null)"
         >

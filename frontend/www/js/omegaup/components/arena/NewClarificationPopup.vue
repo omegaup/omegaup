@@ -5,12 +5,12 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
-      <div class="form-group row mt-5">
-        <label class="col-md-6 col-form-label font-weight-bold">
+      <div class="mb-3 row mt-5">
+        <label class="col-md-6 col-form-label fw-bold">
           {{ T.wordsProblem }}
           <select
             v-model="currentProblemAlias"
-            class="form-control"
+            class="form-select"
             required="required"
             data-new-clarification-problem
           >
@@ -25,12 +25,12 @@
         </label>
         <label
           v-if="users.length != 0"
-          class="col-md-6 col-form-label font-weight-bold"
+          class="col-md-6 col-form-label fw-bold"
         >
           {{ T.wordsMessageTo }}
           <select
             v-model="currentUsername"
-            class="form-control"
+            class="form-select"
             :required="users"
             data-new-clarification-user
           >
@@ -44,8 +44,8 @@
           </select>
         </label>
       </div>
-      <div class="form-group row">
-        <label class="col-md-12 col-form-label font-weight-bold">
+      <div class="mb-3 row">
+        <label class="col-md-12 col-form-label fw-bold">
           {{ T.arenaClarificationCreate }}
           <textarea
             v-model="message"
@@ -57,7 +57,7 @@
           ></textarea>
         </label>
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <div class="col-sm-10">
           <button
             type="submit"

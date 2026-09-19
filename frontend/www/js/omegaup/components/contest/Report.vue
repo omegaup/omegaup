@@ -64,13 +64,13 @@
                   :key="`${contestantData.username}_${item.alias}_${group.group}_${groupCase.name}_case`"
                 >
                   <th scope="row">{{ group.group }}.{{ groupCase.name }}</th>
-                  <td class="text-right">
+                  <td class="text-end">
                     {{ groupCase.meta.time.toFixed(3) }}
                   </td>
-                  <td class="text-right">
+                  <td class="text-end">
                     {{ groupCase.meta.wall_time.toFixed(3) }}
                   </td>
-                  <td class="text-right">
+                  <td class="text-end">
                     {{ groupCase.meta.memory.toFixed(2) }}
                   </td>
                   <td class="text-center">{{ groupCase.verdict }}</td>

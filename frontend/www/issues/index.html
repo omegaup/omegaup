@@ -41,7 +41,7 @@
 					<td><a v-bind:href="issue.html_url" target="_blank">{{ issue.title }}</a></td>
 					<td>
 						<template v-for="label in issue.labels">
-							<a class="badge badge-primary" v-bind:href="labelUrl(label)" v-bind:style="labelStyle(label)" target="_blank">{{ label.name }}</a>&ensp;
+							<a class="badge text-bg-primary" v-bind:href="labelUrl(label)" v-bind:style="labelStyle(label)" target="_blank">{{ label.name }}</a>&ensp;
 						</template>
 					</td>
 					<td class="issue-body"><pre>{{ issue.body }}</pre></td>

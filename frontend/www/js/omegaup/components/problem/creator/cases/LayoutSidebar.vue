@@ -50,7 +50,7 @@
               <div class="d-flex">
                 <BIconPencil
                   variant="success"
-                  class="pt-1 mr-3"
+                  class="pt-1 me-3"
                   font-scale="1.2"
                 />
                 {{ T.problemCreatorRenameLayout }}
@@ -63,7 +63,7 @@
               <div class="d-flex">
                 <BIconArrowLeftRight
                   variant="success"
-                  class="pt-1 mr-3"
+                  class="pt-1 me-3"
                   font-scale="1.2"
                 />
                 {{ T.problemCreatorLayoutLoadToSelected }}
@@ -76,7 +76,7 @@
               <div class="d-flex">
                 <BIconArrowRepeat
                   variant="success"
-                  class="pt-1 mr-3"
+                  class="pt-1 me-3"
                   font-scale="1.2"
                 />
                 {{ T.problemCreatorLayoutLoadToAll }}
@@ -89,7 +89,7 @@
               <div class="d-flex">
                 <BIconBoxArrowInDown
                   variant="success"
-                  class="pt-1 mr-3"
+                  class="pt-1 me-3"
                   font-scale="1.2"
                 />
                 {{ T.problemCreatorLayoutCopy }}
@@ -102,7 +102,7 @@
               <div class="d-flex">
                 <BIconTrash
                   variant="danger"
-                  class="pt-1 mr-3"
+                  class="pt-1 me-3"
                   font-scale="1.2"
                 />
                 {{ T.problemCreatorLayoutDelete }}
@@ -121,14 +121,14 @@
                         class="d-flex justify-content-between"
                         align-v="center"
                       >
-                        <b-col cols="4" class="mt-2 mb-2 pl-2 pr-1">
+                        <b-col cols="4" class="mt-2 mb-2 ps-2 pe-1">
                           <b-form-input
                             v-model="lineInfo.label"
                             size="sm"
                             :placeholder="T.problemCreatorLabelPlaceHolder"
                           />
                         </b-col>
-                        <b-col cols="6" class="pl-0 pr-0 text-center">
+                        <b-col cols="6" class="ps-0 pe-0 text-center">
                           <b-dropdown
                             data-line-info-dropdown
                             :text="getLineNameFromKind(lineInfo.data.kind)"
@@ -197,7 +197,7 @@
             <b-button
               data-layout-add-line-info
               variant="light"
-              class="mr-2"
+              class="me-2"
               @click="addNewLineInfoToLayout(layout.layoutID)"
             >
               <div class="container">
@@ -205,7 +205,7 @@
                   <BIconPlusSquare
                     variant="info"
                     font-scale="1.25"
-                    class="mr-2 pt-1"
+                    class="me-2 pt-1"
                   />
                   {{ T.problemCreatorLayoutAddLineInfo }}
                 </div>

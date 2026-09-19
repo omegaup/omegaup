@@ -12,7 +12,7 @@
           />{{ `${T[tag.name]}  (${tag.problemCount})` }}
         </label>
       </div>
-      <div class="form-group mt-2">
+      <div class="mb-3 mt-2">
         <vue-typeahead-bootstrap
           :data="publicQualityTagNames"
           :serializer="publicQualityTagsSerializer"

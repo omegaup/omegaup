@@ -1,6 +1,6 @@
 <template>
   <div data-overlay-popup>
-    <button type="button" class="close" @click="$emit('dismiss')">❌</button>
+    <button type="button" class="btn-close" @click="$emit('dismiss')">❌</button>
     <slot></slot>
   </div>
 </template>

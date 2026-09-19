@@ -5,7 +5,7 @@
         class="form"
         @submit.prevent="$emit('emit-add-group', typeaheadGroup.key)"
       >
-        <div class="form-group">
+        <div class="mb-3">
           <label>{{ T.wordsGroup }}</label>
           <omegaup-common-typeahead
             :existing-options="searchResultGroups"

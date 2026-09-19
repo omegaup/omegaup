@@ -1,6 +1,6 @@
 <template>
   <b-row class="mt-3">
-    <b-col cols="3" class="border-1 border-right">
+    <b-col cols="3" class="border-1 border-end">
       <omegaup-problem-creator-cases-sidebar
         data-cases-sidebar
         :show-window="shouldShowAddWindow"

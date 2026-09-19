@@ -6,7 +6,7 @@
         {{ date }}
       </div>
       <button
-        class="close"
+        class="btn-close"
         @click.prevent="$emit('remove', notification, null)"
       >
         ❌

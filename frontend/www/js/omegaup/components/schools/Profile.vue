@@ -24,7 +24,7 @@
         >
         </omegaup-table-paginator>
       </div>
-      <div class="col-md-8 pl-0">
+      <div class="col-md-8 ps-0">
         <div class="card h-100">
           <div class="card-body">
             <highcharts :options="chartOptions"></highcharts>

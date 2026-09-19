@@ -8,7 +8,7 @@
     <div class="card-body">
       <form class="needs-validation" data-group-new @submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.wordsName }}
               <input
@@ -21,7 +21,7 @@
             </label>
           </div>
 
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.contestNewFormShortTitleAlias }}
               <input
@@ -38,7 +38,7 @@
         </div>
 
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.groupNewFormDescription }}
               <textarea
@@ -53,7 +53,7 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
           <button v-if="isUpdate" type="submit" class="btn btn-primary">
             {{ T.groupNewFormUpdateGroup }}
           </button>

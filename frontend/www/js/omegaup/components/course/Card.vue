@@ -1,7 +1,7 @@
 <template>
   <div class="col mb-3">
     <div class="card">
-      <div class="row no-gutters">
+      <div class="row g-0">
         <div class="col-sm-2 col-lg-3" :class="`${type}-course-card`"></div>
         <div class="col-sm-10 col-lg-9">
           <div class="card-body">
@@ -22,7 +22,7 @@
             ></omegaup-markdown>
             <div
               v-if="type === CourseType.Student"
-              class="row no-gutters justify-content-start align-items-center mb-4"
+              class="row g-0 justify-content-start align-items-center mb-4"
             >
               <div class="col-4">{{ T.wordsProgress }}:</div>
               <div class="col-8 mt-1">

@@ -33,7 +33,7 @@
           </td>
           <td class="d-block mt-1" :class="bannerColor(dependent)">
             <small
-              class="font-italic font-weight-bold"
+              class="fst-italic fw-bold"
               :class="textColor(dependent)"
             >
               {{ dependentsStatusMessage(dependent) }}

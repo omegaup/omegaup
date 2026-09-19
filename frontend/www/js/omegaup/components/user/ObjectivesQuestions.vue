@@ -1,11 +1,11 @@
 <template>
   <b-modal v-model="showModal" hide-footer>
     <template #modal-title>
-      <h5 class="modal-title font-weight-bold">
+      <h5 class="modal-title fw-bold">
         {{ T.userObjectivesModalTitle }}
       </h5>
     </template>
-    <p class="text-right text-primary">
+    <p class="text-end text-primary">
       {{
         ui.formatString(T.userObjectivesModalPageCounter, {
           current: currentModalPage,
@@ -13,12 +13,12 @@
         })
       }}
     </p>
-    <p class="font-weight-bold">{{ description }}</p>
+    <p class="fw-bold">{{ description }}</p>
     <div v-if="currentModalPage === 1" class="mb-3">
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.Learning"
         />{{ T.userObjectivesModalAnswerLearning }}</label
@@ -26,7 +26,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.Teaching"
         />{{ T.userObjectivesModalAnswerTeaching }}</label
@@ -34,7 +34,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.LearningAndTeaching"
         />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
@@ -42,7 +42,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.None"
         />{{ T.userObjectivesModalAnswerNone }}</label
@@ -52,7 +52,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.Scholar"
         />{{ T.userObjectivesModalAnswerScholar }}</label
@@ -60,7 +60,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.Competitive"
         />{{ T.userObjectivesModalAnswerCompetitive }}</label
@@ -68,7 +68,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.ScholarAndCompetitive"
         />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
@@ -76,7 +76,7 @@
       <label class="d-block"
         ><input
           v-model="objective"
-          class="mr-3"
+          class="me-3"
           type="radio"
           :value="ObjectivesAnswers.Other"
         />{{ T.userObjectivesModalAnswerOther }}</label
@@ -85,26 +85,26 @@
     <button
       v-if="currentModalPage === 1 && objective !== ObjectivesAnswers.None"
       type="button"
-      class="btn btn-next-previous float-right pr-0"
+      class="btn btn-next-previous float-end pe-0"
       @click="onNextModalPage"
     >
       {{ T.userObjectivesModalButtonNext }}
-      <font-awesome-icon class="ml-1" icon="greater-than" />
+      <font-awesome-icon class="ms-1" icon="greater-than" />
     </button>
     <div v-else>
       <button
         v-if="objective !== ObjectivesAnswers.None"
         type="button"
-        class="btn btn-next-previous float-left pl-0"
+        class="btn btn-next-previous float-start ps-0"
         @click="onPreviousModalPage"
       >
-        <font-awesome-icon class="mr-1" icon="less-than" />
+        <font-awesome-icon class="me-1" icon="less-than" />
         {{ T.userObjectivesModalButtonPrevious }}
       </button>
       <button
         type="button"
-        class="btn btn-primary float-right w-25"
-        data-dismiss="modal"
+        class="btn btn-primary float-end w-25"
+        data-bs-dismiss="modal"
         @click="onSubmit"
       >
         {{ T.userObjectivesModalButtonSend }}

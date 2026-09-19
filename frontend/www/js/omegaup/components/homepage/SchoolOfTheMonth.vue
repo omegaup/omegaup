@@ -1,7 +1,7 @@
 <template>
   <div class="card h-100">
     <div class="d-flex justify-content-center card-header">
-      <h3 class="m-0 mr-1">
+      <h3 class="m-0 me-1">
         {{ T.schoolOfTheMonth }}
       </h3>
       <a class="card-header-help" :href="NewSchoolofTheMonthFeatureURL">
@@ -15,7 +15,7 @@
         <omegaup-countryflag
           v-if="schoolOfTheMonth.country_id !== null"
           :country="schoolOfTheMonth.country_id"
-          class="mr-1"
+          class="me-1"
         ></omegaup-countryflag>
         <a :href="`/schools/profile/${schoolOfTheMonth.school_id}/`">{{
           schoolOfTheMonth.name

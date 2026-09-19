@@ -4,12 +4,12 @@
       class="form add-identity-form"
       @submit.prevent="$emit('add-identity', { username, password })"
     >
-      <div class="form-group">
+      <div class="mb-3">
         <p>
           {{ T.addContestUsernameAndPassword }}
         </p>
       </div>
-      <div class="form-group">
+      <div class="mb-3">
         <label class="w-100">
           {{ T.wordsIdentity }}
           <font-awesome-icon
@@ -26,7 +26,7 @@
           />
         </label>
       </div>
-      <div class="form-group">
+      <div class="mb-3">
         <label class="w-100">
           {{ T.loginPassword }}
           <omegaup-password-input
@@ -38,7 +38,7 @@
           />
         </label>
       </div>
-      <div class="form-group text-right">
+      <div class="mb-3 text-end">
         <button class="btn btn-primary" type="submit" data-add-identity-button>
           {{ T.wordsAddIdentity }}
         </button>

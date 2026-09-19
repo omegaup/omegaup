@@ -5,7 +5,7 @@
         <a
           :href="getTabName(tab)"
           class="nav-link"
-          data-toggle="tab"
+          data-bs-toggle="tab"
           role="tab"
           :aria-controls="tab.id"
           :class="{ active: currentSelectedTab === tab.id }"

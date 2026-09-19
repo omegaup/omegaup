@@ -1,5 +1,5 @@
 <template>
-  <div class="problem-list mr-3 mr-lg-0">
+  <div class="problem-list mr-3 me-lg-0">
     <b-breadcrumb v-if="inAssignment" data-breadcrumbs>
       <b-breadcrumb-item href="/course/">{{ T.navCourses }}</b-breadcrumb-item>
       <b-breadcrumb-item :href="urlAssignment">{{
@@ -24,16 +24,16 @@
       data-navbar-problem
     >
       <div class="row">
-        <div class="col-xs-5 problem-type w-50 pl-4">
+        <div class="col-xs-5 problem-type w-50 ps-4">
           <span v-if="inAssignment">{{
             getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
         </div>
         <div
           v-if="problem.acceptsSubmissions"
-          class="col-xs-7 solved text-right w-50 pr-3"
+          class="col-xs-7 solved text-end w-50 pe-3"
         >
-          <span class="mr-1">{{ getMaxScoreForProblem(problem) }}</span>
+          <span class="me-1">{{ getMaxScoreForProblem(problem) }}</span>
           <font-awesome-icon
             v-if="
               problem.myBestScore == problem.maxScore ||
@@ -53,7 +53,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12 pl-4">
+        <div class="col-xs-12 ps-4">
           <a
             :data-problem="problem.alias"
             class="name"

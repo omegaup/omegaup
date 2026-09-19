@@ -1,5 +1,5 @@
 <template>
-  <span class="ml-1">
+  <span class="ms-1">
     <a href="#" @click="$emit('apply-filter', column, toggleSort)">
       <font-awesome-icon
         v-if="!selected"

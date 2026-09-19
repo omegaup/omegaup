@@ -46,7 +46,7 @@
         <div class="row">
           <div class="col-md-12">
             <div class="row">
-              <div class="form-group col-md-8">
+              <div class="mb-3 col-md-8">
                 <label
                   >{{ problemCardFooterLabel }}
                   <omegaup-common-typeahead
@@ -62,17 +62,17 @@
                   {{ addCardFooterDescLabel }}
                 </p>
               </div>
-              <div class="form-group col-md-4">
+              <div class="mb-3 col-md-4">
                 <label
                   >{{ T.wordsPoints }}
                   <input v-model="points" type="number" class="form-control" />
                 </label>
               </div>
             </div>
-            <div class="form-group text-right">
+            <div class="mb-3 text-end">
               <button
                 data-add-problem
-                class="btn btn-primary mr-2"
+                class="btn btn-primary me-2"
                 type="submit"
                 :disabled="!problemAlias"
                 @click.prevent="

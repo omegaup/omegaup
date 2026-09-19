@@ -29,10 +29,10 @@
               <h2 class="mb-0">
                 <button
                   ref="basic-info"
-                  class="btn btn-link btn-block text-left"
+                  class="btn btn-link btn-block text-start"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".basic-info"
+                  data-bs-toggle="collapse"
+                  data-bs-target=".basic-info"
                   aria-expanded="true"
                   aria-controls="problem-form-problem"
                 >
@@ -42,7 +42,7 @@
             </div>
             <div class="collapse show card-body px-2 px-sm-4 basic-info">
               <div class="row">
-                <div class="form-group col-md-6 introjs-title">
+                <div class="mb-3 col-md-6 introjs-title">
                   <label class="control-label">{{ T.wordsTitle }}</label>
                   <input
                     v-model="title"
@@ -54,7 +54,7 @@
                     @blur="onGenerateAlias"
                   />
                 </div>
-                <div class="form-group col-md-6 introjs-short-title">
+                <div class="mb-3 col-md-6 introjs-short-title">
                   <label class="control-label">{{ T.wordsAlias }}</label>
                   <input
                     ref="alias"
@@ -71,7 +71,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="form-group col-md-6 introjs-origin">
+                <div class="mb-3 col-md-6 introjs-origin">
                   <label class="control-label">{{ T.problemEditSource }}</label>
                   <input
                     v-model="source"
@@ -84,7 +84,7 @@
                 </div>
                 <div
                   v-if="!isUpdate && showCreationMethodSelector"
-                  class="form-group col-md-6 introjs-creation-method"
+                  class="mb-3 col-md-6 introjs-creation-method"
                 >
                   <div class="btn-group btn-group-toggle d-flex" role="group">
                     <button
@@ -156,7 +156,7 @@
                     />
                   </div>
                 </div>
-                <div v-else class="form-group col-md-6 introjs-file">
+                <div v-else class="mb-3 col-md-6 introjs-file">
                   <label class="control-label">{{
                     T.problemEditFormFile
                   }}</label>
@@ -182,10 +182,10 @@
                 <h2 class="mb-0">
                   <button
                     ref="tags"
-                    class="btn btn-link btn-block text-left"
+                    class="btn btn-link btn-block text-start"
                     type="button"
-                    data-toggle="collapse"
-                    data-target=".tags"
+                    data-bs-toggle="collapse"
+                    data-bs-target=".tags"
                     aria-expanded="true"
                     aria-controls="problem-form-problem"
                   >
@@ -238,10 +238,10 @@
               <h2 class="mb-0">
                 <button
                   ref="validation"
-                  class="btn btn-link btn-block text-left collapsed"
+                  class="btn btn-link btn-block text-start collapsed"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".validation"
+                  data-bs-toggle="collapse"
+                  data-bs-target=".validation"
                   aria-expanded="true"
                   aria-controls="problem-form-problem"
                 >
@@ -251,12 +251,12 @@
             </div>
             <div class="card-body px-2 px-sm-4 validation">
               <div class="row">
-                <div class="form-group col-md-6 introjs-type">
+                <div class="mb-3 col-md-6 introjs-type">
                   <label>{{ T.problemEditFormLanguages }}</label>
                   <select
                     v-model="currentLanguages"
                     name="languages"
-                    class="form-control"
+                    class="form-select"
                     :class="{ 'is-invalid': errors.includes('languages') }"
                     :required="!isUpdate"
                   >
@@ -269,12 +269,12 @@
                     </option>
                   </select>
                 </div>
-                <div class="form-group col-md-6 introjs-validator">
+                <div class="mb-3 col-md-6 introjs-validator">
                   <label>{{ T.problemEditFormValidatorType }}</label>
                   <select
                     v-model="validator"
                     name="validator"
-                    class="form-control"
+                    class="form-select"
                     :class="{ 'is-invalid': errors.includes('validator') }"
                     :disabled="currentLanguages === ''"
                     required
@@ -296,10 +296,10 @@
               <h2 class="mb-0">
                 <button
                   ref="limits"
-                  class="btn btn-link btn-block text-left collapsed"
+                  class="btn btn-link btn-block text-start collapsed"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".limits"
+                  data-bs-toggle="collapse"
+                  data-bs-target=".limits"
                   aria-expanded="true"
                   aria-controls="problem-form-problem"
                 >
@@ -327,10 +327,10 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  class="btn btn-link btn-block text-left collapsed"
+                  class="btn btn-link btn-block text-start collapsed"
                   type="button"
-                  data-toggle="collapse"
-                  data-target=".access"
+                  data-bs-toggle="collapse"
+                  data-bs-target=".access"
                   aria-expanded="true"
                   aria-controls="problem-form-problem"
                 >
@@ -340,7 +340,7 @@
             </div>
             <div class="collapse card-body px-2 px-sm-4 access">
               <div class="row">
-                <div class="form-group col-md-6">
+                <div class="mb-3 col-md-6">
                   <label>{{ T.problemEditEmailClarifications }}</label>
                   <div class="form-control">
                     <div class="form-check form-check-inline">
@@ -369,7 +369,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="mb-3 col-md-6">
                   <label>{{ T.problemEditFormAppearsAsPublic }}</label>
                   <div class="form-control">
                     <label class="form-check form-check-inline">
@@ -405,10 +405,10 @@
               <div class="card-header">
                 <h2 class="mb-0">
                   <button
-                    class="btn btn-link btn-block text-left collapsed"
+                    class="btn btn-link btn-block text-start collapsed"
                     type="button"
-                    data-toggle="collapse"
-                    data-target=".evaluation"
+                    data-bs-toggle="collapse"
+                    data-bs-target=".evaluation"
                     aria-expanded="true"
                     aria-controls="problem-form-problem"
                   >
@@ -418,12 +418,12 @@
               </div>
               <div class="collapse card-body px-2 px-sm-4 evaluation">
                 <div class="row">
-                  <div class="form-group col-md-6">
+                  <div class="mb-3 col-md-6">
                     <label>{{ T.wordsShowCasesDiff }}</label>
                     <select
                       v-model="showDiff"
                       name="show_diff"
-                      class="form-control"
+                      class="form-select"
                       :class="{ 'is-invalid': errors.includes('show_diff') }"
                       :disabled="languages === ''"
                     >
@@ -436,12 +436,12 @@
                       <option value="all">{{ T.wordsAll }}</option>
                     </select>
                   </div>
-                  <div class="form-group col-md-6">
+                  <div class="mb-3 col-md-6">
                     <label>{{ T.problemEditGroupScorePolicy }}</label>
                     <select
                       v-model="groupScorePolicy"
                       name="group_score_policy"
-                      class="form-control"
+                      class="form-select"
                       :class="{
                         'is-invalid': errors.includes('group_score_policy'),
                       }"
@@ -462,12 +462,12 @@
         </div>
         <template v-if="isUpdate">
           <div class="mt-8 row">
-            <div class="form-group col-md-4">
+            <div class="mb-3 col-md-4">
               <label>{{ T.wordsShowCasesDiff }}</label>
               <select
                 v-model="showDiff"
                 name="show_diff"
-                class="form-control"
+                class="form-select"
                 :class="{ 'is-invalid': errors.includes('show_diff') }"
               >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
@@ -475,12 +475,12 @@
                 <option value="all">{{ T.wordsAll }}</option>
               </select>
             </div>
-            <div class="form-group col-md-4">
+            <div class="mb-3 col-md-4">
               <label>{{ T.problemEditGroupScorePolicy }}</label>
               <select
                 v-model="groupScorePolicy"
                 name="group_score_policy"
-                class="form-control"
+                class="form-select"
                 :class="{ 'is-invalid': errors.includes('group_score_policy') }"
                 :disabled="languages === ''"
               >
@@ -492,7 +492,7 @@
                 </option>
               </select>
             </div>
-            <div class="form-group col-md-4">
+            <div class="mb-3 col-md-4">
               <label class="control-label">{{
                 T.problemEditCommitMessage
               }}</label>
@@ -516,7 +516,7 @@
         <input name="request" value="submit" type="hidden" />
         <input name="update_published" value="non-problemset" type="hidden" />
         <div class="row">
-          <div class="form-group col-md-6 no-bottom-margin">
+          <div class="mb-3 col-md-6 no-bottom-margin">
             <button
               type="submit"
               class="btn btn-primary"

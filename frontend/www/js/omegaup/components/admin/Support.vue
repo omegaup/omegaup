@@ -21,7 +21,7 @@
               </h5>
             </div>
             <div class="card-body">
-              <div class="form-group">
+              <div class="mb-3">
                 <omegaup-toggle-switch
                   :checked-value="currentMaintenanceEnabled"
                   @update:value="onToggleMaintenance"
@@ -37,10 +37,10 @@
                   </template>
                 </omegaup-toggle-switch>
               </div>
-              <div v-if="currentMaintenanceEnabled" class="form-group">
+              <div v-if="currentMaintenanceEnabled" class="mb-3">
                 <select
                   v-model="selectedTemplateId"
-                  class="form-control mb-3"
+                  class="form-select mb-3"
                   @change="onSelectTemplate"
                 >
                   <option value="">
@@ -79,7 +79,7 @@
                 <label>{{ T.maintenanceModeMessage }}</label>
                 <div class="row mb-2">
                   <div class="col-auto d-flex align-items-center">
-                    <span class="badge badge-secondary w-100">{{
+                    <span class="badge text-bg-secondary w-100">{{
                       T.wordsSpanish
                     }}</span>
                   </div>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="row mb-2">
                   <div class="col-auto d-flex align-items-center">
-                    <span class="badge badge-secondary w-100">{{
+                    <span class="badge text-bg-secondary w-100">{{
                       T.wordsEnglish
                     }}</span>
                   </div>
@@ -115,7 +115,7 @@
                 </div>
                 <div class="row mb-2">
                   <div class="col-auto d-flex align-items-center">
-                    <span class="badge badge-secondary w-100">{{
+                    <span class="badge text-bg-secondary w-100">{{
                       T.wordsPortuguese
                     }}</span>
                   </div>
@@ -170,7 +170,7 @@
             </div>
           </form>
         </div>
-        <div class="col-md-6 text-right">
+        <div class="col-md-6 text-end">
           <button
             v-if="username != null"
             class="btn btn-secondary"
@@ -206,7 +206,7 @@
             </div>
           </form>
         </div>
-        <div class="col-md-6 text-right">
+        <div class="col-md-6 text-end">
           <button
             v-if="contestFound"
             class="btn btn-secondary"
@@ -256,7 +256,7 @@
             </form>
           </div>
           <div data-last-login class="col-md">
-            <label v-if="lastLogin != null" class="font-weight-bold">
+            <label v-if="lastLogin != null" class="fw-bold">
               {{
                 ui.formatString(T.userLastLogin, {
                   lastLogin: time.formatDateTime(lastLogin),
@@ -268,7 +268,7 @@
             </label>
           </div>
           <div data-birth-date class="col-md">
-            <label v-if="birthDate != null" class="font-weight-bold">
+            <label v-if="birthDate != null" class="fw-bold">
               {{
                 ui.formatString(T.userBirthDate, {
                   birthDate: time.formatDate(birthDate),
@@ -359,7 +359,7 @@
                   />
                 </td>
                 <td>
-                  <span class="badge badge-info w-100">{{ role.name }}</span>
+                  <span class="badge text-bg-info w-100">{{ role.name }}</span>
                 </td>
                 <td>{{ role.description }}</td>
               </tr>

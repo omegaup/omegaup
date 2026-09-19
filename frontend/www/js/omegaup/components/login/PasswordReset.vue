@@ -3,7 +3,7 @@
     <h2 class="card-header">{{ T.passwordResetResetTitle }}</h2>
     <div class="card-body">
       <form>
-        <div class="form-group">
+        <div class="mb-3">
           <h5>{{ T.passwordResetPassword }}</h5>
           <omegaup-password-input
             v-model="password"
@@ -11,7 +11,7 @@
             autocomplete="new-password"
           />
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <h5>{{ T.passwordResetPasswordConfirmation }}</h5>
           <omegaup-password-input
             v-model="passwordConfirmation"
@@ -19,7 +19,7 @@
             autocomplete="new-password"
           />
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <button
             type="button"
             class="btn btn-primary form-control"

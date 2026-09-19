@@ -5,14 +5,14 @@
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
         </label>
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
-            class="form-control"
+            class="form-select"
             name="language"
           >
             <option
@@ -25,13 +25,13 @@
           </select>
         </div>
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label class="col-sm-7 col-form-label">
           {{ T.arenaRunSubmitFilename }}
           <tt>{{ filename }}</tt>
         </label>
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label class="col-sm-7 col-form-label">{{
           T.arenaRunSubmitPaste
         }}</label>
@@ -44,7 +44,7 @@
           @change-language="handleChangeLanguage($event)"
         ></omegaup-arena-code-view>
       </div>
-      <div class="form-group row mt-3 align-items-center">
+      <div class="mb-3 row mt-3 align-items-center">
         <label class="col-sm-3 col-form-label">
           {{ T.arenaRunSubmitUpload }}
         </label>
@@ -52,7 +52,7 @@
           <input ref="inputFile" class="w-100" type="file" name="file" />
         </div>
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <div class="col-sm-10">
           <button
             type="submit"

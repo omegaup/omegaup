@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="hasTeamsGroups" class="mb-3 text-right">
+    <div v-if="hasTeamsGroups" class="mb-3 text-end">
       <a class="btn btn-primary mx-1" href="/teamsgroup/new/">
         {{ T.teamsGroupsCreateNew }}
       </a>
@@ -41,7 +41,7 @@
               </a>
 
               <button
-                class="btn btn-link p-0 ml-2 btn-archive"
+                class="btn btn-link p-0 ms-2 btn-archive"
                 :title="teamsGroup.archived ? T.wordsUnarchive : T.wordsArchive"
                 @click="archiveGroup(teamsGroup)"
               >

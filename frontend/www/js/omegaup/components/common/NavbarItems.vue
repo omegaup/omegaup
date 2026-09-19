@@ -1,5 +1,5 @@
 <template>
-  <div class="mr-auto mt-2 mt-lg-0">
+  <div class="me-auto mt-2 mt-lg-0">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
       class="navbar-nav align-items-start px-3"
@@ -14,7 +14,7 @@
           href="#"
           role="button"
           data-nav-contests
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
         >
@@ -50,7 +50,7 @@
           href="#"
           role="button"
           data-nav-courses
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
         >
@@ -86,7 +86,7 @@
           class="nav-link px-2 dropdown-toggle"
           href="#"
           role="button"
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           data-nav-problems
           aria-haspopup="true"
           aria-expanded="false"
@@ -123,7 +123,7 @@
           class="nav-link px-2 dropdown-toggle"
           href="#"
           role="button"
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
         >
@@ -147,7 +147,7 @@
           class="nav-link px-2 dropdown-toggle"
           href="#"
           role="button"
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
         >
@@ -174,7 +174,7 @@
         </div>
       </li>
     </ul>
-    <ul v-else class="navbar-nav mr-auto"></ul>
+    <ul v-else class="navbar-nav me-auto"></ul>
   </div>
 </template>
 

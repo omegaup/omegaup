@@ -1,30 +1,30 @@
 <template>
   <form role="form" class="card-body" @submit.prevent="onUpdateUserPreferences">
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditProfileImage }}</label>
       <a :href="GravatarURL" target="_blank" data-email class="btn btn-link">
         {{ T.userEditGravatar }} {{ email }}
       </a>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditLanguage }}</label>
       <select
         v-model="locale"
         data-locale
         data-preference-language
-        class="custom-select"
+        class="form-select"
       >
         <option value="es">{{ T.wordsSpanish }}</option>
         <option value="en">{{ T.wordsEnglish }}</option>
         <option value="pt">{{ T.wordsPortuguese }}</option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditPreferredProgrammingLanguage }}</label>
       <select
         v-model="preferredLanguage"
         data-preferred-language
-        class="custom-select"
+        class="form-select"
       >
         <option value="">
           {{ T.userEditPreferredProgrammingLanguagePlaceholder }}
@@ -38,12 +38,12 @@
         </option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
       <select
         v-model="learningTeachingObjective"
         data-learning-teaching-objective
-        class="custom-select"
+        class="form-select"
       >
         <option :value="ObjectivesAnswers.Learning">
           {{ T.userObjectivesModalAnswerLearning }}
@@ -59,13 +59,13 @@
         </option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ scholarCompetitiveObjectiveQuestion }}</label>
       <select
         v-model="scholarCompetitiveObjective"
         :disabled="learningTeachingObjective === ObjectivesAnswers.None"
         data-scholar-competitive-objective
-        class="custom-select"
+        class="form-select"
       >
         <option :value="ObjectivesAnswers.Scholar">
           {{ T.userObjectivesModalAnswerScholar }}
@@ -81,7 +81,7 @@
         </option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <div class="d-inline-flex align-items-center">
         <label class="mb-0">
           <input
@@ -89,14 +89,14 @@
             type="checkbox"
             :checked="isPrivate"
             data-is-private
-            class="mr-2"
+            class="me-2"
             @change="handlePrivateProfileCheckboxChange"
           />{{ T.userEditPrivateProfile }}
         </label>
         <!-- id-lint off -->
         <b-button
           id="popover-private-profile"
-          class="ml-1"
+          class="ms-1"
           size="sm"
           variant="none"
           @click="show = !show"
@@ -115,21 +115,21 @@
         {{ T.profilePrivateRankMessage }}
       </b-popover>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>
         <input
           v-model="hideProblemTags"
           type="checkbox"
           :checked="hideProblemTags"
           data-hide-problem-tags
-          class="mr-2"
+          class="me-2"
         />{{ T.userEditHideProblemTags }}
       </label>
     </div>
     <div class="mt-3">
       <button
         type="submit"
-        class="btn btn-primary mr-2"
+        class="btn btn-primary me-2"
         data-preference-save-button
       >
         {{ T.wordsSaveChanges }}

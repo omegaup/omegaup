@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!currentSaved" class="form-group" @keydown="onHandleKeyDown">
+  <div v-if="!currentSaved" class="mb-3" @keydown="onHandleKeyDown">
     <input
       v-if="!isSelectedNewFeedback"
       class="form-control"
@@ -31,7 +31,7 @@
         ></textarea>
       </div>
       <div class="card-footer text-muted">
-        <div class="form-group my-2">
+        <div class="mb-3 my-2">
           <button
             data-button-submit
             :disabled="!currentFeedbackThread.text"

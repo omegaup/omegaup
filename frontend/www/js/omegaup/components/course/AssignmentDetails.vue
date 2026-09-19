@@ -8,7 +8,7 @@
     <div class="card-body">
       <form class="form schedule" @submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="mb-3 col-md-4">
             <label
               >{{ T.wordsTitle }}
               <input
@@ -22,7 +22,7 @@
                 required
             /></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="mb-3 col-md-4">
             <label
               >{{ T.courseNewFormShortTitleAlias }}
               <font-awesome-icon
@@ -40,7 +40,7 @@
                 required
             /></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="mb-3 col-md-4">
             <label
               >{{ T.wordsContentType }}
               <font-awesome-icon
@@ -49,7 +49,7 @@
               />
               <select
                 v-model="assignmentType"
-                class="form-control"
+                class="form-select"
                 :class="{
                   'is-invalid': invalidParameterName === 'assignment_type',
                 }"
@@ -70,7 +70,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="mb-3 col-md-4">
             <label
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
@@ -86,7 +86,7 @@
               ></omegaup-datetimepicker
             ></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="mb-3 col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormUnlimitedDuration }}
               <font-awesome-icon
@@ -124,7 +124,7 @@
               </div>
             </div>
           </div>
-          <div class="form-group col-md-4">
+          <div class="mb-3 col-md-4">
             <label
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
@@ -143,7 +143,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group container-fluid">
+          <div class="mb-3 container-fluid">
             <label
               >{{ T.courseNewFormDescription }}
               <textarea
@@ -210,10 +210,10 @@
             "
           ></omegaup-course-problem-list>
         </template>
-        <div class="form-group text-right mt-3">
+        <div class="mb-3 text-end mt-3">
           <button
             data-schedule-assignment
-            class="btn btn-primary submit mr-2"
+            class="btn btn-primary submit me-2"
             type="submit"
           >
             <template v-if="update">

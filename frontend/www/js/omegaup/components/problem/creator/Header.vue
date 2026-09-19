@@ -1,7 +1,7 @@
 <template>
   <b-row v-if="!hideHeaderActions" class="mb-3">
     <b-col class="d-flex align-items-center">
-      <span class="mr-2">{{ T.problemCreatorName }}</span>
+      <span class="me-2">{{ T.problemCreatorName }}</span>
       <b-form-input
         v-model="name"
         size="sm"
@@ -11,12 +11,12 @@
     <b-col class="d-flex justify-content-end">
       <b-button
         data-load-problem-button
-        class="mr-2"
+        class="me-2"
         variant="success"
         size="sm"
         @click="uploadZipModal = !uploadZipModal"
       >
-        <BIconUpload class="mr-1" />
+        <BIconUpload class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorLoadProblem }}</span
         >
@@ -43,12 +43,12 @@
       </b-modal>
       <b-button
         data-download-zip
-        class="mr-2"
+        class="me-2"
         variant="primary"
         size="sm"
         @click="generateProblem()"
       >
-        <BIconDownload class="mr-1" />
+        <BIconDownload class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorGenerateProblem }}</span
         >
@@ -59,7 +59,7 @@
         size="sm"
         @click="newProblemConfirmationModal = !newProblemConfirmationModal"
       >
-        <BIconPlus class="mr-1" />
+        <BIconPlus class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
         >

@@ -8,10 +8,10 @@
     <div class="card-body">
       <form class="form" @submit.prevent="onAddContest">
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="w-100"
               >{{ T.wordsContests }}
-              <select v-model="selectedContest" class="form-control" required>
+              <select v-model="selectedContest" class="form-select" required>
                 <option
                   v-for="contest in availableContests"
                   :key="contest.alias"
@@ -23,7 +23,7 @@
             </label>
           </div>
 
-          <div class="form-group col-md-3">
+          <div class="mb-3 col-md-3">
             <label class="w-100"
               >{{ T.groupNewFormOnlyAC }}
               <omegaup-radio-switch
@@ -33,7 +33,7 @@
             </label>
           </div>
 
-          <div class="form-group col-md-3">
+          <div class="mb-3 col-md-3">
             <label class="w-100"
               >{{ T.groupNewFormWeight }}
               <input
@@ -49,7 +49,7 @@
         </div>
 
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <button class="btn btn-primary" type="submit">
               {{ T.groupEditScoreboardsAddContest }}
             </button>

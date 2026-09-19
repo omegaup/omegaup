@@ -5,26 +5,26 @@
     </div>
     <div class="card-body">
       <div class="mb-2">
-        <label class="mr-2">{{ T.wordsLanguage }}:</label>
+        <label class="me-2">{{ T.wordsLanguage }}:</label>
         <select
           v-model="currentLanguage"
-          class="form-control d-inline-block w-auto"
+          class="form-select d-inline-block w-auto"
         >
           <option value="en">{{ T.wordsEnglish }}</option>
           <option value="es">{{ T.wordsSpanish }}</option>
           <option value="pt">{{ T.wordsPortuguese }}</option>
         </select>
-        <label class="mr-2 ml-3">{{ T.wordsStatus }}:</label>
+        <label class="me-2 ms-3">{{ T.wordsStatus }}:</label>
         <select
           v-model="currentStatusFilter"
-          class="form-control d-inline-block w-auto"
+          class="form-select d-inline-block w-auto"
         >
           <option value="active">{{ T.carouselStatusActive }}</option>
           <option value="archived">{{ T.carouselStatusArchived }}</option>
           <option value="all">{{ T.carouselStatusAll }}</option>
         </select>
         <button
-          class="btn btn-primary float-right"
+          class="btn btn-primary float-end"
           @click.prevent="openCreateModal"
         >
           <font-awesome-icon :icon="['fas', 'plus']" />
@@ -90,7 +90,7 @@
             </td>
             <td>
               <button
-                class="btn btn-sm btn-primary mr-1"
+                class="btn btn-sm btn-primary me-1"
                 @click.prevent="editItem(item)"
               >
                 <font-awesome-icon :icon="['fas', 'edit']" />
@@ -143,8 +143,8 @@
         <!-- Multilingual Fields -->
         <div v-for="lang in languages" :key="lang.code">
           <div v-show="editingLanguage === lang.code">
-            <div class="form-row">
-              <div class="form-group col-md-6">
+            <div class="row">
+              <div class="mb-3 col-md-6">
                 <label>{{ T.wordsTitle }} ({{ lang.name }}) *</label>
                 <input
                   v-model="multilingualData.title[lang.code]"
@@ -153,7 +153,7 @@
                   required
                 />
               </div>
-              <div class="form-group col-md-6">
+              <div class="mb-3 col-md-6">
                 <label>{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label>
                 <input
                   v-model="multilingualData.button_title[lang.code]"
@@ -163,7 +163,7 @@
                 />
               </div>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
               <label>{{ T.carouselExcerpt }} ({{ lang.name }}) *</label>
               <textarea
                 v-model="multilingualData.excerpt[lang.code]"
@@ -176,8 +176,8 @@
         </div>
 
         <!-- Non-multilingual Fields -->
-        <div class="form-row">
-          <div class="form-group col-md-6">
+        <div class="row">
+          <div class="mb-3 col-md-6">
             <label>{{ T.carouselImageUrl }} *</label>
             <input
               v-model="currentItem.image_url"
@@ -186,7 +186,7 @@
               required
             />
           </div>
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label>{{ T.carouselLink }} *</label>
             <input
               v-model="currentItem.link"
@@ -196,8 +196,8 @@
             />
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
+        <div class="row">
+          <div class="mb-3 col-md-6">
             <label>{{ T.carouselExpirationDate }}</label>
             <input
               v-model="expirationDateInput"
@@ -208,7 +208,7 @@
               {{ T.carouselExpirationDateHint }}
             </small>
           </div>
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <div class="form-check mt-5">
               <input
                 v-model="currentItem.is_active"

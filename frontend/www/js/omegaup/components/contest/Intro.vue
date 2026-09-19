@@ -154,11 +154,11 @@
       </div>
       <hr />
       <div>
-        <h3 class="ml-4">{{ T.registerForContestChallenges }}</h3>
+        <h3 class="ms-4">{{ T.registerForContestChallenges }}</h3>
         <omegaup-markdown :markdown="contest.description"></omegaup-markdown>
       </div>
       <div>
-        <h3 class="ml-4">{{ T.registerForContestRules }}</h3>
+        <h3 class="ms-4">{{ T.registerForContestRules }}</h3>
         <ul>
           <li v-if="contest.show_scoreboard_after">
             {{ T.contestNewFormScoreboardAtContestEnd }}

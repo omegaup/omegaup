@@ -10,7 +10,7 @@
         <a
           :href="`#${tab.name}`"
           class="nav-link"
-          data-toggle="tab"
+          data-bs-toggle="tab"
           role="tab"
           :aria-controls="tab.name"
           :class="{ active: selectedTab === tab.name }"
@@ -63,7 +63,7 @@
           ></omegaup-markdown>
         </div>
         <hr class="my-3" />
-        <div class="font-italic">
+        <div class="fst-italic">
           {{ `${T.wordsSource}: ${problem.source}` }}
         </div>
         <template v-if="problem.problemsetter">

@@ -3,7 +3,7 @@
     <div
       class="slide d-flex align-items-center justify-content-center flex-column flex-lg-row"
     >
-      <div class="titles-width text-center text-lg-left mb-4 mb-lg-0">
+      <div class="titles-collapse-horizontal text-center text-lg-start mb-4 mb-lg-0">
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
@@ -18,7 +18,7 @@
       </div>
       <div class="image-container d-flex justify-content-center">
         <img
-          class="d-block img-fluid image-width"
+          class="d-block img-fluid image-collapse-horizontal"
           :src="imageSrc"
           :alt="title"
           width="480"

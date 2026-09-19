@@ -16,7 +16,7 @@
         <omegaup-markdown
           :markdown="T.coursePrivacyConsent"
           :full-width="true"
-          class="font-weight-bold h5"
+          class="fw-bold h5"
         ></omegaup-markdown>
         <omegaup-markdown
           v-if="needsBasicInformation"
@@ -31,7 +31,7 @@
           <omegaup-radio-switch
             :value.sync="shareUserInformation"
             :selected-value="shareUserInformation"
-            class="align-to-markdown ml-5 mb-3"
+            class="align-to-markdown ms-5 mb-3"
           ></omegaup-radio-switch>
         </template>
 
@@ -44,7 +44,7 @@
             :value.sync="acceptTeacher"
             :selected-value="acceptTeacher"
             name="accept-teacher"
-            class="align-to-markdown ml-5"
+            class="align-to-markdown ms-5"
           ></omegaup-radio-switch>
         </template>
       </template>

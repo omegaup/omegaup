@@ -5,12 +5,12 @@
     <form
       action="/problem/"
       method="GET"
-      class="form-inline d-flex justify-content-center align-items-center flex-wrap form-mobile"
+      class="d-flex align-items-center d-flex justify-content-center align-items-center flex-wrap form-mobile"
     >
-      <div v-if="tags.length !== 0" class="form-group mr-2 mw-100">
-        <div v-for="tag in tags" :key="tag" class="mr-1">
+      <div v-if="tags.length !== 0" class="mb-3 me-2 mw-100">
+        <div v-for="tag in tags" :key="tag" class="me-1">
           <input type="hidden" name="tag[]" :value="tag" />
-          <span class="badge badge-secondary m-1 p-2">{{
+          <span class="badge text-bg-secondary m-1 p-2">{{
             T[tag] ? T[tag] : tag
           }}</span>
         </div>
@@ -18,7 +18,7 @@
           <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
-      <div class="form-group mr-2">
+      <div class="mb-3 me-2">
         <omegaup-common-typeahead
           data-problem-keyword-search
           :only-existing-tags="false"
@@ -33,14 +33,14 @@
         ></omegaup-common-typeahead>
         <input type="hidden" name="query" :value="currentKeywordValue" />
       </div>
-      <div class="form-group mr-2">
+      <div class="mb-3 me-2">
         <label>
           {{ T.wordsFilterByLanguage }}
           <select
             v-model="currentLanguage"
             data-filter-language
             name="language"
-            class="ml-2 form-control"
+            class="ms-2 form-select"
           >
             <option
               v-for="language in languages"
@@ -52,8 +52,8 @@
           </select>
         </label>
       </div>
-      <div class="form-group mr-2">
-        <label class="ml-4 large:ml-0">
+      <div class="mb-3 me-2">
+        <label class="ml-4 large:ms-0">
           <input
             v-model="currentOnlyQualitySeal"
             name="only_quality_seal"
@@ -66,7 +66,7 @@
       </div>
       <input
         data-filter-submit-button
-        class="btn btn-primary mr-2 button-mobile"
+        class="btn btn-primary me-2 button-mobile"
         type="submit"
         :value="T.wordsSearch"
       />

@@ -8,11 +8,11 @@
       {{ T.messageMakeYourProblemsPublic }}
       <button
         type="button"
-        class="close"
-        data-dismiss="alert"
+        class="btn-close"
+        data-bs-dismiss="alert"
         aria-label="Close"
       >
-        <span aria-hidden="true">&times;</span>
+        
       </button>
     </div>
     <div class="card">
@@ -38,7 +38,7 @@
             >{{ T.wordsSearch }}</a
           >
         </div>
-        <div class="form-row">
+        <div class="row">
           <div class="col">
             <div class="form-check">
               <label class="form-check-label">
@@ -60,7 +60,7 @@
             <select
               v-model="allProblemsVisibilityOption"
               data-selected-problems
-              class="custom-select pl-1 pl-sm-3"
+              class="form-select pl-1 ps-sm-3"
             >
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
@@ -105,12 +105,12 @@
                   :value="problem"
                 />
               </td>
-              <td class="text-right align-middle">
+              <td class="text-end align-middle">
                 {{ problem.problem_id }}
               </td>
               <td class="d-flex align-items-center">
-                <div class="d-inline-block ml-2">
-                  <a class="mr-1" :href="`/arena/problem/${problem.alias}/`">{{
+                <div class="d-inline-block ms-2">
+                  <a class="me-1" :href="`/arena/problem/${problem.alias}/`">{{
                     problem.title
                   }}</a>
                   <font-awesome-icon

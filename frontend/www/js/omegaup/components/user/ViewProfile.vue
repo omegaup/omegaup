@@ -50,7 +50,7 @@
                 class="form-control mb-2"
                 rows="10"
               ></textarea>
-              <button class="btn btn-primary btn-sm mr-2" @click="saveReadme">
+              <button class="btn btn-primary btn-sm me-2" @click="saveReadme">
                 {{ T.wordsSaveChanges }}
               </button>
               <button
@@ -79,7 +79,7 @@
                 @click="currentSelectedTab = ViewProfileTabs.Badges"
               >
                 {{ T.wordsBadgesObtained }}
-                <span class="badge badge-secondary">
+                <span class="badge text-bg-secondary">
                   {{ profileBadges.size }}
                 </span>
               </a>
@@ -103,7 +103,7 @@
                 @click="currentSelectedTab = ViewProfileTabs.Contests"
               >
                 {{ T.profileContests }}
-                <span class="badge badge-secondary">
+                <span class="badge text-bg-secondary">
                   {{ Object.keys(contests).length }}
                 </span>
               </a>
@@ -214,7 +214,7 @@
                   <template v-if="profile.is_own_profile" #header-link
                     ><a
                       href="/problem/mine/"
-                      class="float-right align-self-center"
+                      class="float-end align-self-center"
                       >{{ T.profileCreatedContentSeeAll }}</a
                     ></template
                   >
@@ -229,7 +229,7 @@
                   <template v-if="profile.is_own_profile" #header-link
                     ><a
                       href="/contest/mine/"
-                      class="float-right align-self-center"
+                      class="float-end align-self-center"
                       >{{ T.profileCreatedContentSeeAll }}</a
                     ></template
                   >
@@ -244,7 +244,7 @@
                   <template v-if="profile.is_own_profile" #header-link
                     ><a
                       href="/course/mine/"
-                      class="float-right align-self-center"
+                      class="float-end align-self-center"
                       >{{ T.profileCreatedContentSeeAll }}</a
                     ></template
                   >

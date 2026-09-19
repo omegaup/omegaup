@@ -8,12 +8,12 @@
         "
       >
         <div class="row">
-          <div class="form-group col-md-6">
-            <label class="font-weight-bold">{{ T.wordsTitle }}</label>
+          <div class="mb-3 col-md-6">
+            <label class="fw-bold">{{ T.wordsTitle }}</label>
             <input v-model="title" class="form-control" size="30" type="text" />
           </div>
-          <div class="form-group col-md-6">
-            <label class="font-weight-bold">
+          <div class="mb-3 col-md-6">
+            <label class="fw-bold">
               {{ T.contestNewFormShortTitleAlias }}
               <font-awesome-icon
                 :title="T.contestNewFormShortTitleAliasDesc"
@@ -24,8 +24,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-6">
-            <label class="font-weight-bold">{{
+          <div class="mb-3 col-md-6">
+            <label class="fw-bold">{{
               T.contestNewFormDescription
             }}</label>
             <textarea
@@ -35,8 +35,8 @@
               rows="10"
             ></textarea>
           </div>
-          <div class="form-group col-md-4">
-            <label class="font-weight-bold">
+          <div class="mb-3 col-md-4">
+            <label class="fw-bold">
               {{ T.contestNewFormStartDate }}
               <font-awesome-icon
                 :title="T.contestNewFormStartDateDesc"
@@ -46,7 +46,7 @@
             <omegaup-datetime v-model="startTime"></omegaup-datetime>
           </div>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <button class="btn btn-primary" type="submit">
             {{ T.wordsCloneContest }}
           </button>

@@ -4,19 +4,19 @@
       aria-expanded="false"
       aria-haspopup="true"
       class="nav-link dropdown-toggle px-2 notification-toggle"
-      data-toggle="dropdown"
+      data-bs-toggle="dropdown"
       href="#"
       role="button"
     >
       <font-awesome-icon :icon="['fas', 'bell']" />
       <span
         v-show="!!notifications.length"
-        class="badge badge-danger count-badge"
+        class="badge text-bg-danger count-badge"
         >{{ notifications.length }}</span
       ></a
     >
     <div
-      class="dropdown-menu dropdown-menu-right notification-dropdown position-absolute mt-2"
+      class="dropdown-menu dropdown-menu-end notification-dropdown position-absolute mt-2"
     >
       <div v-if="notifications.length === 0" class="text-center">
         {{ T.notificationsNoNewNotifications }}

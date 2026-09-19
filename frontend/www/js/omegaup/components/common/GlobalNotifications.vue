@@ -9,7 +9,7 @@
       <button
         data-alert-close
         type="button"
-        class="close"
+        class="btn-close"
         aria-label="Close"
         @click="dismiss"
       >

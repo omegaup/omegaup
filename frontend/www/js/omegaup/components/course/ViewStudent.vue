@@ -7,11 +7,11 @@
     </div>
     <div class="card-body">
       <form>
-        <div class="form-group col-md-3">
+        <div class="mb-3 col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
           <select
             v-model="selectedStudent"
-            class="ml-1 form-control"
+            class="ms-1 form-select"
             data-student
           >
             <option
@@ -25,11 +25,11 @@
         </div>
       </form>
       <form>
-        <div class="form-group col-md-3">
+        <div class="mb-3 col-md-3">
           <label>{{ T.courseStudentSelectAssignment }}</label>
           <select
             v-model="selectedAssignment"
-            class="ml-1 form-control"
+            class="ms-1 form-select"
             data-assignment
           >
             <option
@@ -61,7 +61,7 @@
               >
                 <a
                   aria-controls="home"
-                  data-toggle="tab"
+                  data-bs-toggle="tab"
                   href="#home"
                   class="nav-link"
                   :class="{
@@ -108,7 +108,7 @@
               <template v-if="selectedRun">
                 <h5>{{ T.feedbackTitle }}</h5>
                 <pre
-                  class="border rounded rounded-lg p-2 m-0"
+                  class="border rounded rounded-3 p-2 m-0"
                   :class="{ 'bg-light': selectedRun.feedback == null }"
                   >{{
                     selectedRun.feedback
@@ -136,7 +136,7 @@
                     @click="showFeedbackForm = !showFeedbackForm"
                     >{{ T.submissionFeedbackSendButton }}</a
                   >
-                  <div v-show="showFeedbackForm" class="form-group">
+                  <div v-show="showFeedbackForm" class="mb-3">
                     <p>{{ T.submissionFeedbackAnimationButton }}</p>
                     <img
                       src="/media/submission_feedback_demo.gif"

@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-5 max-width mx-auto">
+  <div class="container-fluid p-5 max-collapse-horizontal mx-auto">
     <h1 class="title-font p-0 mb-2 text-center">{{ title }}</h1>
     <div class="mb-4">
       <a href="/problem/collection/" data-nav-problems-collection>{{

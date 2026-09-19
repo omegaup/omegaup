@@ -30,7 +30,7 @@
       <div class="year-selector">
         <select
           v-model="selectedYear"
-          class="form-control"
+          class="form-select"
           @change="onYearChange"
         >
           <option v-for="year in availableYears" :key="year" :value="year">

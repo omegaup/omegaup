@@ -14,7 +14,7 @@
     </div>
     <div class="d-flex align-items-center search-header-sticky-top">
       <omegaup-problem-search-bar
-        class="searchbar-width"
+        class="searchbar-collapse-horizontal"
         :language="language"
         :languages="languages"
         :keyword="keyword"

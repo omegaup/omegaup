@@ -7,7 +7,7 @@
           data-toggle-layout-sidebar
           size="sm"
           variant="primary"
-          class="mr-2"
+          class="me-2"
           @click="showLayoutSidebar = !showLayoutSidebar"
         >
           <BIconLayoutSidebar />
@@ -59,7 +59,7 @@
           data-add-window
           size="sm"
           variant="success"
-          class="mr-2"
+          class="me-2"
           :pressed="showWindow"
           @click="$emit('open-add-window')"
         >
@@ -74,10 +74,10 @@
             data-sidebar-validate-points-dropdown-item
             @click="validateAndFixPointsModal = !validateAndFixPointsModal"
             ><b-row>
-              <div class="ml-6">
+              <div class="ms-6">
                 <BIconBroadcast variant="info" font-scale="1.05" />
               </div>
-              <div class="ml-8">{{ T.problemCreatorValidatePointsButton }}</div>
+              <div class="ms-8">{{ T.problemCreatorValidatePointsButton }}</div>
             </b-row>
           </b-dropdown-item>
         </b-dropdown>
@@ -104,20 +104,20 @@
             <b-button
               data-sidebar-groups="ungrouped"
               variant="light"
-              data-placement="top"
+              data-bs-placement="top"
               :title="T.problemCreatorUngroupedCases"
               class="w-84"
               @click="showUngroupedCases = !showUngroupedCases"
             >
               <div class="d-flex justify-content-between">
-                <div class="mr-2 text-truncate">
+                <div class="me-2 text-truncate">
                   {{ T.problemCreatorUngrouped }}
                 </div>
                 <div class="d-inline-block text-nowrap">
                   <b-badge
                     data-sidebar-ungrouped-cases="count"
                     variant="primary"
-                    class="mr-1"
+                    class="me-1"
                     >{{ ungroupedCases.length }}</b-badge
                   >
                   <b-badge data-sidebar-ungrouped-cases="points" variant="info">
@@ -133,20 +133,20 @@
               </template>
               <b-dropdown-item disabled
                 ><b-row>
-                  <div class="ml-6">
+                  <div class="ms-6">
                     <BIconTrash variant="danger" font-scale=".95" />
                   </div>
-                  <div class="ml-8">
+                  <div class="ms-8">
                     {{ T.problemCreatorDeleteGroup }}
                   </div>
                 </b-row>
               </b-dropdown-item>
               <b-dropdown-item @click="deleteUngroupedCases()"
                 ><b-row>
-                  <div class="ml-6">
+                  <div class="ms-6">
                     <BIconTrash variant="danger" font-scale=".95" />
                   </div>
-                  <div class="ml-8">
+                  <div class="ms-8">
                     {{ T.problemCreatorDeleteCases }}
                   </div>
                 </b-row>
@@ -162,14 +162,14 @@
               >
                 <b-button
                   variant="light"
-                  data-placement="top"
+                  data-bs-placement="top"
                   :data-sidebar-cases-ungrouped="groupID"
                   :title="name"
                   class="w-82"
                   @click="editCase(groupID, cases[0].caseID)"
                 >
                   <div class="d-flex justify-content-between">
-                    <div class="mr-2 text-truncate">{{ name }}</div>
+                    <div class="me-2 text-truncate">{{ name }}</div>
                     <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
                         {{ Math.round(points || 0) }}
@@ -184,10 +184,10 @@
                   </template>
                   <b-dropdown-item @click="deleteCase({ groupID, caseID: '' })"
                     ><b-row>
-                      <div class="ml-6">
+                      <div class="ms-6">
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
-                      <div class="ml-8">
+                      <div class="ms-8">
                         {{ T.problemCreatorDeleteCase }}
                       </div>
                     </b-row>
@@ -205,18 +205,18 @@
           <b-button
             data-sidebar-groups="grouped"
             variant="light"
-            data-placement="top"
+            data-bs-placement="top"
             :title="name"
             class="w-84"
             @click="showCases[groupID] = !showCases[groupID]"
           >
             <div class="d-flex justify-content-between">
-              <div class="mr-2 text-truncate">{{ name }}</div>
+              <div class="me-2 text-truncate">{{ name }}</div>
               <div class="d-inline-block text-nowrap">
                 <b-badge
                   data-sidebar-groups="count"
                   variant="primary"
-                  class="mr-1"
+                  class="me-1"
                   >{{ cases.length }}</b-badge
                 >
                 <b-badge data-sidebar-groups="points" variant="info"
@@ -240,20 +240,20 @@
               data-sidebar-edit-group-dropdown="edit group"
               @click="editGroupModal[groupID] = !editGroupModal[groupID]"
               ><b-row>
-                <div class="ml-6">
+                <div class="ms-6">
                   <BIconPencil variant="info" font-scale=".95" />
                 </div>
-                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div>
+                <div class="ms-8">{{ T.omegaupTitleGroupsEdit }}</div>
               </b-row>
             </b-dropdown-item>
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="delete group"
               @click="deleteGroup(groupID)"
               ><b-row>
-                <div class="ml-6">
+                <div class="ms-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
-                <div class="ml-8">
+                <div class="ms-8">
                   {{ T.problemCreatorDeleteGroup }}
                 </div>
               </b-row>
@@ -262,10 +262,10 @@
               data-sidebar-edit-group-dropdown="delete cases"
               @click="deleteGroupCases(groupID)"
               ><b-row>
-                <div class="ml-6">
+                <div class="ms-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
-                <div class="ml-8">
+                <div class="ms-8">
                   {{ T.problemCreatorDeleteCases }}
                 </div>
               </b-row>
@@ -274,10 +274,10 @@
               data-sidebar-edit-group-dropdown="download .in"
               @click="downloadGroupInput(groupID, '.in')"
               ><b-row>
-                <div class="ml-6">
+                <div class="ms-6">
                   <BIconBoxArrowDown variant="info" font-scale=".95" />
                 </div>
-                <div class="ml-8">
+                <div class="ms-8">
                   {{ T.problemCraetorGroupDownloadIn }}
                 </div>
               </b-row>
@@ -286,10 +286,10 @@
               data-sidebar-edit-group-dropdown="download .txt"
               @click="downloadGroupInput(groupID, '.txt')"
               ><b-row>
-                <div class="ml-6">
+                <div class="ms-6">
                   <BIconTextLeft variant="info" font-scale=".95" />
                 </div>
-                <div class="ml-8">
+                <div class="ms-8">
                   {{ T.problemCraetorGroupDownloadTxt }}
                 </div>
               </b-row>
@@ -304,13 +304,13 @@
               >
                 <b-button
                   variant="light"
-                  data-placement="top"
+                  data-bs-placement="top"
                   :title="caseName"
                   class="w-82"
                   @click="editCase(groupID, caseID)"
                 >
                   <div class="d-flex justify-content-between">
-                    <div class="mr-2 text-truncate">{{ caseName }}</div>
+                    <div class="me-2 text-truncate">{{ caseName }}</div>
                     <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
                         {{ Math.round(casePoints || 0) }}
@@ -325,10 +325,10 @@
                   </template>
                   <b-dropdown-item @click="deleteCase({ groupID, caseID })"
                     ><b-row>
-                      <div class="ml-6">
+                      <div class="ms-6">
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
-                      <div class="ml-8">
+                      <div class="ms-8">
                         {{ T.problemCreatorDeleteCase }}
                       </div>
                     </b-row>

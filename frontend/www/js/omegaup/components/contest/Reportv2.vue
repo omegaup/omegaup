@@ -3,7 +3,7 @@
     class="mb-5"
     :header="ui.formatString(T.contestReport, { contest_alias: contestAlias })"
   >
-    <b-card-text class="text-right">
+    <b-card-text class="text-end">
       <a :href="`/contest/${contestAlias}/report/print/`">
         <b-icon-printer></b-icon-printer>
       </a>

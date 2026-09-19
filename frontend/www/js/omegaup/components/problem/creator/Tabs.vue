@@ -2,7 +2,7 @@
   <b-tabs v-model="activeTabIndex" small>
     <b-tab>
       <template #title>
-        <BIconPencil class="mr-1" />
+        <BIconPencil class="me-1" />
         <span name="writing" data-problem-creator-tab="statement">
           {{ T.problemCreatorStatement }}</span
         >
@@ -20,7 +20,7 @@
 
     <b-tab>
       <template #title>
-        <BIconFileCode class="mr-1" />
+        <BIconFileCode class="me-1" />
         <span name="code" data-problem-creator-tab="code">
           {{ T.problemCreatorCode }}</span
         >
@@ -39,7 +39,7 @@
 
     <b-tab>
       <template #title>
-        <BIconCheckCircle class="mr-1" />
+        <BIconCheckCircle class="me-1" />
         <span name="testcases" data-problem-creator-tab="cases">
           {{ T.problemCreatorTestCases }}</span
         >
@@ -58,7 +58,7 @@
 
     <b-tab>
       <template #title>
-        <BIconFileEarmarkCheck class="mr-1" />
+        <BIconFileEarmarkCheck class="me-1" />
         <span name="solution" data-problem-creator-tab="solution">
           {{ T.problemCreatorSolution }}</span
         >

@@ -73,7 +73,7 @@
       <b-button
         variant="danger"
         size="sm"
-        class="mr-2"
+        class="me-2"
         @click="$emit('close-add-window')"
         >{{ T.wordsCancel }}</b-button
       >

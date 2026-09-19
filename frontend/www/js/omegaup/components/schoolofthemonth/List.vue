@@ -1,11 +1,11 @@
 <template>
-  <div class="card ranking-width">
+  <div class="card ranking-collapse-horizontal">
     <ul class="nav nav-tabs justify-content-around">
       <li class="nav-item">
         <a
           href="#"
           class="nav-link"
-          data-toggle="tab"
+          data-bs-toggle="tab"
           role="tab"
           aria-controls="allSchoolsOfTheMonth"
           :class="{ active: selectedTab === 'allSchoolsOfTheMonth' }"
@@ -19,7 +19,7 @@
         <a
           href="#"
           class="nav-link"
-          data-toggle="tab"
+          data-bs-toggle="tab"
           role="tab"
           aria-controls="schoolsOfPreviousMonth"
           :class="{ active: selectedTab === 'schoolsOfPreviousMonth' }"
@@ -33,7 +33,7 @@
         <a
           href="#"
           class="nav-link"
-          data-toggle="tab"
+          data-bs-toggle="tab"
           role="tab"
           aria-controls="candidatesToSchoolOfTheMonth"
           :class="{

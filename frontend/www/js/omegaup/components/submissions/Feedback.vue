@@ -22,7 +22,7 @@
         @click="showFeedbackForm = !showFeedbackForm"
         >{{ T.submissionFeedbackSendButton }}</a
       >
-      <div v-show="showFeedbackForm" class="form-group">
+      <div v-show="showFeedbackForm" class="mb-3">
         <p>{{ T.submissionFeedbackAnimationButton }}</p>
         <img
           v-show="showFeedbackForm"

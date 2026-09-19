@@ -36,7 +36,7 @@
       ></omegaup-markdown>
     </div>
     <div v-if="!saved" class="card-footer text-muted">
-      <div class="form-group my-2">
+      <div class="mb-3 my-2">
         <button
           data-button-submit
           :disabled="!currentFeedback.text"

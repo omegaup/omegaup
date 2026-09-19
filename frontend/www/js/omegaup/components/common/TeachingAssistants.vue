@@ -2,8 +2,8 @@
   <div class="card mb-3 panel panel-primary">
     <div class="card-body panel-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group mb-0">
-          <label class="font-weight-bold w-100"
+        <div class="mb-3 mb-0">
+          <label class="fw-bold w-100"
             >{{ T.courseEditTeachingAssistants }}
             <font-awesome-icon
               :title="T.courseEditAddTeachingAssistantsTooltip"
@@ -54,7 +54,7 @@
               <button
                 v-if="teachingAssistant.role === 'teaching_assistant'"
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="onRemove(teachingAssistant)"
               >
                 &times;

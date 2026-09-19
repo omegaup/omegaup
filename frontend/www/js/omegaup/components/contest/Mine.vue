@@ -8,11 +8,11 @@
       {{ T.messageMakeYourContestsPublic }}
       <button
         type="button"
-        class="close"
-        data-dismiss="alert"
+        class="btn-close"
+        data-bs-dismiss="alert"
         aria-label="Close"
       >
-        <span aria-hidden="true">&times;</span>
+        
       </button>
     </div>
     <h3 class="text-center mb-4">{{ T.wordsMyContests }}</h3>
@@ -50,7 +50,7 @@
           </div>
           <select
             v-model="allContestsVisibilityOption"
-            class="custom-select col-md-3"
+            class="form-select col-md-3"
             @change="onChangeAdmissionMode"
           >
             <option selected value="none">{{ T.forSelectedItems }}</option>
@@ -92,8 +92,8 @@
                   type="checkbox"
                   :value="contest.alias"
                 />
-                <div class="d-inline-block ml-2">
-                  <a class="mr-1" :href="ui.contestURL(contest)">{{
+                <div class="d-inline-block ms-2">
+                  <a class="me-1" :href="ui.contestURL(contest)">{{
                     ui.contestTitle(contest)
                   }}</a>
                 </div>
@@ -125,7 +125,7 @@
                 </a>
                 <a
                   v-if="contest.scoreboard_url_admin"
-                  class="ml-1"
+                  class="ms-1"
                   :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
                 >
                   <font-awesome-icon
@@ -141,31 +141,31 @@
                     :icon="['fas', 'edit']"
                   />
                 </a>
-                <a class="ml-2" :href="`/arena/${contest.alias}/#runs`">
+                <a class="ms-2" :href="`/arena/${contest.alias}/#runs`">
                   <font-awesome-icon
                     :title="T.contestListSubmissions"
                     :icon="['fas', 'tachometer-alt']"
                   />
                 </a>
-                <a class="ml-2" :href="`/contest/${contest.alias}/stats/`">
+                <a class="ms-2" :href="`/contest/${contest.alias}/stats/`">
                   <font-awesome-icon
                     :title="T.profileStatistics"
                     :icon="['fas', 'chart-bar']"
                   />
                 </a>
-                <a class="ml-2" :href="`/contest/${contest.alias}/activity/`">
+                <a class="ms-2" :href="`/contest/${contest.alias}/activity/`">
                   <font-awesome-icon
                     :title="T.activityReport"
                     :icon="['fas', 'clock']"
                   />
                 </a>
-                <a class="ml-2" :href="`/arena/${contest.alias}/print/`">
+                <a class="ms-2" :href="`/arena/${contest.alias}/print/`">
                   <font-awesome-icon
                     :title="T.contestPrintableVersion"
                     :icon="['fas', 'print']"
                   />
                 </a>
-                <a class="ml-2" href="#" @click="onDownloadCsv(contest.alias)">
+                <a class="ms-2" href="#" @click="onDownloadCsv(contest.alias)">
                   <font-awesome-icon
                     :title="T.contestDownloadListOfUsersInContest"
                     :icon="['fas', 'file-download']"

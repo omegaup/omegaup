@@ -22,12 +22,12 @@
               <span>{{ T.wordsTitle }}</span>
               <span
                 v-if="showProblemTags"
-                class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
+                class="badge custom-badge custom-badge-quality me-1 ms-1 p-2"
                 >{{ T.tagSourceLevel }}</span
               >
               <span
                 v-if="showProblemTags"
-                class="badge custom-badge custom-badge-owner mr-1 p-2"
+                class="badge custom-badge custom-badge-owner me-1 p-2"
                 >{{ T.tagSourceOwner }}</span
               >
               <span
@@ -127,7 +127,7 @@
             <td class="align-middle">
               <a
                 :href="`/arena/problem/${problem.alias}/`"
-                class="mr-2"
+                class="me-2"
                 data-problem-title-list
                 >{{ problem.title }}</a
               >
@@ -184,7 +184,7 @@
                 {{ QUALITY_TAGS[Math.round(problem.quality)] }}
               </span>
             </td>
-            <td v-else class="text-right align-middle">—</td>
+            <td v-else class="text-end align-middle">—</td>
             <td
               v-if="problem.difficulty !== null"
               class="text-center align-middle"
@@ -200,12 +200,12 @@
               </span>
             </td>
             <td v-else class="text-center align-middle">—</td>
-            <td class="text-right align-middle">
+            <td class="text-end align-middle">
               {{ (100.0 * problem.ratio).toFixed(2) }}%<br />({{
                 problem.accepted
               }}/{{ problem.submissions }})
             </td>
-            <td v-if="loggedIn" class="text-right align-middle">
+            <td v-if="loggedIn" class="text-end align-middle">
               <span
                 :title="getProblemStatusTitle(problem)"
                 :class="['badge', getProblemStatusClass(problem)]"
@@ -213,7 +213,7 @@
                 {{ problem.score.toFixed(2) }}
               </span>
             </td>
-            <td class="text-right align-middle">
+            <td class="text-end align-middle">
               {{ problem.points.toFixed(2) }}
             </td>
           </tr>

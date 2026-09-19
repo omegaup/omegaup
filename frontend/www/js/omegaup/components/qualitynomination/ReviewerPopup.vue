@@ -4,10 +4,10 @@
       <form data-reviewewr-popup class="h-auto w-auto" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
-            <p class="h4 font-weight-bold pb-4 text-center w-100">
+            <p class="h4 fw-bold pb-4 text-center w-100">
               {{ T.reviewerNominationFormTitle }}
             </p>
-            <div class="form-group w-100">
+            <div class="mb-3 w-100">
               <label class="control-label">
                 {{ T.reviewerNominationQuality }}
               </label>
@@ -17,7 +17,7 @@
                 :selected-value="qualitySeal"
               ></omegaup-radio-switch>
             </div>
-            <div class="form-group w-100" data-other-tag-input>
+            <div class="mb-3 w-100" data-other-tag-input>
               <vue-typeahead-bootstrap
                 :data="publicTags"
                 :serializer="publicTagsSerializer"
@@ -54,10 +54,10 @@
                 </table>
               </div>
             </div>
-            <div class="text-right">
+            <div class="text-end">
               <button
                 data-review-submit-button
-                class="btn btn-primary mr-3"
+                class="btn btn-primary me-3"
                 type="submit"
                 :disabled="publicTagsList.length === 0"
                 @click="onSubmit"
