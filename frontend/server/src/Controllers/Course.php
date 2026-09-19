@@ -1624,7 +1624,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $assignments
      * @omegaup-request-param string $course_alias
      */
-   public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
+    public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
