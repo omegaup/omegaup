@@ -734,7 +734,6 @@ const translations: { [key: string]: string; } = {
   courseStudentRemoved: "O estudante foi removido com sucesso.",
   courseStudentSelectAssignment: "Selecione designa\u00e7\u00e3o",
   courseStudentSelectStudent: "Selecione o aluno",
-  courseStudentsEmpty: "N\u00e3o h\u00e1 alunos",
   courseStudentsEmptyDescription: "Adicione alunos a este curso para come\u00e7ar a acompanhar o progresso deles.",
   courseStudentsEmptyTitle: "Ainda n\u00e3o h\u00e1 alunos inscritos",
   courseStudentsProgress: "Progresso do aluno",
