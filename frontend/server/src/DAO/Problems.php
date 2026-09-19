@@ -352,7 +352,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        ?string $solvedStatus
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -480,22 +481,52 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
-        if (!is_null($query)) {
-            if (is_numeric($query)) {
+        if (
+            !is_null($solvedStatus)
+            && $solvedStatus !== 'all'
+            && !is_null($identityId)
+            && !is_null($userId)
+        ) {
+            $solvedExists = 'EXISTS (SELECT 1 FROM Submissions ss WHERE ss.problem_id = p.problem_id AND ss.identity_id = ? AND ss.verdict = \'AC\' AND ss.type = \'normal\')';
+            $submittedExists = 'EXISTS (SELECT 1 FROM Submissions ss WHERE ss.problem_id = p.problem_id AND ss.identity_id = ? AND ss.type = \'normal\')';
+            $forfeitedExists = 'NOT EXISTS (SELECT 1 FROM Problems_Forfeited pf WHERE pf.problem_id = p.problem_id AND pf.user_id = ?)';
+            $ownedExists = 'NOT EXISTS (SELECT 1 FROM ACLs acl_own WHERE acl_own.acl_id = p.acl_id AND acl_own.owner_id = ?)';
+            if ($solvedStatus === 'solved') {
                 $clauses[] = [
-                    "(
-                    p.title LIKE CONCAT('%', ?, '%') OR
-                    p.alias LIKE CONCAT('%', ?, '%') OR
-                    p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
+                    '(' . $solvedExists . ' AND ' . $forfeitedExists . ' AND ' . $ownedExists . ')',
+                    [$identityId, $userId, $userId],
                 ];
-            } else {
+            } elseif ($solvedStatus === 'attempted') {
                 $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
+                    '(' . $submittedExists . ' AND NOT ' . $solvedExists . ' AND ' . $forfeitedExists . ' AND ' . $ownedExists . ')',
+                    [$identityId, $identityId, $userId, $userId],
+                ];
+            } elseif ($solvedStatus === 'unsolved') {
+                $clauses[] = [
+                    'NOT ' . $submittedExists,
+                    [$identityId],
                 ];
             }
+        }
+
+        if (!is_null($query) && $query !== '') {
+            $isNumericQuery = is_numeric($query);
+            $conditions = [
+                'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
+            ];
+            $argsForQuery = [
+                \OmegaUp\DAO\DAO::escapeBooleanModeQuery($query),
+            ];
+
+            if ($isNumericQuery) {
+                $conditions[] = 'p.problem_id = ?';
+                $argsForQuery[] = intval($query);
+            }
+
+            $clauses[] = [
+                '(' . implode(' OR ', $conditions) . ')',
+                $argsForQuery,
+            ];
         }
 
         if ($identityType === IDENTITY_ADMIN && !is_null($identityId)) {
@@ -917,7 +948,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql = "
             SELECT
                 {$fields},
-                SUM(s.verdict = 'AC') AS solved_count
+                SUM(s.verdict = 'AC' AND s.type = 'normal') AS solved_count
             FROM
                 Submissions s
             INNER JOIN
@@ -1308,11 +1339,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!empty($query)) {
             $sql .= '
                 WHERE
-                    p.`title` LIKE CONCAT("%", ?, "%") OR
-                    p.`alias` LIKE CONCAT("%", ?, "%")
+                    MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE)
             ';
-            $params[] = $query;
-            $params[] = $query;
+            $params[] = \OmegaUp\DAO\DAO::escapeBooleanModeQuery($query);
         }
 
         /** @var int */
@@ -1367,28 +1396,45 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             'p'
         );
         $sql = '
-            FROM
-                Problems AS p
+            FROM (
+                SELECT
+                    a.acl_id
+                FROM
+                    Identities AS i
+                STRAIGHT_JOIN
+                    ACLs AS a ON a.owner_id = i.user_id
+                WHERE
+                    i.identity_id = ?
+
+                UNION
+
+                SELECT
+                    ur.acl_id
+                FROM
+                    Identities AS i
+                INNER JOIN
+                    User_Roles AS ur ON ur.user_id = i.user_id
+                WHERE
+                    i.identity_id = ?
+                    AND ur.role_id = ?
+
+                UNION
+
+                SELECT
+                    gr.acl_id
+                FROM
+                    Groups_Identities AS gi
+                INNER JOIN
+                    Group_Roles AS gr ON gr.group_id = gi.group_id
+                WHERE
+                    gi.identity_id = ?
+                    AND gr.role_id = ?
+            ) AS admined_acls
             INNER JOIN
-                ACLs AS a ON a.acl_id = p.acl_id
-            INNER JOIN
-                Identities AS ai ON a.owner_id = ai.user_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = p.acl_id
-            LEFT JOIN
-                Identities uri ON ur.user_id = uri.user_id
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = p.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id
+                Problems AS p ON p.acl_id = admined_acls.acl_id
             WHERE
-                (ai.identity_id = ? OR
-                (ur.role_id = ? AND uri.identity_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)) AND
                 p.visibility > ?';
         $limits = '
-            GROUP BY
-                p.problem_id
             ORDER BY
                 p.problem_id DESC
             LIMIT
@@ -1396,10 +1442,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [
             $identityId,
-            \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
         ];
 
@@ -1832,11 +1878,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     WHERE
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 5, $query);
-            $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+            $curatedQuery = strval(preg_replace('/\W+/', ' ', $query));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
+            $problemIdUnion = '';
+            $args = array_fill(0, 2, $query);
+            if (is_numeric($query)) {
+                $problemIdUnion = "
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            2.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            problem_id = ?";
+                $args[] = intval($query);
+            }
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
             $sql = "FROM
                     (
                         SELECT
@@ -1854,18 +1913,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                             Problems p
                         WHERE
                             title = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            0.1 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            (
-                                title LIKE CONCAT('%', ?, '%') OR
-                                alias LIKE CONCAT('%', ?, '%') OR
-                                problem_id = ?
-                            )
+                        {$problemIdUnion}
                         UNION ALL
                         SELECT
                             {$fields},
