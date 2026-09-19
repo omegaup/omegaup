@@ -60,6 +60,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $title
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         self::ensureCanManageCarouselItems($r->identity);
 
@@ -94,6 +95,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         self::ensureCanManageCarouselItems($r->identity);
 
@@ -129,6 +131,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $title
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         self::ensureCanManageCarouselItems($r->identity);
 
