@@ -61,6 +61,11 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
         self._phase_forced: List[bool] = []
 
     @property
+    def run_id(self) -> Optional[int]:
+        '''The `Cron_Runs` row opened for this run, or None when untracked.'''
+        return self._run_id
+
+    @property
     def _lock_name(self) -> str:
         return f'cron:{self._program}'[:64]
 
