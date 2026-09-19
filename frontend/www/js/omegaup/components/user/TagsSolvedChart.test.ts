@@ -2,9 +2,6 @@ import { shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import TagsSolvedChart from './TagsSolvedChart.vue';
 
-// Mock Highcharts to avoid actual chart rendering in tests
-// Use render function instead of template since Vue runtime-only build
-// doesn't include the template compiler
 jest.mock('highcharts-vue', () => ({
   Chart: {
     name: 'highcharts',
@@ -23,10 +20,21 @@ describe('TagsSolvedChart.vue', () => {
     { name: 'math', count: 5 },
   ];
 
+  const defaultTagsFull = [
+    { name: 'dynamic-programming', count: 25 },
+    { name: 'greedy', count: 20 },
+    { name: 'graphs', count: 15 },
+    { name: 'binary-search', count: 10 },
+    { name: 'math', count: 5 },
+    { name: 'strings', count: 4 },
+    { name: 'geometry', count: 3 },
+  ];
+
   it('should render the component with chart title', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
+        tagsFull: defaultTagsFull,
       },
     });
 
@@ -37,6 +45,7 @@ describe('TagsSolvedChart.vue', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
+        tagsFull: defaultTagsFull,
       },
     });
 
@@ -48,6 +57,7 @@ describe('TagsSolvedChart.vue', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: [],
+        tagsFull: [],
       },
     });
 
@@ -59,6 +69,7 @@ describe('TagsSolvedChart.vue', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
+        tagsFull: defaultTagsFull,
       },
     });
 
@@ -70,28 +81,11 @@ describe('TagsSolvedChart.vue', () => {
     expect(options.series[0].data.length).toBe(5);
   });
 
-  it('should limit chart data to 18 tags maximum', () => {
-    const manyTags = Array.from({ length: 25 }, (_, i) => ({
-      name: `tag-${i}`,
-      count: 25 - i,
-    }));
-
-    const wrapper = shallowMount(TagsSolvedChart, {
-      propsData: {
-        tags: manyTags,
-      },
-    });
-
-    const vm = wrapper.vm as any;
-    const options = vm.chartOptions;
-
-    expect(options.series[0].data.length).toBe(18);
-  });
-
   it('should have correct data structure for chart', () => {
     const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
+        tagsFull: defaultTagsFull,
       },
     });
 
@@ -102,5 +96,109 @@ describe('TagsSolvedChart.vue', () => {
     expect(firstDataPoint).toHaveProperty('name', 'dynamic-programming');
     expect(firstDataPoint).toHaveProperty('y', 25);
     expect(firstDataPoint).toHaveProperty('color');
+  });
+
+  it('should render the chart by default and offer a table toggle', () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+        tagsFull: defaultTagsFull,
+      },
+    });
+
+    expect((wrapper.vm as any).view).toBe('chart');
+    const buttons = wrapper.findAll('.btn-group button');
+    expect(buttons.length).toBe(2);
+  });
+
+  it('should fall back to tags when tagsFull is missing', () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    expect(vm.sortedTagsFull.map((r: any) => r.name)).toEqual(
+      defaultTags.map((t) => t.name),
+    );
+  });
+
+  it('should use the full tag list in the table when tagsFull is provided', () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+        tagsFull: defaultTagsFull,
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    expect(vm.sortedTagsFull.length).toBe(defaultTagsFull.length);
+    expect(vm.sortedTagsFull.map((r: any) => r.name)).toEqual(
+      defaultTagsFull.map((t) => t.name),
+    );
+  });
+
+  it('should sort the table by count descending by default', () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+        tagsFull: defaultTagsFull,
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    const counts = vm.sortedTagsFull.map((r: any) => r.count);
+    const sorted = [...counts].sort((a, b) => b - a);
+    expect(counts).toEqual(sorted);
+  });
+
+  it('should sort by tag name ascending when sortKey is name and direction is asc', () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+        tagsFull: defaultTagsFull,
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    vm.sortKey = 'name';
+    vm.sortDirection = 'asc';
+    const names = vm.sortedTagsFull.map((r: any) => r.name);
+    const sorted = [...names].sort();
+    expect(names).toEqual(sorted);
+  });
+
+  it('should flip sort direction when clicking the active sort column header', () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+        tagsFull: defaultTagsFull,
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    vm.sortKey = 'count';
+    vm.sortDirection = 'desc';
+    const before = vm.sortedTagsFull.map((r: any) => r.count);
+    vm.toggleSort('count');
+    expect(vm.sortDirection).toBe('asc');
+    const after = vm.sortedTagsFull.map((r: any) => r.count);
+    expect(after).toEqual([...before].reverse());
+  });
+
+  it('should switch to the table view and render its rows', async () => {
+    const wrapper = shallowMount(TagsSolvedChart, {
+      propsData: {
+        tags: defaultTags,
+        tagsFull: defaultTagsFull,
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    vm.view = 'table';
+    await Vue.nextTick();
+    expect(vm.view).toBe('table');
+    expect(wrapper.find('table.tags-table').exists()).toBe(true);
   });
 });
