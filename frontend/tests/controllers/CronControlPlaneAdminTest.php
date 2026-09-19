@@ -212,4 +212,43 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(7, $runs[0]['rows_affected']);
         $this->assertSame([], $runs[0]['phases']);
     }
+
+    public function testGetCronsForTypeScriptReturnsTheOpenHealthFindings() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
+        $now = \OmegaUp\Time::get();
+        \OmegaUp\DAO\ProblemHealthChecks::create(
+            new \OmegaUp\DAO\VO\ProblemHealthChecks([
+                'problem_id' => $problem->problem_id,
+                'check_type' => \OmegaUp\ProblemHealthCheckType::NoLanguages->value,
+                'severity' => \OmegaUp\ProblemHealthSeverity::Error->value,
+                'detail' => 'the problem has no enabled language',
+                'first_detected_at' => new \OmegaUp\Timestamp($now),
+                'last_seen_at' => new \OmegaUp\Timestamp($now),
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Admin::getCronsForTypeScript(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        $findings = array_values(array_filter(
+            $response['templateProperties']['payload']['problemHealthFindings'],
+            fn ($finding) => $finding['problem_id'] === intval(
+                $problem->problem_id
+            )
+        ));
+        $this->assertCount(1, $findings);
+        $this->assertSame($problem->alias, $findings[0]['alias']);
+        $this->assertSame(
+            \OmegaUp\ProblemHealthCheckType::NoLanguages->value,
+            $findings[0]['check_type']
+        );
+        $this->assertSame(
+            \OmegaUp\ProblemHealthSeverity::Error->value,
+            $findings[0]['severity']
+        );
+    }
 }
