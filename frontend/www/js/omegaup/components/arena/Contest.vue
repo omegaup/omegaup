@@ -33,9 +33,11 @@
         </a>
       </template>
       <template #clock>
+      <!--
         <div v-if="isContestFinished" class="alert alert-warning" role="alert">
           <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
         </div>
+        -->
         <omegaup-countdown
           v-show="!isContestStarted"
           :countdown-format="omegaup.CountdownFormat.ContestHasNotStarted"
@@ -312,8 +314,19 @@ export default class ArenaContest extends Vue {
   @Prop({ default: () => [] }) logs!: types.ContestProblemChangeLog[];
 
   T = T;
-  ui = ui;
-  omegaup = omegaup;
+ui = ui;
+omegaup = omegaup;
+
+mounted(): void {
+  if (this.isContestFinished) {
+    ui.notifications.add({
+      message: this.T.arenaContestEndedUsePractice,
+      type: 'info',
+    });
+  }
+}
+    }
+  
   AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
