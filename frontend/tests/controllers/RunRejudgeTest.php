@@ -117,4 +117,86 @@ class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
         $this->assertSame(1, $detourGrader->getGraderCallCount());
     }
+
+    public function testRejudgeDebugFlagPropagatesForAdmin(): void {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $contestant = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        ['identity' => $adminIdentity] =
+            \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($adminIdentity);
+
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+
+        $response = \OmegaUp\Controllers\Run::apiRejudge(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'run_alias' => $runData['response']['guid'],
+                'debug' => true,
+            ])
+        );
+
+        $this->assertSame('ok', $response['status']);
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
+        $this->assertTrue($detourGrader->getLastRejudgeDebug());
+    }
+
+    public function testRejudgeDebugFlagDefaultsToFalse(): void {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $contestant = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        ['identity' => $adminIdentity] =
+            \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($adminIdentity);
+
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+
+        $response = \OmegaUp\Controllers\Run::apiRejudge(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $this->assertSame('ok', $response['status']);
+        $this->assertSame(1, $detourGrader->getGraderCallCount());
+        $this->assertFalse($detourGrader->getLastRejudgeDebug());
+    }
+
+    public function testRejudgeDebugForbiddenForNonAdmin(): void {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $authorLogin = self::login($problemData['author']);
+
+        $contestant = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+
+        try {
+            \OmegaUp\Controllers\Run::apiRejudge(
+                new \OmegaUp\Request([
+                    'auth_token' => $authorLogin->auth_token,
+                    'run_alias' => $runData['response']['guid'],
+                    'debug' => true,
+                ])
+            );
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
 }
