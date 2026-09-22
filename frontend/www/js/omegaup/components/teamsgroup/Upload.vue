@@ -53,35 +53,77 @@
       </div>
       <template v-if="identities.length > 0">
         <h3 class="card-header">{{ T.teamsGroupEditTeams }}</h3>
-        <b-table responsive striped hover :items="items" :fields="columns">
-          <template #cell(usernames)="row">
-            <b-button
-              :title="T.groupEditMembersAddMembers"
-              class="d-inline-block mb-2"
-              variant="primary"
-              @click="row.toggleDetails"
-            >
-              <font-awesome-icon
-                :icon="['fas', 'user-plus']"
-                class="mr-2"
-              ></font-awesome-icon>
-              <b-badge variant="light">{{ row.item.usernames.length }}</b-badge>
-            </b-button>
-          </template>
-          <template #row-details="row">
-            <b-form @submit.prevent="onAddUsers(row)">
-              <b-card>
-                <b-table
-                  responsive
-                  striped
-                  hover
-                  :items="row.item.usernames"
-                  :fields="identitiesColumns"
-                ></b-table>
-              </b-card>
-            </b-form>
-          </template>
-        </b-table>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th v-for="column in columns" :key="column.key">
+                  {{ column.label }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="item in items">
+                <tr :key="item.username">
+                  <th>{{ item.username }}</th>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.country_id }}</td>
+                  <td>{{ item.state_id }}</td>
+                  <td>{{ item.gender }}</td>
+                  <td>{{ item.school_name }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      :title="T.groupEditMembersAddMembers"
+                      class="btn btn-primary d-inline-block mb-2"
+                      @click="toggleDetails(item.username)"
+                    >
+                      <font-awesome-icon
+                        :icon="['fas', 'user-plus']"
+                        class="mr-2"
+                      ></font-awesome-icon>
+                      <span class="badge badge-light">{{
+                        item.usernames.length
+                      }}</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr
+                  v-if="isExpanded(item.username)"
+                  :key="`${item.username}-details`"
+                >
+                  <td :colspan="columns.length">
+                    <div class="card">
+                      <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                          <thead>
+                            <tr>
+                              <th
+                                v-for="column in identitiesColumns"
+                                :key="column.key"
+                              >
+                                {{ column.label }}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="identity in item.usernames"
+                              :key="identity.username"
+                            >
+                              <td>{{ identity.username }}</td>
+                              <td>{{ identity.password }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
         <div class="card-footer">
           <button
             class="btn btn-primary d-inline-block mb-2"
@@ -133,25 +175,6 @@ import {
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 import { getBlogUrl } from '../../urlHelper';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-// Import Only Required Plugins
-import {
-  TablePlugin,
-  ButtonPlugin,
-  BadgePlugin,
-  CardPlugin,
-  BForm,
-  BRow,
-  BCol,
-} from 'bootstrap-vue';
-Vue.use(TablePlugin);
-Vue.use(ButtonPlugin);
-Vue.use(BadgePlugin);
-Vue.use(CardPlugin);
-
 type TeamIdentity = types.Identity & {
   usernames: { username: string; password?: string }[];
 };
@@ -162,9 +185,6 @@ library.add(faDownload, faUserPlus, faSpinner);
     FontAwesomeIcon,
     'omegaup-common-multi-typeahead': common_MultiTypeahead,
     'omegaup-markdown': omegaup_Markdown,
-    BForm,
-    BRow,
-    BCol,
   },
 })
 export default class Upload extends Vue {
@@ -184,6 +204,7 @@ export default class Upload extends Vue {
   humanReadable = false;
   selfGeneratedIdentities = false;
   typeaheadUsers: types.ListItem[] = [];
+  expandedUsernames: string[] = [];
   columns = [
     {
       key: 'username',
@@ -208,6 +229,19 @@ export default class Upload extends Vue {
       ...identity,
       usernames: this.identitiesTeams[identity.username],
     }));
+  }
+
+  toggleDetails(username: string): void {
+    const index = this.expandedUsernames.indexOf(username);
+    if (index === -1) {
+      this.expandedUsernames.push(username);
+    } else {
+      this.expandedUsernames.splice(index, 1);
+    }
+  }
+
+  isExpanded(username: string): boolean {
+    return this.expandedUsernames.includes(username);
   }
 
   readFile(e: HTMLInputElement): File | null {

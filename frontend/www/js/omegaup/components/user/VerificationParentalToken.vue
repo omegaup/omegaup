@@ -2,16 +2,18 @@
   <div class="card">
     <h1 class="card-header">{{ T.omegaupTitleParentalVerificationToken }}</h1>
     <div class="card-body">
-      <b-icon-check-circle-fill
+      <font-awesome-icon
         v-if="hasParentalVerificationToken"
-        scale="2"
-        variant="success"
-      ></b-icon-check-circle-fill>
-      <b-icon-x-circle-fill
+        icon="check-circle"
+        class="text-success"
+        size="2x"
+      ></font-awesome-icon>
+      <font-awesome-icon
         v-else
-        scale="2"
-        variant="danger"
-      ></b-icon-x-circle-fill>
+        icon="times-circle"
+        class="text-danger"
+        size="2x"
+      ></font-awesome-icon>
       <omegaup-markdown :markdown="message"></omegaup-markdown>
 
       <a href="/dependents/">{{
@@ -27,19 +29,17 @@ import T from '../../lang';
 
 import omegaup_Markdown from '../Markdown.vue';
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  BIconCheckCircleFill,
-  BIconXCircleFill,
-  BootstrapVue,
-} from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
+  faCheckCircle,
+  faTimesCircle,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faCheckCircle, faTimesCircle);
 
 @Component({
   components: {
-    BIconCheckCircleFill,
-    BIconXCircleFill,
+    FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
   },
 })

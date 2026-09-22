@@ -124,23 +124,15 @@
             >
               {{ T.rankSolved }}
               <!-- id-lint off -->
-              <b-button
+              <button
                 id="popover-solved-problems"
-                class="ml-1"
-                size="sm"
-                variant="none"
-                @click="showPopover = !showPopover"
+                type="button"
+                class="btn btn-sm ml-1"
+                :title="T.userRankSolvedProblemsHelp"
               >
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
-              </b-button>
+              </button>
               <!-- id-lint on -->
-              <b-popover
-                :show.sync="showPopover"
-                target="popover-solved-problems"
-                placement="right"
-              >
-                {{ T.userRankSolvedProblemsHelp }}
-              </b-popover>
             </th>
           </tr>
         </thead>
@@ -226,13 +218,6 @@ library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
 
 import { getBlogUrl } from '../../urlHelper';
 
-// Import Bootstrap and BootstrapVue CSS files (order is important: base before overrides)
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'bootstrap/dist/css/bootstrap.css';
-// Import Only Required Plugins
-import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
-Vue.use(ButtonPlugin);
-Vue.use(PopoverPlugin);
 interface Rank {
   country: string;
   classname?: string;
@@ -268,7 +253,6 @@ export default class UserRank extends Vue {
   T = T;
   ui = ui;
   searchedUsername: null | types.ListItem = null;
-  showPopover: boolean = false;
   currentFilter = this.filter;
   isSelectionMode: boolean = false;
   selectedUsers: string[] = [];

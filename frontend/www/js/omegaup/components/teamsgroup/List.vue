@@ -79,17 +79,44 @@
       </div>
     </div>
 
-    <b-modal
-      v-model="showArchiveModal"
-      :title="archiveModalTitle"
-      :ok-title="T.wordsYes"
-      :cancel-title="T.wordsNo"
-      ok-variant="primary"
-      cancel-variant="secondary"
-      @ok="confirmArchive"
-    >
-      <p>{{ archiveModalBody }}</p>
-    </b-modal>
+    <div v-if="showArchiveModal">
+      <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ archiveModalTitle }}</h5>
+              <button
+                type="button"
+                class="close"
+                @click="showArchiveModal = false"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>{{ archiveModalBody }}</p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="showArchiveModal = false"
+              >
+                {{ T.wordsNo }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="confirmArchive"
+              >
+                {{ T.wordsYes }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+    </div>
   </div>
 </template>
 
@@ -157,6 +184,7 @@ export default class TeamsGroupList extends Vue {
       archived: !this.selectedTeamsGroup.archived,
     });
     this.selectedTeamsGroup = null;
+    this.showArchiveModal = false;
   }
 }
 </script>
