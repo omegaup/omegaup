@@ -1,14 +1,22 @@
 <template>
   <div class="problem-list mr-3 mr-lg-0">
-    <b-breadcrumb v-if="inAssignment" data-breadcrumbs>
-      <b-breadcrumb-item href="/course/">{{ T.navCourses }}</b-breadcrumb-item>
-      <b-breadcrumb-item :href="urlAssignment">{{
-        courseName
-      }}</b-breadcrumb-item>
-      <b-breadcrumb-item v-if="currentAssignment" active>
-        {{ currentAssignment.name }}
-      </b-breadcrumb-item>
-    </b-breadcrumb>
+    <nav v-if="inAssignment" aria-label="breadcrumb" data-breadcrumbs>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/course/">{{ T.navCourses }}</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a :href="urlAssignment">{{ courseName }}</a>
+        </li>
+        <li
+          v-if="currentAssignment"
+          class="breadcrumb-item active"
+          aria-current="page"
+        >
+          {{ currentAssignment.name }}
+        </li>
+      </ol>
+    </nav>
     <div class="summary" :class="{ active: !activeProblem }">
       <a
         class="name"
@@ -81,14 +89,11 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
-import { BBreadcrumb, BBreadcrumbItem } from 'bootstrap-vue';
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
-    'b-breadcrumb': BBreadcrumb,
-    'b-breadcrumb-item': BBreadcrumbItem,
   },
 })
 export default class ArenaNavbarProblems extends Vue {

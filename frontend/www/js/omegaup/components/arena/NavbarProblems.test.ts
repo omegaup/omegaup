@@ -33,14 +33,6 @@ describe('NavbarProblems.vue', () => {
         inAssignment: true,
         problems: [],
       },
-      stubs: {
-        'b-breadcrumb': {
-          template: '<div v-bind="$attrs"><slot /></div>',
-        },
-        'b-breadcrumb-item': {
-          template: '<span><slot /></span>',
-        },
-      },
     });
 
     expect(wrapper.text()).toMatch(
@@ -58,16 +50,8 @@ describe('NavbarProblems.vue', () => {
         inAssignment: false,
         problems: [],
       },
-      stubs: {
-        'b-breadcrumb': {
-          template: '<div v-bind="$attrs"><slot /></div>',
-        },
-        'b-breadcrumb-item': {
-          template: '<span><slot /></span>',
-        },
-      },
     });
 
-    expect(wrapper.find('div[data-breadcrumbs]').exists()).toBeFalsy();
+    expect(wrapper.find('[data-breadcrumbs]').exists()).toBeFalsy();
   });
 });

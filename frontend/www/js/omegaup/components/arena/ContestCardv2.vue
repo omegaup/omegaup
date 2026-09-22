@@ -1,136 +1,126 @@
 <template>
-  <b-card
-    class="shadow-sm contest-card-vertical w-100 h-100"
-    body-class="d-flex flex-column"
-  >
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <h5
-        class="m-0 font-weight-bold text-truncate w-100"
-        :title="contest.title"
-      >
-        <a
-          :href="getContestURL(contest.alias)"
-          class="text-dark text-decoration-none"
+  <div class="card shadow-sm contest-card-vertical w-100 h-100">
+    <div class="card-body d-flex flex-column">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <h5
+          class="m-0 font-weight-bold text-truncate w-100"
+          :title="contest.title"
         >
-          {{ contest.title }}
-        </a>
-      </h5>
-      <font-awesome-icon
-        v-if="contest.recommended"
-        ref="contestIconRecommended"
-        class="text-warning ml-2"
-        icon="award"
-      />
-    </div>
+          <a
+            :href="getContestURL(contest.alias)"
+            class="text-dark text-decoration-none"
+          >
+            {{ contest.title }}
+          </a>
+        </h5>
+        <font-awesome-icon
+          v-if="contest.recommended"
+          ref="contestIconRecommended"
+          class="text-warning ml-2"
+          icon="award"
+        />
+      </div>
 
-    <div class="mb-3 text-muted small">
-      <div class="d-flex align-items-center mb-1">
-        <font-awesome-icon icon="clipboard-list" class="mr-2" />
-        <span class="text-truncate" :title="contest.organizer">{{
-          contest.organizer
-        }}</span>
-      </div>
-      <div class="d-flex align-items-center mb-1">
-        <slot name="text-contest-date"></slot>
-      </div>
-      <div class="d-flex align-items-center">
-        <font-awesome-icon icon="stopwatch" class="mr-2" />
-        <span>{{
-          ui.formatString(T.contestDuration, {
-            duration: contestDuration,
-          })
-        }}</span>
-      </div>
-    </div>
-
-    <div class="mt-auto">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="d-flex align-items-center text-muted">
-          <font-awesome-icon icon="users" class="mr-2" />
-          <span>{{ contest.contestants }}</span>
+      <div class="mb-3 text-muted small">
+        <div class="d-flex align-items-center mb-1">
+          <font-awesome-icon icon="clipboard-list" class="mr-2" />
+          <span class="text-truncate" :title="contest.organizer">{{
+            contest.organizer
+          }}</span>
         </div>
-        <slot name="contest-enroll-status">
-          <div
-            v-if="contest.participating"
-            ref="contestEnrollStatus"
-            class="text-success d-flex align-items-center small font-weight-bold"
-          >
-            <font-awesome-icon class="mr-1" icon="check-circle" />
-            {{ T.contestEnrollStatus }}
-          </div>
-        </slot>
+        <div class="d-flex align-items-center mb-1">
+          <slot name="text-contest-date"></slot>
+        </div>
+        <div class="d-flex align-items-center">
+          <font-awesome-icon icon="stopwatch" class="mr-2" />
+          <span>{{
+            ui.formatString(T.contestDuration, {
+              duration: contestDuration,
+            })
+          }}</span>
+        </div>
       </div>
 
-      <div class="d-flex flex-column">
-        <slot name="contest-button-enter">
-          <b-button
-            v-if="contest.participating"
-            ref="contestButtonEnter"
-            :href="getContestURL(contest.alias)"
-            variant="primary"
-            block
-            size="sm"
-            class="mb-2"
-          >
-            {{ T.contestButtonEnter }}
-          </b-button>
-        </slot>
-        <slot name="contest-button-see-details">
-          <b-button
-            v-if="!contest.participating"
-            ref="contestButtonSeeDetails"
-            :href="getContestURL(contest.alias)"
-            variant="primary"
-            block
-            size="sm"
-            class="mb-2 d-flex align-items-center justify-content-center"
-          >
-            <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-            {{ T.contestButtonSeeDetails }}
-          </b-button>
-        </slot>
-        <slot name="contest-button-scoreboard">
-          <b-button
-            ref="contestButtonScoreboard"
-            :href="getContestScoreboardURL(contest.alias)"
-            variant="success"
-            block
-            size="sm"
-            class="mb-2 d-flex align-items-center justify-content-center text-white"
-          >
-            <font-awesome-icon class="mr-1" icon="table" />
-            {{ T.contestButtonScoreboard }}
-          </b-button>
-        </slot>
-        <slot name="contest-button-virtual">
-          <b-button
-            ref="contestButtonVirtual"
-            :href="getVirtualContestURL(contest.alias)"
-            variant="primary"
-            block
-            size="sm"
-            class="mb-2 d-flex align-items-center justify-content-center"
-          >
-            <font-awesome-icon class="mr-1" icon="gamepad" />
-            {{ T.contestVirtualMode }}
-          </b-button>
-        </slot>
-        <slot name="contest-button-practice">
-          <b-button
-            ref="contestButtonPractice"
-            :href="getPracticeContestURL(contest.alias)"
-            variant="primary"
-            block
-            size="sm"
-            class="mb-2 d-flex align-items-center justify-content-center"
-          >
-            <font-awesome-icon class="mr-1" icon="flask" />
-            {{ T.contestPracticeMode }}
-          </b-button>
-        </slot>
+      <div class="mt-auto">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center text-muted">
+            <font-awesome-icon icon="users" class="mr-2" />
+            <span>{{ contest.contestants }}</span>
+          </div>
+          <slot name="contest-enroll-status">
+            <div
+              v-if="contest.participating"
+              ref="contestEnrollStatus"
+              data-contest-enroll-status
+              class="text-success d-flex align-items-center small font-weight-bold"
+            >
+              <font-awesome-icon class="mr-1" icon="check-circle" />
+              {{ T.contestEnrollStatus }}
+            </div>
+          </slot>
+        </div>
+
+        <div class="d-flex flex-column">
+          <slot name="contest-button-enter">
+            <a
+              v-if="contest.participating"
+              ref="contestButtonEnter"
+              data-contest-button-enter
+              :href="getContestURL(contest.alias)"
+              class="btn btn-primary btn-sm btn-block mb-2"
+            >
+              {{ T.contestButtonEnter }}
+            </a>
+          </slot>
+          <slot name="contest-button-see-details">
+            <a
+              v-if="!contest.participating"
+              ref="contestButtonSeeDetails"
+              data-contest-button-see-details
+              :href="getContestURL(contest.alias)"
+              class="btn btn-primary btn-sm btn-block mb-2 d-flex align-items-center justify-content-center"
+            >
+              <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+              {{ T.contestButtonSeeDetails }}
+            </a>
+          </slot>
+          <slot name="contest-button-scoreboard">
+            <a
+              ref="contestButtonScoreboard"
+              data-contest-button-scoreboard
+              :href="getContestScoreboardURL(contest.alias)"
+              class="btn btn-success btn-sm btn-block mb-2 d-flex align-items-center justify-content-center text-white"
+            >
+              <font-awesome-icon class="mr-1" icon="table" />
+              {{ T.contestButtonScoreboard }}
+            </a>
+          </slot>
+          <slot name="contest-button-virtual">
+            <a
+              ref="contestButtonVirtual"
+              data-contest-button-virtual
+              :href="getVirtualContestURL(contest.alias)"
+              class="btn btn-primary btn-sm btn-block mb-2 d-flex align-items-center justify-content-center"
+            >
+              <font-awesome-icon class="mr-1" icon="gamepad" />
+              {{ T.contestVirtualMode }}
+            </a>
+          </slot>
+          <slot name="contest-button-practice">
+            <a
+              ref="contestButtonPractice"
+              data-contest-button-practice
+              :href="getPracticeContestURL(contest.alias)"
+              class="btn btn-primary btn-sm btn-block mb-2 d-flex align-items-center justify-content-center"
+            >
+              <font-awesome-icon class="mr-1" icon="flask" />
+              {{ T.contestPracticeMode }}
+            </a>
+          </slot>
+        </div>
       </div>
     </div>
-  </b-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -139,15 +129,6 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
-
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-import { ButtonPlugin, DropdownPlugin, LayoutPlugin } from 'bootstrap-vue';
-Vue.use(ButtonPlugin);
-Vue.use(DropdownPlugin);
-Vue.use(LayoutPlugin);
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
