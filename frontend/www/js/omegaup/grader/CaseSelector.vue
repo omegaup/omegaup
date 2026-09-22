@@ -88,7 +88,7 @@
             <button
               v-if="groups.length > 1"
               :aria-label="T.wordsClose"
-              class="close"
+              class="btn-close"
               type="button"
               @click.prevent.stop="removeCase(item.name)"
             >

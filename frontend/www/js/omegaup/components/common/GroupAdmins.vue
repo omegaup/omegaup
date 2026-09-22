@@ -53,7 +53,7 @@
           <td class="text-center">
             <button
               v-if="groupAdmin.name !== 'admin'"
-              class="close float-none"
+              class="btn btn-link p-0"
               type="button"
               @click="$emit('remove-group-admin', groupAdmin.alias)"
             >

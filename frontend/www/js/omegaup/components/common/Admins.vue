@@ -67,7 +67,7 @@
               <button
                 v-if="admin.role === 'admin'"
                 type="button"
-                class="close float-none"
+                class="btn btn-link p-0"
                 @click="$emit('remove-admin', admin.username)"
               >
                 <font-awesome-icon :icon="['fas', 'trash']" size="xs" />

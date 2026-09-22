@@ -37,7 +37,7 @@
           </td>
           <td class="text-center">
             <button
-              class="close float-none"
+              class="btn btn-link p-0"
               type="button"
               @click="$emit('emit-remove-group', group.alias)"
             >

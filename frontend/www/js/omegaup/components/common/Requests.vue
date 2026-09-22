@@ -47,7 +47,7 @@
           <td v-else></td>
           <td v-if="!request.accepted" class="text-center">
             <button
-              class="close float-none text-danger mx-2"
+              class="btn btn-link p-0 text-danger mx-2"
               @click="toggleFeedbackModal(request.username)"
             >
               ×
@@ -97,7 +97,7 @@
               <div class="modal-backdrop fade show"></div>
             </div>
             <button
-              class="close float-none text-success mx-2"
+              class="btn btn-link p-0 text-success mx-2"
               @click="$emit('accept-request', { username: request.username })"
             >
               ✓

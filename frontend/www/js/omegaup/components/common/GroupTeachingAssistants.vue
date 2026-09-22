@@ -56,7 +56,7 @@
           <td class="text-center">
             <button
               v-if="groupTeachingAssistant.name !== 'teaching_assistant'"
-              class="close float-none"
+              class="btn btn-link p-0"
               type="button"
               @click="
                 $emit(

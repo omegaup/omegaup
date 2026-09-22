@@ -80,7 +80,7 @@
             </td>
             <td class="text-center">
               <button
-                class="close float-none"
+                class="btn btn-link p-0"
                 type="button"
                 :title="T.contestAdduserRegisteredUserDelete"
                 @click="$emit('remove-user', user)"

@@ -14,7 +14,7 @@
       </template>
       <button
         v-if="currentFeedback.status === FeedbackStatus.InProgress"
-        class="close btn-sm"
+        class="btn-close btn-sm"
         type="button"
         @click.prevent="onDeleteFeedback"
       >

@@ -77,7 +77,7 @@ export class ProblemPage {
     cy.visit('nomination');
     cy.get(`.${problemAlias}`).click();
     cy.get('[data-ban-problem-button]').click();
-    cy.get('.modal-footer [data-dismiss="modal"]').first().click();
+    cy.get('.modal-footer [data-bs-dismiss="modal"]').first().click();
   }
 
   verifyBan(problemAlias: string): void {

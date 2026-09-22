@@ -15,7 +15,7 @@
           :linkify="true"
         ></omegaup-user-username>
         <button
-          class="close btn-sm"
+          class="btn-close btn-sm"
           type="button"
           @click.prevent="onDeleteFeedbackThread"
         >

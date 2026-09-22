@@ -24,7 +24,7 @@ describe('Notification.vue', () => {
       },
     });
 
-    expect(wrapper.find('button.close').text()).toBe('❌');
+    expect(wrapper.find('button.btn-close').text()).toBe('❌');
     expect(wrapper.text()).toEqual(expect.stringContaining(courseName));
   });
 });

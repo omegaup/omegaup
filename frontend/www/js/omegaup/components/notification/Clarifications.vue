@@ -156,7 +156,7 @@ export default class Clarifications extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-.close {
+.btn-close {
   font-size: inherit;
 }
 

@@ -185,7 +185,7 @@ export class CoursePage {
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
     cy.get('[data-dificulty-radio-button]').last().click();
     cy.get('[data-submit-feedback-button]').click();
-    cy.get('[data-overlay-popup] button.close')
+    cy.get('[data-overlay-popup] button.btn-close')
       .should('be.visible')
       .first()
       .click({ force: true });
@@ -276,7 +276,7 @@ export class CoursePage {
             text,
           );
         });
-        cy.get('[data-overlay-popup] button.close')
+        cy.get('[data-overlay-popup] button.btn-close')
           .should('be.visible')
           .first()
           .click({ force: true });
@@ -310,7 +310,7 @@ export class CoursePage {
       cy.wrap(userCode).as('userCodeLines');
     });
     cy.get('@userCodeLines').should('have.length.above', 11);
-    cy.get('[data-overlay-popup] button.close')
+    cy.get('[data-overlay-popup] button.btn-close')
       .should('be.visible')
       .first()
       .click({ force: true });
