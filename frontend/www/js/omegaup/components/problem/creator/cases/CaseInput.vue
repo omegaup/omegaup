@@ -1,49 +1,63 @@
 <template>
   <div class="mt-3">
-    <b-form-group
-      :description="T.problemCreatorCaseGroupNameHelper"
-      :label="T.problemCreatorCaseName"
-      label-for="case-name"
-      class="mb-4"
-    >
-      <b-form-input
-        v-model="caseName"
+    <div class="form-group mb-4">
+      <label for="case-name">{{ T.problemCreatorCaseName }}</label>
+      <input
+        id="case-name"
+        :value="caseName"
         data-problem-creator-case-input="name"
         name="case-name"
-        :formatter="formatter"
+        class="form-control"
         required
         autocomplete="off"
+        @input="onCaseNameInput"
       />
-    </b-form-group>
-    <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="caseGroup" :options="options" name="case-group" />
-    </b-form-group>
-
-    <b-form-group
-      v-show="!caseAutoPoints"
-      :label="T.problemCreatorPoints"
-      label-for="case-points"
-    >
-      <b-form-input
-        v-model="casePoints"
-        name="case-points"
-        :formatter="pointsFormatter"
-        type="number"
-        number
-        min="0"
-      />
-    </b-form-group>
-    <b-form-group
-      :label="T.problemCreatorAutomaticPointsRecommended"
-      :description="T.problemCreatorAutomaticPointsHelperCase"
-    >
-      <b-form-checkbox
-        :checked="caseAutoPoints"
-        name="auto-points"
-        @change="toggleAutoPoints"
+      <small class="form-text text-muted">{{
+        T.problemCreatorCaseGroupNameHelper
+      }}</small>
+    </div>
+    <div class="form-group">
+      <label for="case-group">{{ T.problemCreatorGroupName }}</label>
+      <select
+        id="case-group"
+        v-model="caseGroup"
+        name="case-group"
+        class="custom-select"
       >
-      </b-form-checkbox>
-    </b-form-group>
+        <option
+          v-for="option in options"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.text }}
+        </option>
+      </select>
+    </div>
+
+    <div v-show="!caseAutoPoints" class="form-group">
+      <label for="case-points">{{ T.problemCreatorPoints }}</label>
+      <input
+        id="case-points"
+        :value="casePoints"
+        name="case-points"
+        class="form-control"
+        type="number"
+        min="0"
+        @input="onCasePointsInput"
+      />
+    </div>
+    <div class="form-group">
+      <label>{{ T.problemCreatorAutomaticPointsRecommended }}</label>
+      <small class="form-text text-muted d-block">{{
+        T.problemCreatorAutomaticPointsHelperCase
+      }}</small>
+      <input
+        type="checkbox"
+        name="auto-points"
+        :checked="caseAutoPoints"
+        @change="toggleAutoPoints"
+      />
+    </div>
   </div>
 </template>
 
@@ -104,6 +118,16 @@ export default class CaseInput extends Vue {
 
   pointsFormatter(points: number) {
     return Math.max(points, 0);
+  }
+
+  onCaseNameInput(event: Event) {
+    this.caseName = this.formatter((event.target as HTMLInputElement).value);
+  }
+
+  onCasePointsInput(event: Event) {
+    this.casePoints = this.pointsFormatter(
+      Number((event.target as HTMLInputElement).value),
+    );
   }
 }
 </script>

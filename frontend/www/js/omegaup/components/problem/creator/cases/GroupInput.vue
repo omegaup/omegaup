@@ -1,45 +1,45 @@
 <template>
   <div class="mt-3">
-    <b-form-group
-      :description="T.problemCreatorCaseGroupNameHelper"
-      :label="T.problemCreatorGroupName"
-      label-for="case-name"
-      class="mb-4"
-    >
-      <b-form-input
-        v-model="groupName"
+    <div class="form-group mb-4">
+      <label for="group-name">{{ T.problemCreatorGroupName }}</label>
+      <input
+        id="group-name"
+        :value="groupName"
         data-problem-creator-group-input="name"
-        :formatter="formatter"
+        class="form-control"
         required
         autocomplete="off"
         name="group-name"
+        @input="onGroupNameInput"
       />
-    </b-form-group>
-    <b-form-group
-      v-show="!groupAutoPoints"
-      :label="T.problemCreatorPoints"
-      label-for="case-points"
-    >
-      <b-form-input
-        v-model="groupPoints"
+      <small class="form-text text-muted">{{
+        T.problemCreatorCaseGroupNameHelper
+      }}</small>
+    </div>
+    <div v-show="!groupAutoPoints" class="form-group">
+      <label for="group-points">{{ T.problemCreatorPoints }}</label>
+      <input
+        id="group-points"
+        :value="groupPoints"
         name="group-points"
-        :formatter="pointsFormatter"
+        class="form-control"
         type="number"
-        number
         min="0"
+        @input="onGroupPointsInput"
       />
-    </b-form-group>
-    <b-form-group
-      :label="T.problemCreatorAutomaticPoints"
-      :description="T.problemCreatorAutomaticPointsHelperGroup"
-    >
-      <b-form-checkbox
-        :checked="groupAutoPoints"
+    </div>
+    <div class="form-group">
+      <label>{{ T.problemCreatorAutomaticPoints }}</label>
+      <small class="form-text text-muted d-block">{{
+        T.problemCreatorAutomaticPointsHelperGroup
+      }}</small>
+      <input
+        type="checkbox"
         name="group-auto-points"
+        :checked="groupAutoPoints"
         @change="toggleGroupAutoPoints"
-      >
-      </b-form-checkbox>
-    </b-form-group>
+      />
+    </div>
   </div>
 </template>
 
@@ -72,6 +72,16 @@ export default class GroupInput extends Vue {
     if (this.groupAutoPoints) {
       this.groupPoints = 100;
     }
+  }
+
+  onGroupNameInput(event: Event) {
+    this.groupName = this.formatter((event.target as HTMLInputElement).value);
+  }
+
+  onGroupPointsInput(event: Event) {
+    this.groupPoints = this.pointsFormatter(
+      Number((event.target as HTMLInputElement).value),
+    );
   }
 }
 </script>

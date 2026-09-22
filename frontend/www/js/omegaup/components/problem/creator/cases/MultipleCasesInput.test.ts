@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import MultipleCasesInput from './MultipleCasesInput.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 import store from '@/js/omegaup/problem/creator/store';
@@ -9,8 +8,6 @@ import { Group } from '@/js/omegaup/problem/creator/types';
 import { v4 as uuid } from 'uuid';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 const testGroup: Group = {
   groupID: uuid(),
@@ -38,12 +35,12 @@ describe('MultipleCasesInput.vue', () => {
 
     await Vue.nextTick();
 
-    const inputElements = wrapper.findAll('[label]');
+    const inputElements = wrapper.findAll('label');
 
     expect(inputElements.length).toBe(expectedTextInputText.length);
 
     inputElements.wrappers.forEach((element, index) => {
-      expect(element.attributes('label')).toBe(expectedTextInputText[index]); // We need to make it like this because that's how Vue-Bootstrap input element works
+      expect(element.text()).toBe(expectedTextInputText[index]);
     });
 
     // Check if the name is being generated correctly
@@ -52,9 +49,7 @@ describe('MultipleCasesInput.vue', () => {
 
     await Vue.nextTick();
 
-    expect(wrapper.find('[description]').attributes('description')).toContain(
-      'case',
-    ); // Again, the description is stored inside the attribute
+    expect(wrapper.find('small.form-text').text()).toContain('case');
   });
 
   it('Should handle autoformatting', () => {
@@ -79,9 +74,12 @@ describe('MultipleCasesInput.vue', () => {
       store,
     });
 
-    const formSelect = wrapper.find(
-      'b-form-select-stub[name="multiple-cases-group"]',
+    const formSelect = wrapper.find('select[name="multiple-cases-group"]');
+    const optionValues = formSelect
+      .findAll('option')
+      .wrappers.map((option) => option.attributes('value'));
+    expect(optionValues).toEqual(
+      wrapper.vm.options.map((option) => String(option.value)),
     );
-    expect(formSelect.props()['options']).toBe(wrapper.vm.options);
   });
 });
