@@ -224,14 +224,14 @@
         <div class="card">
           <div class="card-body">
             <form class="form" @submit.prevent="onDownload">
-              <div class="form-group">
+              <div class="mb-3">
                 {{ T.problemDownloadZip }}:
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
                 </button>
               </div>
             </form>
-            <div class="form-group">
+            <div class="mb-3">
               {{ T.problemPrintableVersion }}:
               <button class="btn btn-primary" @click="onGotoPrintableVersion">
                 {{ T.contestPrintableVersion }}
@@ -244,7 +244,7 @@
       <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
-            <div class="form-group">
+            <div class="mb-3">
               <div class="alert alert-danger">
                 <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
                 <hr />
@@ -274,10 +274,10 @@
               </h5>
               <button
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="showConfirmationModal = false"
               >
-                <span aria-hidden="true">&times;</span>
+                
               </button>
             </div>
             <div class="modal-body">

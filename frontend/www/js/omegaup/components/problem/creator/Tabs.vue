@@ -8,7 +8,7 @@
           href="#"
           @click.prevent="activeTabIndex = TabIndex.Statement"
         >
-          <font-awesome-icon icon="pencil-alt" class="mr-1" />
+          <font-awesome-icon icon="pencil-alt" class="me-1" />
           <span name="writing" data-problem-creator-tab="statement">
             {{ T.problemCreatorStatement }}</span
           >
@@ -21,7 +21,7 @@
           href="#"
           @click.prevent="activeTabIndex = TabIndex.Code"
         >
-          <font-awesome-icon icon="file-code" class="mr-1" />
+          <font-awesome-icon icon="file-code" class="me-1" />
           <span name="code" data-problem-creator-tab="code">
             {{ T.problemCreatorCode }}</span
           >
@@ -34,7 +34,7 @@
           href="#"
           @click.prevent="activeTabIndex = TabIndex.TestCases"
         >
-          <font-awesome-icon icon="check-circle" class="mr-1" />
+          <font-awesome-icon icon="check-circle" class="me-1" />
           <span name="testcases" data-problem-creator-tab="cases">
             {{ T.problemCreatorTestCases }}</span
           >
@@ -47,7 +47,7 @@
           href="#"
           @click.prevent="activeTabIndex = TabIndex.Solution"
         >
-          <font-awesome-icon icon="file-alt" class="mr-1" />
+          <font-awesome-icon icon="file-alt" class="me-1" />
           <span name="solution" data-problem-creator-tab="solution">
             {{ T.problemCreatorSolution }}</span
           >

@@ -4,7 +4,7 @@
       {{ ui.formatString(T.contestReport, { contest_alias: contestAlias }) }}
     </div>
     <div class="card-body">
-      <p class="card-text text-right">
+      <p class="card-text text-end">
         <a :href="`/contest/${contestAlias}/report/print/`">
           <font-awesome-icon icon="print" />
         </a>

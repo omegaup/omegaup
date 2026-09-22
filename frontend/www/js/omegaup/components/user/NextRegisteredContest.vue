@@ -1,7 +1,7 @@
 <template>
   <div v-show="showContestInfo" class="p-4 border bg-light container-fluid">
     <div class="justify-content-end">
-      <button type="button" class="close" @click="showContestInfo = false">
+      <button type="button" class="btn-close" @click="showContestInfo = false">
         ×
       </button>
     </div>
@@ -20,17 +20,17 @@
             <font-awesome-icon
               v-if="nextRegisteredContest.recommended"
               ref="contestIconRecommended"
-              class="ml-1"
+              class="ms-1"
               icon="award"
             />
           </h5>
         </div>
         <div class="col-md-4 col-sm-12 p-1 text-center">
-          <font-awesome-icon class="mr-1" icon="clipboard-list" />
+          <font-awesome-icon class="me-1" icon="clipboard-list" />
           {{ nextRegisteredContest.organizer }}
         </div>
         <div class="col-md-4 col-sm-12 p-1 text-center">
-          <font-awesome-icon class="mr-1" icon="users" />
+          <font-awesome-icon class="me-1" icon="users" />
           {{ nextRegisteredContest.contestants }}
         </div>
       </div>
@@ -53,7 +53,7 @@
           </a>
         </div>
         <div class="col-md-4 col-sm-12 p-1 text-center">
-          <font-awesome-icon class="mr-1" icon="stopwatch" />
+          <font-awesome-icon class="me-1" icon="stopwatch" />
           {{ T.wordsDuration }}:
           <omegaup-countdown
             v-if="isContestStarted"

@@ -2,9 +2,9 @@
   <div class="card">
     <div class="card-body">
       <div v-if="showEditControls" class="row">
-        <div class="form-group col-md-6">
-          <label class="font-weight-bold">{{ T.statementLanguage }}</label>
-          <select v-model="currentLanguage" class="form-control">
+        <div class="mb-3 col-md-6">
+          <label class="fw-bold">{{ T.statementLanguage }}</label>
+          <select v-model="currentLanguage" class="form-select">
             <option
               v-for="language in languages"
               :key="language"
@@ -16,7 +16,7 @@
           </select>
         </div>
         <div
-          class="form-group col-md-6"
+          class="mb-3 col-md-6"
           :class="{ 'has-error': errors.includes('message') }"
         >
           <label class="control-label">{{ T.problemEditCommitMessage }}</label>

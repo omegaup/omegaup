@@ -60,7 +60,7 @@
           ></omegaup-markdown>
         </div>
         <hr class="my-3" />
-        <div class="font-italic">
+        <div class="fst-italic">
           {{
             ui.formatString(T.problemDetailsSource, {
               source: problem.source,

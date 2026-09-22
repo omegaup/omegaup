@@ -54,10 +54,10 @@
               {{ T.problemCreatorCannotHaveSameName }}
               <button
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="invalidCaseName = false"
               >
-                <span aria-hidden="true">&times;</span>
+                
               </button>
             </div>
             <omegaup-problem-creator-case-input ref="case-input" />
@@ -71,10 +71,10 @@
               {{ T.problemCreatorCannotHaveSameName }}
               <button
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="invalidGroupName = false"
               >
-                <span aria-hidden="true">&times;</span>
+                
               </button>
             </div>
             <omegaup-problem-creator-group-input ref="group-input" />
@@ -88,10 +88,10 @@
               {{ T.problemCreatorCannotHaveSameName }}
               <button
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="invalidCaseName = false"
               >
-                <span aria-hidden="true">&times;</span>
+                
               </button>
             </div>
             <omegaup-problem-creator-multiple-cases-input
@@ -101,7 +101,7 @@
         </div>
         <button
           type="button"
-          class="btn btn-danger btn-sm mr-2"
+          class="btn btn-danger btn-sm me-2"
           @click="$emit('close-add-window')"
         >
           {{ T.wordsCancel }}

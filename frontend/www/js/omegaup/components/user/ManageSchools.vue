@@ -1,6 +1,6 @@
 <template>
   <form role="form" class="card-body" @submit.prevent="onUpdateUserSchools">
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.profileSchool }}</label>
       <omegaup-common-typeahead
         :existing-options="searchResultSchools"
@@ -12,9 +12,9 @@
         "
       ></omegaup-common-typeahead>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditSchoolGrade }}</label>
-      <select v-model="scholarDegree" class="form-control" data-school-grade>
+      <select v-model="scholarDegree" class="form-select" data-school-grade>
         <option value="none">{{ T.userEditNone }}</option>
         <option value="early_childhood">
           {{ T.userEditEarlyChildhood }}
@@ -34,14 +34,14 @@
         <option value="doctorate">{{ T.userEditDoctorate }}</option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditManageSchoolsUserCurrentlyEnrolled }}</label>
       <omegaup-radio-switch
         :value.sync="isCurrentlyEnrolled"
         :selected-value="isCurrentlyEnrolled"
       ></omegaup-radio-switch>
     </div>
-    <div class="form-group" data-graduation-date>
+    <div class="mb-3" data-graduation-date>
       <label>{{ T.userEditGraduationDate }}</label>
       <omegaup-datepicker
         v-model="graduationDate"
@@ -52,7 +52,7 @@
     <div class="mt-3">
       <button
         type="submit"
-        class="btn btn-primary mr-2"
+        class="btn btn-primary me-2"
         data-save-school-changes
       >
         {{ T.wordsSaveChanges }}

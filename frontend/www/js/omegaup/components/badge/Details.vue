@@ -20,7 +20,7 @@
     </figure>
     <div class="row justify-content-center align-items-center text-center">
       <div class="col-sm-6 col-md-4">
-        <div class="font-weight-bold badge-data">
+        <div class="fw-bold badge-data">
           {{ ownersNumber }}
         </div>
         <div class="badge-text">
@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="col-sm-6 col-md-4 mt-3 mt-md-0">
-        <div class="font-weight-bold badge-data">
+        <div class="fw-bold badge-data">
           {{ firstAssignationDate }}
         </div>
         <div class="badge-text">
@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="col-sm-6 col-md-4 mt-3 mt-md-0">
-        <div class="font-weight-bold badge-data">
+        <div class="fw-bold badge-data">
           {{ assignationDate }}
         </div>
         <div class="badge-text">

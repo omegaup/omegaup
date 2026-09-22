@@ -1,7 +1,7 @@
 <template>
   <div class="col mb-3">
     <div class="card">
-      <div class="row no-gutters">
+      <div class="row g-0">
         <div class="col-sm-2 public-course-card"></div>
         <div class="col-sm-10">
           <div

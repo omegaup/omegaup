@@ -4,7 +4,7 @@
     class="card-body"
     @submit.prevent="onUpdateUserBasicInformation"
   >
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.username }}</label>
       <input
         v-model="username"
@@ -16,22 +16,22 @@
         {{ T.parameterInvalidAlias }}
       </div>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.wordsName }}</label>
       <input v-model="name" data-name class="form-control" />
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.wordsGender }}</label>
-      <select v-model="gender" data-gender class="custom-select">
+      <select v-model="gender" data-gender class="form-select">
         <option value="female">{{ T.wordsGenderFemale }}</option>
         <option value="male">{{ T.wordsGenderMale }}</option>
         <option value="other">{{ T.wordsGenderOther }}</option>
         <option value="decline">{{ T.wordsGenderDecline }}</option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.wordsCountry }}</label>
-      <select v-model="countryId" data-countries class="custom-select">
+      <select v-model="countryId" data-countries class="form-select">
         <option value=""></option>
         <option
           v-for="country in countries"
@@ -42,13 +42,13 @@
         </option>
       </select>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.profileState }}</label>
       <select
         v-model="stateId"
         data-states
         :disabled="!isCountrySelected"
-        class="custom-select"
+        class="form-select"
       >
         <option
           v-for="[code, state] in Object.entries(countryStates)"
@@ -59,7 +59,7 @@
         </option>
       </select>
     </div>
-    <div class="form-group" data-date-of-birth>
+    <div class="mb-3" data-date-of-birth>
       <label>{{ T.userEditBirthDate }}</label>
       <omegaup-datepicker
         v-model="birthDate"
@@ -70,7 +70,7 @@
     <div class="mt-3">
       <button
         type="submit"
-        class="btn btn-primary mr-2"
+        class="btn btn-primary me-2"
         data-save-profile-changes-button
         :class="{ disabled: !hasChanges }"
         :disabled="!hasChanges"

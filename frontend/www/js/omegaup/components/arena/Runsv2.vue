@@ -42,23 +42,23 @@
                 class="text-center align-middle"
                 :class="verdictCellClass(row)"
               >
-                <span class="mr-1">{{ status(row) }}</span>
+                <span class="me-1">{{ status(row) }}</span>
                 <button
                   v-if="row.status === 'ready' && row.verdict !== 'AC'"
                   class="btn btn-sm"
                   type="button"
                   data-status-help
                   :title="statusHelp(row)"
-                  data-toggle="tooltip"
-                  data-placement="right"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="right"
                 >
                   <font-awesome-icon icon="question-circle" />
                 </button>
               </td>
-              <td class="align-middle text-right">{{ row.percentage }}</td>
+              <td class="align-middle text-end">{{ row.percentage }}</td>
               <td class="text-center align-middle">{{ row.language }}</td>
-              <td class="align-middle text-right">{{ row.memory }}</td>
-              <td class="align-middle text-right">{{ row.runtime }}</td>
+              <td class="align-middle text-end">{{ row.memory }}</td>
+              <td class="align-middle text-end">{{ row.runtime }}</td>
               <td class="text-center align-middle"></td>
             </tr>
             <tr v-if="expandedGuid === row.guid" :key="`${row.guid}-details`">
@@ -196,7 +196,7 @@ export default class Runs extends Vue {
         key: 'percentage',
         class: 'align-middle',
         thClass: 'text-center',
-        tdClass: 'text-right',
+        tdClass: 'text-end',
       },
       {
         label: T.wordsLanguage,
@@ -208,14 +208,14 @@ export default class Runs extends Vue {
         key: 'memory',
         class: 'align-middle',
         thClass: 'text-center',
-        tdClass: 'text-right',
+        tdClass: 'text-end',
       },
       {
         label: T.wordsRuntime,
         key: 'runtime',
         class: 'align-middle',
         thClass: 'text-center',
-        tdClass: 'text-right',
+        tdClass: 'text-end',
       },
       {
         label: T.wordsActions,

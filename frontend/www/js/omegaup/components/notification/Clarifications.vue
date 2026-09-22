@@ -7,18 +7,18 @@
       aria-expanded="false"
       aria-haspopup="true"
       class="nav-link dropdown-toggle px-2 notification-toggle"
-      data-toggle="dropdown"
+      data-bs-toggle="dropdown"
       href="#"
       role="button"
     >
       <font-awesome-icon :icon="['fas', 'bell']" />
       <span
         v-if="unreadClarifications && unreadClarifications.length > 0"
-        class="badge badge-danger count-badge"
+        class="badge text-bg-danger count-badge"
         >{{ unreadClarifications.length }}</span
       ></a
     >
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown">
+    <div class="dropdown-menu dropdown-menu-end notification-dropdown">
       <div v-if="unreadClarifications.length === 0" class="text-center">
         {{ T.notificationsNoNewNotifications }}
       </div>
@@ -32,7 +32,7 @@
           <hr class="w-100 my-2" />
           <div class="w-100 justify-content-between">
             <button
-              class="close"
+              class="btn-close"
               @click.prevent="onCloseClicked(clarification)"
             >
               ❌

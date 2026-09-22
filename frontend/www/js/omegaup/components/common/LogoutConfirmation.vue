@@ -5,8 +5,8 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ T.logoutConfirmationTitle }}</h5>
-            <button type="button" class="close" @click="showModal = false">
-              <span aria-hidden="true">&times;</span>
+            <button type="button" class="btn-close" @click="showModal = false">
+              
             </button>
           </div>
           <div class="modal-body p-0"></div>

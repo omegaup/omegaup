@@ -1,6 +1,6 @@
 <template>
   <label
-    class="switch-container font-weight-bold"
+    class="switch-container fw-bold"
     :class="[size, { disabled }]"
   >
     <div class="switch">

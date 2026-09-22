@@ -75,7 +75,7 @@ export const CustomActionSlot: Story = {
       <empty-state v-bind="$props">
         <template #action>
           <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-primary mr-2">Create Course</button>
+            <button class="btn btn-primary me-2">Create Course</button>
             <button class="btn btn-secondary">Join Course</button>
           </div>
         </template>

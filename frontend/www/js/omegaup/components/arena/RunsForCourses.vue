@@ -13,7 +13,7 @@
       }"
     >
       <div>
-        <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
+        <span class="fw-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
           <nav v-if="showFilters" data-pagination>
             <ul class="pagination pagination-sm">
@@ -51,12 +51,12 @@
             </ul>
           </nav>
           <div class="filters row">
-            <label class="col-3 col-sm pr-0 font-weight-bold">
+            <label class="col-3 col-sm pe-0 fw-bold">
               {{ T.wordsExecution }}
               <select
                 v-model="filterExecution"
                 data-select-execution
-                class="form-control"
+                class="form-select"
               >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="EXECUTION_JUDGE_ERROR">
@@ -83,12 +83,12 @@
               </select>
             </label>
 
-            <label class="col-3 col-sm pr-0 font-weight-bold">
+            <label class="col-3 col-sm pe-0 fw-bold">
               {{ T.wordsOutput }}
               <select
                 v-model="filterOutput"
                 data-select-output
-                class="form-control"
+                class="form-select"
               >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="OUTPUT_EXCEEDED">
@@ -106,12 +106,12 @@
               </select>
             </label>
 
-            <label class="col-5 col-sm pr-0 font-weight-bold"
+            <label class="col-5 col-sm pe-0 fw-bold"
               >{{ T.wordsLanguage }}:
               <select
                 v-model="filterLanguage"
                 data-select-language
-                class="form-control"
+                class="form-select"
               >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp20-gcc">C++20 (g++ 10.3)</option>
@@ -142,7 +142,7 @@
             </label>
 
             <template v-if="showProblem">
-              <label class="col-6 col-sm pr-1 font-weight-bold"
+              <label class="col-6 col-sm pe-1 fw-bold"
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
                   data-search-problem
@@ -156,7 +156,7 @@
             </template>
 
             <template v-if="showUser">
-              <label class="col-5 col-sm font-weight-bold"
+              <label class="col-5 col-sm fw-bold"
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   data-search-username
@@ -174,9 +174,9 @@
               <span
                 v-for="filter in filtersExcludingOffset"
                 :key="filter.name"
-                class="btn-secondary mr-3"
+                class="btn-secondary me-3"
               >
-                <span class="mr-2">{{ filter.name }}: {{ filter.value }}</span>
+                <span class="me-2">{{ filter.name }}: {{ filter.value }}</span>
                 <a
                   :data-remove-filter="filter.name"
                   @click="onRemoveFilter(filter.name)"
@@ -189,7 +189,7 @@
                 data-remove-all-filters
                 @click="onRemoveFilter('all')"
               >
-                <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
+                <span class="me-2">{{ T.wordsRemoveFilter }}</span>
               </a>
             </div>
           </div>
@@ -303,7 +303,7 @@
                       (filterUsername = { key: username, value: username })
                   "
                 ></omegaup-user-username>
-                <a :href="`/profile/${run.username}/`" class="ml-2">
+                <a :href="`/profile/${run.username}/`" class="ms-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
@@ -321,7 +321,7 @@
                 <a
                   v-if="run.contest_alias"
                   :href="`/arena/${run.contest_alias}/`"
-                  class="ml-2"
+                  class="ms-2"
                 >
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
@@ -337,23 +337,23 @@
                   "
                   >{{ run.alias }}</a
                 >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                <a :href="`/arena/problem/${run.alias}/`" class="ms-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
               <td
                 :class="statusClass(run)"
                 data-run-status
-                class="text-center opacity-4 font-weight-bold"
+                class="text-center opacity-4 fw-bold"
                 hidden
               >
-                <span class="mr-1">{{ status(run) }}</span>
+                <span class="me-1">{{ status(run) }}</span>
                 <button
                   v-if="!!statusHelp(run)"
                   type="button"
                   :data-content="statusHelp(run)"
-                  data-toggle="popover"
-                  data-trigger="focus"
+                  data-bs-toggle="popover"
+                  data-bs-trigger="focus"
                   class="btn-outline-dark btn-sm"
                   @click="showVerdictHelp"
                 >
@@ -410,13 +410,13 @@
                   <font-awesome-icon :icon="['fas', 'search-plus']" />
                   <span
                     v-if="run.suggestions && run.suggestions > 0"
-                    class="position-absolute badge badge-danger"
+                    class="position-absolute badge text-bg-danger"
                     >{{ run.suggestions }}
                   </span>
                 </button>
                 <button
                   v-if="requestFeedback"
-                  class="details btn-outline-dark btn-sm ml-1"
+                  class="details btn-outline-dark btn-sm ms-1"
                   @click="$emit('request-feedback', run.guid)"
                 >
                   <font-awesome-icon
@@ -429,7 +429,7 @@
                 v-else-if="showDetails || showDisqualify || showRejudge"
                 :data-actions="run.guid"
               >
-                <div class="d-inline-block mr-2">
+                <div class="d-inline-block me-2">
                   <button
                     class="details btn-outline-dark btn-sm"
                     data-runs-show-details-button
@@ -439,7 +439,7 @@
                     <font-awesome-icon :icon="['fas', 'search-plus']" />
                     <span
                       v-if="run.suggestions && run.suggestions > 0"
-                      class="position-absolute badge badge-danger"
+                      class="position-absolute badge text-bg-danger"
                       >{{ run.suggestions }}
                     </span>
                   </button>
@@ -449,7 +449,7 @@
                     data-runs-actions-button
                     class="btn btn-secondary dropdown-toggle"
                     type="button"
-                    data-toggle="dropdown"
+                    data-bs-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"
                   >
@@ -606,13 +606,6 @@ library.add(faClock);
 library.add(faCalendarAlt);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface JQuery {
-    popover(action: string): JQuery;
-  }
-}
 
 export enum MemoryStatus {
   NotAvailable = 'MEMORY_NOT_AVAILABLE',
@@ -922,7 +915,16 @@ export default class RunsForCourses extends Vue {
   }
 
   showVerdictHelp(ev: Event): void {
-    $(ev.target as HTMLElement).popover('show');
+    const bootstrap = (window as unknown) as {
+      bootstrap?: {
+        Popover: {
+          getOrCreateInstance: (el: Element) => { show: () => void };
+        };
+      };
+    };
+    bootstrap.bootstrap?.Popover.getOrCreateInstance(
+      ev.target as HTMLElement,
+    ).show();
   }
 
   statusClass(run: types.Run): string {

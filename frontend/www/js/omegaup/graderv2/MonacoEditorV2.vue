@@ -46,7 +46,7 @@
         >
           <font-awesome-icon v-if="!copied" icon="clipboard" />
           <font-awesome-icon v-else icon="check" />
-          <span class="sr-only">{{ copyButtonText }}</span>
+          <span class="visually-hidden">{{ copyButtonText }}</span>
         </button>
 
         <button
@@ -57,7 +57,7 @@
           @click="confirmReset"
         >
           <i class="fas fa-undo" aria-hidden="true"></i>
-          <span class="sr-only">{{ T.monacoEditorReset }}</span>
+          <span class="visually-hidden">{{ T.monacoEditorReset }}</span>
         </button>
 
         <button
@@ -585,7 +585,7 @@ export default class MonacoEditor extends Vue {
   color: #fff;
 }
 
-.sr-only {
+.visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;

@@ -3,8 +3,8 @@
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-12">
-            <label class="font-weight-bold">{{ T.wordsProblem }}</label>
+          <div class="mb-3 col-md-12">
+            <label class="fw-bold">{{ T.wordsProblem }}</label>
             <input
               v-if="isUpdate"
               :value="title"
@@ -12,8 +12,7 @@
               disabled="disabled"
             />
             <div v-else class="input-group w-100">
-              <div class="input-group-prepend w-25">
-                <select v-model="selectedSearchType" class="custom-select">
+              <select v-model="selectedSearchType" class="form-select">
                   <option
                     v-for="searchType in availableSearchTypes"
                     :key="searchType.key"
@@ -23,7 +22,6 @@
                     {{ searchType.value }}
                   </option>
                 </select>
-              </div>
               <omegaup-common-typeahead
                 class="w-75"
                 :existing-options="searchResultProblems"
@@ -42,8 +40,8 @@
           </div>
         </div>
         <div v-if="alias" class="row">
-          <div class="form-group col-md-6">
-            <label for="use-latest-version" class="font-weight-bold"
+          <div class="mb-3 col-md-6">
+            <label for="use-latest-version" class="fw-bold"
               >{{ T.contestAddproblemChooseVersion }}
             </label>
             <omegaup-radio-switch
@@ -54,10 +52,10 @@
               :text-for-false="T.contestAddproblemOtherVersion"
             ></omegaup-radio-switch>
           </div>
-          <div class="form-group col-md-3">
+          <div class="mb-3 col-md-3">
             <label
               v-tooltip="T.contestAddproblemProblemPoints"
-              class="font-weight-bold"
+              class="fw-bold"
               >{{ T.wordsPoints }}
               <font-awesome-icon icon="info-circle" />
             </label>
@@ -68,10 +66,10 @@
               type="number"
             />
           </div>
-          <div class="form-group col-md-3">
+          <div class="mb-3 col-md-3">
             <label
               v-tooltip="T.contestAddproblemContestOrder"
-              class="font-weight-bold"
+              class="fw-bold"
               >{{ T.contestAddproblemProblemOrder }}
               <font-awesome-icon icon="info-circle" />
             </label>
@@ -92,7 +90,7 @@
           :show-footer="false"
           @runs-diff="onRunsDiff"
         ></omegaup-problem-versions>
-        <div class="form-group">
+        <div class="mb-3">
           <button
             class="btn btn-primary add-problem"
             type="submit"
@@ -129,7 +127,7 @@
               problem.title
             }}</a>
           </td>
-          <td class="text-right">{{ problem.points }}</td>
+          <td class="text-end">{{ problem.points }}</td>
           <td class="text-center">
             <button
               v-tooltip="T.problemEditFormUpdateProblem"
@@ -144,8 +142,8 @@
               v-tooltip="T.cannotRemoveProblemWithSubmissions"
               :data-remove-problem-disabled="problem.alias"
               class="btn btn-link"
-              data-toggle="tooltip"
-              data-placement="bottom"
+              data-bs-toggle="tooltip"
+              data-bs-placement="bottom"
             >
               <font-awesome-icon icon="trash" class="disabled text-secondary" />
             </button>

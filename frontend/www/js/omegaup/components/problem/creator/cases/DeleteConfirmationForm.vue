@@ -2,7 +2,7 @@
   <div v-show="visible" class="w-100 mt-2">
     <form enctype="multipart/form-data" method="post" @submit="onSubmit">
       <div class="p-3 border rounded bg-light item-active-for-delete">
-        <div class="form-group">
+        <div class="mb-3">
           <label class="control-label">{{ T.problemEditCommitMessage }}</label>
           <input v-model="commitMessage" class="form-control" />
         </div>

@@ -19,9 +19,9 @@
         {{ T.wordsRankingMeasurement }}
       </a>
     </h5>
-    <div v-if="!showHeader" class="card-body form-row">
+    <div v-if="!showHeader" class="card-body row">
       <omegaup-common-typeahead
-        class="col col-md-4 pl-0 pr-2"
+        class="col col-md-4 ps-0 pe-2"
         :existing-options="searchResultSchools"
         :value.sync="searchedSchool"
         :max-results="10"

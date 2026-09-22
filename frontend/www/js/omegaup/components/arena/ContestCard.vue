@@ -10,7 +10,7 @@
                 <font-awesome-icon
                   v-if="contest.recommended"
                   ref="contestIconRecommended"
-                  class="ml-1 mr-1"
+                  class="ms-1 me-1"
                   icon="award"
                 />
               </h5>
@@ -20,7 +20,7 @@
             <div
               class="card-text d-flex justify-content-center align-items-center"
             >
-              <font-awesome-icon class="mr-1" icon="clipboard-list" />
+              <font-awesome-icon class="me-1" icon="clipboard-list" />
               <p class="m-0">{{ contest.organizer }}</p>
             </div>
           </div>
@@ -33,7 +33,7 @@
                 :href="getContestScoreboardURL(contest.alias)"
                 class="btn btn-success d-flex justify-content-center align-items-center mb-2"
               >
-                <font-awesome-icon class="mr-1" icon="table" />
+                <font-awesome-icon class="me-1" icon="table" />
                 {{ T.contestButtonScoreboard }}
               </a>
             </slot>
@@ -45,7 +45,7 @@
                   data-contest-enroll-status
                   class="contest-enroll-status card-text d-flex justify-content-center align-items-center"
                 >
-                  <font-awesome-icon class="mr-1" icon="clipboard-check" />
+                  <font-awesome-icon class="me-1" icon="clipboard-check" />
                   <p class="m-0">{{ T.contestEnrollStatus }}</p>
                 </div>
               </slot>
@@ -60,7 +60,7 @@
             <div
               class="card-text d-flex justify-content-center align-items-center"
             >
-              <font-awesome-icon class="mr-1" icon="stopwatch" />
+              <font-awesome-icon class="me-1" icon="stopwatch" />
               <p class="m-0">
                 {{
                   ui.formatString(T.contestDuration, {
@@ -76,7 +76,7 @@
             <div class="d-flex align-items-center justify-content-center">
               <slot>
                 <div
-                  class="card-text mr-3 m-0 d-flex justify-content-center align-items-center"
+                  class="card-text me-3 m-0 d-flex justify-content-center align-items-center"
                 >
                   <font-awesome-icon icon="users" class="m-1" />
                   <p class="m-0">{{ contest.contestants }}</p>
@@ -90,7 +90,7 @@
                   :href="getContestURL(contest.alias)"
                   class="btn btn-primary button-style d-flex justify-content-center align-items-center"
                 >
-                  <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                  <font-awesome-icon class="me-1" icon="sign-in-alt" />
                   {{ T.contestButtonEnter }}
                 </a>
               </slot>
@@ -102,7 +102,7 @@
                   :href="getContestURL(contest.alias)"
                   class="btn btn-primary d-flex align-items-center justify-content-center"
                 >
-                  <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                  <font-awesome-icon class="me-1" icon="sign-in-alt" />
                   {{ T.contestButtonSeeDetails }}
                 </a>
               </slot>
@@ -112,11 +112,11 @@
                 <button
                   class="btn btn-primary dropdown-toggle"
                   type="button"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                  <font-awesome-icon class="me-1" icon="sign-in-alt" />
                   {{ T.contestButtonEnter }}
                 </button>
                 <div class="dropdown-menu">

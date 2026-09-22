@@ -2,7 +2,7 @@
   <div class="card">
     <h6 v-if="title" class="card-header">
       {{ title }}
-      <span class="badge badge-secondary">{{ filteredItems.length }}</span>
+      <span class="badge text-bg-secondary">{{ filteredItems.length }}</span>
       <slot name="header-link"></slot>
     </h6>
     <div v-if="sortOptions.length > 0" class="card-body text-center">
@@ -10,7 +10,7 @@
         <label
           v-for="(sortOption, index) in sortOptions"
           :key="index"
-          class="form-check-label mr-4"
+          class="form-check-label me-4"
         >
           <input
             v-model="currentSortOption"
@@ -46,7 +46,7 @@
               </a>
             </slot>
           </td>
-          <td v-if="!group[0].getBadge().isEmpty()" class="text-right">
+          <td v-if="!group[0].getBadge().isEmpty()" class="text-end">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
@@ -54,12 +54,12 @@
     </table>
     <form
       v-if="shouldShowFilterInput"
-      class="form-inline m-3"
+      class="d-flex align-items-center m-3"
       @submit.prevent=""
     >
       <input
         v-model="filter"
-        class="form-control mr-sm-2 mb-2"
+        class="form-control me-sm-2 mb-2"
         type="search"
         :placeholder="filterByProblemText"
       />

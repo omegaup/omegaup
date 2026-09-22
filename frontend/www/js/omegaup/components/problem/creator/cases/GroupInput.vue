@@ -1,6 +1,6 @@
 <template>
   <div class="mt-3">
-    <div class="form-group mb-4">
+    <div class="mb-3 mb-4">
       <label for="group-name">{{ T.problemCreatorGroupName }}</label>
       <input
         id="group-name"
@@ -16,7 +16,7 @@
         T.problemCreatorCaseGroupNameHelper
       }}</small>
     </div>
-    <div v-show="!groupAutoPoints" class="form-group">
+    <div v-show="!groupAutoPoints" class="mb-3">
       <label for="group-points">{{ T.problemCreatorPoints }}</label>
       <input
         id="group-points"
@@ -28,7 +28,7 @@
         @input="onGroupPointsInput"
       />
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.problemCreatorAutomaticPoints }}</label>
       <small class="form-text text-muted d-block">{{
         T.problemCreatorAutomaticPointsHelperGroup

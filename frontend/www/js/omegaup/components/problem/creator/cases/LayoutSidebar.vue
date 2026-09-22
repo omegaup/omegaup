@@ -18,10 +18,10 @@
                 </h5>
                 <button
                   type="button"
-                  class="close"
+                  class="btn-close"
                   @click="showRenameModal[layout.layoutID] = false"
                 >
-                  <span aria-hidden="true">&times;</span>
+                  
                 </button>
               </div>
               <div class="modal-body">
@@ -60,7 +60,7 @@
           >
             <button
               type="button"
-              class="btn btn-primary flex-grow-1 text-left"
+              class="btn btn-primary flex-grow-1 text-start"
               @click="showLayout[layout.layoutID] = !showLayout[layout.layoutID]"
             >
               {{ layout.name }}
@@ -68,13 +68,13 @@
             <button
               type="button"
               class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-              data-toggle="dropdown"
+              data-bs-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false"
             >
-              <span class="sr-only">Toggle Dropdown</span>
+              <span class="visually-hidden">Toggle Dropdown</span>
             </button>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-end">
               <a
                 class="dropdown-item"
                 href="#"
@@ -88,7 +88,7 @@
                 <div class="d-flex">
                   <font-awesome-icon
                     icon="pencil-alt"
-                    class="text-success pt-1 mr-3"
+                    class="text-success pt-1 me-3"
                   />
                   {{ T.problemCreatorRenameLayout }}
                 </div>
@@ -102,7 +102,7 @@
                 <div class="d-flex">
                   <font-awesome-icon
                     icon="exchange-alt"
-                    class="text-success pt-1 mr-3"
+                    class="text-success pt-1 me-3"
                   />
                   {{ T.problemCreatorLayoutLoadToSelected }}
                 </div>
@@ -116,7 +116,7 @@
                 <div class="d-flex">
                   <font-awesome-icon
                     icon="sync"
-                    class="text-success pt-1 mr-3"
+                    class="text-success pt-1 me-3"
                   />
                   {{ T.problemCreatorLayoutLoadToAll }}
                 </div>
@@ -130,7 +130,7 @@
                 <div class="d-flex">
                   <font-awesome-icon
                     icon="download"
-                    class="text-success pt-1 mr-3"
+                    class="text-success pt-1 me-3"
                   />
                   {{ T.problemCreatorLayoutCopy }}
                 </div>
@@ -144,7 +144,7 @@
                 <div class="d-flex">
                   <font-awesome-icon
                     icon="trash"
-                    class="text-danger pt-1 mr-3"
+                    class="text-danger pt-1 me-3"
                   />
                   {{ T.problemCreatorLayoutDelete }}
                 </div>
@@ -165,19 +165,19 @@
                       <div
                         class="row d-flex justify-content-between align-items-center"
                       >
-                        <div class="col-4 mt-2 mb-2 pl-2 pr-1">
+                        <div class="col-4 mt-2 mb-2 ps-2 pe-1">
                           <input
                             v-model="lineInfo.label"
                             class="form-control form-control-sm"
                             :placeholder="T.problemCreatorLabelPlaceHolder"
                           />
                         </div>
-                        <div class="col-6 pl-0 pr-0 text-center">
+                        <div class="col-6 ps-0 pe-0 text-center">
                           <div class="dropdown d-inline-block" data-line-info-dropdown>
                             <button
                               type="button"
                               class="btn btn-light dropdown-toggle"
-                              data-toggle="dropdown"
+                              data-bs-toggle="dropdown"
                               aria-haspopup="true"
                               aria-expanded="false"
                             >
@@ -248,14 +248,14 @@
             <button
               type="button"
               data-layout-add-line-info
-              class="btn btn-light mr-2"
+              class="btn btn-light me-2"
               @click="addNewLineInfoToLayout(layout.layoutID)"
             >
               <div class="container">
                 <div class="row">
                   <font-awesome-icon
                     icon="plus-square"
-                    class="text-info mr-2 pt-1"
+                    class="text-info me-2 pt-1"
                   />
                   {{ T.problemCreatorLayoutAddLineInfo }}
                 </div>

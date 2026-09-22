@@ -76,7 +76,7 @@ export default class Markdown extends Vue {
 
       const copyButton = document.createElement('button');
       copyButton.type = 'button';
-      copyButton.className = 'btn btn-link btn-sm ml-2 copy-btn';
+      copyButton.className = 'btn btn-link btn-sm ms-2 copy-btn';
       copyButton.textContent = T.wordsCopyToClipboard;
 
       const copyHint = document.createElement('span');

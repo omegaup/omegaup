@@ -1,6 +1,6 @@
 <template>
   <div class="mt-3">
-    <div class="form-group mb-4">
+    <div class="mb-3 mb-4">
       <label for="case-name">{{ T.problemCreatorCaseName }}</label>
       <input
         id="case-name"
@@ -16,13 +16,13 @@
         T.problemCreatorCaseGroupNameHelper
       }}</small>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label for="case-group">{{ T.problemCreatorGroupName }}</label>
       <select
         id="case-group"
         v-model="caseGroup"
         name="case-group"
-        class="custom-select"
+        class="form-select"
       >
         <option
           v-for="option in options"
@@ -34,7 +34,7 @@
       </select>
     </div>
 
-    <div v-show="!caseAutoPoints" class="form-group">
+    <div v-show="!caseAutoPoints" class="mb-3">
       <label for="case-points">{{ T.problemCreatorPoints }}</label>
       <input
         id="case-points"
@@ -46,7 +46,7 @@
         @input="onCasePointsInput"
       />
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.problemCreatorAutomaticPointsRecommended }}</label>
       <small class="form-text text-muted d-block">{{
         T.problemCreatorAutomaticPointsHelperCase

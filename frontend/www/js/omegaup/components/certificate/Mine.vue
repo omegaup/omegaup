@@ -11,16 +11,16 @@
     <table v-else class="table table-striped table-hover mb-0">
       <thead>
         <tr>
-          <th scope="col" class="text-left align-middle">
+          <th scope="col" class="text-start align-middle">
             {{ T.certificateListMineDate }}
           </th>
-          <th scope="col" class="text-left align-middle">
+          <th scope="col" class="text-start align-middle">
             {{ T.certificateListMineReason }}
           </th>
-          <th scope="col" class="text-left align-middle d-none d-md-table-cell">
+          <th scope="col" class="text-start align-middle d-none d-md-table-cell">
             {{ T.certificateListMineVerificationLink }}
           </th>
-          <th scope="col" class="text-left align-middle">
+          <th scope="col" class="text-start align-middle">
             {{ T.certificateListMineActions }}
           </th>
         </tr>
@@ -29,17 +29,17 @@
         <tr v-for="(certificate, index) in certificates" :key="index">
           <td
             v-if="selectedCertificate === certificate.verification_code"
-            class="text-left align-middle border-selected"
+            class="text-start align-middle border-selected"
           >
             {{ certificate.date.toLocaleDateString() }}
           </td>
-          <td v-else class="text-left align-middle">
+          <td v-else class="text-start align-middle">
             {{ certificate.date.toLocaleDateString() }}
           </td>
-          <td class="text-left align-middle">
+          <td class="text-start align-middle">
             {{ getReason(certificate.name, certificate.certificate_type) }}
           </td>
-          <td class="text-left align-middle d-none d-md-table-cell">
+          <td class="text-start align-middle d-none d-md-table-cell">
             <span class="bg-light rounded border p-2 d-block w-100">
               {{ getVerificationLink(certificate.verification_code) }}
             </span>
@@ -48,7 +48,7 @@
             <button
               v-clipboard="getVerificationLink(certificate.verification_code)"
               copy-to-clipboard
-              class="btn btn-primary mr-2"
+              class="btn btn-primary me-2"
               type="button"
               :title="T.certificateListMineCopyToClipboard"
               :data-code="certificate.verification_code"

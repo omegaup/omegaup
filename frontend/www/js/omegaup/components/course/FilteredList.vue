@@ -9,7 +9,7 @@
           @click="showTab = filteredCourses.timeType"
         >
           <a
-            data-toggle="tab"
+            data-bs-toggle="tab"
             class="nav-link"
             href="#"
             :class="{ active: activeTab === filteredCourses.timeType }"

@@ -10,7 +10,7 @@
         ></omegaup-user-username>
       </a>
     </th>
-    <td data-global-score class="text-center font-weight-bold align-middle">
+    <td data-global-score class="text-center fw-bold align-middle">
       <span class="d-block"
         >{{ studentProgress.courseProgress.toFixed(0) }}%</span
       >
@@ -38,8 +38,8 @@
             :key="problem.alias"
             v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
             :class="getProblemColor(assignment.alias, problem)"
-            data-toggle="tooltip"
-            data-placement="bottom"
+            data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
             :href="
               getStudentProgressUrlWithAssignmentAndProblem(
                 assignment.alias,

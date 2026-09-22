@@ -2,8 +2,8 @@
   <div class="card mb-3">
     <div class="card-body">
       <form class="form" @submit.prevent="$emit('add-admin', username.key)">
-        <div class="form-group mb-0">
-          <label class="font-weight-bold w-100"
+        <div class="mb-3 mb-0">
+          <label class="fw-bold w-100"
             >{{ T.wordsAdmin }}
             <font-awesome-icon
               :title="T.courseEditAddAdminsTooltip"
@@ -19,7 +19,7 @@
             ></omegaup-common-typeahead>
           </label>
         </div>
-        <div class="form-group mb-0">
+        <div class="mb-3 mb-0">
           <label>
             <input
               v-model="showSiteAdmins"

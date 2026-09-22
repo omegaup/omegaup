@@ -2,12 +2,12 @@
   <div class="card-body py-3 px-4">
     <hr class="my-3" />
     <form enctype="multipart/form-data" method="post" @submit="onSubmit">
-      <div class="form-group col-md-12">
+      <div class="mb-3 col-md-12">
         <label class="control-label">{{ T.problemEditCommitMessage }}</label>
         <input v-model="commitMessage" class="form-control" />
       </div>
 
-      <div v-if="isTruncatedInput" class="form-group col-md-6">
+      <div v-if="isTruncatedInput" class="mb-3 col-md-6">
         <label class="control-label">{{ T.problemEditInputFile }}</label>
         <input
           type="file"
@@ -17,7 +17,7 @@
         />
       </div>
 
-      <div v-if="isTruncatedOutput" class="form-group col-md-6">
+      <div v-if="isTruncatedOutput" class="mb-3 col-md-6">
         <label class="control-label">{{ T.problemEditOutputFile }}</label>
         <input
           type="file"

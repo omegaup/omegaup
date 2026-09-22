@@ -1,8 +1,8 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="form-group">
-        <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
+      <div class="mb-3">
+        <label class="fw-bold">{{ T.wordsPublicTags }}</label>
         <omegaup-common-typeahead
           v-if="canAddNewTags"
           data-tags-input
@@ -20,11 +20,11 @@
             <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="pl-5" scope="col">
+            <th class="ps-5" scope="col">
               {{ T.contestEditTagDelete }}
               <a
                 v-if="!isLecture"
-                data-toggle="tooltip"
+                data-bs-toggle="tooltip"
                 rel="tooltip"
                 :title="T.problemEditTagPublicRequired"
               >
@@ -55,8 +55,8 @@
           </tr>
         </tbody>
       </table>
-      <div class="form-group">
-        <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
+      <div class="mb-3">
+        <label class="fw-bold">{{ T.wordsPrivateTags }}</label>
         <div class="input-group">
           <input
             v-model="newPrivateTag"
@@ -64,8 +64,7 @@
             class="form-control"
             :placeholder="T.privateTagsPlaceholder"
           />
-          <div class="input-group-append">
-            <button
+          <button
               class="btn btn-outline-primary"
               type="button"
               :disabled="newPrivateTag === ''"
@@ -73,7 +72,6 @@
             >
               {{ T.wordsAddTag }}
             </button>
-          </div>
         </div>
       </div>
       <table class="table table-striped">
@@ -82,7 +80,7 @@
             <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="pl-5" scope="col">
+            <th class="ps-5" scope="col">
               {{ T.contestEditTagDelete }}
             </th>
           </tr>
@@ -107,12 +105,12 @@
         </tbody>
       </table>
       <div class="row mx-1">
-        <div class="form-group w-100">
-          <label class="font-weight-bold">{{ T.wordsLevel }}</label>
+        <div class="mb-3 w-100">
+          <label class="fw-bold">{{ T.wordsLevel }}</label>
           <select
             v-model="problemLevelTag"
             required
-            class="form-control"
+            class="form-select"
             name="problem-level"
             @change="onSelectProblemLevel"
           >
@@ -136,7 +134,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-danger ml-1"
+              class="btn btn-danger ms-1"
               :disabled="!problemLevel"
               @click.prevent="onDeleteProblemLevel"
             >
@@ -145,7 +143,7 @@
           </template>
         </div>
       </div>
-      <div class="form-group">
+      <div class="mb-3">
         <omegaup-toggle-switch
           :value.sync="allowTags"
           :checked-value="allowTags"

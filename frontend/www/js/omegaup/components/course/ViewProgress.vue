@@ -74,7 +74,7 @@
                         }}
                         <a
                           v-if="assignment.points === 0"
-                          data-toggle="tooltip"
+                          data-bs-toggle="tooltip"
                           rel="tooltip"
                           :title="T.studentProgressOnlyLecturesDescription"
                           ><img
@@ -125,7 +125,7 @@
                 class="spinner-border"
                 role="status"
               >
-                <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
+                <span class="visually-hidden">{{ T.spinnerLoadingMessage }}</span>
               </div>
               <span v-else>.csv</span>
             </a>
@@ -140,7 +140,7 @@
                 class="spinner-border"
                 role="status"
               >
-                <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
+                <span class="visually-hidden">{{ T.spinnerLoadingMessage }}</span>
               </div>
               <span v-else>.ods</span>
             </a>

@@ -10,11 +10,11 @@
           <code class="title">{{ verificationCode }}</code>
         </p>
         <p class="description">{{ T.certificateValidationCertifyValidity }}</p>
-        <div class="embed-responsive embed-responsive-4by3">
+        <div class="ratio ratio-4x3">
           <object
             :data="certificateUrl"
             type="application/pdf"
-            class="embed-responsive-item"
+            class=""
           ></object>
         </div>
       </div>

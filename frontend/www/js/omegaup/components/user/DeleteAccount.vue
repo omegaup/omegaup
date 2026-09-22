@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <form class="form" @submit.prevent="$emit('remove')">
-      <div class="form-group">
+      <div class="mb-3">
         <div class="alert alert-danger">
           <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
           <hr />
@@ -29,10 +29,10 @@
               </h5>
               <button
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="showConfirmationModal = false"
               >
-                <span aria-hidden="true">&times;</span>
+                
               </button>
             </div>
             <div class="modal-body">

@@ -6,7 +6,7 @@
         <button
           type="button"
           data-toggle-layout-sidebar
-          class="btn btn-primary btn-sm mr-2"
+          class="btn btn-primary btn-sm me-2"
           @click="showLayoutSidebar = !showLayoutSidebar"
         >
           <font-awesome-icon icon="columns" />
@@ -56,7 +56,7 @@
         <button
           type="button"
           data-add-window
-          class="btn btn-success btn-sm mr-2"
+          class="btn btn-success btn-sm me-2"
           :class="{ active: showWindow }"
           @click="$emit('open-add-window')"
         >
@@ -67,13 +67,13 @@
           <button
             type="button"
             class="btn btn-light btn-sm"
-            data-toggle="dropdown"
+            data-bs-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
           >
             <font-awesome-icon icon="ellipsis-v" />
           </button>
-          <div class="dropdown-menu dropdown-menu-right">
+          <div class="dropdown-menu dropdown-menu-end">
             <a
               class="dropdown-item"
               href="#"
@@ -83,10 +83,10 @@
               "
             >
               <div class="row">
-                <div class="ml-6">
+                <div class="ms-6">
                   <font-awesome-icon icon="broadcast-tower" class="text-info" />
                 </div>
-                <div class="ml-8">
+                <div class="ms-8">
                   {{ T.problemCreatorValidatePointsButton }}
                 </div>
               </div>
@@ -103,10 +103,10 @@
               <h5 class="modal-title">{{ T.problemCreatorValidatePoints }}</h5>
               <button
                 type="button"
-                class="close"
+                class="btn-close"
                 @click="validateAndFixPointsModal = false"
               >
-                <span aria-hidden="true">&times;</span>
+                
               </button>
             </div>
             <div class="modal-body">
@@ -141,24 +141,24 @@
               <button
                 type="button"
                 data-sidebar-groups="ungrouped"
-                data-placement="top"
+                data-bs-placement="top"
                 :title="T.problemCreatorUngroupedCases"
                 class="btn btn-light w-84"
                 @click="showUngroupedCases = !showUngroupedCases"
               >
                 <div class="d-flex justify-content-between">
-                  <div class="mr-2 text-truncate">
+                  <div class="me-2 text-truncate">
                     {{ T.problemCreatorUngrouped }}
                   </div>
                   <div class="d-inline-block text-nowrap">
                     <span
                       data-sidebar-ungrouped-cases="count"
-                      class="badge badge-primary mr-1"
+                      class="badge text-bg-primary me-1"
                       >{{ ungroupedCases.length }}</span
                     >
                     <span
                       data-sidebar-ungrouped-cases="points"
-                      class="badge badge-info"
+                      class="badge text-bg-info"
                     >
                       {{ Math.round(getTotalPointsForUngroupedCases) }}
                       {{ T.problemCreatorPointsAbbreviation }}</span
@@ -170,19 +170,19 @@
                 <button
                   type="button"
                   class="btn btn-light btn-sm"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
                   <font-awesome-icon icon="ellipsis-v" />
                 </button>
-                <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-menu dropdown-menu-end">
                   <a class="dropdown-item disabled" href="#">
                     <div class="row">
-                      <div class="ml-6">
+                      <div class="ms-6">
                         <font-awesome-icon icon="trash" class="text-danger" />
                       </div>
-                      <div class="ml-8">
+                      <div class="ms-8">
                         {{ T.problemCreatorDeleteGroup }}
                       </div>
                     </div>
@@ -193,10 +193,10 @@
                     @click.prevent="deleteUngroupedCases()"
                   >
                     <div class="row">
-                      <div class="ml-6">
+                      <div class="ms-6">
                         <font-awesome-icon icon="trash" class="text-danger" />
                       </div>
-                      <div class="ml-8">
+                      <div class="ms-8">
                         {{ T.problemCreatorDeleteCases }}
                       </div>
                     </div>
@@ -215,15 +215,15 @@
                     <button
                       type="button"
                       class="btn btn-light w-82"
-                      data-placement="top"
+                      data-bs-placement="top"
                       :data-sidebar-cases-ungrouped="groupID"
                       :title="name"
                       @click="editCase(groupID, cases[0].caseID)"
                     >
                       <div class="d-flex justify-content-between">
-                        <div class="mr-2 text-truncate">{{ name }}</div>
+                        <div class="me-2 text-truncate">{{ name }}</div>
                         <div class="d-inline-block text-nowrap">
-                          <span class="badge badge-info">
+                          <span class="badge text-bg-info">
                             {{ Math.round(points || 0) }}
                             {{ T.problemCreatorPointsAbbreviation }}</span
                           >
@@ -234,26 +234,26 @@
                       <button
                         type="button"
                         class="btn btn-light btn-sm"
-                        data-toggle="dropdown"
+                        data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
                         <font-awesome-icon icon="ellipsis-v" />
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right">
+                      <div class="dropdown-menu dropdown-menu-end">
                         <a
                           class="dropdown-item"
                           href="#"
                           @click.prevent="deleteCase({ groupID, caseID: '' })"
                         >
                           <div class="row">
-                            <div class="ml-6">
+                            <div class="ms-6">
                               <font-awesome-icon
                                 icon="trash"
                                 class="text-danger"
                               />
                             </div>
-                            <div class="ml-8">
+                            <div class="ms-8">
                               {{ T.problemCreatorDeleteCase }}
                             </div>
                           </div>
@@ -274,19 +274,19 @@
               type="button"
               data-sidebar-groups="grouped"
               class="btn btn-light w-84"
-              data-placement="top"
+              data-bs-placement="top"
               :title="name"
               @click="showCases[groupID] = !showCases[groupID]"
             >
               <div class="d-flex justify-content-between">
-                <div class="mr-2 text-truncate">{{ name }}</div>
+                <div class="me-2 text-truncate">{{ name }}</div>
                 <div class="d-inline-block text-nowrap">
                   <span
                     data-sidebar-groups="count"
-                    class="badge badge-primary mr-1"
+                    class="badge text-bg-primary me-1"
                     >{{ cases.length }}</span
                   >
-                  <span data-sidebar-groups="points" class="badge badge-info"
+                  <span data-sidebar-groups="points" class="badge text-bg-info"
                     >{{ Math.round(points || 0) }}
                     {{ T.problemCreatorPointsAbbreviation }}</span
                   >
@@ -297,13 +297,13 @@
               <button
                 type="button"
                 class="btn btn-light btn-sm"
-                data-toggle="dropdown"
+                data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
               >
                 <font-awesome-icon icon="ellipsis-v" />
               </button>
-              <div class="dropdown-menu dropdown-menu-right">
+              <div class="dropdown-menu dropdown-menu-end">
                 <a
                   class="dropdown-item"
                   href="#"
@@ -313,10 +313,10 @@
                   "
                 >
                   <div class="row">
-                    <div class="ml-6">
+                    <div class="ms-6">
                       <font-awesome-icon icon="pencil-alt" class="text-info" />
                     </div>
-                    <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div>
+                    <div class="ms-8">{{ T.omegaupTitleGroupsEdit }}</div>
                   </div>
                 </a>
                 <a
@@ -326,10 +326,10 @@
                   @click.prevent="deleteGroup(groupID)"
                 >
                   <div class="row">
-                    <div class="ml-6">
+                    <div class="ms-6">
                       <font-awesome-icon icon="trash" class="text-danger" />
                     </div>
-                    <div class="ml-8">
+                    <div class="ms-8">
                       {{ T.problemCreatorDeleteGroup }}
                     </div>
                   </div>
@@ -341,10 +341,10 @@
                   @click.prevent="deleteGroupCases(groupID)"
                 >
                   <div class="row">
-                    <div class="ml-6">
+                    <div class="ms-6">
                       <font-awesome-icon icon="trash" class="text-danger" />
                     </div>
-                    <div class="ml-8">
+                    <div class="ms-8">
                       {{ T.problemCreatorDeleteCases }}
                     </div>
                   </div>
@@ -356,10 +356,10 @@
                   @click.prevent="downloadGroupInput(groupID, '.in')"
                 >
                   <div class="row">
-                    <div class="ml-6">
+                    <div class="ms-6">
                       <font-awesome-icon icon="download" class="text-info" />
                     </div>
-                    <div class="ml-8">
+                    <div class="ms-8">
                       {{ T.problemCraetorGroupDownloadIn }}
                     </div>
                   </div>
@@ -371,10 +371,10 @@
                   @click.prevent="downloadGroupInput(groupID, '.txt')"
                 >
                   <div class="row">
-                    <div class="ml-6">
+                    <div class="ms-6">
                       <font-awesome-icon icon="align-left" class="text-info" />
                     </div>
-                    <div class="ml-8">
+                    <div class="ms-8">
                       {{ T.problemCraetorGroupDownloadTxt }}
                     </div>
                   </div>
@@ -396,14 +396,14 @@
                     <button
                       type="button"
                       class="btn btn-light w-82"
-                      data-placement="top"
+                      data-bs-placement="top"
                       :title="caseName"
                       @click="editCase(groupID, caseID)"
                     >
                       <div class="d-flex justify-content-between">
-                        <div class="mr-2 text-truncate">{{ caseName }}</div>
+                        <div class="me-2 text-truncate">{{ caseName }}</div>
                         <div class="d-inline-block text-nowrap">
-                          <span class="badge badge-info">
+                          <span class="badge text-bg-info">
                             {{ Math.round(casePoints || 0) }}
                             {{ T.problemCreatorPointsAbbreviation }}</span
                           >
@@ -414,26 +414,26 @@
                       <button
                         type="button"
                         class="btn btn-light btn-sm"
-                        data-toggle="dropdown"
+                        data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
                         <font-awesome-icon icon="ellipsis-v" />
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right">
+                      <div class="dropdown-menu dropdown-menu-end">
                         <a
                           class="dropdown-item"
                           href="#"
                           @click.prevent="deleteCase({ groupID, caseID })"
                         >
                           <div class="row">
-                            <div class="ml-6">
+                            <div class="ms-6">
                               <font-awesome-icon
                                 icon="trash"
                                 class="text-danger"
                               />
                             </div>
-                            <div class="ml-8">
+                            <div class="ms-8">
                               {{ T.problemCreatorDeleteCase }}
                             </div>
                           </div>
@@ -455,15 +455,15 @@
                       <h5 class="modal-title">{{ T.groupEditTitle }}</h5>
                       <button
                         type="button"
-                        class="close"
+                        class="btn-close"
                         @click="editGroupModal[groupID] = false"
                       >
-                        <span aria-hidden="true">&times;</span>
+                        
                       </button>
                     </div>
                     <div class="modal-body">
                       <div class="mt-3">
-                        <div class="form-group mb-4">
+                        <div class="mb-3 mb-4">
                           <label>{{ T.problemCreatorGroupName }}</label>
                           <input
                             :value="editGroupName[groupID]"
@@ -479,7 +479,7 @@
                         </div>
                         <div
                           v-show="!editGroupAutoPoints[groupID]"
-                          class="form-group"
+                          class="mb-3"
                         >
                           <label>{{ T.problemCreatorPoints }}</label>
                           <input
@@ -491,7 +491,7 @@
                             @input="onEditGroupPointsInput(groupID, $event)"
                           />
                         </div>
-                        <div class="form-group">
+                        <div class="mb-3">
                           <label>{{ T.problemCreatorAutomaticPoints }}</label>
                           <small class="form-text text-muted d-block">{{
                             T.problemCreatorAutomaticPointsHelperGroup
@@ -705,11 +705,11 @@ export default class Sidebar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.ml-8 {
+.ms-8 {
   margin-left: 8%;
 }
 
-.ml-6 {
+.ms-6 {
   margin-left: 6%;
 }
 

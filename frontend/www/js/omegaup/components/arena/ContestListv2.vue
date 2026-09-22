@@ -73,13 +73,11 @@
                     >
                       &times;
                     </button>
-                    <div class="input-group-append">
-                      <input
+                    <input
                         class="btn btn-primary btn-style btn-md btn-block active nav-link"
                         type="submit"
                         :value="T.wordsSearch"
                       />
-                    </div>
                   </div>
                 </form>
                   </div>
@@ -93,7 +91,7 @@
                         class="btn"
                         :class="isNonDefaultOrder ? 'btn-primary' : 'btn-light'"
                         type="button"
-                        data-toggle="dropdown"
+                        data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
@@ -103,7 +101,7 @@
                             {{ activeOrderLabel }}
                             <font-awesome-icon
                               icon="times-circle"
-                              class="ml-1 reset-icon"
+                              class="ms-1 reset-icon"
                               :title="T.contestOrderBy"
                               @click.stop="orderByEnds"
                             />
@@ -121,7 +119,7 @@
                           <font-awesome-icon
                             v-if="currentOrder === ContestOrder.Ends"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestOrderByEnds }}
                         </a>
                         <a
@@ -133,7 +131,7 @@
                           <font-awesome-icon
                             v-if="currentOrder === ContestOrder.Title"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestOrderByTitle }}
                         </a>
                         <a
@@ -145,7 +143,7 @@
                           <font-awesome-icon
                             v-if="currentOrder === ContestOrder.Duration"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestOrderByDuration }}
                         </a>
                         <a
@@ -157,7 +155,7 @@
                           <font-awesome-icon
                             v-if="currentOrder === ContestOrder.Organizer"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestOrderByOrganizer }}
                         </a>
                         <a
@@ -169,7 +167,7 @@
                           <font-awesome-icon
                             v-if="currentOrder === ContestOrder.Contestants"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestOrderByContestants }}
                         </a>
                         <a
@@ -181,21 +179,21 @@
                           <font-awesome-icon
                             v-if="currentOrder === ContestOrder.SignedUp"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestOrderBySignedUp }}
                         </a>
                       </div>
                     </div>
                     <div
                       ref="dropdownFilterBy"
-                      class="dropdown mr-0"
+                      class="dropdown me-0"
                       data-dropdown-filter
                     >
                       <button
                         class="btn"
                         :class="isNonDefaultFilter ? 'btn-primary' : 'btn-light'"
                         type="button"
-                        data-toggle="dropdown"
+                        data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
@@ -204,7 +202,7 @@
                           {{ activeFilterLabel }}
                           <font-awesome-icon
                             icon="times-circle"
-                            class="ml-1 reset-icon"
+                            class="ms-1 reset-icon"
                             :title="T.contestFilterBy"
                             @click.stop="filterByAll"
                           />
@@ -221,7 +219,7 @@
                           <font-awesome-icon
                             v-if="currentFilter === ContestFilter.All"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestFilterByAll }}
                         </a>
                         <a
@@ -233,7 +231,7 @@
                           <font-awesome-icon
                             v-if="currentFilter === ContestFilter.SignedUp"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestFilterBySignedUp }}
                         </a>
                         <a
@@ -245,7 +243,7 @@
                           <font-awesome-icon
                             v-if="currentFilter === ContestFilter.OnlyRecommended"
                             icon="check"
-                            class="mr-1"
+                            class="me-1"
                           />{{ T.contestFilterByRecommended }}
                         </a>
                       </div>

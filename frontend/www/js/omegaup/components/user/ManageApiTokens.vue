@@ -1,12 +1,12 @@
 <template>
   <div>
     <form class="form" @submit.prevent="handleCreateApiToken">
-      <div class="form-group">
+      <div class="mb-3">
         <p>
           {{ T.apiTokenDescription }}
         </p>
       </div>
-      <div class="form-group">
+      <div class="mb-3">
         <label class="w-100">
           {{ T.apiTokenName }}
           <input
@@ -18,7 +18,7 @@
           />
         </label>
       </div>
-      <div class="form-group text-right">
+      <div class="mb-3 text-end">
         <button class="btn btn-primary" type="submit">
           {{ T.apiTokenAdd }}
         </button>

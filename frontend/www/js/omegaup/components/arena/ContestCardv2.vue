@@ -3,7 +3,7 @@
     <div class="card-body d-flex flex-column">
       <div class="d-flex justify-content-between align-items-start mb-2">
         <h5
-          class="m-0 font-weight-bold text-truncate w-100"
+          class="m-0 fw-bold text-truncate w-100"
           :title="contest.title"
         >
           <a
@@ -16,14 +16,14 @@
         <font-awesome-icon
           v-if="contest.recommended"
           ref="contestIconRecommended"
-          class="text-warning ml-2"
+          class="text-warning ms-2"
           icon="award"
         />
       </div>
 
       <div class="mb-3 text-muted small">
         <div class="d-flex align-items-center mb-1">
-          <font-awesome-icon icon="clipboard-list" class="mr-2" />
+          <font-awesome-icon icon="clipboard-list" class="me-2" />
           <span class="text-truncate" :title="contest.organizer">{{
             contest.organizer
           }}</span>
@@ -32,7 +32,7 @@
           <slot name="text-contest-date"></slot>
         </div>
         <div class="d-flex align-items-center">
-          <font-awesome-icon icon="stopwatch" class="mr-2" />
+          <font-awesome-icon icon="stopwatch" class="me-2" />
           <span>{{
             ui.formatString(T.contestDuration, {
               duration: contestDuration,
@@ -44,7 +44,7 @@
       <div class="mt-auto">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div class="d-flex align-items-center text-muted">
-            <font-awesome-icon icon="users" class="mr-2" />
+            <font-awesome-icon icon="users" class="me-2" />
             <span>{{ contest.contestants }}</span>
           </div>
           <slot name="contest-enroll-status">
@@ -52,9 +52,9 @@
               v-if="contest.participating"
               ref="contestEnrollStatus"
               data-contest-enroll-status
-              class="text-success d-flex align-items-center small font-weight-bold"
+              class="text-success d-flex align-items-center small fw-bold"
             >
-              <font-awesome-icon class="mr-1" icon="check-circle" />
+              <font-awesome-icon class="me-1" icon="check-circle" />
               {{ T.contestEnrollStatus }}
             </div>
           </slot>
@@ -80,7 +80,7 @@
               :href="getContestURL(contest.alias)"
               class="btn btn-primary btn-sm btn-block mb-2 d-flex align-items-center justify-content-center"
             >
-              <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+              <font-awesome-icon class="me-1" icon="sign-in-alt" />
               {{ T.contestButtonSeeDetails }}
             </a>
           </slot>
@@ -91,7 +91,7 @@
               :href="getContestScoreboardURL(contest.alias)"
               class="btn btn-success btn-sm btn-block mb-2 d-flex align-items-center justify-content-center text-white"
             >
-              <font-awesome-icon class="mr-1" icon="table" />
+              <font-awesome-icon class="me-1" icon="table" />
               {{ T.contestButtonScoreboard }}
             </a>
           </slot>
@@ -102,7 +102,7 @@
               :href="getVirtualContestURL(contest.alias)"
               class="btn btn-primary btn-sm btn-block mb-2 d-flex align-items-center justify-content-center"
             >
-              <font-awesome-icon class="mr-1" icon="gamepad" />
+              <font-awesome-icon class="me-1" icon="gamepad" />
               {{ T.contestVirtualMode }}
             </a>
           </slot>
@@ -113,7 +113,7 @@
               :href="getPracticeContestURL(contest.alias)"
               class="btn btn-primary btn-sm btn-block mb-2 d-flex align-items-center justify-content-center"
             >
-              <font-awesome-icon class="mr-1" icon="flask" />
+              <font-awesome-icon class="me-1" icon="flask" />
               {{ T.contestPracticeMode }}
             </a>
           </slot>

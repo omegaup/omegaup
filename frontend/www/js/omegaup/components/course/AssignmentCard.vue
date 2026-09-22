@@ -1,7 +1,7 @@
 <template>
-  <div class="card ml-3 mr-3 mb-3">
+  <div class="card ms-3 me-3 mb-3">
     <div class="mx-3 mt-3 d-flex justify-content-between align-items-center">
-      <div class="font-weight-bold">
+      <div class="fw-bold">
         <h5 class="mb-1">
           <a :href="`/course/${courseAlias}/assignment/${assignment.alias}`">{{
             assignment.name
@@ -10,25 +10,25 @@
         <p class="mb-0 assignment-type">
           <template v-if="assignment.assignment_type === 'homework'">
             <font-awesome-icon icon="file-alt" />
-            <span class="ml-2">{{ T.wordsHomework }}</span>
+            <span class="ms-2">{{ T.wordsHomework }}</span>
           </template>
           <template v-else-if="assignment.assignment_type === 'lesson'">
             <font-awesome-icon icon="chalkboard-teacher" />
-            <span class="ml-2">{{ T.wordsLesson }}</span>
+            <span class="ms-2">{{ T.wordsLesson }}</span>
           </template>
           <template v-else>
             <font-awesome-icon icon="list-alt" />
-            <span class="ml-2">{{ T.wordsExam }}</span>
+            <span class="ms-2">{{ T.wordsExam }}</span>
           </template>
         </p>
         <p v-if="assignment.finish_time" class="mb-0 mt-1 due-date">
           <font-awesome-icon :icon="['fas', 'clock']" />
-          <span class="ml-1">{{
+          <span class="ms-1">{{
             ui.formatString(T.assignmentCardDueDate, {
               time: getFormattedTime(assignment.finish_time),
             })
           }}</span>
-          <span v-if="isOverdue" class="badge badge-danger ml-2">{{
+          <span v-if="isOverdue" class="badge text-bg-danger ms-2">{{
             T.wordsOverdue
           }}</span>
         </p>
@@ -62,7 +62,7 @@
         class="col-4 p-0 d-flex align-items-center"
       >
         {{ studentProgress.toFixed(0) }}%
-        <div class="progress ml-1 w-100">
+        <div class="progress ms-1 w-100">
           <div
             class="progress-bar"
             role="progressbar"

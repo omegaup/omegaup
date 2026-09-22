@@ -1,15 +1,15 @@
 <template>
   <div class="card code-edit">
     <div class="card-body">
-      <div class="form-group row align-items-center">
-        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
+      <div class="mb-3 row align-items-center">
+        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pe-sm-2">
           {{ T.wordsLanguage }}
         </label>
-        <div class="col-12 col-sm-auto pl-sm-0">
+        <div class="col-12 col-sm-auto ps-sm-0">
           <select
             v-model="selectedLanguage"
             data-problem-creator-code-language
-            class="form-control"
+            class="form-select"
             name="language"
           >
             <option value="" disabled>
@@ -40,9 +40,9 @@
         </div>
       </div>
       <div
-        class="form-group d-flex flex-nowrap overflow-auto mt-3 align-items-center"
+        class="mb-3 d-flex flex-nowrap overflow-auto mt-3 align-items-center"
       >
-        <label class="col-form-label mb-0 mr-2 text-nowrap">
+        <label class="col-form-label mb-0 me-2 text-nowrap">
           {{ T.problemCreatorCodeUpload }}
         </label>
         <div class="d-flex align-items-center flex-grow-1">

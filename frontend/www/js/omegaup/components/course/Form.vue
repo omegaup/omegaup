@@ -7,8 +7,8 @@
       <div class="required-fields-legend">{{ T.wordsRequiredField }}</div>
       <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-course-name">
+          <div class="mb-3 col-md-4">
+            <label class="fw-bold w-100 introjs-course-name">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isNameComplete }"
@@ -30,8 +30,8 @@
               >{{ name.length }}/{{ MAX_LENGTH.name }}</small
             >
           </div>
-          <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-short-title">
+          <div class="mb-3 col-md-4">
+            <label class="fw-bold w-100 introjs-short-title">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isAliasComplete }"
@@ -58,8 +58,8 @@
               >{{ alias.length }}/{{ MAX_LENGTH.alias }}</small
             >
           </div>
-          <div class="form-group col-md-4 introjs-scoreboard">
-            <span class="font-weight-bold"
+          <div class="mb-3 col-md-4 introjs-scoreboard">
+            <span class="fw-bold"
               >{{ T.courseNewFormShowScoreboard }}
               <font-awesome-icon
                 :title="T.courseNewFormShowScoreboardDesc"
@@ -75,8 +75,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-start-date"
+          <div class="mb-3 col-md-4">
+            <label class="fw-bold w-100 introjs-start-date"
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
                 :title="T.courseNewFormStartDateDesc"
@@ -89,8 +89,8 @@
               ></omegaup-datepicker
             ></label>
           </div>
-          <div class="form-group col-md-4 introjs-duration">
-            <span class="font-weight-bold"
+          <div class="mb-3 col-md-4 introjs-duration">
+            <span class="fw-bold"
               >{{ T.courseNewFormUnlimitedDuration }}
               <font-awesome-icon
                 :title="T.courseNewFormUnlimitedDurationDesc"
@@ -104,8 +104,8 @@
               name="unlimited-duration"
             ></omegaup-radio-switch>
           </div>
-          <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-end-date"
+          <div class="mb-3 col-md-4">
+            <label class="fw-bold w-100 introjs-end-date"
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
                 :title="T.courseNewFormEndDateDesc"
@@ -129,8 +129,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-school">
+          <div class="mb-3 col-md-4">
+            <label class="fw-bold w-100 introjs-school">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isSchoolComplete }"
@@ -153,8 +153,8 @@
               </div>
             </label>
           </div>
-          <div class="form-group col-md-4 introjs-basic-information">
-            <span class="font-weight-bold"
+          <div class="mb-3 col-md-4 introjs-basic-information">
+            <span class="fw-bold"
               >{{ T.courseNewFormBasicInformationRequired }}
               <font-awesome-icon
                 :title="T.courseNewFormBasicInformationRequiredDesc"
@@ -168,8 +168,8 @@
               :selected-value="needsBasicInformation"
             ></omegaup-radio-switch>
           </div>
-          <div class="form-group col-md-4 introjs-ask-information">
-            <span class="font-weight-bold"
+          <div class="mb-3 col-md-4 introjs-ask-information">
+            <span class="fw-bold"
               >{{ T.courseNewFormUserInformationRequired }}
               <font-awesome-icon
                 :title="T.courseNewFormUserInformationRequiredDesc"
@@ -180,7 +180,7 @@
               v-model="requestsUserInformation"
               data-course-participant-information
               :disabled="readOnly"
-              class="form-control"
+              class="form-select"
             >
               <option value="no">
                 {{ T.wordsNo }}
@@ -195,8 +195,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-6">
-            <label class="font-weight-bold w-100"
+          <div class="mb-3 col-md-6">
+            <label class="fw-bold w-100"
               >{{ T.courseNewFormLevel }}
               <font-awesome-icon
                 :title="T.courseNewFormLevelDesc"
@@ -207,7 +207,7 @@
               v-model="level"
               :disabled="readOnly"
               data-course-problem-level
-              class="form-control introjs-level"
+              class="form-select introjs-level"
             >
               <option value="" disabled>
                 {{ T.courseNewFormLevelPlaceholder }}
@@ -221,8 +221,8 @@
               </option>
             </select>
           </div>
-          <div class="form-group col-md-6 introjs-language">
-            <label class="font-weight-bold w-100">
+          <div class="mb-3 col-md-6 introjs-language">
+            <label class="fw-bold w-100">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isLanguagesComplete }"
@@ -248,8 +248,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-objective"
+          <div class="mb-3 container-fluid col-md-6">
+            <label class="fw-bold w-100 introjs-objective"
               >{{ T.courseNewFormObjective }}
               <font-awesome-icon
                 :title="T.courseNewFormObjectiveDesc"
@@ -274,8 +274,8 @@
               >{{ (objective || '').length }}/{{ MAX_LENGTH.objective }}</small
             >
           </div>
-          <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-description">
+          <div class="mb-3 container-fluid col-md-6">
+            <label class="fw-bold w-100 introjs-description">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isDescriptionComplete }"
@@ -303,9 +303,9 @@
           </div>
         </div>
         <div v-if="!readOnly" class="row">
-          <div class="form-group col-md-12 text-right">
+          <div class="mb-3 col-md-12 text-end">
             <button
-              class="btn btn-primary mr-2 submit introjs-submit"
+              class="btn btn-primary me-2 submit introjs-submit"
               type="submit"
             >
               <template v-if="update">

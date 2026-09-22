@@ -22,7 +22,7 @@
         @click="showFeedbackForm = !showFeedbackForm"
         >{{ T.submissionFeedbackSendButton }}</a
       >
-      <div v-show="showFeedbackForm" class="form-group">
+      <div v-show="showFeedbackForm" class="mb-3">
         <p>{{ T.submissionFeedbackAnimationButton }}</p>
         <img
           v-show="showFeedbackForm"
@@ -74,7 +74,7 @@ export default class SubmissionFeedback extends Vue {
 @import '../../../../sass/main.scss';
 .feedback-section {
   margin-top: 1.5em;
-  .form-group {
+  .mb-3 {
     margin-top: 0.5em;
     button {
       margin-top: 1em;

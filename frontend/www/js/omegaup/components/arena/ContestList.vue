@@ -32,13 +32,11 @@
                   >
                     &times;
                   </button>
-                  <div class="input-group-append">
-                    <input
+                  <input
                       class="btn btn-primary btn-style btn-md btn-block active nav-link"
                       type="submit"
                       :value="T.wordsSearch"
                     />
-                  </div>
                 </div>
               </form>
             </div>
@@ -47,7 +45,7 @@
                 <button
                   class="btn btn-secondary"
                   type="button"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
@@ -66,7 +64,7 @@
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Ends"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestOrderByEnds }}
                   </a>
                   <a
@@ -78,7 +76,7 @@
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Title"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestOrderByTitle }}
                   </a>
                   <a
@@ -90,7 +88,7 @@
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Duration"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestOrderByDuration }}
                   </a>
                   <a
@@ -102,7 +100,7 @@
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Organizer"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestOrderByOrganizer }}
                   </a>
                   <a
@@ -114,7 +112,7 @@
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Contestants"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestOrderByContestants }}
                   </a>
                   <a
@@ -126,20 +124,20 @@
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.SignedUp"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestOrderBySignedUp }}
                   </a>
                 </div>
               </div>
               <div
                 ref="dropdownFilterBy"
-                class="dropdown mr-0"
+                class="dropdown me-0"
                 data-dropdown-filter
               >
                 <button
                   class="btn btn-secondary"
                   type="button"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
@@ -156,7 +154,7 @@
                     <font-awesome-icon
                       v-if="currentFilter === ContestFilter.All"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestFilterByAll }}
                   </a>
                   <a
@@ -168,7 +166,7 @@
                     <font-awesome-icon
                       v-if="currentFilter === ContestFilter.SignedUp"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestFilterBySignedUp }}
                   </a>
                   <a
@@ -180,7 +178,7 @@
                     <font-awesome-icon
                       v-if="currentFilter === ContestFilter.OnlyRecommended"
                       icon="check"
-                      class="mr-1"
+                      class="me-1"
                     />{{ T.contestFilterByRecommended }}
                   </a>
                 </div>
@@ -235,7 +233,7 @@
               <div
                 v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
                 :key="contestItem.contest_id"
-                class="mr-3"
+                class="me-3"
                 style="min-width: 300px; max-width: 300px"
               >
                 <omegaup-contest-card :contest="contestItem">
@@ -347,7 +345,7 @@
     <div v-else>
       <div class="d-flex align-items-center mb-4 px-3">
         <button
-          class="btn btn-outline-secondary mr-3"
+          class="btn btn-outline-secondary me-3"
           type="button"
           :title="T.wordsBack"
           @click="setViewAll(null)"

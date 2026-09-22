@@ -2,7 +2,7 @@
   <div class="mt-3">
     <div class="row">
       <div class="col">
-        <div data-prefix class="form-group mb-4">
+        <div data-prefix class="mb-3 mb-4">
           <label for="prefix">{{ T.problemCreatorPrefix }}</label>
           <input
             id="prefix"
@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="form-group mb-4">
+        <div class="mb-3 mb-4">
           <label for="suffix">{{ T.problemCreatorSuffix }}</label>
           <input
             id="suffix"
@@ -30,7 +30,7 @@
         </div>
       </div>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label for="multiple-cases-count">{{
         T.problemCreatorNumberOfCases
       }}</label>
@@ -47,13 +47,13 @@
         {{ T.problemCreatorNumberOfCasesHelper }} {{ caseNamePreview }}
       </small>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label for="multiple-cases-group">{{ T.problemCreatorGroupName }}</label>
       <select
         id="multiple-cases-group"
         v-model="multipleCasesGroup"
         name="multiple-cases-group"
-        class="custom-select"
+        class="form-select"
       >
         <option
           v-for="option in options"

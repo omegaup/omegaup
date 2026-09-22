@@ -1,7 +1,7 @@
 <template>
   <div v-if="!hideHeaderActions" class="row mb-3">
     <div class="col d-flex align-items-center">
-      <span class="mr-2">{{ T.problemCreatorName }}</span>
+      <span class="me-2">{{ T.problemCreatorName }}</span>
       <input
         v-model="name"
         class="form-control form-control-sm"
@@ -12,10 +12,10 @@
       <button
         type="button"
         data-load-problem-button
-        class="btn btn-success btn-sm mr-2"
+        class="btn btn-success btn-sm me-2"
         @click="uploadZipModal = !uploadZipModal"
       >
-        <font-awesome-icon icon="upload" class="mr-1" />
+        <font-awesome-icon icon="upload" class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorLoadProblem }}</span
         >
@@ -28,10 +28,10 @@
                 <h5 class="modal-title">{{ T.problemCreatorZipFileUpload }}</h5>
                 <button
                   type="button"
-                  class="close"
+                  class="btn-close"
                   @click="uploadZipModal = false"
                 >
-                  <span aria-hidden="true">&times;</span>
+                  
                 </button>
               </div>
               <div class="modal-body">
@@ -68,10 +68,10 @@
       <button
         type="button"
         data-download-zip
-        class="btn btn-primary btn-sm mr-2"
+        class="btn btn-primary btn-sm me-2"
         @click="generateProblem()"
       >
-        <font-awesome-icon icon="download" class="mr-1" />
+        <font-awesome-icon icon="download" class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorGenerateProblem }}</span
         >
@@ -82,7 +82,7 @@
         data-create-new-problem-button
         @click="newProblemConfirmationModal = !newProblemConfirmationModal"
       >
-        <font-awesome-icon icon="plus" class="mr-1" />
+        <font-awesome-icon icon="plus" class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
         >
@@ -97,10 +97,10 @@
                 </h5>
                 <button
                   type="button"
-                  class="close"
+                  class="btn-close"
                   @click="newProblemConfirmationModal = false"
                 >
-                  <span aria-hidden="true">&times;</span>
+                  
                 </button>
               </div>
               <div class="modal-body">

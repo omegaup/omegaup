@@ -2,7 +2,7 @@
   <div v-if="getSelectedCase && getSelectedGroup">
     <div class="d-flex justify-content-between">
       <div>
-        <h3 class="mb-0 d-md-inline mr-2">{{ getSelectedCase.name }}</h3>
+        <h3 class="mb-0 d-md-inline me-2">{{ getSelectedCase.name }}</h3>
         <h5 class="mb-0 d-none d-md-inline text-muted">
           {{ getSelectedGroup.name }}
         </h5>
@@ -10,14 +10,14 @@
       <div>
         <button
           type="button"
-          class="btn btn-light mr-2"
+          class="btn btn-light me-2"
           @click="editCaseModal = !editCaseModal"
         >
           <div class="container">
             <div class="row">
               <font-awesome-icon
                 icon="pencil-alt"
-                class="text-info mr-1 pt-1"
+                class="text-info me-1 pt-1"
               />
               {{ T.problemCreatorEditCase }}
             </div>
@@ -31,10 +31,10 @@
                   <h5 class="modal-title">{{ T.caseEditTitle }}</h5>
                   <button
                     type="button"
-                    class="close"
+                    class="btn-close"
                     @click="editCaseModal = false"
                   >
-                    <span aria-hidden="true">&times;</span>
+                    
                   </button>
                 </div>
                 <div class="modal-body">
@@ -71,7 +71,7 @@
         <button
           type="button"
           data-delete-case
-          class="btn btn-light mr-2"
+          class="btn btn-light me-2"
           @click="
             deleteCase({
               groupID: getSelectedGroup.groupID,
@@ -81,7 +81,7 @@
         >
           <div class="container">
             <div class="row">
-              <font-awesome-icon icon="trash-alt" class="text-danger mr-1 pt-1" />
+              <font-awesome-icon icon="trash-alt" class="text-danger me-1 pt-1" />
               {{ T.problemCreatorDeleteCase }}
             </div>
           </div>
@@ -90,13 +90,13 @@
           <button
             type="button"
             class="btn btn-light"
-            data-toggle="dropdown"
+            data-bs-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
           >
             <font-awesome-icon icon="ellipsis-v" />
           </button>
-          <div class="dropdown-menu dropdown-menu-right">
+          <div class="dropdown-menu dropdown-menu-end">
             <button
               type="button"
               data-menu-delete-lines
@@ -104,7 +104,7 @@
               @click="deleteLines()"
             >
               <div class="d-flex">
-                <font-awesome-icon icon="trash" class="text-danger pt-1 mr-3" />
+                <font-awesome-icon icon="trash" class="text-danger pt-1 me-3" />
                 {{ T.problemCreatorLinesDelete }}
               </div>
             </button>
@@ -118,7 +118,7 @@
               <div class="d-flex">
                 <font-awesome-icon
                   icon="download"
-                  class="text-info pt-1 mr-3"
+                  class="text-info pt-1 me-3"
                 />
                 {{ T.problemCreatorCaseDownloadIn }}
               </div>
@@ -132,7 +132,7 @@
               <div class="d-flex">
                 <font-awesome-icon
                   icon="align-left"
-                  class="text-info pt-1 mr-3"
+                  class="text-info pt-1 me-3"
                 />
                 {{ T.problemCreatorCaseDownloadTxt }}
               </div>
@@ -165,14 +165,14 @@
                       <font-awesome-icon icon="sort" />
                     </button>
                   </div>
-                  <div class="col-2 pl-0 pr-2">
+                  <div class="col-2 ps-0 pe-2">
                     <input
                       v-model="line.label"
                       class="form-control form-control-sm"
                       :placeholder="T.problemCreatorLabelPlaceHolder"
                     />
                   </div>
-                  <div class="col-5 pr-0 text-center">
+                  <div class="col-5 pe-0 text-center">
                     <input
                       v-if="getLineDisplay(line) === LineDisplayOption.LINE"
                       v-model="line.data.value"
@@ -189,13 +189,13 @@
                       :placeholder="T.problemCreatorContentPlaceHolder"
                     ></textarea>
                   </div>
-                  <div class="col-3 pl-2 pr-0 text-center">
+                  <div class="col-3 ps-2 pe-0 text-center">
                     <div class="dropdown d-inline-block">
                       <button
                         :data-array-modal-dropdown="line.lineID"
                         type="button"
                         class="btn btn-light dropdown-toggle"
-                        data-toggle="dropdown"
+                        data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
@@ -244,16 +244,16 @@
                               <h5 class="modal-title">{{ T.arrayEditTitle }}</h5>
                               <button
                                 type="button"
-                                class="close"
+                                class="btn-close"
                                 @click="arrayModalEdit = false"
                               >
-                                <span aria-hidden="true">&times;</span>
+                                
                               </button>
                             </div>
                             <div class="modal-body">
                               <div class="container">
                                 <div class="row mb-4">
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     {{ T.arrayModalSize }}
                                     <input
                                       v-model="line.data.size"
@@ -262,7 +262,7 @@
                                       class="form-control"
                                     />
                                   </div>
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     {{ T.arrayModalMinimum }}
                                     <input
                                       v-model="line.data.min"
@@ -271,7 +271,7 @@
                                       class="form-control"
                                     />
                                   </div>
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     {{ T.arrayModalMaximum }}
                                     <input
                                       v-model="line.data.max"
@@ -282,7 +282,7 @@
                                   </div>
                                 </div>
                                 <div class="row mt-2 mb-4">
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     <input
                                       id="array-modal-distinct"
                                       v-model="line.data.distinct"
@@ -290,7 +290,7 @@
                                       data-array-modal-checkbox
                                     />
                                     <label
-                                      class="ml-1"
+                                      class="ms-1"
                                       for="array-modal-distinct"
                                     >
                                       {{ T.arrayModalDistinctValues }}
@@ -298,7 +298,7 @@
                                   </div>
                                 </div>
                                 <div class="row mt-4">
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     <button
                                       type="button"
                                       class="btn btn-primary"
@@ -317,7 +317,7 @@
                                   </div>
                                 </div>
                                 <hr />
-                                <div class="text-left">
+                                <div class="text-start">
                                   {{ T.arrayModalGeneratedArray }}
                                 </div>
                                 <input
@@ -365,16 +365,16 @@
                               </h5>
                               <button
                                 type="button"
-                                class="close"
+                                class="btn-close"
                                 @click="matrixModalEdit = false"
                               >
-                                <span aria-hidden="true">&times;</span>
+                                
                               </button>
                             </div>
                             <div class="modal-body">
                               <div class="container">
                                 <div class="row mb-4">
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     {{ T.matrixModalRows }}
                                     <input
                                       v-model="line.data.rows"
@@ -392,7 +392,7 @@
                                       class="form-control"
                                     />
                                   </div>
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     {{ T.matrixModalMinimum }}
                                     <input
                                       v-model="line.data.min"
@@ -412,8 +412,8 @@
                                   </div>
                                 </div>
                                 <div class="row mt-2 mb-4">
-                                  <div class="col text-left">
-                                    <div class="mb-1 font-weight-bold">
+                                  <div class="col text-start">
+                                    <div class="mb-1 fw-bold">
                                       {{ T.matrixModalDistinct }}
                                     </div>
                                     <div class="dropdown d-inline-block">
@@ -421,7 +421,7 @@
                                         type="button"
                                         class="btn btn-light dropdown-toggle"
                                         data-matrix-modal-dropdown
-                                        data-toggle="dropdown"
+                                        data-bs-toggle="dropdown"
                                         aria-haspopup="true"
                                         aria-expanded="false"
                                       >
@@ -457,7 +457,7 @@
                                   </div>
                                 </div>
                                 <div class="row mt-4">
-                                  <div class="col text-left">
+                                  <div class="col text-start">
                                     <button
                                       type="button"
                                       class="btn btn-primary"
@@ -477,7 +477,7 @@
                                   </div>
                                 </div>
                                 <hr />
-                                <div class="text-left">
+                                <div class="text-start">
                                   {{ T.matrixModalGeneratedArray }}
                                 </div>
                                 <textarea
@@ -534,7 +534,7 @@
                 <div
                   class="row d-flex justify-content-between align-items-center"
                 >
-                  <div class="col pr-1 text-center">
+                  <div class="col pe-1 text-center">
                     <textarea
                       v-model="getSelectedCase.output"
                       data-output-textarea
@@ -566,14 +566,14 @@
       <button
         type="button"
         data-edit-case-add-line
-        class="btn btn-light mr-2"
+        class="btn btn-light me-2"
         @click="addNewLine"
       >
         <div class="container">
           <div class="row">
             <font-awesome-icon
               icon="plus-square"
-              class="text-info mr-2 pt-1"
+              class="text-info me-2 pt-1"
             />
             {{ T.problemCreatorAddLine }}
           </div>

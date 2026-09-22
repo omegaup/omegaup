@@ -5,7 +5,7 @@
       <omegaup-markdown :markdown="policyMarkdown"></omegaup-markdown>
       <form @submit.prevent="$emit('submit')">
         <div class="top-margin text-center">
-          <label class="mr-5"
+          <label class="me-5"
             ><input
               v-model="currentAgreed"
               name="agreed"

@@ -6,11 +6,11 @@
         method="post"
         @submit="currentError = null"
       >
-        <div class="form-group">
+        <div class="mb-3">
           <label for="language">{{ T.libinteractiveLanguage }}</label>
           <select
             v-model="currentLanguage"
-            class="custom-select"
+            class="form-select"
             name="language"
             :class="{ 'is-invalid': errorField === 'language' }"
             required
@@ -20,11 +20,11 @@
             <option value="java">Java</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label for="os">{{ T.libinteractiveOs }}</label>
           <select
             v-model="currentOs"
-            class="custom-select"
+            class="form-select"
             name="os"
             :class="{ 'is-invalid': errorField === 'os' }"
             required
@@ -33,7 +33,7 @@
             <option value="unix">Linux/Mac OS</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label for="name">{{ T.libinteractiveIdlFilename }}</label>
           <input
             v-model="currentName"
@@ -45,7 +45,7 @@
           />
           <p>{{ T.libinteractiveIdlFilenameHelp }}</p>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label for="idl">IDL</label>
           <textarea
             v-model="currentIdl"
@@ -56,7 +56,7 @@
             required
           ></textarea>
         </div>
-        <div class="form-group text-right">
+        <div class="mb-3 text-end">
           <button type="submit" class="btn btn-primary">
             <font-awesome-icon
               icon="cloud-download-alt"

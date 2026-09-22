@@ -5,8 +5,8 @@
         class="form"
         @submit.prevent="$emit('add-group-admin', groupAlias.key)"
       >
-        <div class="form-group mb-0">
-          <label class="font-weight-bold w-100"
+        <div class="mb-3 mb-0">
+          <label class="fw-bold w-100"
             >{{ T.wordsGroupAdmin }}
             <font-awesome-icon
               :title="T.courseEditAddGroupAdminsTooltip"

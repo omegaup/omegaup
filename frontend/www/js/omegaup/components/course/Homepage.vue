@@ -1,7 +1,7 @@
 <template>
   <div data-homepage-course>
     <div class="row p-4 text-center justify-content-around align-items-center">
-      <h2 class="col-12 mb-5 font-italic">{{ T.courseHomepageTitle }}</h2>
+      <h2 class="col-12 mb-5 fst-italic">{{ T.courseHomepageTitle }}</h2>
       <a
         class="col-xs-6 col-sm-3 btn btn-primary btn-lg mx-auto custom-button"
         role="button"
@@ -12,7 +12,7 @@
     <div class="dropdown-divider"></div>
     <div class="container-lg">
       <div
-        class="row p-4 text-center text-md-left justify-content-around align-items-center"
+        class="row p-4 text-center text-md-start justify-content-around align-items-center"
       >
         <div class="p-3 col-md-5 mt-2 mt-md-0">
           <img
@@ -28,7 +28,7 @@
         </div>
       </div>
       <div
-        class="row p-4 text-center text-md-left justify-content-around align-items-center"
+        class="row p-4 text-center text-md-start justify-content-around align-items-center"
       >
         <div class="p-3 col-md-5 order-md-2 mt-2 mt-md-0">
           <img

@@ -1,6 +1,6 @@
 <template>
   <div class="row p-4 text-center justify-content-around align-items-center">
-    <h3 class="col-12 mb-3 display-4 font-weight-medium">{{ title }}</h3>
+    <h3 class="col-12 mb-3 display-4 fw-medium">{{ title }}</h3>
     <div
       class="p-3 col-md-6 mt-2 mt-md-0"
       :class="{ 'order-md-2': imageToRight }"

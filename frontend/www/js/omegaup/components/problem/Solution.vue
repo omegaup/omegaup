@@ -7,7 +7,7 @@
   </div>
   <div v-else class="card">
     <div class="row p-3">
-      <div class="col-12 text-right">
+      <div class="col-12 text-end">
         <a :href="SolutionViewFeatureGuideURL"
           ><font-awesome-icon :icon="['fas', 'question-circle']" />
           {{ T.officialSolutionsInfo }}</a

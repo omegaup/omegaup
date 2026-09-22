@@ -8,8 +8,8 @@
       <button
         type="button"
         class="btn btn-primary d-block mx-auto"
-        data-toggle="modal"
-        data-target=".modal"
+        data-bs-toggle="modal"
+        data-bs-target=".modal"
       >
         {{ archiveButtonDescription }}
       </button>
@@ -22,14 +22,14 @@
                 <button
                   type="button"
                   class="btn btn-secondary"
-                  data-dismiss="modal"
+                  data-bs-dismiss="modal"
                 >
                   {{ T.wordsClose }}
                 </button>
                 <button
                   type="button"
                   class="btn btn-primary"
-                  data-dismiss="modal"
+                  data-bs-dismiss="modal"
                   @click="onArchive"
                 >
                   {{ T.wordsConfirm }}

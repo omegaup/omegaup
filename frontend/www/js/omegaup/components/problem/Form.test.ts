@@ -144,7 +144,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    expect(wrapper.find('.form-group.col-md-6.introjs-file').exists()).toBe(
+    expect(wrapper.find('.mb-3.col-md-6.introjs-file').exists()).toBe(
       false,
     );
   });

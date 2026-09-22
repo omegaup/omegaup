@@ -3,7 +3,7 @@
     <div v-if="!isProfile" class="card-header">
       <h4 class="card-title">
         {{ T.omegaupTitleBadges }}
-        <span class="badge badge-secondary">{{ badges.length }} </span>
+        <span class="badge text-bg-secondary">{{ badges.length }} </span>
       </h4>
     </div>
     <div class="card-body">

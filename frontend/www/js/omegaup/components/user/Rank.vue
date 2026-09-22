@@ -18,9 +18,9 @@
       >
     </h5>
     <div v-if="!isIndex" class="card-body">
-      <div class="form-row mb-2">
+      <div class="row mb-2">
         <omegaup-common-typeahead
-          class="col col-md-4 pl-0 pr-2"
+          class="col col-md-4 ps-0 pe-2"
           :existing-options="searchResultUsers"
           :value.sync="searchedUsername"
           :max-results="10"
@@ -29,7 +29,7 @@
           "
         ></omegaup-common-typeahead>
         <button
-          class="btn btn-primary form-control col-4 col-md-2 mr-0 mr-md-2"
+          class="btn btn-primary form-control col-4 col-md-2 me-0 me-md-2"
           type="button"
           @click="onSubmit"
         >
@@ -38,7 +38,7 @@
         <template v-if="Object.keys(availableFilters).length > 0">
           <select
             v-model="currentFilter"
-            class="filter form-control col-12 col-md-4 mt-2 mt-md-0"
+            class="filter form-select col-12 col-md-4 mt-2 mt-md-0"
           >
             <option value="">
               {{ T.wordsSelectFilter }}
@@ -57,41 +57,41 @@
         <template v-if="!isSelectionMode">
           <a
             href="/rank/compare/"
-            class="btn btn-outline-primary btn-sm mr-2 mb-2 d-flex align-items-center"
+            class="btn btn-outline-primary btn-sm me-2 mb-2 d-flex align-items-center"
           >
-            <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
+            <font-awesome-icon :icon="['fas', 'exchange-alt']" class="me-1" />
             {{ T.compareUsersTitle }}
           </a>
           <button
-            class="btn btn-outline-secondary btn-sm mr-2 mb-2 d-flex align-items-center"
+            class="btn btn-outline-secondary btn-sm me-2 mb-2 d-flex align-items-center"
             @click="isSelectionMode = true"
           >
-            <font-awesome-icon :icon="['fas', 'check-square']" class="mr-1" />
+            <font-awesome-icon :icon="['fas', 'check-square']" class="me-1" />
             {{ T.selectTwoUsersToCompare }}
           </button>
         </template>
         <template v-else>
           <button
-            class="btn btn-outline-secondary btn-sm mr-2 mb-2 d-flex align-items-center"
+            class="btn btn-outline-secondary btn-sm me-2 mb-2 d-flex align-items-center"
             @click="cancelSelection"
           >
-            <font-awesome-icon :icon="['fas', 'times']" class="mr-1" />
+            <font-awesome-icon :icon="['fas', 'times']" class="me-1" />
             {{ T.wordsCancel }}
           </button>
           <button
-            class="btn btn-primary btn-sm mr-2 mb-2 d-flex align-items-center"
+            class="btn btn-primary btn-sm me-2 mb-2 d-flex align-items-center"
             :disabled="selectedUsers.length !== 2"
             @click="compareSelectedUsers"
           >
-            <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
+            <font-awesome-icon :icon="['fas', 'exchange-alt']" class="me-1" />
             {{ T.compareUsersTitle }}
           </button>
           <button
             v-if="selectedUsers.length === 1 && currentUsername"
-            class="btn btn-outline-primary btn-sm mr-2 mb-2 d-flex align-items-center"
+            class="btn btn-outline-primary btn-sm me-2 mb-2 d-flex align-items-center"
             @click="compareVsMe"
           >
-            <font-awesome-icon :icon="['fas', 'user']" class="mr-1" />
+            <font-awesome-icon :icon="['fas', 'user']" class="me-1" />
             {{ T.compareVsMe }}
           </button>
         </template>
@@ -101,7 +101,7 @@
       <h2>{{ T.userRankEmptyList }}</h2>
     </div>
     <div v-else>
-      <p class="text-right mr-3 mb-2 text-muted">{{ lastUpdatedText }}</p>
+      <p class="text-end me-3 mb-2 text-muted">{{ lastUpdatedText }}</p>
       <table class="table mb-0 table-responsive-sm">
         <thead>
           <tr>
@@ -112,22 +112,22 @@
             >
               {{ T.wordsSelect }}
             </th>
-            <th scope="col" class="pl-4 column-width align-middle">#</th>
+            <th scope="col" class="ps-4 column-width align-middle">#</th>
             <th scope="col" class="align-middle">{{ T.contestParticipant }}</th>
-            <th scope="col" class="text-right align-middle">
+            <th scope="col" class="text-end align-middle">
               {{ T.rankScore }}
             </th>
             <th
               v-if="!isIndex"
               scope="col"
-              class="text-right pr-4 align-middle"
+              class="text-end pe-4 align-middle"
             >
               {{ T.rankSolved }}
               <!-- id-lint off -->
               <button
                 id="popover-solved-problems"
                 type="button"
-                class="btn btn-sm ml-1"
+                class="btn btn-sm ms-1"
                 :title="T.userRankSolvedProblemsHelp"
               >
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
@@ -154,7 +154,7 @@
                 @change="toggleUserSelection(user.username)"
               />
             </td>
-            <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
+            <th scope="row" class="ps-4 column-width">{{ user.rank }}</th>
             <td class="coder-column">
               <div class="coder-cell">
                 <span class="coder-flag">
@@ -174,8 +174,8 @@
                 </span>
               </div>
             </td>
-            <td class="text-right">{{ user.score.toFixed(2) }}</td>
-            <td v-if="!isIndex" class="text-right pr-4">
+            <td class="text-end">{{ user.score.toFixed(2) }}</td>
+            <td v-if="!isIndex" class="text-end pe-4">
               {{ user.problems_solved }}
             </td>
           </tr>
