@@ -81,11 +81,7 @@ import Clipboard from 'v-clipboard';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
@@ -95,8 +91,6 @@ export default defineComponent({
   name: 'CertificateMine',
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
   },
   props: {
     certificates: {
