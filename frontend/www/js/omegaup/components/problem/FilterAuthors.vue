@@ -30,12 +30,10 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 import user_Username from '../user/Username.vue';
 
 @Component({
   components: {
-    'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
     'omegaup-user-username': user_Username,
   },
 })
