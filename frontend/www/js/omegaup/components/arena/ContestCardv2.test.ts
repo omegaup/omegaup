@@ -81,23 +81,16 @@ describe('ContestCardv2.vue', () => {
       },
     });
 
-    const contestEnrollStatus = wrapper.findComponent({
-      ref: 'contestEnrollStatus',
-    });
-
-    const contestButtonEnter = wrapper.findComponent({
-      ref: 'contestButtonEnter',
-    });
+    const contestEnrollStatus = wrapper.find('[data-contest-enroll-status]');
+    const contestButtonEnter = wrapper.find('[data-contest-button-enter]');
 
     expect(contestEnrollStatus.exists()).toBe(true);
     expect(contestButtonEnter.text()).toBe(T.contestButtonEnter);
 
-    const contestButtonVirtual = wrapper.findComponent({
-      ref: 'contestButtonVirtual',
-    });
-    const contestButtonPractice = wrapper.findComponent({
-      ref: 'contestButtonPractice',
-    });
+    const contestButtonVirtual = wrapper.find('[data-contest-button-virtual]');
+    const contestButtonPractice = wrapper.find(
+      '[data-contest-button-practice]',
+    );
 
     expect(contestButtonVirtual.exists()).toBe(true);
     expect(contestButtonPractice.exists()).toBe(true);
@@ -111,15 +104,11 @@ describe('ContestCardv2.vue', () => {
       },
     });
 
-    const contestEnrollStatus = wrapper.findComponent({
-      ref: 'contestEnrollStatus',
-    });
-    const contestButtonEnter = wrapper.findComponent({
-      ref: 'contestButtonEnter',
-    });
-    const contestButtonSeeDetails = wrapper.findComponent({
-      ref: 'contestButtonSeeDetails',
-    });
+    const contestEnrollStatus = wrapper.find('[data-contest-enroll-status]');
+    const contestButtonEnter = wrapper.find('[data-contest-button-enter]');
+    const contestButtonSeeDetails = wrapper.find(
+      '[data-contest-button-see-details]',
+    );
     const contestIconRecommended = wrapper.findComponent({
       ref: 'contestIconRecommended',
     });
@@ -138,9 +127,9 @@ describe('ContestCardv2.vue', () => {
       },
     });
 
-    const contestButtonScoreboard = wrapper.findComponent({
-      ref: 'contestButtonScoreboard',
-    });
+    const contestButtonScoreboard = wrapper.find(
+      '[data-contest-button-scoreboard]',
+    );
 
     expect(contestButtonScoreboard.exists()).toBe(true);
   });

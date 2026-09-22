@@ -1,81 +1,92 @@
 <template>
-  <b-container fluid class="p-5">
+  <div class="container-fluid p-5">
     <div>
       <a class="mb-2" :href="`/course/${course.alias}/`">
-        <b-icon-chevron-left></b-icon-chevron-left>
+        <font-awesome-icon icon="chevron-left" />
         {{ T.arenaCourseAllContent }}
       </a>
       <h2 class="mb-0">{{ course.name }}</h2>
       <h4>{{ assignment.name }}</h4>
     </div>
-    <b-row class="px-3 mt-4 align-items-start">
-      <b-card no-body class="col-md-3 col-lg-2 p-0 text-center">
-        <b-card-header header-tag="nav" class="border-0">
-          <b-nav card-header pills justified>
-            <b-nav-item
-              :href="`#${Tabs.Summary}`"
-              :active="currentSelectedTab === Tabs.Summary"
-              @click="currentSelectedTab = Tabs.Summary"
-              >{{ T.wordsSummary }}</b-nav-item
-            >
-            <b-nav-item
-              v-if="scoreboard"
-              :href="`#${Tabs.Ranking}`"
-              :active="currentSelectedTab === Tabs.Ranking"
-              @click="currentSelectedTab = Tabs.Ranking"
-              >{{ T.wordsRanking }}</b-nav-item
-            >
-          </b-nav>
+    <div class="row px-3 mt-4 align-items-start">
+      <div class="card col-md-3 col-lg-2 p-0 text-center">
+        <nav class="card-header border-0">
+          <ul class="nav nav-pills nav-justified">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: currentSelectedTab === Tabs.Summary }"
+                :href="`#${Tabs.Summary}`"
+                @click="currentSelectedTab = Tabs.Summary"
+                >{{ T.wordsSummary }}</a
+              >
+            </li>
+            <li v-if="scoreboard" class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: currentSelectedTab === Tabs.Ranking }"
+                :href="`#${Tabs.Ranking}`"
+                @click="currentSelectedTab = Tabs.Ranking"
+                >{{ T.wordsRanking }}</a
+              >
+            </li>
+          </ul>
           <hr />
-          <b-nav card-header pills vertical>
-            <b-nav-item
+          <ul class="nav nav-pills flex-column">
+            <li
               v-for="problem in problems"
               :key="problem.alias"
-              :href="`/course/${encodeURIComponent(
-                course.alias,
-              )}/arena/${encodeURIComponent(
-                assignment.alias,
-              )}/problem/${encodeURIComponent(problem.alias)}/`"
-              :active="
-                !currentSelectedTab &&
-                currentProblem &&
-                currentProblem.alias === problem.alias
-              "
-              >{{
-                ui.formatString(T.arenaCourseProblemTitle, {
-                  letter: problem.letter,
-                  title: problem.title,
-                })
-              }}</b-nav-item
+              class="nav-item"
             >
-          </b-nav>
+              <a
+                class="nav-link"
+                :href="`/course/${encodeURIComponent(
+                  course.alias,
+                )}/arena/${encodeURIComponent(
+                  assignment.alias,
+                )}/problem/${encodeURIComponent(problem.alias)}/`"
+                :class="{
+                  active:
+                    !currentSelectedTab &&
+                    currentProblem &&
+                    currentProblem.alias === problem.alias,
+                }"
+                >{{
+                  ui.formatString(T.arenaCourseProblemTitle, {
+                    letter: problem.letter,
+                    title: problem.title,
+                  })
+                }}</a
+              >
+            </li>
+          </ul>
           <hr />
           <div>
-            <b-button
+            <a
               v-if="previousAssignment"
-              block
-              variant="info"
+              class="btn btn-info btn-block"
               :href="`/course/${encodeURIComponent(
                 course.alias,
               )}/arena/${encodeURIComponent(previousAssignment.alias)}/`"
-              ><b-icon-arrow-left-circle-fill></b-icon-arrow-left-circle-fill>
+            >
+              <font-awesome-icon icon="arrow-circle-left" />
               {{ previousAssignment.name }}
-            </b-button>
-            <b-button
+            </a>
+            <a
               v-if="nextAssignment"
-              block
-              variant="info"
+              class="btn btn-info btn-block"
               :href="`/course/${encodeURIComponent(
                 course.alias,
               )}/arena/${encodeURIComponent(nextAssignment.alias)}/`"
-              >{{ nextAssignment.name }}
-              <b-icon-arrow-right-circle-fill></b-icon-arrow-right-circle-fill>
-            </b-button>
+            >
+              {{ nextAssignment.name }}
+              <font-awesome-icon icon="arrow-circle-right" />
+            </a>
           </div>
-        </b-card-header>
-      </b-card>
+        </nav>
+      </div>
 
-      <b-col md="9" lg="10" class="mt-3 mt-md-0">
+      <div class="col-md-9 col-lg-10 mt-3 mt-md-0">
         <omegaup-markdown
           v-if="currentSelectedTab === Tabs.Summary"
           :markdown="assignment.description"
@@ -112,9 +123,9 @@
             }
           "
         ></omegaup-problem-details>
-      </b-col>
-    </b-row>
-  </b-container>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -126,15 +137,10 @@ import omegaup_Markdown from '../Markdown.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import problem_Details from '../problem/Detailsv2.vue';
 
-import {
-  BIconChevronLeft,
-  BIconArrowLeftCircleFill,
-  BIconArrowRightCircleFill,
-  BootstrapVue,
-} from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
 
 export enum Tabs {
   Summary = 'summary',
@@ -143,9 +149,7 @@ export enum Tabs {
 
 @Component({
   components: {
-    BIconChevronLeft,
-    BIconArrowLeftCircleFill,
-    BIconArrowRightCircleFill,
+    FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-problem-details': problem_Details,

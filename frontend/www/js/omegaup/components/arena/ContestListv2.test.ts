@@ -196,9 +196,7 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const currentContestTab = wrapper.findComponent({
-      ref: 'currentContestTab',
-    });
+    const currentContestTab = wrapper.find('[data-contest-tab="current"]');
 
     expect(currentContestTab.exists()).toBe(true);
     expect(currentContestTab.text()).toContain('Current Contest 1');
@@ -212,9 +210,7 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const futureContestTab = wrapper.findComponent({
-      ref: 'futureContestTab',
-    });
+    const futureContestTab = wrapper.find('[data-contest-tab="future"]');
 
     expect(futureContestTab.exists()).toBe(true);
     expect(futureContestTab.text()).toContain('Future Contest 1');
@@ -228,9 +224,7 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const pastContestTab = wrapper.findComponent({
-      ref: 'pastContestTab',
-    });
+    const pastContestTab = wrapper.find('[data-contest-tab="past"]');
 
     expect(pastContestTab.exists()).toBe(true);
     expect(pastContestTab.text()).toContain('Past Contest 1');
@@ -271,9 +265,7 @@ describe('ContestListv2.vue', () => {
         tab: ContestTab.Current,
       },
     });
-    const dropdownFilterBy = wrapper.findComponent({
-      ref: 'dropdownFilterBy',
-    });
+    const dropdownFilterBy = wrapper.find('[data-dropdown-filter]');
     // Current filter "By All" is turned on by default
     expect(wrapper.vm.currentFilter).toBe(ContestFilter.All);
     await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
@@ -302,9 +294,8 @@ describe('ContestListv2.vue', () => {
         },
       });
 
-      const dropdownOrderBy = wrapper.findComponent({
-        ref: 'dropdownOrderBy',
-      }).element as HTMLInputElement;
+      const dropdownOrderBy = wrapper.find('[data-dropdown-order]')
+        .element as HTMLInputElement;
 
       dropdownOrderBy.value = value;
       await dropdownOrderBy.dispatchEvent(new Event('change'));
@@ -368,7 +359,7 @@ describe('ContestListv2.vue', () => {
           },
         });
 
-        const dropdown = wrapper.findComponent({ ref: 'dropdownOrderBy' });
+        const dropdown = wrapper.find('[data-dropdown-order]');
         expect(dropdown.exists()).toBeTruthy();
         expect(wrapper.vm.currentOrder).toBe(ContestOrder.None);
 
