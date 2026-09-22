@@ -18,21 +18,28 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 
 import omegaup_Markdown from '../Markdown.vue';
 
-@Component({
+export default defineComponent({
+  name: 'CertificateDetails',
   components: {
     'omegaup-markdown': omegaup_Markdown,
   },
-})
-export default class CertificateDetails extends Vue {
-  @Prop() uuid!: string;
-
-  T = T;
-  ui = ui;
-}
+  props: {
+    uuid: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+    };
+  },
+});
 </script>

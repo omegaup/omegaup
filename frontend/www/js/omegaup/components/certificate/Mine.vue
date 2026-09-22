@@ -75,7 +75,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue, { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import Clipboard from 'v-clipboard';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -90,52 +91,64 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 Vue.use(Clipboard);
 
-@Component({
+export default defineComponent({
+  name: 'CertificateMine',
   components: {
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
-})
-export default class Mine extends Vue {
-  @Prop() certificates!: types.CertificateListItem[];
-  @Prop() selectedCertificate?: string;
-  @Prop() location!: string;
-
-  T = T;
-  ui = ui;
-
-  getDownloadLink(verificationCode: string): string {
-    return `${this.location}/certificate/${verificationCode}.pdf/`;
-  }
-
-  getVerificationLink(verificationCode: string): string {
-    return `${this.location}/cert/${verificationCode}/`;
-  }
-
-  getReason(name: string | null, type: string): string {
-    if (name === null) {
-      return type === 'coder_of_the_month'
-        ? T.certificateListMineCoderOfTheMonth
-        : T.certificateListMineCoderOfTheMonthFemale;
-    }
-    if (type === 'contest') {
-      return ui.formatString(T.certificateListMineContest, {
-        contest_title: name,
+  props: {
+    certificates: {
+      type: Array as PropType<types.CertificateListItem[]>,
+      required: true,
+    },
+    selectedCertificate: {
+      type: String,
+      default: undefined,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['show-copy-message', 'show-download-message'],
+  data() {
+    return {
+      T,
+      ui,
+    };
+  },
+  methods: {
+    getDownloadLink(verificationCode: string): string {
+      return `${this.location}/certificate/${verificationCode}.pdf/`;
+    },
+    getVerificationLink(verificationCode: string): string {
+      return `${this.location}/cert/${verificationCode}/`;
+    },
+    getReason(name: string | null, type: string): string {
+      if (name === null) {
+        return type === 'coder_of_the_month'
+          ? T.certificateListMineCoderOfTheMonth
+          : T.certificateListMineCoderOfTheMonthFemale;
+      }
+      if (type === 'contest') {
+        return ui.formatString(T.certificateListMineContest, {
+          contest_title: name,
+        });
+      }
+      return ui.formatString(T.certificateListMineCourse, {
+        course_name: name,
       });
-    }
-    return ui.formatString(T.certificateListMineCourse, {
-      course_name: name,
-    });
-  }
-
-  onCopyVerificationLink(): void {
-    this.$emit('show-copy-message');
-  }
-  onDownloadCertificate(): void {
-    this.$emit('show-download-message');
-  }
-}
+    },
+    onCopyVerificationLink(): void {
+      this.$emit('show-copy-message');
+    },
+    onDownloadCertificate(): void {
+      this.$emit('show-download-message');
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
