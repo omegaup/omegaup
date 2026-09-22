@@ -1,7 +1,43 @@
 <template>
-  <b-container fluid>
-    <b-tabs content-class="mt-3" align="center">
-      <b-tab :title="T.wordsProblem" active>
+  <div class="container-fluid">
+    <ul class="nav nav-tabs justify-content-center" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a
+          href="#problem"
+          class="nav-link"
+          :class="{ active: showTab === 'problem' }"
+          role="tab"
+          @click.prevent="showTab = 'problem'"
+        >
+          {{ T.wordsProblem }}
+        </a>
+      </li>
+      <li v-if="user.admin" class="nav-item" role="presentation">
+        <a
+          href="#runs"
+          data-runs-tab
+          class="nav-link"
+          :class="{ active: showTab === 'runs' }"
+          role="tab"
+          @click.prevent="showTab = 'runs'"
+        >
+          {{ T.wordsRuns }}
+        </a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#clarifications"
+          class="nav-link"
+          :class="{ active: showTab === 'clarifications' }"
+          role="tab"
+          @click.prevent="showTab = 'clarifications'"
+        >
+          {{ T.wordsClarifications }}
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content mt-3">
+      <div v-if="showTab === 'problem'" class="tab-pane active">
         <omegaup-problem-settings-summary
           :problem="problem"
           :show-edit-link="user.admin"
@@ -96,8 +132,8 @@
             </template>
           </omegaup-arena-runs-v2>
         </template>
-      </b-tab>
-      <b-tab v-if="user.admin" :title="T.wordsRuns" data-runs-tab>
+      </div>
+      <div v-if="user.admin && showTab === 'runs'" class="tab-pane active">
         <omegaup-arena-runs
           :runs="allRuns"
           :show-all-runs="true"
@@ -116,10 +152,10 @@
             <div></div>
           </template>
         </omegaup-arena-runs>
-      </b-tab>
-      <b-tab :title="T.wordsClarifications">a</b-tab>
-    </b-tabs>
-  </b-container>
+      </div>
+      <div v-if="showTab === 'clarifications'" class="tab-pane active">a</div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -137,11 +173,6 @@ import problem_SettingsSummary from './SettingsSummary.vue';
 import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import user_Username from '../user/Username.vue';
-
-import { BootstrapVue } from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
 
 export interface Tab {
   name: string;
@@ -187,6 +218,7 @@ export default class ProblemDetails extends Vue {
 
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = PopupDisplayed.None;
+  showTab = 'problem';
 
   get isReKarelProblem(): boolean {
     return this.filteredLanguages.includes('rk');
