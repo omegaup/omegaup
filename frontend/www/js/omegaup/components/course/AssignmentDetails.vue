@@ -417,12 +417,16 @@ export default class CourseAssignmentDetails extends Vue {
       this.alias !== (this.assignment.alias || '') ||
       this.assignmentType !== (this.assignment.assignment_type || 'homework') ||
       this.unlimitedDuration !== !this.assignment.finish_time ||
-      (this.startTime &&
-        this.assignment.start_time &&
-        this.startTime.getTime() !== this.assignment.start_time.getTime()) ||
-      (this.finishTime &&
-        this.assignment.finish_time &&
-        this.finishTime.getTime() !== this.assignment.finish_time.getTime());
+      Boolean(
+        this.startTime &&
+          this.assignment.start_time &&
+          this.startTime.getTime() !== this.assignment.start_time.getTime(),
+      ) ||
+      Boolean(
+        this.finishTime &&
+          this.assignment.finish_time &&
+          this.finishTime.getTime() !== this.assignment.finish_time.getTime(),
+      );
 
     const hasScheduledProblems =
       (this.scheduledProblemList?.problems?.length ?? 0) > 0;

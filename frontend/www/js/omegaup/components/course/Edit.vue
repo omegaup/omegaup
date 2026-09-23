@@ -324,7 +324,7 @@ import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import common_Archive from '../common/Archive.vue';
-import course_AssignmentDetails from './AssignmentDetails.vue';
+import CourseAssignmentDetails from './AssignmentDetails.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
@@ -375,7 +375,7 @@ const emptyAssignment: types.CourseAssignment = {
     'omegaup-course-form': course_Form,
     'omegaup-common-archive': common_Archive,
     'omegaup-course-assignment-list': course_AssignmentList,
-    'omegaup-course-assignment-details': course_AssignmentDetails,
+    'omegaup-course-assignment-details': CourseAssignmentDetails,
     'omegaup-course-admision-mode': course_AdmissionMode,
     'omegaup-course-add-students': course_AddStudents,
     'omegaup-common-admins': common_Admins,
@@ -387,7 +387,8 @@ const emptyAssignment: types.CourseAssignment = {
   },
 })
 export default class CourseEdit extends Vue {
-  @Ref('assignment-details') readonly assignmentDetails!: Vue;
+  @Ref('assignment-details')
+  readonly assignmentDetails!: CourseAssignmentDetails;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
@@ -461,7 +462,7 @@ export default class CourseEdit extends Vue {
   switchTab(tab: string): void {
     if (
       this.showTab === 'content' &&
-      (this.assignmentDetails as any)?.hasUnsavedChanges &&
+      this.assignmentDetails?.hasUnsavedChanges &&
       !window.confirm(T.courseUnsavedChangesWarning)
     ) {
       return;
