@@ -51,37 +51,37 @@
               <div class="container">
                 <div class="row justify-content-between align-items-center">
                   <div class="col-12 col-md-5 mb-2 mb-md-0 p-0">
-                <form @submit.prevent="onSearchQuery">
-                  <div class="input-group">
-                    <input
-                      v-model="currentQuery"
-                      class="form-control nav-link"
-                      type="text"
-                      name="query"
-                      autocomplete="off"
-                      autocorrect="off"
-                      autocapitalize="off"
-                      spellcheck="false"
-                      :placeholder="T.wordsKeyword"
-                      @input="onSearchQueryDebounced"
-                      @keyup.enter="onSearchQuery"
-                    />
-                    <button
-                      class="btn reset-btn nav-link"
-                      type="reset"
-                      @click="onReset"
-                    >
-                      &times;
-                    </button>
-                    <div class="input-group-append">
-                      <input
-                        class="btn btn-primary btn-style btn-md btn-block active nav-link"
-                        type="submit"
-                        :value="T.wordsSearch"
-                      />
-                    </div>
-                  </div>
-                </form>
+                    <form @submit.prevent="onSearchQuery">
+                      <div class="input-group">
+                        <input
+                          v-model="currentQuery"
+                          class="form-control nav-link"
+                          type="text"
+                          name="query"
+                          autocomplete="off"
+                          autocorrect="off"
+                          autocapitalize="off"
+                          spellcheck="false"
+                          :placeholder="T.wordsKeyword"
+                          @input="onSearchQueryDebounced"
+                          @keyup.enter="onSearchQuery"
+                        />
+                        <button
+                          class="btn reset-btn nav-link"
+                          type="reset"
+                          @click="onReset"
+                        >
+                          &times;
+                        </button>
+                        <div class="input-group-append">
+                          <input
+                            class="btn btn-primary btn-style btn-md btn-block active nav-link"
+                            type="submit"
+                            :value="T.wordsSearch"
+                          />
+                        </div>
+                      </div>
+                    </form>
                   </div>
                   <div class="d-flex col-12 col-sm-12 col-md-6 btns-group p-0">
                     <div
@@ -193,7 +193,9 @@
                     >
                       <button
                         class="btn"
-                        :class="isNonDefaultFilter ? 'btn-primary' : 'btn-light'"
+                        :class="
+                          isNonDefaultFilter ? 'btn-primary' : 'btn-light'
+                        "
                         type="button"
                         data-toggle="dropdown"
                         aria-haspopup="true"
@@ -243,7 +245,9 @@
                           @click.prevent="filterByRecommended"
                         >
                           <font-awesome-icon
-                            v-if="currentFilter === ContestFilter.OnlyRecommended"
+                            v-if="
+                              currentFilter === ContestFilter.OnlyRecommended
+                            "
                             icon="check"
                             class="mr-1"
                           />{{ T.contestFilterByRecommended }}
@@ -262,67 +266,69 @@
             class="scroll-content tab-pane"
             :class="{ active: currentTab === ContestTab.Current }"
           >
-          <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="`current-${index}`"
-              class="card contest-card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            <template v-if="loading || refreshing">
+              <div
+                v-for="index in 3"
+                :key="`current-${index}`"
+                class="card contest-card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+            <div v-else-if="contestListEmpty" class="empty-category">
+              {{ T.contestListEmpty }}
             </div>
-          </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
-            {{ T.contestListEmpty }}
-          </div>
-          <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
+            <template v-else>
+              <omegaup-contest-card
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                :contest="contestItem"
+              >
+                <template #contest-button-scoreboard>
+                  <div></div>
+                </template>
+                <template #text-contest-date>
+                  <div class="card-text">
+                    <font-awesome-icon icon="calendar-alt" />
+                    <a :href="getTimeLink(contestItem.finish_time)">
+                      {{ currentContestDate(contestItem) }}
+                    </a>
+                  </div>
+                </template>
+                <template #contest-dropdown>
+                  <div></div>
+                </template>
+              </omegaup-contest-card>
+            </template>
+            <template
+              v-if="isScrollLoading && currentTab === ContestTab.Current"
             >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <div class="card-text">
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{ currentContestDate(contestItem) }}
-                  </a>
-                </div>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
-          </template>
-          <template v-if="isScrollLoading && currentTab === ContestTab.Current">
-            <div
-              v-for="index in 3"
-              :key="`loading-more-current-${index}`"
-              class="card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
-            </div>
-          </template>
+              <div
+                v-for="index in 3"
+                :key="`loading-more-current-${index}`"
+                class="card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
 
-          <div
-            v-if="
-              !loading &&
-              !contestListEmpty &&
-              hasMore &&
-              currentTab === ContestTab.Current
-            "
-            class="text-center mb-2"
-          >
-            <button
-              class="btn btn-outline-primary w-100"
-              :disabled="isScrollLoading"
-              @click="loadMoreContests"
+            <div
+              v-if="
+                !loading &&
+                !contestListEmpty &&
+                hasMore &&
+                currentTab === ContestTab.Current
+              "
+              class="text-center mb-2"
             >
-              {{ showMoreContestButtonText }}
-            </button>
-          </div>
+              <button
+                class="btn btn-outline-primary w-100"
+                :disabled="isScrollLoading"
+                @click="loadMoreContests"
+              >
+                {{ showMoreContestButtonText }}
+              </button>
+            </div>
           </div>
           <div
             v-show="currentTab === ContestTab.Future"
@@ -331,70 +337,72 @@
             class="scroll-content tab-pane"
             :class="{ active: currentTab === ContestTab.Future }"
           >
-          <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="`future-${index}`"
-              class="card contest-card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            <template v-if="loading || refreshing">
+              <div
+                v-for="index in 3"
+                :key="`future-${index}`"
+                class="card contest-card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+            <div v-else-if="contestListEmpty" class="empty-category">
+              {{ T.contestListEmpty }}
             </div>
-          </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
-            {{ T.contestListEmpty }}
-          </div>
-          <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
+            <template v-else>
+              <omegaup-contest-card
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                :contest="contestItem"
+              >
+                <template #contest-button-scoreboard>
+                  <div></div>
+                </template>
+                <template #text-contest-date>
+                  <div class="card-text">
+                    <font-awesome-icon icon="calendar-alt" />
+                    <a :href="getTimeLink(contestItem.start_time)">
+                      {{ futureContestDate(contestItem) }}
+                    </a>
+                  </div>
+                </template>
+                <template #contest-button-enter>
+                  <div></div>
+                </template>
+                <template #contest-dropdown>
+                  <div></div>
+                </template>
+              </omegaup-contest-card>
+            </template>
+            <template
+              v-if="isScrollLoading && currentTab === ContestTab.Future"
             >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <div class="card-text">
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{ futureContestDate(contestItem) }}
-                  </a>
-                </div>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
-          </template>
-          <template v-if="isScrollLoading && currentTab === ContestTab.Future">
-            <div
-              v-for="index in 3"
-              :key="`loading-more-future-${index}`"
-              class="card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
-            </div>
-          </template>
+              <div
+                v-for="index in 3"
+                :key="`loading-more-future-${index}`"
+                class="card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
 
-          <div
-            v-if="
-              !loading &&
-              !contestListEmpty &&
-              hasMore &&
-              currentTab === ContestTab.Future
-            "
-            class="text-center mb-2"
-          >
-            <button
-              class="btn btn-outline-primary w-100"
-              :disabled="isScrollLoading"
-              @click="loadMoreContests"
+            <div
+              v-if="
+                !loading &&
+                !contestListEmpty &&
+                hasMore &&
+                currentTab === ContestTab.Future
+              "
+              class="text-center mb-2"
             >
-              {{ showMoreContestButtonText }}
-            </button>
-          </div>
+              <button
+                class="btn btn-outline-primary w-100"
+                :disabled="isScrollLoading"
+                @click="loadMoreContests"
+              >
+                {{ showMoreContestButtonText }}
+              </button>
+            </div>
           </div>
           <div
             v-show="currentTab === ContestTab.Past"
@@ -403,70 +411,70 @@
             class="scroll-content tab-pane"
             :class="{ active: currentTab === ContestTab.Past }"
           >
-          <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="`past-${index}`"
-              class="card contest-card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            <template v-if="loading || refreshing">
+              <div
+                v-for="index in 3"
+                :key="`past-${index}`"
+                class="card contest-card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+            <div v-else-if="contestListEmpty" class="empty-category">
+              {{ T.contestListEmpty }}
             </div>
-          </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
-            {{ T.contestListEmpty }}
-          </div>
-          <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-enroll-status>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <div class="card-text">
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{ pastContestDate(contestItem) }}
-                  </a>
-                </div>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-button-see-details>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
-          </template>
-          <template v-if="isScrollLoading && currentTab === ContestTab.Past">
-            <div
-              v-for="index in 3"
-              :key="`loading-more-past-${index}`"
-              class="card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
-            </div>
-          </template>
+            <template v-else>
+              <omegaup-contest-card
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                :contest="contestItem"
+              >
+                <template #contest-enroll-status>
+                  <div></div>
+                </template>
+                <template #text-contest-date>
+                  <div class="card-text">
+                    <font-awesome-icon icon="calendar-alt" />
+                    <a :href="getTimeLink(contestItem.finish_time)">
+                      {{ pastContestDate(contestItem) }}
+                    </a>
+                  </div>
+                </template>
+                <template #contest-button-enter>
+                  <div></div>
+                </template>
+                <template #contest-button-see-details>
+                  <div></div>
+                </template>
+              </omegaup-contest-card>
+            </template>
+            <template v-if="isScrollLoading && currentTab === ContestTab.Past">
+              <div
+                v-for="index in 3"
+                :key="`loading-more-past-${index}`"
+                class="card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
 
-          <div
-            v-if="
-              !loading &&
-              !contestListEmpty &&
-              hasMore &&
-              currentTab === ContestTab.Past
-            "
-            class="text-center mb-2"
-          >
-            <button
-              class="btn btn-outline-primary w-100"
-              :disabled="isScrollLoading"
-              @click="loadMoreContests"
+            <div
+              v-if="
+                !loading &&
+                !contestListEmpty &&
+                hasMore &&
+                currentTab === ContestTab.Past
+              "
+              class="text-center mb-2"
             >
-              {{ showMoreContestButtonText }}
-            </button>
-          </div>
+              <button
+                class="btn btn-outline-primary w-100"
+                :disabled="isScrollLoading"
+                @click="loadMoreContests"
+              >
+                {{ showMoreContestButtonText }}
+              </button>
+            </div>
           </div>
         </div>
       </div>

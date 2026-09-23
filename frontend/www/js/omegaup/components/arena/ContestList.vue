@@ -249,10 +249,7 @@
                   </template>
 
                   <template #text-contest-date>
-                    <div
-                      v-if="tab === ContestTab.Current"
-                      class="card-text"
-                    >
+                    <div v-if="tab === ContestTab.Current" class="card-text">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.finish_time)"
@@ -273,10 +270,7 @@
                         {{ futureContestDate(contestItem) }}
                       </a>
                     </div>
-                    <div
-                      v-else-if="tab === ContestTab.Past"
-                      class="card-text"
-                    >
+                    <div v-else-if="tab === ContestTab.Past" class="card-text">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.finish_time)"

@@ -144,9 +144,7 @@ describe('Runsv2.vue', () => {
 
     // TLE run
     expect(table.text()).toContain(runs[1].guid);
-    expect(table.text()).toContain(
-      `>${(runs[1].runtime / 1000).toFixed(2)} s`,
-    );
+    expect(table.text()).toContain(`>${(runs[1].runtime / 1000).toFixed(2)} s`);
   });
 
   it('Should handle JE and CE runs', () => {
