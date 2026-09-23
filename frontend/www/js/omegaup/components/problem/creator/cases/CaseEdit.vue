@@ -81,7 +81,10 @@
         >
           <div class="container">
             <div class="row">
-              <font-awesome-icon icon="trash-alt" class="text-danger mr-1 pt-1" />
+              <font-awesome-icon
+                icon="trash-alt"
+                class="text-danger mr-1 pt-1"
+              />
               {{ T.problemCreatorDeleteCase }}
             </div>
           </div>
@@ -241,7 +244,9 @@
                         <div class="modal-dialog" role="document">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title">{{ T.arrayEditTitle }}</h5>
+                              <h5 class="modal-title">
+                                {{ T.arrayEditTitle }}
+                              </h5>
                               <button
                                 type="button"
                                 class="close"
@@ -284,7 +289,6 @@
                                 <div class="row mt-2 mb-4">
                                   <div class="col text-left">
                                     <input
-                                      id="array-modal-distinct"
                                       v-model="line.data.distinct"
                                       type="checkbox"
                                       data-array-modal-checkbox
@@ -516,10 +520,7 @@
                       :title="T.problemCreatorLineDelete"
                       @click="deleteLine(line.lineID)"
                     >
-                      <font-awesome-icon
-                        icon="trash-alt"
-                        class="text-danger"
-                      />
+                      <font-awesome-icon icon="trash-alt" class="text-danger" />
                     </button>
                   </div>
                 </div>
@@ -571,10 +572,7 @@
       >
         <div class="container">
           <div class="row">
-            <font-awesome-icon
-              icon="plus-square"
-              class="text-info mr-2 pt-1"
-            />
+            <font-awesome-icon icon="plus-square" class="text-info mr-2 pt-1" />
             {{ T.problemCreatorAddLine }}
           </div>
         </div>

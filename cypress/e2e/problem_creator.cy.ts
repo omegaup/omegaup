@@ -281,13 +281,7 @@ describe('Problem creator Test', () => {
 
         // Assert copied layout applied correctly to last case
         cy.get('[data-sidebar-cases-ungrouped]').last().click();
-        const caseTypesUpdated = [
-          { type: 'multiline', text: T.problemCreatorLineArray },
-          { type: 'array', text: T.problemCreatorLineArray },
-          { type: 'matrix', text: T.problemCreatorLineMatrix },
-          { type: 'line', text: T.problemCreatorLineLine },
-        ];
-        problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
+        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
           lineCases.forEach((lineCase) => {
             cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
               .invoke('text')

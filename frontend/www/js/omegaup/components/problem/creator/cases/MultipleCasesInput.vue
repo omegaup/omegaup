@@ -3,9 +3,8 @@
     <div class="row">
       <div class="col">
         <div data-prefix class="form-group mb-4">
-          <label for="prefix">{{ T.problemCreatorPrefix }}</label>
+          <label>{{ T.problemCreatorPrefix }}</label>
           <input
-            id="prefix"
             v-model="multipleCasesPrefix"
             data-problem-creator-multiple-cases-input="prefix"
             class="form-control"
@@ -17,9 +16,8 @@
       </div>
       <div class="col">
         <div class="form-group mb-4">
-          <label for="suffix">{{ T.problemCreatorSuffix }}</label>
+          <label>{{ T.problemCreatorSuffix }}</label>
           <input
-            id="suffix"
             v-model="multipleCasesSuffix"
             data-problem-creator-multiple-cases-input="suffix"
             class="form-control"
@@ -31,11 +29,8 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="multiple-cases-count">{{
-        T.problemCreatorNumberOfCases
-      }}</label>
+      <label>{{ T.problemCreatorNumberOfCases }}</label>
       <input
-        id="multiple-cases-count"
         v-model.number="multipleCasesCount"
         data-problem-creator-multiple-cases-input="count"
         class="form-control"
@@ -48,9 +43,8 @@
       </small>
     </div>
     <div class="form-group">
-      <label for="multiple-cases-group">{{ T.problemCreatorGroupName }}</label>
+      <label>{{ T.problemCreatorGroupName }}</label>
       <select
-        id="multiple-cases-group"
         v-model="multipleCasesGroup"
         name="multiple-cases-group"
         class="custom-select"

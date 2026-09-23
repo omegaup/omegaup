@@ -444,10 +444,7 @@
                 </div>
               </div>
             </div>
-            <div
-              v-if="editGroupModal[groupID]"
-              data-sidebar-edit-group-modal
-            >
+            <div v-if="editGroupModal[groupID]" data-sidebar-edit-group-modal>
               <div class="modal fade show d-block" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
