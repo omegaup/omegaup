@@ -296,11 +296,6 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     ): array {
         $rowsPerPage = min(100, max(1, intval($rowsPerPage)));
         $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
-        if (is_null($identityId)) {
-            $indexHint = 'USE INDEX(PRIMARY)';
-        } else {
-            $indexHint = '';
-        }
         $sql = "
             SELECT
                 s.`time`,
@@ -316,7 +311,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.memory,
                 IFNULL(ur.classname, 'user-rank-unranked') AS classname
             FROM
-                Submissions s $indexHint
+                Submissions s
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             LEFT JOIN

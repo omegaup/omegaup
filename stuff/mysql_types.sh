@@ -23,6 +23,10 @@ else
 	fi
 fi
 
+disable_general_log() {
+	mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL general_log = 'OFF';"
+}
+
 # Clean up anything that might have been left from a previous run.
 if [[ -d "${OMEGAUP_ROOT}/frontend/tests/runfiles/" ]]; then
 	find "${OMEGAUP_ROOT}/frontend/tests/runfiles/" -mindepth 2 -name mysql_types.log -exec rm -f {} \;
@@ -31,12 +35,14 @@ fi
 # Enable General Query Log
 mysql "${MYSQL_ARGS[@]}" -e "TRUNCATE TABLE mysql.general_log;"
 mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL general_log = 'ON';"
+trap disable_general_log EXIT
 mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL log_output = 'TABLE';"
 
 "${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
 
 # Disable General Query Log
-mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL general_log = 'OFF';"
+disable_general_log
+trap - EXIT
 
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \

@@ -439,6 +439,33 @@ export namespace types {
       );
     }
 
+    export function CarouselManagementPayload(
+      elementId: string = 'payload',
+    ): types.CarouselManagementPayload {
+      return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CertificateDetailsPayload(
       elementId: string = 'payload',
     ): types.CertificateDetailsPayload {
@@ -1602,6 +1629,32 @@ export namespace types {
       );
     }
 
+    export function CronsDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CronsDetailsPayload {
+      return ((x) => {
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+              x.finished_at = ((x: number) => new Date(x * 1000))(
+                x.finished_at,
+              );
+            if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+              x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function EmailEditDetailsPayload(
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
@@ -1733,6 +1786,21 @@ export namespace types {
       elementId: string = 'payload',
     ): types.IndexPayload {
       return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
         x.coderOfTheMonthData = ((x) => {
           if (typeof x.all !== 'undefined' && x.all !== null)
             x.all = ((x) => {
@@ -3000,12 +3068,16 @@ export namespace types {
     excerpt: string;
     expiration_date?: Date;
     image_url: string;
+    is_active: boolean;
     link: string;
-    status: boolean;
     title: string;
   }
 
   export interface CarouselItemListPayload {
+    carouselItems: types.CarouselItem[];
+  }
+
+  export interface CarouselManagementPayload {
     carouselItems: types.CarouselItem[];
   }
 
@@ -3788,6 +3860,38 @@ export namespace types {
     teachingAssistant: types.FilteredCourse[];
   }
 
+  export interface CronJob {
+    description?: string;
+    enabled: boolean;
+    name: string;
+    schedule?: string;
+  }
+
+  export interface CronRun {
+    duration_seconds?: number;
+    error_text?: string;
+    finished_at?: Date;
+    hostname?: string;
+    name: string;
+    phases: types.CronRunPhase[];
+    rows_affected?: number;
+    run_id: number;
+    started_at?: Date;
+    status: string;
+  }
+
+  export interface CronRunPhase {
+    duration: number;
+    error_class?: string;
+    phase: string;
+    status: string;
+  }
+
+  export interface CronsDetailsPayload {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
+  }
+
   export interface CurrentSession {
     apiTokenId?: number;
     api_tokens: types.ApiToken[];
@@ -3972,6 +4076,7 @@ export namespace types {
   }
 
   export interface IndexPayload {
+    carouselItems: types.CarouselItem[];
     coderOfTheMonthData: {
       all?: types.UserProfile;
       female?: types.UserProfile;
@@ -5078,6 +5183,11 @@ export namespace types {
     name: string;
   }
 
+  export interface TagDistribution {
+    count: number;
+    name: string;
+  }
+
   export interface TagWithProblemCount {
     name: string;
     problemCount: number;
@@ -5350,6 +5460,15 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetCronRunRequest = { [key: string]: any };
+  export type _AdminGetCronRunServerResponse = any;
+  export type AdminGetCronRunResponse = { run?: types.CronRun };
+  export type AdminGetCronsRequest = { [key: string]: any };
+  export type _AdminGetCronsServerResponse = any;
+  export type AdminGetCronsResponse = {
+    jobs: types.CronJob[];
+    runs: types.CronRun[];
+  };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminGetSystemSettingsRequest = { [key: string]: any };
@@ -5419,9 +5538,6 @@ export namespace messages {
   export type CarouselItemsListRequest = { [key: string]: any };
   export type _CarouselItemsListServerResponse = any;
   export type CarouselItemsListResponse = types.CarouselItemListPayload;
-  export type CarouselItemsListActiveRequest = { [key: string]: any };
-  export type _CarouselItemsListActiveServerResponse = any;
-  export type CarouselItemsListActiveResponse = types.CarouselItemListPayload;
   export type CarouselItemsUpdateRequest = { [key: string]: any };
   export type CarouselItemsUpdateResponse = {};
 
@@ -6318,7 +6434,8 @@ export namespace messages {
       unlabelled: number;
     };
     solved: number;
-    tags: { count: number; name: string }[];
+    tags: types.TagDistribution[];
+    tagsFull: types.TagDistribution[];
   };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
@@ -6371,6 +6488,12 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getCronRun: (
+      params?: messages.AdminGetCronRunRequest,
+    ) => Promise<messages.AdminGetCronRunResponse>;
+    getCrons: (
+      params?: messages.AdminGetCronsRequest,
+    ) => Promise<messages.AdminGetCronsResponse>;
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
@@ -6437,9 +6560,6 @@ export namespace controllers {
     list: (
       params?: messages.CarouselItemsListRequest,
     ) => Promise<messages.CarouselItemsListResponse>;
-    listActive: (
-      params?: messages.CarouselItemsListActiveRequest,
-    ) => Promise<messages.CarouselItemsListActiveResponse>;
     update: (
       params?: messages.CarouselItemsUpdateRequest,
     ) => Promise<messages.CarouselItemsUpdateResponse>;

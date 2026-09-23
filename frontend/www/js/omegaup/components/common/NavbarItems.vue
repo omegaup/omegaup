@@ -20,24 +20,17 @@
         >
           {{ T.wordsContests }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="contests-items">
-            <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
-              {{ T.navViewContests }}
-            </a>
-            <template v-if="isMainUserIdentity">
-              <a class="dropdown-item" href="/scoreboardmerge/">
-                {{ T.contestsJoinScoreboards }}
-              </a>
-              <a
-                v-if="!isUnder13User"
-                class="dropdown-item"
-                href="/contest/new/"
-                data-nav-contests-create
-              >
-                {{ T.contestsCreate }}
-              </a>
-            </template>
+            <omegaup-navbar-item
+              v-for="(entry, index) in contestsEntries"
+              :key="`contests-item-${index}`"
+              :title="entry.title"
+              :description="entry.description"
+              :icon="entry.icon"
+              :href="entry.href"
+              v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+            />
           </slot>
         </div>
       </li>
@@ -63,20 +56,17 @@
         >
           {{ T.navCourses }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="courses-items">
-            <a class="dropdown-item" href="/course/" data-nav-courses-all>
-              {{ T.navViewCourses }}
-            </a>
-            <template v-if="isMainUserIdentity && !isUnder13User">
-              <a
-                class="dropdown-item"
-                href="/course/new/"
-                data-nav-courses-create
-              >
-                {{ T.courseCreate }}
-              </a>
-            </template>
+            <omegaup-navbar-item
+              v-for="(entry, index) in coursesEntries"
+              :key="`courses-item-${index}`"
+              :title="entry.title"
+              :description="entry.description"
+              :icon="entry.icon"
+              :href="entry.href"
+              v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+            />
           </slot>
         </div>
       </li>
@@ -103,63 +93,24 @@
         >
           {{ T.wordsProblems }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
           <slot name="problems-items">
-            <a
-              class="dropdown-item"
-              href="/problem/collection/"
-              data-nav-problems-collection
-              >{{ T.navViewProblems }}</a
-            >
-            <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
-              T.navViewProblemsAll
-            }}</a>
-            <a class="dropdown-item" href="/profile/#problems">{{
-              T.bookmarkedProblems
-            }}</a>
-            <hr class="menu-divider" />
-            <a class="dropdown-item" href="/submissions/">{{
-              T.navViewLatestSubmissions
-            }}</a>
-
-            <template v-if="!isLoggedIn">
-              <a class="dropdown-item" href="/problem/creator/">{{
-                T.createZipFileForProblem
-              }}</a>
+            <template v-for="(entry, index) in problemsEntries">
+              <hr
+                v-if="entry.divider"
+                :key="`problems-divider-${index}`"
+                class="menu-divider"
+              />
+              <omegaup-navbar-item
+                v-else
+                :key="`problems-item-${index}`"
+                :title="entry.title"
+                :description="entry.description"
+                :icon="entry.icon"
+                :href="entry.href"
+                v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+              />
             </template>
-
-            <template v-else>
-              <div class="collapse-submenu">
-                <button
-                  type="button"
-                  class="dropdown-item dropdown-toggle"
-                  data-nav-problems-create-options
-                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
-                  @click.stop.prevent="onCreateProblemClick"
-                >
-                  {{ T.myproblemsListCreateProblem }}
-                </button>
-
-                <div v-show="isCreateProblemSubmenuOpen" class="pl-3">
-                  <a
-                    class="dropdown-item"
-                    href="/problem/creator/"
-                    @click.stop
-                    >{{ T.myproblemsListCreateZipFileProblem }}</a
-                  >
-                  <a
-                    class="dropdown-item"
-                    href="/problem/new/"
-                    data-nav-problems-create
-                    @click.stop
-                    >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
-                  >
-                </div>
-              </div>
-            </template>
-            <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
-              T.navQualityNominationQueue
-            }}</a>
           </slot>
         </div>
       </li>
@@ -178,26 +129,16 @@
         >
           {{ T.navRanking }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
-          <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
-          <a class="dropdown-item" href="/rank/compare/">{{
-            T.navCompareUsers
-          }}</a>
-          <a class="dropdown-item" href="/rank/authors/">{{
-            T.navAuthorRanking
-          }}</a>
-          <a class="dropdown-item" href="/rank/schools/">{{
-            T.navSchoolRanking
-          }}</a>
-          <a class="dropdown-item" href="/coderofthemonth/">{{
-            T.navCoderOfTheMonth
-          }}</a>
-          <a href="/coderofthemonth/female/" class="dropdown-item">{{
-            T.navCoderOfTheMonthFemale
-          }}</a>
-          <a class="dropdown-item" href="/schoolofthemonth/">{{
-            T.navSchoolOfTheMonth
-          }}</a>
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
+          <omegaup-navbar-item
+            v-for="(entry, index) in rankingEntries"
+            :key="`ranking-item-${index}`"
+            :title="entry.title"
+            :description="entry.description"
+            :icon="entry.icon"
+            :href="entry.href"
+            v-bind="entry.dataAttr ? { [entry.dataAttr]: '' } : {}"
+          />
         </div>
       </li>
 
@@ -212,8 +153,8 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <template v-for="(entry, index) in helpMenuEntries">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg navbar-item-dropdown">
+          <template v-for="(entry, index) in helpEntries">
             <hr
               v-if="entry.divider"
               :key="`help-divider-${index}`"
@@ -226,7 +167,7 @@
               :description="entry.description"
               :icon="entry.icon"
               :href="entry.href"
-              target="_blank"
+              :target="entry.target"
               :rel="entry.rel"
             />
           </template>
@@ -240,39 +181,75 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { getExternalUrl } from '../../urlHelper';
+import {
+  NavbarAccess,
+  NavbarMenuEntry,
+  visibleEntries,
+  contestsMenuEntries,
+  coursesMenuEntries,
+  problemsMenuEntries,
+  rankingMenuEntries,
+  helpMenuEntries,
+} from './navbarMenus';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faAward,
+  faBalanceScale,
   faBook,
+  faBookmark,
+  faChalkboardTeacher,
+  faChartLine,
+  faClipboardCheck,
   faCode,
   faComments,
   faDatabase,
+  faFileArchive,
+  faFlagCheckered,
+  faGraduationCap,
+  faHistory,
+  faLayerGroup,
+  faList,
+  faListOl,
+  faMedal,
   faNewspaper,
   faPen,
+  faPenNib,
+  faPlusCircle,
   faRobot,
+  faSchool,
+  faTrophy,
   faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 import NavbarItem from './NavbarItem.vue';
 
 library.add(
+  faAward,
+  faBalanceScale,
   faBook,
+  faBookmark,
+  faChalkboardTeacher,
+  faChartLine,
+  faClipboardCheck,
   faCode,
   faComments,
   faDatabase,
+  faFileArchive,
+  faFlagCheckered,
+  faGraduationCap,
+  faHistory,
+  faLayerGroup,
+  faList,
+  faListOl,
+  faMedal,
   faNewspaper,
   faPen,
+  faPenNib,
+  faPlusCircle,
   faRobot,
+  faSchool,
+  faTrophy,
   faVideo,
 );
-
-interface HelpMenuEntry {
-  divider?: boolean;
-  title?: string;
-  description?: string;
-  icon?: [string, string];
-  href?: string;
-  rel?: string | null;
-}
 
 @Component({
   components: {
@@ -291,97 +268,40 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
-  // Used by Cypress selector + click toggle
-  isCreateProblemSubmenuOpen = false;
-
-  get OmegaUpBlogURL(): string {
-    return getExternalUrl('OmegaUpBlogURL');
+  get access(): NavbarAccess {
+    return {
+      isLoggedIn: this.isLoggedIn,
+      isMainUserIdentity: this.isMainUserIdentity,
+      isUnder13User: this.isUnder13User,
+      isReviewer: this.isReviewer,
+    };
   }
 
-  get YouTubeTutorialsURL(): string {
-    return getExternalUrl('YouTubeTutorialsURL');
+  get contestsEntries(): NavbarMenuEntry[] {
+    return visibleEntries(contestsMenuEntries, this.access);
   }
 
-  get DiscordInviteURL(): string {
-    return getExternalUrl('DiscordInviteURL');
+  get coursesEntries(): NavbarMenuEntry[] {
+    return visibleEntries(coursesMenuEntries, this.access);
   }
 
-  get AlgorithmsBookURL(): string {
-    return getExternalUrl('AlgorithmsBookURL');
+  get problemsEntries(): NavbarMenuEntry[] {
+    return visibleEntries(problemsMenuEntries, this.access);
   }
 
-  get CompetitiveProgrammingBookURL(): string {
-    return getExternalUrl('CompetitiveProgrammingBookURL');
+  get rankingEntries(): NavbarMenuEntry[] {
+    return visibleEntries(rankingMenuEntries, this.access);
   }
 
-  get helpMenuEntries(): HelpMenuEntry[] {
-    return [
-      {
-        title: T.navTutorials,
-        description: T.navTutorialsDesc,
-        icon: ['fas', 'video'],
-        href: this.YouTubeTutorialsURL,
-      },
-      {
-        title: T.navDiscord,
-        description: T.navDiscordDesc,
-        icon: ['fas', 'comments'],
-        href: this.DiscordInviteURL,
-      },
-      {
-        title: T.navBlog,
-        description: T.navBlogDesc,
-        icon: ['fas', 'newspaper'],
-        href: this.OmegaUpBlogURL,
-      },
-      { divider: true },
-      {
-        title: T.navProblemStatementEditor,
-        description: T.navProblemStatementEditorDesc,
-        icon: ['fas', 'pen'],
-        href: '/problem/statement/',
-        rel: 'noopener noreferrer',
-      },
-      {
-        title: T.navOmegaUpIDE,
-        description: T.navOmegaUpIDEDesc,
-        icon: ['fas', 'code'],
-        href: '/grader/ephemeral/',
-        rel: 'noopener noreferrer',
-      },
-      {
-        title: T.navKarel,
-        description: T.navKarelDesc,
-        icon: ['fas', 'robot'],
-        href: '/karel.js/',
-        rel: 'noopener noreferrer',
-      },
-      { divider: true },
-      {
-        title: T.navAlgorithmsBook,
-        description: T.navAlgorithmsBookDesc,
-        icon: ['fas', 'book'],
-        href: this.AlgorithmsBookURL,
-      },
-      {
-        title: T.navCompetitiveProgrammingDataStructuresBook,
-        description: T.navCompetitiveProgrammingDataStructuresBookDesc,
-        icon: ['fas', 'database'],
-        href: this.CompetitiveProgrammingBookURL,
-        rel: 'noopener noreferrer',
-      },
-    ];
-  }
-
-  onCreateProblemClick(): void {
-    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
+  get helpEntries(): NavbarMenuEntry[] {
+    return visibleEntries(helpMenuEntries, this.access);
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @media only screen and (max-width: 992px) {
-  .help-dropdown {
+  .navbar-item-dropdown {
     min-width: auto !important;
     width: auto !important;
     max-width: 85vw !important;

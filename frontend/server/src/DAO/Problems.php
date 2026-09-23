@@ -143,15 +143,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
         // Create placeholders (?, ?, ?) for each username
         $placeholders = implode(',', array_fill(0, count($usernames), '?'));
-        $sql = "SELECT user_id FROM User_Rank WHERE username IN ({$placeholders})";
+        // `Identities` is the canonical username -> user_id mapping and
+        // contains every registered user, including admins, private
+        // users, and users who have only ever created problems.
+        // `User_Rank` is a denormalized cache populated only from users
+        // with at least one AC solution, so querying it here caused the
+        // `author=` filter to silently drop for everyone else.
+        $sql = "SELECT user_id FROM Identities WHERE username IN ({$placeholders}) AND user_id IS NOT NULL";
 
-        /** @var list<array{user_id: int}> */
+        /** @var list<array{user_id: int|null}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $usernames
         );
 
-        return array_map(fn($row) => intval($row['user_id']), $results);
+        return array_map(
+            fn($row) => intval($row['user_id']),
+            $results
+        );
     }
 
     /**
@@ -352,7 +361,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        bool $matchAnyLanguage = false
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -397,11 +407,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
-        /** @var list<array{0: string, 1: list<string>}> */
-        foreach ($programmingLanguages as $programmingLanguage) {
+        if (!empty($programmingLanguages)) {
             $clauses[] = [
-                'FIND_IN_SET(?, p.languages) > 0',
-                [$programmingLanguage],
+                '(' . implode(
+                    ' ' . ($matchAnyLanguage ? 'OR' : 'AND') . ' ',
+                    array_fill(
+                        0,
+                        count($programmingLanguages),
+                        'FIND_IN_SET(?, p.languages) > 0'
+                    )
+                ) . ')',
+                $programmingLanguages,
             ];
         }
 
@@ -480,22 +496,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
-        if (!is_null($query)) {
-            if (is_numeric($query)) {
-                $clauses[] = [
-                    "(
-                    p.title LIKE CONCAT('%', ?, '%') OR
-                    p.alias LIKE CONCAT('%', ?, '%') OR
-                    p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
-                ];
-            } else {
-                $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
-                ];
+        if (!is_null($query) && $query !== '') {
+            $isNumericQuery = is_numeric($query);
+            $conditions = [
+                'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
+            ];
+            $argsForQuery = [
+                \OmegaUp\DAO\DAO::escapeBooleanModeQuery($query),
+            ];
+
+            if ($isNumericQuery) {
+                $conditions[] = 'p.problem_id = ?';
+                $argsForQuery[] = intval($query);
             }
+
+            $clauses[] = [
+                '(' . implode(' OR ', $conditions) . ')',
+                $argsForQuery,
+            ];
         }
 
         if ($identityType === IDENTITY_ADMIN && !is_null($identityId)) {
@@ -560,6 +578,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     'pa_acl.owner_id IN (' . $placeholders . ')',
                     $authorUserIds,
                 ];
+            } else {
+                // Every requested author username failed to resolve to a
+                // user id. This can only happen when the username does
+                // not exist in `Identities`; an empty result set is the
+                // correct answer rather than silently dropping the
+                // filter and returning every visible problem.
+                $clauses[] = ['0 = 1', []];
             }
         }
 
@@ -1308,11 +1333,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!empty($query)) {
             $sql .= '
                 WHERE
-                    p.`title` LIKE CONCAT("%", ?, "%") OR
-                    p.`alias` LIKE CONCAT("%", ?, "%")
+                    MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE)
             ';
-            $params[] = $query;
-            $params[] = $query;
+            $params[] = \OmegaUp\DAO\DAO::escapeBooleanModeQuery($query);
         }
 
         /** @var int */
@@ -1367,28 +1390,45 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             'p'
         );
         $sql = '
-            FROM
-                Problems AS p
+            FROM (
+                SELECT
+                    a.acl_id
+                FROM
+                    Identities AS i
+                STRAIGHT_JOIN
+                    ACLs AS a ON a.owner_id = i.user_id
+                WHERE
+                    i.identity_id = ?
+
+                UNION
+
+                SELECT
+                    ur.acl_id
+                FROM
+                    Identities AS i
+                INNER JOIN
+                    User_Roles AS ur ON ur.user_id = i.user_id
+                WHERE
+                    i.identity_id = ?
+                    AND ur.role_id = ?
+
+                UNION
+
+                SELECT
+                    gr.acl_id
+                FROM
+                    Groups_Identities AS gi
+                INNER JOIN
+                    Group_Roles AS gr ON gr.group_id = gi.group_id
+                WHERE
+                    gi.identity_id = ?
+                    AND gr.role_id = ?
+            ) AS admined_acls
             INNER JOIN
-                ACLs AS a ON a.acl_id = p.acl_id
-            INNER JOIN
-                Identities AS ai ON a.owner_id = ai.user_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = p.acl_id
-            LEFT JOIN
-                Identities uri ON ur.user_id = uri.user_id
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = p.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id
+                Problems AS p ON p.acl_id = admined_acls.acl_id
             WHERE
-                (ai.identity_id = ? OR
-                (ur.role_id = ? AND uri.identity_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)) AND
                 p.visibility > ?';
         $limits = '
-            GROUP BY
-                p.problem_id
             ORDER BY
                 p.problem_id DESC
             LIMIT
@@ -1396,10 +1436,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [
             $identityId,
-            \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
         ];
 
@@ -1832,11 +1872,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     WHERE
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 5, $query);
-            $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+            $curatedQuery = strval(preg_replace('/\W+/', ' ', $query));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
+            $problemIdUnion = '';
+            $args = array_fill(0, 2, $query);
+            if (is_numeric($query)) {
+                $problemIdUnion = "
+                        UNION ALL
+                        SELECT
+                            {$fields},
+                            2.0 AS relevance
+                        FROM
+                            Problems p
+                        WHERE
+                            problem_id = ?";
+                $args[] = intval($query);
+            }
+            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
             $sql = "FROM
                     (
                         SELECT
@@ -1854,18 +1907,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                             Problems p
                         WHERE
                             title = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            0.1 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            (
-                                title LIKE CONCAT('%', ?, '%') OR
-                                alias LIKE CONCAT('%', ?, '%') OR
-                                problem_id = ?
-                            )
+                        {$problemIdUnion}
                         UNION ALL
                         SELECT
                             {$fields},

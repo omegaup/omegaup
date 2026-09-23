@@ -86,4 +86,67 @@ class SystemSettingsDAOTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\DAO\SystemSettings::getStringSetting($key)
         );
     }
+
+    public function testSetBooleanSettingWithInvalidateCacheFalse() {
+        $key = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\DAO\SystemSettings::setBooleanSetting($key, true);
+        $this->assertTrue(
+            \OmegaUp\DAO\SystemSettings::getBooleanSetting($key, false)
+        );
+
+        \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+            $key,
+            false,
+            invalidateCache: false
+        );
+        $this->assertTrue(
+            \OmegaUp\DAO\SystemSettings::getBooleanSetting($key, false)
+        );
+
+        \OmegaUp\DAO\SystemSettings::invalidateCache($key);
+        $this->assertFalse(
+            \OmegaUp\DAO\SystemSettings::getBooleanSetting($key, true)
+        );
+    }
+
+    public function testSetStringSettingWithInvalidateCacheFalse() {
+        $key = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\DAO\SystemSettings::setStringSetting($key, 'first');
+        $this->assertSame(
+            'first',
+            \OmegaUp\DAO\SystemSettings::getStringSetting($key)
+        );
+
+        \OmegaUp\DAO\SystemSettings::setStringSetting(
+            $key,
+            'second',
+            invalidateCache: false
+        );
+        $this->assertSame(
+            'first',
+            \OmegaUp\DAO\SystemSettings::getStringSetting($key)
+        );
+
+        \OmegaUp\DAO\SystemSettings::invalidateCache($key);
+        $this->assertSame(
+            'second',
+            \OmegaUp\DAO\SystemSettings::getStringSetting($key)
+        );
+    }
+
+    public function testExplicitInvalidateCacheAfterDbWrite() {
+        $key = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+            $key,
+            true,
+            invalidateCache: false
+        );
+        \OmegaUp\DAO\SystemSettings::invalidateCache($key);
+        $this->assertTrue(
+            \OmegaUp\DAO\SystemSettings::getBooleanSetting($key, false)
+        );
+    }
 }

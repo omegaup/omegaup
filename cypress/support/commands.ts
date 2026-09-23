@@ -83,8 +83,6 @@ Cypress.Commands.add(
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
-    // Click the dropdown toggle to show options
-    cy.get('[data-nav-problems-create-options]').click();
     cy.get('[data-nav-problems-create]').click();
     if (firstTimeVisited) {
       cy.get('.introjs-skipbutton').click();
@@ -281,7 +279,9 @@ Cypress.Commands.add(
         return;
       }
       cy.visit(`/arena/${contestAlias}/#problems`);
-      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+      cy.get(`a[data-problem="${problem.problemAlias}"]`, {
+        timeout: 10000,
+      }).click();
 
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));

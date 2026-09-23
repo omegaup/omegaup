@@ -177,9 +177,22 @@ export default class ProblemFinderWizard extends Vue {
   }
 
   onEsc(event: KeyboardEvent): void {
-    if (event.key === 'Escape' && this.show) {
-      this.$emit('close');
+    if (event.key !== 'Escape' || !this.show) {
+      return;
     }
+    // Let form elements handle ESC themselves (e.g. dismissing the tags-input
+    // typeahead) instead of closing the whole wizard.
+    const target = event.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable)
+    ) {
+      return;
+    }
+    this.$emit('close');
   }
 }
 </script>

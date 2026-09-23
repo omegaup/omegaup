@@ -98,6 +98,40 @@ export const ACL = {
 };
 
 export const Admin = {
+  getCronRun: apiCall<
+    messages.AdminGetCronRunRequest,
+    messages._AdminGetCronRunServerResponse,
+    messages.AdminGetCronRunResponse
+  >('/api/admin/getCronRun/', (x) => {
+    if (typeof x.run !== 'undefined' && x.run !== null)
+      x.run = ((x) => {
+        if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+          x.finished_at = ((x: number) => new Date(x * 1000))(x.finished_at);
+        if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+          x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+        return x;
+      })(x.run);
+    return x;
+  }),
+  getCrons: apiCall<
+    messages.AdminGetCronsRequest,
+    messages._AdminGetCronsServerResponse,
+    messages.AdminGetCronsResponse
+  >('/api/admin/getCrons/', (x) => {
+    x.runs = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+          x.finished_at = ((x: number) => new Date(x * 1000))(x.finished_at);
+        if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+          x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   getMaintenanceMode: apiCall<
     messages.AdminGetMaintenanceModeRequest,
     messages.AdminGetMaintenanceModeResponse
@@ -267,28 +301,6 @@ export const CarouselItems = {
     messages._CarouselItemsListServerResponse,
     messages.CarouselItemsListResponse
   >('/api/carouselItems/list/', (x) => {
-    x.carouselItems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.expiration_date !== 'undefined' &&
-          x.expiration_date !== null
-        )
-          x.expiration_date = ((x: number) => new Date(x * 1000))(
-            x.expiration_date,
-          );
-        return x;
-      });
-    })(x.carouselItems);
-    return x;
-  }),
-  listActive: apiCall<
-    messages.CarouselItemsListActiveRequest,
-    messages._CarouselItemsListActiveServerResponse,
-    messages.CarouselItemsListActiveResponse
-  >('/api/carouselItems/listActive/', (x) => {
     x.carouselItems = ((x) => {
       if (!Array.isArray(x)) {
         return x;

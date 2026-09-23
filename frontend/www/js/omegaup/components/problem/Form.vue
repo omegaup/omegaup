@@ -131,6 +131,12 @@
                       type="file"
                       accept=".zip"
                       class="d-none"
+                      :data-problem-creator-zip-ready="
+                        creatorGeneratedZipBlob !== null &&
+                        !isGeneratingCreatorZip
+                          ? 'true'
+                          : 'false'
+                      "
                     />
                   </div>
                   <div
@@ -634,63 +640,95 @@ export default class ProblemForm extends Vue {
   showProblemCreator = false;
   creatorGeneratedZipBlob: Blob | null = null;
   isGeneratingCreatorZip = false;
+  private createProblemIntro: ReturnType<typeof introJs> | null = null;
 
   mounted() {
-    const title = T.createProblemInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
-      introJs()
-        .setOptions({
+      this.$nextTick(() => {
+        const title = T.createProblemInteractiveGuideTitle;
+        const steps = [
+          {
+            title,
+            intro: T.createProblemInteractiveGuideWelcome,
+          },
+          {
+            element: document.querySelector('.introjs-title') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideProblemTitle,
+          },
+          {
+            element: document.querySelector('.introjs-short-title') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideShortTitle,
+          },
+          {
+            element: document.querySelector('.introjs-origin') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideOrigin,
+          },
+        ];
+
+        if (!this.isUpdate && this.showCreationMethodSelector) {
+          steps.push({
+            element: document.querySelector(
+              '.introjs-creation-method',
+            ) as Element,
+            title,
+            intro: T.createProblemInteractiveGuideCreationMethod,
+          });
+        }
+
+        const openCreatorElement = document.querySelector(
+          '.introjs-open-creator',
+        ) as Element | null;
+        if (openCreatorElement) {
+          steps.push({
+            element: openCreatorElement,
+            title,
+            intro: T.createProblemInteractiveGuideOpenCreator,
+          });
+        }
+
+        const fileElement = document.querySelector(
+          '.introjs-file',
+        ) as Element | null;
+        if (fileElement) {
+          steps.push({
+            element: fileElement,
+            title,
+            intro: T.createProblemInteractiveGuideFile,
+          });
+        }
+
+        steps.push(
+          {
+            element: document.querySelector(
+              '.introjs-tags-and-level',
+            ) as Element,
+            title,
+            intro: T.createProblemInteractiveGuideTagsAndLevel,
+          },
+          {
+            element: document.querySelector('.introjs-type') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideType,
+          },
+          {
+            element: document.querySelector('.introjs-validator') as Element,
+            title,
+            intro: T.createProblemInteractiveGuideValidator,
+          },
+        );
+
+        this.createProblemIntro = introJs().setOptions({
           nextLabel: T.interactiveGuideNextButton,
           prevLabel: T.interactiveGuidePreviousButton,
           doneLabel: T.interactiveGuideDoneButton,
-          steps: [
-            {
-              title,
-              intro: T.createProblemInteractiveGuideWelcome,
-            },
-            {
-              element: document.querySelector('.introjs-title') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideProblemTitle,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-short-title',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuideShortTitle,
-            },
-            {
-              element: document.querySelector('.introjs-origin') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideOrigin,
-            },
-            {
-              element: document.querySelector('.introjs-file') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideFile,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-tags-and-level',
-              ) as Element,
-              title,
-              intro: T.createProblemInteractiveGuideTagsAndLevel,
-            },
-            {
-              element: document.querySelector('.introjs-type') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideType,
-            },
-            {
-              element: document.querySelector('.introjs-validator') as Element,
-              title,
-              intro: T.createProblemInteractiveGuideValidator,
-            },
-          ],
-        })
-        .start();
-      this.$cookies.set('has-visited-create-problem', true, -1);
+          steps,
+        });
+        this.createProblemIntro.start();
+        this.$cookies.set('has-visited-create-problem', true, -1);
+      });
     }
   }
 
@@ -699,6 +737,8 @@ export default class ProblemForm extends Vue {
   }
 
   openProblemCreatorModal(): void {
+    // Exit the intro tour so its tooltip doesn't float over the open modal.
+    this.createProblemIntro?.exit(true);
     this.showProblemCreator = true;
   }
 
@@ -833,9 +873,40 @@ export default class ProblemForm extends Vue {
     this.problemLevel = levelTag;
   }
 
-  onUploadFile(ev: InputEvent): void {
+  async onUploadFile(ev: InputEvent): Promise<void> {
     const uploadedFile = ev.target as HTMLInputElement;
-    this.hasFile = uploadedFile.files !== null;
+    this.hasFile = uploadedFile.files !== null && uploadedFile.files.length > 0;
+    if (
+      !this.isUpdate &&
+      this.showCreationMethodSelector &&
+      this.currentCreationMethod === CreationMethods.Zip &&
+      uploadedFile.files?.length
+    ) {
+      await this.importZipIntoCreator(uploadedFile.files[0]);
+    }
+  }
+
+  async importZipIntoCreator(zipFile: File): Promise<void> {
+    // Only Creator-generated zips (with a cdp.data snapshot) can populate the
+    // Creator; other zips keep the plain upload flow. Standard omegaUp zips
+    // will be supported in a follow-up.
+    try {
+      const zipContent = await new JSZip().loadAsync(zipFile);
+      if (!zipContent.file('cdp.data')) {
+        return;
+      }
+    } catch {
+      return;
+    }
+    this.currentCreationMethod = CreationMethods.Creator;
+    this.creatorGeneratedZipBlob = null;
+    this.openProblemCreatorModal();
+    await this.$nextTick();
+    const success = await this.problemCreatorRef?.importZipFile?.(zipFile);
+    if (!success) {
+      this.showProblemCreator = false;
+      this.currentCreationMethod = CreationMethods.Zip;
+    }
   }
 
   onGenerateAlias(): void {

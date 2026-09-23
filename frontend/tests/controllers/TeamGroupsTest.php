@@ -447,6 +447,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
             ])
         );
+        // InnoDB updates FULLTEXT indexes at COMMIT time, so MATCH ... AGAINST
+        // cannot see these identities while they are still inside the test transaction.
+        \OmegaUp\Test\Utils::commit();
 
         [
             'identities' => $identities,
