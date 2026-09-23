@@ -8,11 +8,11 @@ namespace OmegaUp;
  */
 class Translations {
     /**
-     * The static Translations instances.
+     * The static Translations instance.
      *
-     * @var array<string, \OmegaUp\Translations>
+     * @var null|\OmegaUp\Translations
      */
-    private static $_instances = [];
+    private static $_instance = null;
 
     /**
      * The translation strings.
@@ -24,7 +24,10 @@ class Translations {
     /**
      * Creates a new instance of Translations.
      */
-    private function __construct(string $lang) {
+    private function __construct(?\OmegaUp\DAO\VO\Identities $identity = null) {
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            identity: $identity
+        );
         /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         $filename = sprintf("%s/templates/{$lang}.lang", strval(OMEGAUP_ROOT));
         /** @var array<int, string> $match */
@@ -48,17 +51,11 @@ class Translations {
      *
      * @return \OmegaUp\Translations the singleton instance.
      */
-    public static function getInstance(
-        ?\OmegaUp\DAO\VO\Identities $identity = null,
-        ?string $lang = null
-    ): \OmegaUp\Translations {
-        $lang ??= \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            identity: $identity
-        );
-        if (!isset(self::$_instances[$lang])) {
-            self::$_instances[$lang] = new \OmegaUp\Translations($lang);
+    public static function getInstance(?\OmegaUp\DAO\VO\Identities $identity = null): \OmegaUp\Translations {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new \OmegaUp\Translations($identity);
         }
-        return self::$_instances[$lang];
+        return self::$_instance;
     }
 
     /**

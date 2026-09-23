@@ -202,6 +202,33 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Executes the given callback while Translations is temporarily configured
+     * to use English strings.
+     *
+     * @param callable(\OmegaUp\Translations): void $fn
+     */
+    private function withEnglishTranslations(callable $fn): void {
+        $reflection = new \ReflectionClass(\OmegaUp\Translations::class);
+        $property = $reflection->getProperty('_instance');
+        $property->setAccessible(true);
+        $originalTranslations = $property->getValue();
+        $originalRequestLang = $_REQUEST['lang'] ?? null;
+
+        $_REQUEST['lang'] = 'en';
+        $property->setValue(null, null);
+        try {
+            $fn(\OmegaUp\Translations::getInstance());
+        } finally {
+            $property->setValue(null, $originalTranslations);
+            if (is_null($originalRequestLang)) {
+                unset($_REQUEST['lang']);
+            } else {
+                $_REQUEST['lang'] = $originalRequestLang;
+            }
+        }
+    }
+
+    /**
      * Test to check that a place suffix of a contest is correct
      *
      * @dataProvider placeSuffixProvider
@@ -209,39 +236,21 @@ class CertificatePdfCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetPlaceSuffix(
         int $place,
         string $expectedSuffixKey
-    ) {
-        $originalAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
-        $originalRequestLang = $_REQUEST['lang'] ?? null;
-        try {
-            $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
-            $_REQUEST['lang'] = 'en';
-            $translator = \OmegaUp\Translations::getInstance(lang: 'en');
-            $this->assertNotSame(
-                $translator->get('certificatePdfContestPlaceSt'),
-                $translator->get('certificatePdfContestPlaceTh')
-            );
-            $this->assertSame(
-                $translator->get($expectedSuffixKey),
-                \OmegaUp\Controllers\Certificate::getPlaceSuffix(
-                    $place,
-                    $translator
-                )
-            );
-            $this->assertSame(
-                $translator->get($expectedSuffixKey),
-                \OmegaUp\Controllers\Certificate::getPlaceSuffix($place)
-            );
-        } finally {
-            if (is_null($originalRequestLang)) {
-                unset($_REQUEST['lang']);
-            } else {
-                $_REQUEST['lang'] = $originalRequestLang;
+    ): void {
+        $this->withEnglishTranslations(
+            function (\OmegaUp\Translations $translator) use (
+                $place,
+                $expectedSuffixKey
+            ): void {
+                $this->assertNotSame(
+                    $translator->get('certificatePdfContestPlaceSt'),
+                    $translator->get('certificatePdfContestPlaceTh')
+                );
+                $this->assertSame(
+                    $translator->get($expectedSuffixKey),
+                    \OmegaUp\Controllers\Certificate::getPlaceSuffix($place)
+                );
             }
-            if (is_null($originalAcceptLanguage)) {
-                unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            } else {
-                $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $originalAcceptLanguage;
-            }
-        }
+        );
     }
 }
