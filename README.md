@@ -52,6 +52,12 @@ Para configurar el entorno de desarrollo localmente, consulta la [Guía de Confi
 
 ### Inicio Rápido
 
+### Video de demostración
+🎥 https://youtu.be/08rFcs6TV9U
+
+Este video explica los pasos para configurar el proyecto localmente y cómo ejecutarlo.
+
+
 ```bash
 # Clonar con submódulos
 git clone --recurse-submodules https://github.com/TU_USUARIO/omegaup
@@ -80,6 +86,45 @@ See the [Issue Assignment Workflow](frontend/www/docs/Issue-Assignment-Workflow.
 To set up the development environment locally, see the [Development Environment Setup Guide](frontend/www/docs/Development-Environment-Setup-Process.md).
 
 ### Quick Start
+
+## 👋 New Contributor Onboarding
+
+If this is your first time contributing to omegaUp, this section will help you
+navigate the existing documentation and get started smoothly.
+
+### Getting Oriented
+Begin by reading this README to understand what omegaUp does and how the
+repository is organized.
+
+### Local Development Setup
+A complete local development guide already exists and should be followed
+step by step:
+
+📄 Documentation: [Development Environment Setup Guide](frontend/www/docs/Development-Environment-Setup-Process.md)   
+🎥 https://youtu.be/08rFcs6TV9U
+
+### Common Pitfalls
+New contributors often run into issues such as:
+- Missing required dependencies
+- Package managers not installed or configured
+- Services not running before starting the application
+
+### Verifying Your Setup
+After completing the setup, make sure:
+- The application starts without errors
+- The web interface loads correctly in the browser
+
+### Next Steps
+Once everything is working, look for beginner-friendly issues and make a small
+contribution to get familiar with the workflow.
+
+If you get stuck, feel free to ask questions in the issue tracker.
+
+### Demo Video
+🎥 https://youtu.be/08rFcs6TV9U
+
+This video explains the local setup steps and how to run the project.
+
 
 ```bash
 # Clone with submodules
@@ -176,6 +221,12 @@ Para configurar o ambiente de desenvolvimento localmente, consulte o [Guia de Co
 
 ### Início Rápido
 
+### Vídeo de demonstração
+🎥 https://youtu.be/08rFcs6TV9U
+
+Este vídeo explica os passos para configurar o projeto localmente e como executá-lo.
+
+
 ```bash
 # Clonar com submódulos
 git clone --recurse-submodules https://github.com/SEUUSUARIO/omegaup
@@ -236,6 +287,12 @@ Questo include anche tutti i browser basati su Blink/WebKit le cui versioni sono
 Per configurare l'ambiente di sviluppo localmente, consulta la [Guida alla Configurazione dell'Ambiente di Sviluppo](frontend/www/docs/Development-Environment-Setup-Process.md).
 
 ### Avvio Rapido
+
+### Video dimostrativo
+🎥 https://youtu.be/08rFcs6TV9U
+
+Questo video spiega i passaggi per configurare il progetto localmente e come eseguirlo.
+
 
 ```bash
 # Clonare con i submodule
