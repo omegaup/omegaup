@@ -2477,6 +2477,11 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+        if (self::isNonUserIdentity($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
         \OmegaUp\Validators::validateValidUsername(
             $r['username'],
             'username'
@@ -2485,12 +2490,6 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['password'],
             'password'
         );
-
-        if (self::isNonUserIdentity($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
 
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
         if ($r['username'] !== $r->identity->username) {
