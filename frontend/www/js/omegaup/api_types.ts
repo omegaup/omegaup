@@ -5183,6 +5183,11 @@ export namespace types {
     name: string;
   }
 
+  export interface TagDistribution {
+    count: number;
+    name: string;
+  }
+
   export interface TagWithProblemCount {
     name: string;
     problemCount: number;
@@ -6429,7 +6434,8 @@ export namespace messages {
       unlabelled: number;
     };
     solved: number;
-    tags: { count: number; name: string }[];
+    tags: types.TagDistribution[];
+    tagsFull: types.TagDistribution[];
   };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
