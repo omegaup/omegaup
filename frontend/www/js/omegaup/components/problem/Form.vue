@@ -83,7 +83,7 @@
                   />
                 </div>
                 <div
-                  v-if="!isUpdate && showCreationMethodSelector"
+                  v-if="!isUpdate"
                   class="form-group col-md-6 introjs-creation-method"
                 >
                   <div class="btn-group btn-group-toggle d-flex" role="group">
@@ -532,7 +532,7 @@
       </form>
     </div>
     <div
-      v-if="showCreationMethodSelector"
+      v-if="!isUpdate"
       v-show="showProblemCreator"
       class="problem-creator-modal"
       @click.self="closeProblemCreatorModal"
@@ -597,7 +597,6 @@ export default class ProblemForm extends Vue {
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
   @Prop({ default: true }) hasVisitedSection!: boolean;
-  @Prop({ default: false }) showCreationMethodSelector!: boolean;
   @Prop({ default: CreationMethods.Creator }) creationMethod!: CreationMethods;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
@@ -668,7 +667,7 @@ export default class ProblemForm extends Vue {
           },
         ];
 
-        if (!this.isUpdate && this.showCreationMethodSelector) {
+        if (!this.isUpdate) {
           steps.push({
             element: document.querySelector(
               '.introjs-creation-method',
@@ -767,7 +766,6 @@ export default class ProblemForm extends Vue {
   handleFormSubmit(ev: Event): void {
     if (
       this.isUpdate ||
-      !this.showCreationMethodSelector ||
       this.currentCreationMethod !== CreationMethods.Creator
     ) {
       return;
@@ -878,7 +876,6 @@ export default class ProblemForm extends Vue {
     this.hasFile = uploadedFile.files !== null && uploadedFile.files.length > 0;
     if (
       !this.isUpdate &&
-      this.showCreationMethodSelector &&
       this.currentCreationMethod === CreationMethods.Zip &&
       uploadedFile.files?.length
     ) {
