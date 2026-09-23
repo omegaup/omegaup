@@ -479,7 +479,6 @@ library.add(faSearchPlus);
 library.add(faExternalLinkAlt);
 library.add(faTimes);
 
-
 export enum DisqualificationType {
   ByGUID,
   ByProblem,

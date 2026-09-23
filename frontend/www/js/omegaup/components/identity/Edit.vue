@@ -10,7 +10,8 @@
             <label class="d-block">
               {{ T.username }}
               <div class="input-group">
-                <div class="input-group-text">{{ groupName }}:
+                <div class="input-group-text" data-identity-prefix>
+                  {{ groupName }}:
                 </div>
                 <input
                   v-model="identityName"
@@ -40,10 +41,7 @@
           <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditCountry }}
-              <select
-                v-model="selectedIdentity.country_id"
-                class="form-select"
-              >
+              <select v-model="selectedIdentity.country_id" class="form-select">
                 <option
                   v-for="country in countries"
                   :key="country.country_id"

@@ -20,9 +20,7 @@
                   type="button"
                   class="btn-close"
                   @click="showRenameModal[layout.layoutID] = false"
-                >
-                  
-                </button>
+                ></button>
               </div>
               <div class="modal-body">
                 <input
@@ -54,14 +52,13 @@
       </div>
       <div class="card w-84 mb-2">
         <div class="card-header p-0">
-          <div
-            class="btn-group d-flex"
-            :data-layout-dropdown="layout.layoutID"
-          >
+          <div class="btn-group d-flex" :data-layout-dropdown="layout.layoutID">
             <button
               type="button"
               class="btn btn-primary flex-grow-1 text-start"
-              @click="showLayout[layout.layoutID] = !showLayout[layout.layoutID]"
+              @click="
+                showLayout[layout.layoutID] = !showLayout[layout.layoutID]
+              "
             >
               {{ layout.name }}
             </button>
@@ -173,7 +170,10 @@
                           />
                         </div>
                         <div class="col-6 ps-0 pe-0 text-center">
-                          <div class="dropdown d-inline-block" data-line-info-dropdown>
+                          <div
+                            class="dropdown d-inline-block"
+                            data-line-info-dropdown
+                          >
                             <button
                               type="button"
                               class="btn btn-light dropdown-toggle"

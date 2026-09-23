@@ -56,9 +56,7 @@
                 type="button"
                 class="btn-close"
                 @click="invalidCaseName = false"
-              >
-                
-              </button>
+              ></button>
             </div>
             <omegaup-problem-creator-case-input ref="case-input" />
           </div>
@@ -73,9 +71,7 @@
                 type="button"
                 class="btn-close"
                 @click="invalidGroupName = false"
-              >
-                
-              </button>
+              ></button>
             </div>
             <omegaup-problem-creator-group-input ref="group-input" />
           </div>
@@ -90,9 +86,7 @@
                 type="button"
                 class="btn-close"
                 @click="invalidCaseName = false"
-              >
-                
-              </button>
+              ></button>
             </div>
             <omegaup-problem-creator-multiple-cases-input
               ref="multiple-cases-input"

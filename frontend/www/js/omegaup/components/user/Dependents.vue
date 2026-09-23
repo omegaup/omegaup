@@ -32,10 +32,7 @@
             ></omegaup-user-username>
           </td>
           <td class="d-block mt-1" :class="bannerColor(dependent)">
-            <small
-              class="fst-italic fw-bold"
-              :class="textColor(dependent)"
-            >
+            <small class="fst-italic fw-bold" :class="textColor(dependent)">
               {{ dependentsStatusMessage(dependent) }}
             </small>
           </td>

@@ -1,9 +1,8 @@
 <template>
   <div class="mt-3">
     <div class="mb-3 mb-4">
-      <label for="case-name">{{ T.problemCreatorCaseName }}</label>
+      <label>{{ T.problemCreatorCaseName }}</label>
       <input
-        id="case-name"
         :value="caseName"
         data-problem-creator-case-input="name"
         name="case-name"
@@ -17,13 +16,8 @@
       }}</small>
     </div>
     <div class="mb-3">
-      <label for="case-group">{{ T.problemCreatorGroupName }}</label>
-      <select
-        id="case-group"
-        v-model="caseGroup"
-        name="case-group"
-        class="form-select"
-      >
+      <label>{{ T.problemCreatorGroupName }}</label>
+      <select v-model="caseGroup" name="case-group" class="form-select">
         <option
           v-for="option in options"
           :key="option.value"
@@ -35,9 +29,8 @@
     </div>
 
     <div v-show="!caseAutoPoints" class="mb-3">
-      <label for="case-points">{{ T.problemCreatorPoints }}</label>
+      <label>{{ T.problemCreatorPoints }}</label>
       <input
-        id="case-points"
         :value="casePoints"
         name="case-points"
         class="form-control"
@@ -121,7 +114,9 @@ export default class CaseInput extends Vue {
   }
 
   onCaseNameInput(event: Event) {
-    this.caseName = this.formatter((event.target as HTMLInputElement).value);
+    const input = event.target as HTMLInputElement;
+    this.caseName = this.formatter(input.value);
+    input.value = this.caseName;
   }
 
   onCasePointsInput(event: Event) {

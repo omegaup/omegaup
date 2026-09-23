@@ -1,9 +1,8 @@
 <template>
   <div class="mt-3">
     <div class="mb-3 mb-4">
-      <label for="group-name">{{ T.problemCreatorGroupName }}</label>
+      <label>{{ T.problemCreatorGroupName }}</label>
       <input
-        id="group-name"
         :value="groupName"
         data-problem-creator-group-input="name"
         class="form-control"
@@ -17,9 +16,8 @@
       }}</small>
     </div>
     <div v-show="!groupAutoPoints" class="mb-3">
-      <label for="group-points">{{ T.problemCreatorPoints }}</label>
+      <label>{{ T.problemCreatorPoints }}</label>
       <input
-        id="group-points"
         :value="groupPoints"
         name="group-points"
         class="form-control"
@@ -75,7 +73,9 @@ export default class GroupInput extends Vue {
   }
 
   onGroupNameInput(event: Event) {
-    this.groupName = this.formatter((event.target as HTMLInputElement).value);
+    const input = event.target as HTMLInputElement;
+    this.groupName = this.formatter(input.value);
+    input.value = this.groupName;
   }
 
   onGroupPointsInput(event: Event) {

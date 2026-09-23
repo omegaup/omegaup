@@ -276,9 +276,7 @@
                 type="button"
                 class="btn-close"
                 @click="showConfirmationModal = false"
-              >
-                
-              </button>
+              ></button>
             </div>
             <div class="modal-body">
               <p>{{ T.problemEditDeleteConfirmationMessage }}</p>

@@ -13,15 +13,15 @@
             />
             <div v-else class="input-group w-100">
               <select v-model="selectedSearchType" class="form-select">
-                  <option
-                    v-for="searchType in availableSearchTypes"
-                    :key="searchType.key"
-                    :value="searchType.key"
-                    :selected="selectedSearchType === searchType.key"
-                  >
-                    {{ searchType.value }}
-                  </option>
-                </select>
+                <option
+                  v-for="searchType in availableSearchTypes"
+                  :key="searchType.key"
+                  :value="searchType.key"
+                  :selected="selectedSearchType === searchType.key"
+                >
+                  {{ searchType.value }}
+                </option>
+              </select>
               <omegaup-common-typeahead
                 class="w-75"
                 :existing-options="searchResultProblems"
@@ -53,9 +53,7 @@
             ></omegaup-radio-switch>
           </div>
           <div class="mb-3 col-md-3">
-            <label
-              v-tooltip="T.contestAddproblemProblemPoints"
-              class="fw-bold"
+            <label v-tooltip="T.contestAddproblemProblemPoints" class="fw-bold"
               >{{ T.wordsPoints }}
               <font-awesome-icon icon="info-circle" />
             </label>
@@ -67,9 +65,7 @@
             />
           </div>
           <div class="mb-3 col-md-3">
-            <label
-              v-tooltip="T.contestAddproblemContestOrder"
-              class="fw-bold"
+            <label v-tooltip="T.contestAddproblemContestOrder" class="fw-bold"
               >{{ T.contestAddproblemProblemOrder }}
               <font-awesome-icon icon="info-circle" />
             </label>

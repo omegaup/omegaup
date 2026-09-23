@@ -33,9 +33,7 @@
                     type="button"
                     class="btn-close"
                     @click="editCaseModal = false"
-                  >
-                    
-                  </button>
+                  ></button>
                 </div>
                 <div class="modal-body">
                   <omegaup-problem-creator-case-input
@@ -81,7 +79,10 @@
         >
           <div class="container">
             <div class="row">
-              <font-awesome-icon icon="trash-alt" class="text-danger me-1 pt-1" />
+              <font-awesome-icon
+                icon="trash-alt"
+                class="text-danger me-1 pt-1"
+              />
               {{ T.problemCreatorDeleteCase }}
             </div>
           </div>
@@ -241,14 +242,14 @@
                         <div class="modal-dialog" role="document">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title">{{ T.arrayEditTitle }}</h5>
+                              <h5 class="modal-title">
+                                {{ T.arrayEditTitle }}
+                              </h5>
                               <button
                                 type="button"
                                 class="btn-close"
                                 @click="arrayModalEdit = false"
-                              >
-                                
-                              </button>
+                              ></button>
                             </div>
                             <div class="modal-body">
                               <div class="container">
@@ -284,15 +285,11 @@
                                 <div class="row mt-2 mb-4">
                                   <div class="col text-start">
                                     <input
-                                      id="array-modal-distinct"
                                       v-model="line.data.distinct"
                                       type="checkbox"
                                       data-array-modal-checkbox
                                     />
-                                    <label
-                                      class="ms-1"
-                                      for="array-modal-distinct"
-                                    >
+                                    <label class="ms-1">
                                       {{ T.arrayModalDistinctValues }}
                                     </label>
                                   </div>
@@ -367,9 +364,7 @@
                                 type="button"
                                 class="btn-close"
                                 @click="matrixModalEdit = false"
-                              >
-                                
-                              </button>
+                              ></button>
                             </div>
                             <div class="modal-body">
                               <div class="container">
@@ -516,10 +511,7 @@
                       :title="T.problemCreatorLineDelete"
                       @click="deleteLine(line.lineID)"
                     >
-                      <font-awesome-icon
-                        icon="trash-alt"
-                        class="text-danger"
-                      />
+                      <font-awesome-icon icon="trash-alt" class="text-danger" />
                     </button>
                   </div>
                 </div>
@@ -571,10 +563,7 @@
       >
         <div class="container">
           <div class="row">
-            <font-awesome-icon
-              icon="plus-square"
-              class="text-info me-2 pt-1"
-            />
+            <font-awesome-icon icon="plus-square" class="text-info me-2 pt-1" />
             {{ T.problemCreatorAddLine }}
           </div>
         </div>

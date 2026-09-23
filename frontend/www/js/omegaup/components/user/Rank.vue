@@ -117,11 +117,7 @@
             <th scope="col" class="text-end align-middle">
               {{ T.rankScore }}
             </th>
-            <th
-              v-if="!isIndex"
-              scope="col"
-              class="text-end pe-4 align-middle"
-            >
+            <th v-if="!isIndex" scope="col" class="text-end pe-4 align-middle">
               {{ T.rankSolved }}
               <!-- id-lint off -->
               <button

@@ -11,15 +11,15 @@
               :value="contestURL"
             />
             <button
-                v-clipboard="contestURL"
-                copy-to-clipboard
-                class="btn btn-primary"
-                type="button"
-                :title="T.contestEditCopyContestLink"
-                @click="onCopyContestLink"
-              >
-                <font-awesome-icon icon="clipboard" />
-              </button>
+              v-clipboard="contestURL"
+              copy-to-clipboard
+              class="btn btn-primary"
+              type="button"
+              :title="T.contestEditCopyContestLink"
+              @click="onCopyContestLink"
+            >
+              <font-awesome-icon icon="clipboard" />
+            </button>
           </div>
 
           <label>{{ T.contestNewFormAdmissionMode }}</label>

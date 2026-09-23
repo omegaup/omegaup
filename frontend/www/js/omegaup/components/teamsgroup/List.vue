@@ -89,9 +89,7 @@
                 type="button"
                 class="btn-close"
                 @click="showArchiveModal = false"
-              >
-                
-              </button>
+              ></button>
             </div>
             <div class="modal-body">
               <p>{{ archiveModalBody }}</p>

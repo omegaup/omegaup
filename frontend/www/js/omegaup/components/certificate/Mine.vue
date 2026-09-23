@@ -17,7 +17,10 @@
           <th scope="col" class="text-start align-middle">
             {{ T.certificateListMineReason }}
           </th>
-          <th scope="col" class="text-start align-middle d-none d-md-table-cell">
+          <th
+            scope="col"
+            class="text-start align-middle d-none d-md-table-cell"
+          >
             {{ T.certificateListMineVerificationLink }}
           </th>
           <th scope="col" class="text-start align-middle">

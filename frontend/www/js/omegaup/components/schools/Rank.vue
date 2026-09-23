@@ -19,23 +19,23 @@
         {{ T.wordsRankingMeasurement }}
       </a>
     </h5>
-    <div v-if="!showHeader" class="card-body row">
-      <omegaup-common-typeahead
-        class="col col-md-4 ps-0 pe-2"
-        :existing-options="searchResultSchools"
-        :value.sync="searchedSchool"
-        :max-results="10"
-        @update-existing-options="
-          (query) => $emit('update-search-result-schools', query)
-        "
-      ></omegaup-common-typeahead>
-      <button
-        class="btn btn-primary form-control col-4 col-md-2"
-        type="button"
-        @click="onSubmit"
-      >
-        {{ T.searchSchool }}
-      </button>
+    <div v-if="!showHeader" class="card-body" data-school-rank-search>
+      <div class="row g-2">
+        <omegaup-common-typeahead
+          class="col-12 col-md-4"
+          :existing-options="searchResultSchools"
+          :value.sync="searchedSchool"
+          :max-results="10"
+          @update-existing-options="
+            (query) => $emit('update-search-result-schools', query)
+          "
+        ></omegaup-common-typeahead>
+        <div class="col-4 col-md-2">
+          <button class="btn btn-primary w-100" type="button" @click="onSubmit">
+            {{ T.searchSchool }}
+          </button>
+        </div>
+      </div>
     </div>
     <table class="table mb-0">
       <thead>

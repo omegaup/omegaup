@@ -159,12 +159,12 @@
                 :placeholder="T.supportTypeEmailOrUsername"
               />
               <button
-                  class="btn btn-outline-secondary"
-                  type="submit"
-                  :disabled="username != null"
-                >
-                  {{ T.wordsSearch }}
-                </button>
+                class="btn btn-outline-secondary"
+                type="submit"
+                :disabled="username != null"
+              >
+                {{ T.wordsSearch }}
+              </button>
             </div>
           </form>
         </div>
@@ -193,12 +193,12 @@
                 :placeholder="T.supportTypeContestAlias"
               />
               <button
-                  class="btn btn-outline-secondary"
-                  type="submit"
-                  :disabled="contestFound"
-                >
-                  {{ T.wordsSearch }}
-                </button>
+                class="btn btn-outline-secondary"
+                type="submit"
+                :disabled="contestFound"
+              >
+                {{ T.wordsSearch }}
+              </button>
             </div>
           </form>
         </div>
@@ -287,28 +287,28 @@
                   @focus="$event.target.select()"
                 />
                 <button
-                    v-clipboard="() => link"
-                    :disabled="!link"
-                    class="btn btn-outline-secondary"
-                    name="copy"
-                    type="button"
-                    data-copy-to-clipboard
-                    :aria-label="T.passwordCopyToken"
-                    :title="T.passwordCopyToken"
-                    @click.prevent="
-                      ui.success(T.passwordResetLinkCopiedToClipboard)
-                    "
-                  >
-                    <font-awesome-icon icon="clipboard" />
-                  </button>
-                  <button
-                    class="btn btn-outline-secondary"
-                    type="button"
-                    :title="T.passwordGenerateTokenDesc"
-                    @click.prevent="onGenerateToken"
-                  >
-                    {{ T.passwordGenerateToken }}
-                  </button>
+                  v-clipboard="() => link"
+                  :disabled="!link"
+                  class="btn btn-outline-secondary"
+                  name="copy"
+                  type="button"
+                  data-copy-to-clipboard
+                  :aria-label="T.passwordCopyToken"
+                  :title="T.passwordCopyToken"
+                  @click.prevent="
+                    ui.success(T.passwordResetLinkCopiedToClipboard)
+                  "
+                >
+                  <font-awesome-icon icon="clipboard" />
+                </button>
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  :title="T.passwordGenerateTokenDesc"
+                  @click.prevent="onGenerateToken"
+                >
+                  {{ T.passwordGenerateToken }}
+                </button>
               </div>
             </div>
           </form>
@@ -326,12 +326,12 @@
                   :placeholder="T.adminSupportTypeNewEmail"
                 />
                 <button
-                    class="btn btn-outline-secondary"
-                    type="submit"
-                    :title="T.adminSupportTypeNewEmail"
-                  >
-                    {{ T.wordsSaveChanges }}
-                  </button>
+                  class="btn btn-outline-secondary"
+                  type="submit"
+                  :title="T.adminSupportTypeNewEmail"
+                >
+                  {{ T.wordsSaveChanges }}
+                </button>
               </div>
             </div>
           </form>

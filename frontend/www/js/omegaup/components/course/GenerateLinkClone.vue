@@ -16,16 +16,16 @@
               @focus="$event.target.select()"
             />
             <button
-                v-clipboard="() => cloneCourseURL"
-                class="btn btn-outline-secondary"
-                type="button"
-                :disabled="!cloneCourseURL"
-                :title="T.wordsCopyToClipboard"
-                data-copy-to-clipboard
-                @click="copiedToClipboard = true"
-              >
-                <font-awesome-icon icon="clipboard" />
-              </button>
+              v-clipboard="() => cloneCourseURL"
+              class="btn btn-outline-secondary"
+              type="button"
+              :disabled="!cloneCourseURL"
+              :title="T.wordsCopyToClipboard"
+              data-copy-to-clipboard
+              @click="copiedToClipboard = true"
+            >
+              <font-awesome-icon icon="clipboard" />
+            </button>
           </div>
         </div>
       </form>

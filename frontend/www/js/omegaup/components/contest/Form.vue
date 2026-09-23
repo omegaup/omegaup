@@ -909,9 +909,11 @@
               <h5 class="modal-title">
                 {{ T.contestNewFormPresetOverwriteWarningModalTitle }}
               </h5>
-              <button type="button" class="btn-close" @click="showModal = false">
-                
-              </button>
+              <button
+                type="button"
+                class="btn-close"
+                @click="showModal = false"
+              ></button>
             </div>
             <div class="modal-body">
               {{ T.contestNewFormPresetOverwriteWarning }}

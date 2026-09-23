@@ -11,9 +11,7 @@
         class="btn-close"
         data-bs-dismiss="alert"
         aria-label="Close"
-      >
-        
-      </button>
+      ></button>
     </div>
     <h3 class="text-center mb-4">{{ T.wordsMyContests }}</h3>
     <div class="card">

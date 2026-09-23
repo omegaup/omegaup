@@ -144,9 +144,7 @@ describe('Settings.vue', () => {
       },
     });
 
-    expect(wrapper.find('.mb-3.col-md-6.introjs-file').exists()).toBe(
-      false,
-    );
+    expect(wrapper.find('.mb-3.col-md-6.introjs-file').exists()).toBe(false);
   });
 
   it('Should show zip file input in selector area when zip method is selected', async () => {

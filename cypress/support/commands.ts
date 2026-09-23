@@ -72,7 +72,6 @@ Cypress.Commands.add(
   'createProblem',
   ({
     problemAlias,
-    tag,
     autoCompleteTextTag,
     problemLevelIndex,
     publicAccess = false,
@@ -94,26 +93,35 @@ Cypress.Commands.add(
     cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
     cy.get('[name="source"]').type(problemAlias);
+    cy.get('body').then(($body) => {
+      if ($body.find('.introjs-creation-method button').length === 0) {
+        return;
+      }
+      cy.get('.introjs-creation-method button').eq(1).click();
+    });
     cy.get('[name="problem_contents"]').attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
-    if (languagesValue === 'cat') {
-      cy.get('select[name="languages"]').should('exist').select(languagesValue);
-    }
     // Tags panel
     cy.waitUntil(() =>
       cy
-        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
-        .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
+        .get('[data-tags-input] .tags-input-typeahead-item-highlighted-default')
+        .should('exist')
         .click({ force: true }),
     );
+
+    if (languagesValue === 'cat') {
+      cy.get('select[name="languages"]')
+        .should('exist')
+        .select(languagesValue, { force: true });
+    }
 
     if (publicAccess) {
       cy.get('[data-bs-target=".access"]').click();
       cy.get('[data-problem-access-radio-yes]').check();
     }
 
-    cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
+    cy.get('[name="problem-level"]').select(problemLevelIndex, { force: true }); // How can we assert this with the real text?
 
     cy.get('button[type="submit"]').click(); // Submit
     cy.url().should('include', problemAlias);

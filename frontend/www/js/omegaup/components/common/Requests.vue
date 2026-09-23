@@ -64,9 +64,7 @@
                         type="button"
                         class="btn-close"
                         @click="toggleFeedbackModal(request.username)"
-                      >
-                        
-                      </button>
+                      ></button>
                     </div>
                     <div class="modal-body">
                       <input

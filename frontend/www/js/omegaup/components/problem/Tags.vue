@@ -65,13 +65,13 @@
             :placeholder="T.privateTagsPlaceholder"
           />
           <button
-              class="btn btn-outline-primary"
-              type="button"
-              :disabled="newPrivateTag === ''"
-              @click.prevent="addPrivateTag"
-            >
-              {{ T.wordsAddTag }}
-            </button>
+            class="btn btn-outline-primary"
+            type="button"
+            :disabled="newPrivateTag === ''"
+            @click.prevent="addPrivateTag"
+          >
+            {{ T.wordsAddTag }}
+          </button>
         </div>
       </div>
       <table class="table table-striped">

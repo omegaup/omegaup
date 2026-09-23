@@ -23,10 +23,7 @@
             </option>
           </select>
         </label>
-        <label
-          v-if="users.length != 0"
-          class="col-md-6 col-form-label fw-bold"
-        >
+        <label v-if="users.length != 0" class="col-md-6 col-form-label fw-bold">
           {{ T.wordsMessageTo }}
           <select
             v-model="currentUsername"

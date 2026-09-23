@@ -105,9 +105,7 @@
                 type="button"
                 class="btn-close"
                 @click="validateAndFixPointsModal = false"
-              >
-                
-              </button>
+              ></button>
             </div>
             <div class="modal-body">
               {{ T.problemCreatorValidatePointsWarning }}
@@ -444,10 +442,7 @@
                 </div>
               </div>
             </div>
-            <div
-              v-if="editGroupModal[groupID]"
-              data-sidebar-edit-group-modal
-            >
+            <div v-if="editGroupModal[groupID]" data-sidebar-edit-group-modal>
               <div class="modal fade show d-block" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
@@ -457,9 +452,7 @@
                         type="button"
                         class="btn-close"
                         @click="editGroupModal[groupID] = false"
-                      >
-                        
-                      </button>
+                      ></button>
                     </div>
                     <div class="modal-body">
                       <div class="mt-3">

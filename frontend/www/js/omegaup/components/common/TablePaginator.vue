@@ -1,7 +1,8 @@
 <template>
   <div class="card" data-table-paginator>
     <h5 v-if="title" class="card-header">
-      {{ title }} <span class="badge text-bg-secondary">{{ items.length }}</span>
+      {{ title }}
+      <span class="badge text-bg-secondary">{{ items.length }}</span>
       <slot name="header-link"></slot>
     </h5>
     <div v-if="sortOptions.length > 0" class="card-body text-center">

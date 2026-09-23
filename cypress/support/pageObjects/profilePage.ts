@@ -30,7 +30,15 @@ export class ProfilePage {
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preferred-language]').select(preferredLanguage);
+    cy.intercept('/api/user/update/').as('updateUserPreferences');
     cy.get('[data-preference-save-button]').click();
+    cy.wait('@updateUserPreferences')
+      .its('response.statusCode')
+      .should('eq', 200);
+    cy.get('.alert[role="alert"]')
+      .should('be.visible')
+      .find('[data-alert-close]')
+      .click();
   }
 
   navigateToMyProblemsPage(): void {

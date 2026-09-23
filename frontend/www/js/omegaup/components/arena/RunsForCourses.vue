@@ -17,10 +17,7 @@
         <div v-if="showFilters">
           <nav v-if="showFilters" data-pagination>
             <ul class="pagination pagination-sm">
-              <li
-                class="page-item"
-                :class="{ disabled: currentPage === 1 }"
-              >
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
                 <button
                   class="page-link"
                   type="button"
@@ -499,10 +496,7 @@
         </table>
         <nav v-if="!showFilters" data-pagination>
           <ul class="pagination justify-content-center">
-            <li
-              class="page-item"
-              :class="{ disabled: currentPage === 1 }"
-            >
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
               <button
                 class="page-link"
                 type="button"

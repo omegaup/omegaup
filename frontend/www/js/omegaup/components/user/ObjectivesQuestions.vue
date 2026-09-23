@@ -7,9 +7,11 @@
             <h5 class="modal-title fw-bold">
               {{ T.userObjectivesModalTitle }}
             </h5>
-            <button type="button" class="btn-close" @click="showModal = false">
-              
-            </button>
+            <button
+              type="button"
+              class="btn-close"
+              @click="showModal = false"
+            ></button>
           </div>
           <div class="modal-body">
             <p class="text-end text-primary">

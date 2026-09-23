@@ -124,9 +124,11 @@
               <h5 class="modal-title">
                 {{ isEditing ? T.carouselEditItem : T.carouselCreateNew }}
               </h5>
-              <button type="button" class="btn-close" @click="closeItemModal">
-                
-              </button>
+              <button
+                type="button"
+                class="btn-close"
+                @click="closeItemModal"
+              ></button>
             </div>
             <div class="modal-body">
               <form ref="carouselForm" @submit.prevent="saveItem">
@@ -261,9 +263,11 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">{{ T.carouselDeleteConfirm }}</h5>
-              <button type="button" class="btn-close" @click="closeArchiveModal">
-                
-              </button>
+              <button
+                type="button"
+                class="btn-close"
+                @click="closeArchiveModal"
+              ></button>
             </div>
             <div class="modal-body">
               {{ T.carouselDeleteMessage }}

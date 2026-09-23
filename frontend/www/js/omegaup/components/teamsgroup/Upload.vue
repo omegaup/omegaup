@@ -66,7 +66,7 @@
               <template v-for="item in items">
                 <tr :key="item.username">
                   <th>{{ item.username }}</th>
-                  <td>{{ item.name }}</td>
+                  <td data-upload-team-name>{{ item.name }}</td>
                   <td>{{ item.country_id }}</td>
                   <td>{{ item.state_id }}</td>
                   <td>{{ item.gender }}</td>

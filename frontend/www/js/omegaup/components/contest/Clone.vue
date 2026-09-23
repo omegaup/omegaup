@@ -25,9 +25,7 @@
         </div>
         <div class="row">
           <div class="mb-3 col-md-6">
-            <label class="fw-bold">{{
-              T.contestNewFormDescription
-            }}</label>
+            <label class="fw-bold">{{ T.contestNewFormDescription }}</label>
             <textarea
               v-model="description"
               class="form-control"

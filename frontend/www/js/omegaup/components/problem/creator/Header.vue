@@ -30,9 +30,7 @@
                   type="button"
                   class="btn-close"
                   @click="uploadZipModal = false"
-                >
-                  
-                </button>
+                ></button>
               </div>
               <div class="modal-body">
                 <div class="mb-4">{{ T.problemCreatorUploadZipMessage }}</div>
@@ -99,9 +97,7 @@
                   type="button"
                   class="btn-close"
                   @click="newProblemConfirmationModal = false"
-                >
-                  
-                </button>
+                ></button>
               </div>
               <div class="modal-body">
                 <div class="mb-4">

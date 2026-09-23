@@ -11,9 +11,7 @@
         class="btn-close"
         data-bs-dismiss="alert"
         aria-label="Close"
-      >
-        
-      </button>
+      ></button>
     </div>
     <div class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
@@ -213,9 +211,7 @@
                   type="button"
                   class="btn-close"
                   @click="toggleConfirmationModal(problemPendingDelete.alias)"
-                >
-                  
-                </button>
+                ></button>
               </div>
               <div class="modal-body">
                 <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
@@ -259,9 +255,7 @@
                   type="button"
                   class="btn-close"
                   @click="showConfirmationModalDeleteAll = false"
-                >
-                  
-                </button>
+                ></button>
               </div>
               <div class="modal-body">
                 <p>
