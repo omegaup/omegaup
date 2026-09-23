@@ -211,6 +211,7 @@ describe('Problem creator Test', () => {
 
         // Create layout from selected case
         cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-close-layout-sidebar]').should('be.visible');
         cy.get('[data-add-layout-from-selected-case]').click();
         cy.get('[data-close-layout-sidebar]').click();
 
@@ -222,11 +223,13 @@ describe('Problem creator Test', () => {
 
         // Enforce layout to all cases
         cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-close-layout-sidebar]').should('be.visible');
 
         cy.contains('[data-layout-dropdown]', 'hellocase_hellocase')
           .as('targetLayout')
           .find('button.dropdown-toggle-split')
-          .click();
+          .should('be.visible')
+          .click({ force: true });
 
         cy.get('@targetLayout')
           .find('[data-layout-dropdown-enforce-to-all]')
@@ -247,11 +250,13 @@ describe('Problem creator Test', () => {
 
         // Copy the layout
         cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-close-layout-sidebar]').should('be.visible');
 
         cy.contains('[data-layout-dropdown]', 'hellocase_hellocase')
           .as('originalLayout')
           .find('button.dropdown-toggle-split')
-          .click();
+          .should('be.visible')
+          .click({ force: true });
 
         cy.get('@originalLayout')
           .find('[data-layout-dropdown-copy]')
@@ -262,7 +267,8 @@ describe('Problem creator Test', () => {
         cy.contains('[data-layout-dropdown]', 'hellocase_hellocase copia')
           .as('copiedLayout')
           .find('button.dropdown-toggle-split')
-          .click();
+          .should('be.visible')
+          .click({ force: true });
 
         cy.get('@copiedLayout')
           .find('[data-layout-dropdown-enforce-to-selected]')
