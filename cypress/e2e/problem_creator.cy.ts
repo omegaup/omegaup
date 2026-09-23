@@ -331,12 +331,14 @@ describe('Problem creator Test', () => {
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
     cy.waitUntil(() =>
       cy
-        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
+        .get(
+          '[data-tags-input] .tags-input-typeahead-item-highlighted-default',
+        )
         .should('exist')
         .click({ force: true }),
     );
 
-    cy.get('[name="problem-level"]').select(1);
+    cy.get('[name="problem-level"]').select(1, { force: true });
 
     cy.get('.introjs-creation-method .btn-group button').first().click();
     cy.get('.introjs-open-creator button').click();

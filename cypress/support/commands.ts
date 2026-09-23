@@ -103,7 +103,9 @@ Cypress.Commands.add(
     // Tags panel
     cy.waitUntil(() =>
       cy
-        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
+        .get(
+          '[data-tags-input] .tags-input-typeahead-item-highlighted-default',
+        )
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click({ force: true }),
     );
