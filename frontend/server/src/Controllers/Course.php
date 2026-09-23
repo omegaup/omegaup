@@ -1580,14 +1580,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'problems'
                 );
             }
+            \OmegaUp\Validators::validateAlias($alias, 'problems');
         }
-        /** @var list<string> $aliases */
-        $aliases = $decodedAliases;
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $order = 1;
-            foreach ($aliases as $alias) {
+            foreach ($decodedAliases as $alias) {
                 $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                     $alias
                 );
@@ -1624,7 +1623,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $assignments
      * @omegaup-request-param string $course_alias
      */
-   public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
+    public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
@@ -1662,14 +1661,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'assignments'
                 );
             }
+            \OmegaUp\Validators::validateAlias($assignment, 'assignments');
         }
-        /** @var list<string> $aliases */
-        $aliases = $decodedAliases;
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $order = 1;
-            foreach ($aliases as $alias) {
+            foreach ($decodedAliases as $alias) {
                 $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                     $alias,
                     $course->course_id

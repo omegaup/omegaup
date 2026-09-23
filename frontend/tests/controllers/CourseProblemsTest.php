@@ -188,7 +188,19 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame([], $response['identities']);
     }
 
-    public function testUpdateProblemsOrderMalformedJson(): void {
+    public static function invalidInputProvider(): array {
+        return [
+            'malformedJson' => ['invalid-json'],
+            'nullValue' => ['[null]'],
+            'objectValue' => ['[{}]'],
+            'invalidAlias' => ['["invalid alias"]'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidInputProvider
+     */
+    public function testUpdateProblemsOrderInvalidInput(string $problemsInput): void {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
@@ -199,39 +211,12 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $courseAlias = $courseData['course_alias'];
         $assignmentAlias = $courseData['assignment_alias'];
 
-        // Test with malformed JSON string
         try {
             \OmegaUp\Controllers\Course::apiUpdateProblemsOrder(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseAlias,
                 'assignment_alias' => $assignmentAlias,
-                'problems' => 'invalid-json',
-            ]));
-            $this->fail('Expected InvalidParameterException was not thrown');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterInvalid', $e->getMessage());
-        }
-
-        // Test with [null]
-        try {
-            \OmegaUp\Controllers\Course::apiUpdateProblemsOrder(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'course_alias' => $courseAlias,
-                'assignment_alias' => $assignmentAlias,
-                'problems' => '[null]',
-            ]));
-            $this->fail('Expected InvalidParameterException was not thrown');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterInvalid', $e->getMessage());
-        }
-
-        // Test with [{}]
-        try {
-            \OmegaUp\Controllers\Course::apiUpdateProblemsOrder(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'course_alias' => $courseAlias,
-                'assignment_alias' => $assignmentAlias,
-                'problems' => '[{}]',
+                'problems' => $problemsInput,
             ]));
             $this->fail('Expected InvalidParameterException was not thrown');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -239,7 +224,10 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testUpdateAssignmentsOrderMalformedJson(): void {
+    /**
+     * @dataProvider invalidInputProvider
+     */
+    public function testUpdateAssignmentsOrderInvalidInput(string $assignmentsInput): void {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
@@ -249,36 +237,11 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $courseAlias = $courseData['course_alias'];
 
-        // Test with malformed JSON string
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseAlias,
-                'assignments' => 'invalid-json',
-            ]));
-            $this->fail('Expected InvalidParameterException was not thrown');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterInvalid', $e->getMessage());
-        }
-
-        // Test with [null]
-        try {
-            \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'course_alias' => $courseAlias,
-                'assignments' => '[null]',
-            ]));
-            $this->fail('Expected InvalidParameterException was not thrown');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterInvalid', $e->getMessage());
-        }
-
-        // Test with [{}]
-        try {
-            \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'course_alias' => $courseAlias,
-                'assignments' => '[{}]',
+                'assignments' => $assignmentsInput,
             ]));
             $this->fail('Expected InvalidParameterException was not thrown');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
