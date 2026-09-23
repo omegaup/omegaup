@@ -503,6 +503,14 @@ export namespace types {
       );
     }
 
+    export function CodeTesterPayload(
+      elementId: string = 'payload',
+    ): types.CodeTesterPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -3123,6 +3131,11 @@ export namespace types {
     public: boolean;
     receiver?: string;
     time: Date;
+  }
+
+  export interface CodeTesterPayload {
+    acceptedLanguages: string[];
+    preferredLanguage?: string;
   }
 
   export interface CoderOfTheMonth {
