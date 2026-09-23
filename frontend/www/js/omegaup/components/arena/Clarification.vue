@@ -12,10 +12,10 @@
           'assignment_alias' in clarification && clarification.assignment_alias
         "
       >
-        <span class="font-weight-bold">{{ T.clarificationHomework }}</span>
+        <span class="fw-bold">{{ T.clarificationHomework }}</span>
         {{ clarification.assignment_alias }}
       </span>
-      <span class="font-weight-bold">{{
+      <span class="fw-bold">{{
         'contest_alias' in clarification && clarification.contest_alias
           ? T.clarificationContest
           : T.clarificationProblem
@@ -26,15 +26,15 @@
           : clarification.problem_alias
       }}
       <span data-author>
-        <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
+        <span class="fw-bold">{{ T.clarificationsAskedBy }}</span>
         {{ clarificationAuthorReceiver }}
       </span>
-      <span class="font-weight-bold">{{ T.clarificationTime }}</span>
+      <span class="fw-bold">{{ T.clarificationTime }}</span>
       {{ time.formatDateTime(clarification.time) }}
     </td>
 
     <td class="column-message align-middle" data-form-clarification-message>
-      <span class="text-monospace text-dark">{{ clarification.message }}</span>
+      <span class="font-monospace text-dark">{{ clarification.message }}</span>
     </td>
     <td
       v-if="isAdmin"
@@ -42,7 +42,7 @@
       data-form-clarification-resolved-answer
     >
       <template v-if="clarification.answer">
-        <span class="text-monospace text-dark">{{ clarification.answer }}</span>
+        <span class="font-monospace text-dark">{{ clarification.answer }}</span>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
@@ -56,14 +56,14 @@
       </template>
       <form
         v-if="!clarification.answer || showUpdateAnswer"
-        class="form-inline justify-content-between"
+        class="d-flex align-items-center justify-content-between"
         data-form-clarification-answer
         @submit.prevent="sendClarificationResponse"
       >
-        <div class="form-group mb-0">
+        <div class="mb-3 mb-0">
           <select
             v-model="selectedResponse"
-            class="form-control"
+            class="form-select"
             data-select-answer
           >
             <option
@@ -75,7 +75,7 @@
             </option>
           </select>
         </div>
-        <div v-if="selectedResponse === 'other'" class="form-group mt-1 mb-0">
+        <div v-if="selectedResponse === 'other'" class="mb-3 mt-1 mb-0">
           <textarea v-model="message" :placeholder="T.wordsAnswer"> </textarea>
         </div>
         <div class="d-flex justify-content-between w-100">
@@ -100,7 +100,7 @@
       class="column-answer align-middle"
       data-clarification-answer-text
     >
-      <span v-if="clarification.answer" class="text-monospace text-dark">{{
+      <span v-if="clarification.answer" class="font-monospace text-dark">{{
         clarification.answer
       }}</span>
     </td>

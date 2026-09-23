@@ -1,91 +1,115 @@
 <template>
-  <b-card :title="T.problemCreatorAdd">
-    <form ref="form" @submit.prevent="addItemToStore">
-      <div class="h-100">
-        <b-tabs small pills lazy>
-          <b-tab
-            :active="tab === 'case'"
-            name="modal-form"
-            @click="tab = 'case'"
-          >
-            <template #title>
-              <span name="group" data-problem-creator-add-panel-tab="case">
-                {{ T.problemCreatorCase }}</span
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ T.problemCreatorAdd }}</h5>
+      <form ref="form" @submit.prevent="addItemToStore">
+        <div class="h-100">
+          <ul class="nav nav-pills">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: tab === 'case' }"
+                href="#"
+                @click.prevent="tab = 'case'"
               >
-            </template>
-            <b-alert
-              v-model="invalidCaseName"
-              variant="danger"
-              class="mt-2"
-              dismissible
+                <span name="group" data-problem-creator-add-panel-tab="case">
+                  {{ T.problemCreatorCase }}</span
+                >
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: tab === 'group' }"
+                href="#"
+                @click.prevent="tab = 'group'"
+              >
+                <span name="group" data-problem-creator-add-panel-tab="group">
+                  {{ T.problemCreatorGroup }}</span
+                >
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: tab === 'multiplecases' }"
+                href="#"
+                @click.prevent="tab = 'multiplecases'"
+              >
+                <span
+                  name="multiple-cases"
+                  data-problem-creator-add-panel-tab="multiple-cases"
+                >
+                  {{ T.problemCreatorMultipleCases }}</span
+                >
+              </a>
+            </li>
+          </ul>
+          <div v-if="tab === 'case'">
+            <div
+              v-if="invalidCaseName"
+              class="alert alert-danger alert-dismissible fade show mt-2"
+              role="alert"
             >
-              {{ T.problemCreatorCannotHaveSameName }}</b-alert
-            >
+              {{ T.problemCreatorCannotHaveSameName }}
+              <button
+                type="button"
+                class="btn-close"
+                @click="invalidCaseName = false"
+              ></button>
+            </div>
             <omegaup-problem-creator-case-input ref="case-input" />
-          </b-tab>
-          <b-tab
-            :active="tab === 'group'"
-            name="modal-form"
-            @click="tab = 'group'"
-          >
-            <template #title>
-              <span name="group" data-problem-creator-add-panel-tab="group">
-                {{ T.problemCreatorGroup }}</span
-              >
-            </template>
-            <b-alert
-              v-model="invalidGroupName"
-              variant="danger"
-              class="mt-2"
-              dismissible
+          </div>
+          <div v-if="tab === 'group'">
+            <div
+              v-if="invalidGroupName"
+              class="alert alert-danger alert-dismissible fade show mt-2"
+              role="alert"
             >
-              {{ T.problemCreatorCannotHaveSameName }}</b-alert
-            >
+              {{ T.problemCreatorCannotHaveSameName }}
+              <button
+                type="button"
+                class="btn-close"
+                @click="invalidGroupName = false"
+              ></button>
+            </div>
             <omegaup-problem-creator-group-input ref="group-input" />
-          </b-tab>
-          <b-tab
-            :active="tab === 'multiplecases'"
-            name="modal-form"
-            @click="tab = 'multiplecases'"
-          >
-            <template #title>
-              <span
-                name="multiple-cases"
-                data-problem-creator-add-panel-tab="multiple-cases"
-              >
-                {{ T.problemCreatorMultipleCases }}</span
-              >
-            </template>
-            <b-alert
-              v-model="invalidCaseName"
-              variant="danger"
-              class="mt-2"
-              dismissible
+          </div>
+          <div v-if="tab === 'multiplecases'">
+            <div
+              v-if="invalidCaseName"
+              class="alert alert-danger alert-dismissible fade show mt-2"
+              role="alert"
             >
-              {{ T.problemCreatorCannotHaveSameName }}</b-alert
-            >
+              {{ T.problemCreatorCannotHaveSameName }}
+              <button
+                type="button"
+                class="btn-close"
+                @click="invalidCaseName = false"
+              ></button>
+            </div>
             <omegaup-problem-creator-multiple-cases-input
               ref="multiple-cases-input"
             />
-          </b-tab>
-        </b-tabs>
-      </div>
-      <b-button
-        variant="danger"
-        size="sm"
-        class="mr-2"
-        @click="$emit('close-add-window')"
-        >{{ T.wordsCancel }}</b-button
-      >
-      <b-button
-        data-problem-creator-add-panel-submit
-        type="submit"
-        variant="success"
-        size="sm"
-        >{{ T.problemCreatorAdd }}</b-button
-      >
-    </form>
-  </b-card>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-danger btn-sm me-2"
+          @click="$emit('close-add-window')"
+        >
+          {{ T.wordsCancel }}
+        </button>
+        <button
+          data-problem-creator-add-panel-submit
+          type="submit"
+          class="btn btn-success btn-sm"
+        >
+          {{ T.problemCreatorAdd }}
+        </button>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

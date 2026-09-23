@@ -229,14 +229,14 @@ export default class Crons extends Vue {
 
   statusClass(status: string | null): string {
     const classes: Record<string, string> = {
-      success: 'badge badge-success',
-      failure: 'badge badge-danger',
-      running: 'badge badge-secondary',
+      success: 'badge text-bg-success',
+      failure: 'badge text-bg-danger',
+      running: 'badge text-bg-secondary',
     };
     if (!status) {
       return '';
     }
-    return classes[status] || 'badge badge-light';
+    return classes[status] || 'badge text-bg-light';
   }
 
   // runs arrive newest first.

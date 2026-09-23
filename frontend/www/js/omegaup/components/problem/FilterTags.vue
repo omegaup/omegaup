@@ -12,14 +12,14 @@
           />{{ `${T[tag.name]}  (${tag.problemCount})` }}
         </label>
       </div>
-      <div class="form-group mt-2">
-        <vue-typeahead-bootstrap
-          :data="publicQualityTagNames"
-          :serializer="publicQualityTagsSerializer"
+      <div class="mb-3 mt-2">
+        <omegaup-common-typeahead
+          :existing-options="publicQualityTagOptions"
+          :value.sync="selectedOtherTag"
           :placeholder="T.collecionOtherTags"
-          @hit="addOtherTag"
-        >
-        </vue-typeahead-bootstrap>
+          :activation-threshold="0"
+          :max-results="publicQualityTagNames.length || 10"
+        ></omegaup-common-typeahead>
       </div>
     </div>
   </div>
@@ -29,10 +29,10 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import common_Typeahead from '../common/Typeahead.vue';
 @Component({
   components: {
-    'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class FilterTags extends Vue {
@@ -42,15 +42,32 @@ export default class FilterTags extends Vue {
 
   T = T;
   currentSelectedTags = this.selectedTags;
+  selectedOtherTag: types.ListItem | null = null;
 
   get publicQualityTagNames(): string[] {
     return this.publicQualityTags.map((x) => x.name);
+  }
+
+  get publicQualityTagOptions(): types.ListItem[] {
+    return this.publicQualityTags.map((tag) => ({
+      key: tag.name,
+      value: this.publicQualityTagsSerializer(tag.name),
+    }));
   }
 
   addOtherTag(tag: string): void {
     if (!this.currentSelectedTags.includes(tag)) {
       this.currentSelectedTags.push(tag);
     }
+  }
+
+  @Watch('selectedOtherTag')
+  onSelectedOtherTagChanged(tag: types.ListItem | null): void {
+    if (!tag) {
+      return;
+    }
+    this.addOtherTag(tag.key);
+    this.selectedOtherTag = null;
   }
 
   publicQualityTagsSerializer(name: string): string {

@@ -58,7 +58,9 @@ export class ProblemPage {
       cy.get('[data-other-tag-input] input').clear().type(tag);
       cy.waitUntil(() =>
         cy
-          .get('[data-other-tag-input] .vbt-autcomplete-list a.vbst-item:first')
+          .get(
+            '[data-other-tag-input] .tags-input-typeahead-item-highlighted-default',
+          )
           .should('have.text', tag)
           .click(),
       );
@@ -77,7 +79,7 @@ export class ProblemPage {
     cy.visit('nomination');
     cy.get(`.${problemAlias}`).click();
     cy.get('[data-ban-problem-button]').click();
-    cy.get('.modal-footer [data-dismiss="modal"]').first().click();
+    cy.get('.modal-footer [data-bs-dismiss="modal"]').first().click();
   }
 
   verifyBan(problemAlias: string): void {
@@ -95,7 +97,7 @@ export class ProblemPage {
       const problemOptions: ProblemOptions = {
         problemAlias: uuid().slice(0, 10),
         tag: 'Recursion',
-        autoCompleteTextTag: 'recur',
+        autoCompleteTextTag: 'recursi',
         problemLevelIndex: 0,
       };
 

@@ -4,10 +4,10 @@
       <form data-reviewewr-popup class="h-auto w-auto" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
-            <p class="h4 font-weight-bold pb-4 text-center w-100">
+            <p class="h4 fw-bold pb-4 text-center w-100">
               {{ T.reviewerNominationFormTitle }}
             </p>
-            <div class="form-group w-100">
+            <div class="mb-3 w-100">
               <label class="control-label">
                 {{ T.reviewerNominationQuality }}
               </label>
@@ -17,14 +17,14 @@
                 :selected-value="qualitySeal"
               ></omegaup-radio-switch>
             </div>
-            <div class="form-group w-100" data-other-tag-input>
-              <vue-typeahead-bootstrap
-                :data="publicTags"
-                :serializer="publicTagsSerializer"
+            <div class="mb-3 w-100" data-other-tag-input>
+              <omegaup-common-typeahead
+                :existing-options="publicTagOptions"
+                :value.sync="selectedOtherTag"
                 :placeholder="T.collecionOtherTags"
-                @hit="addOtherTag"
-              >
-              </vue-typeahead-bootstrap>
+                :activation-threshold="0"
+                :max-results="publicTags.length || 10"
+              ></omegaup-common-typeahead>
               <br />
               <div class="card-body table-responsive w-100">
                 <table class="table table-striped w-100">
@@ -54,10 +54,10 @@
                 </table>
               </div>
             </div>
-            <div class="text-right">
+            <div class="text-end">
               <button
                 data-review-submit-button
-                class="btn btn-primary mr-3"
+                class="btn btn-primary me-3"
                 type="submit"
                 :disabled="publicTagsList.length === 0"
                 @click="onSubmit"
@@ -81,12 +81,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import { Vue, Prop, Component, Watch } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import T from '../../lang';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import { types } from '../../api_types';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -102,7 +103,7 @@ interface ProblemTag {
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-radio-switch': omegaup_RadioSwitch,
-    'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
+    'omegaup-common-typeahead': common_Typeahead,
     FontAwesomeIcon,
   },
 })
@@ -133,6 +134,14 @@ export default class ReviewerPopup extends Vue {
   currentView: AvailableViews = AvailableViews.Content;
   qualitySeal = true;
   publicTagsList = this.selectedPublicTags ?? [];
+  selectedOtherTag: types.ListItem | null = null;
+
+  get publicTagOptions(): types.ListItem[] {
+    return this.publicTags.map((tag) => ({
+      key: tag,
+      value: this.publicTagsSerializer(tag),
+    }));
+  }
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags
@@ -153,6 +162,15 @@ export default class ReviewerPopup extends Vue {
     if (!this.publicTagsList.includes(tag)) {
       this.publicTagsList.push(tag);
     }
+  }
+
+  @Watch('selectedOtherTag')
+  onSelectedOtherTagChanged(tag: types.ListItem | null): void {
+    if (!tag) {
+      return;
+    }
+    this.addOtherTag(tag.key);
+    this.selectedOtherTag = null;
   }
 
   publicTagsSerializer(tagname: string): string {

@@ -14,7 +14,7 @@
         "
       >
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.wordsName }}
               <input
@@ -27,7 +27,7 @@
             </label>
           </div>
 
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.contestNewFormShortTitleAlias }}
               <input
@@ -44,7 +44,7 @@
         </div>
 
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.teamsGroupNewFormDescription }}
               <textarea
@@ -58,7 +58,7 @@
             </label>
           </div>
 
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label class="control-label w-100">
               {{ T.contestNewFormNumberOfContestants }}
               <input
@@ -77,7 +77,7 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
           <button type="submit" class="btn btn-primary" data-create-teams-group>
             <slot name="teams-group-submit-button">
               {{ T.teamsGroupFormCreate }}

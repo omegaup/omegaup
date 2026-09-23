@@ -51,14 +51,15 @@ describe('Edit.vue', () => {
     await wrapper.find('a[data-tab-tags]').trigger('click');
     await wrapper.find('a[data-tab-edit]').trigger('click');
     await wrapper.find('a[data-tab-download]').trigger('click');
-    expect(wrapper.find('.card-body .form .form-group button').text()).toBe(
+    expect(wrapper.find('.card-body .form .mb-3 button').text()).toBe(
       T.wordsDownload,
     );
     await wrapper.find('a[data-tab-delete]').trigger('click');
     expect(wrapper.find('.alert-heading').text()).toBe(T.wordsDangerZone);
 
-    const deleteModal = wrapper.find('b-modal-stub');
-    deleteModal.vm.$emit('ok');
+    await wrapper.find('.alert .btn-danger').trigger('click');
+    expect(wrapper.find('.modal').exists()).toBe(true);
+    await wrapper.find('.modal .btn-danger').trigger('click');
     expect(wrapper.emitted('remove')).toBeDefined();
     expect(wrapper.emitted('remove')).toEqual([['problem-alias']]);
   });

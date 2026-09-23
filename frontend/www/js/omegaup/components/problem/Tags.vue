@@ -1,21 +1,18 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="form-group">
-        <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
-        <vue-typeahead-bootstrap
+      <div class="mb-3">
+        <label class="fw-bold">{{ T.wordsPublicTags }}</label>
+        <omegaup-common-typeahead
           v-if="canAddNewTags"
-          v-model="newPublicTag"
           data-tags-input
-          :data="publicTags"
-          :serializer="publicTagsSerializer"
-          :auto-close="true"
+          :existing-options="publicTagOptions"
+          :value.sync="newPublicTag"
           :placeholder="T.publicTagsPlaceholder"
-          :required="true"
-          :input-class="errors.includes('public_tags') ? 'is-invalid' : ''"
-          @hit="addPublicTag"
-        >
-        </vue-typeahead-bootstrap>
+          :is-invalid="errors.includes('public_tags')"
+          :activation-threshold="0"
+          :max-results="publicTags.length || 10"
+        ></omegaup-common-typeahead>
       </div>
       <table class="table table-striped">
         <thead>
@@ -23,11 +20,11 @@
             <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="pl-5" scope="col">
+            <th class="ps-5" scope="col">
               {{ T.contestEditTagDelete }}
               <a
                 v-if="!isLecture"
-                data-toggle="tooltip"
+                data-bs-toggle="tooltip"
                 rel="tooltip"
                 :title="T.problemEditTagPublicRequired"
               >
@@ -58,8 +55,8 @@
           </tr>
         </tbody>
       </table>
-      <div class="form-group">
-        <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
+      <div class="mb-3">
+        <label class="fw-bold">{{ T.wordsPrivateTags }}</label>
         <div class="input-group">
           <input
             v-model="newPrivateTag"
@@ -67,16 +64,14 @@
             class="form-control"
             :placeholder="T.privateTagsPlaceholder"
           />
-          <div class="input-group-append">
-            <button
-              class="btn btn-outline-primary"
-              type="button"
-              :disabled="newPrivateTag === ''"
-              @click.prevent="addPrivateTag"
-            >
-              {{ T.wordsAddTag }}
-            </button>
-          </div>
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+            :disabled="newPrivateTag === ''"
+            @click.prevent="addPrivateTag"
+          >
+            {{ T.wordsAddTag }}
+          </button>
         </div>
       </div>
       <table class="table table-striped">
@@ -85,7 +80,7 @@
             <th class="text-center w-50" scope="col">
               {{ T.contestEditTagName }}
             </th>
-            <th class="pl-5" scope="col">
+            <th class="ps-5" scope="col">
               {{ T.contestEditTagDelete }}
             </th>
           </tr>
@@ -110,12 +105,12 @@
         </tbody>
       </table>
       <div class="row mx-1">
-        <div class="form-group w-100">
-          <label class="font-weight-bold">{{ T.wordsLevel }}</label>
+        <div class="mb-3 w-100">
+          <label class="fw-bold">{{ T.wordsLevel }}</label>
           <select
             v-model="problemLevelTag"
             required
-            class="form-control"
+            class="form-select"
             name="problem-level"
             @change="onSelectProblemLevel"
           >
@@ -139,7 +134,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-danger ml-1"
+              class="btn btn-danger ms-1"
               :disabled="!problemLevel"
               @click.prevent="onDeleteProblemLevel"
             >
@@ -148,7 +143,7 @@
           </template>
         </div>
       </div>
-      <div class="form-group">
+      <div class="mb-3">
         <omegaup-toggle-switch
           :value.sync="allowTags"
           :checked-value="allowTags"
@@ -168,7 +163,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import { types } from '../../api_types';
+import common_Typeahead from '../common/Typeahead.vue';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -179,7 +175,7 @@ library.add(faTrash);
 @Component({
   components: {
     FontAwesomeIcon,
-    VueTypeaheadBootstrap,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-toggle-switch': omegaup_ToggleSwitch,
   },
 })
@@ -201,13 +197,28 @@ export default class ProblemTags extends Vue {
   allowTags = this.initialAllowTags;
   problemLevelTag: string | null = this.problemLevel;
   newPrivateTag = '';
-  newPublicTag = '';
+  newPublicTag: types.ListItem | null = null;
+
+  get publicTagOptions(): types.ListItem[] {
+    return this.publicTags.map((tag) => ({
+      key: tag,
+      value: this.publicTagsSerializer(tag),
+    }));
+  }
 
   addPublicTag(tag: string): void {
     if (this.canAddNewTags && !this.selectedPublicTags.includes(tag)) {
       this.$emit('emit-add-tag', this.alias, tag, true);
     }
-    this.newPublicTag = '';
+    this.newPublicTag = null;
+  }
+
+  @Watch('newPublicTag')
+  onNewPublicTagChanged(tag: types.ListItem | null): void {
+    if (!tag) {
+      return;
+    }
+    this.addPublicTag(tag.key);
   }
 
   addPrivateTag(): void {

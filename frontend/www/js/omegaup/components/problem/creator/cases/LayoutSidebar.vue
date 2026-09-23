@@ -5,174 +5,225 @@
       :key="layout.layoutID"
       class="d-flex justify-content-center"
     >
-      <b-modal
-        v-model="showRenameModal[layout.layoutID]"
-        size="sm"
+      <div
+        v-if="showRenameModal[layout.layoutID]"
         data-layout-dropdown-rename-modal
-        :title="T.problemCreatorRenameModalTitle"
-        :ok-title="T.problemCreatorRenameModalRename"
-        ok-variant="success"
-        :cancel-title="T.problemCreatorRenameModalBack"
-        cancel-variant="danger"
-        static
-        lazy
-        @ok="
-          editLayoutName([
-            layout.layoutID,
-            editLayoutModalName[layout.layoutID],
-          ])
-        "
       >
-        <b-form-input
-          v-model="editLayoutModalName[layout.layoutID]"
-          data-layout-sidebar-rename-layout
-        />
-      </b-modal>
-      <b-card no-body class="w-84 mb-2">
-        <b-card-header class="p-0">
-          <b-dropdown
-            block
-            split
-            right
-            :data-layout-dropdown="layout.layoutID"
-            :text="layout.name"
-            variant="primary"
-            @click="showLayout[layout.layoutID] = !showLayout[layout.layoutID]"
-          >
-            <b-dropdown-item
-              data-layout-dropdown-rename-layout
+        <div class="modal fade show d-block" tabindex="-1" role="dialog">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  {{ T.problemCreatorRenameModalTitle }}
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  @click="showRenameModal[layout.layoutID] = false"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <input
+                  v-model="editLayoutModalName[layout.layoutID]"
+                  data-layout-sidebar-rename-layout
+                  class="form-control"
+                />
+              </div>
+              <footer class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="showRenameModal[layout.layoutID] = false"
+                >
+                  {{ T.problemCreatorRenameModalBack }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  @click="onRenameLayout(layout.layoutID)"
+                >
+                  {{ T.problemCreatorRenameModalRename }}
+                </button>
+              </footer>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+      </div>
+      <div class="card w-84 mb-2">
+        <div class="card-header p-0">
+          <div class="btn-group d-flex" :data-layout-dropdown="layout.layoutID">
+            <button
+              type="button"
+              class="btn btn-primary flex-grow-1 text-start"
               @click="
-                showRenameModal[layout.layoutID] = !showRenameModal[
-                  layout.layoutID
-                ]
+                showLayout[layout.layoutID] = !showLayout[layout.layoutID]
               "
             >
-              <div class="d-flex">
-                <BIconPencil
-                  variant="success"
-                  class="pt-1 mr-3"
-                  font-scale="1.2"
-                />
-                {{ T.problemCreatorRenameLayout }}
-              </div>
-            </b-dropdown-item>
-            <b-dropdown-item
-              data-layout-dropdown-enforce-to-selected
-              @click="enforceLayoutToTheSelectedCase(layout.layoutID)"
+              {{ layout.name }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+              data-bs-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
             >
-              <div class="d-flex">
-                <BIconArrowLeftRight
-                  variant="success"
-                  class="pt-1 mr-3"
-                  font-scale="1.2"
-                />
-                {{ T.problemCreatorLayoutLoadToSelected }}
-              </div>
-            </b-dropdown-item>
-            <b-dropdown-item
-              data-layout-dropdown-enforce-to-all
-              @click="enforceLayoutToAllCases(layout.layoutID)"
-            >
-              <div class="d-flex">
-                <BIconArrowRepeat
-                  variant="success"
-                  class="pt-1 mr-3"
-                  font-scale="1.2"
-                />
-                {{ T.problemCreatorLayoutLoadToAll }}
-              </div>
-            </b-dropdown-item>
-            <b-dropdown-item
-              data-layout-dropdown-copy
-              @click="copyLayout(layout.layoutID)"
-            >
-              <div class="d-flex">
-                <BIconBoxArrowInDown
-                  variant="success"
-                  class="pt-1 mr-3"
-                  font-scale="1.2"
-                />
-                {{ T.problemCreatorLayoutCopy }}
-              </div>
-            </b-dropdown-item>
-            <b-dropdown-item
-              data-layout-dropdown-delete
-              @click="removeLayout(layout.layoutID)"
-            >
-              <div class="d-flex">
-                <BIconTrash
-                  variant="danger"
-                  class="pt-1 mr-3"
-                  font-scale="1.2"
-                />
-                {{ T.problemCreatorLayoutDelete }}
-              </div>
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-card-header>
-        <b-collapse v-model="showLayout[layout.layoutID]">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <a
+                class="dropdown-item"
+                href="#"
+                data-layout-dropdown-rename-layout
+                @click.prevent="
+                  showRenameModal[layout.layoutID] = !showRenameModal[
+                    layout.layoutID
+                  ]
+                "
+              >
+                <div class="d-flex">
+                  <font-awesome-icon
+                    icon="pencil-alt"
+                    class="text-success pt-1 me-3"
+                  />
+                  {{ T.problemCreatorRenameLayout }}
+                </div>
+              </a>
+              <a
+                class="dropdown-item"
+                href="#"
+                data-layout-dropdown-enforce-to-selected
+                @click.prevent="enforceLayoutToTheSelectedCase(layout.layoutID)"
+              >
+                <div class="d-flex">
+                  <font-awesome-icon
+                    icon="exchange-alt"
+                    class="text-success pt-1 me-3"
+                  />
+                  {{ T.problemCreatorLayoutLoadToSelected }}
+                </div>
+              </a>
+              <a
+                class="dropdown-item"
+                href="#"
+                data-layout-dropdown-enforce-to-all
+                @click.prevent="enforceLayoutToAllCases(layout.layoutID)"
+              >
+                <div class="d-flex">
+                  <font-awesome-icon
+                    icon="sync"
+                    class="text-success pt-1 me-3"
+                  />
+                  {{ T.problemCreatorLayoutLoadToAll }}
+                </div>
+              </a>
+              <a
+                class="dropdown-item"
+                href="#"
+                data-layout-dropdown-copy
+                @click.prevent="copyLayout(layout.layoutID)"
+              >
+                <div class="d-flex">
+                  <font-awesome-icon
+                    icon="download"
+                    class="text-success pt-1 me-3"
+                  />
+                  {{ T.problemCreatorLayoutCopy }}
+                </div>
+              </a>
+              <a
+                class="dropdown-item"
+                href="#"
+                data-layout-dropdown-delete
+                @click.prevent="removeLayout(layout.layoutID)"
+              >
+                <div class="d-flex">
+                  <font-awesome-icon
+                    icon="trash"
+                    class="text-danger pt-1 me-3"
+                  />
+                  {{ T.problemCreatorLayoutDelete }}
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div v-show="showLayout[layout.layoutID]">
           <div>
             <table class="table">
               <tbody>
-                <tr v-for="lineInfo in layout.caseLineInfos">
+                <tr
+                  v-for="lineInfo in layout.caseLineInfos"
+                  :key="lineInfo.lineInfoID"
+                >
                   <td class="align-middle border-0">
-                    <b-container fluid class="bg-light">
-                      <b-row
-                        class="d-flex justify-content-between"
-                        align-v="center"
+                    <div class="container-fluid bg-light">
+                      <div
+                        class="row d-flex justify-content-between align-items-center"
                       >
-                        <b-col cols="4" class="mt-2 mb-2 pl-2 pr-1">
-                          <b-form-input
+                        <div class="col-4 mt-2 mb-2 ps-2 pe-1">
+                          <input
                             v-model="lineInfo.label"
-                            size="sm"
+                            class="form-control form-control-sm"
                             :placeholder="T.problemCreatorLabelPlaceHolder"
                           />
-                        </b-col>
-                        <b-col cols="6" class="pl-0 pr-0 text-center">
-                          <b-dropdown
+                        </div>
+                        <div class="col-6 ps-0 pe-0 text-center">
+                          <div
+                            class="dropdown d-inline-block"
                             data-line-info-dropdown
-                            :text="getLineNameFromKind(lineInfo.data.kind)"
-                            variant="light"
                           >
-                            <b-dropdown-item
-                              v-for="lineKindOption in lineKindOptions"
-                              :key="lineKindOption.kind"
-                              :data-line-info-dropdown-item="
-                                lineKindOption.kind
-                              "
-                              @click="
-                                editLineInfoKind([
-                                  layout.layoutID,
-                                  lineInfo.lineInfoID,
-                                  lineKindOption.kind,
-                                ])
-                              "
+                            <button
+                              type="button"
+                              class="btn btn-light dropdown-toggle"
+                              data-bs-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
                             >
-                              {{ lineKindOption.kind }}
-                            </b-dropdown-item>
-                          </b-dropdown>
-                          <b-button
+                              {{ getLineNameFromKind(lineInfo.data.kind) }}
+                            </button>
+                            <div class="dropdown-menu">
+                              <a
+                                v-for="lineKindOption in lineKindOptions"
+                                :key="lineKindOption.kind"
+                                class="dropdown-item"
+                                href="#"
+                                :data-line-info-dropdown-item="
+                                  lineKindOption.kind
+                                "
+                                @click.prevent="
+                                  editLineInfoKind([
+                                    layout.layoutID,
+                                    lineInfo.lineInfoID,
+                                    lineKindOption.kind,
+                                  ])
+                                "
+                              >
+                                {{ lineKindOption.kind }}
+                              </a>
+                            </div>
+                          </div>
+                          <button
                             v-if="
                               getEditIconDisplay(lineInfo) ===
                               EditIconDisplayOption.EDIT_ICON
                             "
-                            size="sm"
+                            class="btn btn-light btn-sm"
                             type="button"
                             :title="T.problemCreatorLineEdit"
-                            variant="light"
                           >
-                            <BIconPencilSquare
-                              variant="info"
-                              font-scale="1.20"
+                            <font-awesome-icon
+                              icon="pen-square"
+                              class="text-info"
                             />
-                          </b-button>
-                        </b-col>
-                        <b-col cols="2">
-                          <b-button
-                            size="sm"
+                          </button>
+                        </div>
+                        <div class="col-2">
+                          <button
+                            class="btn btn-light btn-sm"
                             type="button"
                             :title="T.problemCreatorLineDelete"
-                            variant="light"
                             @click="
                               removeLineInfoFromLayout([
                                 layout.layoutID,
@@ -180,40 +231,39 @@
                               ])
                             "
                           >
-                            <BIconTrashFill
-                              variant="danger"
-                              font-scale="1.20"
+                            <font-awesome-icon
+                              icon="trash-alt"
+                              class="text-danger"
                             />
-                          </b-button>
-                        </b-col>
-                      </b-row>
-                    </b-container>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div class="text-center mb-2">
-            <b-button
+            <button
+              type="button"
               data-layout-add-line-info
-              variant="light"
-              class="mr-2"
+              class="btn btn-light me-2"
               @click="addNewLineInfoToLayout(layout.layoutID)"
             >
               <div class="container">
                 <div class="row">
-                  <BIconPlusSquare
-                    variant="info"
-                    font-scale="1.25"
-                    class="mr-2 pt-1"
+                  <font-awesome-icon
+                    icon="plus-square"
+                    class="text-info me-2 pt-1"
                   />
                   {{ T.problemCreatorLayoutAddLineInfo }}
                 </div>
               </div>
-            </b-button>
+            </button>
           </div>
-        </b-collapse>
-      </b-card>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -230,10 +280,19 @@ import {
   Group,
   CaseLineInfo,
 } from '@/js/omegaup/problem/creator/types';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+library.add(fas);
 
 const casesStore = namespace('casesStore');
 
-@Component
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Sidebar extends Vue {
   T = T;
 
@@ -265,6 +324,10 @@ export default class Sidebar extends Vue {
   showLayout: { [key: LayoutID]: boolean } = {};
   showRenameModal: { [key: LayoutID]: boolean } = {};
   editLayoutModalName: { [key: LayoutID]: string } = {};
+
+  created() {
+    this.onGroupsChanged();
+  }
 
   @Watch('getAllLayouts')
   onGroupsChanged() {
@@ -306,6 +369,11 @@ export default class Sidebar extends Vue {
 
   getLineNameFromKind(kind: CaseLineKind) {
     return this.lineKindOptions.find((line) => line.kind === kind)?.type;
+  }
+
+  onRenameLayout(layoutID: LayoutID) {
+    this.editLayoutName([layoutID, this.editLayoutModalName[layoutID]]);
+    this.showRenameModal[layoutID] = false;
   }
 }
 </script>

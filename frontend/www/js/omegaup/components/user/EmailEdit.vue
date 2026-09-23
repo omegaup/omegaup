@@ -12,7 +12,7 @@
               class="form-horizontal"
               @submit.prevent="$emit('submit', currentEmail)"
             >
-              <div class="form-group">
+              <div class="mb-3">
                 <label class="col-md-3 control-label" for="email">{{
                   T.userEmailEditEmail
                 }}</label>
@@ -26,7 +26,7 @@
                   />
                 </div>
               </div>
-              <div class="form-group">
+              <div class="mb-3">
                 <div class="col-md-offset-3 col-md-7">
                   <button class="btn btn-primary" type="submit">
                     {{ T.wordsSaveChanges }}

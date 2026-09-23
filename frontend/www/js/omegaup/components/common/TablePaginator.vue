@@ -1,7 +1,8 @@
 <template>
   <div class="card" data-table-paginator>
     <h5 v-if="title" class="card-header">
-      {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
+      {{ title }}
+      <span class="badge text-bg-secondary">{{ items.length }}</span>
       <slot name="header-link"></slot>
     </h5>
     <div v-if="sortOptions.length > 0" class="card-body text-center">
@@ -9,7 +10,7 @@
         <label
           v-for="(sortOption, index) in sortOptions"
           :key="index"
-          class="form-check-label mr-4"
+          class="form-check-label me-4"
         >
           <input
             v-model="currentSortOption"
@@ -38,7 +39,7 @@
             <th
               v-if="showPageOffset"
               scope="row"
-              class="text-left align-middle"
+              class="text-start align-middle"
             >
               {{ currentPageNumber * rowsPerPage + (index + 1) }}
             </th>
@@ -61,7 +62,7 @@
             </td>
             <td
               v-if="!group[0].getBadge().isEmpty()"
-              class="text-right align-middle"
+              class="text-end align-middle"
             >
               <strong>{{ group[0].getBadge().get() }}</strong>
             </td>

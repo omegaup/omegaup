@@ -557,7 +557,7 @@ describe('Contest Test', () => {
     cy.get('a.nav-link[href="#runs"]').should('have.class', 'active');
     cy.get('[data-overlay]').should('exist');
     cy.get('[data-run-details-view]').should('exist');
-    cy.get('[data-overlay-popup] button.close').click({ force: true });
+    cy.get('[data-overlay-popup] button.btn-close').click({ force: true });
     cy.logout();
   });
 

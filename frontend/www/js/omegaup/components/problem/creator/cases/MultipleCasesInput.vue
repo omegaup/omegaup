@@ -1,63 +1,63 @@
 <template>
   <div class="mt-3">
-    <b-row>
-      <b-col>
-        <b-form-group
-          data-prefix
-          :label="T.problemCreatorPrefix"
-          label-for="prefix"
-          :invalid-feedback="T.problemCreatorOnlyNumbers"
-          class="mb-4"
-        >
-          <b-form-input
+    <div class="row">
+      <div class="col">
+        <div data-prefix class="mb-3 mb-4">
+          <label>{{ T.problemCreatorPrefix }}</label>
+          <input
             v-model="multipleCasesPrefix"
             data-problem-creator-multiple-cases-input="prefix"
-            lazy-formatter
-            :formatter="formatter"
+            class="form-control"
             name="multiple-cases-prefix"
             autocomplete="off"
+            @change="multipleCasesPrefix = formatter(multipleCasesPrefix)"
           />
-        </b-form-group>
-      </b-col>
-      <b-col>
-        <b-form-group
-          :label="T.problemCreatorSuffix"
-          label-for="suffix"
-          class="mb-4"
-        >
-          <b-form-input
+        </div>
+      </div>
+      <div class="col">
+        <div class="mb-3 mb-4">
+          <label>{{ T.problemCreatorSuffix }}</label>
+          <input
             v-model="multipleCasesSuffix"
             data-problem-creator-multiple-cases-input="suffix"
-            lazy-formatter
-            :formatter="formatter"
+            class="form-control"
             name="multiple-cases-suffix"
             autocomplete="off"
+            @change="multipleCasesSuffix = formatter(multipleCasesSuffix)"
           />
-        </b-form-group>
-      </b-col>
-    </b-row>
-    <b-form-group
-      :label="T.problemCreatorNumberOfCases"
-      :description="`${T.problemCreatorNumberOfCasesHelper} ${caseNamePreview}`"
-      label-for="case-points"
-    >
-      <b-form-input
-        v-model="multipleCasesCount"
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label>{{ T.problemCreatorNumberOfCases }}</label>
+      <input
+        v-model.number="multipleCasesCount"
         data-problem-creator-multiple-cases-input="count"
-        lazy-formatter
-        :formatter="numberFormatter"
+        class="form-control"
         name="multiple-cases-count"
         type="number"
-        number
+        @change="multipleCasesCount = numberFormatter(multipleCasesCount)"
       />
-    </b-form-group>
-    <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select
+      <small class="form-text text-muted">
+        {{ T.problemCreatorNumberOfCasesHelper }} {{ caseNamePreview }}
+      </small>
+    </div>
+    <div class="mb-3">
+      <label>{{ T.problemCreatorGroupName }}</label>
+      <select
         v-model="multipleCasesGroup"
-        :options="options"
         name="multiple-cases-group"
-      />
-    </b-form-group>
+        class="form-select"
+      >
+        <option
+          v-for="option in options"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.text }}
+        </option>
+      </select>
+    </div>
   </div>
 </template>
 

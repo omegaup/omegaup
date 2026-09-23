@@ -13,30 +13,47 @@
       }"
     >
       <div>
-        <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
+        <span class="fw-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
-          <b-pagination
-            v-if="showFilters"
-            v-model="currentPage"
-            size="sm"
-            :total-rows="totalRows"
-            :per-page="itemsPerPage"
-            :limit="1"
-            hide-goto-end-buttons
-            @page-click="onPageClick"
-          >
-            <template #page="{ page, active }">
-              <b v-if="active" data-page>{{ page }} - {{ totalPages }}</b>
-              <i v-else>{{ page }}</i>
-            </template>
-          </b-pagination>
+          <nav v-if="showFilters" data-pagination>
+            <ul class="pagination pagination-sm">
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <button
+                  class="page-link"
+                  type="button"
+                  :disabled="currentPage === 1"
+                  @click="goToAdjacentPage(currentPage - 1)"
+                >
+                  &laquo;
+                </button>
+              </li>
+              <li class="page-item active">
+                <button class="page-link" type="button">
+                  <b data-page>{{ currentPage }} - {{ totalPages }}</b>
+                </button>
+              </li>
+              <li
+                class="page-item"
+                :class="{ disabled: currentPage === totalPages }"
+              >
+                <button
+                  class="page-link"
+                  type="button"
+                  :disabled="currentPage === totalPages"
+                  @click="goToAdjacentPage(currentPage + 1)"
+                >
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
           <div class="filters row">
-            <label class="col-3 col-sm pr-0 font-weight-bold">
+            <label class="col-3 col-sm pe-0 fw-bold">
               {{ T.wordsExecution }}
               <select
                 v-model="filterExecution"
                 data-select-execution
-                class="form-control"
+                class="form-select"
               >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="EXECUTION_JUDGE_ERROR">
@@ -63,12 +80,12 @@
               </select>
             </label>
 
-            <label class="col-3 col-sm pr-0 font-weight-bold">
+            <label class="col-3 col-sm pe-0 fw-bold">
               {{ T.wordsOutput }}
               <select
                 v-model="filterOutput"
                 data-select-output
-                class="form-control"
+                class="form-select"
               >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="OUTPUT_EXCEEDED">
@@ -86,12 +103,12 @@
               </select>
             </label>
 
-            <label class="col-5 col-sm pr-0 font-weight-bold"
+            <label class="col-5 col-sm pe-0 fw-bold"
               >{{ T.wordsLanguage }}:
               <select
                 v-model="filterLanguage"
                 data-select-language
-                class="form-control"
+                class="form-select"
               >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp20-gcc">C++20 (g++ 10.3)</option>
@@ -122,7 +139,7 @@
             </label>
 
             <template v-if="showProblem">
-              <label class="col-6 col-sm pr-1 font-weight-bold"
+              <label class="col-6 col-sm pe-1 fw-bold"
                 >{{ T.wordsProblem }}:
                 <omegaup-common-typeahead
                   data-search-problem
@@ -136,7 +153,7 @@
             </template>
 
             <template v-if="showUser">
-              <label class="col-5 col-sm font-weight-bold"
+              <label class="col-5 col-sm fw-bold"
                 >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   data-search-username
@@ -154,9 +171,9 @@
               <span
                 v-for="filter in filtersExcludingOffset"
                 :key="filter.name"
-                class="btn-secondary mr-3"
+                class="btn-secondary me-3"
               >
-                <span class="mr-2">{{ filter.name }}: {{ filter.value }}</span>
+                <span class="me-2">{{ filter.name }}: {{ filter.value }}</span>
                 <a
                   :data-remove-filter="filter.name"
                   @click="onRemoveFilter(filter.name)"
@@ -169,7 +186,7 @@
                 data-remove-all-filters
                 @click="onRemoveFilter('all')"
               >
-                <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
+                <span class="me-2">{{ T.wordsRemoveFilter }}</span>
               </a>
             </div>
           </div>
@@ -283,7 +300,7 @@
                       (filterUsername = { key: username, value: username })
                   "
                 ></omegaup-user-username>
-                <a :href="`/profile/${run.username}/`" class="ml-2">
+                <a :href="`/profile/${run.username}/`" class="ms-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
@@ -301,7 +318,7 @@
                 <a
                   v-if="run.contest_alias"
                   :href="`/arena/${run.contest_alias}/`"
-                  class="ml-2"
+                  class="ms-2"
                 >
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
@@ -317,23 +334,23 @@
                   "
                   >{{ run.alias }}</a
                 >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                <a :href="`/arena/problem/${run.alias}/`" class="ms-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
               <td
                 :class="statusClass(run)"
                 data-run-status
-                class="text-center opacity-4 font-weight-bold"
+                class="text-center opacity-4 fw-bold"
                 hidden
               >
-                <span class="mr-1">{{ status(run) }}</span>
+                <span class="me-1">{{ status(run) }}</span>
                 <button
                   v-if="!!statusHelp(run)"
                   type="button"
                   :data-content="statusHelp(run)"
-                  data-toggle="popover"
-                  data-trigger="focus"
+                  data-bs-toggle="popover"
+                  data-bs-trigger="focus"
                   class="btn-outline-dark btn-sm"
                   @click="showVerdictHelp"
                 >
@@ -390,13 +407,13 @@
                   <font-awesome-icon :icon="['fas', 'search-plus']" />
                   <span
                     v-if="run.suggestions && run.suggestions > 0"
-                    class="position-absolute badge badge-danger"
+                    class="position-absolute badge text-bg-danger"
                     >{{ run.suggestions }}
                   </span>
                 </button>
                 <button
                   v-if="requestFeedback"
-                  class="details btn-outline-dark btn-sm ml-1"
+                  class="details btn-outline-dark btn-sm ms-1"
                   @click="$emit('request-feedback', run.guid)"
                 >
                   <font-awesome-icon
@@ -409,7 +426,7 @@
                 v-else-if="showDetails || showDisqualify || showRejudge"
                 :data-actions="run.guid"
               >
-                <div class="d-inline-block mr-2">
+                <div class="d-inline-block me-2">
                   <button
                     class="details btn-outline-dark btn-sm"
                     data-runs-show-details-button
@@ -419,7 +436,7 @@
                     <font-awesome-icon :icon="['fas', 'search-plus']" />
                     <span
                       v-if="run.suggestions && run.suggestions > 0"
-                      class="position-absolute badge badge-danger"
+                      class="position-absolute badge text-bg-danger"
                       >{{ run.suggestions }}
                     </span>
                   </button>
@@ -429,7 +446,7 @@
                     data-runs-actions-button
                     class="btn btn-secondary dropdown-toggle"
                     type="button"
-                    data-toggle="dropdown"
+                    data-bs-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"
                   >
@@ -477,13 +494,52 @@
             </tr>
           </tbody>
         </table>
-        <b-pagination
-          v-if="!showFilters"
-          v-model="currentPage"
-          :total-rows="totalRows"
-          :per-page="itemsPerPage"
-          align="center"
-        ></b-pagination>
+        <nav v-if="!showFilters" data-pagination>
+          <ul class="pagination justify-content-center">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <button
+                class="page-link"
+                type="button"
+                :disabled="currentPage === 1"
+                @click="goToPage(currentPage - 1)"
+              >
+                &laquo;
+              </button>
+            </li>
+            <li
+              v-for="(p, index) in visiblePages"
+              :key="p === 'ellipsis' ? `ellipsis-${index}` : p"
+              class="page-item"
+              :class="{
+                active: p === currentPage,
+                disabled: p === 'ellipsis',
+              }"
+            >
+              <button
+                v-if="p !== 'ellipsis'"
+                class="page-link"
+                type="button"
+                @click="goToPage(p)"
+              >
+                {{ p }}
+              </button>
+              <span v-else class="page-link">…</span>
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <button
+                class="page-link"
+                type="button"
+                :disabled="currentPage === totalPages"
+                @click="goToPage(currentPage + 1)"
+              >
+                &raquo;
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
     <slot name="runs">
@@ -517,7 +573,6 @@ import { DisqualificationType } from './Runs.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
-import { PaginationPlugin } from 'bootstrap-vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -545,15 +600,6 @@ library.add(faClock);
 library.add(faCalendarAlt);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
-
-Vue.use(PaginationPlugin);
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface JQuery {
-    popover(action: string): JQuery;
-  }
-}
 
 export enum MemoryStatus {
   NotAvailable = 'MEMORY_NOT_AVAILABLE',
@@ -680,16 +726,49 @@ export default class RunsForCourses extends Vue {
     return this.nextSubmissionTimestamp.getTime() <= this.now;
   }
 
-  onPageClick(bvEvent: any, page: number): void {
-    if (page == this.currentPage - 1 || page == this.currentPage + 1) {
-      if (this.currentPage + 1 == page) {
-        this.filterOffset++;
-      } else if (this.currentPage - 1 == page) {
-        this.filterOffset--;
-      }
-    } else {
-      bvEvent.preventDefault();
+  get visiblePages(): (number | 'ellipsis')[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
     }
+    const pages = new Set<number>([1, total]);
+    for (let page = current - 2; page <= current + 2; page++) {
+      if (page >= 1 && page <= total) {
+        pages.add(page);
+      }
+    }
+    const sorted = Array.from(pages).sort((a, b) => a - b);
+    const result: (number | 'ellipsis')[] = [];
+    for (let i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
+        result.push('ellipsis');
+      }
+      result.push(sorted[i]);
+    }
+    return result;
+  }
+
+  goToAdjacentPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    if (page !== this.currentPage - 1 && page !== this.currentPage + 1) {
+      return;
+    }
+    if (page === this.currentPage + 1) {
+      this.filterOffset++;
+    } else if (page === this.currentPage - 1) {
+      this.filterOffset--;
+    }
+    this.currentPage = page;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    this.currentPage = page;
   }
 
   get paginatedRuns(): types.Run[] {
@@ -830,7 +909,16 @@ export default class RunsForCourses extends Vue {
   }
 
   showVerdictHelp(ev: Event): void {
-    $(ev.target as HTMLElement).popover('show');
+    const bootstrap = (window as unknown) as {
+      bootstrap?: {
+        Popover: {
+          getOrCreateInstance: (el: Element) => { show: () => void };
+        };
+      };
+    };
+    bootstrap.bootstrap?.Popover.getOrCreateInstance(
+      ev.target as HTMLElement,
+    ).show();
   }
 
   statusClass(run: types.Run): string {

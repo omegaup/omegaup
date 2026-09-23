@@ -1,5 +1,5 @@
 <template>
-  <span v-if="country && country !== ''" class="pr-1">
+  <span v-if="country && country !== ''" class="pe-1">
     <img
       height="11"
       :src="flagUrl"

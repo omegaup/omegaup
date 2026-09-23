@@ -4,9 +4,9 @@
       <div class="modal-content">
         <div class="modal-header">
           <button
-            class="close"
+            class="btn-close"
             type="button"
-            data-dismiss="modal"
+            data-bs-dismiss="modal"
             @click.prevent="$emit('close')"
           >
             ×
@@ -19,7 +19,7 @@
           <button
             type="button"
             class="btn btn-primary"
-            data-dismiss="modal"
+            data-bs-dismiss="modal"
             @click.prevent="$emit('yes')"
           >
             {{ answerYes }}
@@ -27,7 +27,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            data-dismiss="modal"
+            data-bs-dismiss="modal"
             @click.prevent="$emit('no')"
           >
             {{ answerNo }}

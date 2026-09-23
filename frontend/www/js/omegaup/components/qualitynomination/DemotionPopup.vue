@@ -3,8 +3,8 @@
     <transition name="fade">
       <form data-demotion-popup class="h-auto w-auto">
         <template v-if="currentView === AvailableViews.Question">
-          <div class="form-group">
-            <div class="font-weight-bold pb-4">
+          <div class="mb-3">
+            <div class="fw-bold pb-4">
               {{ T.reportProblemFormQuestion }}
             </div>
             <select
@@ -35,13 +35,13 @@
               </option>
             </select>
           </div>
-          <div v-if="selectedReason == 'duplicate'" class="form-group">
+          <div v-if="selectedReason == 'duplicate'" class="mb-3">
             <label class="control-label w-100">{{
               T.reportProblemFormLinkToOriginalProblem
             }}</label>
             <input v-model="original" class="w-100" name="original" />
           </div>
-          <div class="form-group">
+          <div class="mb-3">
             <label class="control-label w-100">{{
               T.reportProblemFormAdditionalComments
             }}</label>
@@ -52,7 +52,7 @@
               type="text"
             ></textarea>
           </div>
-          <div class="text-right">
+          <div class="text-end">
             <button
               data-submit-report-button
               class="col-md-4 btn btn-primary"

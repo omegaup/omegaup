@@ -6,14 +6,14 @@
         <span>{{ time.formatDelta(finishTime - startTime) }}</span>
         <form class="form" @submit.prevent="onSubmit">
           <div class="row">
-            <div class="form-group col-md-4"></div>
-            <div class="form-group col-md-4">
+            <div class="mb-3 col-md-4"></div>
+            <div class="mb-3 col-md-4">
               <label>{{ T.contestNewFormStartDate }}</label>
               <omegaup-datetimepicker
                 v-model="virtualContestStartTime"
               ></omegaup-datetimepicker>
             </div>
-            <div class="form-group col-md-4"></div>
+            <div class="mb-3 col-md-4"></div>
           </div>
           <button
             class="btn btn-primary"

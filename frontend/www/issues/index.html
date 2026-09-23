@@ -7,7 +7,7 @@
 		<title>Issues del sprint</title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" crossorigin="anonymous">
 
  		<!-- Vue -->
 		<script src="https://unpkg.com/vue"></script>
@@ -41,7 +41,7 @@
 					<td><a v-bind:href="issue.html_url" target="_blank">{{ issue.title }}</a></td>
 					<td>
 						<template v-for="label in issue.labels">
-							<a class="badge badge-primary" v-bind:href="labelUrl(label)" v-bind:style="labelStyle(label)" target="_blank">{{ label.name }}</a>&ensp;
+							<a class="badge text-bg-primary" v-bind:href="labelUrl(label)" v-bind:style="labelStyle(label)" target="_blank">{{ label.name }}</a>&ensp;
 						</template>
 					</td>
 					<td class="issue-body"><pre>{{ issue.body }}</pre></td>

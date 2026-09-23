@@ -1,8 +1,5 @@
 <template>
-  <label
-    class="switch-container font-weight-bold"
-    :class="[size, { disabled }]"
-  >
+  <label class="switch-container fw-bold" :class="[size, { disabled }]">
     <div class="switch">
       <input
         v-model="currentCheckedValue"

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="hasTeamsGroups" class="mb-3 text-right">
+    <div v-if="hasTeamsGroups" class="mb-3 text-end">
       <a class="btn btn-primary mx-1" href="/teamsgroup/new/">
         {{ T.teamsGroupsCreateNew }}
       </a>
@@ -41,7 +41,7 @@
               </a>
 
               <button
-                class="btn btn-link p-0 ml-2 btn-archive"
+                class="btn btn-link p-0 ms-2 btn-archive"
                 :title="teamsGroup.archived ? T.wordsUnarchive : T.wordsArchive"
                 @click="archiveGroup(teamsGroup)"
               >
@@ -79,17 +79,42 @@
       </div>
     </div>
 
-    <b-modal
-      v-model="showArchiveModal"
-      :title="archiveModalTitle"
-      :ok-title="T.wordsYes"
-      :cancel-title="T.wordsNo"
-      ok-variant="primary"
-      cancel-variant="secondary"
-      @ok="confirmArchive"
-    >
-      <p>{{ archiveModalBody }}</p>
-    </b-modal>
+    <div v-if="showArchiveModal">
+      <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ archiveModalTitle }}</h5>
+              <button
+                type="button"
+                class="btn-close"
+                @click="showArchiveModal = false"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>{{ archiveModalBody }}</p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="showArchiveModal = false"
+              >
+                {{ T.wordsNo }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="confirmArchive"
+              >
+                {{ T.wordsYes }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+    </div>
   </div>
 </template>
 
@@ -157,6 +182,7 @@ export default class TeamsGroupList extends Vue {
       archived: !this.selectedTeamsGroup.archived,
     });
     this.selectedTeamsGroup = null;
+    this.showArchiveModal = false;
   }
 }
 </script>

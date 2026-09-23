@@ -1,85 +1,132 @@
 <template>
-  <b-row v-if="!hideHeaderActions" class="mb-3">
-    <b-col class="d-flex align-items-center">
-      <span class="mr-2">{{ T.problemCreatorName }}</span>
-      <b-form-input
+  <div v-if="!hideHeaderActions" class="row mb-3">
+    <div class="col d-flex align-items-center">
+      <span class="me-2">{{ T.problemCreatorName }}</span>
+      <input
         v-model="name"
-        size="sm"
+        class="form-control form-control-sm"
         :placeholder="T.problemCreatorNewProblem"
       />
-    </b-col>
-    <b-col class="d-flex justify-content-end">
-      <b-button
+    </div>
+    <div class="col d-flex justify-content-end">
+      <button
+        type="button"
         data-load-problem-button
-        class="mr-2"
-        variant="success"
-        size="sm"
+        class="btn btn-success btn-sm me-2"
         @click="uploadZipModal = !uploadZipModal"
       >
-        <BIconUpload class="mr-1" />
+        <font-awesome-icon icon="upload" class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorLoadProblem }}</span
         >
-      </b-button>
-      <b-modal
-        v-model="uploadZipModal"
-        :title="T.problemCreatorZipFileUpload"
-        :ok-title="T.problemCreatorUploadZip"
-        ok-variant="success"
-        :cancel-title="T.caseModalBack"
-        cancel-variant="danger"
-        static
-        lazy
-        @ok="retrieveStore"
-      >
-        <div class="mb-4">{{ T.problemCreatorUploadZipMessage }}</div>
-        <input
-          data-upload-zip-file
-          class="w-100"
-          type="file"
-          accept=".zip"
-          @change="handleZipFile"
-        />
-      </b-modal>
-      <b-button
+      </button>
+      <div v-if="uploadZipModal">
+        <div class="modal fade show d-block" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">{{ T.problemCreatorZipFileUpload }}</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  @click="uploadZipModal = false"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-4">{{ T.problemCreatorUploadZipMessage }}</div>
+                <input
+                  data-upload-zip-file
+                  class="w-100"
+                  type="file"
+                  accept=".zip"
+                  @change="handleZipFile"
+                />
+              </div>
+              <footer class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="uploadZipModal = false"
+                >
+                  {{ T.caseModalBack }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  @click="onUploadZip"
+                >
+                  {{ T.problemCreatorUploadZip }}
+                </button>
+              </footer>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+      </div>
+      <button
+        type="button"
         data-download-zip
-        class="mr-2"
-        variant="primary"
-        size="sm"
+        class="btn btn-primary btn-sm me-2"
         @click="generateProblem()"
       >
-        <BIconDownload class="mr-1" />
+        <font-awesome-icon icon="download" class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorGenerateProblem }}</span
         >
-      </b-button>
-      <b-button
-        variant="warning"
+      </button>
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
         data-create-new-problem-button
-        size="sm"
         @click="newProblemConfirmationModal = !newProblemConfirmationModal"
       >
-        <BIconPlus class="mr-1" />
+        <font-awesome-icon icon="plus" class="me-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
         >
-      </b-button>
-      <b-modal
-        v-model="newProblemConfirmationModal"
-        data-create-new-problem
-        :title="T.problemCreatorCreateNewProblem"
-        :ok-title="T.problemCreatorCreateNewProblemContinue"
-        ok-variant="danger"
-        :cancel-title="T.problemCreatorCreateNewProblemBack"
-        cancel-variant="success"
-        static
-        lazy
-        @ok="createNewProblem"
-      >
-        <div class="mb-4">{{ T.problemCreatorCreateNewProblemWarning }}</div>
-      </b-modal>
-    </b-col>
-  </b-row>
+      </button>
+      <div v-if="newProblemConfirmationModal" data-create-new-problem>
+        <div class="modal fade show d-block" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  {{ T.problemCreatorCreateNewProblem }}
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  @click="newProblemConfirmationModal = false"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-4">
+                  {{ T.problemCreatorCreateNewProblemWarning }}
+                </div>
+              </div>
+              <footer class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  @click="newProblemConfirmationModal = false"
+                >
+                  {{ T.problemCreatorCreateNewProblemBack }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="onCreateNewProblem"
+                >
+                  {{ T.problemCreatorCreateNewProblemContinue }}
+                </button>
+              </footer>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -89,10 +136,19 @@ import { namespace } from 'vuex-class';
 import T from '../../../lang';
 import * as ui from '../../../ui';
 import { Group, CaseGroupID } from '@/js/omegaup/problem/creator/types';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+library.add(fas);
 
 const casesStore = namespace('casesStore');
 
-@Component
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Header extends Vue {
   @Prop({ default: false }) hideHeaderActions!: boolean;
 
@@ -126,6 +182,16 @@ export default class Header extends Vue {
     if (this.zipFile) {
       await this.importZipFile(this.zipFile);
     }
+  }
+
+  async onUploadZip(): Promise<void> {
+    await this.retrieveStore();
+    this.uploadZipModal = false;
+  }
+
+  onCreateNewProblem(): void {
+    this.createNewProblem();
+    this.newProblemConfirmationModal = false;
   }
 
   async importZipFile(zipFile: File): Promise<boolean> {

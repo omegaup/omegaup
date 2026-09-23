@@ -130,7 +130,7 @@ describe('GlobalNotifications.vue', () => {
       },
     });
 
-    const closeButton = wrapper.find('.close');
+    const closeButton = wrapper.find('[data-alert-close]');
     expect(closeButton.exists()).toBe(true);
 
     await closeButton.trigger('click');

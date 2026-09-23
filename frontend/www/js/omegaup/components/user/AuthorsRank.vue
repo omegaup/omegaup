@@ -10,9 +10,9 @@
         })
       }}
     </h5>
-    <div class="card-body form-row">
+    <div class="card-body row">
       <omegaup-common-typeahead
-        class="col col-md-4 pl-0 pr-2"
+        class="col col-md-4 ps-0 pe-2"
         :existing-options="searchResultUsers"
         :value.sync="searchedUsername"
         :max-results="10"

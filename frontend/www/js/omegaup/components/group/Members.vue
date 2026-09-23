@@ -3,7 +3,7 @@
     <div class="card-body">
       <form class="form" @submit.prevent="onAddMember">
         <div class="row">
-          <div class="form-group col-md-9 mb-1 mt-1">
+          <div class="mb-3 col-md-9 mb-1 mt-1">
             <label class="d-inline">{{ T.wordsMember }}</label>
             <omegaup-common-typeahead
               :existing-options="searchResultUsers"
@@ -16,7 +16,7 @@
             ></omegaup-common-typeahead>
           </div>
           <div
-            class="form-group mb-0 col-md-3 d-flex align-items-center mt-4 margin-phone"
+            class="mb-3 mb-0 col-md-3 d-flex align-items-center mt-4 margin-phone"
           >
             <button class="btn btn-primary" type="submit">
               {{ T.wordsAddMember }}

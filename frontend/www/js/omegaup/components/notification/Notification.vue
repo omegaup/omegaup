@@ -6,7 +6,7 @@
         {{ date }}
       </div>
       <button
-        class="close"
+        class="btn-close"
         @click.prevent="$emit('remove', notification, null)"
       >
         ❌
@@ -136,7 +136,7 @@ export default class Notification extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-.close {
+.btn-close {
   font-size: inherit;
 }
 

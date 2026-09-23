@@ -59,7 +59,7 @@ describe('Runs.vue', () => {
         username: null,
       },
     });
-    const selectedRun = wrapper.find('td button[data-toggle=popover]');
+    const selectedRun = wrapper.find('td button[data-bs-toggle=popover]');
 
     expect(selectedRun.attributes('data-content')).toContain(T.verdictWA);
     expect(selectedRun.attributes('data-content')).toContain(T.verdictHelpWA);

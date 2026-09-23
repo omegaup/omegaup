@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <div class="form-group col-md-6">
+      <div class="mb-3 col-md-6">
         <label for="validator_time_limit">{{
           T.problemEditFormValidatorTimeLimit
         }}</label>
@@ -18,7 +18,7 @@
         />
       </div>
 
-      <div class="form-group col-md-6">
+      <div class="mb-3 col-md-6">
         <label for="time_limit">{{ T.problemEditFormTimeLimit }}</label>
         <input
           name="time_limit"
@@ -33,7 +33,7 @@
     </div>
 
     <div class="row">
-      <div class="form-group col-md-6">
+      <div class="mb-3 col-md-6">
         <label for="overall_wall_time_limit">{{
           T.problemEditFormWallTimeLimit
         }}</label>
@@ -50,7 +50,7 @@
         />
       </div>
 
-      <div class="form-group col-md-6">
+      <div class="mb-3 col-md-6">
         <label for="extra_wall_time">{{ T.wordsExtraWallTimeMs }}</label>
         <input
           name="extra_wall_time"
@@ -65,7 +65,7 @@
     </div>
 
     <div class="row">
-      <div class="form-group col-md-6">
+      <div class="mb-3 col-md-6">
         <label for="memory_limit">{{ T.problemEditFormMemoryLimit }}</label>
         <input
           name="memory_limit"
@@ -78,7 +78,7 @@
         />
       </div>
 
-      <div class="form-group col-md-3 col-sm-6">
+      <div class="mb-3 col-md-3 col-sm-6">
         <label for="output_limit">{{ T.problemEditFormOutputLimit }}</label>
         <input
           name="output_limit"
@@ -90,7 +90,7 @@
           required
         />
       </div>
-      <div class="form-group col-md-3 col-sm-6">
+      <div class="mb-3 col-md-3 col-sm-6">
         <label for="input_limit">{{ T.problemEditFormInputLimit }}</label>
         <input
           name="input_limit"

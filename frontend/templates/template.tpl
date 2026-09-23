@@ -29,9 +29,9 @@
       {% endfor %}
     {% endif %}
 
-    <!-- Bootstrap 4 -->
-    <link rel="stylesheet" href="/third_party/bootstrap-4.5.0/css/bootstrap.min.css"/>
-    <script src="/third_party/bootstrap-4.5.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="/third_party/bootstrap-5.3.8/css/bootstrap.min.css"/>
+    <script src="/third_party/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% versionHash '/css/dist/omegaup_styles.css' %}">
     <link rel="shortcut icon" href="/favicon.ico" />
 

@@ -60,8 +60,8 @@
             <span
               aria-hidden="true"
               class="glyphicon glyphicon-info-sign"
-              data-placement="top"
-              data-toggle="tooltip"
+              data-bs-placement="top"
+              data-bs-toggle="tooltip"
               :title="T.banProblemFormComments"
             ></span>
           </div>

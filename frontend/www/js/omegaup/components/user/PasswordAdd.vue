@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="onAddPassword">
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.profileUsername }}</label>
       <div>
         <input
@@ -12,7 +12,7 @@
         />
       </div>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditChangePasswordNewPassword }}</label>
       <div>
         <omegaup-password-input
@@ -24,7 +24,7 @@
         />
       </div>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label>{{ T.userEditChangePasswordRepeatNewPassword }}</label>
       <div>
         <omegaup-password-input
@@ -43,7 +43,7 @@
     <div>
       <button
         type="submit"
-        class="btn btn-primary mr-2"
+        class="btn btn-primary me-2"
         :disabled="submitDisabled"
       >
         {{ T.wordsSaveChanges }}

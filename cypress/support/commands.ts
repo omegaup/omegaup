@@ -72,7 +72,6 @@ Cypress.Commands.add(
   'createProblem',
   ({
     problemAlias,
-    tag,
     autoCompleteTextTag,
     problemLevelIndex,
     publicAccess = false,
@@ -94,26 +93,35 @@ Cypress.Commands.add(
     cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
     cy.get('[name="source"]').type(problemAlias);
+    cy.get('body').then(($body) => {
+      if ($body.find('.introjs-creation-method button').length === 0) {
+        return;
+      }
+      cy.get('.introjs-creation-method button').eq(1).click();
+    });
     cy.get('[name="problem_contents"]').attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
-    if (languagesValue === 'cat') {
-      cy.get('select[name="languages"]').should('exist').select(languagesValue);
-    }
     // Tags panel
     cy.waitUntil(() =>
       cy
-        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
-        .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
+        .get('[data-tags-input] .tags-input-typeahead-item-highlighted-default')
+        .should('exist')
         .click({ force: true }),
     );
 
+    if (languagesValue === 'cat') {
+      cy.get('select[name="languages"]')
+        .should('exist')
+        .select(languagesValue, { force: true });
+    }
+
     if (publicAccess) {
-      cy.get('[data-target=".access"]').click();
+      cy.get('[data-bs-target=".access"]').click();
       cy.get('[data-problem-access-radio-yes]').check();
     }
 
-    cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
+    cy.get('[name="problem-level"]').select(problemLevelIndex, { force: true }); // How can we assert this with the real text?
 
     cy.get('button[type="submit"]').click(); // Submit
     cy.url().should('include', problemAlias);
@@ -217,7 +225,7 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
-    cy.get('[data-target=".logistics"]').click();
+    cy.get('[data-bs-target=".logistics"]').click();
     cy.get('[data-score-board-visible-time]')
       .clear()
       .type(scoreBoardVisibleTime);
@@ -226,9 +234,9 @@ Cypress.Commands.add(
       cy.get('[data-different-start-time-input]').type(differentStartTime);
     }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
-    cy.get('[data-target=".scoring-rules"]').click();
+    cy.get('[data-bs-target=".scoring-rules"]').click();
     cy.get('[data-score-mode]').select(`${scoreMode}`);
-    cy.get('[data-target=".privacy"]').click();
+    cy.get('[data-bs-target=".privacy"]').click();
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }

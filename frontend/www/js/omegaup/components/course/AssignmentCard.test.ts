@@ -74,7 +74,7 @@ describe('AssignmentCard.vue', () => {
     });
     expect(wrapper.text()).toContain(T.wordsDueDate);
     expect(wrapper.find('.due-date').exists()).toBe(true);
-    expect(wrapper.find('.badge-danger').exists()).toBe(false);
+    expect(wrapper.find('.text-bg-danger').exists()).toBe(false);
   });
 
   it('Should not display due date when finish_time is undefined', () => {
@@ -103,7 +103,7 @@ describe('AssignmentCard.vue', () => {
       },
     });
     expect(wrapper.text()).toContain(T.wordsDueDate);
-    expect(wrapper.find('.badge-danger').exists()).toBe(true);
+    expect(wrapper.find('.text-bg-danger').exists()).toBe(true);
     expect(wrapper.text()).toContain(T.wordsOverdue);
   });
 });

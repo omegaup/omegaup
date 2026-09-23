@@ -7,7 +7,7 @@
       <form v-if="!useSignupFormWithBirthDate">
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-username">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginAccountName }}</label>
               <input
                 v-model="username"
@@ -19,7 +19,7 @@
             </div>
           </div>
           <div class="col-md-4 introjs-email">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
                 v-model="email"
@@ -34,7 +34,7 @@
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-password">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
               <omegaup-password-input
                 v-model="password"
@@ -45,7 +45,7 @@
             </div>
           </div>
           <div class="col-md-4 introjs-confirmpassword">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <omegaup-password-input
                 v-model="passwordConfirmation"
@@ -68,7 +68,7 @@
                 type="checkbox"
                 required
               />
-              <label for="accept-privacy-policy" class="pl-1">
+              <label for="accept-privacy-policy" class="ps-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptPolicyMarkdown"
                 ></omegaup-markdown>
@@ -82,7 +82,7 @@
                 type="checkbox"
                 required
               />
-              <label for="accept-code-of-conduct" class="pl-1">
+              <label for="accept-code-of-conduct" class="ps-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptConductMarkdown"
                 ></omegaup-markdown>
@@ -99,7 +99,7 @@
             ></vue-recaptcha>
           </div>
           <div class="col-md-4 col-md-offset-6">
-            <div class="form-group introjs-register">
+            <div class="mb-3 introjs-register">
               <button
                 data-signup-submit
                 class="btn btn-primary form-control"
@@ -126,8 +126,8 @@
       <form v-else>
         <div class="row">
           <div class="col-md-4 offset-md-2">
-            <div class="form-group">
-              <label class="pl-1">
+            <div class="mb-3">
+              <label class="ps-1">
                 <input
                   v-model="over13Checked"
                   type="checkbox"
@@ -142,7 +142,7 @@
 
         <div class="row">
           <div v-if="isUnder13" class="col-md-8 offset-md-2">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginParentEmail }}</label>
               <input
                 v-model="parentEmail"
@@ -154,7 +154,7 @@
             </div>
           </div>
           <div v-else class="col-md-8 offset-md-2 introjs-email">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
                 v-model="email"
@@ -169,7 +169,7 @@
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-username">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginAccountName }}</label>
               <input
                 v-model="username"
@@ -181,7 +181,7 @@
             </div>
           </div>
           <div class="col-md-4">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginDateOfBirth }}</label>
               <input
                 v-model="dateOfBirth"
@@ -197,7 +197,7 @@
         </div>
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-2 introjs-password">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
               <omegaup-password-input
                 v-model="password"
@@ -208,7 +208,7 @@
             </div>
           </div>
           <div class="col-md-4 introjs-confirmpassword">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <omegaup-password-input
                 v-model="passwordConfirmation"
@@ -230,7 +230,7 @@
                 data-signup-accept-policies
                 type="checkbox"
               />
-              <label for="accept-privacy-policy-birthdate" class="pl-1">
+              <label for="accept-privacy-policy-birthdate" class="ps-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptPolicyMarkdown"
                 ></omegaup-markdown>
@@ -243,7 +243,7 @@
                 data-signup-accept-conduct
                 type="checkbox"
               />
-              <label for="accept-code-of-conduct-birthdate" class="pl-1">
+              <label for="accept-code-of-conduct-birthdate" class="ps-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptConductMarkdown"
                 ></omegaup-markdown>
@@ -266,7 +266,7 @@
 
         <div class="row justify-content-md-center">
           <div class="col-md-4 col-md-offset-6">
-            <div class="form-group introjs-register">
+            <div class="mb-3 introjs-register">
               <button
                 data-signup-submit
                 class="btn btn-primary form-control"

@@ -7,7 +7,7 @@
         v-model="ensureTenLinesInSolution"
       ></textarea>
     </div>
-    <div v-if="!readonly" class="container-fluid text-right py-2">
+    <div v-if="!readonly" class="container-fluid text-end py-2">
       <button
         data-button-send-feedback
         class="btn btn-primary mx-2"

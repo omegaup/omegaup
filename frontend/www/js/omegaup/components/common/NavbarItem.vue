@@ -25,7 +25,7 @@
       :class="[
         'external-link-icon',
         'text-muted',
-        hasIcon ? 'ml-auto flex-shrink-0' : 'ml-1',
+        hasIcon ? 'ms-auto flex-shrink-0' : 'ms-1',
       ]"
     />
   </a>

@@ -9,7 +9,7 @@
     </h5>
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
+        <div class="mb-3">
           <label>{{ T.addUsersMultipleOrSingleUser }}</label>
           <omegaup-common-multi-typeahead
             :existing-options="searchResultUsers"
@@ -24,7 +24,7 @@
           {{ T.wordsAddMember }}
         </button>
         <button
-          class="btn btn-secondary ml-2"
+          class="btn btn-secondary ms-2"
           type="reset"
           @click="$emit('cancel')"
         >

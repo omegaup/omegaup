@@ -9,7 +9,7 @@
           participants = '';
         "
       >
-        <div class="form-group">
+        <div class="mb-3">
           <p class="card-title">{{ T.courseEditAddStudentsDescription }}</p>
           <div class="d-flex align-items-center">
             <omegaup-common-typeahead
@@ -22,7 +22,7 @@
               "
             ></omegaup-common-typeahead>
             <button
-              class="btn btn-secondary add-participant ml-2"
+              class="btn btn-secondary add-participant ms-2"
               :disabled="!participant"
               @click.prevent="addParticipantToList"
             >
@@ -30,7 +30,7 @@
             </button>
           </div>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label>{{ T.wordsMultipleUser }}</label>
           <textarea
             v-model="participants"
@@ -39,7 +39,7 @@
             rows="4"
           ></textarea>
         </div>
-        <div class="form-group float-right">
+        <div class="mb-3 float-end">
           <button
             class="btn btn-primary user-add-bulk"
             :disabled="participants === ''"
@@ -75,7 +75,7 @@
             </td>
             <td>
               <button
-                class="close"
+                class="btn-close"
                 type="button"
                 @click="$emit('emit-remove-student', student)"
               >
@@ -85,7 +85,7 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="students.length > 0" class="float-right">
+      <div v-if="students.length > 0" class="float-end">
         <a class="btn btn-primary" :href="studentsProgressUrl()">
           {{ T.courseStudentsProgress }}
         </a>

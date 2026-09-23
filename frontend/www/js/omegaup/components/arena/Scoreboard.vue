@@ -33,11 +33,11 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
-    <label class="float-right"
+    <label class="float-end"
       >{{ T.scoreboardShowParticipantsNames }}:
       <select
         v-model="nameDisplayOptions"
-        class="form-control"
+        class="form-select"
         data-scoreboard-options
       >
         <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>

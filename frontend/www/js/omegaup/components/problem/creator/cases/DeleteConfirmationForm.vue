@@ -1,8 +1,8 @@
 <template>
-  <b-collapse :visible="visible" class="w-100 mt-2">
+  <div v-show="visible" class="w-100 mt-2">
     <form enctype="multipart/form-data" method="post" @submit="onSubmit">
       <div class="p-3 border rounded bg-light item-active-for-delete">
-        <div class="form-group">
+        <div class="mb-3">
           <label class="control-label">{{ T.problemEditCommitMessage }}</label>
           <input v-model="commitMessage" class="form-control" />
         </div>
@@ -27,7 +27,7 @@
         </div>
       </div>
     </form>
-  </b-collapse>
+  </div>
 </template>
 
 <script lang="ts">
@@ -71,7 +71,7 @@ export default class DeleteConfirmationForm extends Vue {
 
 <style scoped lang="scss">
 .item-active-for-delete {
-  border-left: 3px solid var(--bs-danger) !important;
+  border-left: 3px solid #dc3545 !important;
 }
 
 .button-container {

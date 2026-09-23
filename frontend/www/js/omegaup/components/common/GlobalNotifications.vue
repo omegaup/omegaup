@@ -9,12 +9,10 @@
       <button
         data-alert-close
         type="button"
-        class="close"
+        class="btn-close notification-close"
         aria-label="Close"
         @click="dismiss"
-      >
-        &times;
-      </button>
+      ></button>
       <span v-if="message" class="message">
         <omegaup-markdown :markdown="message"></omegaup-markdown>
       </span>
@@ -68,7 +66,7 @@ export default class GlobalNotifications extends Vue {
   border-radius: 0.3rem;
   overflow: hidden;
 
-  .close {
+  .notification-close {
     position: absolute;
     right: 1rem;
     top: 50%;

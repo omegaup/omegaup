@@ -10,24 +10,22 @@
               {{ T.courseCloneGenerateLinkButton }}
             </button>
             <input
-              class="form-control input-group-append"
+              class="form-control"
               :value="cloneCourseURL"
               readonly
               @focus="$event.target.select()"
             />
-            <div class="input-group-append">
-              <button
-                v-clipboard="() => cloneCourseURL"
-                class="btn btn-outline-secondary"
-                type="button"
-                :disabled="!cloneCourseURL"
-                :title="T.wordsCopyToClipboard"
-                data-copy-to-clipboard
-                @click="copiedToClipboard = true"
-              >
-                <font-awesome-icon icon="clipboard" />
-              </button>
-            </div>
+            <button
+              v-clipboard="() => cloneCourseURL"
+              class="btn btn-outline-secondary"
+              type="button"
+              :disabled="!cloneCourseURL"
+              :title="T.wordsCopyToClipboard"
+              data-copy-to-clipboard
+              @click="copiedToClipboard = true"
+            >
+              <font-awesome-icon icon="clipboard" />
+            </button>
           </div>
         </div>
       </form>

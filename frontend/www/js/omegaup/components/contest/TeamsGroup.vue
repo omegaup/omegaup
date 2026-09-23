@@ -2,7 +2,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
+        <div class="mb-3">
           <label>{{ T.wordsGroup }}</label>
           <omegaup-common-typeahead
             :existing-options="searchResultTeamsGroups"

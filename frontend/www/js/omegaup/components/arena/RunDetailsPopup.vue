@@ -62,7 +62,7 @@
                     />
                   </div>
                 </th>
-                <th class="text-right">
+                <th class="text-end">
                   {{
                     element.contest_score
                       ? element.contest_score
@@ -80,7 +80,7 @@
                     <td></td>
                     <td class="text-center">{{ problemCase.name }}</td>
                     <td class="text-center">{{ problemCase.verdict }}</td>
-                    <td class="text-right">
+                    <td class="text-end">
                       {{ contestScore(problemCase) }}
                     </td>
                     <td class="text-center" width="10">
@@ -182,7 +182,7 @@
     </div>
     <div v-else>
       <div class="spinner-border text-info big" role="status">
-        <span class="sr-only">Loading...</span>
+        <span class="visually-hidden">Loading...</span>
       </div>
     </div>
   </omegaup-overlay-popup>

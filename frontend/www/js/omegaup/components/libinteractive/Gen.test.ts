@@ -45,7 +45,7 @@ describe('Gen.vue', () => {
       currentIdl: 'any text',
     });
 
-    await wrapper.find('b-button-stub[type="submit"]').trigger('click');
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(true);
 
     language = wrapper.find('select[name="language"]')
       .element as HTMLInputElement;

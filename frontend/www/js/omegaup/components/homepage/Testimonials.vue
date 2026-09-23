@@ -3,15 +3,15 @@
   <div
     id="testimonials-carousel-display"
     class="carousel slide"
-    data-ride="carousel"
-    data-interval="8000"
+    data-bs-ride="carousel"
+    data-bs-interval="8000"
   >
     <!-- id-lint off -->
     <ol class="carousel-indicators">
       <li
         v-for="(_, index) in testimonials"
         :key="index"
-        data-target="#testimonials-carousel-display"
+        data-bs-target="#testimonials-carousel-display"
         :data-slide-to="index"
         :class="{ active: !index }"
       ></li>
@@ -42,19 +42,19 @@
       class="carousel-control-prev"
       href="#testimonials-carousel-display"
       role="button"
-      data-slide="prev"
+      data-bs-slide="prev"
     >
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">{{ T.wordsPrevious }}</span>
+      <span class="visually-hidden">{{ T.wordsPrevious }}</span>
     </a>
     <a
       class="carousel-control-next"
       href="#testimonials-carousel-display"
       role="button"
-      data-slide="next"
+      data-bs-slide="next"
     >
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">{{ T.wordsNext }}</span>
+      <span class="visually-hidden">{{ T.wordsNext }}</span>
     </a>
   </div>
 </template>

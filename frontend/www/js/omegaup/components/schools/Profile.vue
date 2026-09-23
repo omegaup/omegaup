@@ -24,7 +24,7 @@
         >
         </omegaup-table-paginator>
       </div>
-      <div class="col-md-8 pl-0">
+      <div class="col-md-8 ps-0">
         <div class="card h-100">
           <div class="card-body">
             <highcharts :options="chartOptions"></highcharts>
@@ -109,15 +109,15 @@ export default class SchoolProfile extends Vue {
   get columnNames(): Array<{ name: string; style: string }> {
     return [
       { name: T.codersOfTheMonthUser, style: '' },
-      { name: T.codersOfTheMonthDate, style: 'text-right' },
+      { name: T.codersOfTheMonthDate, style: 'text-end' },
     ];
   }
 
   get userColumnNames(): Array<{ name: string; style: string }> {
     return [
-      { name: T.profileContestsTablePlace, style: 'col-1 text-left' },
+      { name: T.profileContestsTablePlace, style: 'col-1 text-start' },
       { name: T.username, style: 'text-center' },
-      { name: this.sortByTableTitle, style: 'text-right' },
+      { name: this.sortByTableTitle, style: 'text-end' },
     ];
   }
 

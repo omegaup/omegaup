@@ -35,7 +35,7 @@ describe('Edit.vue', () => {
       },
     });
 
-    expect(wrapper.find('.input-group-prepend').text()).toBe('group:');
+    expect(wrapper.find('[data-identity-prefix]').text()).toBe('group:');
     const input = wrapper.find('input[data-identity-name]')
       .element as HTMLInputElement;
     expect(input.value).toBe('hello');
@@ -53,7 +53,7 @@ describe('Edit.vue', () => {
       },
     });
 
-    expect(wrapper.find('.input-group-prepend').text()).toBe('teams:group:');
+    expect(wrapper.find('[data-identity-prefix]').text()).toBe('teams:group:');
     const input = wrapper.find('input[data-identity-name]')
       .element as HTMLInputElement;
     expect(input.value).toBe('hello');

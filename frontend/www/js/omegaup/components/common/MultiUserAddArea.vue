@@ -16,7 +16,7 @@
       <div class="users-list">
         <div v-for="user in usersList" :key="user" class="users-list__item">
           <span
-            class="tags-input-badge tags-input-badge-pill tags-input-badge-selected-default"
+            class="tags-input-badge tags-input-rounded-pill tags-input-badge-selected-default"
             >{{ user }}</span
           >
           <a

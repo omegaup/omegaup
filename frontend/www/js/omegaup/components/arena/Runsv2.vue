@@ -1,41 +1,75 @@
 <template>
   <div class="mt-4" data-runs>
     <h5 class="mb-3">{{ T.wordsSubmissions }}</h5>
-    <b-table :fields="tableFields" :items="filteredRuns" striped responsive>
-      <template #cell(index)="row">
-        <b-button
-          :disabled="!row.detailsShowing && showDetails"
-          variant="link"
-          size="sm"
-          @click="toggleDetails(row)"
-        >
-          <b-icon-chevron-right v-if="!row.detailsShowing" />
-          <b-icon-chevron-down v-else />
-        </b-button>
-      </template>
-
-      <template #row-details>
-        {{ currentRunDetails }}
-      </template>
-
-      <template #cell(guid)="data">
-        <acronym :title="data.value" data-run-guid>
-          <tt>{{ data.value.substring(0, 8) }}</tt>
-        </acronym>
-      </template>
-
-      <template #cell(verdict)="data">
-        <span class="mr-1">{{ status(data.item) }}</span>
-        <b-button
-          v-if="data.item.status === 'ready' && data.item.verdict !== 'AC'"
-          v-b-tooltip.right="statusHelp(data.item)"
-          size="sm"
-          ><b-icon-question-circle-fill></b-icon-question-circle-fill>
-        </b-button>
-      </template>
-
-      <!-- TODO: Add the new submission button -->
-    </b-table>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th
+              v-for="field in tableFields"
+              :key="field.key"
+              :class="[field.class, field.thClass]"
+            >
+              {{ field.label }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="row in filteredRuns">
+            <tr :key="row.guid">
+              <td class="align-middle">
+                <button
+                  class="btn btn-link btn-sm"
+                  type="button"
+                  data-run-details-toggle
+                  :disabled="expandedGuid !== row.guid && showDetails"
+                  @click="toggleDetails(row)"
+                >
+                  <font-awesome-icon
+                    v-if="expandedGuid !== row.guid"
+                    icon="chevron-right"
+                  />
+                  <font-awesome-icon v-else icon="chevron-down" />
+                </button>
+              </td>
+              <td class="text-center align-middle">{{ row.time }}</td>
+              <td class="text-center align-middle">
+                <acronym :title="row.guid" data-run-guid>
+                  <tt>{{ row.guid.substring(0, 8) }}</tt>
+                </acronym>
+              </td>
+              <td
+                class="text-center align-middle"
+                :class="verdictCellClass(row)"
+              >
+                <span class="me-1">{{ status(row) }}</span>
+                <button
+                  v-if="row.status === 'ready' && row.verdict !== 'AC'"
+                  class="btn btn-sm"
+                  type="button"
+                  data-status-help
+                  :title="statusHelp(row)"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="right"
+                >
+                  <font-awesome-icon icon="question-circle" />
+                </button>
+              </td>
+              <td class="align-middle text-end">{{ row.percentage }}</td>
+              <td class="text-center align-middle">{{ row.language }}</td>
+              <td class="align-middle text-end">{{ row.memory }}</td>
+              <td class="align-middle text-end">{{ row.runtime }}</td>
+              <td class="text-center align-middle"></td>
+            </tr>
+            <tr v-if="expandedGuid === row.guid" :key="`${row.guid}-details`">
+              <td colspan="9">
+                {{ currentRunDetails }}
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -45,15 +79,10 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 
-import {
-  BootstrapVue,
-  BIconChevronRight,
-  BIconChevronDown,
-  BIconQuestionCircleFill,
-} from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
 
 export enum PopupDisplayed {
   None,
@@ -89,9 +118,7 @@ interface TableRunItem {
 
 @Component({
   components: {
-    BIconChevronRight,
-    BIconChevronDown,
-    BIconQuestionCircleFill,
+    FontAwesomeIcon,
   },
 })
 export default class Runs extends Vue {
@@ -101,14 +128,24 @@ export default class Runs extends Vue {
 
   T = T;
   time = time;
-  showDetails = false;
+  expandedGuid: string | null = null;
 
-  toggleDetails(row: { toggleDetails: () => void; item: TableRunItem }): void {
-    this.showDetails = !this.showDetails;
-    if (this.showDetails) {
-      this.$emit('show-run-details', { guid: row.item.guid });
+  get showDetails(): boolean {
+    return this.expandedGuid !== null;
+  }
+
+  toggleDetails(row: TableRunItem): void {
+    if (this.expandedGuid === row.guid) {
+      this.expandedGuid = null;
+      return;
     }
-    row.toggleDetails();
+    this.expandedGuid = row.guid;
+    this.$emit('show-run-details', { guid: row.guid });
+  }
+
+  verdictCellClass(row: TableRunItem): string {
+    const variant = row._cellVariants?.verdict;
+    return variant ? `table-${variant}` : '';
   }
 
   get filteredRuns(): TableRunItem[] {
@@ -130,7 +167,7 @@ export default class Runs extends Vue {
     });
   }
 
-  get tableFields(): (string | TableField)[] {
+  get tableFields(): TableField[] {
     return [
       {
         label: '',
@@ -159,7 +196,7 @@ export default class Runs extends Vue {
         key: 'percentage',
         class: 'align-middle',
         thClass: 'text-center',
-        tdClass: 'text-right',
+        tdClass: 'text-end',
       },
       {
         label: T.wordsLanguage,
@@ -171,14 +208,14 @@ export default class Runs extends Vue {
         key: 'memory',
         class: 'align-middle',
         thClass: 'text-center',
-        tdClass: 'text-right',
+        tdClass: 'text-end',
       },
       {
         label: T.wordsRuntime,
         key: 'runtime',
         class: 'align-middle',
         thClass: 'text-center',
-        tdClass: 'text-right',
+        tdClass: 'text-end',
       },
       {
         label: T.wordsActions,
@@ -278,13 +315,13 @@ export default class Runs extends Vue {
     return '';
   }
 
-  status(run: types.Run): string {
+  status(run: types.Run | TableRunItem): string {
     if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
 
     return run.status == 'ready' ? run.verdict : run.status;
   }
 
-  statusHelp(run: types.Run): string {
+  statusHelp(run: types.Run | TableRunItem): string {
     if (run.status != 'ready' || run.verdict == 'AC') {
       return '';
     }

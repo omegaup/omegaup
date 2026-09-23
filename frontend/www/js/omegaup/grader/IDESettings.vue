@@ -1,7 +1,7 @@
 <template>
   <form class="h-100" :class="theme">
-    <div class="form-row">
-      <div class="form-group col-md-4">
+    <div class="row">
+      <div class="mb-3 col-md-4">
         <label for="inputTimeLimit">{{ T.settingsTimeLimit }}</label>
         <input
           v-model.number="timeLimit"
@@ -12,7 +12,7 @@
           type="number"
         />
       </div>
-      <div class="form-group col-md-4">
+      <div class="mb-3 col-md-4">
         <label for="inputOverallWallTimeLimit">{{
           T.settingsOverallWallTimeLimit
         }}</label>
@@ -25,7 +25,7 @@
           type="number"
         />
       </div>
-      <div class="form-group col-md-4">
+      <div class="mb-3 col-md-4">
         <label for="inputExtraWallTime">{{ T.settingsExtraWallTime }}</label>
         <input
           v-model.number="extraWallTime"
@@ -37,8 +37,8 @@
         />
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
+    <div class="row">
+      <div class="mb-3 col-md-6">
         <label for="inputMemoryLimit">{{ T.settingsMemoryLimit }}</label>
         <input
           v-model.number="memoryLimit"
@@ -49,7 +49,7 @@
           type="number"
         />
       </div>
-      <div class="form-group col-md-6">
+      <div class="mb-3 col-md-6">
         <label for="inputOutputLimit">{{ T.settingsOutputLimit }}</label>
         <input
           v-model.number="outputLimit"
@@ -61,10 +61,10 @@
         />
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
+    <div class="row">
+      <div class="mb-3 col-md-6">
         <label for="inputValidator">{{ T.settingsValidator }}</label>
-        <select v-model="validator" class="form-control">
+        <select v-model="validator" class="form-select">
           <option value="custom">Custom</option>
           <option value="literal">Literal</option>
           <option value="token">Token</option>
@@ -72,7 +72,7 @@
           <option value="token-numeric">Token (Numeric)</option>
         </select>
       </div>
-      <div v-if="validator == 'token-numeric'" class="form-group col-md-6">
+      <div v-if="validator == 'token-numeric'" class="mb-3 col-md-6">
         <label for="inputTolerance">{{ T.settingsTolerance }}</label>
         <input
           v-model.number="tolerance"
@@ -82,16 +82,16 @@
           type="number"
         />
       </div>
-      <div v-if="validator == 'custom'" class="form-group col-md-6">
+      <div v-if="validator == 'custom'" class="mb-3 col-md-6">
         <label for="inputValidatorLanguage">{{ T.settingsLanguage }}</label>
-        <select v-model="validatorLanguage" class="form-control">
+        <select v-model="validatorLanguage" class="form-select">
           <option value="cpp17-gcc">C++17</option>
           <option value="py3">Python 3.6</option>
         </select>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
+    <div class="row">
+      <div class="mb-3 col-md-6">
         <label>{{ T.detectLanguage }}</label>
         <div>
           <input
@@ -102,8 +102,8 @@
         </div>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group col-md-4">
+    <div class="row">
+      <div class="mb-3 col-md-4">
         <label for="inputInteractive">{{ T.settingsInteractive }}</label>
         <omegaup-radio-switch
           :value.sync="interactive"
@@ -112,15 +112,15 @@
         >
         </omegaup-radio-switch>
       </div>
-      <div v-if="interactive" class="form-group col-md-4">
+      <div v-if="interactive" class="mb-3 col-md-4">
         <label for="inputInteractiveModuleName">{{
           T.settingsModuleName
         }}</label>
         <input v-model="interactiveModuleName" class="form-control" />
       </div>
-      <div v-if="interactive" class="form-group col-md-4">
+      <div v-if="interactive" class="mb-3 col-md-4">
         <label for="inputInteractiveLanguage">{{ T.settingsLanguage }}</label>
-        <select v-model="interactiveLanguage" class="form-control">
+        <select v-model="interactiveLanguage" class="form-select">
           <option value="cpp17-gcc">C++17</option>
           <option value="py3">Python</option>
         </select>

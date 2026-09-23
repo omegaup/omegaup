@@ -74,11 +74,11 @@
         <tfoot>
           <tr v-if="hasNext || hasPrevious" align="center">
             <td class="no-wrap" :colspan="pagerColumns">
-              <a v-if="hasPrevious" href="#" class="mr-2" @click="previous">{{
+              <a v-if="hasPrevious" href="#" class="me-2" @click="previous">{{
                 T.wordsPrevPage
               }}</a>
               <span class="page-num">{{ pageNumber }}</span>
-              <a v-if="hasNext" href="#" class="ml-2" @click="next">{{
+              <a v-if="hasNext" href="#" class="ms-2" @click="next">{{
                 T.wordsNextPage
               }}</a>
             </td>

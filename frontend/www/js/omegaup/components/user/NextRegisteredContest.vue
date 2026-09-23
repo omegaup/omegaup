@@ -1,44 +1,41 @@
 <template>
-  <b-collapse
-    v-model="showContestInfo"
-    class="p-4 border bg-light container-fluid"
-  >
+  <div v-show="showContestInfo" class="p-4 border bg-light container-fluid">
     <div class="justify-content-end">
-      <button type="button" class="close" @click="showContestInfo = false">
+      <button type="button" class="btn-close" @click="showContestInfo = false">
         ×
       </button>
     </div>
-    <b-container>
-      <b-row class="p-1">
-        <b-col class="col-12 p-1 text-center">
+    <div class="container">
+      <div class="row p-1">
+        <div class="col-12 p-1 text-center">
           <h3 class="mb-3 display-4">
             {{ T.userNextRegisteredContestTitle }}
           </h3>
-        </b-col>
-      </b-row>
-      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
+        </div>
+      </div>
+      <div class="row p-1 flex-column flex-sm-row align-items-center">
+        <div class="col-md-4 col-sm-12 p-1 text-center">
           <h5 class="m-0">
             <a>{{ nextRegisteredContest.title }}</a>
             <font-awesome-icon
               v-if="nextRegisteredContest.recommended"
               ref="contestIconRecommended"
-              class="ml-1"
+              class="ms-1"
               icon="award"
             />
           </h5>
-        </b-col>
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
-          <font-awesome-icon class="mr-1" icon="clipboard-list" />
+        </div>
+        <div class="col-md-4 col-sm-12 p-1 text-center">
+          <font-awesome-icon class="me-1" icon="clipboard-list" />
           {{ nextRegisteredContest.organizer }}
-        </b-col>
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
-          <font-awesome-icon class="mr-1" icon="users" />
+        </div>
+        <div class="col-md-4 col-sm-12 p-1 text-center">
+          <font-awesome-icon class="me-1" icon="users" />
           {{ nextRegisteredContest.contestants }}
-        </b-col>
-      </b-row>
-      <b-row class="p-1 flex-column flex-sm-row" align-v="center">
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
+        </div>
+      </div>
+      <div class="row p-1 flex-column flex-sm-row align-items-center">
+        <div class="col-md-4 col-sm-12 p-1 text-center">
           <font-awesome-icon icon="calendar-alt" />
           <a v-if="isContestStarted" :href="startTimeLink">
             {{
@@ -54,9 +51,9 @@
               })
             }}
           </a>
-        </b-col>
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
-          <font-awesome-icon class="mr-1" icon="stopwatch" />
+        </div>
+        <div class="col-md-4 col-sm-12 p-1 text-center">
+          <font-awesome-icon class="me-1" icon="stopwatch" />
           {{ T.wordsDuration }}:
           <omegaup-countdown
             v-if="isContestStarted"
@@ -67,8 +64,8 @@
           <p v-else class="d-inline">
             {{ contestDuration }}
           </p>
-        </b-col>
-        <b-col class="col-md-4 col-sm-12 p-1 text-center">
+        </div>
+        <div class="col-md-4 col-sm-12 p-1 text-center">
           <button
             v-if="isContestStarted"
             type="button"
@@ -85,10 +82,10 @@
           >
             {{ T.userNextRegisteredContestButtonSeeDetails }}
           </button>
-        </b-col>
-      </b-row>
-    </b-container>
-  </b-collapse>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -100,13 +97,6 @@ import T from '../../lang';
 import omegaup_Countdown from '../Countdown.vue';
 import { omegaup } from '../../omegaup';
 import { getExternalUrl } from '../../urlHelper';
-
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-import { LayoutPlugin, CollapsePlugin } from 'bootstrap-vue';
-Vue.use(LayoutPlugin);
-Vue.use(CollapsePlugin);
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';

@@ -2,9 +2,9 @@
   <div class="card">
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
+        <div class="mb-3">
           <div class="row">
-            <div class="form-group col-md-6">
+            <div class="mb-3 col-md-6">
               <label class="d-block">
                 {{ T.wordsName }}
                 <input
@@ -15,7 +15,7 @@
               </label>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="mb-3 col-md-6">
               <label class="d-block">
                 {{ T.contestNewFormShortTitleAlias }}
                 <input :value="alias" class="form-control" disabled="true" />
@@ -26,7 +26,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="form-group col-12">
+            <div class="mb-3 col-12">
               <label class="d-block">
                 {{ T.groupNewFormDescription }}
                 <textarea

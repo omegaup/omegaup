@@ -8,25 +8,25 @@
           src="/media/quality-badge.png"
           :title="T.wordsHighQualityProblem"
           :alt="T.wordsHighQualityProblem"
-          class="mr-2"
+          class="me-2"
         />
         <font-awesome-icon
           v-if="problem.visibility === 1 || problem.visibility === -1"
           :icon="['fas', 'exclamation-triangle']"
           :title="T.wordsWarningProblem"
-          class="mr-2"
+          class="me-2"
         ></font-awesome-icon>
         <font-awesome-icon
           v-if="problem.visibility === 0 || problem.visibility === -1"
           :icon="['fas', 'eye-slash']"
           :title="T.wordsPrivate"
-          class="mr-2"
+          class="me-2"
         ></font-awesome-icon>
         <font-awesome-icon
           v-if="problem.visibility <= -2"
           :icon="['fas', 'ban']"
           :title="T.wordsBannedProblem"
-          class="mr-2"
+          class="me-2"
           color="darkred"
         ></font-awesome-icon>
       </template>
@@ -37,7 +37,7 @@
       <button
         v-if="userLoggedIn && !inContestOrCourse && problem.accepts_submissions"
         data-bookmark-button
-        class="btn btn-link p-0 ml-2"
+        class="btn btn-link p-0 ms-2"
         :title="isBookmarked ? T.problemBookmarkRemove : T.problemBookmarkAdd"
         @click.prevent.stop="onToggleBookmark"
       >

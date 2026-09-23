@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row align-items-end">
-        <div class="form-group col-md-8" data-merge-contest-name>
+        <div class="mb-3 col-md-8" data-merge-contest-name>
           <multiselect
             :value="selectedContests"
             :options="contestAliases"
@@ -17,7 +17,7 @@
             @select="onSelect"
           ></multiselect>
         </div>
-        <div class="form-group col-md-4 text-right">
+        <div class="mb-3 col-md-4 text-end">
           <button
             data-merge-contest-button
             class="btn btn-primary w-100"

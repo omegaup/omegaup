@@ -1,6 +1,6 @@
 <template>
-  <b-row class="mt-3">
-    <b-col cols="3" class="border-1 border-right">
+  <div class="row mt-3">
+    <div class="col-3 border-1 border-end">
       <omegaup-problem-creator-cases-sidebar
         data-cases-sidebar
         :show-window="shouldShowAddWindow"
@@ -10,8 +10,8 @@
           (zipObject) => $emit('download-zip-file', zipObject)
         "
       />
-    </b-col>
-    <b-col data-cases-add-panel>
+    </div>
+    <div class="col" data-cases-add-panel>
       <omegaup-problem-creator-cases-add-panel
         v-if="shouldShowAddWindow"
         :show-window="shouldShowAddWindow"
@@ -23,8 +23,8 @@
           (fileObject) => $emit('download-input-file', fileObject)
         "
       />
-    </b-col>
-  </b-row>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

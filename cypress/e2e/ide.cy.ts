@@ -280,14 +280,24 @@ describe('Test IDE', () => {
     cy.clearAllSessionStorage();
     cy.reload();
 
-    cy.get('.close:visible').each(($button) => {
-      cy.wrap($button).click();
+    cy.get('body').then(($body) => {
+      $body.find('[data-alert-close]:visible').each((_, button) => {
+        cy.wrap(button).click();
+      });
     });
 
     cy.get('[data-language-select]')
       .should('be.visible')
       .find('option:selected')
       .should('have.value', 'cpp20-gcc');
+
+    cy.get('body').then(($body) => {
+      if ($body.find('[data-overlay-popup] button.btn-close:visible').length) {
+        cy.get('[data-overlay-popup] button.btn-close:visible').click({
+          force: true,
+        });
+      }
+    });
 
     cy.logout();
   });

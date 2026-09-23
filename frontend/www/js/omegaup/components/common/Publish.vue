@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group">
+        <div class="mb-3">
           <div class="input-group m-2">
             <input
               class="form-control"
@@ -10,24 +10,22 @@
               readonly
               :value="contestURL"
             />
-            <div class="input-group-append">
-              <button
-                v-clipboard="contestURL"
-                copy-to-clipboard
-                class="btn btn-primary"
-                type="button"
-                :title="T.contestEditCopyContestLink"
-                @click="onCopyContestLink"
-              >
-                <font-awesome-icon icon="clipboard" />
-              </button>
-            </div>
+            <button
+              v-clipboard="contestURL"
+              copy-to-clipboard
+              class="btn btn-primary"
+              type="button"
+              :title="T.contestEditCopyContestLink"
+              @click="onCopyContestLink"
+            >
+              <font-awesome-icon icon="clipboard" />
+            </button>
           </div>
 
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select
             v-model="currentAdmissionMode"
-            class="form-control"
+            class="form-select"
             name="admission-mode"
           >
             <option :value="AdmissionMode.Private">
@@ -46,7 +44,7 @@
             ></omegaup-markdown>
           </p>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <omegaup-toggle-switch
             v-if="currentAdmissionMode !== AdmissionMode.Private"
             :value.sync="currentDefaultShowAllContestantsInScoreboard"

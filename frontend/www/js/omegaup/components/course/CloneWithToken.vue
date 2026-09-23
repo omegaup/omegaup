@@ -4,11 +4,11 @@
     <div class="card-body">
       <div class="mb-4">
         <p>
-          <span class="font-weight-bold">{{ T.wordsName }}: </span>
+          <span class="fw-bold">{{ T.wordsName }}: </span>
           {{ course.name }}
         </p>
         <p>
-          <span class="font-weight-bold">{{ T.courseCloneCreatedBy }}: </span>
+          <span class="fw-bold">{{ T.courseCloneCreatedBy }}: </span>
           <omegaup-username
             :classname="classname"
             :username="username"
@@ -16,7 +16,7 @@
           ></omegaup-username>
         </p>
         <div class="d-flex align-items-baseline">
-          <span class="font-weight-bold mr-2 text-nowrap">
+          <span class="fw-bold me-2 text-nowrap">
             {{ T.wordsDescription }}:
           </span>
           <omegaup-markdown

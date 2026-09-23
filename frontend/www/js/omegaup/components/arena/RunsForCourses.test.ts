@@ -213,10 +213,9 @@ describe('RunsForCourses.vue', () => {
       },
     });
 
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-    expect(paginationComponent.exists()).toBe(true);
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(5);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+    expect(wrapper.find('[data-pagination]').exists()).toBe(true);
+    expect(wrapper.vm.totalPages).toBe(5);
+    expect(wrapper.vm.currentPage).toBe(1);
   });
 
   it('Should handle paginator in admin view', async () => {
@@ -230,12 +229,9 @@ describe('RunsForCourses.vue', () => {
       },
     });
 
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-
-    expect(paginationComponent.exists()).toBe(true);
-
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(10);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+    expect(wrapper.find('[data-pagination]').exists()).toBe(true);
+    expect(wrapper.vm.totalPages).toBe(10);
+    expect(wrapper.vm.currentPage).toBe(1);
 
     const pageSlotContent = wrapper.find('[data-page]').text();
 
@@ -267,17 +263,15 @@ describe('RunsForCourses.vue', () => {
       },
     });
 
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-
-    expect(paginationComponent.exists()).toBe(true);
+    expect(wrapper.find('[data-pagination]').exists()).toBe(true);
 
     await wrapper.setData({ filterExecution: 'EXECUTION_INTERRUPTED' });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'execution', value: 'EXECUTION_INTERRUPTED' }],
     ]);
 
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(3);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+    expect(wrapper.vm.totalPages).toBe(3);
+    expect(wrapper.vm.currentPage).toBe(1);
 
     const pageSlotContent = wrapper.find('[data-page]').text();
 
@@ -295,17 +289,15 @@ describe('RunsForCourses.vue', () => {
       },
     });
 
-    const paginationComponent = wrapper.findComponent({ name: 'BPagination' });
-
-    expect(paginationComponent.exists()).toBe(true);
+    expect(wrapper.find('[data-pagination]').exists()).toBe(true);
 
     await wrapper.setData({ filterOutput: 'OUTPUT_CORRECT' });
     expect(wrapper.emitted('filter-changed')).toEqual([
       [{ filter: 'output', value: 'OUTPUT_CORRECT' }],
     ]);
 
-    expect(paginationComponent.vm.$data.localNumberOfPages).toBe(1);
-    expect(paginationComponent.vm.$data.currentPage).toBe(1);
+    expect(wrapper.vm.totalPages).toBe(1);
+    expect(wrapper.vm.currentPage).toBe(1);
 
     const pageSlotContent = wrapper.find('[data-page]').text();
 

@@ -68,7 +68,7 @@ describe('Crons.vue', () => {
     expect(cells.at(0).text()).toBe('update_ranks.py');
     expect(cells.at(1).find('code').text()).toBe('19 8 * * *');
     expect(cells.at(2).text()).toBe('success');
-    expect(cells.at(2).find('.badge-success').exists()).toBe(true);
+    expect(cells.at(2).find('.text-bg-success').exists()).toBe(true);
     expect(cells.at(3).text()).toBe(time.formatDateTime(startedAt));
   });
 
@@ -78,13 +78,13 @@ describe('Crons.vue', () => {
 
     expect(rows).toHaveLength(2);
     expect(rows.at(0).findAll('td').at(1).text()).toBe('update_ranks.py');
-    expect(rows.at(0).find('.badge-success').text()).toBe('success');
+    expect(rows.at(0).find('.text-bg-success').text()).toBe('success');
     expect(rows.at(0).findAll('td').at(3).text()).toBe(
       time.formatDateTime(startedAt),
     );
     expect(rows.at(0).findAll('td').at(4).text()).toBe('0.19s');
     expect(rows.at(0).findAll('td').at(5).text()).toBe('5');
-    expect(rows.at(1).find('.badge-danger').text()).toBe('failure');
+    expect(rows.at(1).find('.text-bg-danger').text()).toBe('failure');
   });
 
   it('Should show phase detail when a run is expanded', async () => {
@@ -125,7 +125,7 @@ describe('Crons.vue', () => {
       propsData: { jobs, runs: [{ ...runs[0], status: 'queued' }] },
     });
 
-    expect(wrapper.find('.cron-run-row .badge-light').text()).toBe('queued');
+    expect(wrapper.find('.cron-run-row .text-bg-light').text()).toBe('queued');
   });
 
   it('Should dash out the values a run did not record', () => {

@@ -281,13 +281,7 @@ describe('Problem creator Test', () => {
 
         // Assert copied layout applied correctly to last case
         cy.get('[data-sidebar-cases-ungrouped]').last().click();
-        const caseTypesUpdated = [
-          { type: 'multiline', text: T.problemCreatorLineArray },
-          { type: 'array', text: T.problemCreatorLineArray },
-          { type: 'matrix', text: T.problemCreatorLineMatrix },
-          { type: 'line', text: T.problemCreatorLineLine },
-        ];
-        problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
+        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
           lineCases.forEach((lineCase) => {
             cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
               .invoke('text')
@@ -331,12 +325,12 @@ describe('Problem creator Test', () => {
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
     cy.waitUntil(() =>
       cy
-        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
+        .get('[data-tags-input] .tags-input-typeahead-item-highlighted-default')
         .should('exist')
         .click({ force: true }),
     );
 
-    cy.get('[name="problem-level"]').select(1);
+    cy.get('[name="problem-level"]').select(1, { force: true });
 
     cy.get('.introjs-creation-method .btn-group button').first().click();
     cy.get('.introjs-open-creator button').click();

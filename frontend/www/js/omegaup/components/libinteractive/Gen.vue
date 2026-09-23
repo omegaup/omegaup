@@ -1,16 +1,16 @@
 <template>
-  <b-card>
-    <b-card-body>
+  <div class="card">
+    <div class="card-body">
       <form
         action="/libinteractive/gen/"
         method="post"
         @submit="currentError = null"
       >
-        <div class="form-group">
+        <div class="mb-3">
           <label for="language">{{ T.libinteractiveLanguage }}</label>
           <select
             v-model="currentLanguage"
-            class="custom-select"
+            class="form-select"
             name="language"
             :class="{ 'is-invalid': errorField === 'language' }"
             required
@@ -20,11 +20,11 @@
             <option value="java">Java</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label for="os">{{ T.libinteractiveOs }}</label>
           <select
             v-model="currentOs"
-            class="custom-select"
+            class="form-select"
             name="os"
             :class="{ 'is-invalid': errorField === 'os' }"
             required
@@ -33,7 +33,7 @@
             <option value="unix">Linux/Mac OS</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label for="name">{{ T.libinteractiveIdlFilename }}</label>
           <input
             v-model="currentName"
@@ -45,7 +45,7 @@
           />
           <p>{{ T.libinteractiveIdlFilenameHelp }}</p>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label for="idl">IDL</label>
           <textarea
             v-model="currentIdl"
@@ -56,37 +56,35 @@
             required
           ></textarea>
         </div>
-        <div class="form-group text-right">
-          <b-button variant="primary" type="submit">
-            <b-icon-cloud-download aria-hidden="true"></b-icon-cloud-download>
+        <div class="mb-3 text-end">
+          <button type="submit" class="btn btn-primary">
+            <font-awesome-icon
+              icon="cloud-download-alt"
+              aria-hidden="true"
+            ></font-awesome-icon>
             {{ T.wordsDownload }}
-          </b-button>
+          </button>
         </div>
       </form>
-    </b-card-body>
-    <b-card-body v-if="errorDescription" class="panel-footer">
+    </div>
+    <div v-if="errorDescription" class="card-body panel-footer">
       <pre><code class="w-100">{{ errorDescription }}</code></pre>
-    </b-card-body>
-  </b-card>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-// Import Only Required Plugins
-import { ButtonPlugin, CardPlugin, BIconCloudDownload } from 'bootstrap-vue';
 import { types } from '../../api_types';
-Vue.use(ButtonPlugin);
-Vue.use(CardPlugin);
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCloudDownloadAlt } from '@fortawesome/free-solid-svg-icons';
+library.add(faCloudDownloadAlt);
 
 @Component({
   components: {
-    BIconCloudDownload,
+    FontAwesomeIcon,
   },
 })
 export default class LibinteractiveGen extends Vue {

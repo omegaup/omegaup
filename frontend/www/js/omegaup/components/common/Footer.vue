@@ -139,7 +139,7 @@
         <ul
           class="mb-2 m-md-0 list-unstyled d-flex justify-content-around d-md-inline-flex order-md-12"
         >
-          <li class="pr-2">
+          <li class="pe-2">
             <a :href="CodeofConductPolicyURL" target="_blank">
               {{ T.frontPageFooterCodeConduct }}
             </a>

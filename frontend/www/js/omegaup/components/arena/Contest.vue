@@ -26,7 +26,7 @@
       </template>
       <template v-if="contestAdmin" #edit-button>
         <a
-          class="edit-contest-button ml-2"
+          class="edit-contest-button ms-2"
           :href="`/contest/${contest.alias}/edit/`"
         >
           <font-awesome-icon icon="edit" />

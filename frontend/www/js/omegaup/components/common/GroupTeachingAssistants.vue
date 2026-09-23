@@ -5,8 +5,8 @@
         class="form"
         @submit.prevent="$emit('add-group-teaching-assistant', group.key)"
       >
-        <div class="form-group mb-0">
-          <label class="font-weight-bold w-100"
+        <div class="mb-3 mb-0">
+          <label class="fw-bold w-100"
             >{{ T.courseEditGroupTeachingAssistant }}
             <font-awesome-icon
               :title="T.courseEditAddGroupTeachingAssistantTooltip"
@@ -56,7 +56,7 @@
           <td class="text-center">
             <button
               v-if="groupTeachingAssistant.name !== 'teaching_assistant'"
-              class="close float-none"
+              class="btn btn-link p-0"
               type="button"
               @click="
                 $emit(

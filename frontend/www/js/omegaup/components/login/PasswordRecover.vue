@@ -3,7 +3,7 @@
     <div class="card mx-auto">
       <h5 class="card-header h2-md">{{ T.passwordResetRequestTitle }}</h5>
       <form class="card-body">
-        <div class="form-group">
+        <div class="mb-3">
           <h5 class="card-title">{{ T.profileEmail }}</h5>
           <input
             v-model="email"

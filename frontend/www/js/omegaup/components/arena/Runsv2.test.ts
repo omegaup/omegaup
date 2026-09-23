@@ -1,16 +1,7 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Runs from './Runsv2.vue';
-
-import BootstrapVue, {
-  BTable,
-  BIconQuestionCircleFill,
-  BIconChevronRight,
-  BIconChevronDown,
-} from 'bootstrap-vue';
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
 
 describe('Runsv2.vue', () => {
   const baseRunData: types.Run = {
@@ -88,13 +79,12 @@ describe('Runsv2.vue', () => {
         runs: [] as types.Run[],
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
     expect(wrapper.find('h5').text()).toBe(T.wordsSubmissions);
-    const tableComponent = wrapper.findComponent(BTable);
-    expect(tableComponent.exists()).toBe(true);
-    expect(tableComponent.findAll('table tbody tr').length).toBe(0);
+    const table = wrapper.find('table');
+    expect(table.exists()).toBe(true);
+    expect(table.findAll('tbody tr').length).toBe(0);
   });
 
   it('Should handle AC runs', () => {
@@ -103,26 +93,19 @@ describe('Runsv2.vue', () => {
         runs,
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
-    const tableComponent = wrapper.findComponent(BTable);
-    expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
-    expect(tableComponent.find('td.table-success').exists()).toBe(true);
-    expect(tableComponent.findComponent(BIconQuestionCircleFill).exists()).toBe(
-      false,
-    );
+    const table = wrapper.find('table');
+    expect(table.findAll('tbody tr').length).toBe(runs.length);
+    expect(table.find('td.table-success').exists()).toBe(true);
+    expect(table.find('[data-status-help]').exists()).toBe(false);
     for (const run of runs) {
-      expect(tableComponent.text()).toContain(run.guid);
-      expect(tableComponent.text()).toContain(
-        `${(run.score * 100).toFixed(2)}%`,
-      );
-      expect(tableComponent.text()).toContain(
+      expect(table.text()).toContain(run.guid);
+      expect(table.text()).toContain(`${(run.score * 100).toFixed(2)}%`);
+      expect(table.text()).toContain(
         `${(run.memory / (1024 * 1024)).toFixed(2)} MB`,
       );
-      expect(tableComponent.text()).toContain(
-        `${(run.runtime / 1000).toFixed(2)} s`,
-      );
+      expect(table.text()).toContain(`${(run.runtime / 1000).toFixed(2)} s`);
     }
   });
 
@@ -146,27 +129,22 @@ describe('Runsv2.vue', () => {
         runs,
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
-    const tableComponent = wrapper.findComponent(BTable);
-    expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
-    expect(tableComponent.find('td.table-success').exists()).toBe(false);
-    expect(
-      tableComponent.findAllComponents(BIconQuestionCircleFill).length,
-    ).toBe(runs.length);
+    const table = wrapper.find('table');
+    expect(table.findAll('tbody tr').length).toBe(runs.length);
+    expect(table.find('td.table-success').exists()).toBe(false);
+    expect(table.findAll('[data-status-help]').length).toBe(runs.length);
 
     // MLE run
-    expect(tableComponent.text()).toContain(runs[0].guid);
-    expect(tableComponent.text()).toContain(
+    expect(table.text()).toContain(runs[0].guid);
+    expect(table.text()).toContain(
       `>${(runs[0].memory / (1024 * 1024)).toFixed(2)} MB`,
     );
 
     // TLE run
-    expect(tableComponent.text()).toContain(runs[1].guid);
-    expect(tableComponent.text()).toContain(
-      `>${(runs[1].runtime / 1000).toFixed(2)} s`,
-    );
+    expect(table.text()).toContain(runs[1].guid);
+    expect(table.text()).toContain(`>${(runs[1].runtime / 1000).toFixed(2)} s`);
   });
 
   it('Should handle JE and CE runs', () => {
@@ -189,16 +167,13 @@ describe('Runsv2.vue', () => {
         runs,
         problemAlias: 'test-problem-1',
       },
-      localVue,
     });
 
-    const tableComponent = wrapper.findComponent(BTable);
-    expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
-    expect(
-      tableComponent.findAllComponents(BIconQuestionCircleFill).length,
-    ).toBe(runs.length);
-    expect(tableComponent.find('td.table-warning').exists()).toBe(true);
-    expect(tableComponent.find('td.table-danger').exists()).toBe(true);
+    const table = wrapper.find('table');
+    expect(table.findAll('tbody tr').length).toBe(runs.length);
+    expect(table.findAll('[data-status-help]').length).toBe(runs.length);
+    expect(table.find('td.table-warning').exists()).toBe(true);
+    expect(table.find('td.table-danger').exists()).toBe(true);
   });
 
   it('Should handle the run details button', async () => {
@@ -208,21 +183,18 @@ describe('Runsv2.vue', () => {
         problemAlias: 'test-problem-1',
         currentRunDetails: runDetails,
       },
-      localVue,
     });
 
-    const tableComponent = wrapper.findComponent(BTable);
+    const table = wrapper.find('table');
 
     // Run details should be hidden
-    expect(tableComponent.text()).not.toContain(runDetails.source);
-    expect(tableComponent.findComponent(BIconChevronRight).exists()).toBe(true);
-    expect(tableComponent.findComponent(BIconChevronDown).exists()).toBe(false);
+    expect(table.text()).not.toContain(runDetails.source);
+    expect(table.find('[data-run-details-toggle]').exists()).toBe(true);
 
     // Click to show the details
-    await tableComponent.findComponent(BIconChevronRight).trigger('click');
+    await table.find('[data-run-details-toggle]').trigger('click');
 
     // Run details should be shown
-    expect(tableComponent.text()).toContain(runDetails.source);
-    expect(tableComponent.findComponent(BIconChevronDown).exists()).toBe(true);
+    expect(table.text()).toContain(runDetails.source);
   });
 });

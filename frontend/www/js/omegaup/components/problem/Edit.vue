@@ -224,14 +224,14 @@
         <div class="card">
           <div class="card-body">
             <form class="form" @submit.prevent="onDownload">
-              <div class="form-group">
+              <div class="mb-3">
                 {{ T.problemDownloadZip }}:
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
                 </button>
               </div>
             </form>
-            <div class="form-group">
+            <div class="mb-3">
               {{ T.problemPrintableVersion }}:
               <button class="btn btn-primary" @click="onGotoPrintableVersion">
                 {{ T.contestPrintableVersion }}
@@ -244,7 +244,7 @@
       <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
-            <div class="form-group">
+            <div class="mb-3">
               <div class="alert alert-danger">
                 <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
                 <hr />
@@ -264,16 +264,44 @@
         </div>
       </div>
     </div>
-    <b-modal
-      v-model="showConfirmationModal"
-      :title="T.problemEditDeleteRequireConfirmation"
-      :ok-title="T.problemEditDeleteOk"
-      ok-variant="danger"
-      :cancel-title="T.problemEditDeleteCancel"
-      @ok="$emit('remove', alias)"
-    >
-      <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
-    </b-modal>
+    <div v-if="showConfirmationModal">
+      <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                {{ T.problemEditDeleteRequireConfirmation }}
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                @click="showConfirmationModal = false"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="showConfirmationModal = false"
+              >
+                {{ T.problemEditDeleteCancel }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                @click="$emit('remove', alias)"
+              >
+                {{ T.problemEditDeleteOk }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+    </div>
   </div>
 </template>
 
@@ -288,10 +316,6 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
-
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import { ModalPlugin } from 'bootstrap-vue';
-Vue.use(ModalPlugin);
 
 @Component({
   components: {

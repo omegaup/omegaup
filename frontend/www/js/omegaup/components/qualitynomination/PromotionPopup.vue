@@ -5,10 +5,10 @@
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
             <slot name="popup-content" :onSubmit="onSubmit" :onHide="onHide">
-              <p class="h4 font-weight-bold pb-4 text-center w-100">
+              <p class="h4 fw-bold pb-4 text-center w-100">
                 {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAc }}
               </p>
-              <div class="form-group w-100">
+              <div class="mb-3 w-100">
                 <label class="w-100">{{ T.qualityFormDifficulty }}</label>
                 <div class="container-fluid">
                   <div
@@ -47,10 +47,10 @@
                   </div>
                 </div>
               </div>
-              <div class="text-right w-100">
+              <div class="text-end w-100">
                 <button
                   data-submit-feedback-button
-                  class="col-md-4 mr-2 mb-1 btn btn-primary"
+                  class="col-md-4 me-2 mb-1 btn btn-primary"
                   type="submit"
                   :disabled="!quality && !difficulty"
                   @click="onSubmit"

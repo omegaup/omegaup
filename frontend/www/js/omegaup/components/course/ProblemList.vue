@@ -80,7 +80,7 @@
         <div class="row">
           <div class="col-md-12">
             <div class="row">
-              <div class="form-group col-md-5">
+              <div class="mb-3 col-md-5">
                 <span class="faux-label">{{ problemCardFooterLabel }}</span>
                 <omegaup-common-typeahead
                   :existing-options="searchResultProblems"
@@ -95,11 +95,11 @@
                   {{ addCardFooterDescLabel }}
                 </small>
               </div>
-              <div class="form-group col-md-2">
+              <div class="mb-3 col-md-2">
                 <span class="faux-label">{{ T.wordsPoints }}</span>
                 <input v-model="points" type="number" class="form-control" />
               </div>
-              <div class="form-group col-md-5">
+              <div class="mb-3 col-md-5">
                 <span class="faux-label"
                   >{{ T.courseExtraPointsProblemLabel }}
                   <font-awesome-icon
@@ -115,7 +115,7 @@
                       :value="true"
                     />{{ T.wordsYes }}</label
                   >
-                  <label class="radio-inline ml-3"
+                  <label class="radio-inline ms-3"
                     ><input
                       v-model="isExtraProblem"
                       type="radio"
@@ -124,11 +124,11 @@
                   >
                 </div>
               </div>
-              <div class="form-group col-md-5">
+              <div class="mb-3 col-md-5">
                 <span class="faux-label">{{
                   T.contestAddproblemChooseVersion
                 }}</span>
-                <div class="form-control form-group">
+                <div class="form-control mb-3">
                   <div class="form-check form-check-inline">
                     <label class="form-check-label">
                       <input
@@ -164,10 +164,10 @@
                 @runs-diff="onRunsDiff"
               ></omegaup-problem-versions>
             </div>
-            <div class="form-group text-right">
+            <div class="mb-3 text-end">
               <button
                 data-add-problem
-                class="btn btn-primary mr-2"
+                class="btn btn-primary me-2"
                 type="submit"
                 :disabled="!problemAlias"
                 @click.prevent="

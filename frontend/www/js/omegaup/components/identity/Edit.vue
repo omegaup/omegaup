@@ -5,13 +5,13 @@
     </h5>
     <div class="card-body">
       <form role="form" @submit.prevent="onEditMember">
-        <div class="form-row">
-          <div class="form-group col-lg-5 col-md-6 col-sm-6">
+        <div class="row">
+          <div class="mb-3 col-lg-5 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.username }}
               <div class="input-group">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">{{ groupName }}:</div>
+                <div class="input-group-text" data-identity-prefix>
+                  {{ groupName }}:
                 </div>
                 <input
                   v-model="identityName"
@@ -21,16 +21,16 @@
               </div>
             </label>
           </div>
-          <div class="form-group col-lg-3 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-3 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profile }}
               <input v-model="selectedIdentity.name" class="form-control" />
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.wordsGender }}
-              <select v-model="selectedIdentity.gender" class="form-control">
+              <select v-model="selectedIdentity.gender" class="form-select">
                 <option value="female">{{ T.wordsGenderFemale }}</option>
                 <option value="male">{{ T.wordsGenderMale }}</option>
                 <option value="other">{{ T.wordsGenderOther }}</option>
@@ -38,13 +38,10 @@
               </select>
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditCountry }}
-              <select
-                v-model="selectedIdentity.country_id"
-                class="form-control"
-              >
+              <select v-model="selectedIdentity.country_id" class="form-select">
                 <option
                   v-for="country in countries"
                   :key="country.country_id"
@@ -55,10 +52,10 @@
               </select>
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profileState }}
-              <select v-model="selectedIdentity.state_id" class="form-control">
+              <select v-model="selectedIdentity.state_id" class="form-select">
                 <option
                   v-for="[code, state] in Object.entries(countryStates)"
                   :key="code"
@@ -69,7 +66,7 @@
               </select>
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="mb-3 col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profileSchool }}
               <omegaup-common-typeahead
@@ -83,12 +80,12 @@
             </label>
           </div>
         </div>
-        <div class="form-group float-right">
+        <div class="mb-3 float-end">
           <button class="btn btn-primary" data-update-identity>
             {{ T.wordsSaveChanges }}
           </button>
           <button
-            class="btn btn-secondary ml-2"
+            class="btn btn-secondary ms-2"
             type="reset"
             @click="$emit('cancel')"
           >
