@@ -4,7 +4,7 @@
   "description": "omegaup frontend",
   "license": "BSD",
   "private": true,
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "pnpm@12.6.0",
   "engines": {
     "node": ">=24"
   },

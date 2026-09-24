@@ -10,5 +10,5 @@ fi
 
 cd /opt/omegaup
 corepack enable
-pnpm install
+pnpm install --config.confirmModulesPurge=false
 exec pnpm run dev-all:watch
