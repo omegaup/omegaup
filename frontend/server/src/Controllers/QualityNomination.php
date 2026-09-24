@@ -8,6 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type NominationListItem=array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+ * @psalm-type NominationContents=array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool, level?: string, rationale?: string}
  *
  */
 class QualityNomination extends \OmegaUp\Controllers\Controller {
@@ -232,7 +233,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool} $contents
+     * @param NominationContents $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -258,17 +259,27 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
             case 'demotion':
                 self::validateDemotionContents($contents);
+                if ($contents['reason'] === 'duplicate') {
+                    $contents['original'] = self::normalizeOriginalProblemAlias(
+                        $contents['original']
+                    );
+                }
                 break;
             case 'dismissal':
                 self::validateDismissalContents($contents);
                 break;
             case 'quality_tag':
-                $qualityNomination = self::validateQualityTagContents(
-                    $problem,
+                self::validateQualityTagContents($identity, $contents);
+                $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
                     $identity,
-                    $contents
+                    $problem
                 );
                 break;
+            default:
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'nomination'
+                );
         }
 
         return self::saveNomination(
@@ -286,7 +297,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * (except demotions and quality tags, which are not tied to having
      * solved the problem) require the identity to have already solved it.
      *
-     * @param array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool} $contents
+     * @param NominationContents $contents
      */
     private static function validateProblemSolvedPrecondition(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -294,7 +305,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         string $nominationType,
         array $contents
     ): void {
-        if ($nominationType === 'demotion' || $nominationType === 'quality_tag') {
+        if (
+            !in_array(
+                $nominationType,
+                self::TYPES_REQUIRING_SOLVED_PROBLEM,
+                true
+            )
+        ) {
             return;
         }
 
@@ -348,7 +365,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Validates the `contents` for a `suggestion` nomination.
      *
-     * @param array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int} $contents
+     * @param NominationContents $contents
      */
     private static function validateSuggestionContents(array $contents): void {
         $atLeastOneFieldIsPresent = false;
@@ -397,7 +414,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Validates the `contents` for a `promotion` nomination.
      *
-     * @param array{tags?: string[], statements?: array<string, array{markdown: string}>, source?: string} $contents
+     * @param NominationContents $contents
      */
     private static function validatePromotionContents(array $contents): void {
         if (
@@ -435,13 +452,16 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Validates the `contents` for a `demotion` nomination. May mutate
-     * `$contents['original']` in place, normalizing a full problem URL into
-     * a plain alias.
+     * Validates the `contents` for a `demotion` nomination: the `reason`,
+     * the `rationale` (required when `reason` is `other`), and that
+     * `original` is present when `reason` is `duplicate`. This function is
+     * purely a validator and does not mutate `$contents`; normalizing the
+     * `original` alias is handled separately by
+     * {@see self::normalizeOriginalProblemAlias()}.
      *
-     * @param array{reason?: string, rationale?: string, original?: string} $contents
+     * @param NominationContents $contents
      */
-    private static function validateDemotionContents(array &$contents): void {
+    private static function validateDemotionContents(array $contents): void {
         if (
             !isset($contents['reason']) ||
             !in_array(
@@ -464,45 +484,56 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             );
         }
         // Duplicate reports need more validation.
-        if ($contents['reason'] === 'duplicate') {
-            if (
+        if (
+            $contents['reason'] === 'duplicate' &&
+            (
                 !isset($contents['original']) ||
                 empty($contents['original'])
-            ) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'contents'
-                );
-            }
-            $original = \OmegaUp\DAO\Problems::getByAlias(
-                $contents['original']
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
             );
-            if (is_null($original)) {
-                $contents['original'] = self::extractAliasFromArgument(
-                    $contents['original']
-                );
-                if (is_null($contents['original'])) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'problemNotFound'
-                    );
-                }
-                $original = \OmegaUp\DAO\Problems::getByAlias(
-                    $contents['original']
-                );
-                if (is_null($original)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'problemNotFound'
-                    );
-                }
-            }
         }
+    }
+
+    /**
+     * Normalizes a demotion's `original` problem reference (a plain alias
+     * or a full problem URL) into a plain, existing problem alias.
+     *
+     * @return string The normalized problem alias.
+     */
+    private static function normalizeOriginalProblemAlias(
+        string $original
+    ): string {
+        $originalProblem = \OmegaUp\DAO\Problems::getByAlias($original);
+        if (!is_null($originalProblem)) {
+            return $original;
+        }
+
+        $alias = self::extractAliasFromArgument($original);
+        if (is_null($alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        $originalProblem = \OmegaUp\DAO\Problems::getByAlias($alias);
+        if (is_null($originalProblem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        return $alias;
     }
 
     /**
      * Validates the `contents` for a `dismissal` nomination. A dismissal
      * carries no extra fields.
      *
-     * @param array<string, mixed> $contents
+     * @param NominationContents $contents
      */
     private static function validateDismissalContents(array $contents): void {
         if (
@@ -522,16 +553,16 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
     /**
      * Validates the `contents` for a `quality_tag` nomination. Only
-     * reviewers are allowed to send this type of nomination.
+     * reviewers are allowed to send this type of nomination. Fetching the
+     * existing nomination contents for the (problem, reviewer) pair is the
+     * caller's responsibility, once validation has passed.
      *
-     * @param array{quality_seal?: bool, level?: string, tags?: list<string>} $contents
-     * @return null|array{qualitynomination_id: int}
+     * @param NominationContents $contents
      */
     private static function validateQualityTagContents(
-        \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity,
         array $contents
-    ) {
+    ): void {
         // Only reviewers are allowed to send this type of nominations
         if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -561,11 +592,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 self::ALLOWED_PUBLIC_TAGS
             );
         }
-
-        return \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
-            $identity,
-            $problem
-        );
     }
 
     /**
@@ -615,7 +641,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * the `quality_tag` case) inside a transaction, and assigns reviewers
      * when it is a `promotion`.
      *
-     * @param array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool} $contents
+     * @param NominationContents $contents
      * @param null|array{qualitynomination_id: int} $qualityNomination
      */
     private static function saveNomination(
