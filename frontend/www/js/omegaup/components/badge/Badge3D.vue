@@ -23,46 +23,50 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class Badge3D extends Vue {
-  private bounds: DOMRect | null = null;
-  private tiltStrength = 30;
-
-  onMouseEnter(event: MouseEvent): void {
-    const target = event.currentTarget as HTMLElement;
-    this.bounds = target.getBoundingClientRect();
-  }
-
-  onMouseMove(event: MouseEvent): void {
-    if (!this.bounds) return;
-    const x = event.clientX - this.bounds.left;
-    const y = event.clientY - this.bounds.top;
-    const cx = x - this.bounds.width / 2;
-    const cy = y - this.bounds.height / 2;
-    const badgeEl = this.$refs.badge3d as HTMLElement;
-    if (badgeEl) {
-      badgeEl.style.transform = `rotateX(${
-        (-cy / this.bounds.height) * this.tiltStrength
-      }deg) rotateY(${
-        (cx / this.bounds.width) * this.tiltStrength
-      }deg) scale3d(1.06, 1.06, 1.06)`;
-    }
-  }
-
-  onMouseLeave(): void {
-    const badgeEl = this.$refs.badge3d as HTMLElement;
-    if (badgeEl) {
-      badgeEl.style.transform = '';
-    }
-    this.bounds = null;
-  }
-
-  beforeDestroy(): void {
+export default defineComponent({
+  name: 'Badge3D',
+  data() {
+    return {
+      bounds: null as DOMRect | null,
+      tiltStrength: 30,
+    };
+  },
+  beforeDestroy() {
     this.onMouseLeave();
-  }
-}
+  },
+  methods: {
+    onMouseEnter(event: MouseEvent): void {
+      const target = event.currentTarget as HTMLElement;
+      this.bounds = target.getBoundingClientRect();
+    },
+
+    onMouseMove(event: MouseEvent): void {
+      if (!this.bounds) return;
+      const x = event.clientX - this.bounds.left;
+      const y = event.clientY - this.bounds.top;
+      const cx = x - this.bounds.width / 2;
+      const cy = y - this.bounds.height / 2;
+      const badgeEl = this.$refs.badge3d as HTMLElement;
+      if (badgeEl) {
+        badgeEl.style.transform = `rotateX(${
+          (-cy / this.bounds.height) * this.tiltStrength
+        }deg) rotateY(${
+          (cx / this.bounds.width) * this.tiltStrength
+        }deg) scale3d(1.06, 1.06, 1.06)`;
+      }
+    },
+
+    onMouseLeave(): void {
+      const badgeEl = this.$refs.badge3d as HTMLElement;
+      if (badgeEl) {
+        badgeEl.style.transform = '';
+      }
+      this.bounds = null;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
