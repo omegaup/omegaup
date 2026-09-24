@@ -103,7 +103,7 @@
     "node-gyp": "^9.4.0",
     "pako": "^1.0.7",
     "popper.js": "^1.16.1",
-    "prettier": "^2.1.2",
+    "prettier": "2.2.1",
     "prismjs": "^1.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
