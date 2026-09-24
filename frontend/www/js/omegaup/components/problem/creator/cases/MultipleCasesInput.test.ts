@@ -43,6 +43,10 @@ describe('MultipleCasesInput.vue', () => {
       expect(element.text()).toBe(expectedTextInputText[index]);
     });
 
+    expect(wrapper.find('[data-prefix] .invalid-feedback').text()).toBe(
+      T.problemCreatorOnlyNumbers,
+    );
+
     // Check if the name is being generated correctly
 
     await wrapper.setData({ multipleCasesPrefix: 'case#' });

@@ -12,6 +12,9 @@
             autocomplete="off"
             @change="multipleCasesPrefix = formatter(multipleCasesPrefix)"
           />
+          <div class="invalid-feedback" role="alert" aria-live="assertive">
+            {{ T.problemCreatorOnlyNumbers }}
+          </div>
         </div>
       </div>
       <div class="col">
