@@ -114,8 +114,11 @@ class _PatchHelpersMixin(unittest.TestCase):
     def _patch(self, **returns: object) -> Dict[str, mock.Mock]:
         mocks: Dict[str, mock.Mock] = {}
         for name, value in returns.items():
+            kwargs = ({'side_effect': value}
+                      if isinstance(value, Exception)
+                      else {'return_value': value})
             patcher = mock.patch.object(
-                update_ranks, name, return_value=value)
+                update_ranks, name, **kwargs)
             mocks[name] = patcher.start()
             self.addCleanup(patcher.stop)
         return mocks
@@ -553,6 +556,108 @@ class UpdateUserRankClassnameTest(unittest.TestCase):
         '''With no cutoffs stored every user is unranked.'''
         self.assertEqual(self._classnames([2000.0], []),
                          ['user-rank-unranked'])
+
+
+
+class UpdateSchoolOfTheMonthCandidatesTest(_PatchHelpersMixin):
+    '''Tests for `update_ranks.update_school_of_the_month_candidates`.'''
+
+    def test_skips_when_school_already_exists(self) -> None:
+        '''If a school was already chosen for next month, do nothing.'''
+        mocks = self._patch(
+            check_existing_school_of_the_next_month=True,
+            remove_school_of_the_month_candidates=None,
+            get_school_of_the_month_candidates=[],
+            insert_school_of_the_month_candidates=None,
+            debug_school_of_the_month_candidates=None,
+        )
+
+        cur = _cursor()
+        cur_readonly = _cursor()
+        update_ranks.update_school_of_the_month_candidates(
+            cur, cur_readonly, _CURRENT_MONTH)
+
+        mocks[
+            'check_existing_school_of_the_next_month'
+        ].assert_called_once_with(cur_readonly, _NEXT_MONTH)
+        mocks['remove_school_of_the_month_candidates'].assert_not_called()
+        mocks['get_school_of_the_month_candidates'].assert_not_called()
+        mocks['insert_school_of_the_month_candidates'].assert_not_called()
+        mocks['debug_school_of_the_month_candidates'].assert_not_called()
+
+    def test_updates_candidates_when_no_school_chosen(self) -> None:
+        '''If no school is chosen, candidates are updated and logged.'''
+        candidates = [
+            School(school_id=1, name='School 1', score=10.0),
+            School(school_id=2, name='School 2', score=5.0),
+        ]
+        mocks = self._patch(
+            check_existing_school_of_the_next_month=False,
+            remove_school_of_the_month_candidates=None,
+            get_school_of_the_month_candidates=candidates,
+            insert_school_of_the_month_candidates=None,
+            debug_school_of_the_month_candidates=None,
+        )
+
+        cur = _cursor()
+        cur_readonly = _cursor()
+        update_ranks.update_school_of_the_month_candidates(
+            cur, cur_readonly, _CURRENT_MONTH)
+
+        mocks[
+            'check_existing_school_of_the_next_month'
+        ].assert_called_once_with(cur_readonly, _NEXT_MONTH)
+        mocks['remove_school_of_the_month_candidates'].assert_called_once_with(
+            cur, _NEXT_MONTH)
+        mocks['get_school_of_the_month_candidates'].assert_called_once_with(
+            cur_readonly, _NEXT_MONTH, _CURRENT_MONTH)
+        mocks['insert_school_of_the_month_candidates'].assert_called_once_with(
+            cur, _NEXT_MONTH, candidates)
+        mocks['debug_school_of_the_month_candidates'].assert_called_once_with(
+            _NEXT_MONTH, candidates, use_json_format=True)
+
+
+class UpdateSchoolsStatsTest(_PatchHelpersMixin):
+    '''Tests for `update_ranks.update_schools_stats`.'''
+
+    def test_updates_all_schools_stats_and_commits(self) -> None:
+        '''All steps are run in order and the transaction commits.'''
+        mocks = self._patch(
+            update_schools_solved_problems=None,
+            update_school_rank=None,
+            update_school_of_the_month_candidates=None,
+        )
+        cur = _cursor()
+        cur_readonly = _cursor()
+        mock_dbconn = mock.MagicMock()
+
+        update_ranks.update_schools_stats(
+            cur, cur_readonly, mock_dbconn, _CURRENT_MONTH)
+
+        mocks['update_schools_solved_problems'].assert_called_once_with(cur)
+        mocks['update_school_rank'].assert_called_once_with(cur)
+        mocks['update_school_of_the_month_candidates'].assert_called_once_with(
+            cur, cur_readonly, _CURRENT_MONTH)
+        mock_dbconn.commit.assert_called_once()
+        mock_dbconn.rollback.assert_not_called()
+
+    def test_rolls_back_on_error(self) -> None:
+        '''An error rolls back the connection and re-raises.'''
+        self._patch(
+            update_schools_solved_problems=None,
+            update_school_rank=RuntimeError('db error'),
+            update_school_of_the_month_candidates=None,
+        )
+        cur = _cursor()
+        cur_readonly = _cursor()
+        mock_dbconn = mock.MagicMock()
+
+        with self.assertRaises(RuntimeError):
+            update_ranks.update_schools_stats(
+                cur, cur_readonly, mock_dbconn, _CURRENT_MONTH)
+
+        mock_dbconn.commit.assert_not_called()
+        mock_dbconn.rollback.assert_called_once()
 
 
 if __name__ == '__main__':
