@@ -5631,6 +5631,12 @@ types.UserProfileInfo;
 
 Get profile statistics including solved problems by difficulty and tags distribution.
 
+`tags` is the capped distribution: at most 10 entries, with every
+remaining tag aggregated into a single 'Others' entry. `tagsFull` is
+the complete distribution with no cap and no aggregation, so `tags` is
+not simply a subset of `tagsFull`: the tail entries are merged into
+the 'Others' entry instead of appearing on their own.
+
 ### Parameters
 
 | Name       | Type           | Description | Required |
@@ -5644,7 +5650,8 @@ Get profile statistics including solved problems by difficulty and tags distribu
 | `attempting` | `number`                                                              |
 | `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
 | `solved`     | `number`                                                              |
-| `tags`       | `List[{ count: number; name: string; }]`                              |
+| `tags`       | `List[types.TagDistribution]`                                         |
+| `tagsFull`   | `List[types.TagDistribution]`                                         |
 
 ## `/api/user/removeExperiment/`
 
