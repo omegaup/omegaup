@@ -2533,7 +2533,6 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $birth_date
      * @omegaup-request-param string $country_id
      * @omegaup-request-param 'decline'|'female'|'male'|'other'|null $gender
@@ -2650,17 +2649,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $schoolName = $r->ensureOptionalString('school_name');
         if (is_null($newSchoolId) && !is_null($schoolName)) {
-            $response = \OmegaUp\Controllers\School::apiCreate(
-                new \OmegaUp\Request([
-                    'name' => $schoolName,
-                    'country_id' => !is_null(
-                        $state
-                    ) ? $state->country_id : null,
-                    'state_id' => !is_null($state) ? $state->state_id : null,
-                    'auth_token' => $r['auth_token'],
-                ])
+            $newSchoolId = \OmegaUp\Controllers\School::createSchool(
+                name: $schoolName,
+                state: $state
             );
-            $newSchoolId = $response['school_id'];
         }
 
         \OmegaUp\Validators::validateOptionalStringNonEmpty(

@@ -5822,7 +5822,6 @@ Update user profile
 | `graduation_date`           | `string`                                     |             | ✓        |
 | `locale`                    | `string`                                     |             | ✓        |
 | `state_id`                  | `string`                                     |             | ✓        |
-| `auth_token`                | `mixed`                                      |             |          |
 | `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |          |
 | `has_competitive_objective` | `bool\|null`                                 |             |          |
 | `has_learning_objective`    | `bool\|null`                                 |             |          |
