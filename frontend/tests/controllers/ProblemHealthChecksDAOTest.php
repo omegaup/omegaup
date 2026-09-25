@@ -118,6 +118,27 @@ class ProblemHealthChecksDAOTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotContains(intval($problem->problem_id), $problemIds);
     }
 
+    public function testCreateWithoutLastSeenAtDefaultsToNow() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problem = $problemData['problem'];
+        $now = \OmegaUp\Time::get();
+
+        $finding = new \OmegaUp\DAO\VO\ProblemHealthChecks([
+            'problem_id' => intval($problem->problem_id),
+            'check_type' => \OmegaUp\ProblemHealthCheckType::NeverSolved->value,
+            'severity' => \OmegaUp\ProblemHealthSeverity::Warning->value,
+            'detail' => 'created without last_seen_at',
+        ]);
+        \OmegaUp\DAO\ProblemHealthChecks::create($finding);
+
+        $saved = \OmegaUp\DAO\ProblemHealthChecks::getByPK(
+            intval($finding->check_id)
+        );
+        $this->assertNotNull($saved);
+        $this->assertNotNull($saved->last_seen_at);
+        $this->assertGreaterThanOrEqual($now, $saved->last_seen_at->time);
+    }
+
     public function testGetOpenFindingsHonorsTheLimit() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $this->createFinding(
