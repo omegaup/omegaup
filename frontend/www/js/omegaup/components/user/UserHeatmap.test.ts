@@ -25,11 +25,11 @@ jest.mock('../../user/profile', () => ({
 
 describe('UserHeatmap.vue', () => {
   const sampleData = [
-    { date: '2024-01-01', runs: 3 },
-    { date: '2024-01-02', runs: 5 },
-    { date: '2024-01-03', runs: 2 },
-    { date: '2024-01-10', runs: 4 },
-    { date: '2024-06-15', runs: 1 },
+    { date: '2024-01-01', runs: 3, verdict: 'AC' },
+    { date: '2024-01-02', runs: 5, verdict: 'AC' },
+    { date: '2024-01-03', runs: 2, verdict: 'AC' },
+    { date: '2024-01-10', runs: 4, verdict: 'AC' },
+    { date: '2024-06-15', runs: 1, verdict: 'AC' },
   ];
 
   const defaultProps = {
@@ -262,7 +262,7 @@ describe('UserHeatmap.vue', () => {
 
     // Trigger the data watcher by setting new data
     await wrapper.setProps({
-      data: [{ date: '2024-03-01', runs: 7 }],
+      data: [{ date: '2024-03-01', runs: 7, verdict: 'AC' }],
     });
 
     // The watcher synchronously sets hasRendered = false
@@ -279,7 +279,7 @@ describe('UserHeatmap.vue', () => {
     const wrapper = shallowMount(UserHeatmap, {
       propsData: {
         ...defaultProps,
-        data: [{ date: '2024-07-15', runs: 10 }],
+        data: [{ date: '2024-07-15', runs: 10, verdict: 'AC' }],
       },
     });
 
@@ -296,5 +296,120 @@ describe('UserHeatmap.vue', () => {
     expect(vm.totalSubmissions).toBe(10);
     expect(vm.activeDays).toBe(1);
     expect(vm.maxStreak).toBe(1);
+  });
+
+  it('should only count accepted submissions in the heatmap', () => {
+    const wrapper = shallowMount(UserHeatmap, {
+      propsData: {
+        ...defaultProps,
+        data: [
+          { date: '2024-01-01', runs: 3, verdict: 'AC' },
+          { date: '2024-01-01', runs: 10, verdict: 'WA' },
+          { date: '2024-01-02', runs: 7, verdict: 'TLE' },
+        ],
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    vm.selectedYear = 2024;
+    vm.hasRendered = false;
+
+    Object.defineProperty(vm, 'heatmapContainer', {
+      get: () => document.createElement('div'),
+      configurable: true,
+    });
+
+    vm.renderHeatmap();
+
+    // Only the 3 accepted runs count; the WA and TLE days are not activity.
+    expect(vm.totalSubmissions).toBe(3);
+    expect(vm.activeDays).toBe(1);
+    expect(vm.maxStreak).toBe(1);
+  });
+
+  it('should compute the current streak ending today', () => {
+    const wrapper = shallowMount(UserHeatmap, {
+      propsData: defaultProps,
+    });
+
+    const vm = wrapper.vm as any;
+
+    const dateMap = new Map<string, number>([
+      ['2024-01-05', 1],
+      ['2024-01-30', 2],
+      ['2024-01-31', 1],
+      ['2024-02-01', 4],
+    ]);
+
+    const start = new Date(2024, 0, 1);
+    const now = new Date(2024, 1, 1);
+
+    vm.selectedYear = 2024;
+    vm.setActivityStats(dateMap, start, now);
+
+    expect(vm.currentStreak).toBe(3); // Jan 30, 31 and Feb 1
+    expect(vm.maxStreak).toBe(3);
+  });
+
+  it('should keep the current streak when today has no activity yet', () => {
+    const wrapper = shallowMount(UserHeatmap, {
+      propsData: defaultProps,
+    });
+
+    const vm = wrapper.vm as any;
+
+    const dateMap = new Map<string, number>([
+      ['2024-01-30', 2],
+      ['2024-01-31', 1],
+    ]);
+
+    const start = new Date(2024, 0, 1);
+    const now = new Date(2024, 1, 1);
+
+    vm.selectedYear = 2024;
+    vm.setActivityStats(dateMap, start, now);
+
+    expect(vm.currentStreak).toBe(2); // streak ending yesterday still counts
+  });
+
+  it('should report a zero current streak after a gap', () => {
+    const wrapper = shallowMount(UserHeatmap, {
+      propsData: defaultProps,
+    });
+
+    const vm = wrapper.vm as any;
+
+    const dateMap = new Map<string, number>([
+      ['2024-01-05', 1],
+      ['2024-01-06', 2],
+    ]);
+
+    const start = new Date(2024, 0, 1);
+    const now = new Date(2024, 1, 1);
+
+    vm.selectedYear = 2024;
+    vm.setActivityStats(dateMap, start, now);
+
+    expect(vm.currentStreak).toBe(0);
+    expect(vm.maxStreak).toBe(2);
+  });
+
+  it('should only show the current streak for the current year', async () => {
+    const wrapper = shallowMount(UserHeatmap, {
+      propsData: {
+        ...defaultProps,
+        availableYears: [new Date().getFullYear(), 2023],
+      },
+    });
+
+    const vm = wrapper.vm as any;
+    await wrapper.vm.$nextTick();
+
+    expect(vm.isCurrentYearSelected).toBe(true);
+
+    vm.selectedYear = 2023;
+    await wrapper.vm.$nextTick();
+
+    expect(vm.isCurrentYearSelected).toBe(false);
   });
 });
