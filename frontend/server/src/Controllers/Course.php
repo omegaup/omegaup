@@ -1566,13 +1566,27 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var list<string> */
-        $aliases = json_decode($problems, true);
+        $decodedAliases = json_decode($problems, true);
+        if (!is_array($decodedAliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
+        foreach ($decodedAliases as $alias) {
+            if (!is_string($alias)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'problems'
+                );
+            }
+            \OmegaUp\Validators::validateAlias($alias, 'problems');
+        }
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $order = 1;
-            foreach ($aliases as $alias) {
+            foreach ($decodedAliases as $alias) {
                 $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                     $alias
                 );
@@ -1633,13 +1647,27 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /** @var list<string> */
-        $aliases = json_decode($assignments, true);
+        $decodedAliases = json_decode($assignments, true);
+        if (!is_array($decodedAliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
+        foreach ($decodedAliases as $assignment) {
+            if (!is_string($assignment)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'assignments'
+                );
+            }
+            \OmegaUp\Validators::validateAlias($assignment, 'assignments');
+        }
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $order = 1;
-            foreach ($aliases as $alias) {
+            foreach ($decodedAliases as $alias) {
                 $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                     $alias,
                     $course->course_id
@@ -5914,7 +5942,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param 'EXECUTION_COMPILATION_ERROR'|'EXECUTION_FINISHED'|'EXECUTION_INTERRUPTED'|'EXECUTION_JUDGE_ERROR'|'EXECUTION_RUNTIME_ERROR'|'EXECUTION_RUNTIME_FUNCTION_ERROR'|'EXECUTION_VALIDATOR_ERROR'|null $execution
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param 'OUTPUT_CORRECT'|'OUTPUT_EXCEEDED'|'OUTPUT_INCORRECT'|'OUTPUT_INTERRUPTED'|null $output
      * @omegaup-request-param null|string $problem_alias
