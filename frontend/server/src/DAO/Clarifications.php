@@ -68,7 +68,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
 
         if (!$isAdmin) {
             $sqlFrom .= '
-                AND (
+                WHERE (
                     cl.public = 1
                     OR cl.author_id = ?
                     OR cl.receiver_id = ?
