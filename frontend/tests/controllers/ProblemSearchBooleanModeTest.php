@@ -63,7 +63,9 @@ class ProblemSearchBooleanModeTest extends \OmegaUp\Test\ControllerTestCase {
             false,
             null,
             'all',
-            []
+            [],
+            false,
+            'all'
         );
     }
 
