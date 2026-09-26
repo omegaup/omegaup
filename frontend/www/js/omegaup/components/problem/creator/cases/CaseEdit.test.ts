@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import CaseEdit from './CaseEdit.vue';
-import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
 import { NIL as UUID_NIL } from 'uuid';
@@ -14,8 +13,6 @@ import T from '../../../../lang';
 import { MatrixDistinctType } from '@/js/omegaup/problem/creator/types';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('CaseEdit.vue', () => {
   const newUngroupedCasegroup = generateGroup({
@@ -53,29 +50,14 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    // There are currently 7 bootstrap buttons on the page.
-    // - Edit case
-    // - Delete case
-    // - Download .in
-    // - Download .txt
-    // - Delete lines
-    // - Add new line
-    // - Erase output
-    const initialBButtonsCount = 7;
-
-    const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(initialBButtonsCount);
-
     expect(wrapper.text()).toContain(newUngroupedCase.name);
     expect(wrapper.text()).toContain(newUngroupedCasegroup.name);
 
-    expect(
-      wrapper.find('biconpencilfill-stub').element.parentElement?.textContent,
-    ).toContain(T.problemCreatorEditCase);
-    expect(
-      wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
-    ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+    expect(wrapper.text()).toContain(T.problemCreatorEditCase);
+    expect(wrapper.find('[data-delete-case]').text()).toContain(
+      T.problemCreatorDeleteCase,
+    );
+    expect(wrapper.find('[data-menu-dropdown]').exists()).toBe(true);
   });
 
   it('Should show a grouped case', async () => {
@@ -92,13 +74,11 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
 
-    expect(
-      wrapper.find('biconpencilfill-stub').element.parentElement?.textContent,
-    ).toContain(T.problemCreatorEditCase);
-    expect(
-      wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
-    ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+    expect(wrapper.text()).toContain(T.problemCreatorEditCase);
+    expect(wrapper.find('[data-delete-case]').text()).toContain(
+      T.problemCreatorDeleteCase,
+    );
+    expect(wrapper.find('[data-menu-dropdown]').exists()).toBe(true);
   });
 
   it('Should delete a case', async () => {
@@ -464,10 +444,8 @@ describe('CaseEdit.vue', () => {
     await dropdowns.at(2).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
 
-    const editSVG = wrapper.find('svg.bi-pencil-square');
-    expect(editSVG.exists()).toBeTruthy();
-
     const editIcon = wrapper.find(`button[data-line-edit-button]`);
+    expect(editIcon.exists()).toBeTruthy();
     await editIcon.trigger('click');
 
     const modalBody = wrapper.find('div[data-array-modal]');
@@ -538,10 +516,8 @@ describe('CaseEdit.vue', () => {
     await dropdowns.at(3).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
-    const editSVG = wrapper.find('svg.bi-pencil-square');
-    expect(editSVG.exists()).toBeTruthy();
-
     const editIcon = wrapper.find(`button[data-line-edit-button]`);
+    expect(editIcon.exists()).toBeTruthy();
     await editIcon.trigger('click');
 
     const modalBody = wrapper.find('div[data-matrix-modal]');
