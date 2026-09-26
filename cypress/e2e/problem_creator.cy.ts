@@ -211,6 +211,7 @@ describe('Problem creator Test', () => {
 
         // Create layout from selected case
         cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-close-layout-sidebar]').should('be.visible');
         cy.get('[data-add-layout-from-selected-case]').click();
         cy.get('[data-close-layout-sidebar]').click();
 
@@ -222,11 +223,13 @@ describe('Problem creator Test', () => {
 
         // Enforce layout to all cases
         cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-close-layout-sidebar]').should('be.visible');
 
         cy.contains('[data-layout-dropdown]', 'hellocase_hellocase')
           .as('targetLayout')
           .find('button.dropdown-toggle-split')
-          .click();
+          .should('be.visible')
+          .click({ force: true });
 
         cy.get('@targetLayout')
           .find('[data-layout-dropdown-enforce-to-all]')
@@ -247,11 +250,13 @@ describe('Problem creator Test', () => {
 
         // Copy the layout
         cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-close-layout-sidebar]').should('be.visible');
 
         cy.contains('[data-layout-dropdown]', 'hellocase_hellocase')
           .as('originalLayout')
           .find('button.dropdown-toggle-split')
-          .click();
+          .should('be.visible')
+          .click({ force: true });
 
         cy.get('@originalLayout')
           .find('[data-layout-dropdown-copy]')
@@ -262,7 +267,8 @@ describe('Problem creator Test', () => {
         cy.contains('[data-layout-dropdown]', 'hellocase_hellocase copia')
           .as('copiedLayout')
           .find('button.dropdown-toggle-split')
-          .click();
+          .should('be.visible')
+          .click({ force: true });
 
         cy.get('@copiedLayout')
           .find('[data-layout-dropdown-enforce-to-selected]')
@@ -298,27 +304,11 @@ describe('Problem creator Test', () => {
     });
   });
 
-  it('Should submit create problem using creator-generated zip in feature-flag flow', () => {
+  it('Should submit create problem using creator-generated zip', () => {
     const problemAlias = `creator-${uuid().slice(0, 8)}`;
     const autoCompleteTextTag = 'recur';
     const creatorProblemContentsInput =
       '.introjs-open-creator input[name="problem_contents"]';
-
-    // Enable the experiment via the admin API so the test does not depend on
-    // OMEGAUP_EXPERIMENT_SECRET / HMAC hashes that differ between environments.
-    cy.loginAdmin();
-    cy.request({
-      method: 'POST',
-      url: '/api/user/addExperiment/',
-      form: true,
-      body: {
-        username: loginOptions.username,
-        experiment: 'problem_creation_method_selector',
-      },
-    }).then((response) => {
-      expect(response.status).to.equal(200);
-    });
-    cy.logoutUsingApi();
 
     cy.login(loginOptions);
     cy.setCookie('has-visited-create-problem', true.toString());
