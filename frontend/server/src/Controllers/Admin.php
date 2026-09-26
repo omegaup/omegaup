@@ -12,7 +12,8 @@
   * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
-  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>}
+  * @psalm-type RecommendationModelRun=array{map_score: float, dataset_size: int, rng_seed: int|null, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, recommendationModelRuns: list<RecommendationModelRun>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
@@ -32,6 +33,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     ];
 
     const CRON_RUNS_LIMIT = 50;
+    const RECOMMENDATION_MODEL_RUNS_LIMIT = 20;
 
     /**
      * Get stats for an overall platform report.
@@ -466,7 +468,29 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     * @param list<\OmegaUp\DAO\VO\RecommendationModelRuns> $modelRuns
+     *
+     * @return list<RecommendationModelRun>
+     */
+    private static function recommendationModelRunsPayload(
+        array $modelRuns
+    ): array {
+        $result = [];
+        foreach ($modelRuns as $modelRun) {
+            $result[] = [
+                'map_score' => floatval($modelRun->map_score),
+                'dataset_size' => intval($modelRun->dataset_size),
+                'rng_seed' => $modelRun->rng_seed,
+                'published' => boolval($modelRun->published),
+                'skip_reason' => $modelRun->skip_reason,
+                'created_at' => $modelRun->created_at,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, recommendationModelRuns: list<RecommendationModelRun>}
      */
     private static function cronsPayload(): array {
         return [
@@ -474,13 +498,19 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'runs' => self::cronRunsPayload(
                 \OmegaUp\DAO\CronRuns::getRecent(self::CRON_RUNS_LIMIT)
             ),
+            'recommendationModelRuns' => self::recommendationModelRunsPayload(
+                \OmegaUp\DAO\RecommendationModelRuns::getRecent(
+                    self::RECOMMENDATION_MODEL_RUNS_LIMIT
+                )
+            ),
         ];
     }
 
     /**
-     * Lists the registered cron jobs and their most recent runs.
+     * Lists the registered cron jobs, their most recent runs and the quality of
+     * the recommendation models the training job produced.
      *
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, recommendationModelRuns: list<RecommendationModelRun>}
      */
     public static function apiGetCrons(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
