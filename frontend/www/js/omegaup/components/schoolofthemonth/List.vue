@@ -134,7 +134,7 @@ export default class SchoolOfTheMonthList extends Vue {
   @Prop() isMentor!: boolean;
   @Prop() canChooseSchool!: boolean;
   @Prop() schoolIsSelected!: boolean;
-  @Prop({ default: true }) isDisabled!: boolean;
+  @Prop({ default: false }) isDisabled!: boolean;
 
   T = T;
   selectedTab = 'allSchoolsOfTheMonth';
