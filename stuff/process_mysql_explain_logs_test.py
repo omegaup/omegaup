@@ -9,6 +9,7 @@ import pytest
 
 from process_mysql_explain_logs import (
     AllowlistValidationError,
+    _main,
     build_inefficiency_key,
     build_query_family,
     deduplicate_results,
@@ -367,3 +368,77 @@ def test_save_to_csv_returns_none_when_open_fails(
         assert save_to_csv(results) is None
 
     assert 'Failed to save CSV' in caplog.text
+
+
+class _FakeConnection:
+    def close(self) -> None:
+        pass
+
+
+def test_main_exits_nonzero_when_csv_save_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''A CSV write failure must produce a non-zero exit code.'''
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.load_allowlist',
+        lambda path: None,
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.create_connection',
+        lambda **kwargs: _FakeConnection(),
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.get_queries_from_general_log',
+        lambda connection: ['SELECT * FROM Users'],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.explain_queries',
+        lambda connection, queries: [
+            _result('1', 'SELECT * FROM Users', 'Users'),
+        ],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.save_to_csv',
+        lambda results: None,
+    )
+
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(SystemExit) as excinfo:
+            _main()
+
+    assert excinfo.value.code == 1
+    assert 'failed to save CSV' in caplog.text
+
+
+def test_main_exits_zero_when_csv_save_succeeds(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    '''A successful CSV write keeps the zero exit code.'''
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.load_allowlist',
+        lambda path: None,
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.create_connection',
+        lambda **kwargs: _FakeConnection(),
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.get_queries_from_general_log',
+        lambda connection: ['SELECT * FROM Users'],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.explain_queries',
+        lambda connection, queries: [
+            _result('1', 'SELECT * FROM Users', 'Users'),
+        ],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.save_to_csv',
+        lambda results: 'stuff/inefficient_queries.csv',
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        _main()
+
+    assert excinfo.value.code == 0
