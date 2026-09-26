@@ -31,6 +31,11 @@ export class ProfilePage {
     cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preferred-language]').select(preferredLanguage);
     cy.get('[data-preference-save-button]').click();
+    // Wait for success notification and dismiss it
+    cy.get('.alert[role="alert"]')
+      .should('be.visible')
+      .find('[data-alert-close]')
+      .click();
   }
 
   navigateToMyProblemsPage(): void {
