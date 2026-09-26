@@ -2477,7 +2477,12 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
+        if (self::isNonUserIdentity($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        \OmegaUp\Validators::validateValidUsername(
             $r['username'],
             'username'
         );
@@ -2486,17 +2491,13 @@ class User extends \OmegaUp\Controllers\Controller {
             'password'
         );
 
-        if (self::isNonUserIdentity($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
         if ($r['username'] !== $r->identity->username) {
-            $testu = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername(
+                $r['username']
+            );
 
-            if (!is_null($testu)) {
+            if (!is_null($identity)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterUsernameInUse',
                     'username'
@@ -2563,8 +2564,8 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         if (!is_null($username)) {
-            $user = \OmegaUp\DAO\Users::FindByUsername($username);
-            if ($username !== $r->identity->username && !is_null($user)) {
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+            if ($username !== $r->identity->username && !is_null($identity)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'usernameInUse'
                 );
