@@ -11,7 +11,10 @@ namespace OmegaUp\DAO;
  */
 class ProblemHealthChecks extends \OmegaUp\DAO\Base\ProblemHealthChecks {
     /**
-     * Returns the open findings, worst first, with the problem they belong to.
+     * Returns the open findings, worst and newest first, with their problem.
+     *
+     * Newest rather than oldest because the caller takes a limited number, and
+     * oldest first would pin the list to findings nobody has acted on.
      *
      * @return list<array{alias: string, check_type: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp, problem_id: int, severity: string, title: string}>
      */
@@ -29,7 +32,7 @@ class ProblemHealthChecks extends \OmegaUp\DAO\Base\ProblemHealthChecks {
                 WHERE phc.`resolved_at` IS NULL
                 ORDER BY
                     FIELD(phc.`severity`, ?, ?),
-                    phc.`first_detected_at` ASC
+                    phc.`first_detected_at` DESC
                 LIMIT ?;';
         /** @var list<array{alias: string, check_type: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp, problem_id: int, severity: string, title: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
