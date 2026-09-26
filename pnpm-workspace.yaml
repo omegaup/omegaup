@@ -1,0 +1,20 @@
+packages:
+  - '.'
+
+minimumReleaseAge: 1440
+trustPolicy: no-downgrade
+# Ignore trust checks for packages published more than 30 days ago (legacy deps lack provenance).
+trustPolicyIgnoreAfter: 43200
+strictDepBuilds: true
+
+allowBuilds:
+  '@swc/core': true
+  bootstrap-vue: true
+  core-js: true
+  core-js-pure: true
+  cypress: true
+  deasync: true
+  esbuild: true
+
+overrides:
+  marked: ^12.0.0
