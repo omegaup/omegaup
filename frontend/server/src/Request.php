@@ -287,6 +287,10 @@ class Request extends \ArrayObject {
         );
         if ($val instanceof \OmegaUp\Timestamp) {
             $timestampVal = $val;
+        } elseif (is_string($val) && !is_numeric($val)) {
+            // Handle strict YYYY-MM-DD format string dates
+            \OmegaUp\Validators::validateDate($val, $key);
+            $timestampVal = new \OmegaUp\Timestamp(strtotime($val));
         } else {
             $timestampVal = new \OmegaUp\Timestamp(intval($val));
         }
