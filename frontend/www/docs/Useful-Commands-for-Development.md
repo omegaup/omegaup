@@ -100,7 +100,7 @@ find frontend/ \
 
 ### Run Vue unit tests
 ```bash
-yarn run test:watch
+pnpm run test:watch
 ```
 **Description:** Runs Vue unit tests in watch mode, automatically rerunning tests when code changes. The command runs within the local development environment of the application, providing an efficient and dynamic workflow during test development.
 
