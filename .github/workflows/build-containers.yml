@@ -67,8 +67,12 @@ jobs:
       - name: Update k8s sandbox manifests
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
+          KUSTOMIZE_VERSION=5.8.1
+          curl -sLo /tmp/kustomize.tar.gz \
+            "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          echo "029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d  /tmp/kustomize.tar.gz" | sha256sum -c
+          tar -xzf /tmp/kustomize.tar.gz -C /tmp/
+          sudo mv /tmp/kustomize /usr/local/bin/
 
           git clone --depth=1 https://omegaup-bot:${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}@github.com/omegaup/prod /tmp/prod
           TAG=${{ github.sha }}
@@ -89,8 +93,12 @@ jobs:
       - name: Update k8s manifests
         if: ${{ github.ref == 'refs/heads/release' }}
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
+          KUSTOMIZE_VERSION=5.8.1
+          curl -sLo /tmp/kustomize.tar.gz \
+            "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          echo "029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d  /tmp/kustomize.tar.gz" | sha256sum -c
+          tar -xzf /tmp/kustomize.tar.gz -C /tmp/
+          sudo mv /tmp/kustomize /usr/local/bin/
 
           git clone --depth=1 https://omegaup-bot:${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}@github.com/omegaup/prod /tmp/prod
           TAG=${{ github.sha }}
