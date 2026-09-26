@@ -259,7 +259,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
             case 'demotion':
                 self::validateDemotionContents($contents);
+                /** @var string $contents['reason'] */
                 if ($contents['reason'] === 'duplicate') {
+                    /** @var string $contents['original'] */
                     $contents['original'] = self::normalizeOriginalProblemAlias(
                         $contents['original']
                     );
