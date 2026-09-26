@@ -107,7 +107,9 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCacheGetOrSetOnlyComputesOnce(\OmegaUp\CacheAdapter $cache) {
         $key = uniqid('getorset-once-');
         $lockGroup = 'test-lock-group-' . uniqid();
-        $invocations = 0;
+            /** @var int $invocations Help static analyzers understand this captured variable. */
+            $invocations = 0;
+        /** @psalm-suppress UndefinedVariable */
         $callback = function () use (&$invocations) {
             $invocations++;
             return 'computed';
