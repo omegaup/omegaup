@@ -381,7 +381,8 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
 
-        if ($n >= 11 && $n <= 13) {
+        $mod100 = $n % 100;
+        if ($mod100 >= 11 && $mod100 <= 13) {
             return $translator->get('certificatePdfContestPlaceTh');
         }
 
