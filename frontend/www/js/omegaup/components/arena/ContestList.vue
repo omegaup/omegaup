@@ -1,161 +1,195 @@
 <template>
-  <b-container fluid class="p-5">
+  <div class="container-fluid p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
 
     <!-- Search and Filter Section -->
-    <b-card class="mb-4 sticky-search-bar">
-      <b-container>
-        <b-row class="justify-content-between" align-v="center">
-          <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
-            <form @submit.prevent="onSearchQuery">
-              <div class="input-group">
-                <input
-                  v-model="currentQuery"
-                  class="form-control nav-link"
-                  type="text"
-                  name="query"
-                  autocomplete="off"
-                  autocorrect="off"
-                  autocapitalize="off"
-                  spellcheck="false"
-                  :placeholder="T.wordsKeyword"
-                  @input="onSearchQueryDebounced"
-                  @keyup.enter="onSearchQuery"
-                />
-                <button
-                  class="btn reset-btn nav-link"
-                  type="reset"
-                  @click="onReset"
-                >
-                  &times;
-                </button>
-                <div class="input-group-append">
+    <div class="card mb-4 sticky-search-bar">
+      <div class="card-body">
+        <div class="container">
+          <div class="row justify-content-between align-items-center">
+            <div class="col-12 col-md-5 mb-2 mb-md-0 p-0">
+              <form @submit.prevent="onSearchQuery">
+                <div class="input-group">
                   <input
-                    class="btn btn-primary btn-style btn-md btn-block active nav-link"
-                    type="submit"
-                    :value="T.wordsSearch"
+                    v-model="currentQuery"
+                    class="form-control nav-link"
+                    type="text"
+                    name="query"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    :placeholder="T.wordsKeyword"
+                    @input="onSearchQueryDebounced"
+                    @keyup.enter="onSearchQuery"
                   />
+                  <button
+                    class="btn reset-btn nav-link"
+                    type="reset"
+                    @click="onReset"
+                  >
+                    &times;
+                  </button>
+                  <div class="input-group-append">
+                    <input
+                      class="btn btn-primary btn-style btn-md btn-block active nav-link"
+                      type="submit"
+                      :value="T.wordsSearch"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="d-flex col-12 col-sm-12 col-md-6 btns-group p-0">
+              <div ref="dropdownOrderBy" class="dropdown" data-dropdown-order>
+                <button
+                  class="btn btn-secondary"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <div>
+                    <font-awesome-icon icon="sort-amount-down" />
+                    {{ T.contestOrderBy }}
+                  </div>
+                </button>
+                <div class="dropdown-menu">
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-order-by-ends
+                    @click.prevent="orderByEnds"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Ends"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByEnds }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-order-by-title
+                    @click.prevent="orderByTitle"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Title"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByTitle }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-order-by-duration
+                    @click.prevent="orderByDuration"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Duration"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByDuration }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-order-by-organizer
+                    @click.prevent="orderByOrganizer"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Organizer"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByOrganizer }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-order-by-contestants
+                    @click.prevent="orderByContestants"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Contestants"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByContestants }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-order-by-signed-up
+                    @click.prevent="orderBySignedUp"
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.SignedUp"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderBySignedUp }}
+                  </a>
                 </div>
               </div>
-            </form>
-          </b-col>
-          <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-            <b-dropdown ref="dropdownOrderBy" no-caret data-dropdown-order>
-              <template #button-content>
-                <div>
-                  <font-awesome-icon icon="sort-amount-down" />
-                  {{ T.contestOrderBy }}
+              <div
+                ref="dropdownFilterBy"
+                class="dropdown mr-0"
+                data-dropdown-filter
+              >
+                <button
+                  class="btn btn-secondary"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <font-awesome-icon icon="filter" />
+                  {{ T.contestFilterBy }}
+                </button>
+                <div class="dropdown-menu">
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-filter-by-all
+                    @click.prevent="filterByAll"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.All"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterByAll }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-filter-by-signed-up
+                    @click.prevent="filterBySignedUp"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.SignedUp"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterBySignedUp }}
+                  </a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-filter-by-recommended
+                    @click.prevent="filterByRecommended"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.OnlyRecommended"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterByRecommended }}
+                  </a>
                 </div>
-              </template>
-              <b-dropdown-item href="#" data-order-by-ends @click="orderByEnds">
-                <font-awesome-icon
-                  v-if="currentOrder === ContestOrder.Ends"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestOrderByEnds }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-order-by-title
-                @click="orderByTitle"
-              >
-                <font-awesome-icon
-                  v-if="currentOrder === ContestOrder.Title"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestOrderByTitle }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-order-by-duration
-                @click="orderByDuration"
-              >
-                <font-awesome-icon
-                  v-if="currentOrder === ContestOrder.Duration"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestOrderByDuration }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-order-by-organizer
-                @click="orderByOrganizer"
-              >
-                <font-awesome-icon
-                  v-if="currentOrder === ContestOrder.Organizer"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestOrderByOrganizer }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-order-by-contestants
-                @click="orderByContestants"
-              >
-                <font-awesome-icon
-                  v-if="currentOrder === ContestOrder.Contestants"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestOrderByContestants }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-order-by-signed-up
-                @click="orderBySignedUp"
-              >
-                <font-awesome-icon
-                  v-if="currentOrder === ContestOrder.SignedUp"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestOrderBySignedUp }}</b-dropdown-item
-              >
-            </b-dropdown>
-            <b-dropdown
-              ref="dropdownFilterBy"
-              class="mr-0"
-              no-caret
-              data-dropdown-filter
-            >
-              <template #button-content>
-                <font-awesome-icon icon="filter" />
-                {{ T.contestFilterBy }}
-              </template>
-              <b-dropdown-item href="#" data-filter-by-all @click="filterByAll">
-                <font-awesome-icon
-                  v-if="currentFilter === ContestFilter.All"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestFilterByAll }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-filter-by-signed-up
-                @click="filterBySignedUp"
-              >
-                <font-awesome-icon
-                  v-if="currentFilter === ContestFilter.SignedUp"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestFilterBySignedUp }}</b-dropdown-item
-              >
-              <b-dropdown-item
-                href="#"
-                data-filter-by-recommended
-                @click="filterByRecommended"
-              >
-                <font-awesome-icon
-                  v-if="currentFilter === ContestFilter.OnlyRecommended"
-                  icon="check"
-                  class="mr-1"
-                />{{ T.contestFilterByRecommended }}</b-dropdown-item
-              >
-            </b-dropdown>
-          </b-col>
-        </b-row>
-      </b-container>
-    </b-card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Summary View (Horizontal Scrolling) -->
     <div v-if="!viewAllCategory">
@@ -172,24 +206,25 @@
           class="d-flex justify-content-between align-items-center mb-3 px-3"
         >
           <h3 class="m-0">{{ getTabTitle(tab) }}</h3>
-          <b-button
+          <button
             v-if="getContestsForTab(tab).length > 0"
-            variant="link"
+            class="btn btn-link"
+            type="button"
             @click="setViewAll(tab)"
           >
             {{ T.wordsViewAll }}
-          </b-button>
+          </button>
         </div>
 
         <div class="position-relative scroll-wrapper">
-          <b-button
+          <button
             v-if="canScrollLeft(tab)"
-            variant="light"
-            class="scroll-btn scroll-left shadow-sm"
+            class="btn btn-light scroll-btn scroll-left shadow-sm"
+            type="button"
             @click="scrollLeft(tab)"
           >
             <font-awesome-icon icon="chevron-left" />
-          </b-button>
+          </button>
 
           <div
             :ref="`scrollContainer_${tab}`"
@@ -214,7 +249,7 @@
                   </template>
 
                   <template #text-contest-date>
-                    <b-card-text v-if="tab === ContestTab.Current">
+                    <div v-if="tab === ContestTab.Current" class="card-text">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.finish_time)"
@@ -222,8 +257,11 @@
                       >
                         {{ currentContestDate(contestItem) }}
                       </a>
-                    </b-card-text>
-                    <b-card-text v-else-if="tab === ContestTab.Future">
+                    </div>
+                    <div
+                      v-else-if="tab === ContestTab.Future"
+                      class="card-text"
+                    >
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.start_time)"
@@ -231,8 +269,8 @@
                       >
                         {{ futureContestDate(contestItem) }}
                       </a>
-                    </b-card-text>
-                    <b-card-text v-else-if="tab === ContestTab.Past">
+                    </div>
+                    <div v-else-if="tab === ContestTab.Past" class="card-text">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.finish_time)"
@@ -240,7 +278,7 @@
                       >
                         {{ pastContestDate(contestItem) }}
                       </a>
-                    </b-card-text>
+                    </div>
                   </template>
 
                   <template #contest-dropdown>
@@ -287,14 +325,14 @@
             </div>
           </div>
 
-          <b-button
+          <button
             v-if="canScrollRight(tab)"
-            variant="light"
-            class="scroll-btn scroll-right shadow-sm"
+            class="btn btn-light scroll-btn scroll-right shadow-sm"
+            type="button"
             @click="scrollRight(tab)"
           >
             <font-awesome-icon icon="chevron-right" />
-          </b-button>
+          </button>
         </div>
       </div>
     </div>
@@ -302,43 +340,37 @@
     <!-- Full Grid View -->
     <div v-else>
       <div class="d-flex align-items-center mb-4 px-3">
-        <b-button
-          variant="outline-secondary"
-          class="mr-3"
+        <button
+          class="btn btn-outline-secondary mr-3"
+          type="button"
           :title="T.wordsBack"
           @click="setViewAll(null)"
         >
           <font-awesome-icon icon="arrow-left" />
-        </b-button>
+        </button>
         <h2 class="m-0">{{ getTabTitle(viewAllCategory) }}</h2>
       </div>
 
       <template v-if="loading || refreshing">
-        <b-row>
-          <b-col
+        <div class="row">
+          <div
             v-for="index in 6"
             :key="`skeleton-${index}`"
-            cols="12"
-            md="6"
-            lg="3"
-            class="mb-4"
+            class="col-12 col-md-6 col-lg-3 mb-4"
           >
             <omegaup-contest-skeleton></omegaup-contest-skeleton>
-          </b-col>
-        </b-row>
+          </div>
+        </div>
       </template>
       <div v-else-if="contestListEmpty" class="empty-category">
         {{ T.contestListEmpty }}
       </div>
       <template v-else>
-        <b-row>
-          <b-col
+        <div class="row">
+          <div
             v-for="contestItem in contestList"
             :key="contestItem.contest_id"
-            cols="12"
-            md="6"
-            lg="3"
-            class="mb-4 d-flex align-items-stretch"
+            class="col-12 col-md-6 col-lg-3 mb-4 d-flex align-items-stretch"
           >
             <omegaup-contest-card :contest="contestItem">
               <!-- Slots -->
@@ -352,7 +384,10 @@
               </template>
 
               <template #text-contest-date>
-                <b-card-text v-if="viewAllCategory === ContestTab.Current">
+                <div
+                  v-if="viewAllCategory === ContestTab.Current"
+                  class="card-text"
+                >
                   <font-awesome-icon icon="calendar-alt" />
                   <a
                     :href="getTimeLink(contestItem.finish_time)"
@@ -360,8 +395,11 @@
                   >
                     {{ currentContestDate(contestItem) }}
                   </a>
-                </b-card-text>
-                <b-card-text v-else-if="viewAllCategory === ContestTab.Future">
+                </div>
+                <div
+                  v-else-if="viewAllCategory === ContestTab.Future"
+                  class="card-text"
+                >
                   <font-awesome-icon icon="calendar-alt" />
                   <a
                     :href="getTimeLink(contestItem.start_time)"
@@ -369,8 +407,11 @@
                   >
                     {{ futureContestDate(contestItem) }}
                   </a>
-                </b-card-text>
-                <b-card-text v-else-if="viewAllCategory === ContestTab.Past">
+                </div>
+                <div
+                  v-else-if="viewAllCategory === ContestTab.Past"
+                  class="card-text"
+                >
                   <font-awesome-icon icon="calendar-alt" />
                   <a
                     :href="getTimeLink(contestItem.finish_time)"
@@ -378,7 +419,7 @@
                   >
                     {{ pastContestDate(contestItem) }}
                   </a>
-                </b-card-text>
+                </div>
               </template>
 
               <template #contest-dropdown>
@@ -425,8 +466,8 @@
                 <div v-if="viewAllCategory === ContestTab.Past"></div>
               </template>
             </omegaup-contest-card>
-          </b-col>
-        </b-row>
+          </div>
+        </div>
       </template>
 
       <div
@@ -447,7 +488,7 @@
         </button>
       </div>
     </div>
-  </b-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -470,27 +511,12 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-// Import Only Required Plugins
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  TabsPlugin,
-  CardPlugin,
-  DropdownPlugin,
-  LayoutPlugin,
-} from 'bootstrap-vue';
 import ContestCard from './ContestCardv2.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
 import infiniteScroll from 'vue-infinite-scroll';
-Vue.use(TabsPlugin);
-Vue.use(CardPlugin);
-Vue.use(DropdownPlugin);
-Vue.use(LayoutPlugin);
 library.add(fas);
 
 export enum ContestTab {

@@ -1,418 +1,485 @@
 <template>
-  <b-container fluid class="p-5">
+  <div class="container-fluid p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
-    <b-card no-body>
-      <b-tabs
-        class="sidebar"
-        pills
-        card
-        vertical
-        nav-wrapper-class="contest-list-nav col-md-2 col-sm-12 test-class"
-      >
-        <b-card class="card-group-menu">
-          <b-container>
-            <b-row class="justify-content-between" align-v="center">
-              <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
-                <form @submit.prevent="onSearchQuery">
-                  <div class="input-group">
-                    <input
-                      v-model="currentQuery"
-                      class="form-control nav-link"
-                      type="text"
-                      name="query"
-                      autocomplete="off"
-                      autocorrect="off"
-                      autocapitalize="off"
-                      spellcheck="false"
-                      :placeholder="T.wordsKeyword"
-                      @input="onSearchQueryDebounced"
-                      @keyup.enter="onSearchQuery"
-                    />
-                    <button
-                      class="btn reset-btn nav-link"
-                      type="reset"
-                      @click="onReset"
+    <div class="card">
+      <div class="sidebar d-md-flex">
+        <div class="contest-list-nav col-md-2 col-sm-12 test-class">
+          <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                :class="[
+                  { active: currentTab === ContestTab.Current },
+                  titleLinkClass(ContestTab.Current),
+                ]"
+                @click.prevent="currentTab = ContestTab.Current"
+                >{{ T.contestListCurrent }}</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                :class="[
+                  { active: currentTab === ContestTab.Future },
+                  titleLinkClass(ContestTab.Future),
+                ]"
+                @click.prevent="currentTab = ContestTab.Future"
+                >{{ T.contestListFuture }}</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                :class="[
+                  { active: currentTab === ContestTab.Past },
+                  titleLinkClass(ContestTab.Past),
+                ]"
+                @click.prevent="currentTab = ContestTab.Past"
+                >{{ T.contestListPast }}</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="flex-grow-1 col-md-10 col-sm-12">
+          <div class="card card-group-menu">
+            <div class="card-body">
+              <div class="container">
+                <div class="row justify-content-between align-items-center">
+                  <div class="col-12 col-md-5 mb-2 mb-md-0 p-0">
+                    <form @submit.prevent="onSearchQuery">
+                      <div class="input-group">
+                        <input
+                          v-model="currentQuery"
+                          class="form-control nav-link"
+                          type="text"
+                          name="query"
+                          autocomplete="off"
+                          autocorrect="off"
+                          autocapitalize="off"
+                          spellcheck="false"
+                          :placeholder="T.wordsKeyword"
+                          @input="onSearchQueryDebounced"
+                          @keyup.enter="onSearchQuery"
+                        />
+                        <button
+                          class="btn reset-btn nav-link"
+                          type="reset"
+                          @click="onReset"
+                        >
+                          &times;
+                        </button>
+                        <div class="input-group-append">
+                          <input
+                            class="btn btn-primary btn-style btn-md btn-block active nav-link"
+                            type="submit"
+                            :value="T.wordsSearch"
+                          />
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="d-flex col-12 col-sm-12 col-md-6 btns-group p-0">
+                    <div
+                      ref="dropdownOrderBy"
+                      class="dropdown"
+                      data-dropdown-order
                     >
-                      &times;
-                    </button>
-                    <div class="input-group-append">
-                      <input
-                        class="btn btn-primary btn-style btn-md btn-block active nav-link"
-                        type="submit"
-                        :value="T.wordsSearch"
-                      />
+                      <button
+                        class="btn"
+                        :class="isNonDefaultOrder ? 'btn-primary' : 'btn-light'"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
+                        <div>
+                          <font-awesome-icon icon="sort-amount-down" />
+                          <span v-if="isNonDefaultOrder">
+                            {{ activeOrderLabel }}
+                            <font-awesome-icon
+                              icon="times-circle"
+                              class="ml-1 reset-icon"
+                              :title="T.contestOrderBy"
+                              @click.stop="orderByEnds"
+                            />
+                          </span>
+                          <span v-else>{{ T.contestOrderBy }}</span>
+                        </div>
+                      </button>
+                      <div class="dropdown-menu">
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-order-by-ends
+                          @click.prevent="orderByEnds"
+                        >
+                          <font-awesome-icon
+                            v-if="currentOrder === ContestOrder.Ends"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestOrderByEnds }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-order-by-title
+                          @click.prevent="orderByTitle"
+                        >
+                          <font-awesome-icon
+                            v-if="currentOrder === ContestOrder.Title"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestOrderByTitle }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-order-by-duration
+                          @click.prevent="orderByDuration"
+                        >
+                          <font-awesome-icon
+                            v-if="currentOrder === ContestOrder.Duration"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestOrderByDuration }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-order-by-organizer
+                          @click.prevent="orderByOrganizer"
+                        >
+                          <font-awesome-icon
+                            v-if="currentOrder === ContestOrder.Organizer"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestOrderByOrganizer }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-order-by-contestants
+                          @click.prevent="orderByContestants"
+                        >
+                          <font-awesome-icon
+                            v-if="currentOrder === ContestOrder.Contestants"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestOrderByContestants }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-order-by-signed-up
+                          @click.prevent="orderBySignedUp"
+                        >
+                          <font-awesome-icon
+                            v-if="currentOrder === ContestOrder.SignedUp"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestOrderBySignedUp }}
+                        </a>
+                      </div>
+                    </div>
+                    <div
+                      ref="dropdownFilterBy"
+                      class="dropdown mr-0"
+                      data-dropdown-filter
+                    >
+                      <button
+                        class="btn"
+                        :class="
+                          isNonDefaultFilter ? 'btn-primary' : 'btn-light'
+                        "
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
+                        <font-awesome-icon icon="filter" />
+                        <span v-if="isNonDefaultFilter">
+                          {{ activeFilterLabel }}
+                          <font-awesome-icon
+                            icon="times-circle"
+                            class="ml-1 reset-icon"
+                            :title="T.contestFilterBy"
+                            @click.stop="filterByAll"
+                          />
+                        </span>
+                        <span v-else>{{ T.contestFilterBy }}</span>
+                      </button>
+                      <div class="dropdown-menu">
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-filter-by-all
+                          @click.prevent="filterByAll"
+                        >
+                          <font-awesome-icon
+                            v-if="currentFilter === ContestFilter.All"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestFilterByAll }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-filter-by-signed-up
+                          @click.prevent="filterBySignedUp"
+                        >
+                          <font-awesome-icon
+                            v-if="currentFilter === ContestFilter.SignedUp"
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestFilterBySignedUp }}
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          data-filter-by-recommended
+                          @click.prevent="filterByRecommended"
+                        >
+                          <font-awesome-icon
+                            v-if="
+                              currentFilter === ContestFilter.OnlyRecommended
+                            "
+                            icon="check"
+                            class="mr-1"
+                          />{{ T.contestFilterByRecommended }}
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </form>
-              </b-col>
-              <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown
-                  ref="dropdownOrderBy"
-                  no-caret
-                  data-dropdown-order
-                  :variant="isNonDefaultOrder ? 'primary' : 'light'"
-                >
-                  <template #button-content>
-                    <div>
-                      <font-awesome-icon icon="sort-amount-down" />
-                      <span v-if="isNonDefaultOrder">
-                        {{ activeOrderLabel }}
-                        <font-awesome-icon
-                          icon="times-circle"
-                          class="ml-1 reset-icon"
-                          :title="T.contestOrderBy"
-                          @click.stop="orderByEnds"
-                        />
-                      </span>
-                      <span v-else>{{ T.contestOrderBy }}</span>
-                    </div>
-                  </template>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-ends
-                    @click="orderByEnds"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Ends"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByEnds }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-title
-                    @click="orderByTitle"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Title"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByTitle }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-duration
-                    @click="orderByDuration"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Duration"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByDuration }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-organizer
-                    @click="orderByOrganizer"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Organizer"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByOrganizer }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-contestants
-                    @click="orderByContestants"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.Contestants"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderByContestants }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-signed-up
-                    @click="orderBySignedUp"
-                  >
-                    <font-awesome-icon
-                      v-if="currentOrder === ContestOrder.SignedUp"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestOrderBySignedUp }}</b-dropdown-item
-                  >
-                </b-dropdown>
-                <b-dropdown
-                  ref="dropdownFilterBy"
-                  class="mr-0"
-                  no-caret
-                  data-dropdown-filter
-                  :variant="isNonDefaultFilter ? 'primary' : 'light'"
-                >
-                  <template #button-content>
-                    <font-awesome-icon icon="filter" />
-                    <span v-if="isNonDefaultFilter">
-                      {{ activeFilterLabel }}
-                      <font-awesome-icon
-                        icon="times-circle"
-                        class="ml-1 reset-icon"
-                        :title="T.contestFilterBy"
-                        @click.stop="filterByAll"
-                      />
-                    </span>
-                    <span v-else>{{ T.contestFilterBy }}</span>
-                  </template>
-                  <b-dropdown-item
-                    href="#"
-                    data-filter-by-all
-                    @click="filterByAll"
-                  >
-                    <font-awesome-icon
-                      v-if="currentFilter === ContestFilter.All"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestFilterByAll }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-filter-by-signed-up
-                    @click="filterBySignedUp"
-                  >
-                    <font-awesome-icon
-                      v-if="currentFilter === ContestFilter.SignedUp"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestFilterBySignedUp }}</b-dropdown-item
-                  >
-                  <b-dropdown-item
-                    href="#"
-                    data-filter-by-recommended
-                    @click="filterByRecommended"
-                  >
-                    <font-awesome-icon
-                      v-if="currentFilter === ContestFilter.OnlyRecommended"
-                      icon="check"
-                      class="mr-1"
-                    />{{ T.contestFilterByRecommended }}</b-dropdown-item
-                  >
-                </b-dropdown>
-              </b-col>
-            </b-row>
-          </b-container>
-        </b-card>
-        <b-tab
-          ref="currentContestTab"
-          class="scroll-content"
-          :title="T.contestListCurrent"
-          :title-link-class="titleLinkClass(ContestTab.Current)"
-          :active="currentTab === ContestTab.Current"
-          @click="currentTab = ContestTab.Current"
-        >
-          <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="`current-${index}`"
-              class="card contest-card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+                </div>
+              </div>
             </div>
-          </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
-            {{ T.contestListEmpty }}
           </div>
-          <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{ currentContestDate(contestItem) }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
-          </template>
-          <template v-if="isScrollLoading && currentTab === ContestTab.Current">
-            <div
-              v-for="index in 3"
-              :key="`loading-more-current-${index}`"
-              class="card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
-            </div>
-          </template>
-
           <div
-            v-if="
-              !loading &&
-              !contestListEmpty &&
-              hasMore &&
-              currentTab === ContestTab.Current
-            "
-            class="text-center mb-2"
+            v-show="currentTab === ContestTab.Current"
+            ref="currentContestTab"
+            data-contest-tab="current"
+            class="scroll-content tab-pane"
+            :class="{ active: currentTab === ContestTab.Current }"
           >
-            <button
-              class="btn btn-outline-primary w-100"
-              :disabled="isScrollLoading"
-              @click="loadMoreContests"
-            >
-              {{ showMoreContestButtonText }}
-            </button>
-          </div>
-        </b-tab>
-        <b-tab
-          ref="futureContestTab"
-          class="scroll-content"
-          :title="T.contestListFuture"
-          :title-link-class="titleLinkClass(ContestTab.Future)"
-          :active="currentTab === ContestTab.Future"
-          @click="currentTab = ContestTab.Future"
-        >
-          <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="`future-${index}`"
-              class="card contest-card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            <template v-if="loading || refreshing">
+              <div
+                v-for="index in 3"
+                :key="`current-${index}`"
+                class="card contest-card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+            <div v-else-if="contestListEmpty" class="empty-category">
+              {{ T.contestListEmpty }}
             </div>
-          </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
-            {{ T.contestListEmpty }}
-          </div>
-          <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
+            <template v-else>
+              <omegaup-contest-card
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                :contest="contestItem"
+              >
+                <template #contest-button-scoreboard>
+                  <div></div>
+                </template>
+                <template #text-contest-date>
+                  <div class="card-text">
+                    <font-awesome-icon icon="calendar-alt" />
+                    <a :href="getTimeLink(contestItem.finish_time)">
+                      {{ currentContestDate(contestItem) }}
+                    </a>
+                  </div>
+                </template>
+                <template #contest-dropdown>
+                  <div></div>
+                </template>
+              </omegaup-contest-card>
+            </template>
+            <template
+              v-if="isScrollLoading && currentTab === ContestTab.Current"
             >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{ futureContestDate(contestItem) }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
-          </template>
-          <template v-if="isScrollLoading && currentTab === ContestTab.Future">
-            <div
-              v-for="index in 3"
-              :key="`loading-more-future-${index}`"
-              class="card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
-            </div>
-          </template>
+              <div
+                v-for="index in 3"
+                :key="`loading-more-current-${index}`"
+                class="card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
 
+            <div
+              v-if="
+                !loading &&
+                !contestListEmpty &&
+                hasMore &&
+                currentTab === ContestTab.Current
+              "
+              class="text-center mb-2"
+            >
+              <button
+                class="btn btn-outline-primary w-100"
+                :disabled="isScrollLoading"
+                @click="loadMoreContests"
+              >
+                {{ showMoreContestButtonText }}
+              </button>
+            </div>
+          </div>
           <div
-            v-if="
-              !loading &&
-              !contestListEmpty &&
-              hasMore &&
-              currentTab === ContestTab.Future
-            "
-            class="text-center mb-2"
+            v-show="currentTab === ContestTab.Future"
+            ref="futureContestTab"
+            data-contest-tab="future"
+            class="scroll-content tab-pane"
+            :class="{ active: currentTab === ContestTab.Future }"
           >
-            <button
-              class="btn btn-outline-primary w-100"
-              :disabled="isScrollLoading"
-              @click="loadMoreContests"
-            >
-              {{ showMoreContestButtonText }}
-            </button>
-          </div>
-        </b-tab>
-        <b-tab
-          ref="pastContestTab"
-          class="scroll-content"
-          :title="T.contestListPast"
-          :title-link-class="titleLinkClass(ContestTab.Past)"
-          :active="currentTab === ContestTab.Past"
-          @click="currentTab = ContestTab.Past"
-        >
-          <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="`past-${index}`"
-              class="card contest-card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            <template v-if="loading || refreshing">
+              <div
+                v-for="index in 3"
+                :key="`future-${index}`"
+                class="card contest-card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+            <div v-else-if="contestListEmpty" class="empty-category">
+              {{ T.contestListEmpty }}
             </div>
-          </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
-            {{ T.contestListEmpty }}
-          </div>
-          <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
+            <template v-else>
+              <omegaup-contest-card
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                :contest="contestItem"
+              >
+                <template #contest-button-scoreboard>
+                  <div></div>
+                </template>
+                <template #text-contest-date>
+                  <div class="card-text">
+                    <font-awesome-icon icon="calendar-alt" />
+                    <a :href="getTimeLink(contestItem.start_time)">
+                      {{ futureContestDate(contestItem) }}
+                    </a>
+                  </div>
+                </template>
+                <template #contest-button-enter>
+                  <div></div>
+                </template>
+                <template #contest-dropdown>
+                  <div></div>
+                </template>
+              </omegaup-contest-card>
+            </template>
+            <template
+              v-if="isScrollLoading && currentTab === ContestTab.Future"
             >
-              <template #contest-enroll-status>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{ pastContestDate(contestItem) }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-button-see-details>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
-          </template>
-          <template v-if="isScrollLoading && currentTab === ContestTab.Past">
-            <div
-              v-for="index in 3"
-              :key="`loading-more-past-${index}`"
-              class="card mb-2"
-            >
-              <omegaup-contest-skeleton></omegaup-contest-skeleton>
-            </div>
-          </template>
+              <div
+                v-for="index in 3"
+                :key="`loading-more-future-${index}`"
+                class="card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
 
-          <div
-            v-if="
-              !loading &&
-              !contestListEmpty &&
-              hasMore &&
-              currentTab === ContestTab.Past
-            "
-            class="text-center mb-2"
-          >
-            <button
-              class="btn btn-outline-primary w-100"
-              :disabled="isScrollLoading"
-              @click="loadMoreContests"
+            <div
+              v-if="
+                !loading &&
+                !contestListEmpty &&
+                hasMore &&
+                currentTab === ContestTab.Future
+              "
+              class="text-center mb-2"
             >
-              {{ showMoreContestButtonText }}
-            </button>
+              <button
+                class="btn btn-outline-primary w-100"
+                :disabled="isScrollLoading"
+                @click="loadMoreContests"
+              >
+                {{ showMoreContestButtonText }}
+              </button>
+            </div>
           </div>
-        </b-tab>
-      </b-tabs>
-    </b-card>
-  </b-container>
+          <div
+            v-show="currentTab === ContestTab.Past"
+            ref="pastContestTab"
+            data-contest-tab="past"
+            class="scroll-content tab-pane"
+            :class="{ active: currentTab === ContestTab.Past }"
+          >
+            <template v-if="loading || refreshing">
+              <div
+                v-for="index in 3"
+                :key="`past-${index}`"
+                class="card contest-card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+            <div v-else-if="contestListEmpty" class="empty-category">
+              {{ T.contestListEmpty }}
+            </div>
+            <template v-else>
+              <omegaup-contest-card
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                :contest="contestItem"
+              >
+                <template #contest-enroll-status>
+                  <div></div>
+                </template>
+                <template #text-contest-date>
+                  <div class="card-text">
+                    <font-awesome-icon icon="calendar-alt" />
+                    <a :href="getTimeLink(contestItem.finish_time)">
+                      {{ pastContestDate(contestItem) }}
+                    </a>
+                  </div>
+                </template>
+                <template #contest-button-enter>
+                  <div></div>
+                </template>
+                <template #contest-button-see-details>
+                  <div></div>
+                </template>
+              </omegaup-contest-card>
+            </template>
+            <template v-if="isScrollLoading && currentTab === ContestTab.Past">
+              <div
+                v-for="index in 3"
+                :key="`loading-more-past-${index}`"
+                class="card mb-2"
+              >
+                <omegaup-contest-skeleton></omegaup-contest-skeleton>
+              </div>
+            </template>
+
+            <div
+              v-if="
+                !loading &&
+                !contestListEmpty &&
+                hasMore &&
+                currentTab === ContestTab.Past
+              "
+              class="text-center mb-2"
+            >
+              <button
+                class="btn btn-outline-primary w-100"
+                :disabled="isScrollLoading"
+                @click="loadMoreContests"
+              >
+                {{ showMoreContestButtonText }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -423,27 +490,12 @@ import * as time from '../../time';
 import T from '../../lang';
 import { getExternalUrl } from '../../urlHelper';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'bootstrap/dist/css/bootstrap.css';
-
-// Import Only Required Plugins
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  CardPlugin,
-  DropdownPlugin,
-  LayoutPlugin,
-  TabsPlugin,
-} from 'bootstrap-vue';
 import infiniteScroll from 'vue-infinite-scroll';
 import ContestCard from './ContestCard.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
-Vue.use(TabsPlugin);
-Vue.use(CardPlugin);
-Vue.use(DropdownPlugin);
-Vue.use(LayoutPlugin);
 library.add(fas);
 
 export enum ContestTab {

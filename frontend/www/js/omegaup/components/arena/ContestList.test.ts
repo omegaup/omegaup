@@ -322,9 +322,7 @@ describe('ContestList.vue', () => {
         tab: ContestTab.Current,
       },
     });
-    const dropdownFilterBy = wrapper.findComponent({
-      ref: 'dropdownFilterBy',
-    });
+    const dropdownFilterBy = wrapper.find('[data-dropdown-filter]');
     // Current filter "By All" is turned on by default
     expect(wrapper.vm.currentFilter).toBe(ContestFilter.All);
     await dropdownFilterBy.find('[data-filter-by-signed-up]').trigger('click');
@@ -353,9 +351,8 @@ describe('ContestList.vue', () => {
         },
       });
 
-      const dropdownOrderBy = wrapper.findComponent({
-        ref: 'dropdownOrderBy',
-      }).element as HTMLInputElement;
+      const dropdownOrderBy = wrapper.find('[data-dropdown-order]')
+        .element as HTMLInputElement;
 
       dropdownOrderBy.value = value;
       await dropdownOrderBy.dispatchEvent(new Event('change'));
@@ -419,7 +416,7 @@ describe('ContestList.vue', () => {
           },
         });
 
-        const dropdown = wrapper.findComponent({ ref: 'dropdownOrderBy' });
+        const dropdown = wrapper.find('[data-dropdown-order]');
         expect(dropdown.exists()).toBeTruthy();
         expect(wrapper.vm.currentOrder).toBe(ContestOrder.None);
 

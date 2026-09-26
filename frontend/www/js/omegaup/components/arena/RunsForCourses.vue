@@ -15,21 +15,38 @@
       <div>
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showFilters">
-          <b-pagination
-            v-if="showFilters"
-            v-model="currentPage"
-            size="sm"
-            :total-rows="totalRows"
-            :per-page="itemsPerPage"
-            :limit="1"
-            hide-goto-end-buttons
-            @page-click="onPageClick"
-          >
-            <template #page="{ page, active }">
-              <b v-if="active" data-page>{{ page }} - {{ totalPages }}</b>
-              <i v-else>{{ page }}</i>
-            </template>
-          </b-pagination>
+          <nav v-if="showFilters" data-pagination>
+            <ul class="pagination pagination-sm">
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <button
+                  class="page-link"
+                  type="button"
+                  :disabled="currentPage === 1"
+                  @click="goToAdjacentPage(currentPage - 1)"
+                >
+                  &laquo;
+                </button>
+              </li>
+              <li class="page-item active">
+                <button class="page-link" type="button">
+                  <b data-page>{{ currentPage }} - {{ totalPages }}</b>
+                </button>
+              </li>
+              <li
+                class="page-item"
+                :class="{ disabled: currentPage === totalPages }"
+              >
+                <button
+                  class="page-link"
+                  type="button"
+                  :disabled="currentPage === totalPages"
+                  @click="goToAdjacentPage(currentPage + 1)"
+                >
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
           <div class="filters row">
             <label class="col-3 col-sm pr-0 font-weight-bold">
               {{ T.wordsExecution }}
@@ -477,13 +494,52 @@
             </tr>
           </tbody>
         </table>
-        <b-pagination
-          v-if="!showFilters"
-          v-model="currentPage"
-          :total-rows="totalRows"
-          :per-page="itemsPerPage"
-          align="center"
-        ></b-pagination>
+        <nav v-if="!showFilters" data-pagination>
+          <ul class="pagination justify-content-center">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <button
+                class="page-link"
+                type="button"
+                :disabled="currentPage === 1"
+                @click="goToPage(currentPage - 1)"
+              >
+                &laquo;
+              </button>
+            </li>
+            <li
+              v-for="(p, index) in visiblePages"
+              :key="p === 'ellipsis' ? `ellipsis-${index}` : p"
+              class="page-item"
+              :class="{
+                active: p === currentPage,
+                disabled: p === 'ellipsis',
+              }"
+            >
+              <button
+                v-if="p !== 'ellipsis'"
+                class="page-link"
+                type="button"
+                @click="goToPage(p)"
+              >
+                {{ p }}
+              </button>
+              <span v-else class="page-link">…</span>
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <button
+                class="page-link"
+                type="button"
+                :disabled="currentPage === totalPages"
+                @click="goToPage(currentPage + 1)"
+              >
+                &raquo;
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
     <slot name="runs">
@@ -517,7 +573,6 @@ import { DisqualificationType } from './Runs.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
-import { PaginationPlugin } from 'bootstrap-vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -545,8 +600,6 @@ library.add(faClock);
 library.add(faCalendarAlt);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
-
-Vue.use(PaginationPlugin);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -680,16 +733,49 @@ export default class RunsForCourses extends Vue {
     return this.nextSubmissionTimestamp.getTime() <= this.now;
   }
 
-  onPageClick(bvEvent: any, page: number): void {
-    if (page == this.currentPage - 1 || page == this.currentPage + 1) {
-      if (this.currentPage + 1 == page) {
-        this.filterOffset++;
-      } else if (this.currentPage - 1 == page) {
-        this.filterOffset--;
-      }
-    } else {
-      bvEvent.preventDefault();
+  get visiblePages(): (number | 'ellipsis')[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
     }
+    const pages = new Set<number>([1, total]);
+    for (let page = current - 2; page <= current + 2; page++) {
+      if (page >= 1 && page <= total) {
+        pages.add(page);
+      }
+    }
+    const sorted = Array.from(pages).sort((a, b) => a - b);
+    const result: (number | 'ellipsis')[] = [];
+    for (let i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
+        result.push('ellipsis');
+      }
+      result.push(sorted[i]);
+    }
+    return result;
+  }
+
+  goToAdjacentPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    if (page !== this.currentPage - 1 && page !== this.currentPage + 1) {
+      return;
+    }
+    if (page === this.currentPage + 1) {
+      this.filterOffset++;
+    } else if (page === this.currentPage - 1) {
+      this.filterOffset--;
+    }
+    this.currentPage = page;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    this.currentPage = page;
   }
 
   get paginatedRuns(): types.Run[] {
