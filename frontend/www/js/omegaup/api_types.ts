@@ -4214,6 +4214,21 @@ export namespace types {
     text: string;
   }
 
+  export interface NominationContents {
+    before_ac?: boolean;
+    difficulty?: number;
+    level?: string;
+    original?: string;
+    quality?: number;
+    quality_seal?: boolean;
+    rationale?: string;
+    reason?: string;
+    source?: string;
+    statements?: { [key: string]: { markdown: string } };
+    tag?: string[];
+    tags?: { [key: string]: string };
+  }
+
   export interface NominationListItem {
     author: { name?: string; username: string };
     contents?: {
