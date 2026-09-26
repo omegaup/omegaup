@@ -44,7 +44,6 @@ describe('Requests.vue', () => {
     const wrapper = shallowMount(common_Requests, { propsData });
 
     const buttons = wrapper.findAll('button.text-danger');
-    const feedbackModals = wrapper.findAll('b-modal-stub');
 
     expect('test_user_1' in wrapper.vm.modalStates).toBe(false);
     await buttons.at(0).trigger('click');
@@ -55,10 +54,10 @@ describe('Requests.vue', () => {
     expect(wrapper.vm.modalStates['test_user_2']).toBe(true);
 
     wrapper.vm.resolutionText = 'Hello';
-    feedbackModals.at(0).vm.$emit('ok');
+    await wrapper.findAll('.modal .btn-success').at(0).trigger('click');
 
     wrapper.vm.resolutionText = 'There';
-    feedbackModals.at(1).vm.$emit('ok');
+    await wrapper.findAll('.modal .btn-success').at(0).trigger('click');
 
     expect(wrapper.emitted('deny-request')).toBeDefined();
     expect(wrapper.emitted('deny-request')).toEqual([

@@ -52,20 +52,50 @@
             >
               ×
             </button>
-            <b-modal
-              v-model="modalStates[request.username]"
-              :title="T.submitFeedbackRequireConfirmation"
-              :ok-title="T.submitFeedbackSubmit"
-              ok-variant="success"
-              :cancel-title="T.submitFeedbackCancel"
-              cancel-variant="danger"
-              @ok="onDenyRequest(request.username, resolutionText)"
-            >
-              <b-form-input
-                v-model="resolutionText"
-                :placeholder="T.submitFeedbackPlaceholder"
-              ></b-form-input>
-            </b-modal>
+            <div v-if="modalStates[request.username]">
+              <div class="modal fade show d-block" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">
+                        {{ T.submitFeedbackRequireConfirmation }}
+                      </h5>
+                      <button
+                        type="button"
+                        class="close"
+                        @click="toggleFeedbackModal(request.username)"
+                      >
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <input
+                        v-model="resolutionText"
+                        class="form-control"
+                        :placeholder="T.submitFeedbackPlaceholder"
+                      />
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        @click="toggleFeedbackModal(request.username)"
+                      >
+                        {{ T.submitFeedbackCancel }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-success"
+                        @click="onDenyRequest(request.username, resolutionText)"
+                      >
+                        {{ T.submitFeedbackSubmit }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-backdrop fade show"></div>
+            </div>
             <button
               class="close float-none text-success mx-2"
               @click="$emit('accept-request', { username: request.username })"
@@ -86,13 +116,6 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import omegaup_Username from '../user/Username.vue';
-
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-import { FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
-Vue.use(FormInputPlugin);
-Vue.use(ModalPlugin);
 
 @Component({
   components: {
