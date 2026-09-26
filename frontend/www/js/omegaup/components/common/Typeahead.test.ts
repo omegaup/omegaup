@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import common_Typeahead from './Typeahead.vue';
-import VoerroTagsInput from '@voerro/vue-tagsinput';
+import VoerroTagsInput from './VoerroTagsInput.vue';
 import Vue from 'vue';
 
 describe('Typeahead.vue', () => {
