@@ -20,6 +20,10 @@
               >
               <span class="stat-value">{{ activeDays }}</span>
             </div>
+            <div v-if="isCurrentYearSelected" class="secondary-item">
+              <span class="stat-label">{{ T.userHeatmapCurrentStreak }}:</span>
+              <span class="stat-value">{{ currentStreak }}</span>
+            </div>
             <div class="secondary-item">
               <span class="stat-label">{{ T.userHeatmapMaxStreak }}:</span>
               <span class="stat-value">{{ maxStreak }}</span>
@@ -75,6 +79,7 @@ export default class UserHeatmap extends Vue {
   totalSubmissions = 0;
   activeDays = 0;
   maxStreak = 0;
+  currentStreak = 0;
   hasRendered: boolean = false;
   T = T;
   ui = ui;
@@ -162,6 +167,9 @@ export default class UserHeatmap extends Vue {
     if (stats?.length) {
       for (const run of stats) {
         if (!run.date) continue;
+
+        // Only count accepted submissions as activity
+        if (run.verdict !== 'AC') continue;
 
         // Only include data for the selected year
         if (run.date.startsWith(this.selectedYear.toString())) {
@@ -272,6 +280,35 @@ export default class UserHeatmap extends Vue {
     this.totalSubmissions = totalSubmissionsCount;
     this.activeDays = activeDays;
     this.maxStreak = bestStreak;
+    this.currentStreak = this.computeCurrentStreak(dateMap, start, lastDay);
+  }
+
+  get isCurrentYearSelected(): boolean {
+    return this.selectedYear === new Date().getFullYear();
+  }
+
+  computeCurrentStreak(
+    dateMap: Map<string, number>,
+    start: Date,
+    lastDay: Date,
+  ): number {
+    const cursor = new Date(lastDay.getTime());
+
+    // A missing submission today should not break the streak yet: fall back
+    // to the streak ending yesterday.
+    if (!(dateMap.get(this.formatDateToString(cursor)) || 0)) {
+      cursor.setDate(cursor.getDate() - 1);
+    }
+
+    let streak = 0;
+    while (
+      cursor >= start &&
+      (dateMap.get(this.formatDateToString(cursor)) || 0) > 0
+    ) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
   }
 
   beforeDestroy(): void {
