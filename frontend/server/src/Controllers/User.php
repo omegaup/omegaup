@@ -7,6 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
+ * @psalm-type TagDistribution=array{name: string, count: int}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
@@ -2381,9 +2382,15 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get profile statistics including solved problems by difficulty and tags distribution.
      *
+     * `tags` is the capped distribution: at most 10 entries, with every
+     * remaining tag aggregated into a single 'Others' entry. `tagsFull` is
+     * the complete distribution with no cap and no aggregation, so `tags` is
+     * not simply a subset of `tagsFull`: the tail entries are merged into
+     * the 'Others' entry instead of appearing on their own.
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<TagDistribution>, tagsFull: list<TagDistribution>}
      *
      * @omegaup-request-param null|string $username
      */
@@ -2412,8 +2419,11 @@ class User extends \OmegaUp\Controllers\Controller {
         $attemptingCount = \OmegaUp\DAO\Problems::getAttemptingCount(
             $identity->identity_id
         );
-        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
+        $tagsFullDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
             $identity->identity_id
+        );
+        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::capTagsDistribution(
+            $tagsFullDistribution
         );
 
         return [
@@ -2426,6 +2436,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'unlabelled' => $difficultyStats['unlabelled'],
             ],
             'tags' => $tagsDistribution,
+            'tagsFull' => $tagsFullDistribution,
         ];
     }
 
