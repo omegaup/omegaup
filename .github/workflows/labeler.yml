@@ -103,7 +103,7 @@ jobs:
           github_api_url: "https://api.github.com"
           files_to_ignore: |
             composer.lock
-            yarn.lock
+            pnpm-lock.yaml
             *.lock
             frontend/www/js/dist/*
             frontend/www/css/dist/*
