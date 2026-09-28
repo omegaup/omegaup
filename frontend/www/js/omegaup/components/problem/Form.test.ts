@@ -93,6 +93,11 @@ describe('Settings.vue', () => {
     });
 
     expect(wrapper.find('.introjs-creation-method').exists()).toBe(true);
+    expect((wrapper.vm as any).currentCreationMethod).toBe(CreationMethods.Zip);
+    expect(wrapper.find('.introjs-creation-method .introjs-file').exists()).toBe(
+      true,
+    );
+    expect(wrapper.find('.introjs-open-creator button').exists()).toBe(false);
   });
 
   it('Should hide creation method selector on update mode', () => {

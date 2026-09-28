@@ -597,7 +597,7 @@ export default class ProblemForm extends Vue {
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
   @Prop({ default: true }) hasVisitedSection!: boolean;
-  @Prop({ default: CreationMethods.Creator }) creationMethod!: CreationMethods;
+  @Prop({ default: CreationMethods.Zip }) creationMethod!: CreationMethods;
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
