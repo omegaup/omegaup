@@ -209,17 +209,23 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run JavaScript tests
-        run: yarn test:coverage
+        run: pnpm test:coverage
 
       - name: Upload code coverage
         run: |
@@ -251,14 +257,20 @@ jobs:
           define('OMEGAUP_LOG_FILE', 'php://stderr');
           EOF
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -349,17 +361,23 @@ jobs:
         with:
           install_host_python_deps: true
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build webpack resources
-        run: yarn build
+        run: pnpm build
 
       - name: Wait for dependencies
         run: |
