@@ -140,10 +140,6 @@ export const Admin = {
     messages.AdminGetSystemSettingsRequest,
     messages.AdminGetSystemSettingsResponse
   >('/api/admin/getSystemSettings/'),
-  operationsSummary: apiCall<
-    messages.AdminOperationsSummaryRequest,
-    messages.AdminOperationsSummaryResponse
-  >('/api/admin/operationsSummary/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse

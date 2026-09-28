@@ -104,7 +104,7 @@ export default class AdminLayout extends Vue {
       },
       {
         href: '/admin/settings/',
-        label: T.omegaupTitleAdminSettings,
+        label: T.omegaupTitleAdminGlobalSettings,
         icon: 'BIconGearFill',
       },
     ];

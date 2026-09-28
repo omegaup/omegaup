@@ -476,6 +476,31 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures that the current identity has administrative access, either
+     * because it is a system admin, or because it is a member of the
+     * support team.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->user_id
+     * @psalm-assert !null $this->identity->username
+     * @psalm-assert !null $this->user
+     * @psalm-assert !null $this->user->main_identity_id
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->username
+     */
+    public function ensureUserHasAdministrativeAccess(): void {
+        $this->ensureMainUserIdentity();
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin($this->identity)
+            && !\OmegaUp\Authorization::isSupportTeamMember($this->identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+    }
+
+    /**
      * Ensures that an identity is logged in is Over 13 years of age.
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException

@@ -401,13 +401,32 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
      */
-    public static function getSettingsForTypeScript(
+    public static function getGlobalSettingsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+
+        return [
+        'entrypoint' => 'admin_global_settings',
+        'templateProperties' => [
+            'title' => new \OmegaUp\TranslationString(
+                'omegaupTitleAdminGlobalSettings'
+            ),
+            'payload' => [],
+        ],
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     */
+    public static function getOperationsDashboardForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureUserHasAdministrativeAccess();
 
         return [
             'entrypoint' => 'admin_operations_dashboard',
@@ -418,53 +437,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 'payload' => [],
                 'fullWidth' => true,
             ],
-        ];
-    }
-
-    /**
-     *
-     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
-     */
-    public static function getOperationsForTypeScript(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureMainUserIdentity();
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
-            && !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        return [
-            'entrypoint' => 'admin_operations_dashboard',
-            'templateProperties' => [
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleAdminOperations'
-                ),
-                'payload' => [],
-            ],
-        ];
-    }
-
-    /**
-     *
-     * @return array{modules: list<string>, generatedAt: int}
-     */
-    public static function apiOperationsSummary(\OmegaUp\Request $r): array {
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-
-        $r->ensureMainUserIdentity();
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
-            && !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        return [
-            'modules' => [],
-            'generatedAt' => \OmegaUp\Time::get(),
         ];
     }
 
