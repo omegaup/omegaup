@@ -5,7 +5,7 @@ CREATE TABLE `Users_Followers` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`users_follower_id`),
   UNIQUE KEY `unique_follow_relationship` (`follower_user_id`, `followed_user_id`),
-  KEY `idx_followed_user_id` (`followed_user_id`),
+  KEY `idx_users_followers_followed_user_id` (`followed_user_id`),
   CONSTRAINT `fk_uf_follower_user_id` FOREIGN KEY (`follower_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_uf_followed_user_id` FOREIGN KEY (`followed_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `chk_uf_no_self_follow` CHECK (`follower_user_id` <> `followed_user_id`)
