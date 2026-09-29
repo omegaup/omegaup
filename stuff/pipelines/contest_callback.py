@@ -54,6 +54,7 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
+        # getattr(self.dbconn, "ping")(reconnect=True, attempts=3, delay=5)
         response = json.loads(body)
 
         try:
