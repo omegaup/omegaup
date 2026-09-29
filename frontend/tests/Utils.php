@@ -474,7 +474,7 @@ class Utils {
             type: 'direct',
             passive: false,
             durable: true,
-            auto_delete: false
+            auto_delete: false // posible problema con el cache de los trabajos
         );
 
         $channel->queue_bind(
@@ -509,6 +509,12 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+            ' --rabbitmq-username ' . escapeshellarg(
+                OMEGAUP_RABBITMQ_USERNAME
+            ) .
+            ' --rabbitmq-password ' . escapeshellarg(
+                OMEGAUP_RABBITMQ_PASSWORD
+            ) .
              ' --test')
         );
     }
