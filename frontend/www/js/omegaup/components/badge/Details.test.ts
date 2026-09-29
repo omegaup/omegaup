@@ -2,13 +2,20 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 import * as time from '../../time';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
+
 import badge_Details from './Details.vue';
+
+// defineComponent() is typed for Vue 2.7/3 interop; @vue/test-utils@1 expects
+// ComponentOptions<Vue>. Runtime is correct, assertion removed with test-utils@2.
+const Details = (badge_Details as unknown) as ComponentOptions<Vue>;
 
 describe('Details.vue', () => {
   const badgeAlias = 'contestManager';
 
   it('Should display the badge icon and the owners count', () => {
-    const wrapper = shallowMount(badge_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: {
         badge: {
           badge_alias: badgeAlias,
@@ -27,7 +34,7 @@ describe('Details.vue', () => {
   it('Should display the assignation dates when the badge is owned', () => {
     const firstAssignation = new Date(2020, 0, 15);
     const assignationTime = new Date(2021, 5, 20);
-    const wrapper = shallowMount(badge_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: {
         badge: {
           badge_alias: badgeAlias,
@@ -47,7 +54,7 @@ describe('Details.vue', () => {
   });
 
   it('Should display the not assigned message when the badge is not owned', () => {
-    const wrapper = shallowMount(badge_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: {
         badge: {
           badge_alias: badgeAlias,
@@ -64,7 +71,7 @@ describe('Details.vue', () => {
   });
 
   it('Should gray out the icon when the badge is not owned', () => {
-    const wrapper = shallowMount(badge_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: {
         badge: {
           badge_alias: badgeAlias,
