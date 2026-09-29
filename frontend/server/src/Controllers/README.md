@@ -3538,6 +3538,7 @@ List of public and user's private problems
 | `query`                 | `null\|string`                                                                                                                     |             |          |
 | `require_all_tags`      | `bool\|null`                                                                                                                       |             |          |
 | `rowcount`              | `int\|null`                                                                                                                        |             |          |
+| `solved_status`         | `'all'\|'attempted'\|'solved'\|'unsolved'\|null`                                                                                   |             |          |
 | `some_tags`             | `bool\|null`                                                                                                                       |             |          |
 | `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |          |
 
