@@ -1566,27 +1566,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $decodedAliases = json_decode($problems, true);
-        if (!is_array($decodedAliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'problems'
-            );
-        }
-        foreach ($decodedAliases as $alias) {
-            if (!is_string($alias)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'problems'
-                );
-            }
-            \OmegaUp\Validators::validateAlias($alias, 'problems');
-        }
+        /** @var list<string> */
+        $aliases = json_decode($problems, true);
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $order = 1;
-            foreach ($decodedAliases as $alias) {
+            foreach ($aliases as $alias) {
                 $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                     $alias
                 );
@@ -1647,27 +1633,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $decodedAliases = json_decode($assignments, true);
-        if (!is_array($decodedAliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'assignments'
-            );
-        }
-        foreach ($decodedAliases as $assignment) {
-            if (!is_string($assignment)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'assignments'
-                );
-            }
-            \OmegaUp\Validators::validateAlias($assignment, 'assignments');
-        }
+        /** @var list<string> */
+        $aliases = json_decode($assignments, true);
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $order = 1;
-            foreach ($decodedAliases as $alias) {
+            foreach ($aliases as $alias) {
                 $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                     $alias,
                     $course->course_id
