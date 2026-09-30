@@ -60,7 +60,7 @@ services:
     image: omegaup/dev-php:20231008
     user: "${UID_GID}"
     restart: always
-    entrypoint: ["wait-for-it", "rabbitmq:5672", "--", "php", "/opt/omegaup/stuff/rabbitmq/consumer.php"]
+    entrypoint: ["wait-for-it", "rabbitmq:5672", "--", "python3", "/opt/omegaup/stuff/pipelines/client_contest.py"]
     volumes:
       - type: bind
         source: .
