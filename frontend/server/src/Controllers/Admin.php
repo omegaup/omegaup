@@ -399,7 +399,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
      */
     public static function getGlobalSettingsForTypeScript(
         \OmegaUp\Request $r
