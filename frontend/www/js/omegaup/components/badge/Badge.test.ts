@@ -4,7 +4,7 @@ import type { ComponentOptions } from 'vue';
 
 import badge_Badge from './Badge.vue';
 
-const Badge = (badge_Badge as unknown) as ComponentOptions<Vue>;
+const Badge = badge_Badge as ComponentOptions<Vue>;
 
 describe('Badge.vue', () => {
   it('Should display badge name', () => {

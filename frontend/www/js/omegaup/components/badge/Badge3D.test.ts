@@ -4,7 +4,7 @@ import type { ComponentOptions } from 'vue';
 
 import badge_Badge3D from './Badge3D.vue';
 
-const Badge3D = (badge_Badge3D as unknown) as ComponentOptions<Vue>;
+const Badge3D = badge_Badge3D as ComponentOptions<Vue>;
 
 describe('Badge3D.vue', () => {
   it('Should render the slot content', () => {

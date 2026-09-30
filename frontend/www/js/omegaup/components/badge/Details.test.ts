@@ -7,7 +7,7 @@ import * as time from '../../time';
 
 import badge_Details from './Details.vue';
 
-const Details = (badge_Details as unknown) as ComponentOptions<Vue>;
+const Details = badge_Details as ComponentOptions<Vue>;
 
 describe('Details.vue', () => {
   const badgeAlias = 'contestManager';

@@ -5,8 +5,7 @@ const meta: Meta<typeof badge_Details> = {
   component: badge_Details,
   title: 'Components/Badge/Details',
   argTypes: {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore Story controls flatten nested badge fields that aren't component props
+    // Story controls flatten nested badge fields for the controls panel.
     badge_alias: {
       control: 'text',
     },

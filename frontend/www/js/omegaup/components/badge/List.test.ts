@@ -5,7 +5,7 @@ import type { ComponentOptions } from 'vue';
 import T from '../../lang';
 import badge_List from './List.vue';
 
-const List = (badge_List as unknown) as ComponentOptions<Vue>;
+const List = badge_List as ComponentOptions<Vue>;
 
 describe('List.vue', () => {
   it('Should display badges link', () => {
