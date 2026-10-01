@@ -12,6 +12,7 @@ describe('Test IDE', () => {
   before(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
+    cy.clearAllSessionStorage();
     cy.visit('/');
 
     loginOptions = loginPage.registerMultipleUsers(1);
@@ -26,6 +27,7 @@ describe('Test IDE', () => {
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
+    cy.clearAllSessionStorage();
     cy.visit('/');
   });
 
