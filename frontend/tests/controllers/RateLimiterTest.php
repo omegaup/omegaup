@@ -288,6 +288,52 @@ class RateLimiterTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test that updating a user's profile with a new school name does not
+     * consume the School::apiCreate rate limit, and that each school is
+     * actually created (see #10077).
+     */
+    public function testSchoolCreateViaProfileUpdateNotRateLimited(): void {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // More profile updates than the School::apiCreate limit allows.
+        // None of them should count against that limit.
+        for ($i = 0; $i < 6; $i++) {
+            \OmegaUp\Controllers\User::apiUpdate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'school_name' => "Profile School RL {$i}",
+                ])
+            );
+            $this->assertNotEmpty(
+                \OmegaUp\DAO\Schools::findByName("Profile School RL {$i}")
+            );
+        }
+
+        // Direct school creation still counts against its own limit.
+        for ($i = 0; $i < 5; $i++) {
+            \OmegaUp\Controllers\School::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => "Direct School RL {$i}",
+                ])
+            );
+        }
+
+        try {
+            \OmegaUp\Controllers\School::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'Direct School RL Excess',
+                ])
+            );
+            $this->fail('Expected RateLimitExceededException');
+        } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
+            $this->assertSame(429, $e->getCode());
+        }
+    }
+
+    /**
      * Test that Problem::apiCreate is rate limited to 20 per hour.
      */
     public function testProblemCreateRateLimit(): void {

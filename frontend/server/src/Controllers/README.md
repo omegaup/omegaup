@@ -3538,6 +3538,7 @@ List of public and user's private problems
 | `query`                 | `null\|string`                                                                                                                     |             |          |
 | `require_all_tags`      | `bool\|null`                                                                                                                       |             |          |
 | `rowcount`              | `int\|null`                                                                                                                        |             |          |
+| `solved_status`         | `'all'\|'attempted'\|'solved'\|'unsolved'\|null`                                                                                   |             |          |
 | `some_tags`             | `bool\|null`                                                                                                                       |             |          |
 | `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |          |
 
@@ -5822,7 +5823,6 @@ Update user profile
 | `graduation_date`           | `string`                                     |             | ✓        |
 | `locale`                    | `string`                                     |             | ✓        |
 | `state_id`                  | `string`                                     |             | ✓        |
-| `auth_token`                | `mixed`                                      |             |          |
 | `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |          |
 | `has_competitive_objective` | `bool\|null`                                 |             |          |
 | `has_learning_objective`    | `bool\|null`                                 |             |          |

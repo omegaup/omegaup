@@ -1,4 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -6,14 +8,14 @@ import * as ui from '../../ui';
 
 import certificate_Mine from './Mine.vue';
 
-interface Mine {
-  options: {
-    methods: {
-      getVerificationLink: (verificationCode: string) => string;
-      getDownloadLink: (verificationCode: string) => string;
-    };
+// defineComponent() is typed for Vue 2.7/3 interop; @vue/test-utils@1 expects
+// ComponentOptions<Vue>. Runtime is correct — assertion removed with test-utils@2.
+const Mine = (certificate_Mine as unknown) as ComponentOptions<Vue> & {
+  methods: {
+    getVerificationLink: (verificationCode: string) => string;
+    getDownloadLink: (verificationCode: string) => string;
   };
-}
+};
 
 describe('Mine.vue', () => {
   const propsData = {
@@ -47,9 +49,10 @@ describe('Mine.vue', () => {
   };
 
   it('Should handle an empty table', () => {
-    const wrapper = shallowMount(certificate_Mine, {
+    const wrapper = shallowMount(Mine, {
       propsData: {
         certificates: [] as types.CertificateListItem[],
+        location: 'https://omegaup.com/',
       },
     });
 
@@ -59,7 +62,7 @@ describe('Mine.vue', () => {
   });
 
   it('Should handle a table with data', () => {
-    const wrapper = mount(certificate_Mine, {
+    const wrapper = mount(Mine, {
       propsData,
     });
 
@@ -84,12 +87,9 @@ describe('Mine.vue', () => {
   });
 
   it('Should copy the verification code', () => {
-    const defineSpy = jest.spyOn(
-      ((certificate_Mine as unknown) as Mine).options.methods,
-      'getVerificationLink',
-    );
+    const defineSpy = jest.spyOn(Mine.methods, 'getVerificationLink');
 
-    shallowMount(certificate_Mine, {
+    shallowMount(Mine, {
       propsData,
     });
 
@@ -104,12 +104,9 @@ describe('Mine.vue', () => {
   });
 
   it('Should download a file', async () => {
-    const clickSpy = jest.spyOn(
-      ((certificate_Mine as unknown) as Mine).options.methods,
-      'getDownloadLink',
-    );
+    const clickSpy = jest.spyOn(Mine.methods, 'getDownloadLink');
 
-    const wrapper = mount(certificate_Mine, {
+    const wrapper = mount(Mine, {
       propsData,
     });
 
