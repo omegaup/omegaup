@@ -27,11 +27,13 @@ export function escapeCsv(cell: TableCell): string {
   if (
     cell.indexOf(',') === -1 &&
     cell.indexOf('"') === -1 &&
-    cell.indexOf("'") === -1
+    cell.indexOf("'") === -1 &&
+    cell.indexOf('\n') === -1 &&
+    cell.indexOf('\r') === -1
   ) {
     return cell;
   }
-  return '"' + cell.replace('"', '""') + '"';
+  return '"' + cell.replace(/"/g, '""') + '"';
 }
 
 export function toCsv(table: TableCell[][] | null): string {
