@@ -372,7 +372,7 @@ def test_save_to_csv_returns_none_when_open_fails(
 
 class _FakeConnection:
     def close(self) -> None:
-        pass
+        '''No-op close for the fake connection used in _main tests.'''
 
 
 def test_main_exits_nonzero_when_csv_save_fails(
@@ -407,7 +407,8 @@ def test_main_exits_nonzero_when_csv_save_fails(
         with pytest.raises(SystemExit) as excinfo:
             _main()
 
-    assert excinfo.value.code == 1
+    exit_exception: SystemExit = excinfo.value
+    assert exit_exception.code == 1
     assert 'failed to save CSV' in caplog.text
 
 
@@ -441,4 +442,5 @@ def test_main_exits_zero_when_csv_save_succeeds(
     with pytest.raises(SystemExit) as excinfo:
         _main()
 
-    assert excinfo.value.code == 0
+    exit_exception: SystemExit = excinfo.value
+    assert exit_exception.code == 0
