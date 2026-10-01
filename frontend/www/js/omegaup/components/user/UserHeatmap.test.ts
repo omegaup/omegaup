@@ -372,6 +372,70 @@ describe('UserHeatmap.vue', () => {
     expect(vm.currentStreak).toBe(2); // streak ending yesterday still counts
   });
 
+  it('should preserve the current streak across year boundaries', () => {
+    const wrapper = shallowMount(UserHeatmap, {
+      propsData: defaultProps,
+    });
+
+    const vm = wrapper.vm as any;
+
+    const dateMap = new Map<string, number>([
+      ['2023-12-30', 1],
+      ['2023-12-31', 2],
+      ['2024-01-01', 3],
+    ]);
+
+    const start = new Date(2024, 0, 1);
+    const now = new Date(2024, 0, 1);
+
+    vm.selectedYear = 2024;
+    vm.setActivityStats(dateMap, start, now);
+
+    expect(vm.currentStreak).toBe(3); // Dec 30, Dec 31 and Jan 1
+    // Per-year stats stay scoped to the selected year.
+    expect(vm.totalSubmissions).toBe(3);
+    expect(vm.activeDays).toBe(1);
+    expect(vm.maxStreak).toBe(1);
+  });
+
+  it('should include previous-year data in the map used for the streak', () => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(new Date(2024, 0, 1));
+
+    try {
+      const wrapper = shallowMount(UserHeatmap, {
+        propsData: {
+          ...defaultProps,
+          availableYears: [2024, 2023],
+          data: [
+            { date: '2023-12-30', runs: 1, verdict: 'AC' },
+            { date: '2023-12-31', runs: 2, verdict: 'AC' },
+            { date: '2024-01-01', runs: 3, verdict: 'AC' },
+          ],
+        },
+      });
+
+      const vm = wrapper.vm as any;
+      vm.selectedYear = 2024;
+      vm.hasRendered = false;
+
+      Object.defineProperty(vm, 'heatmapContainer', {
+        get: () => document.createElement('div'),
+        configurable: true,
+      });
+
+      vm.renderHeatmap();
+
+      expect(vm.currentStreak).toBe(3); // Dec 30, Dec 31 and Jan 1
+      // Per-year stats stay scoped to the selected year.
+      expect(vm.totalSubmissions).toBe(3);
+      expect(vm.activeDays).toBe(1);
+      expect(vm.maxStreak).toBe(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('should report a zero current streak after a gap', () => {
     const wrapper = shallowMount(UserHeatmap, {
       propsData: defaultProps,

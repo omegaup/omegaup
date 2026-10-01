@@ -161,7 +161,9 @@ export default class UserHeatmap extends Vue {
     const startDate = new Date(this.selectedYear, 0, 1);
     const firstDayOffset = startDate.getDay();
 
-    // Create a map for faster lookups, using the same format as bar chart
+    // Create a map for faster lookups, using the same format as bar chart.
+    // The map keeps every year so the current streak can cross year
+    // boundaries; per-year stats and cells only look up selected-year dates.
     const dateMap = new Map<string, number>();
 
     if (stats?.length) {
@@ -171,12 +173,9 @@ export default class UserHeatmap extends Vue {
         // Only count accepted submissions as activity
         if (run.verdict !== 'AC') continue;
 
-        // Only include data for the selected year
-        if (run.date.startsWith(this.selectedYear.toString())) {
-          // Sum runs by date
-          const currentCount = dateMap.get(run.date) || 0;
-          dateMap.set(run.date, currentCount + run.runs);
-        }
+        // Sum runs by date
+        const currentCount = dateMap.get(run.date) || 0;
+        dateMap.set(run.date, currentCount + run.runs);
       }
     }
 
@@ -280,18 +279,14 @@ export default class UserHeatmap extends Vue {
     this.totalSubmissions = totalSubmissionsCount;
     this.activeDays = activeDays;
     this.maxStreak = bestStreak;
-    this.currentStreak = this.computeCurrentStreak(dateMap, start, lastDay);
+    this.currentStreak = this.computeCurrentStreak(dateMap, lastDay);
   }
 
   get isCurrentYearSelected(): boolean {
     return this.selectedYear === new Date().getFullYear();
   }
 
-  computeCurrentStreak(
-    dateMap: Map<string, number>,
-    start: Date,
-    lastDay: Date,
-  ): number {
+  computeCurrentStreak(dateMap: Map<string, number>, lastDay: Date): number {
     const cursor = new Date(lastDay.getTime());
 
     // A missing submission today should not break the streak yet: fall back
@@ -300,11 +295,10 @@ export default class UserHeatmap extends Vue {
       cursor.setDate(cursor.getDate() - 1);
     }
 
+    // Walk backwards without a lower bound so the streak survives year
+    // boundaries (e.g. Dec 31 -> Jan 1).
     let streak = 0;
-    while (
-      cursor >= start &&
-      (dateMap.get(this.formatDateToString(cursor)) || 0) > 0
-    ) {
+    while ((dateMap.get(this.formatDateToString(cursor)) || 0) > 0) {
       streak += 1;
       cursor.setDate(cursor.getDate() - 1);
     }
