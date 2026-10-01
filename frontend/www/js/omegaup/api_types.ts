@@ -3005,6 +3005,8 @@ export namespace types {
 
   export interface BookmarkProblem {
     alias: string;
+    attempted: boolean;
+    solved: boolean;
     title: string;
   }
 
