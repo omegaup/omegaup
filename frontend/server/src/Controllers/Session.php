@@ -459,13 +459,14 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::invalidateLocalCache();
 
-        //erase expired tokens
+        //erase expired tokens (only old ones to reduce lock contention)
+        // During massive login events, this cleanup is lightweight and won't block
         try {
             \OmegaUp\DAO\AuthTokens::expireAuthTokens(
                 intval($identity->identity_id)
             );
         } catch (\Exception $e) {
-            // Best effort
+            // Best effort - don't fail login if cleanup fails
             self::$log->error(
                 'Failed to delete expired tokens',
                 ['exception' => $e],
@@ -481,7 +482,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         );
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
-        \OmegaUp\DAO\AuthTokens::replace(new \OmegaUp\DAO\VO\AuthTokens([
+        // Use create() instead of replace() since tokens are always unique
+        // This avoids the implicit DELETE in REPLACE, reducing lock contention
+        \OmegaUp\DAO\AuthTokens::create(new \OmegaUp\DAO\VO\AuthTokens([
             'user_id' => $identity->user_id,
             'identity_id' => $identity->identity_id,
             'token' => $token,
