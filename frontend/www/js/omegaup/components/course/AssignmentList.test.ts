@@ -16,7 +16,9 @@ describe('AssignmentList.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.courseContentEmpty);
+    expect(wrapper.text()).toContain(T.courseContentEmptyTitle);
+    expect(wrapper.text()).toContain(T.courseContentEmptyDescription);
+    expect(wrapper.text()).toContain(T.courseAddContent);
   });
 
   const localVue = createLocalVue();
