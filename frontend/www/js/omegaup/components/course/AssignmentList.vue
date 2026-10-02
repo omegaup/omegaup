@@ -4,8 +4,18 @@
     <div class="card-body">
       <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
-          {{ T.courseContentEmpty }}
+          <h4 class="mb-2">{{ T.courseContentEmpty }}</h4>
+          <br />
+          <p class="text-muted mb-4">{{ T.courseGetStarted }}
+          </p>
+          <br>
+          <font-awesome-icon
+            icon="book-open"
+            size="3x"
+            class="mb-3 text-muted"
+          />
         </div>
+        
       </div>
       <table v-else class="table table-striped">
         <thead>
@@ -99,7 +109,7 @@
       <form class="new">
         <div class="row">
           <div class="form-group col-md-12 mb-0">
-            <div class="text-right">
+            <div class="text-center">
               <button
                 data-course-add-new-content
                 class="btn btn-primary"
