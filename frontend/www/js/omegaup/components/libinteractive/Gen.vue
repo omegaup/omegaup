@@ -1,6 +1,6 @@
 <template>
-  <b-card>
-    <b-card-body>
+  <div class="card">
+    <div class="card-body">
       <form
         action="/libinteractive/gen/"
         method="post"
@@ -57,36 +57,34 @@
           ></textarea>
         </div>
         <div class="form-group text-right">
-          <b-button variant="primary" type="submit">
-            <b-icon-cloud-download aria-hidden="true"></b-icon-cloud-download>
+          <button type="submit" class="btn btn-primary">
+            <font-awesome-icon
+              icon="cloud-download-alt"
+              aria-hidden="true"
+            ></font-awesome-icon>
             {{ T.wordsDownload }}
-          </b-button>
+          </button>
         </div>
       </form>
-    </b-card-body>
-    <b-card-body v-if="errorDescription" class="panel-footer">
+    </div>
+    <div v-if="errorDescription" class="card-body panel-footer">
       <pre><code class="w-100">{{ errorDescription }}</code></pre>
-    </b-card-body>
-  </b-card>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-// Import Only Required Plugins
-import { ButtonPlugin, CardPlugin, BIconCloudDownload } from 'bootstrap-vue';
 import { types } from '../../api_types';
-Vue.use(ButtonPlugin);
-Vue.use(CardPlugin);
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCloudDownloadAlt } from '@fortawesome/free-solid-svg-icons';
+library.add(faCloudDownloadAlt);
 
 @Component({
   components: {
-    BIconCloudDownload,
+    FontAwesomeIcon,
   },
 })
 export default class LibinteractiveGen extends Vue {

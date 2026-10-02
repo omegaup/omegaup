@@ -84,7 +84,7 @@ export class GroupPage {
     cy.get('[href="#upload"]').click();
     cy.get('[name="identities"]').attachFile('team_groups.csv');
 
-    cy.get('td[aria-colindex="2"]').then((rawHTMLElements) => {
+    cy.get('[data-upload-team-name]').then((rawHTMLElements) => {
       const teamNames: Array<string> = [];
       Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
         cy.task('log', element.innerText);
