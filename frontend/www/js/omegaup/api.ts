@@ -1547,6 +1547,10 @@ export const Problem = {
     messages.ProblemRandomLanguageProblemRequest,
     messages.ProblemRandomLanguageProblemResponse
   >('/api/problem/randomLanguageProblem/'),
+  recommendations: apiCall<
+    messages.ProblemRecommendationsRequest,
+    messages.ProblemRecommendationsResponse
+  >('/api/problem/recommendations/'),
   rejudge: apiCall<
     messages.ProblemRejudgeRequest,
     messages.ProblemRejudgeResponse

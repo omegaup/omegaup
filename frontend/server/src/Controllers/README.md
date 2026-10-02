@@ -177,6 +177,7 @@
   - [`/api/problem/myList/`](#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
+  - [`/api/problem/recommendations/`](#apiproblemrecommendations)
   - [`/api/problem/rejudge/`](#apiproblemrejudge)
   - [`/api/problem/removeAdmin/`](#apiproblemremoveadmin)
   - [`/api/problem/removeGroupAdmin/`](#apiproblemremovegroupadmin)
@@ -3610,6 +3611,20 @@ Gets a list of problems where current user is the owner
 | Name    | Type     |
 | ------- | -------- |
 | `alias` | `string` |
+
+## `/api/problem/recommendations/`
+
+### Description
+
+Returns a short personalized list of recommended problems for the
+logged in user, derived from their recently solved problems. The
+list is empty when no recommendation model has been published yet.
+
+### Returns
+
+| Name       | Type                             |
+| ---------- | -------------------------------- |
+| `problems` | `List[types.RecommendedProblem]` |
 
 ## `/api/problem/rejudge/`
 
