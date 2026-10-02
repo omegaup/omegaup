@@ -127,7 +127,7 @@
   },
   "rs": {
     "extension": "rs",
-    "name": "Rust (1.56.1)",
+    "name": "Rust (1.98.1)",
     "modelMapping": "rust",
     "language": "rs"
   },
