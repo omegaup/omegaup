@@ -799,6 +799,7 @@ const translations: { [key: string]: string; } = {
   createZipFileForProblem: "Use the Problem Creator tool",
   createZipFileForProblemDesc: "Build a problem zip step by step",
   cronControlPlaneDuration: "Duration",
+  cronControlPlaneJobDisabled: "This job is disabled. Enable it before requesting a rerun.",
   cronControlPlaneJobsHeading: "Jobs",
   cronControlPlaneLastRun: "Last run",
   cronControlPlaneLastStatus: "Last status",
