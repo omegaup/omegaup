@@ -152,6 +152,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
+import * as problemHealth from '../../admin/problem_health';
 
 const CRON_FIELD_COUNT = 5;
 
@@ -284,29 +285,15 @@ export default class Crons extends Vue {
   }
 
   checkTypeLabel(checkType: string): string {
-    const labels: Record<string, string> = {
-      judge_errors: T.problemHealthCheckJudgeErrors,
-      no_languages: T.problemHealthCheckNoLanguages,
-      never_solved: T.problemHealthCheckNeverSolved,
-      deprecated_public: T.problemHealthCheckDeprecatedPublic,
-    };
-    return labels[checkType] || checkType;
+    return problemHealth.checkTypeLabel(checkType);
   }
 
   severityLabel(severity: string): string {
-    const labels: Record<string, string> = {
-      error: T.problemHealthSeverityError,
-      warning: T.problemHealthSeverityWarning,
-    };
-    return labels[severity] || severity;
+    return problemHealth.severityLabel(severity);
   }
 
   severityClass(severity: string): string {
-    const classes: Record<string, string> = {
-      error: 'badge badge-danger',
-      warning: 'badge badge-warning',
-    };
-    return classes[severity] || 'badge badge-light';
+    return problemHealth.severityClass(severity);
   }
 
   // runs arrive newest first.
