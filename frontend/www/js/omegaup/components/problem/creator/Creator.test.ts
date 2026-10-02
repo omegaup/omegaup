@@ -4,11 +4,7 @@ import Creator from './Creator.vue';
 import Header from './Header.vue';
 import Tabs from './Tabs.vue';
 
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
-
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('Creator.vue', () => {
   it('Should contain Header and Tabs Components', async () => {
