@@ -7,6 +7,7 @@ import sys
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
 import contest_callback
+import database
 import pika
 import producer_contest
 import pytest
@@ -140,7 +141,7 @@ def test_client_contest() -> None:
             dbconn.conn.commit()
 
 
-@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
+# @pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -171,6 +172,31 @@ def test_client_contest_with_mocked_codes(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
         )
+        mocker.patch(
+            'producer_contest.get_contests_from_db',
+            return_value=[
+                database.contest.ContestCertificate(
+                    certificate_cutoff=1,
+                    alias='contest1',
+                    scoreboard_url='abcdef',
+                    contest_id=1,
+                    ranking=[
+                        database.contest.Ranking(
+                            username='user_1',
+                            place='1')._asdict(),
+                        database.contest.Ranking(
+                            username='user_2',
+                            place='2')._asdict(),
+                        database.contest.Ranking(
+                            username='user_3',
+                            place='3')._asdict(),
+                        database.contest.Ranking(
+                            username='user_4',
+                            place='4')._asdict(),
+                    ],
+                ),
+            ],
+        )
         producer_contest.send_contest_message_to_client(
             cur=cur,
             channel=channel,
@@ -190,11 +216,12 @@ def test_client_contest_with_mocked_codes(
             exchange='certificates',
             queue='contest',
             routing_key='ContestQueue',
-            callback=callback)
+            callback=callback,
+            stop_after_message=True)
         assert spy.call_count == 4
 
 
-@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
+# @pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_duplicated_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -248,7 +275,7 @@ def test_client_contest_with_duplicated_codes(
             exchange='certificates',
             queue='contest',
             routing_key='ContestQueue',
-            callback=callback
-        )
+            callback=callback,
+            stop_after_message=True)
 
         assert spy.call_count > 4
