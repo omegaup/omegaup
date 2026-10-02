@@ -36,7 +36,7 @@ grader/lib/
 /frontend/tests/test_config.php
 
 # and log
-yarn-error.log
+pnpm-debug.log
 
 #ignore crated-by-test stuff
 frontend/tests/runfiles/
@@ -52,7 +52,7 @@ templates_c
 bin/grader.sh
 frontend/www/runner-distrib.sh
 geckodriver.log
-yarn-error.log
+pnpm-debug.log
 .phpunit.result.cache
 
 # Ignore Mac crap :P
