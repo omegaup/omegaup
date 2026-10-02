@@ -194,4 +194,29 @@ describe('Basic Commands Test', () => {
     ]);
     cy.logout();
   });
+
+  it('Should show the cron jobs to an admin', () => {
+    cy.loginAdmin();
+    cy.visit('/admin/crons/');
+
+    cy.get('[data-cron-jobs]').should('be.visible');
+    cy.get('[data-cron-jobs] tbody tr').should('exist');
+    cy.get('[data-cron-runs]').should('exist');
+    cy.logout();
+  });
+
+  it('Should report a cron rerun that is already queued', () => {
+    cy.loginAdmin();
+    cy.visit('/admin/crons/');
+    cy.intercept('POST', '/api/admin/rerunCron/').as('rerunCron');
+
+    cy.get('[data-cron-rerun]:enabled').first().click();
+    cy.wait('@rerunCron').its('response.statusCode').should('eq', 200);
+
+    // Nothing drains the queue here, so the second request finds the first.
+    cy.get('[data-cron-rerun]:enabled').first().click();
+    cy.wait('@rerunCron').its('response.body.queued').should('eq', false);
+    cy.get('.alert-info[role="alert"]').should('be.visible');
+    cy.logout();
+  });
 });
