@@ -536,6 +536,66 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Resolves the registered cron job a request names.
+     *
+     * @omegaup-request-param string $name
+     */
+    private static function cronJobFromRequest(
+        \OmegaUp\Request $r
+    ): \OmegaUp\DAO\VO\CronJobs {
+        $jobName = \OmegaUp\CronJobName::tryFrom($r->ensureString('name'));
+        $job = is_null($jobName) ? null : \OmegaUp\DAO\CronJobs::getByName(
+            $jobName->value
+        );
+        if (is_null($job)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
+        return $job;
+    }
+
+    /**
+     * Queues a manual rerun of a registered cron job for a worker to pick up.
+     * `queued` is false when the job already had a rerun waiting or running.
+     *
+     * @return array{queued: bool}
+     *
+     * @omegaup-request-param string $name
+     */
+    public static function apiRerunCron(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $job = self::cronJobFromRequest($r);
+        // The runner skips a disabled job, so the rerun could never succeed.
+        if (!$job->enabled) {
+            throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                'cronControlPlaneJobDisabled'
+            );
+        }
+        if (
+            !is_null(
+                \OmegaUp\DAO\CronRunRequests::getActiveByName(
+                    strval($job->name)
+                )
+            )
+        ) {
+            return ['queued' => false];
+        }
+        \OmegaUp\DAO\CronRunRequests::create(
+            new \OmegaUp\DAO\VO\CronRunRequests([
+                'name' => $job->name,
+                'requested_by' => $r->user->user_id,
+                'status' => \OmegaUp\CronRunRequestStatus::Pending->value,
+            ])
+        );
+        return ['queued' => true];
+    }
+
+    /**
      * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
