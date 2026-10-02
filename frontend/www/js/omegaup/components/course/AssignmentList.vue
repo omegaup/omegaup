@@ -3,8 +3,20 @@
     <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
       <div v-if="content.length === 0" class="card-body">
-        <div class="empty-table-message">
-          {{ T.courseContentEmpty }}
+        <div class="text-center py-5">
+          <h4 class="mb-2">{{ T.courseContentEmptyTitle }}</h4>
+          <p class="text-muted mb-4">
+            {{ T.courseContentEmptyDescription }}
+          </p>
+          <button
+            v-if="assignmentFormMode === AssignmentFormMode.Default"
+            data-course-add-new-content
+            class="btn btn-primary btn-lg"
+            type="button"
+            @click="$emit('emit-new')"
+          >
+            {{ T.courseAddContent }}
+          </button>
         </div>
       </div>
       <table v-else class="table table-striped">
