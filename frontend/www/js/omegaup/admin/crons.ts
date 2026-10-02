@@ -1,5 +1,8 @@
 import admin_Crons from '../components/admin/Crons.vue';
 import { OmegaUp } from '../omegaup';
+import * as api from '../api';
+import * as ui from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 import { types } from '../api_types';
 
@@ -17,6 +20,19 @@ OmegaUp.on('ready', () => {
           jobs: payload.jobs,
           runs: payload.runs,
           problemHealthFindings: payload.problemHealthFindings,
+        },
+        on: {
+          rerun: (name: string) => {
+            api.Admin.rerunCron({ name })
+              .then((response) => {
+                if (response.queued) {
+                  ui.success(T.cronControlPlaneRerunQueued);
+                } else {
+                  ui.info(T.cronControlPlaneRerunAlreadyQueued);
+                }
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
