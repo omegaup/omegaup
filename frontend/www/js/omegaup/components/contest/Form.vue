@@ -901,18 +901,35 @@
         </div>
       </form>
     </div>
-    <b-modal
-      v-model="showModal"
-      :title="T.contestNewFormPresetOverwriteWarningModalTitle"
-      :ok-title="T.wordsConfirm"
-      ok-only
-      @ok="
-        applyPreset(changePresetTo);
-        hasFormChanged = true;
-      "
-    >
-      {{ T.contestNewFormPresetOverwriteWarning }}
-    </b-modal>
+    <div v-if="showModal">
+      <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                {{ T.contestNewFormPresetOverwriteWarningModalTitle }}
+              </h5>
+              <button type="button" class="close" @click="showModal = false">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {{ T.contestNewFormPresetOverwriteWarning }}
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="onConfirmPresetChange"
+              >
+                {{ T.wordsConfirm }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+    </div>
   </div>
 </template>
 
@@ -929,9 +946,6 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
-import { ModalPlugin } from 'bootstrap-vue';
-Vue.use(ModalPlugin);
-
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -1441,6 +1455,14 @@ export default class Form extends Vue {
     }
     this.applyPreset(presetType);
     this.hasFormChanged = true;
+  }
+
+  onConfirmPresetChange(): void {
+    if (this.changePresetTo) {
+      this.applyPreset(this.changePresetTo);
+      this.hasFormChanged = true;
+    }
+    this.showModal = false;
   }
 
   applyPreset(presetType: PresetType): void {
