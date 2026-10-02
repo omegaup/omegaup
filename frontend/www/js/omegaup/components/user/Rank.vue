@@ -165,21 +165,20 @@
             <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
             <td class="coder-column">
               <div class="coder-cell">
-                <span class="coder-flag">
-                  <omegaup-countryflag
-                    :country="user.country"
-                  ></omegaup-countryflag>
-                </span>
-                <span class="coder-username">
+                <omegaup-countryflag
+                  :country="user.country"
+                ></omegaup-countryflag>
+                <div class="coder-info d-flex flex-column ml-2">
                   <omegaup-user-username
+                    class="coder-username"
                     :classname="user.classname"
                     :linkify="true"
                     :username="user.username"
                   ></omegaup-user-username>
-                </span>
-                <span v-if="user.name && length !== 5" class="coder-name">
-                  {{ user.name }}
-                </span>
+                  <span v-if="user.name && length !== 5" class="coder-name">
+                    {{ user.name }}
+                  </span>
+                </div>
               </div>
             </td>
             <td class="text-right">{{ user.score.toFixed(2) }}</td>
@@ -412,6 +411,7 @@ export default class UserRank extends Vue {
   justify-content: center;
   flex-shrink: 0;
 }
+
 .coder-username {
   width: 100px;
   flex-shrink: 0;
@@ -431,5 +431,10 @@ export default class UserRank extends Vue {
 [data-user-rank] table td,
 [data-user-rank] table th {
   vertical-align: middle !important;
+}
+
+.coder-info {
+  min-width: 0;
+  flex: 1;
 }
 </style>
