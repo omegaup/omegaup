@@ -287,6 +287,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
+import * as cronJobs from '../../admin/cron_jobs';
 
 const CRON_FIELD_COUNT = 5;
 
@@ -384,15 +385,6 @@ export function describeSchedule(schedule?: string | null): string | null {
 library.add(faInfoCircle);
 Vue.use(VBTooltipPlugin);
 
-const JOB_TITLES: Record<string, string> = {
-  'update_ranks.py': T.cronControlPlaneJobUpdateRanks,
-  'assign_badges.py': T.cronControlPlaneJobAssignBadges,
-  'aggregate_feedback.py': T.cronControlPlaneJobAggregateFeedback,
-  'build_problem_rec_model.py': T.cronControlPlaneJobBuildProblemRecModel,
-  'plagiarism_detector.py': T.cronControlPlaneJobPlagiarismDetector,
-  'problem_health_check.py': T.cronControlPlaneJobProblemHealthCheck,
-};
-
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -431,16 +423,11 @@ export default class Crons extends Vue {
   }
 
   jobTitle(name: string): string {
-    if (JOB_TITLES[name]) {
-      return JOB_TITLES[name];
-    }
-    const readable = name.replace(/\.py$/, '').replace(/_/g, ' ');
-    return readable.charAt(0).toUpperCase() + readable.slice(1);
+    return cronJobs.jobTitle(name);
   }
 
   phaseTitle(phase: string): string {
-    const readable = phase.replace(/_/g, ' ');
-    return readable.charAt(0).toUpperCase() + readable.slice(1);
+    return cronJobs.phaseTitle(phase);
   }
 
   toggle(runId: number): void {
@@ -458,15 +445,7 @@ export default class Crons extends Vue {
   }
 
   statusClass(status: string | null): string {
-    const classes: Record<string, string> = {
-      success: 'badge badge-success',
-      failure: 'badge badge-danger',
-      running: 'badge badge-secondary',
-    };
-    if (!status) {
-      return '';
-    }
-    return classes[status] || 'badge badge-light';
+    return cronJobs.statusClass(status);
   }
 
   // runs arrive newest first.
