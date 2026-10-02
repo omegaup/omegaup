@@ -29,6 +29,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ProblemListItem=array{accepted: int, alias: string, can_be_removed?: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
+ * @psalm-type RecommendedProblem=array{alias: string, difficulty: float|null, quality: float|null, score: float, solved_problem_alias: string, solved_problem_title: string, title: string}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int, warningReasons?: list<string>}
@@ -82,6 +83,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     const DEFAULT_LANGUAGE = 'es';
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];
+    const RECOMMENDATIONS_SOLVED_PROBLEMS_WINDOW = 5;
+    const RECOMMENDATIONS_PAGE_SIZE = 10;
     const VALID_SORTING_COLUMNS = [
         'title',
         'quality',
@@ -6690,6 +6693,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRandomKarelProblem(\OmegaUp\Request $r) {
         return [
             'alias' => \OmegaUp\DAO\Problems::getRandomKarelProblemAlias(),
+        ];
+    }
+
+    /**
+     * Returns a short personalized list of recommended problems for the
+     * logged in user, derived from their recently solved problems. The
+     * list is empty when no recommendation model has been published yet.
+     *
+     * @return array{problems: list<RecommendedProblem>}
+     */
+    public static function apiRecommendations(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        return [
+            'problems' => \OmegaUp\DAO\ProblemRecommendations::getRecommendedProblems(
+                intval($r->identity->identity_id),
+                self::RECOMMENDATIONS_SOLVED_PROBLEMS_WINDOW,
+                self::RECOMMENDATIONS_PAGE_SIZE
+            ),
         ];
     }
 

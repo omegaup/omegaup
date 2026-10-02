@@ -4740,6 +4740,16 @@ export namespace types {
     score: number;
   }
 
+  export interface RecommendedProblem {
+    alias: string;
+    difficulty?: number;
+    quality?: number;
+    score: number;
+    solved_problem_alias: string;
+    solved_problem_title: string;
+    title: string;
+  }
+
   export interface Run {
     alias: string;
     classname: string;
@@ -6067,6 +6077,10 @@ export namespace messages {
   export type ProblemRandomKarelProblemResponse = { alias: string };
   export type ProblemRandomLanguageProblemRequest = { [key: string]: any };
   export type ProblemRandomLanguageProblemResponse = { alias: string };
+  export type ProblemRecommendationsRequest = { [key: string]: any };
+  export type ProblemRecommendationsResponse = {
+    problems: types.RecommendedProblem[];
+  };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};
   export type ProblemRemoveAdminRequest = { [key: string]: any };
@@ -7031,6 +7045,9 @@ export namespace controllers {
     randomLanguageProblem: (
       params?: messages.ProblemRandomLanguageProblemRequest,
     ) => Promise<messages.ProblemRandomLanguageProblemResponse>;
+    recommendations: (
+      params?: messages.ProblemRecommendationsRequest,
+    ) => Promise<messages.ProblemRecommendationsResponse>;
     rejudge: (
       params?: messages.ProblemRejudgeRequest,
     ) => Promise<messages.ProblemRejudgeResponse>;
