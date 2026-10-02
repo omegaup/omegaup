@@ -930,6 +930,8 @@ const translations: { [key: string]: string; } = {
   homepageCreateSectionTitle: "(Cr3a73)",
   homepageGetStartedTitle: "(G377ing 57ar73d wi7h 0m3gaUp)",
   homepageHowItWorks: "(H0w i7 w0rk5)",
+  homepageRecommendedProblemsReason: "(B3cau53 y0u 501v3d %(problem))",
+  homepageRecommendedProblemsTitle: "(R3c0mm3nd3d f0r y0u)",
   homepageSponsorsSectionTitle: "(Thank5 70 0ur Sp0n50r)",
   homepageTeachSectionDescription: "(Track y0ur 57ud3n7'5 pr0gr355 7hr0ugh a55ignm3n75 and 73575 7ha7 ar3 au70ma7ica11y a553553d)",
   homepageTeachSectionTitle: "(T3ach)",
