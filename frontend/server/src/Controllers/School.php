@@ -170,14 +170,14 @@ class School extends \OmegaUp\Controllers\Controller {
         string $name,
         ?\OmegaUp\DAO\VO\States $state
     ): int {
-        // Create school object
+        $name = trim($name);
         $school = new \OmegaUp\DAO\VO\Schools([
             'name' => $name,
             'country_id' => !is_null($state) ? $state->country_id : null,
             'state_id' => !is_null($state) ? $state->state_id : null,
         ]);
 
-        $existing = \OmegaUp\DAO\Schools::findByExactName(
+        $existing = \OmegaUp\DAO\Schools::findByExactInformation(
             $name,
             $school->country_id,
             $school->state_id

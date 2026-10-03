@@ -83,47 +83,173 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotSame($longSchoolId, $shortSchoolId);
     }
 
-    /**
-     * Creating a school with the same name reuses the existing profile, and
-     * an exact country/state match is preferred when one exists.
-     */
-    public function testCreateSchoolReusesExactNameAcrossStates() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+    private static function createSchoolWithLocation(
+        string $authToken,
+        string $name,
+        ?string $countryId = null,
+        ?string $stateId = null
+    ): int {
+        return \OmegaUp\Controllers\School::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $authToken,
+                'name' => $name,
+                'country_id' => $countryId,
+                'state_id' => $stateId,
+            ])
+        )['school_id'];
+    }
 
+    public function testCreateSchoolSameNameDifferentState() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $name = \OmegaUp\Test\Utils::createRandomString();
 
-        $schoolId = \OmegaUp\Controllers\School::apiCreate(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'name' => $name,
-                'country_id' => 'MX',
-                'state_id' => 'QUE',
-            ])
-        )['school_id'];
-
-        // The same name without a state still reuses the school.
-        $this->assertSame(
-            $schoolId,
-            \OmegaUp\Controllers\School::apiCreate(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'name' => $name,
-                ])
-            )['school_id']
+        $this->assertNotSame(
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'QUE'
+            ),
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'JAL'
+            )
         );
+    }
 
-        // And the same name with the matching state reuses it too.
+    public function testCreateSchoolSameNameDifferentCountry() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+
+        $this->assertNotSame(
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'QUE'
+            ),
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'US',
+                'CA'
+            )
+        );
+    }
+
+    public function testCreateSchoolSameNameSameLocationReusesSchool() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+
+        $this->assertSame(
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'QUE'
+            ),
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'QUE'
+            )
+        );
+    }
+
+    public function testCreateSchoolSameNameNoLocationReusesSchool() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+
+        $this->assertSame(
+            self::createSchoolWithLocation($login->auth_token, $name),
+            self::createSchoolWithLocation($login->auth_token, $name)
+        );
+    }
+
+    public function testCreateSchoolLocatedAndUnlocatedAreDifferent() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+
+        $locatedId = self::createSchoolWithLocation(
+            $login->auth_token,
+            $name,
+            'MX',
+            'QUE'
+        );
+        $unlocatedId = self::createSchoolWithLocation(
+            $login->auth_token,
+            $name
+        );
+        $this->assertNotSame($locatedId, $unlocatedId);
+
+        // Each one keeps resolving to its own row afterwards.
+        $this->assertSame(
+            $locatedId,
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'QUE'
+            )
+        );
+        $this->assertSame(
+            $unlocatedId,
+            self::createSchoolWithLocation($login->auth_token, $name)
+        );
+    }
+
+    public function testCreateSchoolMatchIgnoresCaseAndAccents() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $suffix = \OmegaUp\Test\Utils::createRandomString();
+
+        // Relies on the utf8mb4_0900_ai_ci collation of Schools.name.
+        $this->assertSame(
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                "Escuela Técnica {$suffix}",
+                'MX',
+                'QUE'
+            ),
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                "ESCUELA tecnica {$suffix}",
+                'MX',
+                'QUE'
+            )
+        );
+    }
+
+    public function testCreateSchoolTrimsName() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+
+        $schoolId = self::createSchoolWithLocation(
+            $login->auth_token,
+            "  {$name} ",
+            'MX',
+            'QUE'
+        );
+        $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
+        $this->assertNotNull($school);
+        $this->assertSame($name, $school->name);
         $this->assertSame(
             $schoolId,
-            \OmegaUp\Controllers\School::apiCreate(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'name' => $name,
-                    'country_id' => 'MX',
-                    'state_id' => 'QUE',
-                ])
-            )['school_id']
+            self::createSchoolWithLocation(
+                $login->auth_token,
+                $name,
+                'MX',
+                'QUE'
+            )
         );
     }
 
