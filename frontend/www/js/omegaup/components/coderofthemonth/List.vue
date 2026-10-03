@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import coderofthemonth_CodersList from './CodersList.vue';
@@ -76,6 +76,11 @@ export default class CoderOfTheMonthList extends Vue {
 
   T = T;
   currentSelectedTab = this.selectedTab;
+
+  @Watch('selectedTab')
+  onSelectedTabChanged(newTab: string): void {
+    this.currentSelectedTab = newTab;
+  }
 
   get availableTabs(): { id: string; component: string; title: string }[] {
     const availableTabs = [
