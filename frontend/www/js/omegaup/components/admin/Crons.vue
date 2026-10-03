@@ -104,6 +104,44 @@
           </template>
         </tbody>
       </table>
+
+      <h5 class="mt-4">{{ T.problemHealthHeading }}</h5>
+      <table
+        v-if="problemHealthFindings.length"
+        class="table table-sm table-hover"
+        data-problem-health
+      >
+        <thead>
+          <tr>
+            <th>{{ T.problemHealthProblem }}</th>
+            <th>{{ T.problemHealthCheckType }}</th>
+            <th>{{ T.problemHealthSeverity }}</th>
+            <th>{{ T.problemHealthDetail }}</th>
+            <th>{{ T.problemHealthSince }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="finding in problemHealthFindings"
+            :key="`${finding.problem_id}-${finding.check_type}`"
+          >
+            <td>
+              <a :href="problemUrl(finding.alias)">{{ finding.title }}</a>
+            </td>
+            <td :title="finding.check_type">
+              {{ checkTypeLabel(finding.check_type) }}
+            </td>
+            <td>
+              <span :class="severityClass(finding.severity)">{{
+                severityLabel(finding.severity)
+              }}</span>
+            </td>
+            <td>{{ finding.detail || '—' }}</td>
+            <td>{{ formatDate(finding.first_detected_at) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <span v-else>{{ T.problemHealthNoFindings }}</span>
     </div>
   </div>
 </template>
@@ -114,6 +152,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
+import * as problemHealth from '../../admin/problem_health';
 
 const CRON_FIELD_COUNT = 5;
 
@@ -213,6 +252,8 @@ export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
+  @Prop({ default: () => [] })
+  problemHealthFindings!: types.ProblemHealthFinding[];
 
   expandedRunId: number | null = null;
 
@@ -237,6 +278,22 @@ export default class Crons extends Vue {
       return '';
     }
     return classes[status] || 'badge badge-light';
+  }
+
+  problemUrl(alias: string): string {
+    return `/arena/problem/${encodeURIComponent(alias)}/`;
+  }
+
+  checkTypeLabel(checkType: string): string {
+    return problemHealth.checkTypeLabel(checkType);
+  }
+
+  severityLabel(severity: string): string {
+    return problemHealth.severityLabel(severity);
+  }
+
+  severityClass(severity: string): string {
+    return problemHealth.severityClass(severity);
   }
 
   // runs arrive newest first.
