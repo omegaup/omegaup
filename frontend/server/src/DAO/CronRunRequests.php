@@ -23,7 +23,6 @@ class CronRunRequests extends \OmegaUp\DAO\Base\CronRunRequests {
         $sql = "SELECT {$fields}
                 FROM Cron_Run_Requests
                 WHERE name = ? AND status IN (?, ?)
-                ORDER BY requested_at DESC
                 LIMIT 1;";
         /** @var array{error_text: null|string, finished_at: \OmegaUp\Timestamp|null, name: string, picked_at: \OmegaUp\Timestamp|null, request_id: int, requested_at: \OmegaUp\Timestamp, requested_by: int|null, run_id: int|null, status: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [

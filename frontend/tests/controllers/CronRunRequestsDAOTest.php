@@ -4,14 +4,6 @@
  * Tests for the \OmegaUp\DAO\CronRunRequests data access object.
  */
 class CronRunRequestsDAOTest extends \OmegaUp\Test\ControllerTestCase {
-    public function setUp(): void {
-        parent::setUp();
-        // The table survives the shared cleanup, so each test starts empty.
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            'DELETE FROM `Cron_Run_Requests`;'
-        );
-    }
-
     private function createRequest(
         string $name,
         \OmegaUp\CronRunRequestStatus $status,
@@ -96,16 +88,16 @@ class CronRunRequestsDAOTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testGetActiveByNameReturnsTheNewestRequest() {
+    public function testGetActiveByNameSkipsAFinishedRequestOfTheSameJob() {
         $now = \OmegaUp\Time::get();
-        $older = $this->createRequest(
+        $this->createRequest(
             \OmegaUp\CronJobName::UpdateRanks->value,
-            \OmegaUp\CronRunRequestStatus::Pending,
+            \OmegaUp\CronRunRequestStatus::Done,
             $now - 500
         );
-        $newer = $this->createRequest(
+        $active = $this->createRequest(
             \OmegaUp\CronJobName::UpdateRanks->value,
-            \OmegaUp\CronRunRequestStatus::Picked,
+            \OmegaUp\CronRunRequestStatus::Pending,
             $now - 10
         );
 
@@ -114,8 +106,7 @@ class CronRunRequestsDAOTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotNull($request);
-        $this->assertNotSame($older, $request->request_id);
-        $this->assertSame($newer, $request->request_id);
+        $this->assertSame($active, $request->request_id);
     }
 
     public function testTheColumnAcceptsEveryStatusOfTheEnum() {
