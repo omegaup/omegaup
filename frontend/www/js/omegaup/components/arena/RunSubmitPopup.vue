@@ -2,7 +2,7 @@
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
     <form
       data-run-submit
-      class="d-flex flex-column h-100"
+      class="modal-form d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
       <div class="form-group row">
@@ -12,7 +12,7 @@
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
-            class="form-control"
+            class="form-control modal-form__control"
             name="language"
           >
             <option
@@ -49,7 +49,12 @@
           {{ T.arenaRunSubmitUpload }}
         </label>
         <div class="col-sm-7">
-          <input ref="inputFile" class="w-100" type="file" name="file" />
+          <input
+            ref="inputFile"
+            class="w-100 modal-form__control"
+            type="file"
+            name="file"
+          />
         </div>
       </div>
       <div class="form-group row">

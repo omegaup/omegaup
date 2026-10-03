@@ -1,15 +1,17 @@
 <template>
   <omegaup-overlay-popup @dismiss="onCloseModal(currentView)">
     <transition name="fade">
-      <form data-promotion-popup class="h-auto w-auto" @submit.prevent="">
+      <form data-promotion-popup class="modal-form" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
             <slot name="popup-content" :onSubmit="onSubmit" :onHide="onHide">
-              <p class="h4 font-weight-bold pb-4 text-center w-100">
+              <p class="modal-form__title text-center">
                 {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAc }}
               </p>
-              <div class="form-group w-100">
-                <label class="w-100">{{ T.qualityFormDifficulty }}</label>
+              <div class="modal-form__field">
+                <label class="modal-form__label">{{
+                  T.qualityFormDifficulty
+                }}</label>
                 <div class="container-fluid">
                   <div
                     v-for="difficultyLevel in difficultyLevels"
@@ -28,8 +30,10 @@
                   </div>
                 </div>
               </div>
-              <div class="w-100 mb-3">
-                <label class="mb-2 w-100">{{ T.qualityFormQuality }}</label>
+              <div class="modal-form__field">
+                <label class="modal-form__label">{{
+                  T.qualityFormQuality
+                }}</label>
                 <div class="container-fluid">
                   <div
                     v-for="qualityLevel in qualityLevels"
@@ -47,10 +51,10 @@
                   </div>
                 </div>
               </div>
-              <div class="text-right w-100">
+              <div class="modal-form__actions">
                 <button
                   data-submit-feedback-button
-                  class="col-md-4 mr-2 mb-1 btn btn-primary"
+                  class="btn btn-primary"
                   type="submit"
                   :disabled="!quality && !difficulty"
                   @click="onSubmit"
@@ -58,7 +62,7 @@
                   {{ T.wordsSend }}
                 </button>
                 <button
-                  class="col-md-4 mb-1 btn btn-secondary"
+                  class="btn btn-secondary"
                   type="button"
                   @click="onHide(true)"
                 >
