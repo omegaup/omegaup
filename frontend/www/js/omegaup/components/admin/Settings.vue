@@ -2,7 +2,7 @@
   <div class="card">
     <div class="text-white bg-primary card-header">
       <div class="card-title h4">
-        {{ T.omegaupTitleAdminSettings }}
+        {{ T.omegaupTitleAdminGlobalSettings }}
       </div>
     </div>
     <div class="card-body">
