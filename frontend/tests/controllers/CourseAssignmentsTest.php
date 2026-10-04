@@ -644,4 +644,22 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame($response['source'], $source);
     }
+
+    public function testUpdateAssignmentsOrderWithInvalidJson() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $adminLogin = self::login($courseData['admin']);
+
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignments' => 'invalid-json',
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+        }
+    }
 }

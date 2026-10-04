@@ -187,4 +187,23 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertSame([], $response['identities']);
     }
+
+    public function testUpdateProblemsOrderWithInvalidJson() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $adminLogin = self::login($courseData['admin']);
+
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateProblemsOrder(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment_alias'],
+                    'problems' => 'invalid-json',
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+        }
+    }
 }
