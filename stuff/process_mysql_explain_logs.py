@@ -471,15 +471,18 @@ def _main() -> None:
         rows = explain_queries(connection, queries_list)
 
         if rows:
-            try:
-                saved = save_to_csv(rows)
-                logging.warning(
-                    "%d inefficient query-table pairs; saved to %s",
-                    len(rows),
-                    saved
+            saved = save_to_csv(rows)
+            if saved is None:
+                logging.error(
+                    "%d inefficient query-table pairs; failed to save CSV",
+                    len(rows)
                 )
-            except (OSError, ValueError) as exc:
-                logging.error("Failed to save CSV: %s", exc)
+                sys.exit(1)
+            logging.warning(
+                "%d inefficient query-table pairs; saved to %s",
+                len(rows),
+                saved
+            )
         else:
             logging.warning("0 inefficient queries")
 
