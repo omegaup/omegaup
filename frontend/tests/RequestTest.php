@@ -8,7 +8,7 @@ class RequestTest extends \OmegaUp\Test\ControllerTestCase {
      * since admin privileges are hierarchical and imply every other
      * administrative role, including support team membership.
      */
-    public function testSystemAdminIsGrantedAccess() {
+    public function testSystemAdminIsGrantedAccess(): void {
         ['identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($adminIdentity);
 
@@ -25,7 +25,7 @@ class RequestTest extends \OmegaUp\Test\ControllerTestCase {
      * A support team member (who is not a system admin) should also be
      * granted administrative access.
      */
-    public function testSupportTeamMemberIsGrantedAccess() {
+    public function testSupportTeamMemberIsGrantedAccess(): void {
         ['identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
         $login = self::login($supportIdentity);
 
@@ -41,7 +41,7 @@ class RequestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A regular user with no administrative role should be rejected.
      */
-    public function testRegularUserIsDenied() {
+    public function testRegularUserIsDenied(): void {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
