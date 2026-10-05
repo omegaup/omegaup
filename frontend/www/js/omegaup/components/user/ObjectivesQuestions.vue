@@ -1,5 +1,9 @@
 <template>
-  <b-modal v-model="showModal" hide-footer>
+  <b-modal
+    v-model="showModal"
+    hide-footer
+    modal-class="objectives-questions-modal"
+  >
     <template #modal-title>
       <h5 class="modal-title font-weight-bold">
         {{ T.userObjectivesModalTitle }}
@@ -268,5 +272,13 @@ export default class UserObjectivesQuestions extends Vue {
 .btn-next-previous:focus,
 .btn-next-previous.focus {
   box-shadow: 0 0 0 0;
+}
+</style>
+
+<style lang="scss">
+.objectives-questions-modal .modal-dialog {
+  max-width: 330px;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
