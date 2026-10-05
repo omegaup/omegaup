@@ -296,7 +296,12 @@
                   <font-awesome-icon :icon="['fas', 'cog']" />
                 </a>
                 <div
-                  class="dropdown-menu dropdown-menu-right fullwidth-mobile-fit-lg navbar-item-dropdown"
+                  :class="[
+                    'dropdown-menu',
+                    'dropdown-menu-right',
+                    'fullwidth-mobile-fit-lg',
+                    'navbar-item-dropdown',
+                  ]"
                 >
                   <omegaup-navbar-item
                     :title="T.omegaupTitleAdminOperations"

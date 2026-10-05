@@ -124,8 +124,8 @@ export default class AdminLayout extends Vue {
   width: 4.5rem;
   flex-shrink: 0;
   padding: 1.25rem 0;
-  background-color: #f8f9fa;
-  border-right: 1px solid #dee2e6;
+  background-color: var(--admin-dashboard-sidebar-background-color);
+  border-right: 1px solid var(--admin-dashboard-sidebar-border-color);
   transition: width 0.2s ease-in-out;
   overflow: hidden;
 
@@ -138,11 +138,11 @@ export default class AdminLayout extends Vue {
   display: flex;
   align-items: center;
   padding: 0.5rem 1.35rem;
-  color: #495057;
+  color: var(--admin-dashboard-sidebar-item-color);
 
   &:hover,
   &:focus {
-    color: #0d6efd;
+    color: var(--admin-dashboard-sidebar-item-hover-color);
     text-decoration: none;
   }
 }
@@ -157,13 +157,15 @@ export default class AdminLayout extends Vue {
   align-items: center;
   width: 100%;
   padding: 0.85rem 1.35rem;
-  color: #495057;
+  color: var(--admin-dashboard-sidebar-item-color);
   text-decoration: none;
   white-space: nowrap;
 
   &:hover {
-    background-color: #e9ecef;
-    color: #0d6efd;
+    background-color: var(
+      --admin-dashboard-sidebar-item-hover-background-color
+    );
+    color: var(--admin-dashboard-sidebar-item-hover-color);
     text-decoration: none;
   }
 }

@@ -410,13 +410,13 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-        'entrypoint' => 'admin_global_settings',
-        'templateProperties' => [
-            'title' => new \OmegaUp\TranslationString(
-                'omegaupTitleAdminGlobalSettings'
-            ),
-            'payload' => [],
-        ],
+            'entrypoint' => 'admin_global_settings',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminGlobalSettings'
+                ),
+                'payload' => [],
+            ],
         ];
     }
 

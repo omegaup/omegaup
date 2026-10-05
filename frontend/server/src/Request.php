@@ -492,10 +492,7 @@ class Request extends \ArrayObject {
      */
     public function ensureUserHasAdministrativeAccess(): void {
         $this->ensureMainUserIdentity();
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin($this->identity)
-            && !\OmegaUp\Authorization::isSupportTeamMember($this->identity)
-        ) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($this->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
