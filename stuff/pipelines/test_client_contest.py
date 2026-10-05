@@ -65,10 +65,11 @@ def test_client_contest() -> None:
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST) as channel:
         rabbitmq_connection.initialize_rabbitmq(
-            queue='contest',
+            queue='contest-test',
             exchange='certificates',
-            routing_key='ContestQueue',
+            routing_key='ContestTestQueue',
             channel=channel)
+        channel.queue_purge(queue='contest-test')
         cur.execute('''
             SELECT
                 c.contest_id,
@@ -99,7 +100,6 @@ def test_client_contest() -> None:
             dbconn.conn.commit()
             cur.execute('TRUNCATE TABLE `Certificates`;')
             dbconn.conn.commit()
-            channel.queue_purge(queue='contest')
             client = omegaup.api.Client(
                 api_token=test_constants.API_TOKEN,
                 url=test_constants.OMEGAUP_API_ENDPOINT,
@@ -109,7 +109,9 @@ def test_client_contest() -> None:
                 channel=channel,
                 date_lower_limit=test_constants.DATE_LOWER_LIMIT,
                 date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-                client=client)
+                client=client,
+                queue='contest-test',
+                routing_key='ContestTestQueue')
             callback = ContestsCallbackForTesting(
                 dbconn=dbconn.conn)
             cur.execute(
@@ -117,9 +119,9 @@ def test_client_contest() -> None:
             count = cur.fetchone()
             assert count['count'] == 0
             rabbitmq_client.receive_messages(
-                queue='contest',
+                queue='contest-test',
                 exchange='certificates',
-                routing_key='ContestQueue',
+                routing_key='ContestTestQueue',
                 channel=channel,
                 callback=callback,
                 stop_after_message=True)
@@ -164,10 +166,11 @@ def test_client_contest_with_mocked_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,) as channel:
-        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+        rabbitmq_connection.initialize_rabbitmq(queue='contest-test',
                                                 exchange='certificates',
-                                                routing_key='ContestQueue',
+                                                routing_key='ContestTestQueue',
                                                 channel=channel)
+        channel.queue_purge(queue='contest-test')
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
@@ -202,7 +205,9 @@ def test_client_contest_with_mocked_codes(
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            client=client)
+            client=client,
+            queue='contest-test',
+            routing_key='ContestTestQueue')
         callback = ContestsCallbackForTesting(dbconn=dbconn.conn)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
@@ -214,8 +219,8 @@ def test_client_contest_with_mocked_codes(
         rabbitmq_client.receive_messages(
             channel=channel,
             exchange='certificates',
-            queue='contest',
-            routing_key='ContestQueue',
+            queue='contest-test',
+            routing_key='ContestTestQueue',
             callback=callback,
             stop_after_message=True)
         assert spy.call_count == 4
@@ -247,10 +252,11 @@ def test_client_contest_with_duplicated_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,) as channel:
-        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+        rabbitmq_connection.initialize_rabbitmq(queue='contest-test',
                                                 exchange='certificates',
-                                                routing_key='ContestQueue',
+                                                routing_key='ContestTestQueue',
                                                 channel=channel)
+        channel.queue_purge(queue='contest-test')
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
@@ -260,7 +266,9 @@ def test_client_contest_with_duplicated_codes(
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            client=client
+            client=client,
+            queue='contest-test',
+            routing_key='ContestTestQueue'
         )
         callback = ContestsCallbackForTesting(dbconn=dbconn.conn)
         cur.execute('TRUNCATE TABLE `Certificates`;')
@@ -273,8 +281,8 @@ def test_client_contest_with_duplicated_codes(
         rabbitmq_client.receive_messages(
             channel=channel,
             exchange='certificates',
-            queue='contest',
-            routing_key='ContestQueue',
+            queue='contest-test',
+            routing_key='ContestTestQueue',
             callback=callback,
             stop_after_message=True)
 
