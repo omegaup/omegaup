@@ -2,44 +2,27 @@
   <footer class="common-footer text-center mt-5">
     <div class="container-xl">
       <div class="footer-navigation d-lg-flex align-items-start py-5 m-auto">
-        <div class="footer-brand mb-4 mb-lg-0 max-width-logo">
-          <img
-            class="footer-logo d-block mx-auto mb-1 mt-n6"
-            width="120"
-            src="/media/logo-main-white.svg"
-            :alt="T.frontPageFooterLogoAlt"
-          />
-          <div class="slogan mx-auto">
+        <div class="footer-brand mb-4 mb-lg-0">
+          <a class="footer-logo d-inline-flex align-items-center" href="/">
+            <span class="footer-logo-wordmark" :aria-label="T.frontPageFooterLogoAlt"
+              ><span class="footer-logo-omega">omega</span
+              ><span class="footer-logo-up">Up</span></span
+          ></a>
+          <div class="slogan">
             {{ T.frontPageFooter }}
           </div>
-        </div>
-        <div
-          class="footer-list-section footer-contact w-50 mb-4 mb-lg-0 mx-auto"
-        >
-          <h4 class="column-title">{{ T.frontPageFooterContact }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
-            </li>
-          </ul>
-          <div
-            class="social-icons my-0 mx-auto d-flex flex-md-column flex-sm-row justify-content-center flex-wrap"
-          >
+          <div class="footer-sponsor">
+            <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
             <a
-              class="mx-1 pt-2"
-              href="https://www.facebook.com/omegaup/"
+              href="https://news.airbnb.com/2025-community-fund/"
               target="_blank"
             >
-              <font-awesome-icon :icon="['fab', 'facebook']" />
-              Facebook
-            </a>
-            <a
-              class="mx-1 pt-2"
-              href="https://discord.gg/K3JFd9d3wk"
-              target="_blank"
-            >
-              <font-awesome-icon :icon="['fab', 'discord']" />
-              Discord
+              <img
+                class="sponsor-logo"
+                src="/media/homepage/airbnb_logo.svg"
+                alt="AirbnbLogo"
+                width="100"
+              />
             </a>
           </div>
         </div>
@@ -60,26 +43,6 @@
             </li>
             <li class="mt-1">
               <a :href="OmegaUpBlogURL" target="_blank">{{ T.navBlog }}</a>
-            </li>
-          </ul>
-        </div>
-        <div
-          class="footer-list-section footer-sponsors w-50 mb-4 mb-lg-0 mx-auto"
-        >
-          <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
-          <ul>
-            <li class="mt-4">
-              <a
-                href="https://news.airbnb.com/2025-community-fund/"
-                target="_blank"
-              >
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/airbnb_logo.svg"
-                  alt="AirbnbLogo"
-                  width="100"
-                />
-              </a>
             </li>
           </ul>
         </div>
@@ -130,6 +93,28 @@
             </li>
           </ul>
         </div>
+        <div
+          class="footer-list-section footer-contact w-50 mb-4 mb-lg-0 mx-auto"
+        >
+          <h4 class="column-title">{{ T.frontPageFooterContact }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
+            </li>
+            <li class="mt-1">
+              <a href="https://www.facebook.com/omegaup/" target="_blank">
+                <font-awesome-icon :icon="['fab', 'facebook']" />
+                Facebook
+              </a>
+            </li>
+            <li class="mt-1">
+              <a href="https://discord.gg/K3JFd9d3wk" target="_blank">
+                <font-awesome-icon :icon="['fab', 'discord']" />
+                Discord
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="copy mt-3">
@@ -144,6 +129,7 @@
               {{ T.frontPageFooterCodeConduct }}
             </a>
           </li>
+          <li class="footer-legal-separator" aria-hidden="true">•</li>
           <li>
             <a :href="PrivacyPolicyURL" target="_blank">
               {{ T.frontPageFooterPrivacyPolicy }}
@@ -211,60 +197,124 @@ export default class Footer extends Vue {
 
 @media (min-width: 1000px) {
   .slogan {
-    max-width: 10rem;
+    max-width: 20rem;
   }
 }
 
 .column-title {
-  font-size: 1.28rem;
-  letter-spacing: 0.04rem;
-  font-weight: 500;
+  margin-bottom: 12px;
+  font-size: 16px;
+  letter-spacing: 0;
+  font-weight: 700;
 }
 
 .common-footer {
-  background-color: $omegaup-primary--darker;
-  color: $omegaup-white;
+  display: block;
+  width: 100%;
+  margin-top: 32px !important;
+  background-color: var(--footer-primary-color);
+  border-top: 0.8px solid var(--footer-border-color);
+  color: rgb(255, 255, 255);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+
+  > .container-xl {
+    max-width: 80rem;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .footer-navigation {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: start;
+    text-align: left;
+
+    padding-top: clamp(40px, 5vw, 56px) !important;
+    padding-right: clamp(20px, 3vw, 40px) !important;
+    padding-bottom: clamp(32px, 4vw, 48px) !important;
+    padding-left: clamp(20px, 3vw, 40px) !important;
+  }
 
   .footer-navigation {
     .footer-brand {
-      max-width: 200px;
-      order: -3;
+      max-width: none;
+      width: 100%;
+      order: 0;
+      grid-column: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
 
       @media only screen and (max-width: 991px) {
         max-width: 100%;
       }
 
-      .footer-logo,
-      .slogan {
-        margin-top: -2.5rem;
+      .footer-logo {
+        color: rgb(255, 255, 255);
+        text-decoration: none;
+      }
+
+      .footer-logo-wordmark {
+        display: block;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.06em;
+        line-height: 1;
+      }
+
+      .footer-logo-omega {
+        color: rgb(0, 0, 0);
+      }
+
+      .footer-logo-up {
+        color: rgb(255, 255, 255);
       }
 
       .slogan {
+        margin-top: 20px;
+        margin-right: 0;
+        margin-left: 0;
+        max-width: 20rem;
+        text-align: left;
+        align-self: flex-start;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
         text-transform: uppercase;
+      }
+
+      .footer-sponsor {
+        margin-top: 38px;
+
+        .column-title {
+          margin-bottom: 12px;
+        }
+
+        .sponsor-logo {
+          width: 120px;
+        }
       }
     }
 
     .footer-list-section {
-      // On medium sizes, this will work as an inline grid (not 100% width)
+      width: 100% !important;
+      margin-right: 0 !important;
+      margin-left: 0 !important;
+
       @media only screen and (min-width: 992px) {
         display: block;
-
-        &.footer-contact {
-          order: 2;
-        }
-        &.footer-site {
-          order: -1;
-        }
-        &.footer-sponsors {
-          order: -2;
-        }
       }
 
       ul {
         list-style-type: none;
         padding: 0;
-        margin: 0 auto;
-        text-align: center;
+        margin: 0;
+        text-align: left;
 
         li {
           margin-top: 8px;
@@ -272,7 +322,7 @@ export default class Footer extends Vue {
 
           a {
             text-decoration: none;
-            color: white;
+            color: rgb(255, 255, 255);
 
             &:hover {
               color: var(--footer-link-hover-color);
@@ -281,15 +331,12 @@ export default class Footer extends Vue {
         }
       }
 
-      img.sponsor-logo {
-        width: 120px;
-      }
     }
   }
 
   a {
     text-decoration: none;
-    color: white;
+    color: rgb(255, 255, 255);
 
     &:hover {
       color: var(--footer-link-hover-color);
@@ -297,7 +344,68 @@ export default class Footer extends Vue {
   }
 
   .copy {
-    background-color: $omegaup-primary--darkest;
+    background-color: var(--footer-primary-color);
+    border-top: 0.8px solid var(--footer-divider-color);
+    text-align: left;
+    color: rgba(191, 219, 254, 0.8);
+
+    .container-xl {
+      max-width: 80rem;
+      padding-right: clamp(20px, 3vw, 40px) !important;
+      padding-left: clamp(20px, 3vw, 40px) !important;
+    }
+
+    a {
+      color: rgba(191, 219, 254, 0.8);
+    }
+
+    .footer-legal-separator {
+      padding-right: 8px;
+      color: rgba(191, 219, 254, 0.8);
+    }
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .common-footer .footer-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .common-footer .footer-navigation {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: 40px;
+    row-gap: 32px;
+
+    .footer-brand {
+      grid-column: span 2;
+    }
+  }
+}
+
+@media only screen and (max-width: 991px) {
+  .common-footer {
+    .footer-navigation {
+      text-align: center;
+    }
+
+    .footer-brand {
+      margin-right: auto;
+      margin-left: auto;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .footer-list-section {
+      ul {
+        text-align: center;
+      }
+    }
+
+    .copy {
+      text-align: center;
+    }
   }
 }
 </style>
