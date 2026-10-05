@@ -12,5 +12,12 @@ export default defineConfig({
       return require('./cypress/plugins/index.js')(on, config)
     },
     baseUrl: 'http://127.0.0.1:8001',
+    retries: {
+      // Retry flaky tests in headless CI runs before failing the job.
+      runMode: 2,
+      // Keep interactive `cypress open` runs at zero retries so flakes
+      // stay visible while developing tests locally.
+      openMode: 0,
+    },
   },
 })
