@@ -1,6 +1,10 @@
 <template>
-  <div>
-    <ul class="nav nav-tabs mb-3" role="tablist">
+  <div class="signin-page-wrapper">
+    <ul
+      v-if="activeTab === AvailableTabs.Signup"
+      class="nav nav-tabs mb-3"
+      role="tablist"
+    >
       <li class="nav-item" role="presentation">
         <a
           :href="`#${AvailableTabs.Login}`"
@@ -25,7 +29,7 @@
       </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content w-100">
       <div
         v-show="activeTab === AvailableTabs.Login"
         class="tab-pane"
@@ -38,6 +42,7 @@
           :github-client-id="githubClientId"
           :github-state="githubState"
           :google-client-id="googleClientId"
+          @change-tab="setActiveTab"
           @login="(username, password) => $emit('login', username, password)"
         >
         </omegaup-login>
@@ -153,11 +158,20 @@ export default class Signin extends Vue {
   margin-bottom: -1px;
 }
 
+.signin-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .tab-content {
   margin-top: 0;
 }
 
 .tab-pane {
   display: block;
+  width: 100%;
 }
 </style>
