@@ -91,6 +91,7 @@ import {
   supportedLanguages,
 } from '../../grader/util';
 import { sourceTemplates } from '../../grader/GraderTemplates';
+import { getCodeTemplate } from '../../code_templates';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -145,12 +146,16 @@ export default class ArenaRunSubmitPopup extends Vue {
       return;
     }
     const extension = this.getLanguageExtension(language);
-    if (extension && sourceTemplates[extension]) {
-      this.code = sourceTemplates[extension];
-    } else {
-      // If no template found, keep current code or set empty
+    if (!extension) {
       this.code = '';
+      return;
     }
+    const customTemplate = getCodeTemplate(extension);
+    if (customTemplate !== null) {
+      this.code = customTemplate;
+      return;
+    }
+    this.code = sourceTemplates[extension] ?? '';
   }
 
   handleChangeLanguage(language: string): void {
