@@ -101,4 +101,69 @@ describe('SettingsSummary.vue', () => {
 
     expect(wrapper.text()).not.toContain('undefined');
   });
+
+  it('Should hide the bookmark button for logged-out users', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: {
+        ...baseSettingsSummaryProps,
+        userLoggedIn: false,
+      },
+    });
+
+    expect(wrapper.find('button[data-bookmark-button]').exists()).toBeFalsy();
+  });
+
+  it('Should hide the bookmark button inside contests or courses', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: {
+        ...baseSettingsSummaryProps,
+        userLoggedIn: true,
+        inContestOrCourse: true,
+      },
+    });
+
+    expect(wrapper.find('button[data-bookmark-button]').exists()).toBeFalsy();
+  });
+
+  it('Should show the bookmark button with the add title when not bookmarked', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: {
+        ...baseSettingsSummaryProps,
+        userLoggedIn: true,
+        isBookmarked: false,
+      },
+    });
+
+    const button = wrapper.find('button[data-bookmark-button]');
+    expect(button.exists()).toBeTruthy();
+    expect(button.attributes('title')).toBe(T.problemBookmarkAdd);
+  });
+
+  it('Should show the remove title when the problem is bookmarked', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: {
+        ...baseSettingsSummaryProps,
+        userLoggedIn: true,
+        isBookmarked: true,
+      },
+    });
+
+    const button = wrapper.find('button[data-bookmark-button]');
+    expect(button.exists()).toBeTruthy();
+    expect(button.attributes('title')).toBe(T.problemBookmarkRemove);
+  });
+
+  it('Should emit toggle-bookmark with the problem alias on click', async () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: {
+        ...baseSettingsSummaryProps,
+        userLoggedIn: true,
+        isBookmarked: false,
+      },
+    });
+
+    await wrapper.find('button[data-bookmark-button]').trigger('click');
+
+    expect(wrapper.emitted('toggle-bookmark')).toEqual([['sumas']]);
+  });
 });

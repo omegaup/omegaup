@@ -156,7 +156,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             // Backwards compatibility: older clients used `status` as boolean.
             $isActive = $r->ensureOptionalBool('status');
         }
-        $carouselItem->status = $isActive ? 'active' : 'inactive';
+        if (!is_null($isActive)) {
+            $carouselItem->status = $isActive ? 'active' : 'inactive';
+        }
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
         return ['status' => 'ok'];
