@@ -321,4 +321,60 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
+
+    /*
+     * Test that a role granted both directly and through a system group
+     * is not duplicated in the system roles list
+     */
+    public function testGroupSystemRolesAndDeduplication() {
+        $username = 'testuserdedup';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => $username]
+            )
+        );
+
+        $login = self::login($identity);
+
+        // Grant the Mentor role directly...
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'role' => 'Mentor'
+        ]));
+        // ...and also through the system group.
+        \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'group' => 'omegaup:mentor'
+        ]));
+
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
+
+        $this->assertContains('Admin', $systemRoles);
+        $this->assertContains('Mentor', $systemRoles);
+
+        // No role should appear more than once.
+        foreach (array_count_values($systemRoles) as $role => $count) {
+            $this->assertSame(
+                1,
+                $count,
+                "Role {$role} should not be duplicated"
+            );
+        }
+
+        [
+            'systemRoles' => $payloadRoles,
+        ] = \OmegaUp\Controllers\User::getUserDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertSame(
+            array_values(array_unique($payloadRoles)),
+            array_values($payloadRoles)
+        );
+    }
 }

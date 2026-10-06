@@ -4689,6 +4689,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $systemRoles = array_merge(
             \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id),
+            \OmegaUp\DAO\GroupRoles::getSystemRoles($user->identity_id),
             \OmegaUp\DAO\GroupRoles::getSystemRoles($user->user_id)
         );
         $systemRoles = array_values(array_unique($systemRoles, SORT_REGULAR));
