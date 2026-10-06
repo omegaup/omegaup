@@ -8,6 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type NominationListItem=array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+ * @psalm-type NominationContents=array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool, level?: string, rationale?: string}
  *
  */
 class QualityNomination extends \OmegaUp\Controllers\Controller {
@@ -221,7 +222,18 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool} $contents
+     * Types of nomination that require the identity to have already solved
+     * the problem, except when a valid `before_ac` suggestion/dismissal is
+     * being made (see {@see self::validateProblemSolvedPrecondition()}).
+     */
+    const TYPES_REQUIRING_SOLVED_PROBLEM = [
+        'suggestion',
+        'promotion',
+        'dismissal',
+    ];
+
+    /**
+     * @param NominationContents $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -230,281 +242,417 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         string $nominationType,
         array $contents
     ): \OmegaUp\DAO\VO\QualityNominations {
-        if ($nominationType !== 'demotion' && $nominationType !== 'quality_tag') {
-            if (
-                isset($contents['before_ac']) &&
-                boolval($contents['before_ac']) &&
-                ($nominationType === 'dismissal' ||
-                 $nominationType === 'suggestion')
-            ) {
-                // Before AC suggestions or dismissals are only allowed
-                // for users who didn't solve a problem, but tried to.
-                if (
-                    \OmegaUp\DAO\Problems::isProblemSolved(
-                        $problem,
-                        intval($identity->identity_id)
-                    )
-                ) {
-                    throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                        'qualityNominationMustNotHaveSolvedProblem'
-                    );
-                }
+        self::validateProblemSolvedPrecondition(
+            $problem,
+            $identity,
+            $nominationType,
+            $contents
+        );
 
-                if (
-                    !\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
-                        $problem,
-                        intval($identity->identity_id)
-                    )
-                ) {
-                    throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                        'qualityNominationMustHaveTriedToSolveProblem'
-                    );
-                }
-            } else {
-                // All nominations types, except demotions and before AC
-                // suggestions/demotions, are only allowed for users who
-                // have already solved the problem.
-                if (
-                    !\OmegaUp\DAO\Problems::isProblemSolved(
-                        $problem,
-                        intval($identity->identity_id)
-                    )
-                ) {
-                    throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                        'qualityNominationMustHaveSolvedProblem'
-                    );
-                }
-            }
-        }
         $qualityNomination = null;
-        if ($nominationType === 'suggestion') {
-            $atLeastOneFieldIsPresent = false;
-            if (isset($contents['difficulty'])) {
-                if (
-                    $contents['difficulty'] < 0 ||
-                    $contents['difficulty'] > 4
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
+        switch ($nominationType) {
+            case 'suggestion':
+                self::validateSuggestionContents($contents);
+                break;
+            case 'promotion':
+                self::validatePromotionContents($contents);
+                break;
+            case 'demotion':
+                self::validateDemotionContents($contents);
+                /** @var string $contents['reason'] */
+                if ($contents['reason'] === 'duplicate') {
+                    /** @var string $contents['original'] */
+                    $contents['original'] = self::normalizeOriginalProblemAlias(
+                        $contents['original']
                     );
                 }
-                $atLeastOneFieldIsPresent = true;
-            }
-            if (isset($contents['tags'])) {
-                if (!empty($contents['tags'])) {
-                    $atLeastOneFieldIsPresent = true;
-                }
-            }
-            if (isset($contents['quality'])) {
-                if (
-                    $contents['quality'] < 0 ||
-                    $contents['quality'] > 4
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
-                    );
-                }
-                $atLeastOneFieldIsPresent = true;
-            }
-            if (!$atLeastOneFieldIsPresent) {
+                break;
+            case 'dismissal':
+                self::validateDismissalContents($contents);
+                break;
+            case 'quality_tag':
+                self::validateQualityTagContents($identity, $contents);
+                $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
+                    $identity,
+                    $problem
+                );
+                break;
+            default:
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
-                    'contents'
+                    'nomination'
                 );
-            }
-            // Tags must be strings.
-            if (isset($contents['tags'])) {
-                /** @var string $tag */
-                foreach ($contents['tags'] as &$tag) {
-                    if (
-                        !in_array($tag, self::ALLOWED_TAGS)
-                    ) {
-                        throw new \OmegaUp\Exceptions\InvalidParameterException(
-                            'parameterInvalid',
-                            'contents'
-                        );
-                    }
-                }
+        }
 
-                $duplicatedTags = self::getDuplicatedTags($contents['tags']);
+        return self::saveNomination(
+            $problem,
+            $identity,
+            $nominationType,
+            $contents,
+            $qualityNomination
+        );
+    }
 
-                if (!empty($duplicatedTags)) {
-                    throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
-                        'duplicateTagsNotAllowed',
-                        'tags',
-                        duplicatedItemsInArray: array_slice(
-                            $duplicatedTags,
-                            0,
-                            20
-                        )
-                    );
-                }
-            }
-        } elseif ($nominationType === 'promotion') {
+    /**
+     * Before AC suggestions or dismissals are only allowed for users who
+     * didn't solve a problem, but tried to. All other nomination types
+     * (except demotions and quality tags, which are not tied to having
+     * solved the problem) require the identity to have already solved it.
+     *
+     * @param NominationContents $contents
+     */
+    private static function validateProblemSolvedPrecondition(
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $nominationType,
+        array $contents
+    ): void {
+        if (
+            !in_array(
+                $nominationType,
+                self::TYPES_REQUIRING_SOLVED_PROBLEM,
+                true
+            )
+        ) {
+            return;
+        }
+
+        $isBeforeAc = (
+            isset($contents['before_ac']) &&
+            boolval($contents['before_ac']) &&
+            ($nominationType === 'dismissal' ||
+             $nominationType === 'suggestion')
+        );
+
+        if ($isBeforeAc) {
             if (
-                (!isset($contents['statements']))
-                || (!isset($contents['source'])
-                || empty($contents['source']))
-                || (!isset($contents['tags']))
-            ) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'contents'
-                );
-            }
-            // Tags must be strings.
-            /** @var string $tag */
-            foreach ($contents['tags'] as &$tag) {
-                if (
-                    !in_array($tag, self::ALLOWED_TAGS)
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
-                    );
-                }
-            }
-
-            $duplicatedTags = self::getDuplicatedTags($contents['tags']);
-
-            if (!empty($duplicatedTags)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
-                    'duplicateTagsNotAllowed',
-                    'tags',
-                    duplicatedItemsInArray: array_slice($duplicatedTags, 0, 20)
-                );
-            }
-
-            /**
-             * Statements must be a dictionary of language => { 'markdown': string }.
-             * @var string $language
-             * @var array{markdown: string} $statement
-             */
-            foreach ($contents['statements'] as $language => $statement) {
-                if (
-                    empty($language) ||
-                    !isset($statement['markdown']) ||
-                    empty($statement['markdown'])
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
-                    );
-                }
-            }
-        } elseif ($nominationType === 'demotion') {
-            if (
-                !isset($contents['reason']) ||
-                !in_array(
-                    $contents['reason'],
-                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases', 'poorly-described']
+                \OmegaUp\DAO\Problems::isProblemSolved(
+                    $problem,
+                    intval($identity->identity_id)
                 )
             ) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'contents'
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'qualityNominationMustNotHaveSolvedProblem'
                 );
             }
+
             if (
-                $contents['reason'] === 'other' &&
-                !isset($contents['rationale'])
+                !\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
+                    $problem,
+                    intval($identity->identity_id)
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'qualityNominationMustHaveTriedToSolveProblem'
+                );
+            }
+            return;
+        }
+
+        // All nominations types, except demotions, quality tags and before
+        // AC suggestions/dismissals, are only allowed for users who have
+        // already solved the problem.
+        if (
+            !\OmegaUp\DAO\Problems::isProblemSolved(
+                $problem,
+                intval($identity->identity_id)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                'qualityNominationMustHaveSolvedProblem'
+            );
+        }
+    }
+
+    /**
+     * Validates the `contents` for a `suggestion` nomination.
+     *
+     * @param NominationContents $contents
+     */
+    private static function validateSuggestionContents(array $contents): void {
+        $atLeastOneFieldIsPresent = false;
+        if (isset($contents['difficulty'])) {
+            if (
+                $contents['difficulty'] < 0 ||
+                $contents['difficulty'] > 4
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'contents'
                 );
             }
-            // Duplicate reports need more validation.
-            if ($contents['reason'] === 'duplicate') {
-                if (
-                    !isset($contents['original']) ||
-                    empty($contents['original'])
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
-                    );
-                }
-                $original = \OmegaUp\DAO\Problems::getByAlias(
-                    $contents['original']
-                );
-                if (is_null($original)) {
-                    $contents['original'] = self::extractAliasFromArgument(
-                        $contents['original']
-                    );
-                    if (is_null($contents['original'])) {
-                        throw new \OmegaUp\Exceptions\NotFoundException(
-                            'problemNotFound'
-                        );
-                    }
-                    $original = \OmegaUp\DAO\Problems::getByAlias(
-                        $contents['original']
-                    );
-                    if (is_null($original)) {
-                        throw new \OmegaUp\Exceptions\NotFoundException(
-                            'problemNotFound'
-                        );
-                    }
-                }
+            $atLeastOneFieldIsPresent = true;
+        }
+        if (isset($contents['tags'])) {
+            if (!empty($contents['tags'])) {
+                $atLeastOneFieldIsPresent = true;
             }
-        } elseif ($nominationType === 'dismissal') {
+        }
+        if (isset($contents['quality'])) {
             if (
-                isset($contents['origin'])
-                || isset($contents['difficulty'])
-                || isset($contents['source'])
-                || isset($contents['tags'])
-                || isset($contents['statements'])
-                || isset($contents['reason'])
+                $contents['quality'] < 0 ||
+                $contents['quality'] > 4
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'contents'
                 );
             }
-        } elseif ($nominationType === 'quality_tag') {
-            // Only reviewers are allowed to send this type of nominations
-            if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'userNotAllowed'
-                );
-            }
+            $atLeastOneFieldIsPresent = true;
+        }
+        if (!$atLeastOneFieldIsPresent) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+        // Tags must be strings.
+        if (isset($contents['tags'])) {
+            self::validateAllowedTags($contents['tags'], self::ALLOWED_TAGS);
+            self::validateNoDuplicatedTags($contents['tags']);
+        }
+    }
 
-            if (!isset($contents['quality_seal'])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'quality_seal'
-                );
-            }
+    /**
+     * Validates the `contents` for a `promotion` nomination.
+     *
+     * @param NominationContents $contents
+     */
+    private static function validatePromotionContents(array $contents): void {
+        if (
+            (!isset($contents['statements']))
+            || (!isset($contents['source'])
+            || empty($contents['source']))
+            || (!isset($contents['tags']))
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+        // Tags must be strings.
+        self::validateAllowedTags($contents['tags'], self::ALLOWED_TAGS);
+        self::validateNoDuplicatedTags($contents['tags']);
+
+        /**
+         * Statements must be a dictionary of language => { 'markdown': string }.
+         * @var string $language
+         * @var array{markdown: string} $statement
+         */
+        foreach ($contents['statements'] as $language => $statement) {
             if (
-                isset($contents['level']) &&
-                !in_array($contents['level'], self::LEVEL_TAGS)
+                empty($language) ||
+                !isset($statement['markdown']) ||
+                empty($statement['markdown'])
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
-                    'level'
+                    'contents'
                 );
             }
+        }
+    }
 
-            if (isset($contents['tags'])) {
-                /** @var list<string> $tag */
-                foreach ($contents['tags'] as &$tag) {
-                    if (!in_array($tag, self::ALLOWED_PUBLIC_TAGS)) {
-                        throw new \OmegaUp\Exceptions\InvalidParameterException(
-                            'parameterInvalid',
-                            'contents'
-                        );
-                    }
-                }
-            }
+    /**
+     * Validates the `contents` for a `demotion` nomination: the `reason`,
+     * the `rationale` (required when `reason` is `other`), and that
+     * `original` is present when `reason` is `duplicate`. This function is
+     * purely a validator and does not mutate `$contents`; normalizing the
+     * `original` alias is handled separately by
+     * {@see self::normalizeOriginalProblemAlias()}.
+     *
+     * @param NominationContents $contents
+     */
+    private static function validateDemotionContents(array $contents): void {
+        if (
+            !isset($contents['reason']) ||
+            !in_array(
+                $contents['reason'],
+                ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases', 'poorly-described']
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+        if (
+            $contents['reason'] === 'other' &&
+            !isset($contents['rationale'])
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+        // Duplicate reports need more validation.
+        if (
+            $contents['reason'] === 'duplicate' &&
+            (
+                !isset($contents['original']) ||
+                empty($contents['original'])
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+    }
 
-            $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
-                $identity,
-                $problem
+    /**
+     * Normalizes a demotion's `original` problem reference (a plain alias
+     * or a full problem URL) into a plain, existing problem alias.
+     *
+     * @return string The normalized problem alias.
+     */
+    private static function normalizeOriginalProblemAlias(
+        string $original
+    ): string {
+        $originalProblem = \OmegaUp\DAO\Problems::getByAlias($original);
+        if (!is_null($originalProblem)) {
+            return $original;
+        }
+
+        $alias = self::extractAliasFromArgument($original);
+        if (is_null($alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
             );
         }
 
+        $originalProblem = \OmegaUp\DAO\Problems::getByAlias($alias);
+        if (is_null($originalProblem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        return $alias;
+    }
+
+    /**
+     * Validates the `contents` for a `dismissal` nomination. A dismissal
+     * carries no extra fields.
+     *
+     * @param NominationContents $contents
+     */
+    private static function validateDismissalContents(array $contents): void {
+        if (
+            isset($contents['origin'])
+            || isset($contents['difficulty'])
+            || isset($contents['source'])
+            || isset($contents['tags'])
+            || isset($contents['statements'])
+            || isset($contents['reason'])
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+    }
+
+    /**
+     * Validates the `contents` for a `quality_tag` nomination. Only
+     * reviewers are allowed to send this type of nomination. Fetching the
+     * existing nomination contents for the (problem, reviewer) pair is the
+     * caller's responsibility, once validation has passed.
+     *
+     * @param NominationContents $contents
+     */
+    private static function validateQualityTagContents(
+        \OmegaUp\DAO\VO\Identities $identity,
+        array $contents
+    ): void {
+        // Only reviewers are allowed to send this type of nominations
+        if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        if (!isset($contents['quality_seal'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'quality_seal'
+            );
+        }
+        if (
+            isset($contents['level']) &&
+            !in_array($contents['level'], self::LEVEL_TAGS)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'level'
+            );
+        }
+
+        if (isset($contents['tags'])) {
+            self::validateAllowedTags(
+                $contents['tags'],
+                self::ALLOWED_PUBLIC_TAGS
+            );
+        }
+    }
+
+    /**
+     * Checks that every tag in `$tags` belongs to `$allowedTags`.
+     *
+     * @param list<string> $tags
+     * @param list<string> $allowedTags
+     */
+    private static function validateAllowedTags(
+        array $tags,
+        array $allowedTags
+    ): void {
+        /** @var string $tag */
+        foreach ($tags as $tag) {
+            if (!in_array($tag, $allowedTags)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            }
+        }
+    }
+
+    /**
+     * Checks that `$tags` has no duplicated entries.
+     *
+     * @param list<string> $tags
+     */
+    private static function validateNoDuplicatedTags(array $tags): void {
+        $duplicatedTags = self::getDuplicatedTags($tags);
+
+        if (!empty($duplicatedTags)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
+                'duplicateTagsNotAllowed',
+                'tags',
+                duplicatedItemsInArray: array_slice(
+                    $duplicatedTags,
+                    0,
+                    20
+                )
+            );
+        }
+    }
+
+    /**
+     * Persists the nomination (creating it, or updating the existing one in
+     * the `quality_tag` case) inside a transaction, and assigns reviewers
+     * when it is a `promotion`.
+     *
+     * @param NominationContents $contents
+     * @param null|array{qualitynomination_id: int} $qualityNomination
+     */
+    private static function saveNomination(
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $nominationType,
+        array $contents,
+        ?array $qualityNomination
+    ): \OmegaUp\DAO\VO\QualityNominations {
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
             'user_id' => $identity->user_id,
             'problem_id' => $problem->problem_id,
@@ -528,25 +676,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
 
             if ($nomination->nomination == 'promotion') {
-                $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
-                    \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-                );
-                if (is_null($qualityReviewerGroup)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'groupNotFound'
-                    );
-                }
-                foreach (
-                    \OmegaUp\DAO\Groups::sampleMembers(
-                        $qualityReviewerGroup,
-                        self::REVIEWERS_PER_NOMINATION
-                    ) as $reviewer
-                ) {
-                    \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
-                        'qualitynomination_id' => $nomination->qualitynomination_id,
-                        'user_id' => $reviewer->user_id,
-                    ]));
-                }
+                self::assignReviewers($nomination);
             }
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -556,6 +686,34 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         return $nomination;
+    }
+
+    /**
+     * Randomly assigns {@see self::REVIEWERS_PER_NOMINATION} members of the
+     * quality reviewer group to review a `promotion` nomination.
+     */
+    private static function assignReviewers(
+        \OmegaUp\DAO\VO\QualityNominations $nomination
+    ): void {
+        $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
+            \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        );
+        if (is_null($qualityReviewerGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+        foreach (
+            \OmegaUp\DAO\Groups::sampleMembers(
+                $qualityReviewerGroup,
+                self::REVIEWERS_PER_NOMINATION
+            ) as $reviewer
+        ) {
+            \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
+                'qualitynomination_id' => $nomination->qualitynomination_id,
+                'user_id' => $reviewer->user_id,
+            ]));
+        }
     }
 
     /**

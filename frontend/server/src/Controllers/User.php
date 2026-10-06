@@ -2477,7 +2477,12 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
+        if (self::isNonUserIdentity($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        \OmegaUp\Validators::validateValidUsername(
             $r['username'],
             'username'
         );
@@ -2486,17 +2491,13 @@ class User extends \OmegaUp\Controllers\Controller {
             'password'
         );
 
-        if (self::isNonUserIdentity($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
         if ($r['username'] !== $r->identity->username) {
-            $testu = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername(
+                $r['username']
+            );
 
-            if (!is_null($testu)) {
+            if (!is_null($identity)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterUsernameInUse',
                     'username'
@@ -2533,7 +2534,6 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $birth_date
      * @omegaup-request-param string $country_id
      * @omegaup-request-param 'decline'|'female'|'male'|'other'|null $gender
@@ -2563,8 +2563,8 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         if (!is_null($username)) {
-            $user = \OmegaUp\DAO\Users::FindByUsername($username);
-            if ($username !== $r->identity->username && !is_null($user)) {
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+            if ($username !== $r->identity->username && !is_null($identity)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'usernameInUse'
                 );
@@ -2650,17 +2650,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $schoolName = $r->ensureOptionalString('school_name');
         if (is_null($newSchoolId) && !is_null($schoolName)) {
-            $response = \OmegaUp\Controllers\School::apiCreate(
-                new \OmegaUp\Request([
-                    'name' => $schoolName,
-                    'country_id' => !is_null(
-                        $state
-                    ) ? $state->country_id : null,
-                    'state_id' => !is_null($state) ? $state->state_id : null,
-                    'auth_token' => $r['auth_token'],
-                ])
+            $newSchoolId = \OmegaUp\Controllers\School::createSchool(
+                name: $schoolName,
+                state: $state
             );
-            $newSchoolId = $response['school_id'];
         }
 
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
