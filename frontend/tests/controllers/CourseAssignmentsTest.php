@@ -662,4 +662,37 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('parameterInvalid', $e->getMessage());
         }
     }
+
+    public function testUpdateAssignmentsOrderWithNonArrayJson() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $adminLogin = self::login($courseData['admin']);
+
+        // Test with a JSON string (valid JSON that decodes to string, not array)
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignments' => json_encode('valid-json-string'),
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+        }
+
+        // Test with a JSON number (valid JSON that decodes to integer, not array)
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignments' => json_encode(123),
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+        }
+    }
 }
