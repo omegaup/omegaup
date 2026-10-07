@@ -1,6 +1,7 @@
 import * as time from '../time';
 import * as ui from '../ui';
 import * as api from '../api';
+import T from '../lang';
 import {
   ContestClarificationType,
   refreshContestClarifications,
@@ -41,6 +42,7 @@ export interface SocketOptions {
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
   scoreMode: ScoreMode;
+  onProblemListChanged?: () => void;
 }
 
 export class EventsSocket {
@@ -61,12 +63,14 @@ export class EventsSocket {
   socketStatus: SocketStatus = SocketStatus.Waiting;
   private clarificationInterval: ReturnType<typeof setTimeout> | null = null;
   private rankingInterval: ReturnType<typeof setTimeout> | null = null;
+  private pollingActive: boolean = false;
   private clarificationsOffset: number;
   private readonly clarificationsRowcount: number;
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
   private readonly scoreMode: ScoreMode;
+  private readonly onProblemListChanged?: () => void;
 
   constructor({
     disableSockets = false,
@@ -85,6 +89,7 @@ export class EventsSocket {
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
     scoreMode = ScoreMode.Partial,
+    onProblemListChanged,
   }: SocketOptions) {
     this.socket = null;
 
@@ -103,8 +108,10 @@ export class EventsSocket {
     this.socketStatus = SocketStatus.Waiting;
     this.clarificationInterval = null;
     this.rankingInterval = null;
+    this.pollingActive = false;
     this.intervalInMilliseconds = intervalInMilliseconds;
     this.scoreMode = scoreMode;
+    this.onProblemListChanged = onProblemListChanged;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -134,6 +141,43 @@ export class EventsSocket {
         startTime: data.scoreboard.start_time,
         finishTime: data.scoreboard.finish_time,
       });
+    } else if (data.message == '/contest/problem/update/') {
+      this.onContestProblemUpdate(data);
+    }
+  }
+
+  private onContestProblemUpdate(data: {
+    type: 'added' | 'modified' | 'removed';
+    problem_alias: string;
+  }) {
+    switch (data.type) {
+      case 'added':
+        ui.info(
+          ui.formatString(T.arenaContestProblemUpdateAdded, {
+            problemAlias: data.problem_alias,
+          }),
+        );
+        break;
+      case 'modified':
+        ui.info(
+          ui.formatString(T.arenaContestProblemModifiedRefresh, {
+            problemAlias: data.problem_alias,
+          }),
+        );
+        break;
+      case 'removed':
+        ui.info(
+          ui.formatString(T.arenaContestProblemUpdateRemoved, {
+            problemAlias: data.problem_alias,
+          }),
+        );
+        break;
+      default:
+        return;
+    }
+
+    if (this.onProblemListChanged) {
+      this.onProblemListChanged();
     }
   }
 
@@ -153,6 +197,18 @@ export class EventsSocket {
     if (scoreboard.finish_time != null) {
       scoreboard.finish_time = time.remoteTime(finishTime * 1000);
     }
+    this.updateRankings({ scoreboard });
+  }
+
+  // The socket path and the polling fallback have to leave the ranking store in
+  // the same state, and they drifted apart because each carried its own copy of
+  // this. processRankings normalizes the socket payload's epoch timestamps
+  // before delegating here.
+  private updateRankings({
+    scoreboard,
+  }: {
+    scoreboard: types.Scoreboard;
+  }): void {
     if (this.isVirtual) {
       api.Problemset.scoreboardEvents({
         problemset_id: this.originalProblemsetId,
@@ -246,6 +302,9 @@ export class EventsSocket {
       clearInterval(this.socketKeepalive);
       this.socketKeepalive = null;
     }
+    // The socket is down: keep the scoreboard moving until it comes back
+    // (`onopen` clears these intervals) or we stop trying altogether.
+    this.setupPolls();
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
       this.socketStatus = SocketStatus.Waiting;
@@ -261,7 +320,6 @@ export class EventsSocket {
   }
 
   private connectSocket(): Promise<void> {
-    this.shouldRetry = false;
     return new Promise((accept, reject) => {
       try {
         const socket = new WebSocket(this.uri, 'com.omegaup.events');
@@ -280,6 +338,7 @@ export class EventsSocket {
             clearInterval(this.rankingInterval);
             this.rankingInterval = null;
           }
+          this.pollingActive = false;
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             this.intervalInMilliseconds,
@@ -323,32 +382,27 @@ export class EventsSocket {
       });
   }
 
-  private setupPolls(): void {
+  // The API layer has already turned time, start_time and finish_time into
+  // Date objects, so the payload goes to updateRankings as-is: the epoch
+  // conversion processRankings does would be wrong here.
+  private refreshRanking(): void {
     api.Problemset.scoreboard({
       problemset_id: this.problemsetId,
       token: this.scoreboardToken,
     })
-      .then((scoreboard) => {
-        const { currentRanking } = onRankingChanged({
-          scoreboard,
-          currentUsername: this.currentUsername,
-          navbarProblems: this.navbarProblems,
-          scoreMode: this.scoreMode,
-        });
-
-        api.Problemset.scoreboardEvents({
-          problemset_id: this.problemsetId,
-          token: this.scoreboardToken,
-        })
-          .then((response) =>
-            onRankingEvents({
-              events: response.events,
-              currentRanking,
-            }),
-          )
-          .catch(ui.ignoreError);
-      })
+      .then((scoreboard) => this.updateRankings({ scoreboard }))
       .catch(ui.ignoreError);
+  }
+
+  private setupPolls(): void {
+    // `onclose` reaches here on every failed reconnect, and the initial
+    // `connect()` failure schedules it as well. Without this the intervals
+    // below would be armed a second time and the old pair leaked.
+    if (this.pollingActive) {
+      return;
+    }
+
+    this.refreshRanking();
     if (!this.problemsetAlias) {
       return;
     }
@@ -360,6 +414,7 @@ export class EventsSocket {
     });
 
     if (!this.socket) {
+      this.pollingActive = true;
       this.clarificationInterval = setInterval(() => {
         this.clarificationsOffset = 0; // Return pagination to start on refresh
         if (this.problemsetAlias) {
@@ -373,31 +428,7 @@ export class EventsSocket {
       }, this.intervalInMilliseconds);
 
       this.rankingInterval = setInterval(() => {
-        api.Problemset.scoreboard({
-          problemset_id: this.problemsetId,
-          token: this.scoreboardToken,
-        })
-          .then((scoreboard) => {
-            const { currentRanking } = onRankingChanged({
-              scoreboard,
-              currentUsername: this.currentUsername,
-              navbarProblems: this.navbarProblems,
-              scoreMode: this.scoreMode,
-            });
-
-            api.Problemset.scoreboardEvents({
-              problemset_id: this.problemsetId,
-              token: this.scoreboardToken,
-            })
-              .then((response) =>
-                onRankingEvents({
-                  events: response.events,
-                  currentRanking,
-                }),
-              )
-              .catch(ui.ignoreError);
-          })
-          .catch(ui.ignoreError);
+        this.refreshRanking();
       }, this.intervalInMilliseconds);
     }
   }

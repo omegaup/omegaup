@@ -49,6 +49,27 @@ class UITools {
     }
 
     /**
+     * If user is not logged in, is not an admin, and is not part of support,
+     * redirect to home page.
+     */
+    public static function redirectIfNoAdminOrSupport(): void {
+        $session = \OmegaUp\Controllers\Session::getCurrentSession();
+        if (
+            $session['is_admin'] ||
+            (
+                !is_null($session['identity']) &&
+                \OmegaUp\Authorization::isSupportTeamMember(
+                    $session['identity']
+                )
+            )
+        ) {
+            return;
+        }
+        header('Location: /');
+        die();
+    }
+
+    /**
      * @return array{twig: \Twig\Environment, twigContext: array<string, mixed>}
      */
     public static function getTwigInstance() {
@@ -218,6 +239,10 @@ class UITools {
             ),
             'maintenanceMessage' => \OmegaUp\Controllers\Admin::getMaintenanceMessage(
                 \OmegaUp\Controllers\Identity::getPreferredLanguage($identity)
+            ),
+            'ephemeralGraderEnabled' => \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+                'ephemeral_grader_enabled',
+                true
             ),
         ];
     }

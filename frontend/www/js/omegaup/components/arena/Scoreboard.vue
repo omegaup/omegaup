@@ -96,18 +96,24 @@
               </td>
 
               <td
-                v-for="(problem, problemIndex) in user.problems"
+                v-for="problem in problems"
                 :key="problem.alias"
-                :class="problemClass(problem, problems[problemIndex].alias)"
+                :class="problemClassByAlias(user, problem.alias)"
               >
-                <template v-if="problem.runs > 0">
+                <template
+                  v-if="
+                    getUserProblem(user, problem.alias) &&
+                    getUserProblem(user, problem.alias).runs > 0
+                  "
+                >
                   <div class="points">
-                    {{ renderPoints(problem) }}
+                    {{ renderPoints(getUserProblem(user, problem.alias)) }}
                   </div>
                   <div class="penalty">
-                    <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
-                      problem.runs
-                    }})
+                    <span v-if="showPenalty">{{
+                      getUserProblem(user, problem.alias).penalty
+                    }}</span>
+                    ({{ getUserProblem(user, problem.alias).runs }})
                   </div>
                 </template>
                 <template v-else> - </template>
@@ -218,6 +224,29 @@ export default class ArenaScoreboard extends Vue {
     } else {
       return alias;
     }
+  }
+
+  problemAlias(
+    problemIndex: number,
+    problem: types.ScoreboardRankingProblem,
+  ): string {
+    return this.problems[problemIndex]?.alias || problem.alias || '';
+  }
+
+  getUserProblem(
+    user: types.ScoreboardRankingEntry,
+    alias: string,
+  ): types.ScoreboardRankingProblem | null {
+    return user.problems.find((p) => p.alias === alias) ?? null;
+  }
+
+  problemClassByAlias(
+    user: types.ScoreboardRankingEntry,
+    alias: string,
+  ): string {
+    const p = this.getUserProblem(user, alias);
+    if (!p) return alias;
+    return this.problemClass(p, alias);
   }
 
   showUser(userIsInvited: boolean): boolean {

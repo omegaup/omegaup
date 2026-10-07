@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { Tab } from '../problem/Details.vue';
@@ -114,6 +114,11 @@ export default class Arena extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  @Watch('activeTab')
+  onActiveTabChanged(newTab: string) {
+    this.selectedTab = newTab;
   }
 
   @Emit('update:activeTab')

@@ -1,0 +1,67 @@
+name: Documentation feedback (English)
+description: Help us improve the platform by requesting changes, clarifications, or enhancements to the documentation using this format.
+title: "[DOCS] Brief description of the proposed improvement"
+labels:
+  - documentation
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and confirmed this is not a duplicate
+          required: true
+        - label: I have discussed this on [GitHub Discussions](https://github.com/omegaup/omegaup/discussions) or [Discord](https://discord.gg/K3JFd9d3wk) and received positive feedback
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Content
+
+        _Explain which part of the documentation needs improvement, updating, or is causing confusion and/or difficulty._
+
+        _Example: The description in [location] may cause confusion for new contributors._
+  - type: textarea
+    id: content
+    attributes:
+      label: Content
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Impact of the Problem (optional)
+
+        _Describe how this affects users, developers, or new contributors._
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact of the Problem (optional)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        ## Proposed Change (optional)
+
+        _Describe the suggested change or expected improvement._
+  - type: textarea
+    id: proposed-change
+    attributes:
+      label: Proposed Change (optional)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        ## Context (optional)
+
+        _Providing context helps us find the proper solution._
+
+        _Example: Links, screenshots, or external references that help clarify the suggested improvement._
+  - type: textarea
+    id: context
+    attributes:
+      label: Context (optional)
+    validations:
+      required: false

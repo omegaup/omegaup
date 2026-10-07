@@ -75,6 +75,17 @@ abstract class CacheAdapter {
     }
 
     /**
+     * Atomically increments a counter with TTL support.
+     * If the key doesn't exist, initializes it to 1 and sets the TTL.
+     * If it exists, increments it (TTL is preserved).
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds (only set on initialization)
+     * @return int The new value after incrementing
+     */
+    abstract public function incWithTTL(string $key, int $ttl): int;
+
+    /**
      * If the specified $id exists in cache, gets its associated value from the
      * cache.  Otherwise, executes $setFunc() to generate the associated
      * value, stores it, and returns it.
@@ -210,7 +221,8 @@ class RedisCacheAdapter extends CacheAdapter {
             if (
                 $this->redis->multi()->set(
                     $key,
-                    serialize($defaultVar)
+                    serialize($defaultVar),
+                    $flags
                 )->exec()
             ) {
                 return $defaultVar;
@@ -303,6 +315,54 @@ class RedisCacheAdapter extends CacheAdapter {
             }
         }
         return $current;
+    }
+
+    /**
+     * Atomically increments a counter with TTL support.
+     * Uses a Lua script over the same serialize() format as the rest of the
+     * adapter for true atomicity.
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds
+     * @return int The new value after incrementing
+     */
+    public function incWithTTL(string $key, int $ttl): int {
+        // Every other method in this adapter stores values with PHP's
+        // serialize() (an integer N is stored as "i:N;"). A raw Redis INCR
+        // would instead store "N", which unserialize() cannot read and which
+        // makes INCR fail on values previously written by inc()/store(). So we
+        // read, increment and write the counter in that same serialized format,
+        // all inside a Lua script for atomicity. The TTL is only (re)set when
+        // the key is first created, preserving the previous behaviour.
+        $script = <<<'LUA'
+        local raw = redis.call('GET', KEYS[1])
+        local is_new = raw == false
+        local count
+        if is_new then
+            count = 1
+        else
+            local n = string.match(raw, '^i:(%-?%d+);$')
+                or string.match(raw, '^(%-?%d+)$')
+            count = (n and tonumber(n) + 1) or 1
+        end
+        local value = 'i:' .. count .. ';'
+        if is_new then
+            redis.call('SET', KEYS[1], value)
+            if tonumber(ARGV[1]) > 0 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
+        else
+            local pttl = redis.call('PTTL', KEYS[1])
+            redis.call('SET', KEYS[1], value)
+            if pttl > 0 then
+                redis.call('PEXPIRE', KEYS[1], pttl)
+            end
+        end
+        return count
+        LUA;
+        /** @var int */
+        $result = $this->redis->eval($script, [$key, $ttl], 1);
+        return $result;
     }
 
     /**
@@ -458,6 +518,24 @@ class APCCacheAdapter extends CacheAdapter {
     public function store(string $key, $var, int $ttl = 0): bool {
         return apcu_store($key, $var, $ttl);
     }
+
+    /**
+     * Atomically increments a counter with TTL support.
+     * Uses apcu_entry() for atomic initialization, then CAS loop.
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds
+     * @return int The new value after incrementing
+     */
+    public function incWithTTL(string $key, int $ttl): int {
+        // Must do this in a loop to avoid race condition
+        do {
+            // Ensure the key exists with TTL (atomic initialization)
+            $current = $this->entry($key, 0, $ttl);
+            $newValue = $current + 1;
+        } while (!$this->cas($key, $current, $newValue));
+        return $newValue;
+    }
 }
 
 /**
@@ -540,6 +618,22 @@ class InProcessCacheAdapter extends CacheAdapter {
         $this->cache[$key] = $var;
         return true;
     }
+
+    /**
+     * Atomically increments a counter.
+     * TTL is ignored in the in-process cache (no expiration needed).
+     *
+     * @param string $key
+     * @param int $ttl Time to live in seconds (ignored)
+     * @return int The new value after incrementing
+     */
+    public function incWithTTL(string $key, int $ttl): int {
+        if (!array_key_exists($key, $this->cache)) {
+            $this->cache[$key] = 0;
+        }
+        $this->cache[$key]++;
+        return $this->cache[$key];
+    }
 }
 
 /**
@@ -582,6 +676,7 @@ class Cache {
     const DATA_CASES_FILES = 'data-cases-files-';
     const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
     const PROBLEM_IDENTITY_TYPE = 'problems-identity-type-';
+    const SYSTEM_SETTINGS = 'system-settings-';
 
     /** @var \Monolog\Logger */
     private $log;
@@ -673,6 +768,28 @@ class Cache {
         }
         $this->log->debug("Cache hit for key: {$this->key}");
         return $result;
+    }
+
+    /**
+     * Atomically increments a counter with TTL support.
+     * If the key doesn't exist, initializes it to 1 and sets the TTL.
+     * If it exists, increments it (TTL is preserved).
+     *
+     * @param int $ttl Time to live in seconds (only set on initialization)
+     * @return int The new value after incrementing, or 0 if cache is disabled
+     */
+    public function incWithTTL(int $ttl): int {
+        if (!self::isEnabled()) {
+            return 0;
+        }
+        $newValue = CacheAdapter::getInstance()->incWithTTL(
+            $this->key,
+            $ttl
+        );
+        $this->log->debug(
+            "Cache counter incremented to {$newValue} for key: {$this->key}"
+        );
+        return $newValue;
     }
 
     /**

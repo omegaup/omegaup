@@ -30,6 +30,7 @@
       <div class="row">
         <div class="col-md-12">
           <button
+            v-if="!hideSaveButton"
             data-problem-creator-solution-save-markdown
             class="btn btn-primary"
             type="submit"
@@ -72,6 +73,7 @@ export default class SolutionTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;
   @Prop() activeTabIndex!: TabIndex;
+  @Prop({ default: false }) hideSaveButton!: boolean;
 
   T = T;
   ui = ui;
@@ -116,7 +118,12 @@ export default class SolutionTab extends Vue {
     this.$emit('show-update-success-message');
   }
 
+  persistDraft(): void {
+    this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
+  }
+
   startIntroGuide() {
+    if (this.hideSaveButton) return;
     if (!this.$cookies.get('has-visited-solution-tab')) {
       introJs()
         .setOptions({

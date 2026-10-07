@@ -3,7 +3,7 @@
     <hr class="dropdown-separator" />
     <li class="grader grader-submissions">
       <a class="grader-submissions-link" href="/arena/admin/">{{
-        T.wordsLatestSubmissions
+        T.latestSubmissionsTitle
       }}</a>
     </li>
     <li class="grader grader-status">{{ graderStatusMessage }}</li>

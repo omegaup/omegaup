@@ -42,7 +42,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0.34
+        image: mysql:8.4.10@sha256:8dbcf531a03aade657e181b9cf2f1d1803ce621a1d55610cb44cb531ab7d7db6
         ports:
           - 13306:13306
         env:
@@ -209,17 +209,23 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '20'
-          cache: 'yarn'
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run JavaScript tests
-        run: yarn test:coverage
+        run: pnpm test:coverage
 
       - name: Upload code coverage
         run: |
@@ -251,8 +257,20 @@ jobs:
           define('OMEGAUP_LOG_FILE', 'php://stderr');
           EOF
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -343,11 +361,23 @@ jobs:
         with:
           install_host_python_deps: true
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build webpack resources
-        run: yarn build
+        run: pnpm build
 
       - name: Wait for dependencies
         run: |

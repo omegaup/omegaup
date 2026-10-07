@@ -8,7 +8,7 @@
   >
     <slot name="title">
       <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+        <h1 class="text-center">{{ T.latestSubmissionsTitle }}</h1>
       </div>
     </slot>
     <div
@@ -111,6 +111,7 @@
                 <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
+                <option value="rk">ReKarel</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
@@ -219,6 +220,15 @@
             </tr>
           </tfoot>
           <tbody>
+            <tr v-if="filteredRuns.length === 0">
+              <td colspan="12">
+                <omegaup-common-empty-state
+                  icon="clipboard-list"
+                  :title="T.runsListEmptyTitle"
+                  :description="T.runsListEmptyDescription"
+                ></omegaup-common-empty-state>
+              </td>
+            </tr>
             <tr v-for="run in filteredRuns" :key="run.guid">
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td>
@@ -450,6 +460,7 @@ import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -501,6 +512,7 @@ export enum PopupDisplayed {
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
+    'omegaup-common-empty-state': common_EmptyState,
   },
   directives: {
     infiniteScroll,
@@ -741,7 +753,7 @@ export default class Runs extends Vue {
       return '';
     }
 
-    if (run.language == 'kj' || run.language == 'kp') {
+    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
       if (run.verdict == 'RTE' || run.verdict == 'RE') {
         return T.verdictHelpKarelRTE;
       } else if (run.verdict == 'TLE' || run.verdict == 'TO') {

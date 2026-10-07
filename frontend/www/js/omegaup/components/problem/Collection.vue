@@ -120,6 +120,7 @@
             <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
             <omegaup-problem-finder-wizard
               v-show="showFinderWizard"
+              :show="showFinderWizard"
               :possible-tags="allTags"
               @close="showFinderWizard = false"
               @search-problems="$emit('search-problems', $event)"
