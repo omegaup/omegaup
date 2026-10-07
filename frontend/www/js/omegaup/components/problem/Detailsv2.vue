@@ -7,16 +7,8 @@
           :show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
         <div v-if="problem.karel_problem" class="karel-js-link my-3">
-          <a
-            class="p-3"
-            :href="`/karel.js/${
-              problem.sample_input
-                ? `#mundo:${encodeURIComponent(problem.sample_input)}`
-                : ''
-            }`"
-            target="_blank"
-          >
-            {{ T.openInKarelJs }}
+          <a class="p-3" :href="karelIdeUrl" target="_blank">
+            {{ openInKarelIdeText }}
             <font-awesome-icon :icon="['fas', 'external-link-alt']" />
           </a>
         </div>
@@ -195,6 +187,18 @@ export default class ProblemDetails extends Vue {
 
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = PopupDisplayed.None;
+
+  get isReKarelProblem(): boolean {
+    return this.filteredLanguages.includes('rk');
+  }
+
+  get karelIdeUrl(): string {
+    return this.isReKarelProblem ? '/rekarel/' : '/karel.js/';
+  }
+
+  get openInKarelIdeText(): string {
+    return this.isReKarelProblem ? T.openInReKarel : T.openInKarelJs;
+  }
 
   get shouldShowEphemeralGrader(): boolean {
     return !this.problem.karel_problem && this.ephemeralGraderEnabled;

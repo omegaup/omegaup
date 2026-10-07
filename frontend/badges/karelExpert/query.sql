@@ -14,7 +14,7 @@ WHERE
     `r`.`verdict` = "AC" AND
     `s`.`type` = "normal" AND
     `p`.`visibility` >= 2 AND
-    FIND_IN_SET(`s`.`language`,'kj,kp')
+    FIND_IN_SET(`s`.`language`,'kj,kp,rk')
 GROUP BY
     `u`.`user_id`
 HAVING

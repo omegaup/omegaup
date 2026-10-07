@@ -2,6 +2,7 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 import { types } from './api_types';
+import { SafeSessionStorage } from './safe_storage';
 import notificationsStore, {
   MessageType,
   NotificationPosition,
@@ -134,6 +135,24 @@ export function success(message: string, options?: NotificationOptions): void {
     position: options?.position,
     onDismiss: options?.onDismiss,
   });
+}
+
+const PENDING_SUCCESS_MESSAGE_KEY = 'omegaup-pending-success-message';
+
+export function persistSuccessMessage(message: string): void {
+  if (!message) {
+    return;
+  }
+  SafeSessionStorage.setItem(PENDING_SUCCESS_MESSAGE_KEY, message);
+}
+
+export function showPersistedSuccessMessage(): void {
+  const message = SafeSessionStorage.getItem(PENDING_SUCCESS_MESSAGE_KEY);
+  if (message === null) {
+    return;
+  }
+  SafeSessionStorage.removeItem(PENDING_SUCCESS_MESSAGE_KEY);
+  success(message);
 }
 
 export function warning(message: string, options?: NotificationOptions): void {

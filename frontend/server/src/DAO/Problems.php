@@ -143,15 +143,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
         // Create placeholders (?, ?, ?) for each username
         $placeholders = implode(',', array_fill(0, count($usernames), '?'));
-        $sql = "SELECT user_id FROM User_Rank WHERE username IN ({$placeholders})";
+        // `Identities` is the canonical username -> user_id mapping and
+        // contains every registered user, including admins, private
+        // users, and users who have only ever created problems.
+        // `User_Rank` is a denormalized cache populated only from users
+        // with at least one AC solution, so querying it here caused the
+        // `author=` filter to silently drop for everyone else.
+        $sql = "SELECT user_id FROM Identities WHERE username IN ({$placeholders}) AND user_id IS NOT NULL";
 
-        /** @var list<array{user_id: int}> */
+        /** @var list<array{user_id: int|null}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $usernames
         );
 
-        return array_map(fn($row) => intval($row['user_id']), $results);
+        return array_map(
+            fn($row) => intval($row['user_id']),
+            $results
+        );
     }
 
     /**
@@ -352,7 +361,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        bool $matchAnyLanguage = false,
+        ?string $solvedStatus = null
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -397,11 +408,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
-        /** @var list<array{0: string, 1: list<string>}> */
-        foreach ($programmingLanguages as $programmingLanguage) {
+        if (!empty($programmingLanguages)) {
             $clauses[] = [
-                'FIND_IN_SET(?, p.languages) > 0',
-                [$programmingLanguage],
+                '(' . implode(
+                    ' ' . ($matchAnyLanguage ? 'OR' : 'AND') . ' ',
+                    array_fill(
+                        0,
+                        count($programmingLanguages),
+                        'FIND_IN_SET(?, p.languages) > 0'
+                    )
+                ) . ')',
+                $programmingLanguages,
             ];
         }
 
@@ -480,12 +497,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
+        if (
+            !is_null($solvedStatus)
+            && $solvedStatus !== 'all'
+            && !is_null($identityId)
+            && !is_null($userId)
+        ) {
+            $solvedExists = 'EXISTS (SELECT 1 FROM Submissions ss WHERE ss.problem_id = p.problem_id AND ss.identity_id = ? AND ss.verdict = \'AC\' AND ss.type = \'normal\')';
+            $submittedExists = 'EXISTS (SELECT 1 FROM Submissions ss WHERE ss.problem_id = p.problem_id AND ss.identity_id = ? AND ss.type = \'normal\')';
+            $forfeitedExists = 'NOT EXISTS (SELECT 1 FROM Problems_Forfeited pf WHERE pf.problem_id = p.problem_id AND pf.user_id = ?)';
+            $ownedExists = 'NOT EXISTS (SELECT 1 FROM ACLs acl_own WHERE acl_own.acl_id = p.acl_id AND acl_own.owner_id = ?)';
+            if ($solvedStatus === 'solved') {
+                $clauses[] = [
+                    '(' . $solvedExists . ' AND ' . $forfeitedExists . ' AND ' . $ownedExists . ')',
+                    [$identityId, $userId, $userId],
+                ];
+            } elseif ($solvedStatus === 'attempted') {
+                $clauses[] = [
+                    '(' . $submittedExists . ' AND NOT ' . $solvedExists . ' AND ' . $forfeitedExists . ' AND ' . $ownedExists . ')',
+                    [$identityId, $identityId, $userId, $userId],
+                ];
+            } elseif ($solvedStatus === 'unsolved') {
+                $clauses[] = [
+                    'NOT ' . $submittedExists,
+                    [$identityId],
+                ];
+            }
+        }
+
         if (!is_null($query) && $query !== '') {
             $isNumericQuery = is_numeric($query);
             $conditions = [
                 'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
             ];
-            $argsForQuery = [$query];
+            $argsForQuery = [
+                \OmegaUp\DAO\DAO::escapeBooleanModeQuery($query),
+            ];
 
             if ($isNumericQuery) {
                 $conditions[] = 'p.problem_id = ?';
@@ -560,6 +607,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     'pa_acl.owner_id IN (' . $placeholders . ')',
                     $authorUserIds,
                 ];
+            } else {
+                // Every requested author username failed to resolve to a
+                // user id. This can only happen when the username does
+                // not exist in `Identities`; an empty result set is the
+                // correct answer rather than silently dropping the
+                // filter and returning every visible problem.
+                $clauses[] = ['0 = 1', []];
             }
         }
 
@@ -917,7 +971,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql = "
             SELECT
                 {$fields},
-                SUM(s.verdict = 'AC') AS solved_count
+                SUM(s.verdict = 'AC' AND s.type = 'normal') AS solved_count
             FROM
                 Submissions s
             INNER JOIN
@@ -1310,7 +1364,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     MATCH(p.`alias`, p.`title`) AGAINST (? IN BOOLEAN MODE)
             ';
-            $params[] = $query;
+            $params[] = \OmegaUp\DAO\DAO::escapeBooleanModeQuery($query);
         }
 
         /** @var int */

@@ -93,13 +93,13 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         if (empty($defaultLanguages)) {
             $supportedLanguages = self::SUPPORTED_LANGUAGES();
-            $filterList = ['cat', 'kp', 'kj'];
+            $filterList = ['cat', 'kp', 'kj', 'rk'];
 
             $defaultLanguages = array_keys(array_filter($supportedLanguages, function (
                 $languageName,
                 $key
             ) use ($filterList) {
-                return !in_array($key, $filterList);
+                return !in_array($key, $filterList, true);
             }, ARRAY_FILTER_USE_BOTH));
         }
 
@@ -1926,7 +1926,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{runs: list<Run>, totalRuns: int}
      *
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $rowcount
