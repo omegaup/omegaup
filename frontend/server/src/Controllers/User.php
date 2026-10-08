@@ -37,7 +37,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
  * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
- * @psalm-type BookmarkProblem=array{alias: string, title: string}
+ * @psalm-type BookmarkProblem=array{alias: string, attempted: bool, solved: bool, title: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
  * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
  * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null}
@@ -2477,7 +2477,12 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
+        if (self::isNonUserIdentity($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        \OmegaUp\Validators::validateValidUsername(
             $r['username'],
             'username'
         );
@@ -2486,17 +2491,13 @@ class User extends \OmegaUp\Controllers\Controller {
             'password'
         );
 
-        if (self::isNonUserIdentity($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
         if ($r['username'] !== $r->identity->username) {
-            $testu = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername(
+                $r['username']
+            );
 
-            if (!is_null($testu)) {
+            if (!is_null($identity)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterUsernameInUse',
                     'username'
@@ -2533,7 +2534,6 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $birth_date
      * @omegaup-request-param string $country_id
      * @omegaup-request-param 'decline'|'female'|'male'|'other'|null $gender
@@ -2563,8 +2563,8 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         if (!is_null($username)) {
-            $user = \OmegaUp\DAO\Users::FindByUsername($username);
-            if ($username !== $r->identity->username && !is_null($user)) {
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+            if ($username !== $r->identity->username && !is_null($identity)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'usernameInUse'
                 );
@@ -2650,17 +2650,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $schoolName = $r->ensureOptionalString('school_name');
         if (is_null($newSchoolId) && !is_null($schoolName)) {
-            $response = \OmegaUp\Controllers\School::apiCreate(
-                new \OmegaUp\Request([
-                    'name' => $schoolName,
-                    'country_id' => !is_null(
-                        $state
-                    ) ? $state->country_id : null,
-                    'state_id' => !is_null($state) ? $state->state_id : null,
-                    'auth_token' => $r['auth_token'],
-                ])
+            $newSchoolId = \OmegaUp\Controllers\School::createSchool(
+                name: $schoolName,
+                state: $state
             );
-            $newSchoolId = $response['school_id'];
         }
 
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
