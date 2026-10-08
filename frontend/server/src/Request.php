@@ -480,6 +480,7 @@ class Request extends \ArrayObject {
      * because it is a system admin, or because it is a member of the
      * support team.
      *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @psalm-assert !null $this->identity
      * @psalm-assert !null $this->identity->identity_id

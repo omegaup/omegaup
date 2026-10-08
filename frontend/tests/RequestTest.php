@@ -12,13 +12,10 @@ class RequestTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($adminIdentity);
 
-        $r = new \OmegaUp\Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-
-        // Should not throw.
-        $r->ensureUserHasAdministrativeAccess();
-        $this->assertTrue(true);
+        $request->ensureUserHasAdministrativeAccess();
     }
 
     /**
@@ -29,29 +26,39 @@ class RequestTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
         $login = self::login($supportIdentity);
 
-        $r = new \OmegaUp\Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-
-        // Should not throw.
-        $r->ensureUserHasAdministrativeAccess();
-        $this->assertTrue(true);
+        $request->ensureUserHasAdministrativeAccess();
     }
 
     /**
      * A regular user with no administrative role should be rejected.
      */
-    public function testRegularUserIsDenied(): void {
+    public function testRegularUserIsDeniedAccess(): void {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $r = new \OmegaUp\Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
 
         $this->expectException(
             \OmegaUp\Exceptions\ForbiddenAccessException::class
         );
-        $r->ensureUserHasAdministrativeAccess();
+        $request->ensureUserHasAdministrativeAccess();
+    }
+
+    /**
+     * A user that is not logged in at all should be rejected before any
+     * permission check happens.
+     */
+    public function testUnauthenticatedUserIsDeniedAccess(): void {
+        $request = new \OmegaUp\Request([]);
+
+        $this->expectException(
+            \OmegaUp\Exceptions\UnauthorizedException::class
+        );
+        $request->ensureUserHasAdministrativeAccess();
     }
 }
