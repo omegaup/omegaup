@@ -603,12 +603,17 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
-                    submission_id, version, commit, verdict
+                    submission_id, version, commit, verdict, penalty, `time`
                 )
             SELECT
-                s.submission_id, ?, ?, "JE"
+                s.submission_id, ?, ?, "JE",
+                IFNULL(r.penalty, s.submit_delay), s.`time`
             FROM
                 Submissions s
+            LEFT JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
             WHERE
                 s.problemset_id = ? AND
                 s.problem_id = ?
