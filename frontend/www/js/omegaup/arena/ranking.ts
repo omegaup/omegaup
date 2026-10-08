@@ -53,7 +53,7 @@ export function onRankingEvents({
   // group points by person
   for (const curr of events) {
     // limit chart to top n users
-    if (currentRanking[curr.username] > placesToShowInChart) continue;
+    if (currentRanking[curr.username] >= placesToShowInChart) continue;
 
     const name = curr.name ?? curr.username;
 

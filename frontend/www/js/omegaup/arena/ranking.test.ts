@@ -539,5 +539,42 @@ describe('ranking', () => {
         }),
       );
     });
+
+    it('should limit the chart series to the top placesToShowInChart users', () => {
+      const currentRanking: { [username: string]: number } = {};
+      const events: types.ScoreboardEvent[] = [];
+      const totalUsers = 12;
+
+      for (let i = 0; i < totalUsers; i++) {
+        const username = `user_${i}`;
+        currentRanking[username] = i;
+        events.push({
+          classname: 'user-rank-unranked',
+          username,
+          delta: i + 1,
+          is_invited: false,
+          problem: {
+            alias: 'problem_alias',
+            points: 100 - i,
+            penalty: i,
+          },
+          total: {
+            points: 100 - i,
+            penalty: i,
+          },
+        });
+      }
+
+      const { series } = onRankingEvents({
+        events,
+        currentRanking,
+        startTimestamp: 0,
+        finishTimestamp: 1000,
+        placesToShowInChart: 10,
+      });
+
+      expect(series).toHaveLength(10);
+      expect(series.map((s) => s.rank)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    });
   });
 });
