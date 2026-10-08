@@ -352,14 +352,16 @@ Returns the detail of a single cron run.
 
 ### Description
 
-Lists the registered cron jobs and their most recent runs.
+Lists the registered cron jobs, their most recent runs and the open
+problem health findings.
 
 ### Returns
 
-| Name   | Type                  |
-| ------ | --------------------- |
-| `jobs` | `List[types.CronJob]` |
-| `runs` | `List[types.CronRun]` |
+| Name                    | Type                               |
+| ----------------------- | ---------------------------------- |
+| `jobs`                  | `List[types.CronJob]`              |
+| `problemHealthFindings` | `List[types.ProblemHealthFinding]` |
+| `runs`                  | `List[types.CronRun]`              |
 
 ## `/api/admin/getMaintenanceMode/`
 
@@ -3538,6 +3540,7 @@ List of public and user's private problems
 | `query`                 | `null\|string`                                                                                                                     |             |          |
 | `require_all_tags`      | `bool\|null`                                                                                                                       |             |          |
 | `rowcount`              | `int\|null`                                                                                                                        |             |          |
+| `solved_status`         | `'all'\|'attempted'\|'solved'\|'unsolved'\|null`                                                                                   |             |          |
 | `some_tags`             | `bool\|null`                                                                                                                       |             |          |
 | `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |          |
 
@@ -5822,7 +5825,6 @@ Update user profile
 | `graduation_date`           | `string`                                     |             | ✓        |
 | `locale`                    | `string`                                     |             | ✓        |
 | `state_id`                  | `string`                                     |             | ✓        |
-| `auth_token`                | `mixed`                                      |             |          |
 | `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |          |
 | `has_competitive_objective` | `bool\|null`                                 |             |          |
 | `has_learning_objective`    | `bool\|null`                                 |             |          |
