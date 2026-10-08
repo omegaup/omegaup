@@ -227,6 +227,10 @@ class _FakeCursor:
         '''Records the executed statement and its params.'''
         self._connection.calls.append((query, params))
 
+    def executemany(self, query: str, params: Any = None) -> None:
+        '''Records the batched statement and its rows.'''
+        self._connection.calls.append((query, params))
+
     def fetchone(self) -> Any:
         '''Returns the scripted row for the last query.'''
         return self._connection.next_fetchone
@@ -322,6 +326,43 @@ class TestRecordModelRun(unittest.TestCase):
 
         _query, params = conn.calls[0]
         self.assertIsNone(params[6])
+
+
+class TestSyncRecommendations(unittest.TestCase):
+    '''Test mirroring the published model into Problem_Recommendations.'''
+
+    def test_sync_replaces_table_with_top_n(self) -> None:
+        '''The table is cleared and only the top n rows per problem synced.'''
+        conn = _FakeConnection()
+        model = {
+            1: [(2, 0.9), (3, 0.5), (4, 0.1)],
+            5: [(6, 0.7)],
+        }
+
+        synced = build_problem_rec_model.sync_recommendations_to_mysql(
+            cast(lib.db.Connection, conn), model, top_n=2)
+
+        self.assertEqual(synced, 3)
+        self.assertEqual(len(conn.calls), 2)
+        delete_query, _ = conn.calls[0]
+        self.assertIn('DELETE FROM `Problem_Recommendations`', delete_query)
+        insert_query, rows = conn.calls[1]
+        self.assertIn('INSERT INTO `Problem_Recommendations`', insert_query)
+        self.assertEqual(rows, [(1, 2, 0.9), (1, 3, 0.5), (5, 6, 0.7)])
+        self.assertEqual(conn.commits, 1)
+
+    def test_sync_empty_model_only_clears_table(self) -> None:
+        '''An empty model clears the table without inserting anything.'''
+        conn = _FakeConnection()
+
+        synced = build_problem_rec_model.sync_recommendations_to_mysql(
+            cast(lib.db.Connection, conn), {}, top_n=50)
+
+        self.assertEqual(synced, 0)
+        self.assertEqual(len(conn.calls), 1)
+        delete_query, _ = conn.calls[0]
+        self.assertIn('DELETE FROM `Problem_Recommendations`', delete_query)
+        self.assertEqual(conn.commits, 1)
 
 
 class TestShouldPublish(unittest.TestCase):

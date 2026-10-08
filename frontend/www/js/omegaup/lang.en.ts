@@ -930,6 +930,8 @@ const translations: { [key: string]: string; } = {
   homepageCreateSectionTitle: "Create",
   homepageGetStartedTitle: "Getting started with omegaUp",
   homepageHowItWorks: "How it works",
+  homepageRecommendedProblemsReason: "Because you solved %(problem)",
+  homepageRecommendedProblemsTitle: "Recommended for you",
   homepageSponsorsSectionTitle: "Thanks to our Sponsor",
   homepageTeachSectionDescription: "Track your student's progress through assignments and tests that are automatically assessed",
   homepageTeachSectionTitle: "Teach",
