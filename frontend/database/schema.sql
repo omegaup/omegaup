@@ -788,7 +788,7 @@ CREATE TABLE `Problem_Health_Checks` (
   `severity` enum('warning','error') NOT NULL DEFAULT 'warning',
   `detail` varchar(255) DEFAULT NULL COMMENT 'Explicación legible de lo que se detectó',
   `first_detected_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La primera vez que se detectó, se conserva entre ejecuciones',
-  `last_seen_at` datetime NOT NULL COMMENT 'La última ejecución en la que se seguía detectando',
+  `last_seen_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La última ejecución en la que se seguía detectando',
   `resolved_at` datetime DEFAULT NULL COMMENT 'Cuando dejó de detectarse, NULL si sigue vigente',
   PRIMARY KEY (`check_id`),
   UNIQUE KEY `unique_problem_check` (`problem_id`,`check_type`),
@@ -1556,6 +1556,21 @@ CREATE TABLE `Users_Experiments` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los experimentos habilitados para un usuario.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Users_Followers` (
+  `users_follower_id` int NOT NULL AUTO_INCREMENT,
+  `follower_user_id` int NOT NULL COMMENT 'El usuario que sigue a alguien más',
+  `followed_user_id` int NOT NULL COMMENT 'El usuario que es seguido',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`users_follower_id`),
+  UNIQUE KEY `unique_follow_relationship` (`follower_user_id`,`followed_user_id`),
+  KEY `idx_users_followers_followed_user_id` (`followed_user_id`),
+  CONSTRAINT `fk_uf_followed_user_id` FOREIGN KEY (`followed_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_uf_follower_user_id` FOREIGN KEY (`follower_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_uf_no_self_follow` CHECK ((`follower_user_id` <> `followed_user_id`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Relaciones de seguimiento entre usuarios para el sistema de amigos/seguidos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
