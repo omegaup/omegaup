@@ -2,7 +2,8 @@
   <b-modal
     v-model="showModal"
     hide-footer
-    modal-class="objectives-questions-modal"
+    dialog-class="mx-auto"
+    header-class="border-bottom-0"
   >
     <template #modal-title>
       <h5 class="modal-title font-weight-bold">
@@ -257,12 +258,9 @@ export default class UserObjectivesQuestions extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
->>> .modal-dialog {
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .modal-dialog {
   max-width: 330px;
-}
-
->>> .modal-header {
-  border-bottom: 0;
 }
 
 .btn-next-previous {
@@ -272,13 +270,5 @@ export default class UserObjectivesQuestions extends Vue {
 .btn-next-previous:focus,
 .btn-next-previous.focus {
   box-shadow: 0 0 0 0;
-}
-</style>
-
-<style lang="scss">
-.objectives-questions-modal .modal-dialog {
-  max-width: 330px;
-  margin-left: auto;
-  margin-right: auto;
 }
 </style>
