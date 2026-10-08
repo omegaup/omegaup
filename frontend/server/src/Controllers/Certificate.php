@@ -647,14 +647,14 @@ class Certificate extends \OmegaUp\Controllers\Controller {
 
         $channel->exchange_declare(
             $exchange,
-            $queue,
+            'direct',
             false,
             true,
             false,
         );
 
         $channel->queue_declare(
-            'contest',
+            $queue,
             false,
             true,
             false,
