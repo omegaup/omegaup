@@ -249,8 +249,12 @@
         </div>
         <div class="row">
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-objective"
-              >{{ T.courseNewFormObjective }}
+            <label class="font-weight-bold w-100 introjs-objective">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isObjectiveComplete }"
+                >{{ T.courseNewFormObjective }}</span
+              >
               <font-awesome-icon
                 :title="T.courseNewFormObjectiveDesc"
                 icon="info-circle"
@@ -265,6 +269,7 @@
                 }"
                 cols="30"
                 rows="5"
+                required="required"
                 :maxlength="MAX_LENGTH.objective"
               ></textarea>
             </label>
@@ -425,6 +430,10 @@ export default class CourseDetails extends Vue {
 
   get isDescriptionComplete(): boolean {
     return this.description !== null && this.description.trim().length > 0;
+  }
+
+  get isObjectiveComplete(): boolean {
+    return this.objective !== null && this.objective.trim().length > 0;
   }
 
   // Computed properties for character limit danger thresholds

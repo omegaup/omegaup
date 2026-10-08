@@ -438,10 +438,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description',
             $isRequired
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['objective'],
+        $r->ensureOptionalString(
             'objective',
-            required: $isRequired
+            $isRequired,
+            fn (string $objective) => $objective !== ''
         );
 
         $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
