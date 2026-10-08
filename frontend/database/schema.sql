@@ -788,7 +788,7 @@ CREATE TABLE `Problem_Health_Checks` (
   `severity` enum('warning','error') NOT NULL DEFAULT 'warning',
   `detail` varchar(255) DEFAULT NULL COMMENT 'Explicación legible de lo que se detectó',
   `first_detected_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La primera vez que se detectó, se conserva entre ejecuciones',
-  `last_seen_at` datetime NOT NULL COMMENT 'La última ejecución en la que se seguía detectando',
+  `last_seen_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La última ejecución en la que se seguía detectando',
   `resolved_at` datetime DEFAULT NULL COMMENT 'Cuando dejó de detectarse, NULL si sigue vigente',
   PRIMARY KEY (`check_id`),
   UNIQUE KEY `unique_problem_check` (`problem_id`,`check_type`),
