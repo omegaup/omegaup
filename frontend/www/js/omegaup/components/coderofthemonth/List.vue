@@ -154,6 +154,11 @@ export default defineComponent({
       );
     },
   },
+  watch: {
+    selectedTab(newTab: string): void {
+      this.currentSelectedTab = newTab;
+    },
+  },
   methods: {
     getSelectedTab(tab: {
       id: string;

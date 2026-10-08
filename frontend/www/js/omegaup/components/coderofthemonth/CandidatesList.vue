@@ -89,7 +89,7 @@ export default defineComponent({
     },
     selectedTab: {
       type: String,
-      required: true,
+      default: undefined,
     },
     isDisabled: {
       type: Boolean,
