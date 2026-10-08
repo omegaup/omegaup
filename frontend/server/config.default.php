@@ -99,8 +99,8 @@ try_define('OMEGAUP_COURSE_CLONE_SECRET_KEY', 'CHANGE_ME');
 # ####################################
 try_define('OMEGAUP_RABBITMQ_HOST', 'rabbitmq');
 try_define('OMEGAUP_RABBITMQ_PORT', 5672);
-try_define('OMEGAUP_RABBITMQ_USERNAME', 'omegaup');
-try_define('OMEGAUP_RABBITMQ_PASSWORD', 'omegaup');
+try_define('OMEGAUP_RABBITMQ_USERNAME', 'XXXXX');
+try_define('OMEGAUP_RABBITMQ_PASSWORD', 'XXXXX');
 
 # ####################################
 # FACEBOOK LOGIN CONFIG

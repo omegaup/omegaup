@@ -54,7 +54,7 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        # getattr(self.dbconn, "ping")(reconnect=True, attempts=3, delay=5)
+        self.dbconn.ping(reconnect=True, attempts=3, delay=5)  # type: ignore
         response = json.loads(body)
 
         try:
@@ -209,5 +209,3 @@ class ContestsCallback:
 def generate_contest_code() -> str:
     '''Generates a random verification code.'''
     return verification_code.generate_code()
-
-# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
