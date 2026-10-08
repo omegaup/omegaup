@@ -1,82 +1,90 @@
 ## POST `problem/create`
 
-### Descripción
-Crea un nuevo problema.
+### Description
+Creates a new problem.
 
-### Privilegios
-Usuario loggeado
+### Privileges
+- Must be a logged-in user.
 
-### Parámetros
-| Parámetro | Tipo | Descripción  | Opcional? |
-| -------- |:-------------:| :-----|:-----|
-|`author_username`|string|Username del usuario que originalmente redactó el problema||
-|`title`|string|Título del problema||
-|`alias`|string|Alias corto del problema||
-|`source`|string|Fuente del problema (UVA, OMI, etc..)||
-|`public`|int|`0` si el problema es privado. `1` si el problema es público||
-|`validator`|string|Define cómo se van a comparar las salidas del los concursantes con las salidas oficiales. Ver la tabla de **validadores**||
-|`time_limit`|int|Límite de tiempo de ejecución para cada caso del problema en milisegundos. (TLE)||
-|`memory_limit`|int|Límite de memoria en tiempo de ejecución para cada caso del problema en KB (MLE)||
-|`order`|string|||
-|`problem_contents`|FILE|Un archivo ZIP con los contenidos del problema: [Cómo escribir problemas para omegaup](Cómo-escribir-problemas-para-Omegaup)||
+### Parameters
 
-#### Validadores
-| Tipo | Descripción |
-| -------- |:-------------|
-|`literal`||
-|`token`||
-|`token-caseless`||
-|`token-numeric`||
+| Parameter          | Type   | Description                                                                                                 | Optional? |
+|--------------------|--------|-------------------------------------------------------------------------------------------------------------|-----------|
+| `author_username`  | string | Username of the user who originally wrote the problem                                                       | No        |
+| `title`            | string | Title of the problem                                                                                        | No        |
+| `alias`            | string | Short alias for the problem                                                                                 | No        |
+| `source`           | string | Source of the problem (UVA, OMI, etc.)                                                                       | No        |
+| `public`           | int    | `0` for private problem, `1` for public problem                                                              | No        |
+| `validator`        | string | Defines how contestants’ outputs are compared to the official outputs. See **Validators** table below.      | No        |
+| `time_limit`       | int    | Time limit in milliseconds for each case of the problem (TLE)                                               | No        |
+| `memory_limit`     | int    | Memory limit in KB for each case of the problem (MLE)                                                        | No        |
+| `order`            | string | (Reserved for ordering information)                                                                         | Yes       |
+| `problem_contents` | FILE   | A ZIP file containing the problem’s contents ([How to write problems for omegaup](Cómo-escribir-problemas-para-Omegaup)) | No        |
 
-### Regresa
+#### Validators
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`status`|string|Si el request fue exitoso, regresa `ok`| 
-|`uploaded_files`|array[]string|Arreglo de archivos que fueron desempacados||
+| Type              | Description |
+|-------------------|-------------|
+| `literal`         |             |
+| `token`           |             |
+| `token-caseless`  |             |
+| `token-numeric`   |             |
+
+### Returns
+
+| Parameter         | Type         | Description                                         |
+|-------------------|--------------|-----------------------------------------------------|
+| `status`          | string       | If successful, returns `ok`                         |
+| `uploaded_files`  | array[string]| List of files that were unpacked from the ZIP file  |
+
+
+---
 
 ## GET `problems/:problem_alias`
 
-### Descripción
-Regresa los detalles de un problema **dentro de un concurso**.
+### Description
+Returns the details of a problem **inside a contest**.
 
-### Privilegios
-Usuario loggeado. Si el concurso es privado, el usuario requiere estar invitado.
+### Privileges
+- Must be a logged-in user.
+- If the contest is private, the user must be invited.
 
-### Parámetros
-| Parámetro | Tipo | Descripción  | Opcional? |
-| -------- |:-------------:| :-----|:-----|
-|`contest_alias`|string|Alias del concurso||
-|`lang`|string|Idioma del concurso. Default es `es`|Opcional|
+### Parameters
 
-### Regresa
+| Parameter        | Type   | Description                             | Optional? |
+|------------------|--------|-----------------------------------------|-----------|
+| `contest_alias`  | string | Contest alias                           | No        |
+| `lang`           | string | Contest language (default: `es`)        | Yes       |
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`title`|string|Título del problema|
-|`author_id`|int|Autor del problema|
-|`validator`|string|Validador del problema. Ver tabla de **validadores**|
-|`time_limit`|int|Tiempo límite de ejecución en milisegundos|
-|`memory_limit`|int|Memoria límite en KB|
-|`visits`|int|Visitas totales a este problema|
-|`submissions`|int|Total de envíos para este problema en todos los concursos|
-|`accepted`|int|Total de envíos correctos (AC) para este problema en todos los concursos|
-|`difficulty`|int|Dificultad del problema determinada por Omegaup|
-|`creation_date`|datetime|Fecha de creación del problema|
-|`source`|string|Fuente del problema.|
-|`runs`|array|Regresa un arreglo con todos los runs del concursante para este problema. Ver tabla `runs`|
+### Returns
+
+| Parameter       | Type     | Description                                                                 |
+|-----------------|----------|-----------------------------------------------------------------------------|
+| `title`         | string   | Title of the problem                                                        |
+| `author_id`     | int      | Problem author ID                                                           |
+| `validator`     | string   | Validator type (see **Validators** table)                                   |
+| `time_limit`    | int      | Time limit in milliseconds                                                  |
+| `memory_limit`  | int      | Memory limit in KB                                                           |
+| `visits`        | int      | Total visits to this problem                                                 |
+| `submissions`   | int      | Total submissions across all contests                                        |
+| `accepted`      | int      | Total accepted submissions (AC) across all contests                          |
+| `difficulty`    | int      | Problem difficulty as determined by Omegaup                                 |
+| `creation_date` | datetime | Date when the problem was created                                            |
+| `source`        | string   | Source of the problem                                                        |
+| `runs`          | array    | List of all runs by the contestant for this problem (see **Runs** table)     |
 
 #### Runs
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`guid`|string|Identificación del run|
-|`language`|string|Lenguaje del envío.|
-|`status`|string|Status del problema en el proceso de calificación. Posibles valores: 'new','waiting','compiling','running','ready'|
-|`veredict`|string|Veredicto del juez sobre el problema. Veredictos posibles: 'AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE'|
-|`runtime`|int|Tiempo total de ejecución en milisegundos que tardó el envío en resolver los casos del problema.|
-|`memory`|int|Memoria total que usó el run para resolver los casos de prueba.|
-|`score`|double|Double entre `0` y `1` que indica el total de casos resueltos, donde `1` significa que se resolvieron todos los casos.|
-|`contest_score`|int|Puntaje ponderado del run. Es el puntaje que se muestra en el scoreboard.|
-|`time`|datetime|Hora de envío del run|
-|`submit_delay`|int|Minutos que pasaron desde el inicio del concurso hasta que se envió el run.|
+| Parameter       | Type     | Description                                                                                   |
+|-----------------|----------|-----------------------------------------------------------------------------------------------|
+| `guid`          | string   | Run ID                                                                                        |
+| `language`      | string   | Submission language                                                                           |
+| `status`        | string   | Status in the grading process (`new`, `waiting`, `compiling`, `running`, `ready`)             |
+| `veredict`      | string   | Judge's verdict (`AC`, `PA`, `PE`, `WA`, `TLE`, `OLE`, `MLE`, `RTE`, `RFE`, `CE`, `JE`)        |
+| `runtime`       | int      | Total execution time in milliseconds                                                          |
+| `memory`        | int      | Total memory used in KB                                                                       |
+| `score`         | double   | Between `0` and `1` — proportion of test cases solved (`1` = all cases solved)                 |
+| `contest_score` | int      | Weighted score shown on the scoreboard                                                        |
+| `time`          | datetime | Time of submission                                                                            |
+| `submit_delay`  | int      | Minutes since the contest started until the run was submitted                                 |
+
