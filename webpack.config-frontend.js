@@ -21,8 +21,9 @@ module.exports = {
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_carousel: './frontend/www/js/omegaup/admin/carousel.ts',
     admin_crons: './frontend/www/js/omegaup/admin/crons.ts',
+    admin_operations_dashboard: './frontend/www/js/omegaup/admin/operations.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.ts',
-    admin_settings: './frontend/www/js/omegaup/admin/settings.ts',
+    admin_global_settings: './frontend/www/js/omegaup/admin/settings.ts',
     admin_support: './frontend/www/js/omegaup/admin/support.ts',
     admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena_contest_contestant:
