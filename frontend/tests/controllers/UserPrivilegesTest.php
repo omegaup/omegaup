@@ -322,59 +322,93 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * @return list<string>
+     */
+    private function getPayloadSystemRoles(
+        string $authToken,
+        string $username
+    ): array {
+        return \OmegaUp\Controllers\User::getUserDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $authToken,
+                'username' => $username,
+            ])
+        )['templateProperties']['payload']['systemRoles'];
+    }
+
     /*
-     * Test that a role granted both directly and through a system group
-     * is not duplicated in the system roles list
+     * Test that a system role granted only through a group is included in
+     * the user payload, and that a role granted both directly and through
+     * a group is returned only once.
      */
     public function testGroupSystemRolesAndDeduplication() {
         $username = 'testuserdedup';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => $username]
             )
         );
-
         $login = self::login($identity);
 
-        // Grant the Mentor role directly...
+        // Put the user in the system group and make sure that group grants
+        // the Mentor role on the system ACL.
+        \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'group' => 'omegaup:mentor'
+        ]));
+        $identityId = intval($identity->identity_id);
+        if (
+            !in_array(
+                'Mentor',
+                \OmegaUp\DAO\GroupRoles::getSystemRoles($identityId)
+            )
+        ) {
+            $group = \OmegaUp\DAO\Groups::findByAlias('omegaup:mentor');
+            $mentorRole = null;
+            foreach (\OmegaUp\DAO\Roles::getAll() as $role) {
+                if ($role->name === 'Mentor') {
+                    $mentorRole = $role;
+                }
+            }
+            $this->assertNotNull($group);
+            $this->assertNotNull($mentorRole);
+            \OmegaUp\DAO\GroupRoles::create(
+                new \OmegaUp\DAO\VO\GroupRoles([
+                    'group_id' => $group->group_id,
+                    'role_id' => $mentorRole->role_id,
+                    'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
+                ])
+            );
+        }
+
+        // The role comes only from the group: it must be in the payload.
+        $payloadRoles = $this->getPayloadSystemRoles(
+            $login->auth_token,
+            $username
+        );
+        $this->assertContains('Admin', $payloadRoles);
+        $this->assertContains('Mentor', $payloadRoles);
+
+        // Now grant the same role directly too.
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
         ]));
-        // ...and also through the system group.
-        \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'username' => $username,
-            'group' => 'omegaup:mentor'
-        ]));
 
-        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
-
-        $this->assertContains('Admin', $systemRoles);
-        $this->assertContains('Mentor', $systemRoles);
-
-        // No role should appear more than once.
-        foreach (array_count_values($systemRoles) as $role => $count) {
-            $this->assertSame(
-                1,
-                $count,
-                "Role {$role} should not be duplicated"
-            );
-        }
-
-        [
-            'systemRoles' => $payloadRoles,
-        ] = \OmegaUp\Controllers\User::getUserDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => $username,
-            ])
-        )['templateProperties']['payload'];
-
+        $payloadRoles = $this->getPayloadSystemRoles(
+            $login->auth_token,
+            $username
+        );
         $this->assertSame(
-            array_values(array_unique($payloadRoles)),
-            array_values($payloadRoles)
+            1,
+            count(array_keys($payloadRoles, 'Mentor', true)),
+            'Mentor should appear exactly once'
+        );
+        $this->assertSame(
+            count($payloadRoles),
+            count(array_unique($payloadRoles))
         );
     }
 }
