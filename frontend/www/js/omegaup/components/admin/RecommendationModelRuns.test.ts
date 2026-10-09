@@ -46,7 +46,7 @@ describe('RecommendationModelRuns.vue', () => {
     expect(cells.at(1).find('small').text()).toBe(asPercent(0.3419));
     expect(cells.at(2).text()).toBe((12345).toLocaleString(T.locale));
     expect(cells.at(2).attributes('title')).toBe('12345');
-    expect(cells.at(4).text()).toBe(T.cronControlPlaneModelPublishedYes);
+    expect(cells.at(4).text()).toBe(T.wordsYes);
     expect(cells.at(4).find('.badge-success').exists()).toBe(true);
     expect(cells.at(5).text()).toBe('—');
   });
@@ -60,7 +60,7 @@ describe('RecommendationModelRuns.vue', () => {
       .at(1)
       .findAll('td');
 
-    expect(cells.at(4).text()).toBe(T.cronControlPlaneModelPublishedNo);
+    expect(cells.at(4).text()).toBe(T.wordsNo);
     expect(cells.at(4).find('.badge-secondary').exists()).toBe(true);
     expect(cells.at(5).text()).toBe('MAP score 0.0312 below minimum 0.0500');
   });
