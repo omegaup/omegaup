@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import Sidebar from './Sidebar.vue';
-import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
 import {
@@ -12,19 +11,8 @@ import {
 import T from '../../../../lang';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('Sidebar.vue', () => {
-  // Total 6 buttons are rendered initially on this page.
-  // - Layout button
-  // - Add case/group button
-  // - Ungrouped case button
-  // - Add new layout button
-  // - Add layout from selected case button
-  // - close layout bar button
-  const initialButtonsCount = 6;
-
   beforeEach(() => {
     store.commit('casesStore/resetStore');
   });
@@ -32,13 +20,15 @@ describe('Sidebar.vue', () => {
   it('Should contain buttons and Groups text', async () => {
     const wrapper = shallowMount(Sidebar, { localVue, store });
 
-    const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(initialButtonsCount);
-    let shouldContainAddText = false;
-    buttons.wrappers.forEach((button) => {
-      if (button.text() === T.problemCreatorAdd) shouldContainAddText = true;
-    });
-    expect(shouldContainAddText).toBe(true);
+    expect(wrapper.find('[data-toggle-layout-sidebar]').exists()).toBe(true);
+    expect(wrapper.find('[data-add-window]').exists()).toBe(true);
+    expect(wrapper.find('[data-add-layout-from-selected-case]').exists()).toBe(
+      true,
+    );
+    expect(wrapper.find('[data-close-layout-sidebar]').exists()).toBe(true);
+    expect(wrapper.find('[data-add-window]').text()).toContain(
+      T.problemCreatorAdd,
+    );
     expect(wrapper.find('h5').text()).toBe(T.problemCreatorGroups);
   });
 
@@ -60,23 +50,23 @@ describe('Sidebar.vue', () => {
 
     await Vue.nextTick();
 
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(4);
-    expect(
-      wrapper.find('b-button-stub[title="ungroupedCase1"]').text(),
-    ).toContain('ungroupedCase1');
+    expect(wrapper.findAll('.dropdown-item').length).toBe(4);
+    expect(wrapper.find('button[title="ungroupedCase1"]').text()).toContain(
+      'ungroupedCase1',
+    );
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(3);
+    expect(wrapper.findAll('.dropdown-item').length).toBe(3);
 
     store.commit('casesStore/addGroup', newGroup1);
     store.commit('casesStore/addGroup', newGroup2);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(5);
+    expect(wrapper.findAll('.dropdown-item').length).toBe(5);
 
     store.commit('casesStore/deleteUngroupedCases');
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(3);
+    expect(wrapper.findAll('.dropdown-item').length).toBe(3);
   });
 
   it('should show groups and cases inside them', async () => {
@@ -103,12 +93,12 @@ describe('Sidebar.vue', () => {
     // - 2 dropdown items for ungrouped case
     // - a dropdown item for validate points
 
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(
+    expect(wrapper.findAll('.dropdown-item').length).toBe(
       totalDropdownItemsCount,
     );
 
-    const group1 = wrapper.find('b-button-stub[title="group1"]');
-    const group2 = wrapper.find('b-button-stub[title="group2withlongname"]');
+    const group1 = wrapper.find('button[title="group1"]');
+    const group2 = wrapper.find('button[title="group2withlongname"]');
 
     expect(group1.text()).toContain('group1');
     expect(group2.text()).toContain('group2withlongname');
@@ -131,23 +121,20 @@ describe('Sidebar.vue', () => {
 
     await Vue.nextTick();
 
-    // The number of dropdown stubs should be equal to
-    // (#dropdown-stubs) = 5*(#groups) + 2 (for ungrouped cases) + 1 (for validate points)
+    // The number of dropdown items should be equal to
+    // (#dropdown-items) = 5*(#groups) + 2 (for ungrouped cases) + 1 (for validate points)
 
     expect(
-      group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
-        .length,
+      group1.element.parentElement?.querySelectorAll('.dropdown-item').length,
     ).toBe(7);
     expect(
-      group2.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
-        .length,
+      group2.element.parentElement?.querySelectorAll('.dropdown-item').length,
     ).toBe(6);
 
     store.commit('casesStore/deleteGroupCases', newGroup2.groupID);
     await Vue.nextTick();
     expect(
-      group2.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
-        .length,
+      group2.element.parentElement?.querySelectorAll('.dropdown-item').length,
     ).toBe(5);
 
     store.commit('casesStore/deleteCase', {
@@ -156,13 +143,12 @@ describe('Sidebar.vue', () => {
     });
     await Vue.nextTick();
     expect(
-      group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
-        .length,
+      group1.element.parentElement?.querySelectorAll('.dropdown-item').length,
     ).toBe(6);
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(8);
+    expect(wrapper.findAll('.dropdown-item').length).toBe(8);
   });
 
   it('Should modify a group', async () => {
