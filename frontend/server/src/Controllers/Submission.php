@@ -567,8 +567,36 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
 
         $feedbackString = $r->ensureString('feedback_list');
-        /** @var list<array{lineNumber: int, feedback: string}> */
-        $feedbackList = json_decode($feedbackString, associative: true);
+        /** @var mixed */
+        $decodedFeedbackList = json_decode($feedbackString, associative: true);
+        if (!is_array($decodedFeedbackList)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters',
+                'feedback_list'
+            );
+        }
+
+        $feedbackList = [];
+        foreach ($decodedFeedbackList as $feedbackEntry) {
+            if (!is_array($feedbackEntry)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidParameters',
+                    'feedback_list'
+                );
+            }
+            $lineNumber = $feedbackEntry['lineNumber'] ?? null;
+            $feedbackText = $feedbackEntry['feedback'] ?? null;
+            if (!is_int($lineNumber) || !is_string($feedbackText)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidParameters',
+                    'feedback_list'
+                );
+            }
+            $feedbackList[] = [
+                'lineNumber' => $lineNumber,
+                'feedback' => $feedbackText,
+            ];
+        }
 
         foreach ($feedbackList as $feedback) {
             self::createOrUpdateFeedback(
