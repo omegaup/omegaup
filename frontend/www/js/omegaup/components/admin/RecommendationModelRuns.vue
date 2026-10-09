@@ -5,7 +5,7 @@
     <table v-if="modelRuns.length" class="table table-sm" data-cron-model-runs>
       <thead>
         <tr>
-          <th>{{ T.cronControlPlaneStarted }}</th>
+          <th>{{ T.cronControlPlaneModelTrained }}</th>
           <th>{{ T.cronControlPlaneModelScore }}</th>
           <th>{{ T.cronControlPlaneModelDataset }}</th>
           <th>{{ T.cronControlPlaneModelSeed }}</th>
@@ -77,9 +77,7 @@ export default class RecommendationModelRuns extends Vue {
   }
 
   publishedLabel(published: boolean): string {
-    return published
-      ? T.cronControlPlaneModelPublishedYes
-      : T.cronControlPlaneModelPublishedNo;
+    return published ? T.wordsYes : T.wordsNo;
   }
 
   publishedClass(published: boolean): string {
