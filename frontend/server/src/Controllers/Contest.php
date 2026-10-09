@@ -5408,9 +5408,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                             'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
                         ])
                     );
-                    if (!is_null($teamsGroup->name)) {
-                        $result['teamsGroupName'] = $teamsGroup->name;
-                    }
+                    $result['teamsGroupName'] = $teamsGroup->name;
                 }
             }
 
