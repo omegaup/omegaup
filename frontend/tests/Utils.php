@@ -478,7 +478,7 @@ class Utils {
             type: 'direct',
             passive: false,
             durable: true,
-            auto_delete: false
+            auto_delete: false // posible problema con el cache de los trabajos
         );
 
         $channel->queue_bind(
