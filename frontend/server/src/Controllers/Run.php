@@ -406,11 +406,11 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      *
-     * @omegaup-request-param null|string $contest_alias
-     * @omegaup-request-param string $language
-     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $contest_alias Alias of the contest
+     * @omegaup-request-param string $language Programming language used for the solution
+     * @omegaup-request-param string $problem_alias Alias of the problem
      * @omegaup-request-param int|null $problemset_id
-     * @omegaup-request-param string $source
+     * @omegaup-request-param string $source Source code of the solution
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -903,9 +903,9 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string, runs: list<array{guid: null|string, username: null|string}>}
      *
-     * @omegaup-request-param null|string $run_alias
-     * @omegaup-request-param null|string $problem_alias
-     * @omegaup-request-param null|string $contest_alias
+     * @omegaup-request-param null|string $run_alias Alias of the run 
+     * @omegaup-request-param null|string $problem_alias 	Alias of the problem
+     * @omegaup-request-param null|string $contest_alias 	Alias of the contest
      * @omegaup-request-param null|string $username
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -1866,7 +1866,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $problem_alias Alias of the problem
      * @omegaup-request-param string $username
      */
     private static function validateList(\OmegaUp\Request $r): array {
@@ -1928,7 +1928,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int $offset
-     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $problem_alias Alias of the problem
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param string $username
