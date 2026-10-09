@@ -167,9 +167,9 @@ OmegaUp.on('ready', () => {
           },
           'submit-edit-course': (request: messages.CourseUpdateRequest) => {
             new Promise<number | null>((accept) => {
-              if (request.school.key) {
+              if (request.school?.key) {
                 accept(request.school.key);
-              } else if (request.school.value) {
+              } else if (request.school?.value) {
                 api.School.create({ name: request.school.value })
                   .then((response) => {
                     accept(response.school_id);
