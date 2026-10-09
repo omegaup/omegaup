@@ -101,3 +101,10 @@ export const Healthy: Story = {
 };
 
 Healthy.storyName = 'Crons with nothing to report';
+
+export const Empty: Story = {
+  args: { jobs: [], runs: [], problemHealthFindings: [] },
+  render: Default.render,
+};
+
+Empty.storyName = 'Crons before anything has run';
