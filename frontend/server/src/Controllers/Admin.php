@@ -12,9 +12,9 @@
   * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
- * @psalm-type ProblemHealthFinding=array{problem_id: int, alias: string, title: string, check_type: string, severity: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp}
- * @psalm-type RecommendationModelRun=array{model_run_id: int, map_score: float, dataset_size: int, rng_seed: int|null, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
- * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
+  * @psalm-type ProblemHealthFinding=array{problem_id: int, alias: string, title: string, check_type: string, severity: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp}
+  * @psalm-type RecommendationModelRun=array{model_run_id: int, map_score: float, dataset_size: int, rng_seed: int|null, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';

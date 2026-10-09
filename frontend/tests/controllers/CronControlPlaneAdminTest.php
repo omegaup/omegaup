@@ -258,8 +258,8 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         int $createdAt,
         ?string $skipReason = null
     ): void {
-            \OmegaUp\DAO\RecommendationModelRuns::create(
-                new \OmegaUp\DAO\VO\RecommendationModelRuns([
+        \OmegaUp\DAO\RecommendationModelRuns::create(
+            new \OmegaUp\DAO\VO\RecommendationModelRuns([
                 'map_score' => $mapScore,
                 'dataset_size' => 4096,
                 'num_followups' => 3,
@@ -270,23 +270,8 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
                 'published' => $published,
                 'skip_reason' => $skipReason,
                 'created_at' => new \OmegaUp\Timestamp($createdAt),
-                ])
-            );
-    }
-
-    private function onlyTheseRuns(array $modelRuns, array $scores): array {
-        // The database is shared, so match only the runs this test created.
-        return array_values(array_filter(
-            $modelRuns,
-            function (array $modelRun) use ($scores): bool {
-                foreach ($scores as $score) {
-                    if (abs($modelRun['map_score'] - $score) < 1e-9) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        ));
+            ])
+        );
     }
 
     public function testGetCronsIncludesTheRecommendationModelRuns() {
@@ -294,69 +279,59 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         $now = \OmegaUp\Time::get();
         $this->createModelRun(
-            0.111111,
+            0.0312,
             published: false,
             createdAt: $now - 200,
-            skipReason: 'MAP score 0.1111 below minimum 0.3000'
+            skipReason: 'MAP score 0.0312 below minimum 0.0500'
         );
-        $this->createModelRun(0.222222, published: true, createdAt: $now - 100);
+        $this->createModelRun(0.1934, published: true, createdAt: $now - 100);
 
         $response = \OmegaUp\Controllers\Admin::apiGetCrons(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
-        $modelRuns = $this->onlyTheseRuns(
-            $response['recommendationModelRuns'],
-            [0.222222, 0.111111]
-        );
+        $modelRuns = $response['recommendationModelRuns'];
         $this->assertCount(2, $modelRuns);
         // Newest first.
-        $this->assertEqualsWithDelta(
-            0.222222,
-            $modelRuns[0]['map_score'],
-            1e-9
-        );
         $this->assertGreaterThan(
             $modelRuns[1]['model_run_id'],
             $modelRuns[0]['model_run_id']
         );
+        $this->assertEqualsWithDelta(0.1934, $modelRuns[0]['map_score'], 1e-9);
         $this->assertTrue($modelRuns[0]['published']);
         $this->assertNull($modelRuns[0]['skip_reason']);
         $this->assertSame(4096, $modelRuns[0]['dataset_size']);
         $this->assertSame(42, $modelRuns[0]['rng_seed']);
         $this->assertSame($now - 100, $modelRuns[0]['created_at']->time);
-        $this->assertEqualsWithDelta(
-            0.111111,
-            $modelRuns[1]['map_score'],
-            1e-9
-        );
+        $this->assertEqualsWithDelta(0.0312, $modelRuns[1]['map_score'], 1e-9);
         $this->assertFalse($modelRuns[1]['published']);
         $this->assertSame(
-            'MAP score 0.1111 below minimum 0.3000',
+            'MAP score 0.0312 below minimum 0.0500',
             $modelRuns[1]['skip_reason']
         );
     }
 
-    public function testGetCronsListsTheTrainingJob() {
+    public function testGetCronsCapsTheRecommendationModelRuns() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $limit = \OmegaUp\Controllers\Admin::RECOMMENDATION_MODEL_RUNS_LIMIT;
+        $now = \OmegaUp\Time::get();
+        for ($i = 0; $i <= $limit; $i++) {
+            $this->createModelRun(0.1, published: true, createdAt: $now - $i);
+        }
 
         $response = \OmegaUp\Controllers\Admin::apiGetCrons(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
-        $names = array_map(fn ($job) => $job['name'], $response['jobs']);
-        $this->assertContains(
-            \OmegaUp\CronJobName::BuildProblemRecModel->value,
-            $names
-        );
+        $this->assertCount($limit, $response['recommendationModelRuns']);
     }
 
     public function testGetCronsForTypeScriptCarriesTheSameModelRuns() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         $this->createModelRun(
-            0.333333,
+            0.1934,
             published: true,
             createdAt: \OmegaUp\Time::get() - 100
         );
@@ -368,14 +343,8 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $fromPage = $this->onlyTheseRuns(
-            $page['templateProperties']['payload']['recommendationModelRuns'],
-            [0.333333]
-        );
+        $fromPage = $page['templateProperties']['payload']['recommendationModelRuns'];
         $this->assertCount(1, $fromPage);
-        $this->assertEquals(
-            $this->onlyTheseRuns($api['recommendationModelRuns'], [0.333333]),
-            $fromPage
-        );
+        $this->assertEquals($api['recommendationModelRuns'], $fromPage);
     }
 }
