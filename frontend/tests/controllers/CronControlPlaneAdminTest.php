@@ -461,6 +461,23 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($job->enabled);
     }
 
+    public function testSetCronJobEnabledRequiresAJobName() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Admin::apiSetCronJobEnabled(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'enabled' => false,
+                ])
+            );
+            $this->fail('Should not have changed a job without a name');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+        }
+    }
+
     public function testSetCronJobEnabledRejectsUnknownJob() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
