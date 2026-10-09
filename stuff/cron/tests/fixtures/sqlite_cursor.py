@@ -11,11 +11,20 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
 # SQLite requires `AS` before an UPDATE alias, MySQL does not.
 _UPDATE_ALIAS_RE = re.compile(
     r'\bUPDATE\s+(`?\w+`?)\s+(?!AS\b|SET\b)(\w+)\b', re.IGNORECASE)
+# SQLite spells date arithmetic as a modifier string.
+_DATE_SUB_RE = re.compile(
+    r'DATE_SUB\(NOW\(\), INTERVAL %s (SECOND|HOUR)\)', re.IGNORECASE)
 _TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 def _translate(sql: str) -> str:
     '''Rewrite the MySQL-only constructs the cron queries use.'''
+    sql = _DATE_SUB_RE.sub(
+        lambda match: (
+            "datetime('now', '-' || %s || ' "
+            f"{match.group(1).lower()}s')"),
+        sql)
+    sql = sql.replace('NOW()', "datetime('now')")
     sql = sql.replace('%s', '?').replace('UNION DISTINCT', 'UNION')
     return _UPDATE_ALIAS_RE.sub(r'UPDATE \1 AS \2', sql)
 
@@ -44,6 +53,11 @@ class SqliteCursor:
     def __init__(self, conn: sqlite3.Connection) -> None:
         self._cur = conn.cursor()
         self.calls: List[Tuple[str, Any]] = []
+
+    @property
+    def rowcount(self) -> int:
+        '''Rows the last statement matched.'''
+        return self._cur.rowcount
 
     def execute(self, sql: str, params: Any = None) -> None:
         '''Record the call and run the translated statement.'''
