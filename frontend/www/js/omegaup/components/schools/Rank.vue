@@ -37,20 +37,23 @@
         {{ T.searchSchool }}
       </button>
     </div>
-    <table class="table mb-0">
-      <thead>
-        <tr>
-          <th class="text-center" scope="col">#</th>
-          <th class="text-center" scope="col">{{ T.profileSchool }}</th>
-          <th class="text-center" scope="col">{{ T.wordsScore }}</th>
-        </tr>
-      </thead>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th class="text-center rank-column" scope="col">#</th>
+            <th class="text-center" scope="col">{{ T.profileSchool }}</th>
+            <th class="text-center score-column" scope="col">
+              {{ T.wordsScore }}
+            </th>
+          </tr>
+        </thead>
       <tbody>
         <tr v-for="(school, index) in rank" :key="index">
-          <th class="text-center" scope="row">
+          <th class="text-center rank-column" scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
-          <td class="text-truncate text-center">
+          <td class="school-name-cell text-center">
             <omegaup-countryflag
               :country="school.country_id"
             ></omegaup-countryflag>
@@ -58,12 +61,13 @@
               school.name
             }}</a>
           </td>
-          <td class="text-center">
+          <td class="text-right score-column">
             {{ school.score.toFixed(2) }}
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
     <div v-if="showHeader" class="card-footer">
       <a href="/rank/schools/">{{ T.rankSeeGeneralRanking }}</a>
     </div>
@@ -125,11 +129,26 @@ export default class SchoolRank extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-// FIXME: This prevents wrapping a table cell when the name of the school is too long.
-// So, both tables (users rank and the current one) are perfectly aligned.
-// Another solution should  be taken in the future.
-.text-truncate {
+
+.school-name-cell {
   max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 576px) {
+    max-width: 140px;
+  }
+}
+
+.rank-column {
+  width: 3rem;
+  white-space: nowrap;
+}
+
+.score-column {
+  min-width: 6rem;
+  white-space: nowrap;
 }
 
 .table-width {
