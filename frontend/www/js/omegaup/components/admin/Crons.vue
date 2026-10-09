@@ -4,6 +4,48 @@
       <div class="card-title h4">{{ T.omegaupTitleAdminCrons }}</div>
     </div>
     <div class="card-body">
+      <div v-if="jobs.length" class="row mb-4" data-cron-health>
+        <div v-for="job in jobs" :key="job.name" class="col-sm-6 col-lg-4 mb-2">
+          <div class="card h-100">
+            <div class="card-body">
+              <h6 class="card-title text-truncate mb-0">
+                {{ jobTitle(job.name) }}
+              </h6>
+              <code class="small d-block text-truncate mb-2">{{
+                job.name
+              }}</code>
+              <span :class="statusClass(latestStatus(job.name))">{{
+                latestStatus(job.name) || '—'
+              }}</span>
+              <dl class="row small mb-0 mt-2">
+                <dt class="col-7 font-weight-normal">
+                  {{ T.cronControlPlaneSuccessRate }}
+                  <font-awesome-icon
+                    class="text-muted"
+                    :icon="['fas', 'info-circle']"
+                    :title="T.cronControlPlaneSuccessRateInfo"
+                  />
+                </dt>
+                <dd class="col-5 mb-0 text-right">
+                  {{ successRate(job.name) }}
+                </dd>
+                <dt class="col-7 font-weight-normal">
+                  {{ T.cronControlPlaneAvgDuration }}
+                  <font-awesome-icon
+                    class="text-muted"
+                    :icon="['fas', 'info-circle']"
+                    :title="T.cronControlPlaneAvgDurationInfo"
+                  />
+                </dt>
+                <dd class="col-5 mb-0 text-right">
+                  {{ avgDuration(job.name) }}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <h5>{{ T.cronControlPlaneJobsHeading }}</h5>
       <table class="table table-sm" data-cron-jobs>
         <thead>
@@ -16,8 +58,19 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="!jobs.length">
+            <td colspan="5" class="text-muted">
+              {{ T.cronControlPlaneNoJobs }}
+            </td>
+          </tr>
           <tr v-for="job in scheduledJobs" :key="job.name">
-            <td>{{ job.name }}</td>
+            <td>
+              <code>{{ job.name }}</code>
+              <small class="d-block text-muted">{{ jobTitle(job.name) }}</small>
+              <small v-if="job.description" class="d-block text-muted">
+                {{ job.description }}
+              </small>
+            </td>
             <td>
               <template v-if="job.schedule">
                 <code>{{ job.schedule }}</code>
@@ -32,8 +85,29 @@
                 latestStatus(job.name) || '—'
               }}</span>
             </td>
-            <td>{{ latestStartedAt(job.name) }}</td>
-            <td class="text-right">
+            <td>
+              <span :title="latestStartedAt(job.name)">{{
+                latestStartedAtRelative(job.name)
+              }}</span>
+            </td>
+            <td class="text-right text-nowrap">
+              <div
+                class="custom-control custom-switch d-inline-block mr-2 align-middle"
+              >
+                <input
+                  :id="`cron-enabled-${job.name}`"
+                  class="custom-control-input"
+                  type="checkbox"
+                  :checked="job.enabled"
+                  data-cron-enabled
+                  @click.prevent="setEnabled(job)"
+                />
+                <label
+                  class="custom-control-label"
+                  :for="`cron-enabled-${job.name}`"
+                  >{{ T.cronControlPlaneEnabled }}</label
+                >
+              </div>
               <button
                 class="btn btn-sm btn-outline-primary"
                 type="button"
@@ -50,6 +124,30 @@
       </table>
 
       <h5 class="mt-4">{{ T.cronControlPlaneRunsHeading }}</h5>
+      <div v-if="runs.length" class="form-inline mb-2" data-cron-filters>
+        <select
+          v-model="filterJob"
+          class="form-control form-control-sm mr-2"
+          data-cron-filter-job
+          :aria-label="T.cronControlPlaneAllJobs"
+        >
+          <option value="">{{ T.cronControlPlaneAllJobs }}</option>
+          <option v-for="job in jobs" :key="job.name" :value="job.name">
+            {{ jobTitle(job.name) }}
+          </option>
+        </select>
+        <select
+          v-model="filterStatus"
+          class="form-control form-control-sm"
+          data-cron-filter-status
+          :aria-label="T.cronControlPlaneAllStatuses"
+        >
+          <option value="">{{ T.cronControlPlaneAllStatuses }}</option>
+          <option v-for="status in runStatuses" :key="status" :value="status">
+            {{ status }}
+          </option>
+        </select>
+      </div>
       <table class="table table-sm table-hover" data-cron-runs>
         <thead>
           <tr>
@@ -57,12 +155,31 @@
             <th>{{ T.cronControlPlaneName }}</th>
             <th>{{ T.cronControlPlaneStatus }}</th>
             <th>{{ T.cronControlPlaneStarted }}</th>
-            <th>{{ T.cronControlPlaneDuration }}</th>
-            <th>{{ T.cronControlPlaneRows }}</th>
+            <th>
+              {{ T.cronControlPlaneDuration }}
+              <font-awesome-icon
+                class="text-muted"
+                :icon="['fas', 'info-circle']"
+                :title="T.cronControlPlaneDurationInfo"
+              />
+            </th>
+            <th>
+              {{ T.cronControlPlaneRows }}
+              <font-awesome-icon
+                class="text-muted"
+                :icon="['fas', 'info-circle']"
+                :title="T.cronControlPlaneRowsInfo"
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
-          <template v-for="run in runs">
+          <tr v-if="!filteredRuns.length">
+            <td colspan="6" class="text-muted" data-cron-no-runs>
+              {{ noRunsMessage }}
+            </td>
+          </tr>
+          <template v-for="run in filteredRuns">
             <tr
               :key="run.run_id"
               class="cron-run-row"
@@ -76,11 +193,20 @@
                   >▸</span
                 >
               </td>
-              <td>{{ run.name }}</td>
+              <td>
+                <code>{{ run.name }}</code>
+                <small class="d-block text-muted">{{
+                  jobTitle(run.name)
+                }}</small>
+              </td>
               <td>
                 <span :class="statusClass(run.status)">{{ run.status }}</span>
               </td>
-              <td>{{ formatDate(run.started_at) }}</td>
+              <td>
+                <span :title="formatDate(run.started_at)">{{
+                  formatRelative(run.started_at)
+                }}</span>
+              </td>
               <td>{{ formatDuration(run.duration_seconds) }}</td>
               <td>{{ formatRows(run.rows_affected) }}</td>
             </tr>
@@ -94,14 +220,40 @@
                 <div v-if="run.error_text" class="text-danger mb-2">
                   {{ run.error_text }}
                 </div>
+                <div v-if="run.hostname" class="small text-muted mb-2">
+                  {{ T.cronControlPlaneHost }}: {{ run.hostname }}
+                  <font-awesome-icon
+                    :icon="['fas', 'info-circle']"
+                    :title="T.cronControlPlaneHostInfo"
+                  />
+                </div>
                 <table
                   v-if="run.phases.length"
                   class="table table-sm table-borderless mb-0"
                   data-cron-phases
                 >
+                  <thead>
+                    <tr>
+                      <th>
+                        {{ T.cronControlPlaneStep }}
+                        <font-awesome-icon
+                          class="text-muted"
+                          :icon="['fas', 'info-circle']"
+                          :title="T.cronControlPlaneStepsInfo"
+                        />
+                      </th>
+                      <th>{{ T.cronControlPlaneStatus }}</th>
+                      <th>{{ T.cronControlPlaneDuration }}</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr v-for="(phase, index) in run.phases" :key="index">
-                      <td>{{ phase.phase }}</td>
+                      <td>
+                        <code>{{ phase.phase }}</code>
+                        <small class="d-block text-muted">{{
+                          phaseTitle(phase.phase)
+                        }}</small>
+                      </td>
                       <td>
                         <span :class="statusClass(phase.status)">{{
                           phase.status
@@ -160,11 +312,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
+import * as cronJobs from '../../admin/cron_jobs';
 import * as problemHealth from '../../admin/problem_health';
 
 const CRON_FIELD_COUNT = 5;
@@ -260,7 +416,13 @@ export function describeSchedule(schedule?: string | null): string | null {
   return null;
 }
 
-@Component
+library.add(faInfoCircle);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
@@ -268,13 +430,46 @@ export default class Crons extends Vue {
   @Prop({ default: () => [] })
   problemHealthFindings!: types.ProblemHealthFinding[];
 
+  runStatuses = cronJobs.RUN_STATUSES;
   expandedRunId: number | null = null;
+  filterJob = '';
+  filterStatus = '';
+
+  get filteredRuns(): types.CronRun[] {
+    return this.runs.filter(
+      (run) =>
+        (!this.filterJob || run.name === this.filterJob) &&
+        (!this.filterStatus || run.status === this.filterStatus),
+    );
+  }
+
+  get noRunsMessage(): string {
+    return this.runs.length
+      ? T.cronControlPlaneNoMatchingRuns
+      : T.cronControlPlaneNoRuns;
+  }
+
+  @Watch('jobs')
+  onJobsChanged(jobs: types.CronJob[]): void {
+    // A refresh can drop the job the filter names, leaving it silently on.
+    if (this.filterJob && !jobs.some((job) => job.name === this.filterJob)) {
+      this.filterJob = '';
+    }
+  }
 
   get scheduledJobs(): (types.CronJob & { humanSchedule: string | null })[] {
     return this.jobs.map((job) => ({
       ...job,
       humanSchedule: describeSchedule(job.schedule),
     }));
+  }
+
+  jobTitle(name: string): string {
+    return cronJobs.jobTitle(name);
+  }
+
+  phaseTitle(phase: string): string {
+    return cronJobs.phaseTitle(phase);
   }
 
   toggle(runId: number): void {
@@ -289,16 +484,13 @@ export default class Crons extends Vue {
     return job.enabled ? null : T.cronControlPlaneJobDisabled;
   }
 
+  // The switch only moves once the page hands back the new job.enabled.
+  setEnabled(job: types.CronJob): void {
+    this.$emit('set-enabled', { name: job.name, enabled: !job.enabled });
+  }
+
   statusClass(status: string | null): string {
-    const classes: Record<string, string> = {
-      success: 'badge badge-success',
-      failure: 'badge badge-danger',
-      running: 'badge badge-secondary',
-    };
-    if (!status) {
-      return '';
-    }
-    return classes[status] || 'badge badge-light';
+    return cronJobs.statusClass(status);
   }
 
   problemUrl(alias: string): string {
@@ -330,8 +522,26 @@ export default class Crons extends Vue {
     return this.formatDate(this.latestRun(name)?.started_at);
   }
 
+  latestStartedAtRelative(name: string): string {
+    const run = this.latestRun(name);
+    return run ? this.formatRelative(run.started_at) : '—';
+  }
+
+  successRate(name: string): string {
+    const rate = cronJobs.successRate(this.runs, name);
+    return rate === null ? '—' : `${rate}%`;
+  }
+
+  avgDuration(name: string): string {
+    return this.formatDuration(cronJobs.averageDuration(this.runs, name));
+  }
+
   formatDate(date: Date | null | undefined): string {
     return date ? time.formatDateTime(date) : '—';
+  }
+
+  formatRelative(date: Date | null | undefined): string {
+    return date ? time.formatFutureDateRelative(date) : '—';
   }
 
   formatDuration(seconds: number | null | undefined): string {
