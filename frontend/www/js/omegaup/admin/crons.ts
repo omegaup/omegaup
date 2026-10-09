@@ -17,6 +17,7 @@ OmegaUp.on('ready', () => {
           jobs: payload.jobs,
           runs: payload.runs,
           problemHealthFindings: payload.problemHealthFindings,
+          recommendationModelRuns: payload.recommendationModelRuns,
         },
       });
     },

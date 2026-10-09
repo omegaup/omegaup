@@ -72,6 +72,25 @@ const problemHealthFindings: types.ProblemHealthFinding[] = [
   },
 ];
 
+const recommendationModelRuns: types.RecommendationModelRun[] = [
+  {
+    model_run_id: 2,
+    created_at: startedAt,
+    map_score: 0.1934,
+    dataset_size: 48210,
+    rng_seed: 42,
+    published: true,
+  },
+  {
+    model_run_id: 1,
+    created_at: startedAt,
+    map_score: 0.0312,
+    dataset_size: 512,
+    published: false,
+    skip_reason: 'MAP score 0.0312 below minimum 0.0500',
+  },
+];
+
 const meta: Meta<typeof Crons> = {
   component: Crons,
   title: 'Components/Admin/Crons',
@@ -82,21 +101,22 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { jobs, runs, problemHealthFindings },
+  args: { jobs, runs, problemHealthFindings, recommendationModelRuns },
   render: (args, { argTypes }) => ({
     components: { Crons },
     props: Object.keys(argTypes),
     template: `<crons
       :jobs="$props.jobs"
       :runs="$props.runs"
-      :problem-health-findings="$props.problemHealthFindings" />`,
+      :problem-health-findings="$props.problemHealthFindings"
+      :recommendation-model-runs="$props.recommendationModelRuns" />`,
   }),
 };
 
 Default.storyName = 'Crons';
 
 export const Healthy: Story = {
-  args: { jobs, runs, problemHealthFindings: [] },
+  args: { jobs, runs, problemHealthFindings: [], recommendationModelRuns: [] },
   render: Default.render,
 };
 
