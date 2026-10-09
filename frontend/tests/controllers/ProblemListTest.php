@@ -26,6 +26,63 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
     protected $problemsMapping;
 
+    /** @var list<string> */
+    private const SOLVED_STATUS_VALUES = ['all', 'solved', 'attempted', 'unsolved'];
+
+    /**
+     * Forces the type of an already created submission to the given value.
+     */
+    private function setSubmissionType(
+        string $guid,
+        string $type
+    ): void {
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $submission->type = $type;
+        \OmegaUp\DAO\Submissions::update($submission);
+    }
+
+    /**
+     * Creates a promoted problem owned by $identity when $own is true.
+     *
+     * @return array{problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
+     */
+    private function createPromotedProblem(
+        \OmegaUp\DAO\VO\Identities $identity,
+        bool $own = false
+    ): array {
+        $params = new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'promoted',
+        ]);
+        if ($own) {
+            $params->author = $identity;
+        }
+        return \OmegaUp\Test\Factories\Problem::createProblem($params);
+    }
+
+    /**
+     * Returns the aliases in apiList() results for a given solved_status.
+     *
+     * @return list<string>
+     */
+    private function listAliasesForStatus(
+        string $solvedStatus,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'solved_status' => $solvedStatus,
+            'rowcount' => 1000,
+        ]));
+        return array_map(
+            fn ($problem) => $problem['alias'],
+            $response['results']
+        );
+    }
+
     /**
      * Test getting a list of problems for an anonymous user while filtering
      * by multiple tags with require_all_tags = true.
@@ -403,6 +460,55 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty($response['results']);
     }
 
+    /**
+     * Test that the only_karel filter returns all Karel problems, including
+     * legacy problems (which allow kp and kj) and ReKarel problems (which only
+     * allow rk).
+     */
+    public function testOnlyKarelFilterReturnsLegacyAndReKarelProblems() {
+        $legacy = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'languages' => 'kp,kj',
+            ])
+        );
+        $rekarel = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'languages' => 'rk',
+            ])
+        );
+        $nonKarel = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'languages' => 'cpp11-gcc',
+            ])
+        );
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'auth_token' => self::login($identity)->auth_token,
+            'only_karel' => true,
+        ]));
+
+        $aliases = array_map(
+            fn (array $problem) => $problem['alias'],
+            $response['results']
+        );
+        $this->assertContains(
+            $legacy['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertContains(
+            $rekarel['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertNotContains(
+            $nonKarel['request']['problem_alias'],
+            $aliases
+        );
+    }
     /**
      * Tests problem lists when searching by tag when tags are not public.
      */
@@ -1463,6 +1569,183 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Verifies that the solved_status filter returns the expected problem
+     * sets, including the forfeited and own-problem exclusions shared with
+     * the solved list, and that the attempted definition ranks a non-normal
+     * AC submission as attempted rather than solved.
+     */
+    public function testSolvedStatusFilter() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $solvedProblemData = $this->createPromotedProblem($identity);
+        $ownProblemData = $this->createPromotedProblem($identity, true);
+        $forfeitedProblemData = $this->createPromotedProblem($identity);
+        $attemptedProblemData = $this->createPromotedProblem($identity);
+        $unattemptedProblemData = $this->createPromotedProblem($identity);
+
+        $solvedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $solvedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($solvedRun);
+
+        $ownRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $ownProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($ownRun);
+
+        $forfeitedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $forfeitedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($forfeitedRun);
+        \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
+            'user_id' => $user->user_id,
+            'problem_id' => $forfeitedProblemData['problem']->problem_id,
+        ]));
+
+        $attemptedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $attemptedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($attemptedRun, '0.0', 'WA');
+        $attemptedRunTest = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $attemptedProblemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($attemptedRunTest);
+        $this->setSubmissionType(
+            $attemptedRunTest['response']['guid'],
+            'test'
+        );
+
+        $solvedAliases = $this->listAliasesForStatus('solved', $identity);
+        $this->assertContains(
+            $solvedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $ownProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $forfeitedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $attemptedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+        $this->assertNotContains(
+            $unattemptedProblemData['request']['problem_alias'],
+            $solvedAliases
+        );
+
+        $attemptedAliases = $this->listAliasesForStatus('attempted', $identity);
+        $this->assertContains(
+            $attemptedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $ownProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $forfeitedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $solvedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+        $this->assertNotContains(
+            $unattemptedProblemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+
+        $unattemptedAliases = $this->listAliasesForStatus(
+            'unsolved',
+            $identity
+        );
+        $this->assertContains(
+            $unattemptedProblemData['request']['problem_alias'],
+            $unattemptedAliases
+        );
+        $this->assertNotContains(
+            $solvedProblemData['request']['problem_alias'],
+            $unattemptedAliases
+        );
+        $this->assertNotContains(
+            $attemptedProblemData['request']['problem_alias'],
+            $unattemptedAliases
+        );
+
+        $allAliases = $this->listAliasesForStatus('all', $identity);
+        foreach (self::SOLVED_STATUS_VALUES as $status) {
+            $statusAliases = $this->listAliasesForStatus($status, $identity);
+            foreach ($statusAliases as $statusAlias) {
+                $this->assertContains(
+                    $statusAlias,
+                    $allAliases,
+                    "solved_status=$status returned an alias not in the full list"
+                );
+            }
+        }
+
+        $overlap = array_intersect(
+            $solvedAliases,
+            $attemptedAliases
+        );
+        $this->assertEmpty(
+            $overlap,
+            'solved and attempted sets must not overlap'
+        );
+    }
+
+    /**
+     * Verifies that a problem whose only AC submission has a non-normal type
+     * is counted as attempted (not solved) by both apiList() with
+     * solved_status=solved / attempted, matching the solved query's
+     * type = 'normal' condition.
+     */
+    public function testAttemptedAndSolvedTypeConsistency() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = $this->createPromotedProblem($identity);
+
+        $waRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($waRun, '0.0', 'WA');
+
+        $acRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($acRun);
+        $this->setSubmissionType(
+            $acRun['response']['guid'],
+            'test'
+        );
+
+        $solvedAliases = $this->listAliasesForStatus('solved', $identity);
+        $this->assertNotContains(
+            $problemData['request']['problem_alias'],
+            $solvedAliases
+        );
+
+        $attemptedAliases = $this->listAliasesForStatus(
+            'attempted',
+            $identity
+        );
+        $this->assertContains(
+            $problemData['request']['problem_alias'],
+            $attemptedAliases
+        );
+    }
+
+    /**
      * Test problem list from url, getting all the parameters
      */
     public function testProblemListPagerFromUrl() {
@@ -1988,5 +2271,79 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('parameterNotInExpectedSet', $e->getMessage());
         }
+    }
+
+    /**
+     * Regression test for #10160: authors that are not present in
+     * `User_Rank` (e.g. admins, users who only create problems, private
+     * users) must still filter the problem list correctly when used as
+     * the `author` parameter. The previous implementation queried
+     * `User_Rank` and silently dropped the filter when no rows matched.
+     */
+    public function testAuthorFilterWorksForUsersAbsentFromUserRank() {
+        // Author that has never solved a problem, so they will be
+        // missing from the denormalized `User_Rank` table.
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'author_without_solutions']
+            )
+        );
+        // A second author with a promoted problem of their own so the
+        // test detects a silently dropped `author` filter: if the filter
+        // is dropped, both problems leak into the results.
+        ['identity' => $otherAuthor] = \OmegaUp\Test\Factories\User::createUser();
+        $otherProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'author' => $otherAuthor,
+            ])
+        );
+
+        $ownProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+                'author' => $author,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'author' => 'author_without_solutions',
+            ])
+        );
+        $aliases = array_column($response['results'], 'alias');
+        $this->assertContains(
+            $ownProblem['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertNotContains(
+            $otherProblem['request']['problem_alias'],
+            $aliases
+        );
+    }
+
+    /**
+     * Regression test for #10160: when the `author` parameter refers to
+     * a username that does not exist in the platform, the problem list
+     * must be empty rather than silently returning every visible
+     * problem. The previous implementation queried `User_Rank` and the
+     * empty result caused the WHERE clause to be omitted entirely.
+     */
+    public function testAuthorFilterWithNonexistentUsernameReturnsEmpty() {
+        // Seed at least one visible problem so we can tell the filter
+        // is actually being applied rather than the platform having
+        // no problems at all.
+        \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'promoted',
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'author' => 'definitely_does_not_exist',
+            ])
+        );
+        $this->assertEmpty($response['results']);
     }
 }

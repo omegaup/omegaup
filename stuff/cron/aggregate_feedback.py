@@ -690,7 +690,7 @@ def main() -> None:
             dbconn.conn.close()
             logging.info('Done')
         if has_failures:
-            cron_run.mark_failure()
+            cron_run.mark_failure('some phases failed to complete')
     if has_failures:
         sys.exit(1)
 
