@@ -58,7 +58,9 @@ export class ProblemPage {
       cy.get('[data-other-tag-input] input').clear().type(tag);
       cy.waitUntil(() =>
         cy
-          .get('[data-other-tag-input] .vbt-autcomplete-list a.vbst-item:first')
+          .get(
+            '[data-other-tag-input] .tags-input-typeahead-item-highlighted-default',
+          )
           .should('have.text', tag)
           .click(),
       );

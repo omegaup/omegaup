@@ -18,13 +18,13 @@
               ></omegaup-radio-switch>
             </div>
             <div class="form-group w-100" data-other-tag-input>
-              <vue-typeahead-bootstrap
-                :data="publicTags"
-                :serializer="publicTagsSerializer"
+              <omegaup-common-typeahead
+                :existing-options="publicTagOptions"
+                :value.sync="selectedOtherTag"
                 :placeholder="T.collecionOtherTags"
-                @hit="addOtherTag"
-              >
-              </vue-typeahead-bootstrap>
+                :activation-threshold="0"
+                :max-results="publicTags.length || 10"
+              ></omegaup-common-typeahead>
               <br />
               <div class="card-body table-responsive w-100">
                 <table class="table table-striped w-100">
@@ -81,12 +81,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import { Vue, Prop, Component, Watch } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import T from '../../lang';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import { types } from '../../api_types';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -102,7 +103,7 @@ interface ProblemTag {
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-radio-switch': omegaup_RadioSwitch,
-    'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
+    'omegaup-common-typeahead': common_Typeahead,
     FontAwesomeIcon,
   },
 })
@@ -133,6 +134,14 @@ export default class ReviewerPopup extends Vue {
   currentView: AvailableViews = AvailableViews.Content;
   qualitySeal = true;
   publicTagsList = this.selectedPublicTags ?? [];
+  selectedOtherTag: types.ListItem | null = null;
+
+  get publicTagOptions(): types.ListItem[] {
+    return this.publicTags.map((tag) => ({
+      key: tag,
+      value: this.publicTagsSerializer(tag),
+    }));
+  }
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags
@@ -153,6 +162,15 @@ export default class ReviewerPopup extends Vue {
     if (!this.publicTagsList.includes(tag)) {
       this.publicTagsList.push(tag);
     }
+  }
+
+  @Watch('selectedOtherTag')
+  onSelectedOtherTagChanged(tag: types.ListItem | null): void {
+    if (!tag) {
+      return;
+    }
+    this.addOtherTag(tag.key);
+    this.selectedOtherTag = null;
   }
 
   publicTagsSerializer(tagname: string): string {
