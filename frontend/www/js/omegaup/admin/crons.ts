@@ -6,6 +6,8 @@ import T from '../lang';
 import Vue from 'vue';
 import { types } from '../api_types';
 
+const REFRESH_INTERVAL_MS = 15000;
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CronsDetailsPayload();
 
@@ -14,18 +16,39 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-admin-crons': admin_Crons,
     },
-    data: () => ({
+    data: {
+      jobs: payload.jobs,
+      runs: payload.runs,
+      problemHealthFindings: payload.problemHealthFindings,
       rerunsInFlight: [] as string[],
-    }),
+    },
     render: function (createElement) {
       return createElement('omegaup-admin-crons', {
         props: {
-          jobs: payload.jobs,
-          runs: payload.runs,
-          problemHealthFindings: payload.problemHealthFindings,
+          jobs: this.jobs,
+          runs: this.runs,
+          problemHealthFindings: this.problemHealthFindings,
           rerunsInFlight: this.rerunsInFlight,
         },
         on: {
+          'set-enabled': ({
+            name,
+            enabled,
+          }: {
+            name: string;
+            enabled: boolean;
+          }) => {
+            api.Admin.setCronJobEnabled({ name, enabled })
+              .then(() => {
+                // A refresh already on its way would put the old state back.
+                latestRefresh++;
+                app.jobs = app.jobs.map((job) =>
+                  job.name === name ? { ...job, enabled } : job,
+                );
+                ui.success(T.cronControlPlaneEnabledUpdated);
+              })
+              .catch(ui.apiError);
+          },
           rerun: (name: string) => {
             // A second click would only be told a rerun is already waiting.
             app.rerunsInFlight.push(name);
@@ -36,6 +59,7 @@ OmegaUp.on('ready', () => {
                 } else {
                   ui.info(T.cronControlPlaneRerunAlreadyQueued);
                 }
+                refresh();
               })
               .catch(ui.apiError)
               .finally(() => {
@@ -48,4 +72,28 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  let latestRefresh = 0;
+
+  function refresh(): void {
+    const sequence = ++latestRefresh;
+    api.Admin.getCrons()
+      .then((response) => {
+        // An answer older than the newest request or change is out of date.
+        if (sequence !== latestRefresh) {
+          return;
+        }
+        app.jobs = response.jobs;
+        app.runs = response.runs;
+        app.problemHealthFindings = response.problemHealthFindings;
+      })
+      // A failed background refresh keeps what is on screen.
+      .catch(() => undefined);
+  }
+
+  window.setInterval(() => {
+    if (!document.hidden) {
+      refresh();
+    }
+  }, REFRESH_INTERVAL_MS);
 });
