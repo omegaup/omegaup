@@ -40,21 +40,29 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import country_Flag from '../CountryFlag.vue';
 import { types } from '../../api_types';
 
-@Component({
+export default defineComponent({
+  name: 'CoderOfTheMonthCodersList',
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-countryflag': country_Flag,
   },
-})
-export default class CoderOfTheMonthList extends Vue {
-  @Prop() coders!: types.CoderOfTheMonthList[];
-
-  T = T;
-}
+  props: {
+    coders: {
+      type: Array as PropType<types.CoderOfTheMonthList[]>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+});
 </script>
