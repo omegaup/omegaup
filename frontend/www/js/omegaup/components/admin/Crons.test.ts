@@ -86,11 +86,15 @@ describe('Crons.vue', () => {
     const wrapper = mount(Crons, { propsData: { jobs, runs } });
     const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
-    expect(cells.at(0).text()).toBe('update_ranks.py');
+    expect(cells.at(0).text()).toContain(T.cronControlPlaneJobUpdateRanks);
     expect(cells.at(1).find('code').text()).toBe('19 8 * * *');
+    expect(cells.at(1).text()).toContain('08:19');
     expect(cells.at(2).text()).toBe('success');
     expect(cells.at(2).find('.badge-success').exists()).toBe(true);
-    expect(cells.at(3).text()).toBe(time.formatDateTime(startedAt));
+    expect(cells.at(3).find('span').attributes('title')).toBe(
+      time.formatDateTime(startedAt),
+    );
+    expect(cells.at(3).text()).toBe(time.formatFutureDateRelative(startedAt));
   });
 
   it('Should show one row per run with its status and totals', () => {
@@ -98,14 +102,107 @@ describe('Crons.vue', () => {
     const rows = wrapper.findAll('.cron-run-row');
 
     expect(rows).toHaveLength(2);
-    expect(rows.at(0).findAll('td').at(1).text()).toBe('update_ranks.py');
-    expect(rows.at(0).find('.badge-success').text()).toBe('success');
-    expect(rows.at(0).findAll('td').at(3).text()).toBe(
-      time.formatDateTime(startedAt),
+    expect(rows.at(0).findAll('td').at(1).text()).toContain('update_ranks.py');
+    expect(rows.at(0).findAll('td').at(1).text()).toContain(
+      T.cronControlPlaneJobUpdateRanks,
     );
+    expect(rows.at(0).find('.badge-success').text()).toBe('success');
+    expect(
+      rows.at(0).findAll('td').at(3).find('span').attributes('title'),
+    ).toBe(time.formatDateTime(startedAt));
     expect(rows.at(0).findAll('td').at(4).text()).toBe('0.19s');
     expect(rows.at(0).findAll('td').at(5).text()).toBe('5');
     expect(rows.at(1).find('.badge-danger').text()).toBe('failure');
+  });
+
+  it('Should show a health card per job with its rate and average', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs,
+        runs: [
+          runs[0],
+          { ...runs[0], run_id: 3, status: 'failure', duration_seconds: 0.31 },
+          { ...runs[0], run_id: 4, status: 'running', duration_seconds: null },
+        ],
+      },
+    });
+    const figures = wrapper.findAll('[data-cron-health] dd');
+
+    // The run still in flight counts for neither figure.
+    expect(figures.at(0).text()).toBe('50%');
+    expect(figures.at(1).text()).toBe('0.25s');
+  });
+
+  it('Should dash out the health of a job with no finished run', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs: [] } });
+    const figures = wrapper.findAll('[data-cron-health] dd');
+
+    expect(figures.at(0).text()).toBe('—');
+    expect(figures.at(1).text()).toBe('—');
+  });
+
+  it('Should filter runs by job', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    await wrapper.find('[data-cron-filter-job]').setValue('update_ranks.py');
+
+    const rows = wrapper.findAll('.cron-run-row');
+    expect(rows).toHaveLength(1);
+    expect(rows.at(0).find('code').text()).toBe('update_ranks.py');
+  });
+
+  it('Should say that no run matches when the filters leave none', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    await wrapper.find('[data-cron-filter-status]').setValue('running');
+
+    expect(wrapper.findAll('.cron-run-row')).toHaveLength(0);
+    expect(wrapper.find('[data-cron-no-runs]').text()).toBe(
+      T.cronControlPlaneNoMatchingRuns,
+    );
+  });
+
+  it('Should offer every known status in the filter', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const options = wrapper.findAll('[data-cron-filter-status] option');
+
+    expect(
+      options.wrappers.map((option) => option.attributes('value')),
+    ).toEqual(['', 'running', 'success', 'failure']);
+  });
+
+  it('Should show the machine a run ran on when it is expanded', async () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs: [{ ...runs[0], hostname: 'cron-01' }] },
+    });
+
+    await wrapper.find('.cron-run-row').trigger('click');
+
+    expect(wrapper.find('.cron-run-detail').text()).toContain('cron-01');
+  });
+
+  it('Should filter runs by status', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    expect(wrapper.findAll('[data-cron-runs] tbody tr').length).toBe(2);
+    await wrapper.find('[data-cron-filter-status]').setValue('failure');
+    const rows = wrapper.findAll('[data-cron-runs] tbody tr');
+    expect(rows.length).toBe(1);
+    expect(rows.at(0).text()).toContain(T.cronControlPlaneJobAssignBadges);
+  });
+
+  it('Should clear a job filter whose job is gone after a refresh', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    await wrapper.find('[data-cron-filter-job]').setValue('update_ranks.py');
+    expect(wrapper.findAll('[data-cron-runs] tbody tr').length).toBe(1);
+
+    await wrapper.setProps({ jobs: [] });
+
+    expect(
+      (wrapper.find('[data-cron-filter-job]').element as HTMLSelectElement)
+        .value,
+    ).toBe('');
+    expect(wrapper.findAll('[data-cron-runs] tbody tr').length).toBe(2);
   });
 
   it('Should show phase detail when a run is expanded', async () => {
@@ -115,7 +212,8 @@ describe('Crons.vue', () => {
     await wrapper.findAll('.cron-run-row').at(0).trigger('click');
 
     const phase = wrapper.findAll('[data-cron-phases] tbody tr td');
-    expect(phase.at(0).text()).toBe('update_users_stats');
+    expect(phase.at(0).find('code').text()).toBe('update_users_stats');
+    expect(phase.at(0).text()).toContain('Update users stats');
     expect(phase.at(1).text()).toBe('success');
     expect(phase.at(2).text()).toBe('0.05s');
   });
@@ -327,5 +425,76 @@ describe('Crons.vue', () => {
     expect(wrapper.findAll('[data-cron-jobs] tbody tr td').at(2).text()).toBe(
       'running',
     );
+  });
+
+  it('Should show the script name next to a readable one', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    const cell = wrapper.find('[data-cron-jobs] tbody tr td');
+    expect(cell.find('code').text()).toBe('update_ranks.py');
+    expect(cell.find('small').text()).toBe(T.cronControlPlaneJobUpdateRanks);
+  });
+
+  it('Should show an empty state and no filters when there are no runs', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs: [] } });
+
+    expect(wrapper.find('[data-cron-no-runs]').text()).toBe(
+      T.cronControlPlaneNoRuns,
+    );
+    expect(wrapper.find('[data-cron-filters]').exists()).toBe(false);
+  });
+
+  it('Should show an empty state and no cards when there are no jobs', () => {
+    const wrapper = mount(Crons, { propsData: { jobs: [], runs: [] } });
+
+    expect(wrapper.find('[data-cron-jobs]').text()).toContain(
+      T.cronControlPlaneNoJobs,
+    );
+    expect(wrapper.find('[data-cron-health]').exists()).toBe(false);
+  });
+
+  it('Should ask for the opposite state when the switch is clicked', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    const toggle = wrapper.find('[data-cron-enabled]');
+    await toggle.trigger('click');
+
+    // jobs still says enabled, so the switch has not moved yet.
+    expect((toggle.element as HTMLInputElement).checked).toBe(true);
+    expect(wrapper.emitted('set-enabled')?.[0]).toEqual([
+      { name: 'update_ranks.py', enabled: false },
+    ]);
+  });
+
+  it('Should move the switch once the job it shows changes', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    await wrapper.setProps({ jobs: [{ ...jobs[0], enabled: false }] });
+
+    const toggle = wrapper.find('[data-cron-enabled]');
+    expect((toggle.element as HTMLInputElement).checked).toBe(false);
+  });
+
+  it('Should emit rerun with the job name when the button is clicked', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    await wrapper.find('[data-cron-rerun]').trigger('click');
+
+    const emitted = wrapper.emitted('rerun');
+    expect(emitted).toBeTruthy();
+    expect(emitted?.[0]).toEqual(['update_ranks.py']);
+  });
+
+  it('Should not offer a rerun for a disabled job', async () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs: [{ ...jobs[0], enabled: false }], runs },
+    });
+    const button = wrapper.find('[data-cron-rerun]');
+
+    await button.trigger('click');
+
+    expect(button.attributes('disabled')).toBe('disabled');
+    expect(button.attributes('title')).toBe(T.cronControlPlaneJobDisabled);
+    expect(wrapper.emitted('rerun')).toBeFalsy();
   });
 });

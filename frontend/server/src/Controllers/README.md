@@ -6,6 +6,8 @@
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/rerunCron/`](#apiadminreruncron)
+  - [`/api/admin/setCronJobEnabled/`](#apiadminsetcronjobenabled)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
@@ -405,6 +407,42 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/rerunCron/`
+
+### Description
+
+Queues a manual rerun of a registered cron job for a worker to pick up.
+`queued` is false when the job already had a rerun waiting or running.
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `name` | `string` |             | ✓        |
+
+### Returns
+
+| Name     | Type      |
+| -------- | --------- |
+| `queued` | `boolean` |
+
+## `/api/admin/setCronJobEnabled/`
+
+### Description
+
+Enables or disables a cron job. A disabled job skips its scheduled runs.
+
+### Parameters
+
+| Name      | Type     | Description | Required |
+| --------- | -------- | ----------- | -------- |
+| `enabled` | `bool`   |             | ✓        |
+| `name`    | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/admin/setMaintenanceMode/`
 
