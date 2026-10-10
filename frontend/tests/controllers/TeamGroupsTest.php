@@ -1756,4 +1756,136 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('U13CannotPerform', $e->getMessage());
         }
     }
+
+    public function testBulkCreateForTeamsWithInvalidUsernamesJson(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_group_alias' => $teamGroup->alias,
+                    'team_identities' => json_encode([[
+                        'username' => "teams:{$teamGroup->alias}:team1",
+                        'name' => 'Team 1',
+                        'usernames' => 'invalid-json',
+                        'country_id' => 'MX',
+                        'state_id' => 'DIF',
+                        'gender' => 'decline',
+                        'school_name' => 'School 1',
+                    ]]),
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('usernames', $e->parameter);
+        }
+    }
+
+    public function testBulkCreateForTeamsWithScalarUsernames(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_group_alias' => $teamGroup->alias,
+                    'team_identities' => json_encode([[
+                        'username' => "teams:{$teamGroup->alias}:team1",
+                        'name' => 'Team 1',
+                        'usernames' => '123',
+                        'country_id' => 'MX',
+                        'state_id' => 'DIF',
+                        'gender' => 'decline',
+                        'school_name' => 'School 1',
+                    ]]),
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('usernames', $e->parameter);
+        }
+    }
+
+    public function testBulkCreateForTeamsWithInvalidIdentitiesShape(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_group_alias' => $teamGroup->alias,
+                    'team_identities' => json_encode(['invalid_team_item']),
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('team_identities', $e->parameter);
+        }
+    }
+
+    public function testBulkCreateForTeamsWithInvalidMemberShape(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_group_alias' => $teamGroup->alias,
+                    'team_identities' => json_encode([[
+                        'username' => "teams:{$teamGroup->alias}:team1",
+                        'name' => 'Team 1',
+                        'usernames' => json_encode(['invalid_member_string']),
+                        'country_id' => 'MX',
+                        'state_id' => 'DIF',
+                        'gender' => 'decline',
+                        'school_name' => 'School 1',
+                    ]]),
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('usernames', $e->parameter);
+        }
+    }
 }
