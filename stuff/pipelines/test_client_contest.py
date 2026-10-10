@@ -7,6 +7,7 @@ import sys
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
 import contest_callback
+import database
 import pika
 import producer_contest
 import pytest
@@ -44,7 +45,6 @@ class ContestsCallbackForTesting:
         '''Function to call the original callback'''
         callback = contest_callback.ContestsCallback(dbconn=self.dbconn)
         callback(channel, method, properties, body)
-        channel.close()
 
 
 def test_client_contest() -> None:
@@ -59,46 +59,91 @@ def test_client_contest() -> None:
             mysql_config_file=lib.db.default_config_file_path() or ''
         )
     )
-
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
-            host=test_credentials.RABBITMQ_HOST,) as channel:
-        rabbitmq_connection.initialize_rabbitmq(queue='contest',
-                                                exchange='certificates',
-                                                routing_key='ContestQueue',
-                                                channel=channel)
-        client = omegaup.api.Client(
-            api_token=test_constants.API_TOKEN,
-            url=test_constants.OMEGAUP_API_ENDPOINT,
-        )
-        producer_contest.send_contest_message_to_client(
-            cur=cur,
-            channel=channel,
-            date_lower_limit=test_constants.DATE_LOWER_LIMIT,
-            date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            client=client)
-        callback = ContestsCallbackForTesting(dbconn=dbconn.conn)
-        cur.execute('TRUNCATE TABLE `Certificates`;')
-        dbconn.conn.commit()
-
-        cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
-        count = cur.fetchone()
-        assert count['count'] == 0
-
-        rabbitmq_client.receive_messages(
-            queue='contest',
+            host=test_credentials.RABBITMQ_HOST) as channel:
+        rabbitmq_connection.initialize_rabbitmq(
+            queue='contest-test',
             exchange='certificates',
-            routing_key='ContestQueue',
-            channel=channel,
-            callback=callback)
-        cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
-        count = cur.fetchone()
-        assert count['count'] > 0
+            routing_key='ContestTestQueue',
+            channel=channel)
+        channel.queue_purge(queue='contest-test')
+        cur.execute('''
+            SELECT
+                c.contest_id,
+                c.finish_time,
+                c.certificates_status,
+                p.scoreboard_url
+            FROM Contests c
+            INNER JOIN Problemsets p
+                ON c.problemset_id = p.problemset_id
+            WHERE p.scoreboard_url IS NOT NULL
+            ORDER BY c.contest_id
+            LIMIT 1;
+        ''')
+        contest = cur.fetchone()
+        if contest is None:
+            pytest.skip('No contest with a scoreboard is available')
+        assert contest is not None
+        contest_id = contest['contest_id']
+        original_finish_time = contest['finish_time']
+        original_certificates_status = contest['certificates_status']
+        try:
+            cur.execute('''
+                UPDATE Contests
+                SET finish_time = NOW() - INTERVAL 1 DAY,
+                    certificates_status = 'uninitiated'
+                WHERE contest_id = %s;
+            ''', (contest_id,))
+            dbconn.conn.commit()
+            cur.execute('TRUNCATE TABLE `Certificates`;')
+            dbconn.conn.commit()
+            client = omegaup.api.Client(
+                api_token=test_constants.API_TOKEN,
+                url=test_constants.OMEGAUP_API_ENDPOINT,
+            )
+            producer_contest.send_contest_message_to_client(
+                cur=cur,
+                channel=channel,
+                date_lower_limit=test_constants.DATE_LOWER_LIMIT,
+                date_upper_limit=test_constants.DATE_UPPER_LIMIT,
+                client=client,
+                queue='contest-test',
+                routing_key='ContestTestQueue')
+            callback = ContestsCallbackForTesting(
+                dbconn=dbconn.conn)
+            cur.execute(
+                'SELECT COUNT(*) AS count FROM `Certificates`;')
+            count = cur.fetchone()
+            assert count['count'] == 0
+            rabbitmq_client.receive_messages(
+                queue='contest-test',
+                exchange='certificates',
+                routing_key='ContestTestQueue',
+                channel=channel,
+                callback=callback,
+                stop_after_message=True)
+            cur.execute(
+                'SELECT COUNT(*) AS count FROM `Certificates`;')
+            count = cur.fetchone()
+            assert count['count'] > 0
+        finally:
+            cur.execute('''
+                UPDATE Contests
+                SET finish_time = %s,
+                    certificates_status = %s
+                WHERE contest_id = %s;
+            ''', (
+                original_finish_time,
+                original_certificates_status,
+                contest_id,
+            ))
+            dbconn.conn.commit()
 
 
-@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
+# @pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -121,20 +166,48 @@ def test_client_contest_with_mocked_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,) as channel:
-        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+        rabbitmq_connection.initialize_rabbitmq(queue='contest-test',
                                                 exchange='certificates',
-                                                routing_key='ContestQueue',
+                                                routing_key='ContestTestQueue',
                                                 channel=channel)
+        channel.queue_purge(queue='contest-test')
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
+        )
+        mocker.patch(
+            'producer_contest.get_contests_from_db',
+            return_value=[
+                database.contest.ContestCertificate(
+                    certificate_cutoff=1,
+                    alias='contest1',
+                    scoreboard_url='abcdef',
+                    contest_id=1,
+                    ranking=[
+                        database.contest.Ranking(
+                            username='user_1',
+                            place='1')._asdict(),
+                        database.contest.Ranking(
+                            username='user_2',
+                            place='2')._asdict(),
+                        database.contest.Ranking(
+                            username='user_3',
+                            place='3')._asdict(),
+                        database.contest.Ranking(
+                            username='user_4',
+                            place='4')._asdict(),
+                    ],
+                ),
+            ],
         )
         producer_contest.send_contest_message_to_client(
             cur=cur,
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            client=client)
+            client=client,
+            queue='contest-test',
+            routing_key='ContestTestQueue')
         callback = ContestsCallbackForTesting(dbconn=dbconn.conn)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
@@ -146,13 +219,14 @@ def test_client_contest_with_mocked_codes(
         rabbitmq_client.receive_messages(
             channel=channel,
             exchange='certificates',
-            queue='contest',
-            routing_key='ContestQueue',
-            callback=callback)
+            queue='contest-test',
+            routing_key='ContestTestQueue',
+            callback=callback,
+            stop_after_message=True)
         assert spy.call_count == 4
 
 
-@pytest.mark.skip(reason="Disabled temporarily because it's flaky")
+# @pytest.mark.skip(reason="Disabled temporarily because it's flaky")
 def test_client_contest_with_duplicated_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -178,10 +252,11 @@ def test_client_contest_with_duplicated_codes(
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,) as channel:
-        rabbitmq_connection.initialize_rabbitmq(queue='contest',
+        rabbitmq_connection.initialize_rabbitmq(queue='contest-test',
                                                 exchange='certificates',
-                                                routing_key='ContestQueue',
+                                                routing_key='ContestTestQueue',
                                                 channel=channel)
+        channel.queue_purge(queue='contest-test')
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
@@ -191,7 +266,9 @@ def test_client_contest_with_duplicated_codes(
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            client=client
+            client=client,
+            queue='contest-test',
+            routing_key='ContestTestQueue'
         )
         callback = ContestsCallbackForTesting(dbconn=dbconn.conn)
         cur.execute('TRUNCATE TABLE `Certificates`;')
@@ -204,9 +281,9 @@ def test_client_contest_with_duplicated_codes(
         rabbitmq_client.receive_messages(
             channel=channel,
             exchange='certificates',
-            queue='contest',
-            routing_key='ContestQueue',
-            callback=callback
-        )
+            queue='contest-test',
+            routing_key='ContestTestQueue',
+            callback=callback,
+            stop_after_message=True)
 
         assert spy.call_count > 4
