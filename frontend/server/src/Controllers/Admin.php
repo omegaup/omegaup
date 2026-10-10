@@ -12,7 +12,8 @@
   * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
-  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>}
+  * @psalm-type ProblemHealthFinding=array{problem_id: int, alias: string, title: string, check_type: string, severity: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
@@ -32,6 +33,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     ];
 
     const CRON_RUNS_LIMIT = 50;
+    const PROBLEM_HEALTH_FINDINGS_LIMIT = 50;
 
     /**
      * Get stats for an overall platform report.
@@ -401,7 +403,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
      */
-    public static function getSettingsForTypeScript(
+    public static function getGlobalSettingsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -410,12 +412,32 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'entrypoint' => 'admin_settings',
+            'entrypoint' => 'admin_global_settings',
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleAdminSettings'
+                    'omegaupTitleAdminGlobalSettings'
                 ),
                 'payload' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     */
+    public static function getOperationsDashboardForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureUserHasAdministrativeAccess();
+
+        return [
+            'entrypoint' => 'admin_operations_dashboard',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminOperations'
+                ),
+                'payload' => [],
+                'fullWidth' => true,
             ],
         ];
     }
@@ -466,7 +488,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>}
      */
     private static function cronsPayload(): array {
         return [
@@ -474,13 +496,17 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'runs' => self::cronRunsPayload(
                 \OmegaUp\DAO\CronRuns::getRecent(self::CRON_RUNS_LIMIT)
             ),
+            'problemHealthFindings' => \OmegaUp\DAO\ProblemHealthChecks::getOpenFindings(
+                self::PROBLEM_HEALTH_FINDINGS_LIMIT
+            ),
         ];
     }
 
     /**
-     * Lists the registered cron jobs and their most recent runs.
+     * Lists the registered cron jobs, their most recent runs and the open
+     * problem health findings.
      *
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>}
      */
     public static function apiGetCrons(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
