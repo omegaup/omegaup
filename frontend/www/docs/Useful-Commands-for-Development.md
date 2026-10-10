@@ -37,8 +37,7 @@ Below is a list of commands/scripts that are useful for people involved in devel
 npx cypress open
 ```
 **Description:** Opens the `Cypress Test Runner`, a graphical interface that allows interactive test execution and debugging. Additional configurations may be required for local environments; the most common are:
-- Install `nodejs`
-- Install `npm`
+- Install Node.js 24 (LTS) — use [nvm](https://github.com/nvm-sh/nvm) and run `nvm install` / `nvm use` in the repo root (see [`.nvmrc`](https://github.com/omegaup/omegaup/blob/main/.nvmrc))
 - Install `libasound2`
 
 \* For more detailed information, visit [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md)
@@ -101,7 +100,7 @@ find frontend/ \
 
 ### Run Vue unit tests
 ```bash
-yarn run test:watch
+pnpm run test:watch
 ```
 **Description:** Runs Vue unit tests in watch mode, automatically rerunning tests when code changes. The command runs within the local development environment of the application, providing an efficient and dynamic workflow during test development.
 

@@ -440,8 +440,8 @@ def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
             )
             logging.info('Creating database %s', dbname)
             database_utils.mysql(
-                f'CREATE DATABASE `{dbname}` CHARACTER SET UTF8 COLLATE '
-                'utf8_general_ci;',
+                f'CREATE DATABASE `{dbname}` CHARACTER SET utf8mb4 COLLATE '
+                'utf8mb4_unicode_ci;',
                 auth=auth,
                 container_check=not args.skip_container_check,
             )

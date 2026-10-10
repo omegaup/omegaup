@@ -24,7 +24,7 @@
             <td class="legend"></td>
             <td class="user">
               {{ rank.username }}
-              {{ rank.name == rank.username ? '' : `(${rank.name})'` }}
+              {{ rank.name == rank.username ? '' : `(${rank.name})` }}
             </td>
             <td
               v-for="contest in contests"

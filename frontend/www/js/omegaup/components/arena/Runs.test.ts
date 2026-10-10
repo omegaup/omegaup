@@ -7,6 +7,8 @@ import { types } from '../../api_types';
 import T from '../../lang';
 
 import arena_Runs, { DisqualificationType } from './Runs.vue';
+import common_EmptyState from '../common/EmptyState.vue';
+import user_Username from '../user/Username.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
@@ -17,8 +19,8 @@ describe('Runs.vue', () => {
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
-    expect(wrapper.find('table tbody').text()).toBe('');
+    expect(wrapper.find('.card-header').text()).toBe(T.latestSubmissionsTitle);
+    expect(wrapper.findComponent(common_EmptyState).exists()).toBe(true);
   });
 
   it('Should handle runs', async () => {
@@ -136,6 +138,18 @@ describe('Runs.vue', () => {
     expect(
       wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
     ).toEqual(['122000', '121500', '121000', '120500', '120000']);
+  });
+
+  it('Should pass the country of the run to the username', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs: [{ ...baseRunData, country: 'MX' }],
+        showUser: true,
+        username: null,
+      },
+    });
+    expect(wrapper.findComponent(user_Username).props('country')).toBe('MX');
   });
 
   const filtersMapping: { filter: string; value: string }[] = [

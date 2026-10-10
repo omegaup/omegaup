@@ -230,7 +230,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test profile statistics throws NotFoundException for non-existent user
+     * Test that profile statistics throws NotFoundException for non-existent user
      */
     public function testProfileStatisticsUserNotFound() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -247,5 +247,170 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertSame('userNotExist', $e->getMessage());
         }
+    }
+
+    /**
+     * A user with more than the $maxTags cap of public tags should still
+     * see all of them in tagsFull, while tags keeps the top-10-plus-Others shape.
+     */
+    public function testProfileStatisticsTagsFullExposesAllTags() {
+        ['identity' => $solver] = \OmegaUp\Test\Factories\User::createUser();
+
+        $tagNames = [
+            'problemTagGreedyAlgorithms',
+            'problemTagDynamicProgramming',
+            'problemTagBinarySearch',
+            'problemTagHashing',
+            'problemTagTries',
+            'problemTagBruteForce',
+            'problemTagBacktracking',
+            'problemTagLocalSearch',
+            'problemTagDivideAndConquer',
+            'problemTagMemorization',
+            'problemTagSubArraySearch',
+            'problemTagSubsequenceSearch',
+        ];
+        foreach ($tagNames as $tagName) {
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Problem::addTag(
+                $problem,
+                $tagName,
+                public: true,
+            );
+            $login = self::login($solver);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $solver,
+                $login,
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
+        }
+
+        $login = self::login($solver);
+        $response = \OmegaUp\Controllers\User::apiProfileStatistics(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertArrayHasKey('tags', $response);
+        $this->assertArrayHasKey('tagsFull', $response);
+
+        $this->assertCount(
+            count($tagNames),
+            $response['tagsFull'],
+        );
+        $returnedFullNames = array_map(
+            fn ($t) => $t['name'],
+            $response['tagsFull'],
+        );
+        foreach ($tagNames as $expected) {
+            $this->assertContains($expected, $returnedFullNames);
+        }
+
+        $this->assertCount(11, $response['tags']);
+        $cappedNames = array_map(
+            fn ($t) => $t['name'],
+            $response['tags'],
+        );
+        $this->assertContains('Others', $cappedNames);
+        $this->assertCount(
+            10,
+            array_values(array_filter(
+                $cappedNames,
+                fn ($name) => $name !== 'Others',
+            )),
+        );
+    }
+
+    /**
+     * tagsFull must be sorted by count descending so the front-end can
+     * render an initial sort without an extra server round-trip.
+     */
+    public function testProfileStatisticsTagsFullSortedByCount() {
+        ['identity' => $solver] = \OmegaUp\Test\Factories\User::createUser();
+
+        $tagsBySolved = [
+            'problemTagGreedyAlgorithms' => 1,
+            'problemTagDynamicProgramming' => 5,
+            'problemTagBinarySearch' => 3,
+        ];
+        foreach ($tagsBySolved as $tagName => $numSolved) {
+            for ($j = 0; $j < $numSolved; $j++) {
+                $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+                \OmegaUp\Test\Factories\Problem::addTag(
+                    $problem,
+                    $tagName,
+                    public: true,
+                );
+                $login = self::login($solver);
+                $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problem,
+                    $solver,
+                    $login,
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($run);
+            }
+        }
+
+        $login = self::login($solver);
+        $response = \OmegaUp\Controllers\User::apiProfileStatistics(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $counts = array_map(
+            fn ($t) => $t['count'],
+            $response['tagsFull'],
+        );
+        $sorted = $counts;
+        rsort($sorted);
+        $this->assertSame($sorted, $counts);
+    }
+
+    /**
+     * When two tags have the same count, the distribution must break
+     * the tie alphabetically by tag name.
+     */
+    public function testProfileStatisticsTagsFullTieBreaksByName() {
+        ['identity' => $solver] = \OmegaUp\Test\Factories\User::createUser();
+
+        $tagsBySolved = [
+            'problemTagDynamicProgramming' => 2,
+            'problemTagBinarySearch' => 2,
+        ];
+        foreach ($tagsBySolved as $tagName => $numSolved) {
+            for ($j = 0; $j < $numSolved; $j++) {
+                $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+                \OmegaUp\Test\Factories\Problem::addTag(
+                    $problem,
+                    $tagName,
+                    public: true,
+                );
+                $login = self::login($solver);
+                $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problem,
+                    $solver,
+                    $login,
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($run);
+            }
+        }
+
+        $login = self::login($solver);
+        $response = \OmegaUp\Controllers\User::apiProfileStatistics(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertSame(
+            [
+                ['name' => 'problemTagBinarySearch', 'count' => 2],
+                ['name' => 'problemTagDynamicProgramming', 'count' => 2],
+            ],
+            $response['tagsFull'],
+        );
     }
 }

@@ -115,4 +115,125 @@ class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertTrue($experiments->isEnabled(self::TEST));
     }
+
+    public function testSupportTeamMemberCanAddAndRemoveExperiment() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'identity' => $supportIdentity,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
+        $login = self::login($supportIdentity);
+
+        $response = \OmegaUp\Controllers\User::apiAddExperiment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username,
+            'experiment' => \OmegaUp\Experiments::USER_README,
+        ]));
+
+        $this->assertSame('ok', $response['status']);
+        $this->assertSame(
+            [\OmegaUp\Experiments::USER_README],
+            array_column(
+                \OmegaUp\DAO\UsersExperiments::getByUserId(
+                    intval(
+                        $user->user_id
+                    )
+                ),
+                'experiment'
+            )
+        );
+
+        $response = \OmegaUp\Controllers\User::apiRemoveExperiment(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identity->username,
+                'experiment' => \OmegaUp\Experiments::USER_README,
+            ])
+        );
+
+        $this->assertSame('ok', $response['status']);
+        $this->assertEmpty(
+            \OmegaUp\DAO\UsersExperiments::getByUserId(intval($user->user_id))
+        );
+    }
+
+    public function testUnauthorizedUserCannotAddOrRemoveExperiment() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'identity' => $unauthorizedIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($unauthorizedIdentity);
+        $request = [
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username,
+            'experiment' => \OmegaUp\Experiments::USER_README,
+        ];
+
+        try {
+            \OmegaUp\Controllers\User::apiAddExperiment(
+                new \OmegaUp\Request($request)
+            );
+            $this->fail('Should not have allowed adding an experiment');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+        $this->assertEmpty(
+            \OmegaUp\DAO\UsersExperiments::getByUserId(intval($user->user_id))
+        );
+
+        \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
+            'user_id' => $user->user_id,
+            'experiment' => \OmegaUp\Experiments::USER_README,
+        ]));
+        try {
+            \OmegaUp\Controllers\User::apiRemoveExperiment(
+                new \OmegaUp\Request($request)
+            );
+            $this->fail('Should not have allowed removing an experiment');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+        $this->assertCount(
+            1,
+            \OmegaUp\DAO\UsersExperiments::getByUserId(intval($user->user_id))
+        );
+    }
+
+    public function testAdminCanStillAddAndRemoveExperiment() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'identity' => $adminIdentity,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($adminIdentity);
+        $request = [
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username,
+            'experiment' => \OmegaUp\Experiments::USER_README,
+        ];
+
+        $response = \OmegaUp\Controllers\User::apiAddExperiment(
+            new \OmegaUp\Request($request)
+        );
+        $this->assertSame('ok', $response['status']);
+        $this->assertCount(
+            1,
+            \OmegaUp\DAO\UsersExperiments::getByUserId(intval($user->user_id))
+        );
+
+        $response = \OmegaUp\Controllers\User::apiRemoveExperiment(
+            new \OmegaUp\Request($request)
+        );
+        $this->assertSame('ok', $response['status']);
+        $this->assertEmpty(
+            \OmegaUp\DAO\UsersExperiments::getByUserId(intval($user->user_id))
+        );
+    }
 }

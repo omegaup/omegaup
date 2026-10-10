@@ -44,7 +44,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
         $this->assertCount(
             1,
-            \OmegaUp\DAO\Courses::findByName(
+            \OmegaUp\DAO\Courses::findByExactName(
                 $r['name']
             )
         );
@@ -65,7 +65,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         \OmegaUp\Controllers\Course::apiCreate($r);
 
-        $courses = \OmegaUp\DAO\Courses::findByName(
+        $courses = \OmegaUp\DAO\Courses::findByExactName(
             $r['name']
         );
         $this->assertCount(1, $courses);
@@ -81,7 +81,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         \OmegaUp\Controllers\Course::apiUpdate($r);
 
-        $courses = \OmegaUp\DAO\Courses::findByName(
+        $courses = \OmegaUp\DAO\Courses::findByExactName(
             $r['name']
         );
         $this->assertSame($r['objective'], $courses[0]->objective);
@@ -104,7 +104,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'unlimited_duration' => true,
         ]));
 
-        $courses = \OmegaUp\DAO\Courses::findByName(
+        $courses = \OmegaUp\DAO\Courses::findByExactName(
             $name
         );
 
@@ -143,7 +143,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             1,
             count(
-                \OmegaUp\DAO\Courses::findByName(
+                \OmegaUp\DAO\Courses::findByExactName(
                     $r['name']
                 )
             )
@@ -186,7 +186,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         \OmegaUp\Controllers\Course::apiCreate($r);
 
-        $courses = \OmegaUp\DAO\Courses::findByName(
+        $courses = \OmegaUp\DAO\Courses::findByExactName(
             $r['name']
         );
         $this->assertCount(1, $courses);
@@ -205,7 +205,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         \OmegaUp\Controllers\Course::apiUpdate($r);
 
-        $courses = \OmegaUp\DAO\Courses::findByName(
+        $courses = \OmegaUp\DAO\Courses::findByExactName(
             $r['name']
         );
         $this->assertSame(
@@ -762,7 +762,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             1,
             count(
-                \OmegaUp\DAO\Courses::findByName(
+                \OmegaUp\DAO\Courses::findByExactName(
                     $r['name']
                 )
             )

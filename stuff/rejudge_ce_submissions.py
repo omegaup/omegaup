@@ -53,7 +53,7 @@ def get_runs_list_endpoint(
     returns the list of run_ids from days when omegaUp runners were down.
     """
     endpoint = (
-        f"/api/run/list?"
+        f"api/run/list?"
         f"offset={offset}"
         f"&rowcount={rowcount}"
     )
