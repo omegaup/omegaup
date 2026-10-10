@@ -142,6 +142,10 @@
         </tbody>
       </table>
       <span v-else>{{ T.problemHealthNoFindings }}</span>
+
+      <omegaup-admin-recommendation-model-runs
+        :model-runs="recommendationModelRuns"
+      ></omegaup-admin-recommendation-model-runs>
     </div>
   </div>
 </template>
@@ -153,6 +157,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
 import * as problemHealth from '../../admin/problem_health';
+import admin_RecommendationModelRuns from './RecommendationModelRuns.vue';
 
 const CRON_FIELD_COUNT = 5;
 
@@ -247,13 +252,19 @@ export function describeSchedule(schedule?: string | null): string | null {
   return null;
 }
 
-@Component
+@Component({
+  components: {
+    'omegaup-admin-recommendation-model-runs': admin_RecommendationModelRuns,
+  },
+})
 export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
   @Prop({ default: () => [] })
   problemHealthFindings!: types.ProblemHealthFinding[];
+  @Prop({ default: () => [] })
+  recommendationModelRuns!: types.RecommendationModelRun[];
 
   expandedRunId: number | null = null;
 
