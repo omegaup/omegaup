@@ -2,11 +2,17 @@
   <div class="omegaup-course-assignmentlist card">
     <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
-      <div v-if="content.length === 0" class="card-body">
-        <div class="empty-table-message">
-          {{ T.courseContentEmpty }}
-        </div>
-      </div>
+      <omegaup-common-empty-state
+        v-if="content.length === 0"
+        :title="T.courseContentEmptyTitle"
+        :description="T.courseContentEmptyDescription"
+        :button-text="
+          assignmentFormMode === AssignmentFormMode.Default
+            ? T.courseAddContent
+            : ''
+        "
+        @action="$emit('emit-new')"
+      ></omegaup-common-empty-state>
       <table v-else class="table table-striped">
         <thead>
           <tr>
@@ -93,7 +99,9 @@
       </div>
     </div>
     <div
-      v-show="assignmentFormMode === AssignmentFormMode.Default"
+      v-show="
+        assignmentFormMode === AssignmentFormMode.Default && content.length > 0
+      "
       class="card-footer"
     >
       <form class="new">
@@ -117,6 +125,7 @@
 </template>
 
 <script lang="ts">
+import common_EmptyState from '../common/EmptyState.vue';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
@@ -138,6 +147,7 @@ library.add(fas);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-common-empty-state': common_EmptyState,
   },
   directives: {
     tooltip: VTooltip,

@@ -615,6 +615,8 @@ const translations: { [key: string]: string; } = {
   courseCloneGenerateLinkSuccess: "La liga se gener\u00f3 correctamente",
   courseCloneGenerateLinkTitle: "Generar liga para clonar",
   courseContentEmpty: "No hay contenido",
+  courseContentEmptyDescription: "Agrega contenido a este curso para comenzar.",
+  courseContentEmptyTitle: "A\u00fan no hay contenido en el curso",
   courseContentNewFormTypeDesc: "El tipo de contenido es usado para distinguir una tarea de una lecci\u00f3n o examen visualmente en los cursos.",
   courseCreate: "Crear Curso",
   courseCreateDesc: "Ense\u00f1a con tu propio curso",
