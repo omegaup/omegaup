@@ -840,6 +840,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         try {
+            $loginAdmin = self::login($admin['identity']);
             \OmegaUp\Controllers\Submission::apiSetFeedbackList(
                 new \OmegaUp\Request([
                     'auth_token' => $loginAdmin->auth_token,
