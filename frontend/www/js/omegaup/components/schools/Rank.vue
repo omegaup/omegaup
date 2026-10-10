@@ -50,7 +50,7 @@
           <th class="text-center" scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
-          <td class="text-truncate text-center">
+          <td class="school-name-cell text-center">
             <omegaup-countryflag
               :country="school.country_id"
             ></omegaup-countryflag>
@@ -125,11 +125,18 @@ export default class SchoolRank extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-// FIXME: This prevents wrapping a table cell when the name of the school is too long.
-// So, both tables (users rank and the current one) are perfectly aligned.
-// Another solution should  be taken in the future.
-.text-truncate {
-  max-width: 250px;
+
+.school-name-cell {
+  max-width: 200px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+@media (max-width: 768px) {
+  .school-name-cell {
+    max-width: 150px;
+  }
 }
 
 .table-width {
