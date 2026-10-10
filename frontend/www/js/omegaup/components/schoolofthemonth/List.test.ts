@@ -28,5 +28,25 @@ describe('List.vue', () => {
         .find('a.nav-link[aria-controls="candidatesToSchoolOfTheMonth"]')
         .text(),
     ).toContain(T.schoolsOfTheMonthCandidates);
+    expect(wrapper.find('div.system-in-maintainance').exists()).toBe(false);
+    expect(wrapper.find('table.table').exists()).toBe(true);
+  });
+
+  it('Should display maintenance message when isDisabled is true', () => {
+    const wrapper = shallowMount(schoolOfTheMonth_List, {
+      propsData: {
+        schoolsOfPreviousMonth: [],
+        schoolsOfPreviousMonths: [],
+        candidatesToSchoolOfTheMonth: [],
+        isMentor: true,
+        canChooseSchool: true,
+        schoolIsSelected: true,
+        isDisabled: true,
+      },
+    });
+
+    expect(wrapper.find('div.system-in-maintainance').exists()).toBe(true);
+    expect(wrapper.find('table.table').exists()).toBe(false);
   });
 });
+
