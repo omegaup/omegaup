@@ -17,7 +17,7 @@ export default class OverlayPopup extends Vue {}
 
 div[data-overlay-popup] {
   background: var(--overlay-popup-background-color);
-  width: 80%;
+  width: 50%;
   height: -moz-max-content;
   height: fit-content;
   max-height: 90%;
@@ -32,6 +32,10 @@ div[data-overlay-popup] {
   left: 0;
   right: 0;
   z-index: -1;
+
+  @media (max-width: 991.98px) {
+    width: 80%;
+  }
 
   button.close {
     position: sticky;
