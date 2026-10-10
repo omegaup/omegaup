@@ -798,6 +798,7 @@
 	"createZipFileForProblem": "Usar la herramienta Creador de problemas",
 	"createZipFileForProblemDesc": "Crea el zip de un problema paso a paso",
 	"cronControlPlaneDuration": "Duraci\u00f3n",
+	"cronControlPlaneJobDisabled": "Este job est\u00e1 deshabilitado. Habil\u00edtalo antes de solicitar una reejecuci\u00f3n.",
 	"cronControlPlaneJobsHeading": "Jobs",
 	"cronControlPlaneLastRun": "\u00daltima ejecuci\u00f3n",
 	"cronControlPlaneLastStatus": "\u00daltimo estado",
