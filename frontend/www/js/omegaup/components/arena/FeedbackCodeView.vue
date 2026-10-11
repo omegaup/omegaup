@@ -8,14 +8,50 @@
       ></textarea>
     </div>
     <div v-if="!readonly" class="container-fluid text-right py-2">
+      <span data-pending-comments class="badge badge-secondary mx-2">
+        {{
+          ui.formatString(T.runDetailsPendingComments, {
+            count: pendingFeedbackList.length,
+          })
+        }}
+      </span>
       <button
-        data-button-send-feedback
+        data-button-finish-review
         class="btn btn-primary mx-2"
-        :disabled="!numberOfComments"
-        @click.prevent="saveFeedbackList"
+        @click.prevent="showReviewPanel = !showReviewPanel"
       >
-        {{ T.submissionSendFeedback }}
+        {{ T.runDetailsFinishReview }}
       </button>
+    </div>
+    <div
+      v-if="!readonly && showReviewPanel"
+      class="container-fluid pb-3 text-left"
+    >
+      <textarea
+        v-model="reviewSummary"
+        data-review-summary
+        class="form-control"
+        rows="3"
+        maxlength="1000"
+        :placeholder="T.runDetailsReviewSummaryPlaceholder"
+      ></textarea>
+      <div class="text-right mt-2">
+        <button
+          data-button-submit-review
+          class="btn btn-primary mx-2"
+          :disabled="!canSubmitReview"
+          @click.prevent="saveFeedbackList"
+        >
+          {{ T.runDetailsSubmitReview }}
+        </button>
+        <button
+          data-button-cancel-review
+          class="btn btn-secondary mx-2"
+          @click.prevent="cancelReview"
+        >
+          {{ T.runDetailsFeedbackCancel }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -25,6 +61,7 @@
 // admin or teaching assistant.
 import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
@@ -53,8 +90,11 @@ export default class FeedbackCodeView extends Vue {
   @Prop() currentUserClassName!: string;
 
   T = T;
+  ui = ui;
   mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
   mapChangeTracker = 1;
+  showReviewPanel = false;
+  reviewSummary = '';
 
   get feedbackList(): ArenaCourseFeedback[] {
     if (!this.mapChangeTracker) {
@@ -63,8 +103,17 @@ export default class FeedbackCodeView extends Vue {
     return Array.from(this.feedbackMap.values());
   }
 
-  get numberOfComments(): number {
-    return this.feedbackList.length;
+  get pendingFeedbackList(): ArenaCourseFeedback[] {
+    return this.feedbackList.filter(
+      (feedback) => feedback.status !== FeedbackStatus.Saved,
+    );
+  }
+
+  get canSubmitReview(): boolean {
+    const hasPendingComment = this.pendingFeedbackList.some((feedback) =>
+      feedback.text?.trim(),
+    );
+    return hasPendingComment || this.reviewSummary.trim() !== '';
   }
 
   get editorOptions(): EditorOptions {
@@ -249,14 +298,23 @@ export default class FeedbackCodeView extends Vue {
     this.mapChangeTracker++;
   }
 
+  cancelReview(): void {
+    this.reviewSummary = '';
+    this.showReviewPanel = false;
+  }
+
   saveFeedbackList(): void {
-    this.$emit(
-      'save-feedback-list',
-      this.feedbackList.map((feedback) => ({
-        lineNumber: feedback.lineNumber,
-        feedback: feedback.text,
-      })),
-    );
+    const generalFeedback = this.reviewSummary.trim();
+    this.$emit('save-feedback-list', {
+      feedbackList: this.pendingFeedbackList.flatMap((feedback) => {
+        if (!feedback.text?.trim()) {
+          return [];
+        }
+        return [{ lineNumber: feedback.lineNumber, feedback: feedback.text }];
+      }),
+      generalFeedback: generalFeedback || null,
+    });
+    this.cancelReview();
   }
 }
 </script>

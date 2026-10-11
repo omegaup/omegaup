@@ -15,21 +15,9 @@
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a
-        data-run-leave-feedback-button
-        role="button"
-        class="btn btn-sm btn-primary"
-        @click="showFeedbackForm = !showFeedbackForm"
-        >{{ T.submissionFeedbackSendButton }}</a
-      >
-      <div v-show="showFeedbackForm" class="form-group">
-        <p>{{ T.submissionFeedbackAnimationButton }}</p>
-        <img
-          v-show="showFeedbackForm"
-          src="/media/submission_feedback_demo.gif"
-          :alt="T.submissionFeedbackDemoAlt"
-        />
-      </div>
+      <p data-submission-feedback-review-hint>
+        {{ T.submissionFeedbackReviewHint }}
+      </p>
     </div>
   </div>
 </template>
@@ -56,9 +44,6 @@ export default class SubmissionFeedback extends Vue {
   T = T;
   ui = ui;
   time = time;
-
-  showFeedbackForm = false;
-  feedback = this.generalFeedback?.feedback ?? null;
 
   get generalFeedback(): null | types.SubmissionFeedback {
     if (!this.feedbackOptions.length) return null;
