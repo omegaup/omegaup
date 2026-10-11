@@ -1,0 +1,35 @@
+name: Sugerencia de mejora (Spanish)
+description: Ayúdanos a mejorar la plataforma describiendo tus ideas con este formato
+title: "[FEATURE] Como un [tipo de usuario], quiero [funcionalidad o mejora esperada] para [beneficio esperado]"
+labels:
+  - feature-request
+body:
+  - type: checkboxes
+    id: lista-verificacion
+    attributes:
+      label: Lista de verificación
+      options:
+        - label: He buscado en los issues existentes y confirmado que esto no es un duplicado
+          required: true
+        - label: He discutido esto en [GitHub Discussions](https://github.com/omegaup/omegaup/discussions) o en [Discord](https://discord.gg/K3JFd9d3wk) y recibí retroalimentación positiva
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        _Provee un título para esta sugerencia con el siguiente formato:_
+
+        _Como un [tipo de usuario], quiero [funcionalidad o mejora esperada] para [beneficio esperado]_
+
+        _Ejemplo: Como [**usuario**], quiero [**un botón de inicio**] para [**poder regresar a la página inicial con un solo click**]_
+
+        ## Contexto
+
+        _Cómo te ha afectado este problema? Cuál es el objetivo a cumplir?_
+
+        _Proveer contexto nos ayuda a encontrar la solución adecuada_
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto
+    validations:
+      required: true

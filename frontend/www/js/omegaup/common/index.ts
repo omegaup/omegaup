@@ -50,6 +50,7 @@ OmegaUp.on('ready', () => {
           },
           schoolOfTheMonth: payload.schoolOfTheMonthData,
           isUnder13User: commonPayload.isUnder13User,
+          carouselItems: payload.carouselItems,
         },
       });
     },

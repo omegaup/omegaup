@@ -337,6 +337,32 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Update profile username with username of an existing non-user identity
+     */
+    public function testDuplicateUsernameUpdateWithNonUserIdentity() {
+        $nonUserIdentity = new \OmegaUp\DAO\VO\Identities([
+            'username' => (
+                'identity_' . \OmegaUp\Test\Utils::createRandomString()
+            ),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+        \OmegaUp\DAO\Identities::create($nonUserIdentity);
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $nonUserIdentity->username,
+            ]));
+            $this->fail('Should not have been able to use duplicate username');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertSame('usernameInUse', $e->getMessage());
+        }
+    }
+
      /**
      * Request parameter name cannot be too long
      */

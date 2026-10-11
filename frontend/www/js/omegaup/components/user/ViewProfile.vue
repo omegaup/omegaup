@@ -11,7 +11,7 @@
           <div
             class="card-header d-flex justify-content-between align-items-center"
           >
-            <span>{{ T.profileReadme }}</span>
+            <span>{{ T.profileAboutSection }}</span>
             <div>
               <button
                 v-if="profile.is_own_profile && !isEditingReadme"
@@ -29,7 +29,7 @@
                 class="btn btn-sm btn-outline-warning"
                 @click="reportReadme"
               >
-                {{ T.profileReadmeReport }}
+                {{ T.profileAboutSectionReport }}
               </button>
             </div>
           </div>
@@ -41,7 +41,7 @@
                 :full-width="true"
               ></omegaup-markdown>
               <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
-                {{ T.profileReadmeAddPrompt }}
+                {{ T.profileAboutSectionAddPrompt }}
               </p>
             </template>
             <template v-else>
@@ -183,7 +183,23 @@
                   :items-per-page="30"
                   :title="T.profileBookmarkedProblems"
                   class="mb-3"
-                ></omegaup-grid-paginator>
+                >
+                  <template #item-data="slotProps">
+                    <a :href="slotProps.item.getUrl()">{{
+                      slotProps.item.toString()
+                    }}</a>
+                    <span
+                      v-if="slotProps.item.solved"
+                      class="badge badge-success ml-1"
+                      >{{ T.problemStatusSolved }}</span
+                    >
+                    <span
+                      v-else-if="slotProps.item.attempted"
+                      class="badge badge-warning ml-1"
+                      >{{ T.problemStatusAttempted }}</span
+                    >
+                  </template>
+                </omegaup-grid-paginator>
               </div>
               <div
                 v-show="currentSelectedTab == ViewProfileTabs.Contests"
@@ -315,6 +331,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
+  BookmarkedProblem,
   Contest,
   ContestResult,
   Course,
@@ -328,7 +345,7 @@ import common_TablePaginator from '../common/TablePaginator.vue';
 import country_Flag from '../CountryFlag.vue';
 import common_Markdown from '../Markdown.vue';
 import user_BasicInfo from './BasicInfov2.vue';
-import user_Charts from './Chartsv2.vue';
+import user_Charts from './Charts.vue';
 import user_MainInfo from './MainInfo.vue';
 import problem_SolvingProgress from './ProblemSolvingProgress.vue';
 import tags_SolvedChart from './TagsSolvedChart.vue';
@@ -450,10 +467,10 @@ export default class ViewProfile extends Vue {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
-  get bookmarkedProblems(): Problem[] {
+  get bookmarkedProblems(): BookmarkedProblem[] {
     if (!this.data?.bookmarkedProblems) return [];
     return this.data.bookmarkedProblems.map(
-      (problem: types.BookmarkProblem) => new Problem(problem as types.Problem),
+      (problem: types.BookmarkProblem) => new BookmarkedProblem(problem),
     );
   }
   get rank(): string {
@@ -499,7 +516,7 @@ export default class ViewProfile extends Vue {
       username: this.profile.username ?? '',
       onSuccess: () => {
         this.readmeReportSubmitted = true;
-        ui.success(T.profileReadmeReportSuccess);
+        ui.success(T.profileAboutSectionReportSuccess);
       },
     });
   }

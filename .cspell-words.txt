@@ -1,0 +1,323 @@
+# =============================================================================
+# omegaUp Custom Dictionary for Spell Checking
+# =============================================================================
+# Add project-specific terms, technical words, and proper nouns here.
+# One word per line. Lines starting with # are comments.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Project Names and Brands
+# -----------------------------------------------------------------------------
+omegaup
+omegaUp
+OmegaUp
+OMEGAUP
+
+# -----------------------------------------------------------------------------
+# omegaUp-specific Terms
+# -----------------------------------------------------------------------------
+Karel
+karel
+libinteractive
+omegajail
+quark
+gitserver
+grader
+minijail
+seccomp
+problemset
+problemsets
+scoreboard
+scoreboards
+rejudge
+rejudged
+requalify
+
+# -----------------------------------------------------------------------------
+# Technical Terms - General
+# -----------------------------------------------------------------------------
+API
+APIs
+CLI
+DAO
+DAOs
+GUID
+UUID
+cron
+crontab
+stdin
+stdout
+stderr
+localhost
+hostname
+webpack
+XDebug
+xdebug
+APCu
+apcu
+JDWP
+bpf
+BPF
+
+# -----------------------------------------------------------------------------
+# Programming Languages & Frameworks
+# -----------------------------------------------------------------------------
+TypeScript
+JavaScript
+PHP
+MySQL
+Redis
+RabbitMQ
+Vue
+VueJS
+Vuex
+SCSS
+Sass
+ESLint
+eslint
+stylelint
+Psalm
+psalm
+phpstan
+PHPStan
+PHPUnit
+phpunit
+Cypress
+cypress
+Codecov
+codecov
+Storybook
+Prism
+prismjs
+CodeMirror
+codemirror
+
+# -----------------------------------------------------------------------------
+# Frontend/Build Tools
+# -----------------------------------------------------------------------------
+webpack
+Webpack
+Babel
+babel
+jQuery
+jquery
+Bootstrap
+bootstrap
+Popper
+polyfill
+polyfills
+transpile
+transpiled
+minify
+minified
+bundler
+sourcemap
+sourcemaps
+
+# -----------------------------------------------------------------------------
+# Infrastructure & DevOps
+# -----------------------------------------------------------------------------
+Kubernetes
+kubernetes
+Docker
+docker
+nginx
+Nginx
+NGINX
+systemd
+uploader
+downloader
+
+# -----------------------------------------------------------------------------
+# Spanish Terms (commonly used in project)
+# -----------------------------------------------------------------------------
+concurso
+concursos
+usuario
+usuarios
+cuenta
+cuentas
+envío
+envíos
+problema
+problemas
+calificación
+puntaje
+
+# -----------------------------------------------------------------------------
+# Portuguese Terms (commonly used in project)
+# -----------------------------------------------------------------------------
+conta
+contas
+código
+códigos
+pontuação
+usuário
+usuários
+
+# -----------------------------------------------------------------------------
+# Abbreviations & Acronyms
+# -----------------------------------------------------------------------------
+GSoC
+GSOC
+IOI
+OMI
+ICPC
+ACM
+OCI
+USACO
+COCI
+CEOI
+BOI
+APIO
+EGOI
+HTML
+CSS
+JSON
+YAML
+XML
+SQL
+HTTP
+HTTPS
+SMTP
+IMAP
+FTP
+SSH
+SSL
+TLS
+OAuth
+CORS
+CSRF
+XSS
+CDN
+DNS
+TCP
+UDP
+URL
+URI
+UTF
+ASCII
+ANSI
+POSIX
+LDAP
+SAML
+JWT
+RSA
+SHA
+HMAC
+
+# -----------------------------------------------------------------------------
+# Version Control & CI/CD
+# -----------------------------------------------------------------------------
+GitHub
+github
+GitLab
+gitlab
+Bitbucket
+submodule
+submodules
+precommit
+postcommit
+rebased
+rebasing
+cherrypick
+cherrypicked
+
+# -----------------------------------------------------------------------------
+# File Extensions & Config Files
+# -----------------------------------------------------------------------------
+tsconfig
+eslintrc
+prettierrc
+stylelintrc
+babelrc
+gitignore
+gitattributes
+gitmodules
+dockerignore
+npmrc
+yarnrc
+editorconfig
+
+# -----------------------------------------------------------------------------
+# Database Terms
+# -----------------------------------------------------------------------------
+varchar
+tinyint
+bigint
+datetime
+timestamp
+autoincrement
+nullable
+innodb
+charset
+collation
+indexing
+reindex
+denormalize
+denormalized
+
+# -----------------------------------------------------------------------------
+# Common Technical Verbs
+# -----------------------------------------------------------------------------
+stringify
+stringified
+serialize
+serialized
+deserialize
+deserialized
+tokenize
+tokenized
+refactor
+refactored
+deprecate
+deprecated
+inline
+inlined
+
+# -----------------------------------------------------------------------------
+# Usernames & Contributors (add as needed)
+# -----------------------------------------------------------------------------
+pabo99
+lhchavez
+
+# -----------------------------------------------------------------------------
+# Miscellaneous Technical Terms
+# -----------------------------------------------------------------------------
+async
+await
+middleware
+middlewares
+validator
+validators
+accessor
+accessors
+mutator
+mutators
+getter
+getters
+setter
+setters
+namespace
+namespaces
+autoload
+autoloader
+mixin
+mixins
+composable
+composables
+lifecycle
+debounce
+debounced
+throttle
+throttled
+callback
+callbacks
+changelog
+changelogs
+bugfix
+bugfixes
+hotfix
+hotfixes
+workaround
+workarounds

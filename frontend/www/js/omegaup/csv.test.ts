@@ -110,7 +110,16 @@ describe('csv_utils', () => {
 
   it('Should handle escaped csv cells', () => {
     const escapedCell = escapeCsv('Escaped "text"');
-    expect(escapedCell).toBe('"Escaped ""text""');
+    expect(escapedCell).toBe('"Escaped ""text"""');
+  });
+
+  it('Should escape every quote in a csv cell', () => {
+    expect(escapeCsv('Juan "JJ" Perez')).toBe('"Juan ""JJ"" Perez"');
+  });
+
+  it('Should quote csv cells with line breaks', () => {
+    expect(escapeCsv('Ana\nMaria')).toBe('"Ana\nMaria"');
+    expect(escapeCsv('Ana\r\nMaria')).toBe('"Ana\r\nMaria"');
   });
 
   it('Should handle csv content', () => {

@@ -523,12 +523,12 @@ class Session extends \OmegaUp\Controllers\Controller {
         for (;;) {
             // Maybe we can bring all records from db
             // with prefix $username, because this:
-            $userexists = \OmegaUp\DAO\Users::FindByUsername(
+            $identityExists = \OmegaUp\DAO\Identities::findByUsername(
                 "{$username}{$suffix}"
             );
             // will query db every single time probably.
 
-            if (empty($userexists)) {
+            if (empty($identityExists)) {
                 break;
             }
 

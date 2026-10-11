@@ -44,7 +44,7 @@ def check_inside_container() -> None:
             f'    docker compose exec -T frontend {shlex.join(sys.argv)}\n')
         sys.stderr.write('\n')
         sys.exit(1)
-    result = subprocess.run(['docker compose', 'exec', '-T', 'frontend'] +
+    result = subprocess.run(['docker', 'compose', 'exec', '-T', 'frontend'] +
                             sys.argv,
                             check=False)
     sys.exit(result.returncode)
@@ -102,7 +102,7 @@ def mysql(query: str,
     '''Runs the MySQL commandline client with |query| as query.'''
     args = []
     if container_check and not inside_container():
-        args.extend(['docker compose', 'exec', '-T', 'frontend'])
+        args.extend(['docker', 'compose', 'exec', '-T', 'frontend'])
     args += [_MYSQL_BINARY] + list(auth)
     if dbname:
         args.append(dbname)
@@ -124,7 +124,7 @@ def mysqldump(*,
     '''Runs the mysqldump commandline tool.'''
     args = []
     if container_check and not inside_container():
-        args.extend(['docker compose', 'exec', '-T', 'frontend'])
+        args.extend(['docker', 'compose', 'exec', '-T', 'frontend'])
     args += [_MYSQLDUMP_BINARY] + list(auth)
     if dbname:
         args.append(dbname)
@@ -136,7 +136,7 @@ def mysqldump(*,
             '--create-options',
             '--single-transaction',
             '--routines',
-            '--default-character-set=utf8',
+            '--default-character-set=utf8mb4',
             '--result-file',
             outfile.name,
         ])

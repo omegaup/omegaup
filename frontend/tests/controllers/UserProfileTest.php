@@ -161,6 +161,46 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /*
+     * Admin viewing another user's profile should NOT be treated as their
+     * own profile, even though they can see normally-private fields.
+     * Regression test for https://github.com/omegaup/omegaup/issues/9982
+     */
+    public function testAdminViewingOtherProfileIsNotOwnProfile() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        $login = self::login($identityAdmin);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
+
+        // Admin can still see normally-private fields...
+        $this->assertArrayHasKey('email', $response);
+        // ...but this is NOT the admin's own profile, so edit UI must not show.
+        $this->assertFalse($response['is_own_profile']);
+    }
+
+    /*
+     * Admin viewing their own profile should still be treated as their
+     * own profile.
+     * Regression test for https://github.com/omegaup/omegaup/issues/9982
+     */
+    public function testAdminViewingOwnProfileIsOwnProfile() {
+        ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        $login = self::login($identityAdmin);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identityAdmin->username
+        ]);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
+
+        $this->assertTrue($response['is_own_profile']);
+    }
+
+    /*
      * User can see his own email
      */
     public function testUserCanSeeSelfEmail() {

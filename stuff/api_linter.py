@@ -14,7 +14,8 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def _which(program: str) -> str:
     '''Looks for |program| in $PATH. Similar to UNIX's `which` command.'''
-    for path in os.environ['PATH'].split(os.pathsep):
+    node_bin = os.path.join(_ROOT, 'node_modules', '.bin')
+    for path in [node_bin] + os.environ['PATH'].split(os.pathsep):
         exe_file = os.path.join(path.strip('"'), program)
         if os.path.isfile(exe_file) and os.access(exe_file, os.X_OK):
             return exe_file

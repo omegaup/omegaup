@@ -15,9 +15,7 @@ export const storeConfig = {
   },
   mutations: {
     addProblem(state: ProblemState, problem: types.ProblemInfo) {
-      if (Object.prototype.hasOwnProperty.call(state.problems, problem.alias)) {
-        return;
-      }
+      // Upsert to keep cached problem details fresh after contest updates.
       Vue.set(state.problems, problem.alias, problem);
     },
   },

@@ -119,7 +119,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     const SOURCE_EXTENSIONS = [
-        'py', 'cpp', 'c', 'java', 'kp', 'kj', 'in', 'out',
+        'py', 'cpp', 'c', 'java', 'kp', 'kj', 'rk', 'in', 'out',
     ];
 
     // Number of rows shown in problems list
@@ -460,6 +460,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentityIsOver13();
+
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
 
         self::createProblem(
             $r->user,
@@ -1723,7 +1725,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 true
             );
-        } elseif (!empty(array_intersect(['kp', 'kj'], $languages))) {
+        } elseif (!empty(array_intersect(['kp', 'kj', 'rk'], $languages))) {
             \OmegaUp\Controllers\Problem::addTag(
                 'problemRestrictedTagKarel',
                 true,
@@ -3005,12 +3007,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             explode(',', $problem->languages)
         );
         $response['accepts_submissions'] = !empty($response['languages']);
-        $response['karel_problem'] = count(
+        $legacyKarelLanguages = count(
             array_intersect(
                 $response['languages'],
                 ['kp', 'kj']
             )
-        ) === 2;
+        );
+        $response['karel_problem'] = (
+            $legacyKarelLanguages === 2 ||
+            in_array('rk', $response['languages'], true)
+        );
         $response['limits'] = [
             'input_limit' => ($response['input_limit'] / 1024) . ' KiB',
             'memory_limit' => (
@@ -3042,6 +3048,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 intval($loggedIdentity->identity_id)
             );
         }
+
         return $response;
     }
 
@@ -3920,6 +3927,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         $sortOrder = $r->ensureOptionalEnum(
@@ -3972,7 +3980,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $onlyKarel = $r->ensureOptionalBool('only_karel');
         if ($onlyKarel) {
-            $programmingLanguages = ['kp', 'kj'];
+            $programmingLanguages = ['kp', 'kj', 'rk'];
         } elseif (!empty($programmingLanguageParam)) {
             $programmingLanguages = explode(
                 ',',
@@ -3983,6 +3991,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         $someTags = $r->ensureOptionalBool('some_tags');
         $requireAllTags = $r->ensureOptionalBool('require_all_tags');
+        $solvedStatus = $r->ensureOptionalEnum(
+            'solved_status',
+            ['all', 'solved', 'attempted', 'unsolved']
+        ) ?? 'all';
 
         return [
             'sortOrder' => $sortOrder,
@@ -3997,9 +4009,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $someTags
             ) : $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
+            'matchAnyLanguage' => $onlyKarel === true,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
             'authors' => $authors,
+            'solvedStatus' => $solvedStatus,
         ];
     }
 
@@ -4069,6 +4083,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -4103,9 +4118,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'keyword' => $keyword,
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
+            'matchAnyLanguage' => $matchAnyLanguage,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
             'authors' => $authors,
+            'solvedStatus' => $solvedStatus,
         ] = self::validateListParams($r);
 
         return self::getListImpl(
@@ -4119,6 +4136,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
+            $matchAnyLanguage,
             $minVisibility,
             $difficultyRange,
             $r->identity,
@@ -4126,7 +4144,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors
+            $authors,
+            $solvedStatus
         );
     }
 
@@ -4148,6 +4167,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $keyword,
         bool $requireAllTags,
         array $programmingLanguages,
+        bool $matchAnyLanguage,
         int $minVisibility,
         ?array $difficultyRange,
         ?\OmegaUp\DAO\VO\Identities $identity,
@@ -4155,7 +4175,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $onlyQualitySeal,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        string $solvedStatus
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -4209,7 +4230,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors
+            $authors,
+            $matchAnyLanguage,
+            $solvedStatus
         );
         return [
             'total' => $count,
@@ -4882,12 +4905,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'problem' => [
                 'alias' => $details['alias'],
-                'karel_problem' => count(
-                    array_intersect(
-                        $details['languages'],
-                        ['kp', 'kj']
-                    )
-                ) === 2,
+                'karel_problem' => (
+                    count(
+                        array_intersect(
+                            $details['languages'],
+                            ['kp', 'kj']
+                        )
+                    ) === 2 ||
+                    in_array('rk', $details['languages'], true)
+                ),
                 'commit' => $details['commit'],
                 'languages' => $details['languages'],
                 'preferred_language' => $details['preferred_language'] ?? null,
@@ -5167,6 +5193,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
@@ -5199,9 +5226,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'keyword' => $keyword,
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
+            'matchAnyLanguage' => $matchAnyLanguage,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
             'authors' => $authors,
+            'solvedStatus' => $solvedStatus,
         ] = self::validateListParams($r);
 
         $result = self::getList(
@@ -5215,15 +5244,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
-            $minVisibility,
-            $difficultyRange,
-            $r->identity,
-            $r->user,
-            $onlyQualitySeal,
+            matchAnyLanguage: $matchAnyLanguage,
+            minVisibility: $minVisibility,
+            difficultyRange: $difficultyRange,
+            identity: $r->identity,
+            user: $r->user,
+            onlyQualitySeal: $onlyQualitySeal,
             url: '/problem/list/',
             level: null,
             difficulty: 'all',
-            authors: $authors
+            authors: $authors,
+            solvedStatus: $solvedStatus
         );
 
         $solvedProblemAliases = [];
@@ -5359,6 +5390,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $sortedLanguages
             ) => 'C, C++, C#, Java, Kotlin, Python, Ruby, Pascal, Haskell, Lua, Go, Rust, JavaScript',
             'kj,kp' => 'Karel',
+            'rk' => 'ReKarel',
             'cat' => \OmegaUp\Translations::getInstance($identity)->get(
                 'wordsJustOutput'
             ),
@@ -6536,6 +6568,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function getCollectionsDetailsByLevelForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -6572,6 +6605,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'keyword' => $keyword,
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
+            'matchAnyLanguage' => $matchAnyLanguage,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
             'authors' => $authors,
@@ -6588,15 +6622,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
-            $minVisibility,
-            $difficultyRange,
-            $r->identity,
-            $r->user,
+            matchAnyLanguage: $matchAnyLanguage,
+            minVisibility: $minVisibility,
+            difficultyRange: $difficultyRange,
+            identity: $r->identity,
+            user: $r->user,
             onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: "/problem/collection/{$collectionLevel}/",
             level: $collectionLevel,
             difficulty: $difficulty,
-            authors: $authors
+            authors: $authors,
+            solvedStatus: 'all'
         );
 
         $frequentTags = \OmegaUp\Controllers\Tag::getFrequentQualityTagsByLevel(
@@ -6676,6 +6712,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $keyword,
         bool $requireAllTags,
         array $programmingLanguages,
+        bool $matchAnyLanguage,
         int $minVisibility,
         ?array $difficultyRange,
         ?\OmegaUp\DAO\VO\Identities $identity,
@@ -6684,7 +6721,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $url,
         ?string $level,
         string $difficulty,
-        array $authors
+        array $authors,
+        string $solvedStatus
     ) {
         $response = self::getListImpl(
             $page ?: 1,
@@ -6697,6 +6735,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
+            $matchAnyLanguage,
             $minVisibility,
             $difficultyRange,
             $identity,
@@ -6704,7 +6743,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $onlyQualitySeal,
             $level,
             $difficulty,
-            $authors
+            $authors,
+            $solvedStatus
         );
 
         $params = [
@@ -6714,7 +6754,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'sort_order' => $sortOrder,
             'tag' => $tags,
             'author' => $authors,
-            'difficulty' => $difficulty
+            'difficulty' => $difficulty,
+            'solved_status' => $solvedStatus
         ];
 
         $pagerItems = \OmegaUp\Pager::paginateWithUrl(
@@ -6780,6 +6821,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -6814,6 +6856,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'keyword' => $keyword,
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
+            'matchAnyLanguage' => $matchAnyLanguage,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
             'authors' => $authors,
@@ -6830,15 +6873,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
-            $minVisibility,
-            $difficultyRange,
-            $r->identity,
-            $r->user,
+            matchAnyLanguage: $matchAnyLanguage,
+            minVisibility: $minVisibility,
+            difficultyRange: $difficultyRange,
+            identity: $r->identity,
+            user: $r->user,
             onlyQualitySeal: ($quality === 'onlyQualityProblems'),
             url: '/problem/collection/author/',
             level: null,
             difficulty: $difficulty,
-            authors: $authors
+            authors: $authors,
+            solvedStatus: 'all'
         );
 
         $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(

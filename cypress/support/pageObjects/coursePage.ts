@@ -25,6 +25,7 @@ export class CoursePage {
 
   addStudents(users: Array<string>): void {
     cy.get('[data-course-edit-students]').click();
+    cy.get('.omegaup-course-addstudent button.btn-lg').click();
     cy.get('textarea[data-course-multiple-students-add]').type(
       users.join(', '),
     );

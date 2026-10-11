@@ -50,6 +50,42 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Scenario:
+     *     A non-user identity exists with username = A{$salt}
+     *     A user logs in with google using email = A{$salt}@isp.com
+     *     The username should avoid the collision and be assigned A{$salt}1
+     */
+    public function testUserNameCollisionWithNonUserIdentity() {
+        $salt = \OmegaUp\Time::get();
+        $nonUserIdentity = new \OmegaUp\DAO\VO\Identities([
+            'username' => "A{$salt}",
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+        \OmegaUp\DAO\Identities::create($nonUserIdentity);
+
+        // User does not exist, but identity exists
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}"));
+        $this->assertNotNull(
+            \OmegaUp\DAO\Identities::findByUsername("A{$salt}")
+        );
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Session::loginViaGoogleEmail(
+                "A{$salt}@isp.com"
+            );
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        ob_end_clean();
+
+        // The user created should have username A{$salt}1
+        // because A{$salt} was taken
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername("A{$salt}1"));
+    }
+
+    /**
      * User logged via google, try log in with native mode
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {

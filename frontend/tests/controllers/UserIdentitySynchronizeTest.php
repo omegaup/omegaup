@@ -212,4 +212,64 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($identity->username, $identityDb['username']);
         $this->assertSame($identity->password, $identityDb['password']);
     }
+
+    /**
+     * Update basic info username with username of an existing non-user identity
+     */
+    public function testUpdateBasicInfoDuplicateUsernameWithNonUserIdentity() {
+        $nonUserIdentity = new \OmegaUp\DAO\VO\Identities([
+            'username' => (
+                'identity_' . \OmegaUp\Test\Utils::createRandomString()
+            ),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+        \OmegaUp\DAO\Identities::create($nonUserIdentity);
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdateBasicInfo(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $nonUserIdentity->username,
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Should not have been able to use duplicate username');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterUsernameInUse', $e->getMessage());
+        }
+    }
+
+    /**
+     * Update basic info with invalid username format
+     */
+    public function testUpdateBasicInfoInvalidUsername() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Test with invalid characters (e.g. spaces)
+        try {
+            \OmegaUp\Controllers\User::apiUpdateBasicInfo(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => 'invalid username',
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Should not allow username with spaces');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalidAlias', $e->getMessage());
+        }
+
+        // Test with too short username (length < 2)
+        try {
+            \OmegaUp\Controllers\User::apiUpdateBasicInfo(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => 'a',
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Should not allow 1-character username');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterStringTooShort', $e->getMessage());
+        }
+    }
 }
