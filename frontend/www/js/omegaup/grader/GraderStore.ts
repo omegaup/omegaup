@@ -6,6 +6,7 @@ import Vue from 'vue';
 import * as Util from './util';
 import * as templates from './GraderTemplates';
 import { types } from '../api_types';
+import { getCodeTemplate } from '../code_templates';
 
 export type CaseKey = `${string}.${'err' | 'meta' | 'out'}`;
 export interface GraderOutputs {
@@ -102,6 +103,17 @@ const languageExtensionMapping: Record<string, string> = {};
 Object.keys(Util.supportedLanguages).forEach((key) => {
   languageExtensionMapping[key] = Util.supportedLanguages[key].extension;
 });
+
+function getTemplateSource(language: string, interactive: boolean): string {
+  const extension = languageExtensionMapping[language];
+  const personalTemplate = getCodeTemplate(extension);
+  if (personalTemplate !== null) return personalTemplate;
+
+  const defaultTemplates = interactive
+    ? interactiveTemplates
+    : sourceTemplates;
+  return defaultTemplates[extension] || '';
+}
 Vue.use(Vuex);
 const storeOptions: StoreOptions<GraderStore> = {
   state: {
@@ -403,12 +415,12 @@ const storeOptions: StoreOptions<GraderStore> = {
         }
       }
       if (!state.sessionStorageSources) {
-        const tmpl = state.request.input.interactive
-          ? interactiveTemplates
-          : sourceTemplates;
         const sources: Record<string, string> = {};
         for (const lang of state.languages) {
-          sources[lang] = tmpl[languageExtensionMapping[lang]] || '';
+          sources[lang] = getTemplateSource(
+            lang,
+            Boolean(state.request.input.interactive),
+          );
         }
         state.sessionStorageSources = {
           language: initialLanguage,
@@ -447,19 +459,18 @@ const storeOptions: StoreOptions<GraderStore> = {
         return;
       }
 
-      if (
+      const personalTemplate = getCodeTemplate(extension);
+      if (personalTemplate !== null) {
+        state.request.source = personalTemplate;
+      } else if (
         state.sessionStorageSources &&
-        state.sessionStorageSources.sources[language]
+        state.sessionStorageSources.sources[language] !== undefined
       ) {
         state.request.source = state.sessionStorageSources.sources[language];
       } else if (state.request.input.interactive) {
-        if (interactiveTemplates[extension]) {
-          state.request.source = interactiveTemplates[extension];
-        }
+        state.request.source = getTemplateSource(language, true);
       } else {
-        if (sourceTemplates[extension]) {
-          state.request.source = sourceTemplates[extension];
-        }
+        state.request.source = getTemplateSource(language, false);
       }
 
       if (state.sessionStorageSources && !state.updatingSettings) {
@@ -826,10 +837,11 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     resetSource({ commit, state }: { commit: Commit; state: GraderStore }) {
       const extension = languageExtensionMapping[state.request.language];
-      const templateSource = state.request.input.interactive
-        ? interactiveTemplates[extension]
-        : sourceTemplates[extension];
-      if (templateSource) {
+      const templateSource = getTemplateSource(
+        state.request.language,
+        Boolean(state.request.input.interactive),
+      );
+      if (templateSource !== undefined) {
         commit('request.source', templateSource);
       }
     },
