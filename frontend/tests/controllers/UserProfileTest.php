@@ -485,6 +485,14 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test update main email api
      */
     public function testUpdateMainEmail() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $this->assertTrue($user->verified);
+
+        $login = self::login($identity);
+
         $emailSender = new \OmegaUp\Test\FakeEmailSender();
         $scopedSender = new \OmegaUp\Test\ScopedEmailSender($emailSender);
         $originalSendEmailOnVerify = (
@@ -493,14 +501,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
 
         try {
-            [
-                'user' => $user,
-                'identity' => $identity,
-            ] = \OmegaUp\Test\Factories\User::createUser();
-            $this->assertTrue($user->verified);
-            $this->assertNull($user->verification_id);
-
-            $login = self::login($identity);
             \OmegaUp\Controllers\User::apiUpdateMainEmail(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
@@ -555,6 +555,20 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test update main email for unverified user regenerates token
      */
     public function testUpdateMainEmailForUnverifiedUser() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'verify' => false,
+            ])
+        );
+        $this->assertFalse($user->verified);
+        $this->assertNotNull($user->verification_id);
+        $initialVerificationId = $user->verification_id;
+
+        $login = self::login($identity);
+
         $emailSender = new \OmegaUp\Test\FakeEmailSender();
         $scopedSender = new \OmegaUp\Test\ScopedEmailSender($emailSender);
         $originalSendEmailOnVerify = (
@@ -563,19 +577,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
 
         try {
-            [
-                'user' => $user,
-                'identity' => $identity,
-            ] = \OmegaUp\Test\Factories\User::createUser(
-                new \OmegaUp\Test\Factories\UserParams([
-                    'verify' => false,
-                ])
-            );
-            $this->assertFalse($user->verified);
-            $this->assertNotNull($user->verification_id);
-            $initialVerificationId = $user->verification_id;
-
-            $login = self::login($identity);
             \OmegaUp\Controllers\User::apiUpdateMainEmail(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
