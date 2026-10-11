@@ -191,6 +191,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -255,7 +256,7 @@ export default class ActivityFeed extends Vue {
     window.addEventListener('popstate', this.syncFromHash);
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('popstate', this.syncFromHash);
   }
 

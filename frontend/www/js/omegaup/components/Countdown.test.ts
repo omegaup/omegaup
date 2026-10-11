@@ -138,7 +138,7 @@ describe('Countdown.vue', () => {
     });
 
     // With fake timers, the watcher hasn't fired yet, so the interval
-    // is still active. beforeDestroy should clean it up.
+    // is still active. beforeUnmount should clean it up.
     wrapper.destroy();
     expect(clearIntervalSpy).toHaveBeenCalled();
     expect((wrapper.vm as any).timerInterval).toBe(0);

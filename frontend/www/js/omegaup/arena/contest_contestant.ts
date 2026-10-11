@@ -1,3 +1,4 @@
+import '../vue3LifecycleCompat';
 import Vue from 'vue';
 import * as api from '../api';
 import { types } from '../api_types';
@@ -177,7 +178,7 @@ OmegaUp.on('ready', async () => {
       blockedMessage,
       logs: [] as types.ContestProblemChangeLog[],
     }),
-    beforeDestroy() {
+    beforeUnmount() {
       window.removeEventListener('popstate', syncFromHash);
     },
     render: function (createElement) {

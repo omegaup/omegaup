@@ -23,6 +23,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

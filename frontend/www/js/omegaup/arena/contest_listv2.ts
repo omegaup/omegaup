@@ -1,3 +1,4 @@
+import '../vue3LifecycleCompat';
 import Vue from 'vue';
 import { types } from '../api_types';
 import arena_ContestList, {
@@ -138,8 +139,7 @@ OmegaUp.on('ready', () => {
       sortOrder: initialState.sortOrder,
       filter: initialState.filter,
     }),
-    // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
-    beforeDestroy() {
+    beforeUnmount() {
       window.removeEventListener('popstate', onPopState);
       window.removeEventListener('hashchange', onHashChange);
     },

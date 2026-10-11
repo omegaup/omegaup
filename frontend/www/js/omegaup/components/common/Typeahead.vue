@@ -21,6 +21,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
@@ -63,7 +64,7 @@ export default class Typeahead extends Vue {
     }, this.debounceDelay);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     // Clean up timer on component destruction
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);

@@ -380,6 +380,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -551,7 +552,7 @@ export default class Navbar extends Vue {
     this.updateScroll();
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
     window.removeEventListener('scroll', this.updateScroll);
   }
