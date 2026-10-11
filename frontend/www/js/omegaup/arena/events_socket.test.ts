@@ -487,6 +487,52 @@ describe('EventsSocket', () => {
     expect(store.state.runs[0]['classname']).toBe('user-rank-unranked');
   });
 
+  it('should fill in the country and classname of a /run/update/ message from the ranking', async () => {
+    const socket = new EventsSocket({ ...options, disableSockets: false });
+
+    socket.connect();
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    const store = new Vuex.Store(runsStoreConfig);
+    rankingStore.commit('updateRanking', [
+      {
+        classname: 'user-rank-expert',
+        country: 'MX',
+        is_invited: true,
+        problems: [],
+        total: { penalty: 0, points: 0 },
+        username: 'contestant',
+      },
+    ]);
+
+    server?.send({
+      message: '/run/update/',
+      run: {
+        alias: 'hello',
+        contest_score: 100,
+        guid: 'fedcba',
+        language: 'py3',
+        memory: 10240,
+        penalty: 20,
+        runtime: 1,
+        score: 1,
+        score_by_group: {},
+        status: 'ready',
+        submit_delay: 1,
+        time: 0,
+        username: 'contestant',
+        verdict: 'AC',
+      },
+    });
+
+    const run = store.state.runs.find((run) => run.guid === 'fedcba');
+    expect(run?.country).toBe('MX');
+    expect(run?.classname).toBe('user-rank-expert');
+
+    rankingStore.commit('updateRanking', []);
+  });
+
   it('should handle a socket when server sends /clarification/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
