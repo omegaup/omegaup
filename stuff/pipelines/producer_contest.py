@@ -44,7 +44,7 @@ def send_contest_message_to_client(
      When API token and URL are given, it is possible to send the messages.
     '''
     contest_producer = rabbitmq_producer.RabbitmqProducer(
-        queue='client_contest',
+        queue='contest',
         exchange='certificates',
         routing_key='ContestQueue',
         channel=channel

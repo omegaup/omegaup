@@ -54,10 +54,14 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        self.dbconn.ping(reconnect=True, attempts=3, delay=5)  # type: ignore
         response = json.loads(body)
 
         try:
+            self.dbconn.ping(  # type: ignore[attr-defined]
+                reconnect=True,
+                attempts=3,
+                delay=5,
+            )
             ranking = []
             for user_ranking in response['ranking']:
                 ranking.append(database.contest.Ranking(**user_ranking))
