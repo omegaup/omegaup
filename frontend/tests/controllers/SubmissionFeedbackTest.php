@@ -811,4 +811,256 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame(3, $runs[0]['suggestions']);
     }
+
+    /**
+     * Creates a course submission reviewed by a teaching assistant.
+     *
+     * @return array{assignmentAlias: string, courseAlias: string, guid: string, student: array{identity: \OmegaUp\DAO\VO\Identities, user: \OmegaUp\DAO\VO\Users}, teachingAssistant: \OmegaUp\DAO\VO\Identities, teachingAssistantLogin: \OmegaUp\Test\ScopedLoginToken}
+     */
+    private function createCourseSubmissionWithTeachingAssistant(): array {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        ['identity' => $studentIdentity, 'user' => $studentUser] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $studentIdentity
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $studentIdentity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        ['identity' => $teachingAssistant] = \OmegaUp\Test\Factories\User::createUser();
+        // Earlier logins are logged out when their tokens leave scope, so the
+        // admin has to sign in again before managing the course.
+        $adminLogin = self::login($admin);
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $teachingAssistant->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+        $teachingAssistantLogin = self::login($teachingAssistant);
+
+        return [
+            'assignmentAlias' => $courseData['assignment_alias'],
+            'courseAlias' => $courseData['course_alias'],
+            'guid' => $runData['response']['guid'],
+            'student' => [
+                'identity' => $studentIdentity,
+                'user' => $studentUser,
+            ],
+            'teachingAssistant' => $teachingAssistant,
+            'teachingAssistantLogin' => $teachingAssistantLogin,
+        ];
+    }
+
+    /**
+     * @param list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, feedback_thread?: list<array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}>, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}> $feedbackList
+     * @return list<array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string, feedback_thread?: list<array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}>, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int}>
+     */
+    private function generalFeedbackRows(array $feedbackList): array {
+        return array_values(array_filter(
+            $feedbackList,
+            fn (array $feedback) => is_null($feedback['range_bytes_start'])
+        ));
+    }
+
+    public function testSetFeedbackListWithGeneralFeedback() {
+        [
+            'assignmentAlias' => $assignmentAlias,
+            'courseAlias' => $courseAlias,
+            'guid' => $guid,
+            'student' => $student,
+            'teachingAssistant' => $teachingAssistant,
+            'teachingAssistantLogin' => $teachingAssistantLogin,
+        ] = $this->createCourseSubmissionWithTeachingAssistant();
+
+        $summary = 'Overall the solution works, but it can be simpler.';
+        \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback_list' => json_encode([
+                    ['lineNumber' => 1, 'feedback' => 'Rename this variable'],
+                    ['lineNumber' => 4, 'feedback' => 'This loop is unnecessary'],
+                ]),
+                'feedback' => $summary,
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'run_alias' => $guid,
+            ])
+        );
+
+        $this->assertCount(3, $feedbackList);
+        $generalFeedback = $this->generalFeedbackRows($feedbackList);
+        $this->assertCount(1, $generalFeedback);
+        $this->assertSame($summary, $generalFeedback[0]['feedback']);
+        $this->assertSame(
+            $teachingAssistant->username,
+            $generalFeedback[0]['author']
+        );
+
+        $lineFeedback = array_values(array_filter(
+            $feedbackList,
+            fn (array $feedback) => !is_null($feedback['range_bytes_start'])
+        ));
+        $this->assertCount(2, $lineFeedback);
+
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $student['user']
+        );
+        $this->assertCount(1, $notifications);
+    }
+
+    public function testSetFeedbackListReplacesFeedbackRequest() {
+        [
+            'assignmentAlias' => $assignmentAlias,
+            'courseAlias' => $courseAlias,
+            'guid' => $guid,
+            'student' => $student,
+            'teachingAssistant' => $teachingAssistant,
+            'teachingAssistantLogin' => $teachingAssistantLogin,
+        ] = $this->createCourseSubmissionWithTeachingAssistant();
+
+        $studentLogin = self::login($student['identity']);
+        \OmegaUp\Controllers\Course::apiRequestFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'assignment_alias' => $assignmentAlias,
+                'course_alias' => $courseAlias,
+                'guid' => $guid,
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'run_alias' => $guid,
+            ])
+        );
+        $requestMessage = \OmegaUp\Translations::getInstance()->get(
+            'requestFeedbackMessage'
+        );
+        $generalFeedback = $this->generalFeedbackRows($feedbackList);
+        $this->assertCount(1, $generalFeedback);
+        $this->assertSame($requestMessage, $generalFeedback[0]['feedback']);
+
+        $summary = 'Thanks for asking. Start by checking the loop bounds.';
+        \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback_list' => json_encode([
+                    ['lineNumber' => 2, 'feedback' => 'Off by one here'],
+                ]),
+                'feedback' => $summary,
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'run_alias' => $guid,
+            ])
+        );
+        $generalFeedback = $this->generalFeedbackRows($feedbackList);
+        $this->assertCount(1, $generalFeedback);
+        $this->assertSame($summary, $generalFeedback[0]['feedback']);
+        $this->assertSame(
+            $teachingAssistant->username,
+            $generalFeedback[0]['author']
+        );
+        $this->assertNotSame(
+            $requestMessage,
+            $generalFeedback[0]['feedback']
+        );
+    }
+
+    public function testSetFeedbackListOnlyGeneralFeedback() {
+        [
+            'assignmentAlias' => $assignmentAlias,
+            'courseAlias' => $courseAlias,
+            'guid' => $guid,
+            'teachingAssistant' => $teachingAssistant,
+            'teachingAssistantLogin' => $teachingAssistantLogin,
+        ] = $this->createCourseSubmissionWithTeachingAssistant();
+
+        $summary = 'Looks good overall.';
+        $response = \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback_list' => '[]',
+                'feedback' => $summary,
+            ])
+        );
+        $this->assertSame('ok', $response['status']);
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'run_alias' => $guid,
+            ])
+        );
+        $this->assertCount(1, $feedbackList);
+        $this->assertNull($feedbackList[0]['range_bytes_start']);
+        $this->assertSame($summary, $feedbackList[0]['feedback']);
+        $this->assertSame(
+            $teachingAssistant->username,
+            $feedbackList[0]['author']
+        );
+    }
+
+    public function testSetFeedbackListEmptyReviewFails() {
+        [
+            'assignmentAlias' => $assignmentAlias,
+            'courseAlias' => $courseAlias,
+            'guid' => $guid,
+            'teachingAssistantLogin' => $teachingAssistantLogin,
+        ] = $this->createCourseSubmissionWithTeachingAssistant();
+
+        $this->expectException(
+            \OmegaUp\Exceptions\InvalidParameterException::class
+        );
+        $this->expectExceptionMessage('invalidParameters');
+
+        \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback_list' => '[]',
+            ])
+        );
+    }
 }
