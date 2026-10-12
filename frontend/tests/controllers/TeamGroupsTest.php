@@ -1978,6 +1978,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => json_encode([[
                     'username' => "teams:{$teamGroup->alias}:team1",
                     'name' => 'Team 1',
+                    'password' => \OmegaUp\Test\Utils::createRandomString(),
                     'usernames' => null,
                     'country_id' => 'MX',
                     'state_id' => 'DIF',

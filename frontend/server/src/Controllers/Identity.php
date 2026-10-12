@@ -376,8 +376,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             $seenUsernames[$teamIdentity['username']] = true;
 
+            // array_key_exists is intentional: isset() returns false for null values,
+            // which would cause Psalm to think null is unreachable on the next check.
             if (
-                !isset($teamIdentity['usernames'])
+                !array_key_exists('usernames', $teamIdentity)
                 || is_null($teamIdentity['usernames'])
                 || $teamIdentity['usernames'] === ''
             ) {
@@ -385,6 +387,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 continue;
             }
 
+            // At this point usernames is a non-null, non-empty value from JSON.
+            // Validate it is actually a string (guards against integer/bool inputs).
             /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
             if (!is_string($teamIdentity['usernames'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
