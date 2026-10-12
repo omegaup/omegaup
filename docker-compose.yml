@@ -60,14 +60,16 @@ services:
     image: omegaup/dev-php:20231008
     user: "${UID_GID}"
     restart: always
-    entrypoint: ["wait-for-it", "rabbitmq:5672", "--", "php", "/opt/omegaup/stuff/rabbitmq/consumer.php"]
+    entrypoint: ["wait-for-it", "rabbitmq:5672", "--", "python3", "/opt/omegaup/stuff/pipelines/client_contest.py"]
     volumes:
       - type: bind
         source: .
         target: /opt/omegaup
     depends_on:
-      - rabbitmq
-      - mysql
+      mysql: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_started
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
@@ -168,6 +170,12 @@ services:
       MYSQL_PASSWORD: 'omegaup'
       MYSQL_ROOT_PASSWORD: 'omegaup'
       MYSQL_TCP_PORT: 13306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "13306", "-uomegaup", "-pomegaup"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
     command:
       - --max_execution_time=30000
       - --lock_wait_timeout=10
