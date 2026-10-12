@@ -272,11 +272,14 @@ export default class ArenaRunDetailsPopup extends Vue {
   }
 
   onSaveFeedbackList(
-    feedbackList: { lineNumber: number; feedback: string }[],
+    request: {
+      feedbackList: { lineNumber: number; feedback: string }[];
+      generalFeedback: string | null;
+    },
     guid: string,
   ) {
     this.$parent?.$parent?.$parent?.$parent?.$emit('save-feedback-list', {
-      feedbackList,
+      ...request,
       guid,
     });
   }

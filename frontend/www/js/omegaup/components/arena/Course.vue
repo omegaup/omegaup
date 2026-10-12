@@ -192,8 +192,7 @@
                 :current-user-class-name="currentUserClassName"
                 :current-username="currentUsername"
                 @save-feedback-list="
-                  (feedbackList) =>
-                    $emit('save-feedback-list', { feedbackList, guid })
+                  (request) => $emit('save-feedback-list', { ...request, guid })
                 "
                 @submit-feedback-thread="
                   (feedback) =>

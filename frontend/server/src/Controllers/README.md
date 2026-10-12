@@ -4796,12 +4796,13 @@ also it creates a notification
 
 ### Parameters
 
-| Name               | Type     | Description | Required |
-| ------------------ | -------- | ----------- | -------- |
-| `assignment_alias` | `string` |             | ✓        |
-| `course_alias`     | `string` |             | ✓        |
-| `feedback_list`    | `string` |             | ✓        |
-| `guid`             | `string` |             | ✓        |
+| Name               | Type           | Description | Required |
+| ------------------ | -------------- | ----------- | -------- |
+| `assignment_alias` | `string`       |             | ✓        |
+| `course_alias`     | `string`       |             | ✓        |
+| `feedback_list`    | `string`       |             | ✓        |
+| `guid`             | `string`       |             | ✓        |
+| `feedback`         | `null\|string` |             |          |
 
 ### Returns
 

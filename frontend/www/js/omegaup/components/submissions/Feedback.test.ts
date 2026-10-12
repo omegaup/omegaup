@@ -23,6 +23,12 @@ describe('Feedback.vue', () => {
     expect(
       wrapper.find('div[data-submission-feedback] > pre > code').text(),
     ).toBe(savedFeedbackMessage);
+    expect(
+      wrapper.find('[data-submission-feedback-review-hint]').exists(),
+    ).toBe(true);
+    expect(wrapper.find('[data-run-leave-feedback-button]').exists()).toBe(
+      false,
+    );
   });
 
   it('Should handle existing feedback for user', async () => {
