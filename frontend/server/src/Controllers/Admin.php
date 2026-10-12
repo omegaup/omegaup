@@ -403,7 +403,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
      */
-    public static function getSettingsForTypeScript(
+    public static function getGlobalSettingsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -412,12 +412,32 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'entrypoint' => 'admin_settings',
+            'entrypoint' => 'admin_global_settings',
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleAdminSettings'
+                    'omegaupTitleAdminGlobalSettings'
                 ),
                 'payload' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     */
+    public static function getOperationsDashboardForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureUserHasAdministrativeAccess();
+
+        return [
+            'entrypoint' => 'admin_operations_dashboard',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminOperations'
+                ),
+                'payload' => [],
+                'fullWidth' => true,
             ],
         ];
     }

@@ -3231,6 +3231,7 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isSupportTeamMember: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
     maintenanceMessage?: types.MaintenanceMessage;
