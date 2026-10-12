@@ -5,7 +5,6 @@
         <a
           href="#"
           class="nav-link"
-          data-toggle="tab"
           role="tab"
           aria-controls="allSchoolsOfTheMonth"
           :class="{ active: selectedTab === 'allSchoolsOfTheMonth' }"
@@ -19,7 +18,6 @@
         <a
           href="#"
           class="nav-link"
-          data-toggle="tab"
           role="tab"
           aria-controls="schoolsOfPreviousMonth"
           :class="{ active: selectedTab === 'schoolsOfPreviousMonth' }"
@@ -33,7 +31,6 @@
         <a
           href="#"
           class="nav-link"
-          data-toggle="tab"
           role="tab"
           aria-controls="candidatesToSchoolOfTheMonth"
           :class="{
