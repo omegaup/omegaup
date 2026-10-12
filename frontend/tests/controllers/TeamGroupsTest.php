@@ -1958,4 +1958,34 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('usernames', $e->parameter);
         }
     }
+
+    public function testBulkCreateForTeamsWithNullUsernames(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        $response = \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_group_alias' => $teamGroup->alias,
+                'team_identities' => json_encode([[
+                    'username' => "teams:{$teamGroup->alias}:team1",
+                    'name' => 'Team 1',
+                    'usernames' => null,
+                    'country_id' => 'MX',
+                    'state_id' => 'DIF',
+                    'gender' => 'decline',
+                    'school_name' => 'School 1',
+                ]]),
+            ])
+        );
+        $this->assertSame('ok', $response['status']);
+    }
 }

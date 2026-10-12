@@ -346,7 +346,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         $encodedTeamIdentities = $r->ensureString('team_identities');
 
-        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames?: string}>|null $teamIdentities */
+        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames?: null|string}>|null $teamIdentities */
         $teamIdentities = json_decode($encodedTeamIdentities, true);
         if (!is_array($teamIdentities) || empty($teamIdentities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -376,20 +376,21 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             $seenUsernames[$teamIdentity['username']] = true;
 
-            /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
             if (
                 !isset($teamIdentity['usernames'])
-                || !is_string($teamIdentity['usernames'])
+                || is_null($teamIdentity['usernames'])
+                || $teamIdentity['usernames'] === ''
             ) {
+                $teamIdentities[$username]['identityUsernames'] = null;
+                continue;
+            }
+
+            /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
+            if (!is_string($teamIdentity['usernames'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'usernames'
                 );
-            }
-
-            if ($teamIdentity['usernames'] === '') {
-                $teamIdentities[$username]['identityUsernames'] = null;
-                continue;
             }
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
