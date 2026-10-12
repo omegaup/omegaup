@@ -24,7 +24,9 @@
         :key="item.href"
         :href="item.href"
         class="admin-dashboard-sidebar__item"
+        :class="{ 'admin-dashboard-sidebar__item--active': isActive(item) }"
         :title="item.label"
+        :aria-current="isActive(item) ? 'page' : null"
       >
         <span class="admin-dashboard-sidebar__icon">
           <component :is="item.icon" scale="1.3" />
@@ -54,6 +56,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import {
   BIconList,
   BIconChevronDoubleLeft,
+  BIconHouseDoorFill,
   BIconPersonLinesFill,
   BIconClockHistory,
   BIconHeadset,
@@ -65,12 +68,14 @@ interface SidebarItem {
   href: string;
   label: string;
   icon: string;
+  adminOnly?: boolean;
 }
 
 @Component({
   components: {
     BIconList,
     BIconChevronDoubleLeft,
+    BIconHouseDoorFill,
     BIconPersonLinesFill,
     BIconClockHistory,
     BIconHeadset,
@@ -79,6 +84,8 @@ interface SidebarItem {
 })
 export default class AdminLayout extends Vue {
   @Prop({ default: '' }) currentModule!: string;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: 'home' }) selectedModule!: string;
 
   T = T;
 
@@ -106,8 +113,20 @@ export default class AdminLayout extends Vue {
     }
   }
 
+  // Los href con # cambian de sección sin recargar, los demás aún son páginas aparte.
   get sidebarItems(): SidebarItem[] {
-    return [
+    const items: SidebarItem[] = [
+      {
+        href: '#home',
+        label: T.omegaupTitleAdminOperations,
+        icon: 'BIconHouseDoorFill',
+      },
+      {
+        href: '#settings',
+        label: T.omegaupTitleAdminGlobalSettings,
+        icon: 'BIconGearFill',
+        adminOnly: true,
+      },
       {
         href: '/admin/user/',
         label: T.omegaupTitleAdminUsers,
@@ -117,18 +136,20 @@ export default class AdminLayout extends Vue {
         href: '/admin/crons/',
         label: T.omegaupTitleAdminCrons,
         icon: 'BIconClockHistory',
+        adminOnly: true,
       },
       {
         href: '/admin/support/',
         label: T.omegaupTitleSupportDashboard,
         icon: 'BIconHeadset',
       },
-      {
-        href: '/admin/settings/',
-        label: T.omegaupTitleAdminGlobalSettings,
-        icon: 'BIconGearFill',
-      },
     ];
+    return items.filter((item) => !item.adminOnly || this.isAdmin);
+  }
+
+  // Solo los items con # (ya integrados al dashboard) se resaltan.
+  isActive(item: SidebarItem): boolean {
+    return item.href === `#${this.selectedModule}`;
   }
 }
 </script>
@@ -199,6 +220,14 @@ export default class AdminLayout extends Vue {
     );
     color: var(--admin-dashboard-sidebar-item-hover-color);
     text-decoration: none;
+  }
+
+  &--active {
+    background-color: var(
+      --admin-dashboard-sidebar-item-hover-background-color
+    );
+    color: var(--admin-dashboard-sidebar-item-hover-color);
+    font-weight: 600;
   }
 
   &:focus-visible {
