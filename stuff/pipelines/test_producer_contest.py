@@ -122,10 +122,11 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
             host=test_credentials.RABBITMQ_HOST,
     ) as channel:
         rabbitmq_connection.initialize_rabbitmq(
-            queue='contest',
+            queue='contest-test',
             exchange='certificates',
             routing_key='ContestQueue',
             channel=channel)
+        channel.queue_purge(queue='contest-test')
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
@@ -134,7 +135,7 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
                                                         channel=channel,
                                                         client=client)
         callback = MessageSavingCallback()
-        rabbitmq_client.receive_messages(queue='contest',
+        rabbitmq_client.receive_messages(queue='contest-test',
                                          exchange='certificates',
                                          routing_key='ContestQueue',
                                          channel=channel,
