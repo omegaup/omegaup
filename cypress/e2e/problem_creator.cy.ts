@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { LoginOptions } from '../support/types';
 import T from '../../frontend/www/js/omegaup/lang';
 import { problemCreatorPage } from '../support/pageObjects/problemCreatorPage';
@@ -295,5 +296,52 @@ describe('Problem creator Test', () => {
         });
       });
     });
+  });
+
+  it('Should submit create problem using creator-generated zip', () => {
+    const problemAlias = `creator-${uuid().slice(0, 8)}`;
+    const autoCompleteTextTag = 'recur';
+    const creatorProblemContentsInput =
+      '.introjs-open-creator input[name="problem_contents"]';
+
+    cy.login(loginOptions);
+    cy.setCookie('has-visited-create-problem', true.toString());
+
+    cy.visit('/problem/new/');
+
+    cy.get('[name="title"]').type(problemAlias).blur();
+    cy.get('[name="source"]').type(problemAlias);
+
+    cy.get('[data-tags-input]').type(autoCompleteTextTag);
+    cy.waitUntil(() =>
+      cy
+        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
+        .should('exist')
+        .click({ force: true }),
+    );
+
+    cy.get('[name="problem-level"]').select(1);
+
+    cy.get('.introjs-creation-method .btn-group button').first().click();
+    cy.get('.introjs-open-creator button').click();
+
+    // Add a case in the creator so the generated zip has a valid layout
+    cy.get('[data-problem-creator-tab="cases"]').click();
+    cy.get('[data-add-window]').click();
+    cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+    cy.get('[data-problem-creator-case-input="name"]').type('case1');
+    cy.get('[data-problem-creator-add-panel-submit]').click();
+
+    cy.get('[data-problem-creator-close]').click();
+
+    cy.get(creatorProblemContentsInput, { timeout: 10000 }).should(
+      'have.attr',
+      'data-problem-creator-zip-ready',
+      'true',
+    );
+
+    cy.get('button[type="submit"]').click();
+
+    cy.url({ timeout: 15000 }).should('include', problemAlias);
   });
 });

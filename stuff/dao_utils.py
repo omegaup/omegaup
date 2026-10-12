@@ -123,7 +123,8 @@ def _parse(text: str) -> Sequence[Table]:
         (((CaselessKeyword('PRIMARY KEY')('type')) |
           ((CaselessKeyword('FULLTEXT KEY') | CaselessKeyword('UNIQUE KEY')
             | CaselessKeyword('KEY'))('type') + identifier('index_name'))) +
-         '(' + delimited_list(index_column)('key_part') + ')') |
+         '(' + delimited_list(index_column)('key_part') + ')' +
+         Opt(comment)) |
         (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') +
          ((CaselessKeyword('FOREIGN KEY')
            ('type') + '(' + delimited_list(identifier)

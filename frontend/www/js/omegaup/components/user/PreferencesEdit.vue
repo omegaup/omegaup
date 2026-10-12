@@ -26,7 +26,9 @@
         data-preferred-language
         class="custom-select"
       >
-        <option value=""></option>
+        <option value="">
+          {{ T.userEditPreferredProgrammingLanguagePlaceholder }}
+        </option>
         <option
           v-for="[extension, name] in Object.entries(programmingLanguages)"
           :key="extension"
@@ -80,32 +82,34 @@
       </select>
     </div>
     <div class="form-group">
-      <label>
-        <input
-          v-model="isPrivate"
-          type="checkbox"
-          :checked="isPrivate"
-          data-is-private
-          class="mr-2"
-          @change="handlePrivateProfileCheckboxChange"
-        />{{ T.userEditPrivateProfile }}
-      </label>
-      <!-- id-lint off -->
-      <b-button
-        id="popover-private-profile"
-        class="ml-1"
-        size="sm"
-        variant="none"
-        @click="show = !show"
-      >
-        <font-awesome-icon :icon="['fas', 'question-circle']" />
-      </b-button>
-      <!-- id-lint on -->
+      <div class="d-inline-flex align-items-center">
+        <label class="mb-0">
+          <input
+            v-model="isPrivate"
+            type="checkbox"
+            :checked="isPrivate"
+            data-is-private
+            class="mr-2"
+            @change="handlePrivateProfileCheckboxChange"
+          />{{ T.userEditPrivateProfile }}
+        </label>
+        <!-- id-lint off -->
+        <b-button
+          id="popover-private-profile"
+          class="ml-1"
+          size="sm"
+          variant="none"
+          @click="show = !show"
+        >
+          <font-awesome-icon :icon="['fas', 'question-circle']" />
+        </b-button>
+        <!-- id-lint on -->
+      </div>
       <b-popover
         :show.sync="show"
         target="popover-private-profile"
         variant="danger"
-        placement="right"
+        placement="bottom"
       >
         <template #title>{{ T.profilePrivateRankMessageTitle }}</template>
         {{ T.profilePrivateRankMessage }}
@@ -165,7 +169,7 @@ export default class UserPreferencesEdit extends Vue {
   ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
   locale = this.profile.locale;
-  preferredLanguage = this.profile.preferred_language;
+  preferredLanguage = this.profile.preferred_language ?? '';
   programmingLanguages = this.profile.programming_languages;
   isPrivate = this.profile.is_private;
   hideProblemTags = this.profile.hide_problem_tags;
@@ -265,7 +269,8 @@ export default class UserPreferencesEdit extends Vue {
     this.$emit('update-user-preferences', {
       userPreferences: {
         locale: this.locale,
-        preferred_language: this.preferredLanguage ?? null,
+        preferred_language:
+          this.preferredLanguage === '' ? null : this.preferredLanguage,
         is_private: this.isPrivate,
         hide_problem_tags: this.hideProblemTags,
         has_competitive_objective: this.hasCompetitiveObjective,
@@ -282,3 +287,13 @@ export default class UserPreferencesEdit extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+#popover-private-profile {
+  &:focus,
+  &:active:focus {
+    box-shadow: none;
+    outline: none;
+  }
+}
+</style>

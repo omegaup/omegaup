@@ -1,15 +1,22 @@
 <template>
   <div>
-    <div class="mb-3 text-right">
-      <a class="btn btn-primary mx-1" href="/teamsgroup/new/">{{
-        T.teamsGroupsCreateNew
-      }}</a>
+    <div v-if="hasTeamsGroups" class="mb-3 text-right">
+      <a class="btn btn-primary mx-1" href="/teamsgroup/new/">
+        {{ T.teamsGroupsCreateNew }}
+      </a>
     </div>
     <div class="card">
-      <div class="card-header mb-3">
-        <h3 class="card-title">{{ T.omegaupTitleTeamsGroups }}</h3>
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h3 class="card-title mb-0">{{ T.omegaupTitleTeamsGroups }}</h3>
+        <label class="mb-0">
+          <input v-model="showArchived" type="checkbox" />
+          {{ T.teamsGroupShowArchived }}
+        </label>
       </div>
-      <table class="table" data-table-teams-groups>
+
+      <table v-if="hasTeamsGroups" class="table" data-table-teams-groups>
         <thead>
           <tr>
             <th>{{ T.teamsGroupTeamsGroupName }}</th>
@@ -18,23 +25,71 @@
         </thead>
         <tbody>
           <tr
-            v-for="teamsGroup in teamsGroups"
+            v-for="teamsGroup in visibleTeamsGroups"
             :key="`${teamsGroup.type}_${teamsGroup.alias}`"
           >
             <td>
               <strong>
-                <a :href="teamsGroupUrl(teamsGroup)">{{ teamsGroup.name }}</a>
+                <a :href="teamsGroupUrl(teamsGroup)">
+                  {{ teamsGroup.name }}
+                </a>
               </strong>
             </td>
             <td>
               <a :href="teamsGroupEditUrl(teamsGroup)" :title="T.wordsEdit">
                 <font-awesome-icon :icon="['fas', 'edit']" />
               </a>
+
+              <button
+                class="btn btn-link p-0 ml-2 btn-archive"
+                :title="teamsGroup.archived ? T.wordsUnarchive : T.wordsArchive"
+                @click="archiveGroup(teamsGroup)"
+              >
+                <font-awesome-icon
+                  :icon="
+                    teamsGroup.archived
+                      ? ['fas', 'box-open']
+                      : ['fas', 'archive']
+                  "
+                />
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
+
+      <div v-else class="text-center py-5">
+        <font-awesome-icon
+          :icon="['fas', 'users']"
+          size="3x"
+          class="mb-3 text-muted"
+        />
+
+        <h4 class="mb-2">
+          {{ T.teamsGroupEmptyTitle }}
+        </h4>
+
+        <p class="text-muted mb-4">
+          {{ T.teamsGroupEmptyDescription }}
+        </p>
+
+        <a class="btn btn-primary btn-lg" href="/teamsgroup/new/">
+          {{ T.createTeamsGroup }}
+        </a>
+      </div>
     </div>
+
+    <b-modal
+      v-model="showArchiveModal"
+      :title="archiveModalTitle"
+      :ok-title="T.wordsYes"
+      :cancel-title="T.wordsNo"
+      ok-variant="primary"
+      cancel-variant="secondary"
+      @ok="confirmArchive"
+    >
+      <p>{{ archiveModalBody }}</p>
+    </b-modal>
   </div>
 </template>
 
@@ -44,8 +99,12 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit);
+import {
+  faEdit,
+  faArchive,
+  faBoxOpen,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faArchive, faBoxOpen);
 @Component({
   components: {
     FontAwesomeIcon,
@@ -54,11 +113,58 @@ library.add(faEdit);
 export default class TeamsGroupList extends Vue {
   @Prop() teamsGroups!: types.TeamsGroup[];
   T = T;
+  showArchiveModal = false;
+  selectedTeamsGroup: types.TeamsGroup | null = null;
+
   teamsGroupUrl(teamsGroup: types.TeamsGroup): string {
     return `/teamsgroup/${teamsGroup.alias}/edit/#teams`;
   }
   teamsGroupEditUrl(teamsGroup: types.TeamsGroup): string {
     return `/teamsgroup/${teamsGroup.alias}/edit/#edit`;
   }
+  get hasTeamsGroups(): boolean {
+    return this.visibleTeamsGroups && this.visibleTeamsGroups.length > 0;
+  }
+  showArchived: boolean = false;
+  get visibleTeamsGroups(): types.TeamsGroup[] {
+    if (this.showArchived) {
+      return this.teamsGroups.filter((g) => g.archived);
+    }
+    return this.teamsGroups.filter((g) => !g.archived);
+  }
+
+  get archiveModalTitle(): string {
+    if (!this.selectedTeamsGroup) return '';
+    return this.selectedTeamsGroup.archived ? T.wordsUnarchive : T.wordsArchive;
+  }
+
+  get archiveModalBody(): string {
+    if (!this.selectedTeamsGroup) return '';
+    return this.selectedTeamsGroup.archived
+      ? T.teamsGroupUnarchiveConfirmText
+      : T.teamsGroupArchiveConfirmText;
+  }
+
+  archiveGroup(teamsGroup: types.TeamsGroup) {
+    this.selectedTeamsGroup = teamsGroup;
+    this.showArchiveModal = true;
+  }
+
+  confirmArchive() {
+    if (!this.selectedTeamsGroup) return;
+    this.$emit('archive-group', {
+      teamsGroup: this.selectedTeamsGroup,
+      archived: !this.selectedTeamsGroup.archived,
+    });
+    this.selectedTeamsGroup = null;
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.btn-archive {
+  color: var(--teams-group-archive-btn-color);
+}
+</style>

@@ -28,7 +28,7 @@ export class SafeStorage {
   static clearOldItems(): void {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     try {
-      for (let i = 0; i < localStorage.length; i++) {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && key.startsWith('clarification-')) {
           const timestamp = localStorage.getItem(key);
@@ -39,6 +39,43 @@ export class SafeStorage {
       }
     } catch (e) {
       console.warn('Failed to clear old items from localStorage:', e);
+    }
+  }
+}
+
+export class SafeSessionStorage {
+  static setItem(key: string, value: string): boolean {
+    try {
+      sessionStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      if (e instanceof DOMException) {
+        if (e.name === 'QuotaExceededError') {
+          console.warn('sessionStorage quota exceeded');
+        } else if (e.name === 'SecurityError') {
+          console.warn('sessionStorage not available (private browsing mode)');
+        }
+      }
+      return false;
+    }
+  }
+
+  static getItem(key: string): string | null {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (e) {
+      console.warn('sessionStorage read failed:', e);
+      return null;
+    }
+  }
+
+  static removeItem(key: string): boolean {
+    try {
+      sessionStorage.removeItem(key);
+      return true;
+    } catch (e) {
+      console.warn('sessionStorage remove failed:', e);
+      return false;
     }
   }
 }

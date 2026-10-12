@@ -46,6 +46,60 @@ class ApiCallerGetRejectionTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertArrayHasKey('time', $response);
     }
 
+    public function testGetToContestCloneReturns405() {
+        $_SERVER['REQUEST_URI'] = '/api/contest/clone';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertSame('error', $response['status']);
+        $this->assertSame(405, $response['errorcode']);
+        $this->assertSame('methodNotAllowed', $response['errorname']);
+    }
+
+    public function testGetToContestOpenReturns405() {
+        $_SERVER['REQUEST_URI'] = '/api/contest/open';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertSame('error', $response['status']);
+        $this->assertSame(405, $response['errorcode']);
+        $this->assertSame('methodNotAllowed', $response['errorname']);
+    }
+
+    public function testGetToAcceptPrivacyPolicyReturns405() {
+        $_SERVER['REQUEST_URI'] = '/api/user/acceptPrivacyPolicy';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertSame('error', $response['status']);
+        $this->assertSame(405, $response['errorcode']);
+        $this->assertSame('methodNotAllowed', $response['errorname']);
+    }
+
+    public function testAllowlistedLastPrivacyPolicyAcceptedAllowsGet() {
+        $_SERVER['REQUEST_URI'] = '/api/user/lastPrivacyPolicyAccepted';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertNotSame(
+            405,
+            $response['errorcode'] ?? null,
+            'lastPrivacyPolicyAccepted must allow GET'
+        );
+    }
+
     public function testAllowlistedReadOnlyListAssociatedIdentitiesAllowsGet() {
         $_SERVER['REQUEST_URI'] = '/api/user/listAssociatedIdentities';
 

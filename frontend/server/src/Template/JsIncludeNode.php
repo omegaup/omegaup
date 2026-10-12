@@ -102,7 +102,7 @@ class JsIncludeNode extends \Twig\Node\Node {
         $textContents = @file_get_contents($jsonPath);
         if ($textContents === false) {
             die(
-                'Please run <tt style="background: #eee">cd /opt/omegaup && yarn install && yarn run dev-all</tt>.'
+                'Please run <tt style="background: #eee">cd /opt/omegaup && corepack enable && pnpm install && pnpm run dev-all</tt>.'
             );
         }
         /** @var array{css: list<string>, js: list<string>} */

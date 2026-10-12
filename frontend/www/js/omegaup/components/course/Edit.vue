@@ -23,7 +23,7 @@
           class="nav-link"
           data-tab-course
           :class="{ active: showTab === 'course' }"
-          @click="showTab = 'course'"
+          @click.prevent="switchTab('course')"
           >{{ T.courseEdit }}</a
         >
       </li>
@@ -33,7 +33,7 @@
           class="nav-link"
           data-tab-content
           :class="{ active: showTab === 'content' }"
-          @click="onSelectAssignmentTab"
+          @click.prevent="switchTab('content')"
           >{{ T.wordsContent }}</a
         >
       </li>
@@ -43,7 +43,7 @@
           class="nav-link"
           data-tab-admission-mode
           :class="{ active: showTab === 'admission-mode' }"
-          @click="showTab = 'admission-mode'"
+          @click.prevent="switchTab('admission-mode')"
           >{{ T.contestNewFormAdmissionMode }}</a
         >
       </li>
@@ -53,7 +53,7 @@
           class="nav-link"
           data-tab-students
           :class="{ active: showTab === 'students' }"
-          @click="showTab = 'students'"
+          @click.prevent="switchTab('students')"
           >{{ T.courseEditStudents }}</a
         >
       </li>
@@ -63,7 +63,7 @@
           class="nav-link"
           data-tab-admins
           :class="{ active: showTab === 'admins' }"
-          @click="showTab = 'admins'"
+          @click.prevent="switchTab('admins')"
           >{{ T.courseEditAdmins }}</a
         >
       </li>
@@ -73,7 +73,7 @@
           class="nav-link"
           data-tab-clone
           :class="{ active: showTab === 'clone' }"
-          @click="showTab = 'clone'"
+          @click.prevent="switchTab('clone')"
           >{{ T.courseEditClone }}</a
         >
       </li>
@@ -83,7 +83,7 @@
           class="nav-link"
           data-tab-archive
           :class="{ active: showTab === 'archive' }"
-          @click="showTab = 'archive'"
+          @click.prevent="switchTab('archive')"
           >{{ T.courseEditArchive }}</a
         >
       </li>
@@ -174,8 +174,8 @@
             >
               {{ T.wordsCancel }}
             </button></template
-          ></omegaup-course-assignment-details
-        >
+          >
+        </omegaup-course-assignment-details>
       </div>
 
       <div
@@ -324,7 +324,7 @@ import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import common_Archive from '../common/Archive.vue';
-import course_AssignmentDetails from './AssignmentDetails.vue';
+import CourseAssignmentDetails from './AssignmentDetails.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
@@ -375,7 +375,7 @@ const emptyAssignment: types.CourseAssignment = {
     'omegaup-course-form': course_Form,
     'omegaup-common-archive': common_Archive,
     'omegaup-course-assignment-list': course_AssignmentList,
-    'omegaup-course-assignment-details': course_AssignmentDetails,
+    'omegaup-course-assignment-details': CourseAssignmentDetails,
     'omegaup-course-admision-mode': course_AdmissionMode,
     'omegaup-course-add-students': course_AddStudents,
     'omegaup-common-admins': common_Admins,
@@ -387,7 +387,8 @@ const emptyAssignment: types.CourseAssignment = {
   },
 })
 export default class CourseEdit extends Vue {
-  @Ref('assignment-details') readonly assignmentDetails!: Vue;
+  @Ref('assignment-details')
+  readonly assignmentDetails!: CourseAssignmentDetails;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
@@ -456,6 +457,21 @@ export default class CourseEdit extends Vue {
   onSelectAssignmentTab(): void {
     this.showTab = 'content';
     this.onResetAssignmentForm();
+  }
+
+  switchTab(tab: string): void {
+    if (
+      this.showTab === 'content' &&
+      this.assignmentDetails?.hasUnsavedChanges &&
+      !window.confirm(T.courseUnsavedChangesWarning)
+    ) {
+      return;
+    }
+    if (tab === 'content') {
+      this.onSelectAssignmentTab();
+      return;
+    }
+    this.showTab = tab;
   }
 
   onArchiveCourse(archive: boolean): void {
