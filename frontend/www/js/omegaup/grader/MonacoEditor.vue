@@ -35,6 +35,7 @@ import * as Util from './util';
 import * as monaco from 'monaco-editor';
 import T from '../lang';
 import * as templates from './GraderTemplates';
+import { getCodeTemplate } from '../code_templates';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -289,6 +290,11 @@ export default class MonacoEditor extends Vue {
 
   onReset(): void {
     const extension = Util.supportedLanguages[this.language].extension;
+    const personalTemplate = getCodeTemplate(extension);
+    if (personalTemplate !== null) {
+      this.contents = personalTemplate;
+      return;
+    }
     if (this.isInteractive) {
       // For interactive problems, use original interactive templates
       this.contents = templates.originalInteractiveTemplates[extension];

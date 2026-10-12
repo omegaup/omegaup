@@ -16,6 +16,16 @@ export class SafeStorage {
     }
   }
 
+  static removeItem(key: string): boolean {
+    try {
+      localStorage.removeItem(key);
+      return true;
+    } catch (e) {
+      console.warn('localStorage remove failed:', e);
+      return false;
+    }
+  }
+
   static getItem(key: string): string | null {
     try {
       return localStorage.getItem(key);

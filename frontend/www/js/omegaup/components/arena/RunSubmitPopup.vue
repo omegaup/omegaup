@@ -82,6 +82,7 @@ import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { SafeStorage } from '../../safe_storage';
+import { getCodeTemplate } from '../../code_templates';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
@@ -145,6 +146,11 @@ export default class ArenaRunSubmitPopup extends Vue {
       return;
     }
     const extension = this.getLanguageExtension(language);
+    const personalTemplate = getCodeTemplate(extension);
+    if (personalTemplate !== null) {
+      this.code = personalTemplate;
+      return;
+    }
     if (extension && sourceTemplates[extension]) {
       this.code = sourceTemplates[extension];
     } else {
