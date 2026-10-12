@@ -376,13 +376,24 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             $seenUsernames[$teamIdentity['username']] = true;
 
-            if (empty($teamIdentity['usernames'])) {
+            /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
+            if (
+                !isset($teamIdentity['usernames'])
+                || !is_string($teamIdentity['usernames'])
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'usernames'
+                );
+            }
+
+            if ($teamIdentity['usernames'] === '') {
                 $teamIdentities[$username]['identityUsernames'] = null;
                 continue;
             }
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
-            $identities = json_decode(strval($teamIdentity['usernames']), true);
+            $identities = json_decode($teamIdentity['usernames'], true);
             if (!is_array($identities)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
