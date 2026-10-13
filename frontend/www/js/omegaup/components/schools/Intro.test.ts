@@ -1,12 +1,16 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 
 import schools_Intro from './Intro.vue';
 
+const Intro = schools_Intro as ComponentOptions<Vue>;
+
 describe('Intro.vue', () => {
   it('Should render header title and course link', () => {
-    const wrapper = shallowMount(schools_Intro);
+    const wrapper = shallowMount(Intro);
 
     expect(wrapper.find('h1').text()).toBe(T.schoolsLearnProgBySolvProblems);
     const courseLink = wrapper.find('a.btn-primary');
@@ -15,7 +19,7 @@ describe('Intro.vue', () => {
   });
 
   it('Should render feature thumbnails and descriptions', () => {
-    const wrapper = shallowMount(schools_Intro);
+    const wrapper = shallowMount(Intro);
 
     const thumbnails = wrapper.findAll('.thumbnail');
     expect(thumbnails.length).toBe(3);

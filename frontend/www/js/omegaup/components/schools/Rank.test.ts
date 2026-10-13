@@ -1,8 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 
 import schools_Rank from './Rank.vue';
+
+const SchoolRank = schools_Rank as ComponentOptions<Vue>;
 
 describe('SchoolRank.vue', () => {
   const propsData = {
@@ -22,7 +26,7 @@ describe('SchoolRank.vue', () => {
   };
 
   it('Should handle an empty rank', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData,
     });
 
@@ -31,7 +35,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should handle a rank with data', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData: {
         ...propsData,
         ...{
@@ -53,7 +57,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should show search bar when showHeader is false', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData,
     });
 
@@ -62,7 +66,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should hide search bar when showHeader is true', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData: {
         ...propsData,
         showHeader: true,
@@ -81,7 +85,7 @@ describe('SchoolRank.vue', () => {
     window.location = { href: '' } as any;
 
     try {
-      const wrapper = shallowMount(schools_Rank, {
+      const wrapper = shallowMount(SchoolRank, {
         propsData,
       });
 
@@ -104,7 +108,7 @@ describe('SchoolRank.vue', () => {
     window.location = { href: '' } as any;
 
     try {
-      const wrapper = shallowMount(schools_Rank, {
+      const wrapper = shallowMount(SchoolRank, {
         propsData,
       });
 
@@ -119,7 +123,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should emit update-search-result-schools when typeahead emits update-existing-options', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData,
     });
 

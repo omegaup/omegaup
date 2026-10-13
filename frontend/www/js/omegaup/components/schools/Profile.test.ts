@@ -1,8 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 import schools_Profile from './Profile.vue';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../linkable_resource';
+
+const SchoolProfile = schools_Profile as ComponentOptions<Vue>;
 
 describe('Profile.vue', () => {
   const defaultProps = {
@@ -56,7 +60,7 @@ describe('Profile.vue', () => {
   };
 
   it('Should handle profile view', () => {
-    const wrapper = shallowMount(schools_Profile, {
+    const wrapper = shallowMount(SchoolProfile, {
       propsData: defaultProps,
     });
 
@@ -67,7 +71,7 @@ describe('Profile.vue', () => {
   });
 
   it('Should handle profile view without country or state', () => {
-    const wrapper = shallowMount(schools_Profile, {
+    const wrapper = shallowMount(SchoolProfile, {
       propsData: {
         ...defaultProps,
         country: null,
@@ -97,7 +101,7 @@ describe('Profile.vue', () => {
       solved_problems: 50,
     });
 
-    const wrapper = shallowMount(schools_Profile, {
+    const wrapper = shallowMount(SchoolProfile, {
       propsData: {
         ...defaultProps,
         users: [user1, user2],

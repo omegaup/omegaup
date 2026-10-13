@@ -63,7 +63,6 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
-import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
@@ -74,7 +73,6 @@ export default defineComponent({
   name: 'SchoolProfile',
   components: {
     'omegaup-country-flag': CountryFlag,
-    'omegaup-grid-paginator': common_GridPaginator,
     'omegaup-table-paginator': common_TablePaginator,
     'omegaup-username': user_Username,
     highcharts: Chart,
