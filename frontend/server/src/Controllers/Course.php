@@ -224,11 +224,17 @@ class Course extends \OmegaUp\Controllers\Controller {
         $addedProblems = [];
         $problemsJson = $r->ensureOptionalString('problems');
         if (!empty($problemsJson)) {
-          /** @var list<array{alias: string, commit?: string, points?: int|float|string, is_extra_problem?: bool}> */
+            /** @var list<array{alias: string, commit?: string, is_extra_problem?: bool, points?: float|int|string}>|null */
             $problemsData = json_decode(
                 $problemsJson,
                 associative: true,
             );
+            if (!is_array($problemsData)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'problems'
+                );
+            }
             foreach ($problemsData as $problemData) {
                 if (!isset($problemData['alias'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1566,8 +1572,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var list<string> */
-        $aliases = json_decode($problems, true);
+        /** @var list<string>|null */
+        $aliases = json_decode($problems, associative: true);
+        if (!is_array($aliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
@@ -1593,7 +1605,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -1633,8 +1645,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /** @var list<string> */
-        $aliases = json_decode($assignments, true);
+        /** @var list<string>|null */
+        $aliases = json_decode($assignments, associative: true);
+        if (!is_array($aliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
@@ -1660,7 +1678,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
