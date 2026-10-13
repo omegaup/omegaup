@@ -6,10 +6,12 @@
     header-class="border-bottom-0"
   >
     <template #modal-title>
-      <h5 class="modal-title font-weight-bold">Help us get to know you</h5>
+      <h5 class="modal-title font-weight-bold">
+        {{ T.userObjectivesModalTitle }}
+      </h5>
     </template>
     <p class="modal-description">
-      Two quick questions to tailor omegaUp for you. Takes under a minute.
+      {{ T.userObjectivesModalIntro }}
     </p>
     <div class="modal-progress">
       <div
@@ -104,7 +106,7 @@
     </div>
     <div v-if="currentModalPage === 1" class="modal-actions">
       <button type="button" class="btn btn-skip pl-0" @click="skip">
-        Skip for now
+        {{ T.userObjectivesModalSkip }}
       </button>
       <button
         v-if="objective !== ObjectivesAnswers.None"
