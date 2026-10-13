@@ -1633,6 +1633,17 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CronsDetailsPayload {
       return ((x) => {
+        x.problemHealthFindings = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.first_detected_at = ((x: number) => new Date(x * 1000))(
+              x.first_detected_at,
+            );
+            return x;
+          });
+        })(x.problemHealthFindings);
         x.runs = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -3005,6 +3016,8 @@ export namespace types {
 
   export interface BookmarkProblem {
     alias: string;
+    attempted: boolean;
+    solved: boolean;
     title: string;
   }
 
@@ -3218,6 +3231,7 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isSupportTeamMember: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
     maintenanceMessage?: types.MaintenanceMessage;
@@ -3889,6 +3903,7 @@ export namespace types {
 
   export interface CronsDetailsPayload {
     jobs: types.CronJob[];
+    problemHealthFindings: types.ProblemHealthFinding[];
     runs: types.CronRun[];
   }
 
@@ -4479,6 +4494,16 @@ export namespace types {
     alias: string;
     name: string;
     role: string;
+  }
+
+  export interface ProblemHealthFinding {
+    alias: string;
+    check_type: string;
+    detail?: string;
+    first_detected_at: Date;
+    problem_id: number;
+    severity: string;
+    title: string;
   }
 
   export interface ProblemInfo {
@@ -5482,6 +5507,7 @@ export namespace messages {
   export type _AdminGetCronsServerResponse = any;
   export type AdminGetCronsResponse = {
     jobs: types.CronJob[];
+    problemHealthFindings: types.ProblemHealthFinding[];
     runs: types.CronRun[];
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };

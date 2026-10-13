@@ -2,6 +2,7 @@ import { mount, shallowMount } from '@vue/test-utils';
 
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import contest_AddProblem from './AddProblem.vue';
 
@@ -28,6 +29,7 @@ const versionLog: types.ProblemVersion[] = [
   { ...revision },
   { ...revision, commit: alternativeCommit },
 ];
+
 const problem: types.ProblemsetProblemWithVersions = {
   accepted: 0,
   accepts_submissions: true,
@@ -78,7 +80,7 @@ describe('AddProblem.vue', () => {
     expect(wrapper.text()).toContain(T.wordsProblem);
   });
 
-  it('Should enable the delete button when a problem has no submissions', async () => {
+  it('Should enable the delete button and show confirmation modal when a problem has no submissions', async () => {
     const wrapper = shallowMount(contest_AddProblem, {
       propsData: {
         contestAlias: 'testContestAlias',
@@ -94,6 +96,16 @@ describe('AddProblem.vue', () => {
     await wrapper
       .find('button[data-remove-problem="problem"]')
       .trigger('click');
+    expect(wrapper.emitted('remove-problem')).toBeUndefined();
+
+    const deleteModal = wrapper.find('b-modal-stub');
+    expect(deleteModal.exists()).toBe(true);
+    expect(deleteModal.text()).toContain(
+      ui.formatString(T.contestAddproblemProblemConfirmRemove, {
+        problem: problem.title,
+      }),
+    );
+    deleteModal.vm.$emit('ok');
     expect(wrapper.emitted('remove-problem')).toBeDefined();
     expect(wrapper.emitted('remove-problem')).toEqual([['problem']]);
   });
