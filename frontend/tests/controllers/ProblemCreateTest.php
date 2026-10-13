@@ -679,6 +679,80 @@ if __name__ == \'__main__\':
     }
 
     /**
+     * Test creating a problem with a scalar selected_tags value
+     */
+    public function testCreateProblemWithScalarSelectedTags() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = json_encode(123);
+
+        try {
+            // Call the API
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Exception was expected. Invalid selected_tags');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('selected_tags', $e->parameter);
+        }
+    }
+
+    /**
+     * Test creating a problem with a non-array element in selected_tags
+     */
+    public function testCreateProblemWithNonArraySelectedTag() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = json_encode([123]);
+
+        try {
+            // Call the API
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Exception was expected. Non-array selected_tag');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('selected_tags', $e->parameter);
+        }
+    }
+
+    /**
+     * Test creating a problem with an invalid type for the public tag field
+     */
+    public function testCreateProblemWithInvalidTagPublicType() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['selected_tags'] = json_encode([
+            ['tagname' => 'math', 'public' => 'invalid'],
+        ]);
+
+        try {
+            // Call the API
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Exception was expected. Invalid public tag type');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('public', $e->parameter);
+        }
+    }
+
+    /**
      * Basic test for uploading problem without statement
      */
     public function testCreateProblemWithoutStatement() {
