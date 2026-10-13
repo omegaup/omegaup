@@ -113,7 +113,6 @@ export default class AdminLayout extends Vue {
     }
   }
 
-  // Los href con # cambian de sección sin recargar, los demás aún son páginas aparte.
   get sidebarItems(): SidebarItem[] {
     const items: SidebarItem[] = [
       {
@@ -147,7 +146,6 @@ export default class AdminLayout extends Vue {
     return items.filter((item) => !item.adminOnly || this.isAdmin);
   }
 
-  // Solo los items con # (ya integrados al dashboard) se resaltan.
   isActive(item: SidebarItem): boolean {
     return item.href === `#${this.selectedModule}`;
   }
