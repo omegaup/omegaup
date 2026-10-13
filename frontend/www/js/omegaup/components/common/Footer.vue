@@ -41,6 +41,14 @@
               <font-awesome-icon :icon="['fab', 'discord']" />
               Discord
             </a>
+            <a
+              class="mx-1 pt-2"
+              href="https://www.instagram.com/omegaup_org/"
+              target="_blank"
+            >
+              <font-awesome-icon :icon="['fab', 'instagram']" />
+              Instagram
+            </a>
           </div>
         </div>
         <div class="footer-list-section footer-site w-50 mb-4 mb-lg-0 mx-auto">
@@ -175,8 +183,9 @@ import {
   faFacebook,
   faGithub,
   faDiscord,
+  faInstagram,
 } from '@fortawesome/free-brands-svg-icons';
-library.add(faFacebook, faGithub, faDiscord);
+library.add(faFacebook, faGithub, faDiscord, faInstagram);
 
 @Component({
   components: {
