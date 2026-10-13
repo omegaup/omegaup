@@ -57,7 +57,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -69,7 +70,8 @@ import { types } from '../../api_types';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../linkable_resource';
 import { Chart } from 'highcharts-vue';
 
-@Component({
+export default defineComponent({
+  name: 'SchoolProfile',
   components: {
     'omegaup-country-flag': CountryFlag,
     'omegaup-grid-paginator': common_GridPaginator,
@@ -77,76 +79,105 @@ import { Chart } from 'highcharts-vue';
     'omegaup-username': user_Username,
     highcharts: Chart,
   },
-})
-export default class SchoolProfile extends Vue {
-  @Prop() name!: string;
-  @Prop() rank!: number;
-  @Prop() country!: omegaup.Country;
-  @Prop() stateName!: string;
-  @Prop() monthlySolvedProblemsCount!: types.SchoolProblemsSolved[];
-  @Prop() users!: SchoolUser[];
-  @Prop() codersOfTheMonth!: SchoolCoderOfTheMonth;
-  @Prop() chartOptions!: Chart;
-
-  T = T;
-  ui = ui;
-  sortBy = 'solved_problems';
-  sortOptions = [
-    {
-      title: T.profileSolvedProblems,
-      value: 'solved_problems',
+  props: {
+    name: {
+      type: String,
+      required: true,
     },
-    {
-      title: T.profileCreatedProblems,
-      value: 'created_problems',
+    rank: {
+      type: Number,
+      required: true,
     },
-    {
-      title: T.profileOrganizedContests,
-      value: 'organized_contests',
+    country: {
+      type: Object as PropType<omegaup.Country | null>,
+      default: null,
     },
-  ];
-
-  get columnNames(): Array<{ name: string; style: string }> {
-    return [
-      { name: T.codersOfTheMonthUser, style: '' },
-      { name: T.codersOfTheMonthDate, style: 'text-right' },
-    ];
-  }
-
-  get userColumnNames(): Array<{ name: string; style: string }> {
-    return [
-      { name: T.profileContestsTablePlace, style: 'col-1 text-left' },
-      { name: T.username, style: 'text-center' },
-      { name: this.sortByTableTitle, style: 'text-right' },
-    ];
-  }
-
-  get schoolUsers(): SchoolUser[] {
-    return this.users.sort((userA, userB) => {
-      if (userA.getDisplayValue() < userB.getDisplayValue()) return 1;
-      if (userA.getDisplayValue() > userB.getDisplayValue()) return -1;
-      return 0;
-    });
-  }
-
-  get sortByTableTitle(): string {
-    switch (this.sortBy) {
-      case 'solved_problems':
-        return T.profileSolvedProblems;
-      case 'created_problems':
-        return T.profileCreatedProblems;
-      case 'organized_contests':
-        return T.profileOrganizedContests;
-      default:
-        return '';
-    }
-  }
-
-  updateUsers(newSortBy: string): void {
-    this.users.forEach((user) => (user.displayField = newSortBy));
-    this.sortBy = newSortBy;
-  }
-}
+    stateName: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    monthlySolvedProblemsCount: {
+      type: Array as PropType<types.SchoolProblemsSolved[]>,
+      default: () => [],
+    },
+    users: {
+      type: Array as PropType<SchoolUser[]>,
+      required: true,
+    },
+    codersOfTheMonth: {
+      type: [Array, Object] as PropType<
+        SchoolCoderOfTheMonth[] | SchoolCoderOfTheMonth
+      >,
+      required: true,
+    },
+    chartOptions: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+      sortBy: 'solved_problems',
+      sortOptions: [
+        {
+          title: T.profileSolvedProblems,
+          value: 'solved_problems',
+        },
+        {
+          title: T.profileCreatedProblems,
+          value: 'created_problems',
+        },
+        {
+          title: T.profileOrganizedContests,
+          value: 'organized_contests',
+        },
+      ],
+    };
+  },
+  computed: {
+    columnNames(): Array<{ name: string; style: string }> {
+      return [
+        { name: T.codersOfTheMonthUser, style: '' },
+        { name: T.codersOfTheMonthDate, style: 'text-right' },
+      ];
+    },
+    userColumnNames(): Array<{ name: string; style: string }> {
+      return [
+        { name: T.profileContestsTablePlace, style: 'col-1 text-left' },
+        { name: T.username, style: 'text-center' },
+        { name: this.sortByTableTitle, style: 'text-right' },
+      ];
+    },
+    schoolUsers(): SchoolUser[] {
+      this.sortBy;
+      return [...this.users].sort((userA, userB) => {
+        if (userA.getDisplayValue() < userB.getDisplayValue()) return 1;
+        if (userA.getDisplayValue() > userB.getDisplayValue()) return -1;
+        return 0;
+      });
+    },
+    sortByTableTitle(): string {
+      switch (this.sortBy) {
+        case 'solved_problems':
+          return T.profileSolvedProblems;
+        case 'created_problems':
+          return T.profileCreatedProblems;
+        case 'organized_contests':
+          return T.profileOrganizedContests;
+        default:
+          return '';
+      }
+    },
+  },
+  methods: {
+    updateUsers(newSortBy: string): void {
+      this.users.forEach((user) => (user.displayField = newSortBy));
+      this.sortBy = newSortBy;
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
