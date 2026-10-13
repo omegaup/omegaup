@@ -1,12 +1,20 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import coderofthemonth_List from './List.vue';
+import coderOfTheMonth_List from './List.vue';
 import coderofthemonth_CodersList from './CodersList.vue';
 import coderofthemonth_TopCodersList from './TopCodersList.vue';
 import coderofthemonth_CandidatesList from './CandidatesList.vue';
+
+const coderofthemonth_List = coderOfTheMonth_List as ComponentOptions<Vue>;
+
+type ListVm = Vue & {
+  currentSelectedTab: string;
+  visibleCoders: types.CoderOfTheMonthList[];
+};
 
 describe('List.vue', () => {
   const codersOfCurrentMonth: types.CoderOfTheMonthList[] = [
@@ -55,7 +63,7 @@ describe('List.vue', () => {
       propsData: defaultProps,
     });
 
-    expect(wrapper.vm.currentSelectedTab).toBe('codersOfTheMonth');
+    expect((wrapper.vm as ListVm).currentSelectedTab).toBe('codersOfTheMonth');
 
     const currentTabLink = wrapper.find(
       'a.nav-link[aria-controls="codersOfTheMonth"]',
@@ -75,7 +83,7 @@ describe('List.vue', () => {
 
     // shallowMount stubs child components; check visibleCoders computed property
     // which is the data source passed down to the rendered sub-component.
-    expect(wrapper.vm.visibleCoders).toEqual(codersOfCurrentMonth);
+    expect((wrapper.vm as ListVm).visibleCoders).toEqual(codersOfCurrentMonth);
 
     const renderedComponent = wrapper.findComponent(coderofthemonth_CodersList);
     expect(renderedComponent.exists()).toBe(true);
@@ -88,7 +96,9 @@ describe('List.vue', () => {
 
     await wrapper.setProps({ selectedTab: 'codersOfPreviousMonth' });
 
-    expect(wrapper.vm.currentSelectedTab).toBe('codersOfPreviousMonth');
+    expect((wrapper.vm as ListVm).currentSelectedTab).toBe(
+      'codersOfPreviousMonth',
+    );
 
     const prevTabLink = wrapper.find(
       'a.nav-link[aria-controls="codersOfPreviousMonth"]',
@@ -102,7 +112,7 @@ describe('List.vue', () => {
     expect(currentTabLink.classes()).not.toContain('active');
 
     // shallowMount stubs child components; check visibleCoders computed property.
-    expect(wrapper.vm.visibleCoders).toEqual(codersOfPreviousMonth);
+    expect((wrapper.vm as ListVm).visibleCoders).toEqual(codersOfPreviousMonth);
 
     const renderedComponent = wrapper.findComponent(
       coderofthemonth_TopCodersList,
@@ -117,7 +127,9 @@ describe('List.vue', () => {
 
     await wrapper.setProps({ selectedTab: 'candidatesToCoderOfTheMonth' });
 
-    expect(wrapper.vm.currentSelectedTab).toBe('candidatesToCoderOfTheMonth');
+    expect((wrapper.vm as ListVm).currentSelectedTab).toBe(
+      'candidatesToCoderOfTheMonth',
+    );
 
     const candidatesTabLink = wrapper.find(
       'a.nav-link[aria-controls="candidatesToCoderOfTheMonth"]',
@@ -131,7 +143,9 @@ describe('List.vue', () => {
     expect(currentTabLink.classes()).not.toContain('active');
 
     // shallowMount stubs child components; check visibleCoders computed property.
-    expect(wrapper.vm.visibleCoders).toEqual(candidatesToCoderOfTheMonth);
+    expect((wrapper.vm as ListVm).visibleCoders).toEqual(
+      candidatesToCoderOfTheMonth,
+    );
 
     const renderedComponent = wrapper.findComponent(
       coderofthemonth_CandidatesList,
@@ -149,7 +163,9 @@ describe('List.vue', () => {
     );
     await prevTabLink.trigger('click');
 
-    expect(wrapper.vm.currentSelectedTab).toBe('codersOfPreviousMonth');
+    expect((wrapper.vm as ListVm).currentSelectedTab).toBe(
+      'codersOfPreviousMonth',
+    );
     expect(window.location.hash).toBe('#codersOfPreviousMonth');
   });
 
