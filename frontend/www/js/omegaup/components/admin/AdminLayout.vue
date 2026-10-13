@@ -81,10 +81,29 @@ export default class AdminLayout extends Vue {
   @Prop({ default: '' }) currentModule!: string;
 
   T = T;
+
   expanded = false;
+  isLargeScreen = false;
 
   created(): void {
-    this.expanded = window.matchMedia('(min-width: 992px)').matches;
+    this.isLargeScreen = window.matchMedia('(min-width: 992px)').matches;
+    this.expanded = this.isLargeScreen;
+  }
+
+  mounted(): void {
+    window.addEventListener('resize', this.onResize);
+  }
+
+  beforeDestroy(): void {
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  onResize(): void {
+    const isLargeScreen = window.matchMedia('(min-width: 992px)').matches;
+    if (isLargeScreen !== this.isLargeScreen) {
+      this.isLargeScreen = isLargeScreen;
+      this.expanded = isLargeScreen;
+    }
   }
 
   get sidebarItems(): SidebarItem[] {
@@ -150,13 +169,11 @@ export default class AdminLayout extends Vue {
     text-decoration: none;
   }
 
-  // Sin recuadro al hacer clic con el mouse...
   &:focus {
     box-shadow: none;
     outline: none;
   }
 
-  // ...pero visible al navegar con teclado.
   &:focus-visible {
     outline: 2px solid var(--admin-dashboard-sidebar-item-hover-color);
     outline-offset: -2px;
