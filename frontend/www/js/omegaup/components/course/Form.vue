@@ -433,7 +433,7 @@ export default class CourseDetails extends Vue {
   }
 
   get isObjectiveComplete(): boolean {
-    return this.objective !== null && this.objective.trim().length > 0;
+    return (this.objective ?? '').trim().length > 0;
   }
 
   // Computed properties for character limit danger thresholds
