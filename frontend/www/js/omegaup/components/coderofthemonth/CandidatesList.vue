@@ -57,7 +57,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import country_Flag from '../CountryFlag.vue';
@@ -69,22 +70,38 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCogs } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs);
 
-@Component({
+export default defineComponent({
+  name: 'CoderOfTheMonthCandidatesList',
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-countryflag': country_Flag,
     'omegaup-markdown': omegaup_Markdown,
     'font-awesome-icon': FontAwesomeIcon,
   },
-})
-export default class CoderOfTheMonthList extends Vue {
-  @Prop() coders!: types.CoderOfTheMonthList[];
-  @Prop() isMentor!: boolean;
-  @Prop() selectedTab!: string;
-  @Prop({ default: false }) isDisabled!: boolean;
-
-  T = T;
-}
+  props: {
+    coders: {
+      type: Array as PropType<types.CoderOfTheMonthList[]>,
+      required: true,
+    },
+    isMentor: {
+      type: Boolean,
+      required: true,
+    },
+    selectedTab: {
+      type: String,
+      default: undefined,
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+});
 </script>
 
 <style scoped lang="scss">
