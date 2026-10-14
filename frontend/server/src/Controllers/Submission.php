@@ -576,6 +576,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        /** @var list<array{lineNumber: int, feedback: string}> */
         $feedbackList = [];
         foreach ($decodedFeedbackList as $feedbackEntry) {
             if (!is_array($feedbackEntry)) {
