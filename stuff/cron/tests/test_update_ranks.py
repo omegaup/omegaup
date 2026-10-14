@@ -193,6 +193,155 @@ class GetUserProblemsTest(unittest.TestCase):
 
         self.assertEqual(solved, {1: []})
 
+    def test_counts_problems_first_solved_in_month_even_with_later_runs(
+        self,
+    ) -> None:
+        '''First solved in month counts even if solved again later.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'AC', 'normal', '2026-06-10 10:00:00'),
+            (1, 10, 'AC', 'normal', '2026-07-05 12:00:00'),
+            (1, 10, 'AC', 'normal', '2026-08-01 00:00:00'),
+        ])
+
+        self.assertEqual(solved, {1: [10]})
+
+    def test_excludes_prior_month_ac_with_current_month_resubmission(
+        self,
+    ) -> None:
+        '''Problem first solved in May and re-solved in June is excluded.'''
+        solved = _run_get_user_problems([
+            (1, 10, 'AC', 'normal', '2026-05-20 09:00:00'),
+            (1, 10, 'AC', 'normal', '2026-06-15 10:00:00'),
+        ])
+
+        self.assertEqual(solved, {1: []})
+
+    def test_includes_problem_with_prior_failed_runs_and_first_ac_in_month(
+        self,
+    ) -> None:
+        '''WA or test runs in prior months do not disqualify a first normal
+        AC in the target month.
+        '''
+        solved = _run_get_user_problems([
+            (1, 10, 'WA', 'normal', '2026-05-10 08:00:00'),
+            (1, 10, 'AC', 'test', '2026-05-12 08:00:00'),
+            (1, 10, 'AC', 'normal', '2026-06-05 14:30:00'),
+        ])
+
+        self.assertEqual(solved, {1: [10]})
+
+    def test_sql_having_filters_rows_at_cursor_level(self) -> None:
+        '''Submissions outside the target month are discarded by SQL HAVING.'''
+        submissions = [
+            (1, 10, 'AC', 'normal', '2026-05-15 10:00:00'),  # Before month
+            (1, 20, 'AC', 'normal', '2026-06-15 10:00:00'),  # In month
+            (1, 30, 'AC', 'normal', '2026-07-15 10:00:00'),  # After month
+        ]
+        identity_ids = [1]
+        problem_ids = [10, 20, 30]
+        conn = sqlite_cursor.connect(*_USER_PROBLEMS_SCHEMA)
+        conn.executemany(
+            'INSERT INTO Identities VALUES (?, ?);', [(1, 1)])
+        conn.executemany('INSERT INTO Submissions VALUES (?, ?, ?, ?, ?);',
+                         submissions)
+        conn.executemany(
+            'INSERT INTO Problems VALUES (?, ?);',
+            [(p, p) for p in problem_ids])
+        cursor = sqlite_cursor.SqliteCursor(conn)
+
+        user_problems = get_user_problems(
+            cast(mysql.connector.cursor.MySQLCursorDict, cursor),
+            identity_ids,
+            problem_ids,
+            [_user(1)],
+            _CURRENT_MONTH,
+        )
+
+        # Only problem 20 should be counted
+        self.assertEqual(user_problems[1]['solved'], [20])
+        # Verify that the query executed has the HAVING clause
+        query_text, _ = cursor.calls[-1]
+        self.assertIn('HAVING', query_text)
+        self.assertIn('MIN(s.time) >= %s', query_text)
+        self.assertIn('MIN(s.time) < %s', query_text)
+
+    def test_year_boundary_december_to_january_exact_seconds(self) -> None:
+        '''Month transitions across year boundary [2026-12-01, 2027-01-01).'''
+        submissions = [
+            (1, 10, 'AC', 'normal', '2026-11-30 23:59:59'),  # Prev month
+            (1, 20, 'AC', 'normal', '2026-12-01 00:00:00'),  # Exact start
+            (1, 30, 'AC', 'normal', '2026-12-31 23:59:59'),  # Exact end
+            (1, 40, 'AC', 'normal', '2027-01-01 00:00:00'),  # Next month
+        ]
+        identity_ids = [1]
+        problem_ids = [10, 20, 30, 40]
+        conn = sqlite_cursor.connect(*_USER_PROBLEMS_SCHEMA)
+        conn.executemany(
+            'INSERT INTO Identities VALUES (?, ?);', [(1, 1)])
+        conn.executemany('INSERT INTO Submissions VALUES (?, ?, ?, ?, ?);',
+                         submissions)
+        conn.executemany(
+            'INSERT INTO Problems VALUES (?, ?);',
+            [(p, p) for p in problem_ids])
+
+        december_month = datetime.date(2026, 12, 1)
+        user_problems = get_user_problems(
+            cast(mysql.connector.cursor.MySQLCursorDict,
+                 sqlite_cursor.SqliteCursor(conn)),
+            identity_ids,
+            problem_ids,
+            [_user(1)],
+            december_month,
+        )
+        self.assertEqual(sorted(user_problems[1]['solved']), [20, 30])
+
+    def test_leap_year_february_boundary_exact_seconds(self) -> None:
+        '''Tests leap-year Feb 29 bounds [2024-02-01 00:00:00, 2024-03-01).'''
+        submissions = [
+            (1, 10, 'AC', 'normal', '2024-01-31 23:59:59'),  # Jan end
+            (1, 20, 'AC', 'normal', '2024-02-01 00:00:00'),  # Feb start
+            (1, 30, 'AC', 'normal', '2024-02-29 23:59:59'),  # Feb 29 leap end
+            (1, 40, 'AC', 'normal', '2024-03-01 00:00:00'),  # Mar start
+        ]
+        identity_ids = [1]
+        problem_ids = [10, 20, 30, 40]
+        conn = sqlite_cursor.connect(*_USER_PROBLEMS_SCHEMA)
+        conn.executemany(
+            'INSERT INTO Identities VALUES (?, ?);', [(1, 1)])
+        conn.executemany('INSERT INTO Submissions VALUES (?, ?, ?, ?, ?);',
+                         submissions)
+        conn.executemany(
+            'INSERT INTO Problems VALUES (?, ?);',
+            [(p, p) for p in problem_ids])
+
+        february_month = datetime.date(2024, 2, 1)
+        user_problems = get_user_problems(
+            cast(mysql.connector.cursor.MySQLCursorDict,
+                 sqlite_cursor.SqliteCursor(conn)),
+            identity_ids,
+            problem_ids,
+            [_user(1)],
+            february_month,
+        )
+        self.assertEqual(sorted(user_problems[1]['solved']), [20, 30])
+
+    def test_handles_empty_identity_or_problem_ids(self) -> None:
+        '''Returns initialized dictionary if user or problem list is empty.'''
+        conn = sqlite_cursor.connect(*_USER_PROBLEMS_SCHEMA)
+        cur = cast(
+            mysql.connector.cursor.MySQLCursorDict,
+            sqlite_cursor.SqliteCursor(conn),
+        )
+        empty_users = get_user_problems(
+            cur, [], [10], [], _CURRENT_MONTH
+        )
+        self.assertEqual(empty_users, {})
+
+        empty_problems = get_user_problems(
+            cur, [1], [], [_user(1)], _CURRENT_MONTH
+        )
+        self.assertEqual(empty_problems, {1: {'solved': [], 'score': 0.0}})
+
 
 class ComputePointsForUserTest(_PatchHelpersMixin):
     '''Tests for `update_ranks.compute_points_for_user`.'''
