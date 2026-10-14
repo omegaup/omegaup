@@ -1,6 +1,8 @@
 import Homepage from '../components/homepage/Homepage.vue';
 import { OmegaUp } from '../omegaup';
+import * as api from '../api';
 import { types } from '../api_types';
+import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -21,9 +23,23 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-homepage': Homepage,
     },
+    data: () => ({
+      recommendedProblems: [] as types.RecommendedProblem[],
+    }),
+    mounted() {
+      if (!commonPayload.isLoggedIn) {
+        return;
+      }
+      api.Problem.recommendations()
+        .then((response) => {
+          this.recommendedProblems = response.problems;
+        })
+        .catch(ui.apiError);
+    },
     render: function (createElement) {
       return createElement('omegaup-homepage', {
         props: {
+          recommendedProblems: this.recommendedProblems,
           coderOfTheMonth: payload.coderOfTheMonthData
             ? payload.coderOfTheMonthData.all
             : null,

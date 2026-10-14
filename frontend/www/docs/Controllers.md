@@ -183,6 +183,7 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/problem/myList/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemmylist)
   - [`/api/problem/randomKarelProblem/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemrandomkarelproblem)
   - [`/api/problem/randomLanguageProblem/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemrandomlanguageproblem)
+  - [`/api/problem/recommendations/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemrecommendations)
   - [`/api/problem/rejudge/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemrejudge)
   - [`/api/problem/removeAdmin/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemremoveadmin)
   - [`/api/problem/removeGroupAdmin/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemremovegroupadmin)

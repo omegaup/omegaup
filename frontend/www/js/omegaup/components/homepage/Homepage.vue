@@ -1,6 +1,15 @@
 <template>
   <div>
     <omegaup-carousel :carousel-items="carouselItems"></omegaup-carousel>
+    <div v-if="recommendedProblems.length" class="container-lg pt-5">
+      <div class="row justify-content-around">
+        <div class="col-xs-10 col-md-8">
+          <omegaup-recommended-problems
+            :problems="recommendedProblems"
+          ></omegaup-recommended-problems>
+        </div>
+      </div>
+    </div>
     <div
       v-if="
         coderOfTheMonthFemale ||
@@ -99,6 +108,7 @@ import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
+import homepage_RecommendedProblems from './RecommendedProblems.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import homepage_Testimonials from './Testimonials.vue';
@@ -113,6 +123,7 @@ Vue.use(VueCookies, { expires: -1 });
 @Component({
   components: {
     'omegaup-carousel': homepage_Carousel,
+    'omegaup-recommended-problems': homepage_RecommendedProblems,
     'omegaup-coder-of-the-month': homepage_CoderOfTheMonth,
     'omegaup-school-of-the-month': homepage_SchoolOfTheMonth,
     'omegaup-school-rank': school_Rank,
@@ -132,6 +143,7 @@ export default class Homepage extends Vue {
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
   @Prop() isUnder13User!: boolean;
   @Prop({ default: () => [] }) carouselItems!: types.CarouselItem[];
+  @Prop({ default: () => [] }) recommendedProblems!: types.RecommendedProblem[];
 
   T = T;
   cookieClickedAccept() {
