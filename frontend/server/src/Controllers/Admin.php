@@ -569,30 +569,43 @@ class Admin extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        $job = self::cronJobFromRequest($r);
-        // The runner skips a disabled job, so the rerun could never succeed.
-        if (!$job->enabled) {
-            throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                'cronControlPlaneJobDisabled'
+        $name = strval(self::cronJobFromRequest($r)->name);
+
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            // Locking the job row makes concurrent requests for the same job
+            // wait here, so only the first one can queue a rerun.
+            $job = \OmegaUp\DAO\CronJobs::getByNameForUpdate($name);
+            if (is_null($job)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'name'
+                );
+            }
+            // The runner skips a disabled job, so the rerun could never succeed.
+            if (!$job->enabled) {
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'cronControlPlaneJobDisabled'
+                );
+            }
+            $queued = is_null(
+                \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
             );
+            if ($queued) {
+                \OmegaUp\DAO\CronRunRequests::create(
+                    new \OmegaUp\DAO\VO\CronRunRequests([
+                        'name' => $name,
+                        'requested_by' => $r->user->user_id,
+                        'status' => \OmegaUp\CronRunRequestStatus::Pending->value,
+                    ])
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-        if (
-            !is_null(
-                \OmegaUp\DAO\CronRunRequests::getActiveByName(
-                    strval($job->name)
-                )
-            )
-        ) {
-            return ['queued' => false];
-        }
-        \OmegaUp\DAO\CronRunRequests::create(
-            new \OmegaUp\DAO\VO\CronRunRequests([
-                'name' => $job->name,
-                'requested_by' => $r->user->user_id,
-                'status' => \OmegaUp\CronRunRequestStatus::Pending->value,
-            ])
-        );
-        return ['queued' => true];
+        return ['queued' => $queued];
     }
 
     /**
