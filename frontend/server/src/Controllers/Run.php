@@ -409,7 +409,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $contest_alias Alias of the contest
      * @omegaup-request-param string $language Programming language used for the solution
      * @omegaup-request-param string $problem_alias Alias of the problem
-     * @omegaup-request-param int|null $problemset_id
+     * @omegaup-request-param int|null $problemset_id ID of the problemset associated with the submission
      * @omegaup-request-param string $source Source code of the solution
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
@@ -903,7 +903,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string, runs: list<array{guid: null|string, username: null|string}>}
      *
-     * @omegaup-request-param null|string $run_alias Alias of the run 
+     * @omegaup-request-param null|string $run_alias Alias of the run to retrieve details for.
      * @omegaup-request-param null|string $problem_alias 	Alias of the problem
      * @omegaup-request-param null|string $contest_alias 	Alias of the contest
      * @omegaup-request-param null|string $username
@@ -1926,8 +1926,8 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{runs: list<Run>, totalRuns: int}
      *
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
-     * @omegaup-request-param int $offset
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language Filter runs by programming language
+     * @omegaup-request-param int $offset Number of runs to skip before returning results (used for pagination)
      * @omegaup-request-param string $problem_alias Alias of the problem
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
