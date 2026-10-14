@@ -5059,6 +5059,7 @@ export namespace types {
 
   export interface ScoreboardRankingProblem {
     alias: string;
+    first_solved?: number;
     penalty: number;
     pending?: number;
     percent: number;

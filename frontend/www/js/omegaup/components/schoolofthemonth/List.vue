@@ -110,7 +110,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
@@ -120,37 +121,63 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCogs } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs);
 
-@Component({
+export default defineComponent({
+  name: 'SchoolOfTheMonthList',
   components: {
     'omegaup-country-flag': country_Flag,
     'omegaup-markdown': omegaup_Markdown,
     'font-awesome-icon': FontAwesomeIcon,
   },
-})
-export default class SchoolOfTheMonthList extends Vue {
-  @Prop() schoolsOfPreviousMonths!: omegaup.SchoolOfTheMonth[];
-  @Prop() schoolsOfPreviousMonth!: omegaup.SchoolOfTheMonth[];
-  @Prop() candidatesToSchoolOfTheMonth!: omegaup.SchoolOfTheMonth[];
-  @Prop() isMentor!: boolean;
-  @Prop() canChooseSchool!: boolean;
-  @Prop() schoolIsSelected!: boolean;
-  @Prop({ default: true }) isDisabled!: boolean;
-
-  T = T;
-  selectedTab = 'allSchoolsOfTheMonth';
-
-  get visibleSchools(): omegaup.SchoolOfTheMonth[] {
-    switch (this.selectedTab) {
-      case 'allSchoolsOfTheMonth':
-      default:
-        return this.schoolsOfPreviousMonths;
-      case 'schoolsOfPreviousMonth':
-        return this.schoolsOfPreviousMonth;
-      case 'candidatesToSchoolOfTheMonth':
-        return this.candidatesToSchoolOfTheMonth;
-    }
-  }
-}
+  props: {
+    schoolsOfPreviousMonths: {
+      type: Array as PropType<omegaup.SchoolOfTheMonth[]>,
+      default: () => [],
+    },
+    schoolsOfPreviousMonth: {
+      type: Array as PropType<omegaup.SchoolOfTheMonth[]>,
+      default: () => [],
+    },
+    candidatesToSchoolOfTheMonth: {
+      type: Array as PropType<omegaup.SchoolOfTheMonth[]>,
+      default: () => [],
+    },
+    isMentor: {
+      type: Boolean,
+      default: false,
+    },
+    canChooseSchool: {
+      type: Boolean,
+      default: false,
+    },
+    schoolIsSelected: {
+      type: Boolean,
+      default: false,
+    },
+    isDisabled: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      selectedTab: 'allSchoolsOfTheMonth',
+    };
+  },
+  computed: {
+    visibleSchools(): omegaup.SchoolOfTheMonth[] {
+      switch (this.selectedTab) {
+        case 'allSchoolsOfTheMonth':
+        default:
+          return this.schoolsOfPreviousMonths;
+        case 'schoolsOfPreviousMonth':
+          return this.schoolsOfPreviousMonth;
+        case 'candidatesToSchoolOfTheMonth':
+          return this.candidatesToSchoolOfTheMonth;
+      }
+    },
+  },
+});
 </script>
 
 <style scoped>
