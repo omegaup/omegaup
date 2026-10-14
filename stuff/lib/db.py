@@ -19,9 +19,9 @@ import mysql.connector
 
 class DatabaseConnectionArguments(NamedTuple):
     '''Arguments for database connection.'''
-    host: str
-    user: str
-    password: str
+    host: Optional[str]
+    user: Optional[str]
+    password: Optional[str]
     mysql_config_file: str
     database: str
     port: int
