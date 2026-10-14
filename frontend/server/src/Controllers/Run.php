@@ -904,8 +904,8 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return array{status: string, runs: list<array{guid: null|string, username: null|string}>}
      *
      * @omegaup-request-param null|string $run_alias Alias of the run to retrieve details for.
-     * @omegaup-request-param null|string $problem_alias 	Alias of the problem
-     * @omegaup-request-param null|string $contest_alias 	Alias of the contest
+     * @omegaup-request-param null|string $problem_alias Alias of the problem
+     * @omegaup-request-param null|string $contest_alias Alias of the contest
      * @omegaup-request-param null|string $username
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
