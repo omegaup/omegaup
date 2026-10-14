@@ -375,6 +375,86 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($first->request_id, $second->request_id);
     }
 
+    public function testRerunCronSeesARequestQueuedByAnotherConnection() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $name = \OmegaUp\CronJobName::AssignBadges->value;
+        // The other connection commits a row, so the table needs cleaning.
+        \OmegaUp\Test\Utils::commit();
+        // A plain read here would fix the snapshot the rest of the request sees.
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'SELECT COUNT(*) FROM Cron_Run_Requests;'
+        );
+
+        $other = self::otherConnection();
+        try {
+            $other->query(
+                "INSERT INTO Cron_Run_Requests (name, status)
+                 VALUES ('{$name}', 'pending');"
+            );
+        } finally {
+            $other->close();
+        }
+
+        $response = \OmegaUp\Controllers\Admin::apiRerunCron(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+            ])
+        );
+
+        $this->assertFalse($response['queued']);
+    }
+
+    public function testRerunCronWaitsForTheJobLock() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $name = \OmegaUp\CronJobName::AssignBadges->value;
+        $connection = \OmegaUp\MySQLConnection::getInstance();
+
+        // Another request for the same job is still holding the job row.
+        $other = self::otherConnection();
+        $other->begin_transaction();
+        $other->query(
+            "SELECT job_id FROM Cron_Jobs WHERE name = '{$name}' FOR UPDATE;"
+        );
+        /** @var int|null */
+        $timeout = $connection->GetOne(
+            'SELECT @@SESSION.innodb_lock_wait_timeout;'
+        );
+        $connection->Execute('SET SESSION innodb_lock_wait_timeout = 1;');
+        try {
+            \OmegaUp\Controllers\Admin::apiRerunCron(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+            ]));
+            $this->fail('Should have waited for the other request');
+        } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
+            $this->assertStringContainsString(
+                'Lock wait timeout',
+                $e->getMessage()
+            );
+        } finally {
+            $connection->Execute(
+                'SET SESSION innodb_lock_wait_timeout = ' . intval($timeout) . ';'
+            );
+            $other->rollback();
+            $other->close();
+        }
+        $this->assertNull(
+            \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+        );
+    }
+
+    private static function otherConnection(): \mysqli {
+        return new \mysqli(
+            OMEGAUP_DB_HOST,
+            OMEGAUP_DB_USER,
+            OMEGAUP_DB_PASS,
+            OMEGAUP_DB_NAME
+        );
+    }
+
     public function testEveryJobNameTheApiAcceptsIsLaunchable() {
         // The dispatcher needs the name in Cron_Jobs and a script on disk,
         // so a case missing either would be queued and then rejected.
