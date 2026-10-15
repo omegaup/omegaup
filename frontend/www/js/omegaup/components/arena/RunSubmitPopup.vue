@@ -1,5 +1,5 @@
 <template>
-  <omegaup-overlay-popup @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup class="run-submit-popup" @dismiss="$emit('dismiss')">
     <form
       data-run-submit
       class="modal-form d-flex flex-column h-100"
@@ -36,7 +36,7 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="h-100">
+      <div class="h-100 run-submit-code-view">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
@@ -318,3 +318,29 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@media (max-height: 706px), (max-width: 475px) {
+  .run-submit-popup form[data-run-submit] {
+    height: calc(90vh - 54px) !important;
+    max-height: none;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .run-submit-popup form[data-run-submit] > * {
+    flex-shrink: 0;
+  }
+
+  .run-submit-popup form[data-run-submit] > .run-submit-code-view {
+    height: auto !important;
+    flex: 1 1 0;
+    min-height: 100px;
+    flex-shrink: 1;
+  }
+
+  .run-submit-popup .run-submit-code-view .CodeMirror-scroll {
+    height: 100% !important;
+  }
+}
+</style>
