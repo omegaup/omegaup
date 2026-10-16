@@ -37,6 +37,12 @@ _MIN_MAP_SCORE = 0.05
 _NUM_FOLLOWUPS = 3
 _FOLLOWUP_DECAY = 0.4
 
+# How many recommendations per solved problem are mirrored into MySQL. The
+# serving query filters out problems the user already solved after this cut,
+# so it needs to be comfortably above the feed page size to avoid starving
+# the feed for users who solved several of the top recommendations.
+_SYNC_TOP_N = 50
+
 # Type aliases for type checking
 ProblemList = List[int]
 ProblemSet = Set[int]
@@ -424,6 +430,34 @@ def record_model_run(
     dbconn.conn.commit()
 
 
+def sync_recommendations_to_mysql(
+        dbconn: lib.db.Connection,
+        model: Mapping[int, Sequence[Tuple[int, float]]],
+        top_n: int,
+) -> int:
+    '''Mirrors the top `top_n` rows per solved problem into MySQL.
+
+    Replaces the whole `Problem_Recommendations` table in one transaction so
+    the serving side either sees the previous model or the new one, never a
+    mix. Returns the number of rows synced.
+    '''
+    rows: List[Tuple[int, int, float]] = []
+    for solved_problem_id, recommendations in model.items():
+        for recommended_problem_id, score in recommendations[:top_n]:
+            rows.append((solved_problem_id, recommended_problem_id, score))
+    with dbconn.cursor() as cur:
+        cur.execute('DELETE FROM `Problem_Recommendations`;')
+        if rows:
+            cur.executemany(
+                '''
+                INSERT INTO `Problem_Recommendations`
+                    (`solved_problem_id`, `recommended_problem_id`, `score`)
+                VALUES (%s, %s, %s);''',
+                rows)
+    dbconn.conn.commit()
+    return len(rows)
+
+
 def get_last_published_map(
         dbconn: lib.db.Connection,
         output_path: str,
@@ -508,6 +542,10 @@ def train_and_publish(
                                                 args.max_map_regression)
         if published:
             model.save(args.output)
+            if dbconn is not None:
+                synced = sync_recommendations_to_mysql(
+                    dbconn, model.model, args.sync_top_n)
+                logging.info('Synced %d recommendation rows to MySQL', synced)
         else:
             logging.error('Model NOT saved. %s', skip_reason)
             cron_run.mark_failure(skip_reason)
@@ -574,6 +612,15 @@ def build_parser() -> argparse.ArgumentParser:
                                help='Do not publish a model whose MAP score '
                                'is more than this below the last published '
                                'model. Keeps the previous good model live.')
+    training_args.add_argument('--sync-top-n',
+                               type=int,
+                               default=_SYNC_TOP_N,
+                               help='How many recommendations per solved '
+                               'problem to mirror into MySQL after '
+                               'publishing. Must stay comfortably above the '
+                               'feed page size because the serving query '
+                               'filters already-solved problems after this '
+                               'cut.')
     # Input/Output
     io_args = parser.add_argument_group('Input/Output')
     io_args.add_argument('--sqlite-database',
