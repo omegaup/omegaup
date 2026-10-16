@@ -313,6 +313,9 @@ def get_user_problems(
         user.identity_id:
             {'solved': [], 'score': 0.0} for user in eligible_users}
 
+    if not identity_ids or not problem_ids:
+        return user_problems
+
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
 
@@ -339,12 +342,19 @@ def get_user_problems(
                 AND pf.problem_id IS NULL
             GROUP BY
                 s.identity_id,
-                s.problem_id;
+                s.problem_id
+            HAVING
+                MIN(s.time) >= %s
+                AND MIN(s.time) < %s;
     '''
     sql = sql.format(
         identity_ids_str=', '.join(['%s'] * len(identity_ids)),
         problem_ids_str=', '.join(['%s'] * len(problem_ids)))
-    params = tuple(identity_ids) + tuple(problem_ids)
+    params = (
+        tuple(identity_ids)
+        + tuple(problem_ids)
+        + (first_day_of_current_month, first_day_of_next_month)
+    )
     cur_readonly.execute('EXPLAIN ' + sql, params)
 
     logging.info("Evaluating [get_user_problems] for %d "
