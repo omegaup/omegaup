@@ -1541,6 +1541,29 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
+
+        $rawProblems = $r['problems'];
+        if (!is_string($rawProblems)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
+        $decodedProblems = json_decode($rawProblems, true);
+        if (!is_array($decodedProblems) || !array_is_list($decodedProblems)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
+        foreach ($decodedProblems as $item) {
+            if (!is_string($item)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidAlias',
+                    'problems'
+                );
+            }
+        }
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -1625,6 +1648,35 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
+
+        $rawAssignments = $r['assignments'];
+        if (!is_string($rawAssignments)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
+        $decodedAssignments = json_decode($rawAssignments, true);
+        if (
+            !is_array(
+                $decodedAssignments
+            ) || !array_is_list(
+                $decodedAssignments
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
+        foreach ($decodedAssignments as $item) {
+            if (!is_string($item)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidAlias',
+                    'assignments'
+                );
+            }
+        }
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
