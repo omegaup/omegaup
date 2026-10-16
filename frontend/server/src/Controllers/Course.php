@@ -1538,26 +1538,32 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problems
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r): array {
-        $r->EnsureIdentity();
-        $r->ensurePresent(['course_alias', 'problems']);
-        $problems = json_decode($r['problems'], true);
-        if (!is_array($problems)) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureIdentity();
+
+        $rawProblems = $r['problems'];
+        if (!is_string($rawProblems)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'problems'
             );
         }
-        foreach ($problems as $problem) {
-            if (!is_string($problem)) {
+        $decodedProblems = json_decode($rawProblems, true);
+        if (!is_array($decodedProblems) || !array_is_list($decodedProblems)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
+        foreach ($decodedProblems as $item) {
+            if (!is_string($item)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
+                    'parameterInvalidAlias',
                     'problems'
                 );
             }
         }
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-
-        $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -1639,26 +1645,38 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
-        $r->EnsureIdentity();
-        $r->ensurePresent(['course_alias', 'assignments']);
-        $assignments = json_decode($r['assignments'], true);
-        if (!is_array($assignments)) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureIdentity();
+
+        $rawAssignments = $r['assignments'];
+        if (!is_string($rawAssignments)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'assignments'
             );
         }
-        foreach ($assignments as $assignment) {
-            if (!is_string($assignment)) {
+        $decodedAssignments = json_decode($rawAssignments, true);
+        if (
+            !is_array(
+                $decodedAssignments
+            ) || !array_is_list(
+                $decodedAssignments
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
+        foreach ($decodedAssignments as $item) {
+            if (!is_string($item)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
+                    'parameterInvalidAlias',
                     'assignments'
                 );
             }
         }
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-
-        $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -5966,7 +5984,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param 'EXECUTION_COMPILATION_ERROR'|'EXECUTION_FINISHED'|'EXECUTION_INTERRUPTED'|'EXECUTION_JUDGE_ERROR'|'EXECUTION_RUNTIME_ERROR'|'EXECUTION_RUNTIME_FUNCTION_ERROR'|'EXECUTION_VALIDATOR_ERROR'|null $execution
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param 'OUTPUT_CORRECT'|'OUTPUT_EXCEEDED'|'OUTPUT_INCORRECT'|'OUTPUT_INTERRUPTED'|null $output
      * @omegaup-request-param null|string $problem_alias

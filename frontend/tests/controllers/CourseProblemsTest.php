@@ -201,7 +201,10 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @dataProvider invalidInputProvider
      */
-    public function testUpdateProblemsOrderInvalidInput(string $problemsInput): void {
+    public function testUpdateProblemsOrderInvalidInput(
+        string $problemsInput,
+        string $expectedError
+    ): void {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
@@ -221,14 +224,17 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Expected InvalidParameterException was not thrown');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame($expectedError, $e->getMessage());
         }
     }
 
     /**
      * @dataProvider invalidInputProvider
      */
-    public function testUpdateAssignmentsOrderInvalidInput(string $assignmentsInput): void {
+    public function testUpdateAssignmentsOrderInvalidInput(
+        string $assignmentsInput,
+        string $expectedError
+    ): void {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
@@ -246,7 +252,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Expected InvalidParameterException was not thrown');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame($expectedError, $e->getMessage());
         }
     }
 }
