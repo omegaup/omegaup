@@ -53,6 +53,22 @@ services:
         volume:
           nocopy: true
 
+  certification-consumer:
+    build:
+      dockerfile: ./Dockerfile.dev-php
+      context: ./stuff/docker/
+    image: omegaup/dev-php:20231008
+    user: "${UID_GID}"
+    restart: always
+    entrypoint: ["wait-for-it", "rabbitmq:5672", "--", "python3", "/opt/omegaup/stuff/pipelines/client_contest.py"]
+    volumes:
+      - type: bind
+        source: .
+        target: /opt/omegaup
+    depends_on:
+      - rabbitmq
+      - mysql
+
   gitserver:
     image: omegaup/gitserver:v1.9.13
     entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
