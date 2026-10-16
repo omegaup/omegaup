@@ -57,7 +57,7 @@ export default class Username extends Vue {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 span {
