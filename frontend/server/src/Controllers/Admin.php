@@ -536,6 +536,79 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Resolves the registered cron job a request names.
+     *
+     * @omegaup-request-param string $name
+     */
+    private static function cronJobFromRequest(
+        \OmegaUp\Request $r
+    ): \OmegaUp\DAO\VO\CronJobs {
+        $jobName = \OmegaUp\CronJobName::tryFrom($r->ensureString('name'));
+        $job = is_null($jobName) ? null : \OmegaUp\DAO\CronJobs::getByName(
+            $jobName->value
+        );
+        if (is_null($job)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
+        return $job;
+    }
+
+    /**
+     * Queues a manual rerun of a registered cron job for a worker to pick up.
+     * `queued` is false when the job already had a rerun waiting or running.
+     *
+     * @return array{queued: bool}
+     *
+     * @omegaup-request-param string $name
+     */
+    public static function apiRerunCron(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $name = strval(self::cronJobFromRequest($r)->name);
+
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            // Locking the job row makes concurrent requests for the same job
+            // wait here, so only the first one can queue a rerun.
+            $job = \OmegaUp\DAO\CronJobs::getByNameForUpdate($name);
+            if (is_null($job)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'name'
+                );
+            }
+            // The runner skips a disabled job, so the rerun could never succeed.
+            if (!$job->enabled) {
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'cronControlPlaneJobDisabled'
+                );
+            }
+            $queued = is_null(
+                \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+            );
+            if ($queued) {
+                \OmegaUp\DAO\CronRunRequests::create(
+                    new \OmegaUp\DAO\VO\CronRunRequests([
+                        'name' => $name,
+                        'requested_by' => $r->user->user_id,
+                        'status' => \OmegaUp\CronRunRequestStatus::Pending->value,
+                    ])
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+        return ['queued' => $queued];
+    }
+
+    /**
      * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
