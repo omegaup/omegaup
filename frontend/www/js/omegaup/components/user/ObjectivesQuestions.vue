@@ -1,126 +1,136 @@
 <template>
-  <b-modal v-model="showModal" hide-footer>
-    <template #modal-title>
-      <h5 class="modal-title font-weight-bold">
-        {{ T.userObjectivesModalTitle }}
-      </h5>
-    </template>
-    <p class="text-right text-primary">
-      {{
-        ui.formatString(T.userObjectivesModalPageCounter, {
-          current: currentModalPage,
-          last: lastModalPage,
-        })
-      }}
-    </p>
-    <p class="font-weight-bold">{{ description }}</p>
-    <div v-if="currentModalPage === 1" class="mb-3">
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.Learning"
-        />{{ T.userObjectivesModalAnswerLearning }}</label
-      >
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.Teaching"
-        />{{ T.userObjectivesModalAnswerTeaching }}</label
-      >
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.LearningAndTeaching"
-        />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
-      >
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.None"
-        />{{ T.userObjectivesModalAnswerNone }}</label
-      >
+  <div v-if="showModal">
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title font-weight-bold">
+              {{ T.userObjectivesModalTitle }}
+            </h5>
+            <button type="button" class="close" @click="showModal = false">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-right text-primary">
+              {{
+                ui.formatString(T.userObjectivesModalPageCounter, {
+                  current: currentModalPage,
+                  last: lastModalPage,
+                })
+              }}
+            </p>
+            <p class="font-weight-bold">{{ description }}</p>
+            <div v-if="currentModalPage === 1" class="mb-3">
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.Learning"
+                />{{ T.userObjectivesModalAnswerLearning }}</label
+              >
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.Teaching"
+                />{{ T.userObjectivesModalAnswerTeaching }}</label
+              >
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.LearningAndTeaching"
+                />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
+              >
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.None"
+                />{{ T.userObjectivesModalAnswerNone }}</label
+              >
+            </div>
+            <div v-else class="mb-3">
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.Scholar"
+                />{{ T.userObjectivesModalAnswerScholar }}</label
+              >
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.Competitive"
+                />{{ T.userObjectivesModalAnswerCompetitive }}</label
+              >
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.ScholarAndCompetitive"
+                />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
+              >
+              <label class="d-block"
+                ><input
+                  v-model="objective"
+                  class="mr-3"
+                  type="radio"
+                  :value="ObjectivesAnswers.Other"
+                />{{ T.userObjectivesModalAnswerOther }}</label
+              >
+            </div>
+            <button
+              v-if="
+                currentModalPage === 1 && objective !== ObjectivesAnswers.None
+              "
+              type="button"
+              class="btn btn-next-previous float-right pr-0"
+              @click="onNextModalPage"
+            >
+              {{ T.userObjectivesModalButtonNext }}
+              <font-awesome-icon class="ml-1" icon="greater-than" />
+            </button>
+            <div v-else>
+              <button
+                v-if="objective !== ObjectivesAnswers.None"
+                type="button"
+                class="btn btn-next-previous float-left pl-0"
+                @click="onPreviousModalPage"
+              >
+                <font-awesome-icon class="mr-1" icon="less-than" />
+                {{ T.userObjectivesModalButtonPrevious }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary float-right w-25"
+                data-dismiss="modal"
+                @click="onSubmit"
+              >
+                {{ T.userObjectivesModalButtonSend }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div v-else class="mb-3">
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.Scholar"
-        />{{ T.userObjectivesModalAnswerScholar }}</label
-      >
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.Competitive"
-        />{{ T.userObjectivesModalAnswerCompetitive }}</label
-      >
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.ScholarAndCompetitive"
-        />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
-      >
-      <label class="d-block"
-        ><input
-          v-model="objective"
-          class="mr-3"
-          type="radio"
-          :value="ObjectivesAnswers.Other"
-        />{{ T.userObjectivesModalAnswerOther }}</label
-      >
-    </div>
-    <button
-      v-if="currentModalPage === 1 && objective !== ObjectivesAnswers.None"
-      type="button"
-      class="btn btn-next-previous float-right pr-0"
-      @click="onNextModalPage"
-    >
-      {{ T.userObjectivesModalButtonNext }}
-      <font-awesome-icon class="ml-1" icon="greater-than" />
-    </button>
-    <div v-else>
-      <button
-        v-if="objective !== ObjectivesAnswers.None"
-        type="button"
-        class="btn btn-next-previous float-left pl-0"
-        @click="onPreviousModalPage"
-      >
-        <font-awesome-icon class="mr-1" icon="less-than" />
-        {{ T.userObjectivesModalButtonPrevious }}
-      </button>
-      <button
-        type="button"
-        class="btn btn-primary float-right w-25"
-        data-dismiss="modal"
-        @click="onSubmit"
-      >
-        {{ T.userObjectivesModalButtonSend }}
-      </button>
-    </div>
-  </b-modal>
+    <div class="modal-backdrop fade show"></div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
-
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import { ModalPlugin } from 'bootstrap-vue';
-Vue.use(ModalPlugin);
 
 import {
   FontAwesomeIcon,
@@ -253,11 +263,11 @@ export default class UserObjectivesQuestions extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
->>> .modal-dialog {
+.modal-dialog {
   max-width: 330px;
 }
 
->>> .modal-header {
+.modal-header {
   border-bottom: 0;
 }
 

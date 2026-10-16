@@ -94,26 +94,21 @@
           />{{ T.userEditPrivateProfile }}
         </label>
         <!-- id-lint off -->
-        <b-button
+        <button
           id="popover-private-profile"
-          class="ml-1"
-          size="sm"
-          variant="none"
+          type="button"
+          class="btn btn-sm ml-1"
+          :title="T.profilePrivateRankMessageTitle"
           @click="show = !show"
         >
           <font-awesome-icon :icon="['fas', 'question-circle']" />
-        </b-button>
+        </button>
         <!-- id-lint on -->
       </div>
-      <b-popover
-        :show.sync="show"
-        target="popover-private-profile"
-        variant="danger"
-        placement="bottom"
-      >
-        <template #title>{{ T.profilePrivateRankMessageTitle }}</template>
+      <div v-if="show" class="alert alert-danger mt-2 mb-0" role="alert">
+        <strong>{{ T.profilePrivateRankMessageTitle }}</strong>
         {{ T.profilePrivateRankMessage }}
-      </b-popover>
+      </div>
     </div>
     <div class="form-group">
       <label>
@@ -146,15 +141,6 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { getExternalUrl } from '../../urlHelper';
-
-// Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-// Import Only Required Plugins
-import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
-Vue.use(ButtonPlugin);
-Vue.use(PopoverPlugin);
 
 @Component({
   components: {

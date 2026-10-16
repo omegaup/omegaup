@@ -1666,7 +1666,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 )
             );
 
-            \OmegaUp\Test\Utils::runUpdateRanks();
+            \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
             $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'category' => $category,

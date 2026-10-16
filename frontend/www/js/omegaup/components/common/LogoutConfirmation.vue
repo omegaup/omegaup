@@ -1,18 +1,36 @@
 <template>
-  <b-modal
-    v-model="showModal"
-    :title="T.logoutConfirmationTitle"
-    :ok-title="T.wordsYes"
-    :cancel-title="T.wordsNo"
-    ok-variant="primary"
-    cancel-variant="secondary"
-    footer-class="logout-confirmation-modal"
-    body-class="p-0"
-    static
-    lazy
-    @ok="confirmLogout"
-  >
-  </b-modal>
+  <div v-if="showModal">
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ T.logoutConfirmationTitle }}</h5>
+            <button type="button" class="close" @click="showModal = false">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body p-0"></div>
+          <footer class="modal-footer logout-confirmation-modal">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showModal = false"
+            >
+              {{ T.wordsNo }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="confirmLogout"
+            >
+              {{ T.wordsYes }}
+            </button>
+          </footer>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  </div>
 </template>
 
 <script lang="ts">
