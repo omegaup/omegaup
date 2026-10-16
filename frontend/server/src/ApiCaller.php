@@ -200,6 +200,9 @@ class ApiCaller {
         $readOnlyAllowlist = [
             'execute',
             'executeforide',
+            'followers',
+            'following',
+            'followstatus',
             'getsystemsettings',
             'lastprivacypolicyaccepted',
             'listassociatedidentities',
@@ -212,8 +215,8 @@ class ApiCaller {
         $mutatingPatterns = [
             'accept', 'add', 'arbitrate', 'archive', 'associate',
             'bulkcreate', 'change', 'clone', 'confirm', 'create',
-            'delete', 'disqualify', 'execute', 'expire', 'forfeit',
-            'generate', 'invalidate', 'login', 'logout', 'open',
+            'delete', 'disqualify', 'execute', 'expire', 'follow',
+            'forfeit', 'generate', 'invalidate', 'login', 'logout', 'open',
             'read', 'refresh', 'register', 'rejudge', 'remove',
             'requalify', 'resolve', 'revoke', 'select', 'set',
             'toggle', 'update', 'verify',
