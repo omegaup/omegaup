@@ -1539,8 +1539,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r): array {
         $r->EnsureIdentity();
-        $r->EnsurePresent(['course_alias', 'problems']);
-        $problems = json_decode($r->problems);
+        $r->ensurePresent(['course_alias', 'problems']);
+        $problems = json_decode($r['problems'], true);
         if (!is_array($problems)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -1640,8 +1640,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
         $r->EnsureIdentity();
-        $r->EnsurePresent(['course_alias', 'assignments']);
-        $assignments = json_decode($r->assignments);
+        $r->ensurePresent(['course_alias', 'assignments']);
+        $assignments = json_decode($r['assignments'], true);
         if (!is_array($assignments)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
