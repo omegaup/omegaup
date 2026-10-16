@@ -19,9 +19,9 @@ import mysql.connector
 
 class DatabaseConnectionArguments(NamedTuple):
     '''Arguments for database connection.'''
-    host: str
-    user: str
-    password: str
+    host: Optional[str]
+    user: Optional[str]
+    password: Optional[str]
     mysql_config_file: str
     database: str
     port: int
@@ -176,7 +176,7 @@ def connect(args: DatabaseConnectionArguments) -> Connection:
     database = args.database
     if (user is None and args.mysql_config_file
             and os.path.isfile(args.mysql_config_file)):
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(interpolation=None)
         config.read(args.mysql_config_file)
         # Puppet quotes some configuration entries.
         port = int(config['client']['port'].strip("'"))
@@ -215,7 +215,7 @@ def connect_readonly(
     database = args.database
     if (user is None and args.mysql_config_file
             and os.path.isfile(args.mysql_config_file)):
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(interpolation=None)
         config.read(args.mysql_config_file)
         # Puppet quotes some configuration entries.
         if 'clientreadonly' in config:
