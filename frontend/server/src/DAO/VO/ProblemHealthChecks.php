@@ -86,6 +86,10 @@ class ProblemHealthChecks extends \OmegaUp\DAO\VO\VO {
                     $data['last_seen_at']
                 )
             );
+        } else {
+            $this->last_seen_at = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['resolved_at'])) {
             /**
@@ -147,9 +151,9 @@ class ProblemHealthChecks extends \OmegaUp\DAO\VO\VO {
     /**
      * La última ejecución en la que se seguía detectando
      *
-     * @var \OmegaUp\Timestamp|null
+     * @var \OmegaUp\Timestamp
      */
-    public $last_seen_at = null;
+    public $last_seen_at;  // CURRENT_TIMESTAMP
 
     /**
      * Cuando dejó de detectarse, NULL si sigue vigente
