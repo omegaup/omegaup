@@ -244,7 +244,7 @@
                 <omegaup-user-username
                   :classname="run.classname"
                   :username="run.username"
-                  :country="run.country_id"
+                  :country="run.country"
                   :linkify="true"
                   :href="'#runs'"
                   :emit-click-event="true"

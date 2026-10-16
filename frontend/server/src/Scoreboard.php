@@ -9,7 +9,7 @@ namespace OmegaUp;
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
- * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, first_solved?: float, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  */
@@ -498,7 +498,7 @@ class Scoreboard {
     }
 
     /**
-     * @param list<array{alias: string, points: float, penalty: float, percent: float, runs: int}> $scores
+     * @param list<array{alias: string, first_solved?: float, points: float, penalty: float, percent: float, runs: int}> $scores
      * @param string $contestPenaltyCalcPolicy
      * @return array{points: float, penalty: float}
      */
@@ -560,7 +560,7 @@ class Scoreboard {
         $testOnly = [];
         /** @val array<int, bool> */
         $noRuns = [];
-        /** @val array<int, array{problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, username: string, name: string|null, country: string, is_invited: bool, total: array{points: float, penalty: float}}> */
+        /** @val array<int, array{problems: list<array{alias: string, first_solved?: float, points: float, penalty: float, percent: float, runs: int}>, username: string, name: string|null, country: string, is_invited: bool, total: array{points: float, penalty: float}}> */
         $identitiesInfo = [];
 
         $problems = [];
@@ -570,7 +570,7 @@ class Scoreboard {
 
         // Calculate score for each contestant x problem
         foreach ($rawContestIdentities as $contestant) {
-            /** @var list<array{alias: string, points: float, penalty: float, percent: float, runs: int}> */
+            /** @var list<array{alias: string, first_solved?: float, points: float, penalty: float, percent: float, runs: int}> */
             $identityProblems = [];
 
             $testOnly[$contestant['identity_id']] = true;
@@ -634,6 +634,19 @@ class Scoreboard {
                     $problem['runs']++;
                     $problem['pending'] = true;
                     continue;
+                }
+            }
+
+            if (round($score * 100, 2) >= 100.0 && !empty($run['time'])) {
+                $solvedMinutes = max(
+                    0.0,
+                    ($run['time']->time - $contestStartTime->time) / 60.0
+                );
+                if (
+                    !isset($problem['first_solved'])
+                    || $solvedMinutes < $problem['first_solved']
+                ) {
+                    $problem['first_solved'] = $solvedMinutes;
                 }
             }
 
