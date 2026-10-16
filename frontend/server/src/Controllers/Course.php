@@ -1538,6 +1538,23 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problems
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r): array {
+        $r->EnsureIdentity();
+        $r->EnsurePresent(['course_alias', 'problems']);
+        $problems = json_decode($r->problems);
+        if (!is_array($problems)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
+            );
+        }
+        foreach ($problems as $problem) {
+            if (!is_string($problem)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'problems'
+                );
+            }
+        }
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
@@ -1622,6 +1639,23 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
+        $r->EnsureIdentity();
+        $r->EnsurePresent(['course_alias', 'assignments']);
+        $assignments = json_decode($r->assignments);
+        if (!is_array($assignments)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
+            );
+        }
+        foreach ($assignments as $assignment) {
+            if (!is_string($assignment)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'assignments'
+                );
+            }
+        }
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
