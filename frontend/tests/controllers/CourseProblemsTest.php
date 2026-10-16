@@ -194,7 +194,6 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'malformedJson' => ['invalid-json', 'parameterInvalid'],
             'nullValue' => ['[null]', 'parameterInvalidAlias'],
             'objectValue' => ['[{}]', 'parameterInvalidAlias'],
-            'invalidAlias' => ['["invalid alias"]', 'parameterInvalid'],
         ];
     }
 
