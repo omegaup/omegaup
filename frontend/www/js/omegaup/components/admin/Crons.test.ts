@@ -328,4 +328,27 @@ describe('Crons.vue', () => {
       'running',
     );
   });
+
+  it('Should emit rerun with the job name when the button is clicked', async () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    await wrapper.find('[data-cron-rerun]').trigger('click');
+
+    const emitted = wrapper.emitted('rerun');
+    expect(emitted).toBeTruthy();
+    expect(emitted?.[0]).toEqual(['update_ranks.py']);
+  });
+
+  it('Should not offer a rerun for a disabled job', async () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs: [{ ...jobs[0], enabled: false }], runs },
+    });
+    const button = wrapper.find('[data-cron-rerun]');
+
+    await button.trigger('click');
+
+    expect(button.attributes('disabled')).toBe('disabled');
+    expect(button.attributes('title')).toBe(T.cronControlPlaneJobDisabled);
+    expect(wrapper.emitted('rerun')).toBeFalsy();
+  });
 });
