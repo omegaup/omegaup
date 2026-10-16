@@ -11,8 +11,10 @@
         :aria-expanded="expanded.toString()"
         @click="expanded = !expanded"
       >
-        <BIconList v-if="!expanded" scale="1.4" />
-        <BIconChevronDoubleLeft v-else scale="1.2" />
+        <span class="admin-dashboard-sidebar__icon">
+          <BIconList v-if="!expanded" scale="1.3" />
+          <BIconChevronDoubleLeft v-else scale="1.3" />
+        </span>
       </button>
 
       <hr class="admin-dashboard-sidebar__divider" />
@@ -24,14 +26,10 @@
         class="admin-dashboard-sidebar__item"
         :title="item.label"
       >
-        <component
-          :is="item.icon"
-          scale="1.3"
-          class="admin-dashboard-sidebar__icon"
-        />
-        <span v-if="expanded" class="admin-dashboard-sidebar__label">{{
-          item.label
-        }}</span>
+        <span class="admin-dashboard-sidebar__icon">
+          <component :is="item.icon" scale="1.3" />
+        </span>
+        <span class="admin-dashboard-sidebar__label">{{ item.label }}</span>
       </a>
     </nav>
 
@@ -83,7 +81,30 @@ export default class AdminLayout extends Vue {
   @Prop({ default: '' }) currentModule!: string;
 
   T = T;
+
   expanded = false;
+  isLargeScreen = false;
+
+  created(): void {
+    this.isLargeScreen = window.matchMedia('(min-width: 992px)').matches;
+    this.expanded = this.isLargeScreen;
+  }
+
+  mounted(): void {
+    window.addEventListener('resize', this.onResize);
+  }
+
+  beforeDestroy(): void {
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  onResize(): void {
+    const isLargeScreen = window.matchMedia('(min-width: 992px)').matches;
+    if (isLargeScreen !== this.isLargeScreen) {
+      this.isLargeScreen = isLargeScreen;
+      this.expanded = isLargeScreen;
+    }
+  }
 
   get sidebarItems(): SidebarItem[] {
     return [
@@ -114,7 +135,8 @@ export default class AdminLayout extends Vue {
 
 <style lang="scss" scoped>
 .admin-dashboard-layout {
-  min-height: calc(100vh - 12rem);
+  min-height: calc(100vh - 8rem);
+  margin-bottom: -3rem;
 }
 
 .admin-dashboard-sidebar {
@@ -130,20 +152,31 @@ export default class AdminLayout extends Vue {
   overflow: hidden;
 
   &--expanded {
-    width: 15rem;
+    width: 19rem;
   }
 }
 
 .admin-dashboard-sidebar__toggle {
   display: flex;
   align-items: center;
-  padding: 0.5rem 1.35rem;
+  width: 100%;
+  padding: 0.85rem 1.35rem;
+  border-radius: 0;
   color: var(--admin-dashboard-sidebar-item-color);
 
-  &:hover,
-  &:focus {
+  &:hover {
     color: var(--admin-dashboard-sidebar-item-hover-color);
     text-decoration: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-dashboard-sidebar-item-hover-color);
+    outline-offset: -2px;
   }
 }
 
@@ -159,7 +192,6 @@ export default class AdminLayout extends Vue {
   padding: 0.85rem 1.35rem;
   color: var(--admin-dashboard-sidebar-item-color);
   text-decoration: none;
-  white-space: nowrap;
 
   &:hover {
     background-color: var(
@@ -168,15 +200,35 @@ export default class AdminLayout extends Vue {
     color: var(--admin-dashboard-sidebar-item-hover-color);
     text-decoration: none;
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-dashboard-sidebar-item-hover-color);
+    outline-offset: -2px;
+  }
 }
 
 .admin-dashboard-sidebar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  width: 1.75rem;
 }
 
 .admin-dashboard-sidebar__label {
+  min-width: 0;
   margin-left: 1rem;
   font-size: 0.95rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.admin-dashboard-sidebar--expanded .admin-dashboard-sidebar__label {
+  opacity: 1;
 }
 
 .admin-dashboard-content {
