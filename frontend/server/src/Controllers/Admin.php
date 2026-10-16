@@ -13,7 +13,8 @@
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
   * @psalm-type ProblemHealthFinding=array{problem_id: int, alias: string, title: string, check_type: string, severity: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp}
-  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>}
+  * @psalm-type RecommendationModelRun=array{model_run_id: int, map_score: float, dataset_size: int, rng_seed: int|null, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
@@ -34,6 +35,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
 
     const CRON_RUNS_LIMIT = 50;
     const PROBLEM_HEALTH_FINDINGS_LIMIT = 50;
+    const RECOMMENDATION_MODEL_RUNS_LIMIT = 20;
 
     /**
      * Get stats for an overall platform report.
@@ -488,7 +490,30 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>}
+     * @param list<\OmegaUp\DAO\VO\RecommendationModelRuns> $modelRuns
+     *
+     * @return list<RecommendationModelRun>
+     */
+    private static function recommendationModelRunsPayload(
+        array $modelRuns
+    ): array {
+        $result = [];
+        foreach ($modelRuns as $modelRun) {
+            $result[] = [
+                'model_run_id' => intval($modelRun->model_run_id),
+                'map_score' => floatval($modelRun->map_score),
+                'dataset_size' => intval($modelRun->dataset_size),
+                'rng_seed' => $modelRun->rng_seed,
+                'published' => boolval($modelRun->published),
+                'skip_reason' => $modelRun->skip_reason,
+                'created_at' => $modelRun->created_at,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
      */
     private static function cronsPayload(): array {
         return [
@@ -499,14 +524,19 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'problemHealthFindings' => \OmegaUp\DAO\ProblemHealthChecks::getOpenFindings(
                 self::PROBLEM_HEALTH_FINDINGS_LIMIT
             ),
+            'recommendationModelRuns' => self::recommendationModelRunsPayload(
+                \OmegaUp\DAO\RecommendationModelRuns::getRecent(
+                    self::RECOMMENDATION_MODEL_RUNS_LIMIT
+                )
+            ),
         ];
     }
 
     /**
-     * Lists the registered cron jobs, their most recent runs and the open
-     * problem health findings.
+     * Lists the registered cron jobs, their most recent runs, the open problem
+     * health findings and the quality of the recommendation models.
      *
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>}
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
      */
     public static function apiGetCrons(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();

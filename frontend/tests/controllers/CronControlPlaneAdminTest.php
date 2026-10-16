@@ -251,4 +251,100 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
             $findings[0]['severity']
         );
     }
+
+    private function createModelRun(
+        float $mapScore,
+        bool $published,
+        int $createdAt,
+        ?string $skipReason = null
+    ): void {
+        \OmegaUp\DAO\RecommendationModelRuns::create(
+            new \OmegaUp\DAO\VO\RecommendationModelRuns([
+                'map_score' => $mapScore,
+                'dataset_size' => 4096,
+                'num_followups' => 3,
+                'followup_decay' => 0.4,
+                'train_fraction' => 0.8,
+                'rng_seed' => 42,
+                'output_path' => '/tmp/model.db',
+                'published' => $published,
+                'skip_reason' => $skipReason,
+                'created_at' => new \OmegaUp\Timestamp($createdAt),
+            ])
+        );
+    }
+
+    public function testGetCronsIncludesTheRecommendationModelRuns() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $now = \OmegaUp\Time::get();
+        $this->createModelRun(
+            0.0312,
+            published: false,
+            createdAt: $now - 200,
+            skipReason: 'MAP score 0.0312 below minimum 0.0500'
+        );
+        $this->createModelRun(0.1934, published: true, createdAt: $now - 100);
+
+        $response = \OmegaUp\Controllers\Admin::apiGetCrons(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        $modelRuns = $response['recommendationModelRuns'];
+        $this->assertCount(2, $modelRuns);
+        // Newest first.
+        $this->assertGreaterThan(
+            $modelRuns[1]['model_run_id'],
+            $modelRuns[0]['model_run_id']
+        );
+        $this->assertEqualsWithDelta(0.1934, $modelRuns[0]['map_score'], 1e-9);
+        $this->assertTrue($modelRuns[0]['published']);
+        $this->assertNull($modelRuns[0]['skip_reason']);
+        $this->assertSame(4096, $modelRuns[0]['dataset_size']);
+        $this->assertSame(42, $modelRuns[0]['rng_seed']);
+        $this->assertSame($now - 100, $modelRuns[0]['created_at']->time);
+        $this->assertEqualsWithDelta(0.0312, $modelRuns[1]['map_score'], 1e-9);
+        $this->assertFalse($modelRuns[1]['published']);
+        $this->assertSame(
+            'MAP score 0.0312 below minimum 0.0500',
+            $modelRuns[1]['skip_reason']
+        );
+    }
+
+    public function testGetCronsCapsTheRecommendationModelRuns() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $limit = \OmegaUp\Controllers\Admin::RECOMMENDATION_MODEL_RUNS_LIMIT;
+        $now = \OmegaUp\Time::get();
+        for ($i = 0; $i <= $limit; $i++) {
+            $this->createModelRun(0.1, published: true, createdAt: $now - $i);
+        }
+
+        $response = \OmegaUp\Controllers\Admin::apiGetCrons(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        $this->assertCount($limit, $response['recommendationModelRuns']);
+    }
+
+    public function testGetCronsForTypeScriptCarriesTheSameModelRuns() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $this->createModelRun(
+            0.1934,
+            published: true,
+            createdAt: \OmegaUp\Time::get() - 100
+        );
+
+        $page = \OmegaUp\Controllers\Admin::getCronsForTypeScript(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+        $api = \OmegaUp\Controllers\Admin::apiGetCrons(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        $fromPage = $page['templateProperties']['payload']['recommendationModelRuns'];
+        $this->assertCount(1, $fromPage);
+        $this->assertEquals($api['recommendationModelRuns'], $fromPage);
+    }
 }
