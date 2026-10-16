@@ -10,17 +10,34 @@
         {{ T.userObjectivesModalTitle }}
       </h5>
     </template>
-    <p class="text-right text-primary">
-      {{
-        ui.formatString(T.userObjectivesModalPageCounter, {
-          current: currentModalPage,
-          last: lastModalPage,
-        })
-      }}
+    <p class="modal-description">
+      {{ T.userObjectivesModalIntro }}
     </p>
+    <div class="modal-progress">
+      <div
+        class="modal-progress-track"
+        role="progressbar"
+        :aria-valuenow="currentModalPage"
+        :aria-valuemin="1"
+        :aria-valuemax="lastModalPage"
+      >
+        <div
+          class="modal-progress-value"
+          :style="{ width: `${(currentModalPage / lastModalPage) * 100}%` }"
+        ></div>
+      </div>
+      <span class="modal-progress-counter">
+        {{
+          ui.formatString(T.userObjectivesModalPageCounter, {
+            current: currentModalPage,
+            last: lastModalPage,
+          })
+        }}
+      </span>
+    </div>
     <p class="font-weight-bold">{{ description }}</p>
     <div v-if="currentModalPage === 1" class="mb-3">
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -28,7 +45,7 @@
           :value="ObjectivesAnswers.Learning"
         />{{ T.userObjectivesModalAnswerLearning }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -36,7 +53,7 @@
           :value="ObjectivesAnswers.Teaching"
         />{{ T.userObjectivesModalAnswerTeaching }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -44,7 +61,7 @@
           :value="ObjectivesAnswers.LearningAndTeaching"
         />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -54,7 +71,7 @@
       >
     </div>
     <div v-else class="mb-3">
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -62,7 +79,7 @@
           :value="ObjectivesAnswers.Scholar"
         />{{ T.userObjectivesModalAnswerScholar }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -70,7 +87,7 @@
           :value="ObjectivesAnswers.Competitive"
         />{{ T.userObjectivesModalAnswerCompetitive }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -78,7 +95,7 @@
           :value="ObjectivesAnswers.ScholarAndCompetitive"
         />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -87,15 +104,29 @@
         />{{ T.userObjectivesModalAnswerOther }}</label
       >
     </div>
-    <button
-      v-if="currentModalPage === 1 && objective !== ObjectivesAnswers.None"
-      type="button"
-      class="btn btn-next-previous float-right pr-0"
-      @click="onNextModalPage"
-    >
-      {{ T.userObjectivesModalButtonNext }}
-      <font-awesome-icon class="ml-1" icon="greater-than" />
-    </button>
+    <div v-if="currentModalPage === 1" class="modal-actions">
+      <button type="button" class="btn btn-skip pl-0" @click="skip">
+        {{ T.userObjectivesModalSkip }}
+      </button>
+      <button
+        v-if="objective !== ObjectivesAnswers.None"
+        type="button"
+        class="btn btn-next-previous btn-welcome-next"
+        @click="onNextModalPage"
+      >
+        {{ T.userObjectivesModalButtonNext }}
+        <font-awesome-icon class="ml-1" icon="greater-than" />
+      </button>
+      <button
+        v-else-if="objective === ObjectivesAnswers.None"
+        type="button"
+        class="btn btn-primary"
+        data-dismiss="modal"
+        @click="onSubmit"
+      >
+        {{ T.userObjectivesModalButtonSend }}
+      </button>
+    </div>
     <div v-else>
       <button
         v-if="objective !== ObjectivesAnswers.None"
@@ -220,6 +251,10 @@ export default class UserObjectivesQuestions extends Vue {
     this.currentModalPage--;
   }
 
+  skip(): void {
+    this.showModal = false;
+  }
+
   onSubmit(): void {
     if (this.currentModalPage !== 1) {
       switch (this.objective) {
@@ -263,8 +298,62 @@ export default class UserObjectivesQuestions extends Vue {
   max-width: 330px;
 }
 
+.modal-description {
+  color: #7a828a;
+}
+
+.modal-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.modal-progress-track {
+  flex: 1;
+  height: 4px;
+  background-color: #d8dce0;
+}
+
+.modal-progress-value {
+  height: 100%;
+  background-color: #007bff;
+}
+
+.modal-progress-counter {
+  color: #007bff;
+  white-space: nowrap;
+}
+
+.objective-option {
+  display: flex;
+  align-items: center;
+  min-height: 43px;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cfd4da;
+  cursor: pointer;
+}
+
+.objective-option input {
+  margin-right: 0.75rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-skip,
 .btn-next-previous {
   color: var(--btn-next-previous-font-color);
+}
+
+.btn-welcome-next {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
 }
 
 .btn-next-previous:focus,
