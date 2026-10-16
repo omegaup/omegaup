@@ -3,19 +3,16 @@
     <div class="card-body">
       <div class="form-group">
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
-        <vue-typeahead-bootstrap
+        <omegaup-common-typeahead
           v-if="canAddNewTags"
-          v-model="newPublicTag"
           data-tags-input
-          :data="publicTags"
-          :serializer="publicTagsSerializer"
-          :auto-close="true"
+          :existing-options="publicTagOptions"
+          :value.sync="newPublicTag"
           :placeholder="T.publicTagsPlaceholder"
-          :required="true"
-          :input-class="errors.includes('public_tags') ? 'is-invalid' : ''"
-          @hit="addPublicTag"
-        >
-        </vue-typeahead-bootstrap>
+          :is-invalid="errors.includes('public_tags')"
+          :activation-threshold="0"
+          :max-results="publicTags.length || 10"
+        ></omegaup-common-typeahead>
       </div>
       <table class="table table-striped">
         <thead>
@@ -168,7 +165,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import { types } from '../../api_types';
+import common_Typeahead from '../common/Typeahead.vue';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -179,7 +177,7 @@ library.add(faTrash);
 @Component({
   components: {
     FontAwesomeIcon,
-    VueTypeaheadBootstrap,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-toggle-switch': omegaup_ToggleSwitch,
   },
 })
@@ -201,13 +199,28 @@ export default class ProblemTags extends Vue {
   allowTags = this.initialAllowTags;
   problemLevelTag: string | null = this.problemLevel;
   newPrivateTag = '';
-  newPublicTag = '';
+  newPublicTag: types.ListItem | null = null;
+
+  get publicTagOptions(): types.ListItem[] {
+    return this.publicTags.map((tag) => ({
+      key: tag,
+      value: this.publicTagsSerializer(tag),
+    }));
+  }
 
   addPublicTag(tag: string): void {
     if (this.canAddNewTags && !this.selectedPublicTags.includes(tag)) {
       this.$emit('emit-add-tag', this.alias, tag, true);
     }
-    this.newPublicTag = '';
+    this.newPublicTag = null;
+  }
+
+  @Watch('newPublicTag')
+  onNewPublicTagChanged(tag: types.ListItem | null): void {
+    if (!tag) {
+      return;
+    }
+    this.addPublicTag(tag.key);
   }
 
   addPrivateTag(): void {
