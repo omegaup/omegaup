@@ -57,6 +57,11 @@ class ContestsCallback:
         response = json.loads(body)
 
         try:
+            self.dbconn.ping(  # type: ignore[attr-defined]
+                reconnect=True,
+                attempts=3,
+                delay=5,
+            )
             ranking = []
             for user_ranking in response['ranking']:
                 ranking.append(database.contest.Ranking(**user_ranking))
@@ -208,5 +213,3 @@ class ContestsCallback:
 def generate_contest_code() -> str:
     '''Generates a random verification code.'''
     return verification_code.generate_code()
-
-# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
