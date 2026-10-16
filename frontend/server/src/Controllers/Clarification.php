@@ -35,6 +35,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $message
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
 
         $problemAlias = $r->ensureString(
@@ -273,6 +274,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $public
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate user
         $r->ensureIdentity();
 
