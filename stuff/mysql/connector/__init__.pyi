@@ -18,6 +18,10 @@ class MySQLConnection:
     def close(self) -> None:
         ...
 
+    def ping(self, reconnect: bool = ..., attempts: int = ...,
+             delay: int = ...) -> None:
+        ...
+
     @overload
     def cursor(self, *, buffered: Literal[True],
                dictionary: Literal[True]) -> cursor.MySQLCursorBufferedDict:
