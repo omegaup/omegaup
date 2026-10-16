@@ -65,7 +65,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import { SafeStorage } from '../../safe_storage';
@@ -74,21 +75,50 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faBell, faAlignRight } from '@fortawesome/free-solid-svg-icons';
 library.add(faBell, faAlignRight);
 
-@Component({
+export default defineComponent({
+  name: 'Clarifications',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class Clarifications extends Vue {
-  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
-
-  @Prop() isAdmin!: boolean;
-  T = T;
-
-  flashInterval: number = 0;
-  unreadClarifications = this.clarifications;
-
-  beforeDestroy() {
+  props: {
+    clarifications: {
+      type: Array as PropType<types.Clarification[]>,
+      default: () => [],
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      T,
+      flashInterval: 0 as number,
+      unreadClarifications: this.clarifications as types.Clarification[],
+    };
+  },
+  watch: {
+    clarifications(newValue: types.Clarification[]): void {
+      this.unreadClarifications = newValue;
+      const audio = this.$refs['notification-audio'] as HTMLMediaElement;
+      if (!audio) return;
+      audio.play();
+    },
+    unreadClarifications(newValue: types.Clarification[]): void {
+      if (newValue.length > 0) {
+        if (this.flashInterval) return;
+        this.flashInterval = window.setInterval(this.flashTitle, 1000);
+      } else {
+        if (!this.flashInterval) return;
+        clearInterval(this.flashInterval);
+        this.flashInterval = 0;
+        if (document.title.indexOf('!') === 0) {
+          document.title = document.title.substring(2);
+        }
+      }
+    },
+  },
+  beforeUnmount() {
     if (this.flashInterval) {
       clearInterval(this.flashInterval);
       this.flashInterval = 0;
@@ -96,61 +126,37 @@ export default class Clarifications extends Vue {
     if (document.title.indexOf('!') === 0) {
       document.title = document.title.substring(2);
     }
-  }
-
-  @Watch('clarifications')
-  onPropertyChanged(newValue: types.Clarification[]): void {
-    this.unreadClarifications = newValue;
-    const audio = this.$refs['notification-audio'] as HTMLMediaElement;
-    if (!audio) return;
-    audio.play();
-  }
-
-  @Watch('unreadClarifications')
-  onPropertyChange(newValue: types.Clarification[]): void {
-    if (newValue.length > 0) {
-      if (this.flashInterval) return;
-      this.flashInterval = setInterval(this.flashTitle, 1000);
-    } else {
-      if (!this.flashInterval) return;
-      clearInterval(this.flashInterval);
-      this.flashInterval = 0;
+  },
+  methods: {
+    anchor(clarification: types.Clarification): string {
+      return `#clarifications/clarification-${clarification.clarification_id}`;
+    },
+    flashTitle(reset?: boolean): void {
       if (document.title.indexOf('!') === 0) {
         document.title = document.title.substring(2);
+      } else if (!reset) {
+        document.title = `! ${document.title}`;
       }
-    }
-  }
-
-  anchor(clarification: types.Clarification): string {
-    return `#clarifications/clarification-${clarification.clarification_id}`;
-  }
-
-  flashTitle(reset: boolean): void {
-    if (document.title.indexOf('!') === 0) {
-      document.title = document.title.substring(2);
-    } else if (!reset) {
-      document.title = `! ${document.title}`;
-    }
-  }
-
-  onCloseClicked(clarification: types.Clarification): void {
-    const id = `clarification-${clarification.clarification_id}`;
-    this.unreadClarifications = this.unreadClarifications.filter(
-      (element) => element.clarification_id !== clarification.clarification_id,
-    );
-    if (!SafeStorage.setItem(id, Date.now().toString())) {
-      console.warn('Could not persist clarification state');
-    }
-  }
-
-  onMarkAllAsRead(): void {
-    for (const clarification of this.unreadClarifications) {
+    },
+    onCloseClicked(clarification: types.Clarification): void {
       const id = `clarification-${clarification.clarification_id}`;
-      SafeStorage.setItem(id, Date.now().toString());
-    }
-    this.unreadClarifications = [];
-  }
-}
+      this.unreadClarifications = this.unreadClarifications.filter(
+        (element) =>
+          element.clarification_id !== clarification.clarification_id,
+      );
+      if (!SafeStorage.setItem(id, Date.now().toString())) {
+        console.warn('Could not persist clarification state');
+      }
+    },
+    onMarkAllAsRead(): void {
+      for (const clarification of this.unreadClarifications) {
+        const id = `clarification-${clarification.clarification_id}`;
+        SafeStorage.setItem(id, Date.now().toString());
+      }
+      this.unreadClarifications = [];
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
