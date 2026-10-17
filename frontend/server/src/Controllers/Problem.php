@@ -360,16 +360,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $selectedTags = null;
             $hasPublicTags = false;
             if (!is_null($params->selectedTagsAsJSON)) {
-                $decoded = json_decode(
-                    $params->selectedTagsAsJSON,
-                    associative: true
-                );
-                if (!is_array($decoded)) {
+                /** @var mixed */
+                $rawDecoded = json_decode($params->selectedTagsAsJSON);
+                if (!is_array($rawDecoded)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'selected_tags'
                     );
                 }
+                /** @var list<mixed> */
+                $decoded = json_decode(
+                    $params->selectedTagsAsJSON,
+                    associative: true
+                );
                 $selectedTags = [];
                 foreach ($decoded as $tag) {
                     if (!is_array($tag)) {
@@ -378,7 +381,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             'selected_tags'
                         );
                     }
-                    if (empty($tag['tagname'])) {
+                    if (!array_key_exists('tagname', $tag)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterEmpty',
                             'tagname'
@@ -387,6 +390,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     if (!is_string($tag['tagname'])) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
+                            'tagname'
+                        );
+                    }
+                    if (empty($tag['tagname'])) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterEmpty',
                             'tagname'
                         );
                     }
