@@ -135,49 +135,71 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
 import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
-import common_Paginator from '../common/Paginator.vue';
 import infiniteScroll from 'vue-infinite-scroll';
 
-@Component({
+export default defineComponent({
+  name: 'SubmissionsList',
   components: {
     'omegaup-username': UserName,
     'omegaup-common-typeahead': common_Typeahead,
-    'omegaup-common-paginator': common_Paginator,
   },
   directives: {
     infiniteScroll,
   },
-})
-export default class SubmissionsList extends Vue {
-  @Prop() page!: number;
-  @Prop() includeUser!: boolean;
-  @Prop() submissions!: types.Submission[];
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() loading!: boolean;
-  @Prop() endOfResults!: boolean;
-
-  T = T;
-  ui = ui;
-  time = time;
-  searchedUsername: types.ListItem | null = null;
-
-  get hrefSearchUser(): string {
-    if (!this.searchedUsername?.key) {
-      return '/submissions/';
-    }
-    return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
-  }
-  get isScrollDisabled() {
-    return this.loading || this.endOfResults;
-  }
-}
+  props: {
+    page: {
+      type: Number,
+      default: 1,
+    },
+    includeUser: {
+      type: Boolean,
+      default: false,
+    },
+    submissions: {
+      type: Array as PropType<types.Submission[]>,
+      default: () => [],
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    endOfResults: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+      time,
+      searchedUsername: null as types.ListItem | null,
+    };
+  },
+  computed: {
+    hrefSearchUser(): string {
+      if (!this.searchedUsername?.key) {
+        return '/submissions/';
+      }
+      return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
+    },
+    isScrollDisabled(): boolean {
+      return this.loading || this.endOfResults;
+    },
+  },
+});
 </script>
 
 <style lang="scss">
