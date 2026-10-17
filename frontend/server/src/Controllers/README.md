@@ -3526,6 +3526,7 @@ List of public and user's private problems
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
 | `difficulty`            | `null\|string`                                                                                                                     |             |          |
 | `difficulty_range`      | `null\|string`                                                                                                                     |             |          |
+| `excluded_tag`          | `list<string>\|null`                                                                                                               |             |          |
 | `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |          |
 | `level`                 | `null\|string`                                                                                                                     |             |          |
 | `max_difficulty`        | `int\|null`                                                                                                                        |             |          |
