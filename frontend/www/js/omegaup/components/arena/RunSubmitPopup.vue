@@ -1,5 +1,9 @@
 <template>
-  <omegaup-overlay-popup class="run-submit-popup" @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup
+    class="run-submit-popup"
+    width="80%"
+    @dismiss="$emit('dismiss')"
+  >
     <form
       data-run-submit
       class="modal-form d-flex flex-column h-100"

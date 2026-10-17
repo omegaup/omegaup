@@ -1,15 +1,18 @@
 <template>
-  <div data-overlay-popup>
+  <div data-overlay-popup :style="width ? { width: width } : null">
     <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
-export default class OverlayPopup extends Vue {}
+export default class OverlayPopup extends Vue {
+  @Prop({ type: String })
+  readonly width!: string;
+}
 </script>
 
 <style lang="scss" scoped>
