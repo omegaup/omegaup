@@ -1,15 +1,18 @@
 <template>
-  <div data-overlay-popup>
+  <div data-overlay-popup :style="width ? { width: width } : null">
     <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
-export default class OverlayPopup extends Vue {}
+export default class OverlayPopup extends Vue {
+  @Prop({ type: String })
+  readonly width!: string;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -17,7 +20,7 @@ export default class OverlayPopup extends Vue {}
 
 div[data-overlay-popup] {
   background: var(--overlay-popup-background-color);
-  width: 80%;
+  width: 50%;
   height: -moz-max-content;
   height: fit-content;
   max-height: 90%;
@@ -32,6 +35,10 @@ div[data-overlay-popup] {
   left: 0;
   right: 0;
   z-index: -1;
+
+  @media (max-width: 991.98px) {
+    width: 80%;
+  }
 
   button.close {
     position: sticky;
