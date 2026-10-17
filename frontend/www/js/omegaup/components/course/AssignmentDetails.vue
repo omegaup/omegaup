@@ -239,6 +239,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop, Watch, Emit, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
@@ -459,7 +460,7 @@ export default class CourseAssignmentDetails extends Vue {
     }
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     window.removeEventListener('beforeunload', this.onBeforeUnload);
   }
 

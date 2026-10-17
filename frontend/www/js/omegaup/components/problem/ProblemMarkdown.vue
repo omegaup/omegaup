@@ -7,6 +7,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../../markdown';
 import * as ui from '../../ui';
@@ -199,7 +200,7 @@ export default class ProblemMarkdown extends Vue {
     }
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     for (const app of this.vueInstances) {
       app.$destroy();
       if (app.$el && app.$el.parentNode) {

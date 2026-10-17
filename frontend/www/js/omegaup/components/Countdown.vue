@@ -5,6 +5,7 @@
 </template>
 
 <script lang="ts">
+import '../vue3LifecycleCompat';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import * as time from '../time';
@@ -65,7 +66,7 @@ export default class Countdown extends Vue {
     this.$emit('finish');
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = 0;

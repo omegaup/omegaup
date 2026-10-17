@@ -1,5 +1,6 @@
 import * as util from 'util';
 import 'process';
+import './vue3LifecycleCompat';
 
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/extend-expect';

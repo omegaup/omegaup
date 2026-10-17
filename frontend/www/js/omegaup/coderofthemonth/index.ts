@@ -69,10 +69,12 @@ OmegaUp.on('ready', () => {
 
   window.addEventListener('hashchange', onHashChange);
 
-  // Clean up event listener on Vue instance destruction to prevent memory leaks
-  coderOfTheMonthList.$once('hook:beforeDestroy', () => {
+  // Vue 2.7 emits hook:beforeDestroy. Vue 3 emits hook:beforeUnmount.
+  const removeHashChangeListener = () => {
     window.removeEventListener('hashchange', onHashChange);
-  });
+  };
+  coderOfTheMonthList.$once('hook:beforeDestroy', removeHashChangeListener);
+  coderOfTheMonthList.$once('hook:beforeUnmount', removeHashChangeListener);
 
   function getSelectedValidTab(tab: string): string {
     const validTabs = [

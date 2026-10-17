@@ -6,6 +6,7 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
+import '../vue3LifecycleCompat';
 import Vue from 'vue';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 import {
@@ -41,7 +42,7 @@ OmegaUp.on('ready', () => {
       isLoading: false,
       searchResultSchools: searchResultSchools,
     }),
-    beforeDestroy() {
+    beforeUnmount() {
       window.removeEventListener('hashchange', onHashChange);
     },
     methods: {

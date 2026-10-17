@@ -1,3 +1,4 @@
+import '../vue3LifecycleCompat';
 import group_Edit, { AvailableTabs } from '../components/group/Edit.vue';
 import group_Members from '../components/group/Members.vue';
 import group_Scoreboards from '../components/group/Scoreboards.vue';
@@ -40,7 +41,7 @@ OmegaUp.on('ready', () => {
       searchResultUsers: [] as types.ListItem[],
       searchResultSchools: searchResultSchools,
     }),
-    beforeDestroy() {
+    beforeUnmount() {
       window.removeEventListener('hashchange', onHashChange);
     },
     methods: {

@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as Highcharts from 'highcharts/highstock';
 import HighchartsHeatmap from 'highcharts/modules/heatmap';
@@ -305,7 +306,7 @@ export default class UserHeatmap extends Vue {
     return streak;
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     if (this.chart) {
       this.chart.destroy();
     }
