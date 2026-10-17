@@ -132,6 +132,10 @@ entries:
   table: organizer
   issue: 10108
   reason: Detected in the initial main baseline
+- normalized_query: SELECT DISTINCT `u`.`user_id` FROM `Problems` AS `p` INNER JOIN `Submissions` AS `s` ON `p`.`problem_id` = `s`.`problem_id` INNER JOIN `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id` INNER JOIN `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id` INNER JOIN `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id` LEFT JOIN `Problems_Forfeited` AS `pf` ON `pf`.`problem_id` = `p`.`problem_id` AND `pf`.`user_id` = `u`.`user_id` LEFT JOIN `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id` AND `a`.`owner_id` = `u`.`user_id` WHERE `r`.`verdict` = ? AND `s`.`type` = ? AND `pf`.`problem_id` IS NULL AND `a`.`acl_id` IS NULL GROUP BY `u`.`user_id` HAVING COUNT(DISTINCT `p`.`problem_id`) >= ?
+  table: s
+  issue: 10108
+  reason: Detected in the initial main baseline
 - normalized_query: SELECT DISTINCT `u`.`user_id` FROM `Problems` AS `p` INNER JOIN `Submissions` AS `s` ON `p`.`problem_id` = `s`.`problem_id` INNER JOIN `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id` INNER JOIN `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id` INNER JOIN `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id` WHERE `r`.`verdict` = ? AND `s`.`type` = ? AND `p`.`visibility` >= ? AND FIND_IN_SET(`s`.`language`,?) GROUP BY `u`.`user_id` HAVING COUNT(DISTINCT `p`.`problem_id`) > ?
   table: s
   issue: 10108
@@ -174,6 +178,10 @@ entries:
   reason: Detected in the initial main baseline
 - normalized_query: SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` FROM `Problemset_Access_Log` ORDER BY `problemset_id` ASC
   table: Problemset_Access_Log
+  issue: 10108
+  reason: Detected in the initial main baseline
+- normalized_query: SELECT `Recommendation_Model_Runs`.`model_run_id`, `Recommendation_Model_Runs`.`cron_run_id`, `Recommendation_Model_Runs`.`map_score`, `Recommendation_Model_Runs`.`dataset_size`, `Recommendation_Model_Runs`.`num_followups`, `Recommendation_Model_Runs`.`followup_decay`, `Recommendation_Model_Runs`.`train_fraction`, `Recommendation_Model_Runs`.`rng_seed`, `Recommendation_Model_Runs`.`output_path`, `Recommendation_Model_Runs`.`published`, `Recommendation_Model_Runs`.`skip_reason`, `Recommendation_Model_Runs`.`created_at` FROM Recommendation_Model_Runs ORDER BY created_at DESC, model_run_id DESC LIMIT ?
+  table: Recommendation_Model_Runs
   issue: 10108
   reason: Detected in the initial main baseline
 - normalized_query: SELECT `activity`.`user_id` FROM ( ( SELECT DISTINCT `a`.`owner_id` AS `user_id`, YEAR(`c`.`last_updated`) AS `year` FROM `Contests` AS `c` INNER JOIN `ACLs` AS `a` ON `a`.`acl_id` = `c`.`acl_id` ) UNION DISTINCT ( SELECT DISTINCT `a`.`owner_id` AS `user_id`, YEAR(`p`.`creation_date`) AS `year` FROM `Problems` AS `p` INNER JOIN `ACLs` AS `a` ON `p`.`acl_id` = `a`.`acl_id` ) UNION DISTINCT ( SELECT DISTINCT `u`.`user_id`, YEAR(`s`.`time`) AS `year` FROM `Submissions` AS `s` INNER JOIN `Users` AS `u` ON `s`.`identity_id` = `u`.`main_identity_id` INNER JOIN `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id` WHERE `r`.`verdict` = ? ) ) AS `activity` WHERE `activity`.`year` >= YEAR(NOW()) - ? GROUP BY `activity`.`user_id` HAVING COUNT(`activity`.`year`) = ?
@@ -252,6 +260,10 @@ entries:
   table: s
   issue: 10108
   reason: Detected in the initial main baseline
+- normalized_query: SELECT cm.time, i.username, IFNULL(i.country_id, ?) AS country_id, e.email, IFNULL(ur.classname, ?) AS classname FROM Coder_Of_The_Month cm INNER JOIN Users u ON u.user_id = cm.user_id INNER JOIN Identities i ON i.identity_id = u.main_identity_id LEFT JOIN Emails e ON e.user_id = u.user_id LEFT JOIN User_Rank ur ON ur.user_id = cm.user_id WHERE (cm.selected_by IS NOT NULL OR ( cm.`ranking` = ? AND NOT EXISTS ( SELECT * FROM Coder_Of_The_Month WHERE time = cm.time AND selected_by IS NOT NULL AND category = ? ) ) ) AND cm.category = ? AND cm.time <= ? ORDER BY cm.time DESC
+  table: e
+  issue: 10108
+  reason: Detected in the initial main baseline
 - normalized_query: SELECT cm.time, i.username, IFNULL(i.country_id, ?) AS country_id, e.email, IFNULL(ur.classname, ?) AS classname FROM Coder_Of_The_Month cm INNER JOIN Users u ON u.user_id = cm.user_id INNER JOIN Identities i ON i.identity_id = u.main_identity_id LEFT JOIN Emails e ON e.user_id = u.user_id LEFT JOIN User_Rank ur ON ur.user_id = cm.user_id WHERE (cm.selected_by IS NOT NULL OR ( cm.`ranking` = ? AND NOT EXISTS ( SELECT * FROM Coder_Of_The_Month WHERE time = cm.time AND selected_by IS NOT NULL AND category = ? ) )) AND cm.category = ? AND cm.time <= ? AND cm.time > DATE_SUB(?, INTERVAL ? MONTH) ORDER BY cm.time DESC LIMIT ?, ?
   table: e
   issue: 10108
@@ -260,24 +272,36 @@ entries:
   table: i
   issue: 10108
   reason: Detected in the initial main baseline
+- normalized_query: SELECT i.identity_id, i.username, i.name, IFNULL(i.country_id, ?) AS country_id, FALSE AS is_invited, IFNULL(ur.classname, ?) AS classname FROM ( SELECT DISTINCT s.identity_id FROM Submissions s WHERE s.problemset_id = ? AND s.type = ? AND s.status = ? AND s.verdict NOT IN (?, ?, ?) ) AS s INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id
+  table: i
+  issue: 10108
+  reason: Detected in the initial main baseline
+- normalized_query: SELECT i.identity_id, i.username, i.name, IFNULL(i.country_id, ?) AS country_id, FALSE AS is_invited, IFNULL(ur.classname, ?) AS classname FROM ( SELECT DISTINCT s.identity_id FROM Submissions s WHERE s.problemset_id = ? AND s.type = ? AND s.status = ? AND s.verdict NOT IN (?, ?, ?) ) AS s INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id
+  table: ur
+  issue: 10108
+  reason: Detected in the initial main baseline
+- normalized_query: SELECT i.user_id, i.username, pi.identity_id, pi.access_time, pi.end_time, pi.is_invited, e.email, i.country_id FROM Identities i INNER JOIN Problemset_Identities pi ON pi.identity_id = i.identity_id LEFT JOIN Emails e ON e.user_id = i.user_id WHERE pi.problemset_id = ?
+  table: e
+  issue: 10108
+  reason: Detected in the initial main baseline
 - normalized_query: SELECT i.user_id, i.username, ur.acl_id AS acl FROM User_Roles ur INNER JOIN Identities i ON i.user_id = ur.user_id WHERE ur.role_id = ? AND ur.acl_id IN (?, ?)
   table: i
   issue: 10108
   reason: Detected in the initial main baseline
 - normalized_query: SELECT i.username, COALESCE(i.name, i.username) AS name, i.country_id, IFNULL(ur.classname, ?) AS classname, a.alias AS assignment_alias, p.alias AS problem_alias, IFNULL(MAX(r.contest_score), ?.?) AS problem_score, psp.is_extra_problem FROM Submissions s INNER JOIN Runs r ON r.run_id = s.current_run_id INNER JOIN Problemset_Problems psp ON psp.problemset_id = s.problemset_id INNER JOIN Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id INNER JOIN Assignments a ON a.problemset_id = s.problemset_id INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id WHERE s.identity_id IN (?,?) AND a.course_id = ? AND a.assignment_type <> ? GROUP BY s.identity_id, a.assignment_id, p.problem_id HAVING MAX(r.contest_score) IS NOT NULL ORDER BY COALESCE(i.name, i.username), a.`order`, psp.`order`
-  table: r
+  table: psp
   issue: 10108
   reason: Detected in the initial main baseline
 - normalized_query: SELECT i.username, COALESCE(i.name, i.username) AS name, i.country_id, IFNULL(ur.classname, ?) AS classname, a.alias AS assignment_alias, p.alias AS problem_alias, IFNULL(MAX(r.contest_score), ?.?) AS problem_score, psp.is_extra_problem FROM Submissions s INNER JOIN Runs r ON r.run_id = s.current_run_id INNER JOIN Problemset_Problems psp ON psp.problemset_id = s.problemset_id INNER JOIN Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id INNER JOIN Assignments a ON a.problemset_id = s.problemset_id INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id WHERE s.identity_id IN (?,?) AND a.course_id = ? AND a.assignment_type <> ? GROUP BY s.identity_id, a.assignment_id, p.problem_id HAVING MAX(r.contest_score) IS NOT NULL ORDER BY COALESCE(i.name, i.username), a.`order`, psp.`order`
-  table: psp
-  issue: 10108
-  reason: Detected in the initial main baseline
-- normalized_query: SELECT i.username, COALESCE(i.name, i.username) AS name, i.country_id, IFNULL(ur.classname, ?) AS classname, a.alias AS assignment_alias, p.alias AS problem_alias, IFNULL(MAX(r.contest_score), ?.?) AS problem_score, psp.is_extra_problem FROM Submissions s INNER JOIN Runs r ON r.run_id = s.current_run_id INNER JOIN Problemset_Problems psp ON psp.problemset_id = s.problemset_id INNER JOIN Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id INNER JOIN Assignments a ON a.problemset_id = s.problemset_id INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id WHERE s.identity_id IN (?,?,?) AND a.course_id = ? AND a.assignment_type <> ? GROUP BY s.identity_id, a.assignment_id, p.problem_id HAVING MAX(r.contest_score) IS NOT NULL ORDER BY COALESCE(i.name, i.username), a.`order`, psp.`order`
   table: r
   issue: 10108
   reason: Detected in the initial main baseline
 - normalized_query: SELECT i.username, COALESCE(i.name, i.username) AS name, i.country_id, IFNULL(ur.classname, ?) AS classname, a.alias AS assignment_alias, p.alias AS problem_alias, IFNULL(MAX(r.contest_score), ?.?) AS problem_score, psp.is_extra_problem FROM Submissions s INNER JOIN Runs r ON r.run_id = s.current_run_id INNER JOIN Problemset_Problems psp ON psp.problemset_id = s.problemset_id INNER JOIN Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id INNER JOIN Assignments a ON a.problemset_id = s.problemset_id INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id WHERE s.identity_id IN (?,?,?) AND a.course_id = ? AND a.assignment_type <> ? GROUP BY s.identity_id, a.assignment_id, p.problem_id HAVING MAX(r.contest_score) IS NOT NULL ORDER BY COALESCE(i.name, i.username), a.`order`, psp.`order`
   table: psp
+  issue: 10108
+  reason: Detected in the initial main baseline
+- normalized_query: SELECT i.username, COALESCE(i.name, i.username) AS name, i.country_id, IFNULL(ur.classname, ?) AS classname, a.alias AS assignment_alias, p.alias AS problem_alias, IFNULL(MAX(r.contest_score), ?.?) AS problem_score, psp.is_extra_problem FROM Submissions s INNER JOIN Runs r ON r.run_id = s.current_run_id INNER JOIN Problemset_Problems psp ON psp.problemset_id = s.problemset_id INNER JOIN Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id INNER JOIN Assignments a ON a.problemset_id = s.problemset_id INNER JOIN Identities i ON i.identity_id = s.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id WHERE s.identity_id IN (?,?,?) AND a.course_id = ? AND a.assignment_type <> ? GROUP BY s.identity_id, a.assignment_id, p.problem_id HAVING MAX(r.contest_score) IS NOT NULL ORDER BY COALESCE(i.name, i.username), a.`order`, psp.`order`
+  table: r
   issue: 10108
   reason: Detected in the initial main baseline
 - normalized_query: SELECT i.username, i.name, IFNULL(qnc.vote, ?) AS vote, qnc.`time` FROM QualityNomination_Reviewers qnr LEFT JOIN QualityNomination_Comments qnc ON qnc.qualitynomination_id = qnr.qualitynomination_id AND qnc.user_id = qnr.user_id AND qnc.qualitynomination_comment_id = ( -- Gets the last vote per qualitynomination_id, user_id. SELECT MAX(qualitynomination_comment_id) FROM QualityNomination_Comments WHERE qualitynomination_id = qnr.qualitynomination_id AND user_id = qnr.user_id GROUP BY user_id ) INNER JOIN Identities i ON i.user_id = qnr.user_id WHERE qnr.qualitynomination_id = ? ORDER BY i.username

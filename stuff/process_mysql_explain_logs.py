@@ -9,13 +9,14 @@ import os
 import csv
 from typing import (
     Any,
-    Iterable,
-    Tuple,
-    Optional,
-    List,
     Dict,
-    Set,
+    Iterable,
+    List,
     NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+    TypedDict,
 )
 import configparser
 import re
@@ -42,12 +43,38 @@ class AllowlistValidationError(ValueError):
     '''Raised when the inefficient queries allowlist is not valid.'''
 
 
+class KnownQuery(TypedDict):
+    '''Validated entry from the inefficient queries allowlist.'''
+
+    normalized_query: str
+    table: str
+    issue: int
+    reason: str
+
+
+InefficientQueryResult = TypedDict(
+    'InefficientQueryResult',
+    {
+        'Query ID': str,
+        'Query': str,
+        'Normalized Query': str,
+        'Query Family': str,
+        'Table': str,
+        'Type': str,
+        'Key': str,
+        'Possible Keys': str,
+        'Extra': str,
+    },
+    total=False,
+)
+
+
 class AllowlistComparison(NamedTuple):
     '''Results grouped by their relationship with the allowlist.'''
 
-    known_results: List[Dict[str, str]]
-    new_results: List[Dict[str, str]]
-    not_detected_entries: List[Dict[str, Any]]
+    known_results: List[InefficientQueryResult]
+    new_results: List[InefficientQueryResult]
+    not_detected_entries: List[KnownQuery]
 
 
 def normalize_query(query: str) -> str:
@@ -96,7 +123,7 @@ def _get_non_empty_string(
     return value
 
 
-def load_allowlist(path: str) -> List[Dict[str, Any]]:
+def load_allowlist(path: str) -> List[KnownQuery]:
     '''Load and validate the inefficient queries allowlist.'''
     try:
         with open(path, 'r', encoding='utf-8') as allowlist_file:
@@ -138,7 +165,7 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
             'Allowlist field "entries" must be a list.'
         )
 
-    validated_entries: List[Dict[str, Any]] = []
+    validated_entries: List[KnownQuery] = []
     seen: Set[Tuple[str, str]] = set()
     for entry_number, entry in enumerate(entries, start=1):
         if not isinstance(entry, dict):
@@ -163,7 +190,7 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
             )
 
         table = _get_non_empty_string(entry, 'table', entry_number)
-        _get_non_empty_string(entry, 'reason', entry_number)
+        reason = _get_non_empty_string(entry, 'reason', entry_number)
 
         issue = entry['issue']
         if (
@@ -183,21 +210,26 @@ def load_allowlist(path: str) -> List[Dict[str, Any]]:
                 f'{identity}.'
             )
         seen.add(identity)
-        validated_entries.append(entry)
+        validated_entries.append(KnownQuery(
+            normalized_query=normalized_query,
+            table=table,
+            issue=issue,
+            reason=reason,
+        ))
 
     return validated_entries
 
 
 def build_inefficiency_key(
-    result: Dict[str, str],
+    result: InefficientQueryResult,
 ) -> Tuple[str, str]:
     '''Return the stable identity of an inefficient EXPLAIN row.'''
     return (result['Normalized Query'], result['Table'])
 
 
 def compare_results_with_allowlist(
-    results: Iterable[Dict[str, str]],
-    allowlist: Iterable[Dict[str, Any]],
+    results: Iterable[InefficientQueryResult],
+    allowlist: Iterable[KnownQuery],
 ) -> AllowlistComparison:
     '''Group detected results according to their allowlist status.'''
     allowlist_entries = list(allowlist)
@@ -206,8 +238,8 @@ def compare_results_with_allowlist(
         for entry in allowlist_entries
     }
     detected_keys: Set[Tuple[str, str]] = set()
-    known_results: List[Dict[str, str]] = []
-    new_results: List[Dict[str, str]] = []
+    known_results: List[InefficientQueryResult] = []
+    new_results: List[InefficientQueryResult] = []
 
     for result in results:
         key = build_inefficiency_key(result)
@@ -250,11 +282,11 @@ def get_comparison_exit_code(comparison: AllowlistComparison) -> int:
 
 
 def deduplicate_results(
-    results: Iterable[Dict[str, str]],
-) -> List[Dict[str, str]]:
+    results: Iterable[InefficientQueryResult],
+) -> List[InefficientQueryResult]:
     '''Remove duplicate query-table results while preserving their order.'''
     seen: Set[Tuple[str, str]] = set()
-    deduplicated: List[Dict[str, str]] = []
+    deduplicated: List[InefficientQueryResult] = []
     for result in results:
         key = build_inefficiency_key(result)
         if key in seen:
@@ -265,8 +297,8 @@ def deduplicate_results(
 
 
 def sort_results_for_csv(
-    results: Iterable[Dict[str, str]],
-) -> List[Dict[str, str]]:
+    results: Iterable[InefficientQueryResult],
+) -> List[InefficientQueryResult]:
     '''Sort results so similar query families are adjacent in the CSV.'''
     return sorted(
         results,
@@ -366,7 +398,7 @@ def get_queries_from_general_log(
 def explain_queries(
     connection: mysql.connector.MySQLConnection,
     queries: Iterable[Tuple[Any, ...]]
-) -> List[Dict[str, str]]:
+) -> List[InefficientQueryResult]:
     """
     Run EXPLAIN for each query and detect inefficiencies.
 
@@ -376,7 +408,7 @@ def explain_queries(
     Excludes small/irrelevant tables:
     - Languages, Roles, Groups_, Tags, Countries, general_log, urc
     """
-    results: List[Dict[str, str]] = []
+    results: List[InefficientQueryResult] = []
     cursor = connection.cursor()
     query_id_map: Dict[str, int] = {}
 
@@ -482,7 +514,7 @@ def explain_queries(
     return deduplicate_results(results)
 
 
-def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
+def save_to_csv(results: List[InefficientQueryResult]) -> Optional[str]:
     """
     Save results to stuff/inefficient_queries.csv (UTF-8).
     Returns the file path on success, None on error.
