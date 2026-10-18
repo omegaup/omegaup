@@ -106,6 +106,11 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
     visible: true,
   },
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
+  {
+    key: 'edit-code-templates',
+    title: T.userEditCodeTemplates,
+    visible: true,
+  },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
   { key: 'manage-api-tokens', title: T.profileManageApiTokens, visible: true },
