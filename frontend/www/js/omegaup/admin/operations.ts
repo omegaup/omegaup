@@ -5,12 +5,10 @@ import T from '../lang';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
+import { AccessLevel, getModuleFromHash } from './operations_modules';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload();
-
-  const getModuleFromHash = (): string =>
-    window.location.hash.substring(1).split('#')[0] || 'home';
 
   const operationsDashboard = new Vue({
     el: '#main-container',
@@ -18,14 +16,16 @@ OmegaUp.on('ready', () => {
       'omegaup-admin-operations-dashboard': admin_OperationsDashboard,
     },
     data: () => ({
-      selectedModule: getModuleFromHash(),
+      module: getModuleFromHash(window.location.hash),
       ephemeralGraderEnabled: payload.ephemeralGraderEnabled,
     }),
     render: function (createElement) {
       return createElement('omegaup-admin-operations-dashboard', {
         props: {
-          isAdmin: payload.isAdmin,
-          selectedModule: this.selectedModule,
+          accessLevel: payload.isAdmin
+            ? AccessLevel.Admin
+            : AccessLevel.Support,
+          selectedModule: this.module,
           ephemeralGraderEnabled: this.ephemeralGraderEnabled,
         },
         on: {
@@ -42,7 +42,11 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  window.addEventListener('hashchange', () => {
-    operationsDashboard.selectedModule = getModuleFromHash();
+  const onHashChange = () => {
+    operationsDashboard.module = getModuleFromHash(window.location.hash);
+  };
+  window.addEventListener('hashchange', onHashChange);
+  operationsDashboard.$once('hook:beforeDestroy', () => {
+    window.removeEventListener('hashchange', onHashChange);
   });
 });

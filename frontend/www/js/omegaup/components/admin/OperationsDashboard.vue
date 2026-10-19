@@ -1,11 +1,11 @@
 <template>
   <omegaup-admin-layout
-    :is-admin="isAdmin"
+    :access-level="accessLevel"
     :current-module="currentModuleLabel"
     :selected-module="currentModule"
   >
     <omegaup-admin-settings
-      v-if="currentModule === 'settings'"
+      v-if="currentModule === AvailableModules.Settings"
       :ephemeral-grader-enabled="ephemeralGraderEnabled"
       @update-ephemeral-grader="onUpdateEphemeralGrader"
     ></omegaup-admin-settings>
@@ -14,9 +14,6 @@
         <div class="card-title h4">
           {{ T.omegaupTitleAdminOperations }}
         </div>
-      </div>
-      <div class="card-body">
-        <p>Esqueleto funcionando</p>
       </div>
     </div>
   </omegaup-admin-layout>
@@ -27,6 +24,12 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import admin_AdminLayout from './AdminLayout.vue';
 import admin_Settings from './Settings.vue';
+import {
+  AccessLevel,
+  AvailableModules,
+  MODULE_ACCESS_LEVELS,
+  hasAccessLevel,
+} from '../../admin/operations_modules';
 
 @Component({
   components: {
@@ -35,20 +38,24 @@ import admin_Settings from './Settings.vue';
   },
 })
 export default class OperationsDashboard extends Vue {
-  @Prop({ default: false }) isAdmin!: boolean;
-  @Prop({ default: 'home' }) selectedModule!: string;
+  @Prop({ default: AccessLevel.Support }) accessLevel!: AccessLevel;
+  @Prop({ default: AvailableModules.Home }) selectedModule!: AvailableModules;
   @Prop({ default: true }) ephemeralGraderEnabled!: boolean;
 
   T = T;
+  AvailableModules = AvailableModules;
 
-  get currentModule(): string {
-    return this.selectedModule === 'settings' && this.isAdmin
-      ? 'settings'
-      : 'home';
+  get currentModule(): AvailableModules {
+    return hasAccessLevel(
+      this.accessLevel,
+      MODULE_ACCESS_LEVELS[this.selectedModule],
+    )
+      ? this.selectedModule
+      : AvailableModules.Home;
   }
 
   get currentModuleLabel(): string {
-    return this.currentModule === 'settings'
+    return this.currentModule === AvailableModules.Settings
       ? T.omegaupTitleAdminGlobalSettings
       : '';
   }

@@ -63,12 +63,18 @@ import {
   BIconGearFill,
 } from 'bootstrap-vue';
 import T from '../../lang';
+import {
+  AccessLevel,
+  AvailableModules,
+  MODULE_ACCESS_LEVELS,
+  hasAccessLevel,
+} from '../../admin/operations_modules';
 
 interface SidebarItem {
   href: string;
   label: string;
   icon: string;
-  adminOnly?: boolean;
+  accessLevel: AccessLevel;
 }
 
 @Component({
@@ -84,8 +90,8 @@ interface SidebarItem {
 })
 export default class AdminLayout extends Vue {
   @Prop({ default: '' }) currentModule!: string;
-  @Prop({ default: false }) isAdmin!: boolean;
-  @Prop({ default: 'home' }) selectedModule!: string;
+  @Prop({ default: AccessLevel.Support }) accessLevel!: AccessLevel;
+  @Prop({ default: AvailableModules.Home }) selectedModule!: AvailableModules;
 
   T = T;
 
@@ -116,34 +122,39 @@ export default class AdminLayout extends Vue {
   get sidebarItems(): SidebarItem[] {
     const items: SidebarItem[] = [
       {
-        href: '#home',
+        href: `#${AvailableModules.Home}`,
         label: T.omegaupTitleAdminOperations,
         icon: 'BIconHouseDoorFill',
+        accessLevel: MODULE_ACCESS_LEVELS[AvailableModules.Home],
       },
       {
-        href: '#settings',
+        href: `#${AvailableModules.Settings}`,
         label: T.omegaupTitleAdminGlobalSettings,
         icon: 'BIconGearFill',
-        adminOnly: true,
+        accessLevel: MODULE_ACCESS_LEVELS[AvailableModules.Settings],
       },
       {
         href: '/admin/user/',
         label: T.omegaupTitleAdminUsers,
         icon: 'BIconPersonLinesFill',
+        accessLevel: AccessLevel.Support,
       },
       {
         href: '/admin/crons/',
         label: T.omegaupTitleAdminCrons,
         icon: 'BIconClockHistory',
-        adminOnly: true,
+        accessLevel: AccessLevel.Admin,
       },
       {
         href: '/admin/support/',
         label: T.omegaupTitleSupportDashboard,
         icon: 'BIconHeadset',
+        accessLevel: AccessLevel.Support,
       },
     ];
-    return items.filter((item) => !item.adminOnly || this.isAdmin);
+    return items.filter((item) =>
+      hasAccessLevel(this.accessLevel, item.accessLevel),
+    );
   }
 
   isActive(item: SidebarItem): boolean {
