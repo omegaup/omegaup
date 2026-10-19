@@ -857,7 +857,28 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testSetFeedbackListWithMalformedElements() {
+    /**
+     * A PHPUnit data provider for malformed feedback lists.
+     *
+     * @return list<list<string>>
+     */
+    public function malformedFeedbackListProvider(): array {
+        return [
+            ['"a string"'],
+            ['[1]'],
+            ['[{"feedback":"ok"}]'],
+            ['[{"lineNumber":5}]'],
+            ['[{"lineNumber":"abc","feedback":"ok"}]'],
+            ['[{"lineNumber":5,"feedback":10}]'],
+        ];
+    }
+
+    /**
+     * @dataProvider malformedFeedbackListProvider
+     */
+    public function testSetFeedbackListWithMalformedElements(
+        string $malformedFeedbackList
+    ) {
         $admin = \OmegaUp\Test\Factories\User::createUser();
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $admin['identity'],
@@ -884,35 +905,24 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $malformedFeedbackLists = [
-            '"a string"',
-            '[1]',
-            '[{"feedback":"ok"}]',
-            '[{"lineNumber":5}]',
-            '[{"lineNumber":"abc","feedback":"ok"}]',
-            '[{"lineNumber":5,"feedback":10}]',
-        ];
-
-        foreach ($malformedFeedbackLists as $malformedFeedbackList) {
-            try {
-                \OmegaUp\Controllers\Submission::apiSetFeedbackList(
-                    new \OmegaUp\Request([
-                        'auth_token' => self::login(
-                            $admin['identity']
-                        )->auth_token,
-                        'guid' => $runData['response']['guid'],
-                        'course_alias' => $courseData['course_alias'],
-                        'assignment_alias' => $courseData['assignment_alias'],
-                        'feedback_list' => $malformedFeedbackList,
-                    ])
-                );
-                $this->fail(
-                    "Should have thrown an InvalidParameterException for {$malformedFeedbackList}"
-                );
-            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertSame('invalidParameters', $e->getMessage());
-                $this->assertSame('feedback_list', $e->parameter);
-            }
+        try {
+            \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+                new \OmegaUp\Request([
+                    'auth_token' => self::login(
+                        $admin['identity']
+                    )->auth_token,
+                    'guid' => $runData['response']['guid'],
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment_alias'],
+                    'feedback_list' => $malformedFeedbackList,
+                ])
+            );
+            $this->fail(
+                "Should have thrown an InvalidParameterException for {$malformedFeedbackList}"
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('invalidParameters', $e->getMessage());
+            $this->assertSame('feedback_list', $e->parameter);
         }
     }
 

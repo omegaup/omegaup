@@ -567,7 +567,6 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
 
         $feedbackString = $r->ensureString('feedback_list');
-        /** @var mixed */
         $decodedFeedbackList = json_decode($feedbackString, associative: true);
         if (!is_array($decodedFeedbackList)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
