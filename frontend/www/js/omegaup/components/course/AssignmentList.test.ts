@@ -27,6 +27,9 @@ describe('AssignmentList.vue', () => {
       T.courseContentEmptyDescription,
     );
     expect(emptyState.props('buttonText')).toBe(T.courseAddContent);
+    expect(emptyState.props('buttonDataAttribute')).toBe(
+      'data-course-add-new-content',
+    );
   });
 
   it('Should emit emit-new when empty-state action is clicked', async () => {

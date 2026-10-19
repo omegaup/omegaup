@@ -11,6 +11,7 @@
             ? T.courseAddContent
             : ''
         "
+        button-data-attribute="data-course-add-new-content"
         @action="$emit('emit-new')"
       ></omegaup-common-empty-state>
       <table v-else class="table table-striped">
