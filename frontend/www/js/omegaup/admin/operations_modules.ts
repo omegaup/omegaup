@@ -1,28 +1,30 @@
 export enum AvailableModules {
-    Home = 'home',
-    Settings = 'settings',
+  Home = 'home',
+  Settings = 'settings',
 }
 
 export enum AccessLevel {
-    Support = 'support',
-    Admin = 'admin',
+  Support = 'support',
+  Admin = 'admin',
 }
 
 export const MODULE_ACCESS_LEVELS: Record<AvailableModules, AccessLevel> = {
-    [AvailableModules.Home]: AccessLevel.Support,
-    [AvailableModules.Settings]: AccessLevel.Admin,
+  [AvailableModules.Home]: AccessLevel.Support,
+  [AvailableModules.Settings]: AccessLevel.Admin,
 };
 
 export function hasAccessLevel(
-    userLevel: AccessLevel,
-    requiredLevel: AccessLevel,
+  userLevel: AccessLevel,
+  requiredLevel: AccessLevel,
 ): boolean {
-    return userLevel === AccessLevel.Admin || userLevel === requiredLevel;
+  return userLevel === AccessLevel.Admin || userLevel === requiredLevel;
 }
 
 export function getModuleFromHash(hash: string): AvailableModules {
-    const hashModule = hash.substring(1).split('#')[0];
-    return Object.values(AvailableModules).includes(hashModule as AvailableModules)
-        ? (hashModule as AvailableModules)
-        : AvailableModules.Home;
+  const hashModule = hash.substring(1).split('#')[0];
+  return Object.values(AvailableModules).includes(
+    hashModule as AvailableModules,
+  )
+    ? (hashModule as AvailableModules)
+    : AvailableModules.Home;
 }
