@@ -680,6 +680,68 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Regression test for https://github.com/omegaup/omegaup/issues/1043
+     *
+     * A run submitted to a contest whose penalty_type is 'runtime' must get
+     * its penalty set to the execution time once graded, without the contest
+     * settings being updated afterwards.
+     */
+    public function testRuntimePenaltyIsAppliedForNewSubmissions() {
+        $originalTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'penaltyType' => 'runtime',
+                'startTime' => $originalTime,
+                'lastUpdated' => $originalTime,
+                'finishTime' => new \OmegaUp\Timestamp(
+                    $originalTime->time + 60 * 60
+                ),
+            ])
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        \OmegaUp\Time::setTimeForTesting($originalTime->time + 5 * 60);
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Simulate the grader populating the execution time of the run.
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
+        $this->assertNotNull($submission);
+        $this->assertNotNull($submission->current_run_id);
+        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
+        $this->assertNotNull($run);
+        $run->runtime = 1234;
+        \OmegaUp\DAO\Runs::update($run);
+
+        \OmegaUp\Time::setTimeForTesting($originalTime->time);
+
+        $directorLogin = self::login($contestData['director']);
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+
+        $this->assertSame(
+            $response['runs'][0]['runtime'],
+            $response['runs'][0]['penalty']
+        );
+    }
+
+    /**
      * Update window_length
      *
      */
