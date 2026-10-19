@@ -1,5 +1,8 @@
 <template>
-  <omegaup-overlay-popup width="80%" @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup
+    class="overlay-popup--wide"
+    @dismiss="$emit('dismiss')"
+  >
     <div v-if="data">
       <form data-run-details-view class="modal-form">
         <slot

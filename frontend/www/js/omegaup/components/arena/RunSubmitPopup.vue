@@ -1,7 +1,6 @@
 <template>
   <omegaup-overlay-popup
-    class="run-submit-popup"
-    width="80%"
+    class="run-submit-popup overlay-popup--wide"
     @dismiss="$emit('dismiss')"
   >
     <form
