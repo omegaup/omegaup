@@ -23,7 +23,7 @@
       >
         <div
           class="modal-progress-value"
-          :style="{ width: `${(currentModalPage / lastModalPage) * 100}%` }"
+          :class="currentModalPage === 1 ? 'w-50' : 'w-100'"
         ></div>
       </div>
       <span class="modal-progress-counter">
@@ -299,7 +299,7 @@ export default class UserObjectivesQuestions extends Vue {
 }
 
 .modal-description {
-  color: #7a828a;
+  color: var(--user-objectives-modal-description-font-color);
 }
 
 .modal-progress {
@@ -312,16 +312,16 @@ export default class UserObjectivesQuestions extends Vue {
 .modal-progress-track {
   flex: 1;
   height: 4px;
-  background-color: #d8dce0;
+  background-color: var(--user-objectives-modal-progress-track-background-color);
 }
 
 .modal-progress-value {
   height: 100%;
-  background-color: #007bff;
+  background-color: var(--btn-ok-background-color);
 }
 
 .modal-progress-counter {
-  color: #007bff;
+  color: var(--btn-ok-background-color);
   white-space: nowrap;
 }
 
@@ -331,7 +331,7 @@ export default class UserObjectivesQuestions extends Vue {
   min-height: 43px;
   margin-bottom: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #cfd4da;
+  border: 1px solid var(--user-objectives-modal-option-border-color);
   cursor: pointer;
 }
 
@@ -351,9 +351,9 @@ export default class UserObjectivesQuestions extends Vue {
 }
 
 .btn-welcome-next {
-  color: #fff;
-  background-color: #007bff;
-  border-color: #007bff;
+  color: var(--btn-ok-font-color);
+  background-color: var(--btn-ok-background-color);
+  border-color: var(--btn-ok-background-color);
 }
 
 .btn-next-previous:focus,
