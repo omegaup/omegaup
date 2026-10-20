@@ -312,7 +312,9 @@ export default class UserObjectivesQuestions extends Vue {
 .modal-progress-track {
   flex: 1;
   height: 4px;
-  background-color: var(--user-objectives-modal-progress-track-background-color);
+  background-color: var(
+    --user-objectives-modal-progress-track-background-color
+  );
 }
 
 .modal-progress-value {
