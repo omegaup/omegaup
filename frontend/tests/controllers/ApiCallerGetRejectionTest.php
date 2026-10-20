@@ -85,6 +85,19 @@ class ApiCallerGetRejectionTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('methodNotAllowed', $response['errorname']);
     }
 
+    public function testGetToRerunCronReturns405() {
+        $_SERVER['REQUEST_URI'] = '/api/admin/rerunCron';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertSame('error', $response['status']);
+        $this->assertSame(405, $response['errorcode']);
+        $this->assertSame('methodNotAllowed', $response['errorname']);
+    }
+
     public function testAllowlistedLastPrivacyPolicyAcceptedAllowsGet() {
         $_SERVER['REQUEST_URI'] = '/api/user/lastPrivacyPolicyAccepted';
 
