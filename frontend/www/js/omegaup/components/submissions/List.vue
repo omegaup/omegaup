@@ -165,7 +165,7 @@ export default defineComponent({
     },
     submissions: {
       type: Array as PropType<types.Submission[]>,
-      default: () => [],
+      required: true,
     },
     searchResultUsers: {
       type: Array as PropType<types.ListItem[]>,
