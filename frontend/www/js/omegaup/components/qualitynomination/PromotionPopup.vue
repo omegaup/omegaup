@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import T from '../../lang';
@@ -94,67 +94,79 @@ interface QualityLevel {
   description: string;
 }
 
-@Component({
+export default defineComponent({
+  name: 'QualityPromotionPopup',
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
-})
-export default class QualityPromotionPopup extends Vue {
-  @Prop({ default: false }) solved!: boolean;
-  @Prop({ default: false }) tried!: boolean;
-  @Prop({
-    default: () => [
-      { id: '0', description: T.qualityFormDifficultyVeryEasy },
-      { id: '1', description: T.qualityFormDifficultyEasy },
-      { id: '2', description: T.qualityFormDifficultyMedium },
-      { id: '3', description: T.qualityFormDifficultyHard },
-      { id: '4', description: T.qualityFormDifficultyVeryHard },
-    ],
-  })
-  difficultyLevels!: DifficultyLevel[];
-  @Prop({
-    default: () => [
-      { id: '0', description: T.qualityFormQualityVeryBad },
-      { id: '1', description: T.qualityFormQualityBad },
-      { id: '2', description: T.qualityFormQualityFair },
-      { id: '3', description: T.qualityFormQualityGood },
-      { id: '4', description: T.qualityFormQualityVeryGood },
-    ],
-  })
-  qualityLevels!: QualityLevel[];
+  props: {
+    solved: {
+      type: Boolean,
+      default: false,
+    },
+    tried: {
+      type: Boolean,
+      default: false,
+    },
+    difficultyLevels: {
+      type: Array as PropType<DifficultyLevel[]>,
+      default: () => [
+        { id: '0', description: T.qualityFormDifficultyVeryEasy },
+        { id: '1', description: T.qualityFormDifficultyEasy },
+        { id: '2', description: T.qualityFormDifficultyMedium },
+        { id: '3', description: T.qualityFormDifficultyHard },
+        { id: '4', description: T.qualityFormDifficultyVeryHard },
+      ],
+    },
+    qualityLevels: {
+      type: Array as PropType<QualityLevel[]>,
+      default: () => [
+        { id: '0', description: T.qualityFormQualityVeryBad },
+        { id: '1', description: T.qualityFormQualityBad },
+        { id: '2', description: T.qualityFormQualityFair },
+        { id: '3', description: T.qualityFormQualityGood },
+        { id: '4', description: T.qualityFormQualityVeryGood },
+      ],
+    },
+  },
+  emits: ['dismiss', 'submit'],
+  data() {
+    return {
+      AvailableViews,
+      T,
+      currentView: AvailableViews.Content as AvailableViews,
+      difficulty: '',
+      quality: '',
+    };
+  },
+  methods: {
+    onCloseModal(currentView: AvailableViews): void {
+      if (currentView !== AvailableViews.Thanks) {
+        this.onDismiss();
+        return;
+      }
+      this.onHide(false);
+    },
 
-  AvailableViews = AvailableViews;
-  T = T;
-  currentView: AvailableViews = AvailableViews.Content;
-  difficulty = '';
-  quality = '';
+    onHide(isDismissed: boolean): void {
+      this.$emit('dismiss', this, isDismissed);
+    },
 
-  onCloseModal(currentView: AvailableViews): void {
-    if (currentView !== AvailableViews.Thanks) {
-      this.onDismiss();
-      return;
-    }
-    this.onHide(false);
-  }
+    onDismiss(): void {
+      this.$emit('dismiss', this, /*isDismissed=*/ true);
+    },
 
-  onHide(isDismissed: boolean): void {
-    this.$emit('dismiss', this, isDismissed);
-  }
+    onSubmit(): void {
+      this.$emit('submit', {
+        solved: this.solved,
+        tried: this.tried,
+        difficulty: this.difficulty,
+        quality: this.quality,
+      });
+      this.currentView = AvailableViews.Thanks;
 
-  onDismiss(): void {
-    this.$emit('dismiss', this, /*isDismissed=*/ true);
-  }
-
-  onSubmit(): void {
-    this.$emit('submit', {
-      solved: this.solved,
-      tried: this.tried,
-      difficulty: this.difficulty,
-      quality: this.quality,
-    });
-    this.currentView = AvailableViews.Thanks;
-
-    setTimeout(() => this.onHide(false), 2000);
-  }
-}
+      setTimeout(() => this.onHide(false), 2000);
+    },
+  },
+});
 </script>
