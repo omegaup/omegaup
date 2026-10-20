@@ -17,18 +17,15 @@
 
       <div class="left-pane-center my-auto">
         <h2 class="motivational-headline">
-          CODE A BETTER<br />
-          FUTURE. FOR<br />
-          EVERYONE.
+          {{ T.loginMotivationalHeadline }}
         </h2>
         <p class="motivational-subtext">
-          Welcome back to the platform. Choose your preferred way to access your
-          account.
+          {{ T.loginMotivationalSubtext }}
         </p>
       </div>
 
       <div class="left-pane-footer">
-        <span>omegaUp © {{ currentYear }}</span>
+        <span>{{ T.loginFooterCopyright }} &copy; {{ currentYear }}</span>
       </div>
     </div>
 
@@ -36,32 +33,48 @@
     <div class="login-right-pane">
       <h1 class="login-title">{{ T.loginHeader }}</h1>
       <p class="login-subtitle">
-        Welcome back! Please choose your preferred method to access the platform.
+        {{ T.loginRightSubtitle }}
       </p>
 
-      <div class="auth-tabs" role="tablist">
+      <div
+        class="auth-tabs"
+        role="tablist"
+        @keydown.left.prevent="$emit('change-tab', 'login')"
+        @keydown.right.prevent="$emit('change-tab', 'signup')"
+      >
         <button
+          id="tab-login"
           type="button"
           class="auth-tab"
           :class="{ active: activeTab === 'login' }"
           role="tab"
           :aria-selected="activeTab === 'login'"
+          aria-controls="tabpanel-login"
+          :tabindex="activeTab === 'login' ? 0 : -1"
           @click.prevent="$emit('change-tab', 'login')"
         >
           {{ T.omegaupTitleLogin }}
         </button>
         <button
+          id="tab-signup"
           type="button"
           class="auth-tab"
           :class="{ active: activeTab === 'signup' }"
           role="tab"
           :aria-selected="activeTab === 'signup'"
+          aria-controls="tabpanel-signup"
+          :tabindex="activeTab === 'signup' ? 0 : -1"
           @click.prevent="$emit('change-tab', 'signup')"
         >
           {{ T.loginSignUp }}
         </button>
       </div>
 
+      <div
+        id="tabpanel-login"
+        role="tabpanel"
+        aria-labelledby="tab-login"
+      >
       <form
         class="native-login-form introjs-native"
         @submit.prevent="$emit('login', usernameOrEmail, password)"
@@ -77,7 +90,7 @@
             name="login_username"
             type="text"
             class="form-control auth-input"
-            placeholder="Enter your email or username"
+            :placeholder="T.loginUsernamePlaceholder"
             tabindex="1"
             autocomplete="username"
             required
@@ -119,9 +132,10 @@
           {{ T.loginLogIn }}
         </button>
       </form>
+      </div>
 
       <div class="auth-divider">
-        <span>OR</span>
+        <span>{{ T.loginOrDivider }}</span>
       </div>
 
       <div class="social-login-section introjs-federated">
@@ -177,7 +191,7 @@
                   d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                 />
               </svg>
-              <span>Sign in with Google</span>
+              <span>{{ T.loginSignInWithGoogle }}</span>
             </button>
           </div>
 
@@ -409,10 +423,10 @@ export default class LoginV2 extends Vue {
   max-width: 900px;
   width: 100%;
   margin: 0 auto;
-  background-color: #ffffff;
-  border: 1px solid #eef2f6;
+  background-color: var(--login-right-pane-bg);
+  border: 1px solid var(--login-card-border-color);
   border-radius: 20px;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 40px -15px var(--login-card-box-shadow);
   overflow: hidden;
 
   @media (max-width: 768px) {
@@ -428,13 +442,13 @@ export default class LoginV2 extends Vue {
   overflow: hidden;
   flex: 0 0 42%;
   min-width: 330px;
-  background-color: rgb(103, 141, 215);
-  background: rgb(103, 141, 215);
+  background-color: var(--header-primary-color);
+  background: var(--header-primary-color);
   padding: 40px 36px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: #ffffff;
+  color: var(--login-left-pane-font-color);
 
   @media (max-width: 768px) {
     min-width: 100%;
@@ -448,7 +462,7 @@ export default class LoginV2 extends Vue {
     width: 200px;
     height: 200px;
     background-image: radial-gradient(
-      rgba(255, 255, 255, 0.35) 1.5px,
+      var(--login-left-pane-pattern-dot-color) 1.5px,
       transparent 1.5px
     );
     background-size: 16px 16px;
@@ -466,7 +480,7 @@ export default class LoginV2 extends Vue {
     &.glow-circle-large {
       width: 260px;
       height: 260px;
-      background: rgba(255, 255, 255, 0.12);
+      background: var(--login-left-pane-glow-large-color);
       filter: blur(45px);
       bottom: -60px;
       right: -60px;
@@ -475,7 +489,7 @@ export default class LoginV2 extends Vue {
     &.glow-circle-small {
       width: 170px;
       height: 170px;
-      background: rgba(147, 197, 253, 0.25);
+      background: var(--login-left-pane-glow-small-color);
       filter: blur(28px);
       bottom: 40px;
       right: 30px;
@@ -500,11 +514,11 @@ export default class LoginV2 extends Vue {
       line-height: 1;
 
       .brand-omega {
-        color: #000000;
+        color: var(--login-brand-omega-color);
       }
 
       .brand-up {
-        color: #ffffff;
+        color: var(--login-brand-up-color);
       }
     }
   }
@@ -515,7 +529,7 @@ export default class LoginV2 extends Vue {
     padding: 40px 0;
 
     .motivational-headline {
-      color: #ffffff;
+      color: var(--login-motivational-headline-color);
       font-size: 28px;
       font-weight: 800;
       line-height: 1.2;
@@ -525,7 +539,7 @@ export default class LoginV2 extends Vue {
     }
 
     .motivational-subtext {
-      color: #dbeafe;
+      color: var(--login-motivational-subtext-color);
       font-size: 13.5px;
       font-style: italic;
       line-height: 1.55;
@@ -536,7 +550,7 @@ export default class LoginV2 extends Vue {
   }
 
   .left-pane-footer {
-    color: #bfdbfe;
+    color: var(--login-footer-color);
     font-size: 12px;
     opacity: 0.75;
     font-weight: 500;
@@ -548,7 +562,7 @@ export default class LoginV2 extends Vue {
 // ------------------------------------
 .login-right-pane {
   flex: 1 1 auto;
-  background-color: #ffffff;
+  background-color: var(--login-right-pane-bg);
   padding: 44px 44px;
   display: flex;
   flex-direction: column;
@@ -559,7 +573,7 @@ export default class LoginV2 extends Vue {
   }
 
   .login-title {
-    color: #111827;
+    color: var(--login-title-color);
     font-size: 26px;
     font-weight: 800;
     line-height: 1.25;
@@ -568,7 +582,7 @@ export default class LoginV2 extends Vue {
   }
 
   .login-subtitle {
-    color: #64748b;
+    color: var(--login-subtitle-color);
     font-size: 13.5px;
     line-height: 1.5;
     margin: 0 0 20px 0;
@@ -578,7 +592,7 @@ export default class LoginV2 extends Vue {
     display: flex;
     gap: 20px;
     margin-bottom: 22px;
-    border-bottom: 1.5px solid #f1f5f9;
+    border-bottom: 1.5px solid var(--login-tabs-border-color);
 
     .auth-tab {
       background: none;
@@ -586,13 +600,13 @@ export default class LoginV2 extends Vue {
       padding: 0 0 10px 0;
       font-size: 14.5px;
       font-weight: 500;
-      color: #64748b;
+      color: var(--login-tab-inactive-color);
       cursor: pointer;
       position: relative;
       transition: color 0.15s ease;
 
       &.active {
-        color: #111827;
+        color: var(--login-tab-active-color);
         font-weight: 700;
 
         &::after {
@@ -602,13 +616,13 @@ export default class LoginV2 extends Vue {
           left: 0;
           right: 0;
           height: 3px;
-          background-color: #111827;
+          background-color: var(--login-tab-active-color);
           border-radius: 3px 3px 0 0;
         }
       }
 
       &:hover:not(.active) {
-        color: #111827;
+        color: var(--login-tab-active-color);
       }
     }
   }
@@ -618,7 +632,7 @@ export default class LoginV2 extends Vue {
       display: block;
       font-size: 13.5px;
       font-weight: 600;
-      color: #1e293b;
+      color: var(--login-label-color);
       margin-bottom: 6px;
       text-align: left;
     }
@@ -626,22 +640,22 @@ export default class LoginV2 extends Vue {
     .auth-input {
       width: 100%;
       height: 46px;
-      border: 1.5px solid #e2e8f0;
+      border: 1.5px solid var(--login-input-border-color);
       border-radius: 10px;
       padding: 10px 16px;
       font-size: 14px;
-      color: #1e293b;
-      background-color: #ffffff;
+      color: var(--login-label-color);
+      background-color: var(--login-input-bg);
       box-shadow: none;
       transition: all 0.2s ease;
 
       &::placeholder {
-        color: #94a3b8;
+        color: var(--login-placeholder-color);
       }
 
       &:focus {
-        border-color: rgb(103, 141, 215);
-        box-shadow: 0 0 0 3px rgba(103, 141, 215, 0.2);
+        border-color: var(--header-primary-color);
+        box-shadow: 0 0 0 3px var(--login-input-focus-shadow);
         outline: none;
       }
     }
@@ -655,12 +669,12 @@ export default class LoginV2 extends Vue {
       .forgot-password-link {
         font-size: 13px;
         font-weight: 500;
-        color: rgb(103, 141, 215);
+        color: var(--login-link-color);
         text-decoration: none;
         transition: color 0.15s ease;
 
         &:hover {
-          color: #4a74c2;
+          color: var(--login-link-hover-color);
           text-decoration: underline;
         }
       }
@@ -672,32 +686,32 @@ export default class LoginV2 extends Vue {
       input {
         width: 100%;
         height: 46px;
-        border: 1.5px solid #e2e8f0;
+        border: 1.5px solid var(--login-input-border-color);
         border-radius: 10px;
         padding: 10px 42px 10px 16px;
         font-size: 14px;
-        color: #1e293b;
-        background-color: #ffffff;
+        color: var(--login-label-color);
+        background-color: var(--login-input-bg);
         box-shadow: none;
         transition: all 0.2s ease;
 
         &::placeholder {
-          color: #94a3b8;
+          color: var(--login-placeholder-color);
         }
 
         &:focus {
-          border-color: rgb(103, 141, 215);
-          box-shadow: 0 0 0 3px rgba(103, 141, 215, 0.2);
+          border-color: var(--header-primary-color);
+          box-shadow: 0 0 0 3px var(--login-input-focus-shadow);
           outline: none;
         }
       }
 
       .password-toggle-btn {
         right: 10px;
-        color: #94a3b8;
+        color: var(--login-password-toggle-color);
 
         &:hover {
-          color: rgb(103, 141, 215);
+          color: var(--header-primary-color);
         }
       }
     }
@@ -705,27 +719,27 @@ export default class LoginV2 extends Vue {
     .auth-submit-btn {
       width: 100%;
       height: 48px;
-      background-color: rgb(103, 141, 215);
-      color: #ffffff;
+      background-color: var(--login-btn-bg);
+      color: var(--login-btn-font-color);
       font-size: 15px;
       font-weight: 600;
       border: none;
       border-radius: 24px;
-      box-shadow: 0 6px 16px 0 rgba(103, 141, 215, 0.35);
+      box-shadow: 0 6px 16px 0 var(--login-btn-shadow);
       cursor: pointer;
       transition: all 0.2s ease;
       margin-top: 10px;
 
       &:hover {
-        background-color: #557ec9;
-        box-shadow: 0 8px 20px 0 rgba(103, 141, 215, 0.45);
+        background-color: var(--login-btn-hover-bg);
+        box-shadow: 0 8px 20px 0 var(--login-btn-shadow-hover);
         transform: translateY(-1px);
-        color: #ffffff;
+        color: var(--login-btn-font-color);
       }
 
       &:active {
         transform: translateY(0);
-        box-shadow: 0 2px 8px 0 rgba(103, 141, 215, 0.35);
+        box-shadow: 0 2px 8px 0 var(--login-btn-shadow);
       }
     }
   }
@@ -735,7 +749,7 @@ export default class LoginV2 extends Vue {
     align-items: center;
     text-align: center;
     margin: 22px 0 18px;
-    color: #94a3b8;
+    color: var(--login-divider-color);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -744,7 +758,7 @@ export default class LoginV2 extends Vue {
     &::after {
       content: '';
       flex: 1;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid var(--login-divider-line-color);
     }
 
     span {
@@ -756,7 +770,7 @@ export default class LoginV2 extends Vue {
     .social-login-heading {
       font-size: 13.5px;
       font-weight: 600;
-      color: #475569;
+      color: var(--login-social-heading-color);
       margin-bottom: 12px;
       text-align: left;
     }
@@ -798,10 +812,10 @@ export default class LoginV2 extends Vue {
       width: 100%;
       height: 44px;
       padding: 8px 12px;
-      border: 1.5px solid #e2e8f0;
+      border: 1.5px solid var(--login-social-btn-border-color);
       border-radius: 10px;
-      background-color: #ffffff;
-      color: #1e293b;
+      background-color: var(--login-social-btn-bg);
+      color: var(--login-social-btn-font-color);
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
@@ -813,9 +827,9 @@ export default class LoginV2 extends Vue {
       }
 
       &:hover:not(:disabled) {
-        border-color: #cbd5e1;
-        background-color: #f8fafc;
-        color: #1e293b;
+        border-color: var(--login-social-btn-hover-border);
+        background-color: var(--login-social-btn-hover-bg);
+        color: var(--login-social-btn-font-color);
       }
 
       &:disabled {
@@ -825,10 +839,10 @@ export default class LoginV2 extends Vue {
     }
 
     .github-btn {
-      color: #1e293b;
+      color: var(--login-social-btn-font-color);
 
       .github-svg {
-        color: #1e293b;
+        color: var(--login-social-btn-font-color);
       }
     }
   }
