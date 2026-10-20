@@ -360,27 +360,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $selectedTags = null;
             $hasPublicTags = false;
             if (!is_null($params->selectedTagsAsJSON)) {
-                /** @var mixed */
-                $rawDecoded = json_decode($params->selectedTagsAsJSON);
-                if (!is_array($rawDecoded)) {
+                $decoded = json_decode($params->selectedTagsAsJSON);
+                if (!is_array($decoded)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'selected_tags'
                     );
                 }
-                /** @var list<mixed> */
-                $decoded = json_decode(
-                    $params->selectedTagsAsJSON,
-                    associative: true
-                );
                 $selectedTags = [];
                 foreach ($decoded as $tag) {
-                    if (!is_array($tag)) {
+                    if (!is_object($tag)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
                             'selected_tags'
                         );
                     }
+                    $tag = (array)$tag;
                     if (!array_key_exists('tagname', $tag)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterEmpty',
