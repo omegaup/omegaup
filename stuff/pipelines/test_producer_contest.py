@@ -41,7 +41,7 @@ class MessageSavingCallback:
         '''Callback function to test'''
         self.message = contest_callback.ContestCertificate(**json.loads(
             body.decode()))
-        channel.close()
+        channel.stop_consuming()
 
 
 # mypy has conflict with pytest decorations
@@ -124,20 +124,23 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
         rabbitmq_connection.initialize_rabbitmq(
             queue='contest-test',
             exchange='certificates',
-            routing_key='ContestQueue',
+            routing_key='ContestQueue-test',
             channel=channel)
         channel.queue_purge(queue='contest-test')
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
         )
-        producer_contest.send_contest_message_to_client(cur=cur,
-                                                        channel=channel,
-                                                        client=client)
+        producer_contest.send_contest_message_to_client(
+            cur=cur,
+            channel=channel,
+            client=client,
+            queue='contest-test',
+            routing_key='ContestQueue-test')
         callback = MessageSavingCallback()
         rabbitmq_client.receive_messages(queue='contest-test',
                                          exchange='certificates',
-                                         routing_key='ContestQueue',
+                                         routing_key='ContestQueue-test',
                                          channel=channel,
                                          callback=callback)
 

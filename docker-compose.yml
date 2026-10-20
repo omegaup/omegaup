@@ -66,10 +66,10 @@ services:
         source: .
         target: /opt/omegaup
     depends_on:
-      mysql: 
+      mysql:
         condition: service_healthy
-      rabbitmq: 
-        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
@@ -198,6 +198,12 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
       RABBITMQ_DEFAULT_PASS: 'omegaup'
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "await_startup", "-t", "5"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 15s
     expose:
       - '5672'
       - '15672'
