@@ -225,7 +225,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run JavaScript tests
-        run: pnpm test:coverage
+        run: |
+          set -o pipefail
+          pnpm test:coverage 2>&1 | tee jest-output.log
 
       - name: Upload code coverage
         run: |
@@ -233,6 +235,17 @@ jobs:
           echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
           chmod +x codecov
           ./codecov
+
+      - name: Upload JavaScript test artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: javascript-test-results-${{ github.run_attempt }}
+          path: |
+            jest-output.log
+            coverage/
+          if-no-files-found: ignore
+          retention-days: 7
 
   lint:
     runs-on: ubuntu-22.04
@@ -308,10 +321,12 @@ jobs:
             . /opt/omegaup/stuff/venv/bin/activate && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
+          set -o pipefail
+          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null 2>&1 | tee lint-output.log
 
       - name: Run Psalm
         run: |
+          set -o pipefail
           find frontend/ \
             -name *.php \
             -and -not -wholename 'frontend/server/libs/third_party/*' \
@@ -322,13 +337,24 @@ jobs:
           | xargs ./vendor/bin/psalm \
             --output-format=github \
             --long-progress \
-            --show-info=false
+            --show-info=false 2>&1 | tee psalm-output.log
 
       - name: Find unused translation strings
         run: ./stuff/unused_translation_strings.py
 
       - name: Validate generated Python API syntax
         run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
+
+      - name: Upload lint artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lint-logs-${{ github.run_attempt }}
+          path: |
+            lint-output.log
+            psalm-output.log
+          if-no-files-found: ignore
+          retention-days: 7
 
   cypress:
     name: cypress (${{ matrix.name }})
