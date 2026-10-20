@@ -357,22 +357,36 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             /** @var list<array{tagname: string, public: bool}>|null */
-            $selectedTags = !is_null($params->selectedTagsAsJSON) ? json_decode(
-                $params->selectedTagsAsJSON,
-                associative: true
-            ) : null;
-            $isLecture = $params->languages === '';
-            if (empty($selectedTags) && !$isLecture) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'problemEditTagPublicRequired',
-                    'public_tags'
-                );
-            }
+            $selectedTags = null;
             $hasPublicTags = false;
-            if (!is_null($selectedTags)) {
-                foreach ($selectedTags as $tag) {
-                    if (!$hasPublicTags) {
-                        $hasPublicTags = boolval($tag['public']);
+            if (!is_null($params->selectedTagsAsJSON)) {
+                $decoded = json_decode($params->selectedTagsAsJSON);
+                if (!is_array($decoded)) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'selected_tags'
+                    );
+                }
+                $selectedTags = [];
+                foreach ($decoded as $tag) {
+                    if (!is_object($tag)) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterInvalid',
+                            'selected_tags'
+                        );
+                    }
+                    $tag = (array)$tag;
+                    if (!array_key_exists('tagname', $tag)) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterEmpty',
+                            'tagname'
+                        );
+                    }
+                    if (!is_string($tag['tagname'])) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterInvalid',
+                            'tagname'
+                        );
                     }
                     if (empty($tag['tagname'])) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -380,7 +394,32 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             'tagname'
                         );
                     }
+                    if (array_key_exists('public', $tag)) {
+                        if (!is_bool($tag['public'])) {
+                            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                                'parameterInvalid',
+                                'public'
+                            );
+                        }
+                        $isPublic = $tag['public'];
+                    } else {
+                        $isPublic = false;
+                    }
+                    if (!$hasPublicTags) {
+                        $hasPublicTags = $isPublic;
+                    }
+                    $selectedTags[] = [
+                        'tagname' => $tag['tagname'],
+                        'public' => $isPublic,
+                    ];
                 }
+            }
+            $isLecture = $params->languages === '';
+            if (empty($selectedTags) && !$isLecture) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
             }
             if (!$hasPublicTags && !$isLecture) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
