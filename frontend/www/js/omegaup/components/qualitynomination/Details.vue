@@ -166,7 +166,7 @@ export default defineComponent({
       type: Object as PropType<omegaup.Problem>,
       required: true,
     },
-    qualitynomination_id: {
+    qualitynominationId: {
       type: Number,
       required: true,
     },
@@ -187,6 +187,11 @@ export default defineComponent({
       showConfirmation: false,
       status: 'banned',
     };
+  },
+  computed: {
+    qualitynomination_id(): number {
+      return this.qualitynominationId;
+    },
   },
   methods: {
     userUrl(alias: string): string {

@@ -34,7 +34,7 @@ describe('Details.vue', () => {
       alias: 'problem-test',
       title: 'Problem Test',
     },
-    qualitynomination_id: 42,
+    qualitynominationId: 42,
     reviewer: true,
     votes: [],
   };
