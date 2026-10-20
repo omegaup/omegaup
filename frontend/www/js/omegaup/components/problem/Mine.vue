@@ -193,47 +193,110 @@
                   <font-awesome-icon :icon="['fas', 'trash']" />
                 </button>
               </td>
-              <b-modal
-                v-if="problemCanBeDeleted(problem)"
-                v-model="confirmationModal[problem.alias]"
-                :title="
-                  ui.formatString(T.problemEditDeleteRequireConfirmation, {
-                    problemAlias: problem.alias,
-                  })
-                "
-                :ok-title="T.problemEditDeleteOk"
-                ok-variant="danger"
-                :cancel-title="T.problemEditDeleteCancel"
-                @ok="
-                  $emit('remove', {
-                    alias: problem.alias,
-                    shouldShowAllProblems,
-                  })
-                "
-              >
-                <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
-              </b-modal>
             </tr>
           </tbody>
         </table>
       </div>
-      <b-modal
-        v-model="showConfirmationModalDeleteAll"
-        :title="T.problemEditDeleteSelectedProblemsRequireConfirmation"
-        :ok-title="T.problemEditDeleteOk"
-        ok-variant="danger"
-        :cancel-title="T.problemEditDeleteCancel"
-        @ok="
-          $emit('remove-all-problems', {
-            selectedProblems,
-            shouldShowAllProblems,
-          });
-          selectedProblems = [];
-          allProblemsVisibilityOption = -1;
-        "
-      >
-        <p>{{ T.problemEditDeleteSelectedProblemsConfirmationMessage }}</p>
-      </b-modal>
+      <div v-if="problemPendingDelete">
+        <div class="modal fade show d-block" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  {{
+                    ui.formatString(T.problemEditDeleteRequireConfirmation, {
+                      problemAlias: problemPendingDelete.alias,
+                    })
+                  }}
+                </h5>
+                <button
+                  type="button"
+                  class="close"
+                  @click="toggleConfirmationModal(problemPendingDelete.alias)"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>{{ T.problemEditDeleteConfirmationMessage }}</p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click="toggleConfirmationModal(problemPendingDelete.alias)"
+                >
+                  {{ T.problemEditDeleteCancel }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="
+                    $emit('remove', {
+                      alias: problemPendingDelete.alias,
+                      shouldShowAllProblems,
+                    });
+                    toggleConfirmationModal(problemPendingDelete.alias);
+                  "
+                >
+                  {{ T.problemEditDeleteOk }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+      </div>
+      <div v-if="showConfirmationModalDeleteAll">
+        <div class="modal fade show d-block" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  {{ T.problemEditDeleteSelectedProblemsRequireConfirmation }}
+                </h5>
+                <button
+                  type="button"
+                  class="close"
+                  @click="showConfirmationModalDeleteAll = false"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  {{ T.problemEditDeleteSelectedProblemsConfirmationMessage }}
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click="showConfirmationModalDeleteAll = false"
+                >
+                  {{ T.problemEditDeleteCancel }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="
+                    $emit('remove-all-problems', {
+                      selectedProblems,
+                      shouldShowAllProblems,
+                    });
+                    selectedProblems = [];
+                    allProblemsVisibilityOption = -1;
+                    showConfirmationModalDeleteAll = false;
+                  "
+                >
+                  {{ T.problemEditDeleteOk }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+      </div>
       <div class="card-footer">
         <omegaup-common-paginator
           :pager-items="pagerItems"
@@ -269,9 +332,6 @@ library.add(
   faExclamationTriangle,
   faBan,
 );
-import { ModalPlugin } from 'bootstrap-vue';
-Vue.use(ModalPlugin);
-
 @Component({
   components: {
     FontAwesomeIcon,
@@ -299,6 +359,13 @@ export default class ProblemMine extends Vue {
     return this.isSysadmin
       ? T.problemListShowAdminProblemsAndDeleted
       : T.problemListShowAdminProblems;
+  }
+
+  get problemPendingDelete(): types.ProblemListItem | null {
+    return (
+      this.problems.find((problem) => this.confirmationModal[problem.alias]) ??
+      null
+    );
   }
 
   get canDeleteSelectedProblems(): boolean {
