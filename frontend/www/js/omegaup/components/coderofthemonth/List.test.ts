@@ -271,9 +271,11 @@ describe('CoderOfTheMonth navigation with hashchange (Back/Forward buttons)', ()
     };
 
     window.addEventListener('hashchange', onHashChange);
-    wrapper.vm.$once('hook:beforeDestroy', () => {
+    const removeHashChangeListener = () => {
       window.removeEventListener('hashchange', onHashChange);
-    });
+    };
+    wrapper.vm.$once('hook:beforeDestroy', removeHashChangeListener);
+    wrapper.vm.$once('hook:beforeUnmount', removeHashChangeListener);
 
     const childList = wrapper.findComponent(coderofthemonth_List);
     const childVm = childList.vm as any;

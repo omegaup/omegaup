@@ -416,6 +416,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import debounce from 'lodash/debounce';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -570,7 +571,7 @@ class ArenaContestList extends Vue {
     this.fetchInitialContests();
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.onSearchQueryDebounced.cancel();
   }
   async loadMoreContests() {

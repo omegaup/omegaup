@@ -451,6 +451,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
   let timer: number | null = null;
   return (...args: any[]) => {
@@ -670,7 +671,7 @@ class ArenaContestList extends Vue {
     window.addEventListener('resize', this.updateColumnsPerRow);
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('resize', this.updateColumnsPerRow);
   }
 

@@ -111,6 +111,7 @@
 </template>
 
 <script lang="ts">
+import '../vue3LifecycleCompat';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from '../grader/GraderStore';
 import * as Util from '../grader/util';
@@ -305,7 +306,7 @@ export default class MonacoEditor extends Vue {
     this.onResize();
   }
 
-  destroyed(): void {
+  unmounted(): void {
     if (this.copyTimeout) clearTimeout(this.copyTimeout);
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
 

@@ -145,6 +145,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
@@ -214,7 +215,7 @@ export default class CollectionList extends Vue {
     window.addEventListener('resize', this.updateViewportMode);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     window.removeEventListener('resize', this.updateViewportMode);
   }
 

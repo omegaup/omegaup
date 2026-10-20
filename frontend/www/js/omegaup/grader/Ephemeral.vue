@@ -171,6 +171,7 @@
 </template>
 
 <script lang="ts">
+import '../vue3LifecycleCompat';
 import * as monaco from 'monaco-editor';
 (window as any).monaco = monaco;
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
@@ -609,7 +610,7 @@ export default class Ephemeral extends Vue {
     this.isCopySuccess = false;
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
     window.removeEventListener(
       'grader:language-detected',

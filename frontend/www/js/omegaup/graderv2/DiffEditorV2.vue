@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts">
+import '../vue3LifecycleCompat';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from '../grader/GraderStore';
 import * as monaco from 'monaco-editor';
@@ -103,7 +104,7 @@ export default class DiffEditorV2 extends Vue {
     this._resizeObserver.observe(this.$refs.wrapper as HTMLElement);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     this._resizeObserver?.disconnect();
     this._editor?.dispose();
     this._originalModel?.dispose();

@@ -228,6 +228,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -381,7 +382,7 @@ export default class ArenaContest extends Vue {
     }
   }
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.lockdown) {
       window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }

@@ -72,6 +72,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
@@ -172,7 +173,7 @@ export default class ProblemFinderWizard extends Vue {
     document.addEventListener('keydown', this.onEsc);
   }
 
-  beforeDestroy(): void {
+  beforeUnmount(): void {
     document.removeEventListener('keydown', this.onEsc);
   }
 

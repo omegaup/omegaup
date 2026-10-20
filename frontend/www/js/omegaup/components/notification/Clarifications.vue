@@ -65,6 +65,7 @@
 </template>
 
 <script lang="ts">
+import '../../vue3LifecycleCompat';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
@@ -88,7 +89,7 @@ export default class Clarifications extends Vue {
   flashInterval: number = 0;
   unreadClarifications = this.clarifications;
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.flashInterval) {
       clearInterval(this.flashInterval);
       this.flashInterval = 0;
