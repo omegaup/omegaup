@@ -1,14 +1,28 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 import qualitynomination_DemotionPopup, {
   AvailableViews,
 } from './DemotionPopup.vue';
 
+const DemotionPopup = qualitynomination_DemotionPopup as ComponentOptions<Vue>;
+
+type DemotionPopupVm = Vue & {
+  currentView: AvailableViews;
+  selectedReason: string;
+  rationale: string;
+  original: string;
+  onHide: () => void;
+};
+
 describe('DemotionPopup.vue', () => {
   it('Should render with initial Question view', () => {
-    const wrapper = shallowMount(qualitynomination_DemotionPopup);
+    const wrapper = shallowMount(DemotionPopup);
 
     expect(wrapper.find('[data-demotion-popup]').exists()).toBe(true);
-    expect(wrapper.vm.currentView).toBe(AvailableViews.Question);
+    expect((wrapper.vm as DemotionPopupVm).currentView).toBe(
+      AvailableViews.Question,
+    );
     expect(wrapper.find('select[name="selectedReason"]').exists()).toBe(true);
     expect(
       wrapper.find('[data-submit-report-button]').attributes('disabled'),
@@ -16,7 +30,7 @@ describe('DemotionPopup.vue', () => {
   });
 
   it('Should handle selection of duplicate reason and show original input', async () => {
-    const wrapper = shallowMount(qualitynomination_DemotionPopup);
+    const wrapper = shallowMount(DemotionPopup);
 
     expect(wrapper.find('input[name="original"]').exists()).toBe(false);
 
@@ -36,7 +50,7 @@ describe('DemotionPopup.vue', () => {
   });
 
   it('Should emit submit and switch to Thanks view on submit', async () => {
-    const wrapper = shallowMount(qualitynomination_DemotionPopup);
+    const wrapper = shallowMount(DemotionPopup);
 
     await wrapper.setData({
       selectedReason: 'poorly-described',
@@ -49,13 +63,15 @@ describe('DemotionPopup.vue', () => {
     await submitBtn.trigger('click');
 
     expect(wrapper.emitted('submit')).toBeTruthy();
-    expect(wrapper.vm.currentView).toBe(AvailableViews.Thanks);
+    expect((wrapper.vm as DemotionPopupVm).currentView).toBe(
+      AvailableViews.Thanks,
+    );
   });
 
   it('Should emit dismiss when onHide is invoked', async () => {
-    const wrapper = shallowMount(qualitynomination_DemotionPopup);
+    const wrapper = shallowMount(DemotionPopup);
 
-    wrapper.vm.onHide();
+    (wrapper.vm as DemotionPopupVm).onHide();
     expect(wrapper.emitted('dismiss')).toBeTruthy();
   });
 });

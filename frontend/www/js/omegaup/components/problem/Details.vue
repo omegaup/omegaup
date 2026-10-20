@@ -685,7 +685,9 @@ export default class ProblemDetails extends Vue {
   }
 
   onPopupPromotionDismissed(
-    qualityPromotionComponent: qualitynomination_PromotionPopup,
+    qualityPromotionComponent: InstanceType<
+      typeof qualitynomination_PromotionPopup
+    >,
     isDismissed: boolean,
   ): void {
     this.onPopupDismissed();

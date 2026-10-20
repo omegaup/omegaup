@@ -1,5 +1,17 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 import qualitynomination_Details from './Details.vue';
+
+const Details = qualitynomination_Details as ComponentOptions<Vue>;
+
+type DetailsVm = Vue & {
+  userUrl: (username: string) => string;
+  problemUrl: (problemAlias: string) => string;
+  showConfirmation: boolean;
+  status: string;
+  markResolution: (decision: boolean) => void;
+};
 
 describe('Details.vue', () => {
   const baseProps = {
@@ -28,7 +40,7 @@ describe('Details.vue', () => {
   };
 
   it('Should render nomination details properly', () => {
-    const wrapper = shallowMount(qualitynomination_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: baseProps,
     });
 
@@ -41,18 +53,20 @@ describe('Details.vue', () => {
   });
 
   it('Should generate correct profile and problem URLs', () => {
-    const wrapper = shallowMount(qualitynomination_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: baseProps,
     });
 
-    expect(wrapper.vm.userUrl('test_user')).toBe('/profile/test_user/');
-    expect(wrapper.vm.problemUrl('test_problem')).toBe(
+    expect((wrapper.vm as DetailsVm).userUrl('test_user')).toBe(
+      '/profile/test_user/',
+    );
+    expect((wrapper.vm as DetailsVm).problemUrl('test_problem')).toBe(
       '/arena/problem/test_problem/',
     );
   });
 
   it('Should show reviewer actions and handle resolution workflow', async () => {
-    const wrapper = shallowMount(qualitynomination_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: baseProps,
     });
 
@@ -61,19 +75,19 @@ describe('Details.vue', () => {
 
     await banButton.trigger('click');
 
-    expect(wrapper.vm.showConfirmation).toBe(true);
-    expect(wrapper.vm.status).toBe('banned');
+    expect((wrapper.vm as DetailsVm).showConfirmation).toBe(true);
+    expect((wrapper.vm as DetailsVm).status).toBe('banned');
 
-    wrapper.vm.markResolution(true);
+    (wrapper.vm as DetailsVm).markResolution(true);
 
-    expect(wrapper.vm.showConfirmation).toBe(false);
+    expect((wrapper.vm as DetailsVm).showConfirmation).toBe(false);
     expect(wrapper.emitted('mark-resolution')).toEqual([
       [wrapper.vm, 'banned', true],
     ]);
   });
 
   it('Should hide reviewer action buttons when reviewer is false', () => {
-    const wrapper = shallowMount(qualitynomination_Details, {
+    const wrapper = shallowMount(Details, {
       propsData: {
         ...baseProps,
         reviewer: false,
