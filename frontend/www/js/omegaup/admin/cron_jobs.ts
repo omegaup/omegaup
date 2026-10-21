@@ -19,13 +19,19 @@ export enum CronRunStatus {
 
 export const RUN_STATUSES: CronRunStatus[] = Object.values(CronRunStatus);
 
-// Keyed on the enum so a new job is a compile error here, not an untitled row.
+// Keyed on the enum, so a job added to it needs a title here too.
 const JOB_TITLES: Record<CronJobName, string> = {
   [CronJobName.AggregateFeedback]: T.cronControlPlaneJobAggregateFeedback,
   [CronJobName.AssignBadges]: T.cronControlPlaneJobAssignBadges,
   [CronJobName.BuildProblemRecModel]: T.cronControlPlaneJobBuildProblemRecModel,
   [CronJobName.ProblemHealthCheck]: T.cronControlPlaneJobProblemHealthCheck,
   [CronJobName.UpdateRanks]: T.cronControlPlaneJobUpdateRanks,
+};
+
+const STATUS_TITLES: Record<CronRunStatus, string> = {
+  [CronRunStatus.Running]: T.cronControlPlaneStatusRunning,
+  [CronRunStatus.Success]: T.cronControlPlaneStatusSuccess,
+  [CronRunStatus.Failure]: T.cronControlPlaneStatusFailure,
 };
 
 const STATUS_CLASSES: Record<CronRunStatus, string> = {
@@ -49,11 +55,20 @@ export function phaseTitle(phase: string): string {
   return humanize(phase);
 }
 
+export function statusTitle(status: string): string {
+  return STATUS_TITLES[status as CronRunStatus] ?? status;
+}
+
+export interface SuccessRate {
+  succeeded: number;
+  finished: number;
+}
+
 // Both figures only see the runs the page was given, the most recent ones.
 export function successRate(
   runs: types.CronRun[],
   name: string,
-): number | null {
+): SuccessRate | null {
   const finished = runs.filter(
     (run) => run.name === name && run.status !== CronRunStatus.Running,
   );
@@ -63,7 +78,7 @@ export function successRate(
   const succeeded = finished.filter(
     (run) => run.status === CronRunStatus.Success,
   ).length;
-  return Math.round((100 * succeeded) / finished.length);
+  return { succeeded, finished: finished.length };
 }
 
 export function averageDuration(
