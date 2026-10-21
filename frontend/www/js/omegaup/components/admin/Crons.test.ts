@@ -351,4 +351,19 @@ describe('Crons.vue', () => {
     expect(button.attributes('title')).toBe(T.cronControlPlaneJobDisabled);
     expect(wrapper.emitted('rerun')).toBeFalsy();
   });
+
+  it('Should not offer a second rerun while the first is unanswered', async () => {
+    const wrapper = mount(Crons, {
+      propsData: { jobs, runs, rerunsInFlight: ['update_ranks.py'] },
+    });
+    const button = wrapper.find('[data-cron-rerun]');
+
+    await button.trigger('click');
+
+    expect(button.attributes('disabled')).toBe('disabled');
+    expect(button.attributes('aria-label')).toBe(
+      ui.formatString(T.cronControlPlaneRerunJob, { name: 'update_ranks.py' }),
+    );
+    expect(wrapper.emitted('rerun')).toBeFalsy();
+  });
 });

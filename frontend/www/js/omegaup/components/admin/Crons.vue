@@ -38,8 +38,9 @@
                 class="btn btn-sm btn-outline-primary"
                 type="button"
                 data-cron-rerun
-                :disabled="!job.enabled"
+                :disabled="!job.enabled || rerunsInFlight.includes(job.name)"
                 :title="rerunTitle(job)"
+                :aria-label="rerunLabel(job.name)"
                 @click="rerun(job.name)"
               >
                 {{ T.cronControlPlaneRerun }}
@@ -265,6 +266,8 @@ export default class Crons extends Vue {
   T = T;
   @Prop({ default: () => [] }) jobs!: types.CronJob[];
   @Prop({ default: () => [] }) runs!: types.CronRun[];
+  // Jobs whose rerun request has not been answered yet.
+  @Prop({ default: () => [] }) rerunsInFlight!: string[];
   @Prop({ default: () => [] })
   problemHealthFindings!: types.ProblemHealthFinding[];
 
@@ -283,6 +286,10 @@ export default class Crons extends Vue {
 
   rerun(name: string): void {
     this.$emit('rerun', name);
+  }
+
+  rerunLabel(name: string): string {
+    return ui.formatString(T.cronControlPlaneRerunJob, { name });
   }
 
   rerunTitle(job: types.CronJob): string | null {
