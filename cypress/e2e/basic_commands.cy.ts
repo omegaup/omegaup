@@ -200,7 +200,7 @@ describe('Basic Commands Test', () => {
     cy.visit('/admin/crons/');
 
     cy.get('[data-cron-jobs]').should('be.visible');
-    cy.get('[data-cron-jobs] tbody tr').should('exist');
+    cy.get('[data-cron-jobs] [data-cron-rerun]').should('exist');
     cy.get('[data-cron-runs]').should('exist');
     cy.logout();
   });
@@ -210,11 +210,13 @@ describe('Basic Commands Test', () => {
     cy.visit('/admin/crons/');
     cy.intercept('POST', '/api/admin/rerunCron/').as('rerunCron');
 
-    cy.get('[data-cron-rerun]:enabled').first().click();
+    cy.get('[data-cron-rerun]').first().as('rerun');
+
+    cy.get('@rerun').should('be.enabled').click();
     cy.wait('@rerunCron').its('response.statusCode').should('eq', 200);
 
     // Nothing drains the queue here, so the second request finds the first.
-    cy.get('[data-cron-rerun]:enabled').first().click();
+    cy.get('@rerun').should('be.enabled').click();
     cy.wait('@rerunCron').its('response.body.queued').should('eq', false);
     cy.get('.alert-info[role="alert"]').should('be.visible');
     cy.logout();
