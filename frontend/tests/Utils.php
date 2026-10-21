@@ -269,6 +269,7 @@ class Utils {
             'Submission_Log',
             'Team_Groups',
             'Teams',
+            'Team_Users',
             'User_Roles',
             'User_Rank',
             'Users',
