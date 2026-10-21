@@ -6,6 +6,7 @@ the single place that actually launches a job.
 '''
 
 import argparse
+import configparser
 import contextlib
 import enum
 import json
@@ -18,8 +19,8 @@ import sys
 import tempfile
 import types
 
-from typing import (Callable, Dict, Iterator, List, NamedTuple, Optional,
-                    Tuple)
+from typing import (IO, Callable, Dict, Iterator, List, NamedTuple,
+                    Optional, Tuple)
 
 import mysql.connector.cursor
 
@@ -33,6 +34,9 @@ import lib.logs  # pylint: disable=wrong-import-position
 _CRON_DIR = os.path.dirname(os.path.realpath(__file__))
 
 _MAX_ERROR_LENGTH = 1000
+
+# Kubernetes kills a stopping pod 30 seconds after asking it to stop.
+_STOP_GRACE_SECONDS = 20
 
 DEFAULT_RUN_TIMEOUT_SECONDS = 6 * 3600
 
@@ -255,6 +259,25 @@ def _own_run_id(
     return None if row is None else int(row['run_id'])
 
 
+def _readonly_section(args: argparse.Namespace) -> str:
+    '''The replica settings, so the child's heavy reads skip the primary.'''
+    if args.readonly_user and args.readonly_password:
+        return (f'[clientreadonly]\n'
+                f'host={args.readonly_host or args.host}\n'
+                f'port={args.readonly_port}\n'
+                f'user={args.readonly_user}\n'
+                f'password={args.readonly_password}\n'
+                f'database={args.readonly_database}\n')
+    if args.mysql_config_file and os.path.isfile(args.mysql_config_file):
+        config = configparser.ConfigParser(interpolation=None)
+        config.read(args.mysql_config_file)
+        if 'clientreadonly' in config:
+            return '[clientreadonly]\n' + ''.join(
+                f'{key}={value}\n'
+                for key, value in config['clientreadonly'].items())
+    return ''
+
+
 @contextlib.contextmanager
 def db_command_args(args: argparse.Namespace) -> Iterator[List[str]]:
     '''Yields the DB flags to hand down to the child script.'''
@@ -274,9 +297,47 @@ def db_command_args(args: argparse.Namespace) -> Iterator[List[str]]:
                           f'host={args.host}\n'
                           f'port={args.port}\n'
                           f'user={args.user}\n'
-                          f'password={args.password}\n')
+                          f'password={args.password}\n'
+                          + _readonly_section(args))
         config_file.flush()
         yield command + ['--mysql-config-file', config_file.name]
+
+
+def _log_args(args: argparse.Namespace) -> List[str]:
+    '''The logging flags, so a rerun logs the way a scheduled run does.'''
+    command = [flag for flag, enabled in (('--log-json', args.log_json),
+                                          ('--verbose', args.verbose),
+                                          ('--quiet', args.quiet))
+               if enabled]
+    if args.logfile:
+        command.extend(['--logfile', args.logfile])
+    return command
+
+
+def _stop(process: 'subprocess.Popen[bytes]') -> None:
+    '''Interrupts the child's process group, and kills it if it lingers.
+
+    lib.runner turns SIGINT into a failed `Cron_Runs` row and releases its
+    lock. SIGKILL skips both and leaves the run `running` forever.
+    '''
+    os.killpg(process.pid, signal.SIGINT)
+    try:
+        process.wait(timeout=_STOP_GRACE_SECONDS)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        process.wait()
+
+
+def _forward_and_tail(stderr_file: IO[bytes]) -> str:
+    '''Copies the child's stderr to ours and returns its last part.'''
+    stderr_file.seek(0)
+    while chunk := stderr_file.read(1 << 16):
+        sys.stderr.write(chunk.decode('utf-8', errors='replace'))
+    sys.stderr.flush()
+    end = stderr_file.seek(0, os.SEEK_END)
+    stderr_file.seek(max(0, end - 4 * _MAX_ERROR_LENGTH))
+    tail = stderr_file.read().decode('utf-8', errors='replace')
+    return tail[-_MAX_ERROR_LENGTH:]
 
 
 def run_script(
@@ -285,29 +346,41 @@ def run_script(
 ) -> Tuple[int, Optional[str]]:
     '''Runs a registered cron script as a subprocess.
 
-    stderr goes to a file rather than a pipe and only its tail is read back,
-    so a job that writes gigabytes cannot grow the dispatcher.
+    stderr goes to a file rather than a pipe and is copied over in chunks once
+    the child exits, so a job that writes gigabytes cannot grow the
+    dispatcher. The child gets its own process group so it can be stopped
+    together with anything it starts.
     '''
     timeout = args.run_timeout_seconds
     with db_command_args(args) as db_args:
         command = ([sys.executable, os.path.join(_CRON_DIR, name)] + db_args
-                   + (job_args(args, name) or []))
+                   + _log_args(args) + (job_args(args, name) or []))
         with tempfile.TemporaryFile() as stderr_file:
-            try:
-                result = subprocess.run(command, check=False,
-                                        stdin=subprocess.DEVNULL,
-                                        stdout=subprocess.DEVNULL,
-                                        stderr=stderr_file,
-                                        timeout=timeout)
-            except subprocess.TimeoutExpired:
-                logging.error('Rerun of %s timed out after %ds', name, timeout)
-                return (1, f'timed out after {timeout}s')
-            if result.returncode == 0:
-                return (0, None)
-            end = stderr_file.seek(0, os.SEEK_END)
-            stderr_file.seek(max(0, end - 4 * _MAX_ERROR_LENGTH))
-            tail = stderr_file.read().decode('utf-8', errors='replace')
-    return (result.returncode, tail[-_MAX_ERROR_LENGTH:])
+            with subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.DEVNULL,
+                                  stderr=stderr_file,
+                                  start_new_session=True) as process:
+                returncode, timed_out = 1, False
+                try:
+                    returncode = process.wait(timeout=timeout)
+                except subprocess.TimeoutExpired:
+                    logging.error('Rerun of %s timed out after %ds', name,
+                                  timeout)
+                    _stop(process)
+                    timed_out = True
+                except BaseException:
+                    _stop(process)
+                    raise
+            tail = _forward_and_tail(stderr_file)
+    if timed_out:
+        error_text = f'timed out after {timeout}s'
+        if tail:
+            room = _MAX_ERROR_LENGTH - len(error_text) - 1
+            error_text = f'{error_text}\n{tail[-room:]}'
+        return (1, error_text)
+    if returncode == 0:
+        return (0, None)
+    return (returncode, tail)
 
 
 def _notify_requester(

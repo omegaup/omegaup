@@ -41,6 +41,7 @@ class CronRerunFlowTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($request->finished_at);
         $this->assertNull(\OmegaUp\DAO\CronRunRequests::getActiveByName($name));
 
+        $this->assertNotNull($request->run_id);
         $run = \OmegaUp\DAO\CronRuns::getByPK(intval($request->run_id));
         $this->assertNotNull($run);
         $this->assertSame($name, $run->name);
@@ -54,6 +55,56 @@ class CronRerunFlowTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('cron-rerun', $contents['type']);
         $this->assertSame(
             'notificationCronRerunSucceeded',
+            $contents['body']['localizationString']
+        );
+    }
+
+    public function testARerunTheDispatcherCannotRunEndsFailed() {
+        [
+            'identity' => $identity,
+            'user' => $user,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        // The test dispatcher is not told where the model goes.
+        $name = \OmegaUp\CronJobName::BuildProblemRecModel->value;
+
+        \OmegaUp\Controllers\Admin::apiRerunCron(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $name,
+        ]));
+        $request = \OmegaUp\DAO\CronRunRequests::getActiveByName($name);
+        $this->assertNotNull($request);
+
+        $exitMessage = '';
+        try {
+            \OmegaUp\Test\Utils::runCronDispatcher();
+        } catch (\Exception $e) {
+            $exitMessage = $e->getMessage();
+        }
+        // Whatever watches the dispatcher has to see the failure.
+        $this->assertStringContainsString('status=1', $exitMessage);
+
+        $request = \OmegaUp\DAO\CronRunRequests::getByPK(
+            intval($request->request_id)
+        );
+        $this->assertNotNull($request);
+        $this->assertSame(
+            \OmegaUp\CronRunRequestStatus::Failed->value,
+            $request->status
+        );
+        $this->assertSame(
+            'the dispatcher was not told where this job writes',
+            $request->error_text
+        );
+        $this->assertNull($request->run_id);
+
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $user
+        );
+        $this->assertCount(1, $notifications);
+        $contents = json_decode($notifications[0]['contents'], true);
+        $this->assertSame(
+            'notificationCronRerunFailed',
             $contents['body']['localizationString']
         );
     }

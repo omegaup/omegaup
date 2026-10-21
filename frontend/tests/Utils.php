@@ -450,6 +450,7 @@ class Utils {
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/cron_dispatcher.py' .
              ' --verbose ' .
+             ' --run-timeout-seconds 600 ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
