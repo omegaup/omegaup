@@ -856,4 +856,59 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('feedback_list', $e->parameter);
         }
     }
+
+    public function testSetFeedbackListWithMalformedItems(): void {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        $loginAdmin = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $loginAdmin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+        $student = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $malformedPayloads = [
+            'non-array element' => json_encode(['not-an-object']),
+            'missing feedback key' => json_encode([['lineNumber' => 10]]),
+            'non-string feedback' => json_encode([['feedback' => 123, 'lineNumber' => 10]]),
+            'empty feedback string' => json_encode([['feedback' => '', 'lineNumber' => 10]]),
+            'missing lineNumber key' => json_encode([['feedback' => 'great work']]),
+            'non-int lineNumber' => json_encode([['feedback' => 'great work', 'lineNumber' => 'ten']]),
+        ];
+
+        foreach ($malformedPayloads as $description => $payload) {
+            try {
+                \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+                    new \OmegaUp\Request([
+                        'auth_token' => $loginAdmin->auth_token,
+                        'guid' => $runData['response']['guid'],
+                        'course_alias' => $courseData['course_alias'],
+                        'assignment_alias' => $courseData['assignment_alias'],
+                        'feedback_list' => $payload,
+                    ])
+                );
+                $this->fail("Should have thrown an InvalidParameterException for {$description}");
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertSame('invalidParameters', $e->getMessage());
+                $this->assertSame('feedback_list', $e->parameter);
+            }
+        }
+    }
 }

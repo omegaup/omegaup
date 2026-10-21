@@ -577,6 +577,20 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
 
         foreach ($feedbackList as $feedback) {
+            /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
+            if (
+                !is_array($feedback)
+                || empty($feedback['feedback'])
+                || !is_string($feedback['feedback'])
+                || !isset($feedback['lineNumber'])
+                || !is_int($feedback['lineNumber'])
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidParameters',
+                    'feedback_list'
+                );
+            }
+
             self::createOrUpdateFeedback(
                 $r->identity,
                 $submission,
