@@ -1,7 +1,10 @@
 <template>
-  <omegaup-overlay-popup @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup
+    class="overlay-popup--wide"
+    @dismiss="$emit('dismiss')"
+  >
     <div v-if="data">
-      <form data-run-details-view>
+      <form data-run-details-view class="modal-form">
         <slot
           name="feedback"
           :feedback="data.feedback"
