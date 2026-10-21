@@ -11,6 +11,7 @@ const modelRuns: types.RecommendationModelRun[] = [
     map_score: 0.1934,
     dataset_size: 48210,
     rng_seed: 42,
+    output_path: '/var/lib/omegaup/problem_rec_model.db',
     published: true,
   },
   {

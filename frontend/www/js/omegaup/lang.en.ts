@@ -815,7 +815,7 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneModelNoRuns: "No training runs recorded yet",
   cronControlPlaneModelPublished: "Published",
   cronControlPlaneModelScore: "MAP score",
-  cronControlPlaneModelScoreInfo: "How often the model suggested a problem the user went on to solve. The higher the better. A new model is only published if it clears the minimum and is not clearly worse than the last published one.",
+  cronControlPlaneModelScoreInfo: "Mean average precision (MAP) of the top suggestions for users left out of training: how high the problems they went on to solve were ranked. From 0 to 1, higher is better. A new model is only published if it clears the minimum and is not clearly worse than the last one published to the same path.",
   cronControlPlaneModelSeed: "Seed",
   cronControlPlaneModelSeedUnset: "not fixed",
   cronControlPlaneModelSkipReason: "Reason not published",

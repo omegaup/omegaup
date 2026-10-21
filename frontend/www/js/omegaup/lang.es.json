@@ -814,7 +814,7 @@
 	"cronControlPlaneModelNoRuns": "A\u00fan no hay entrenamientos registrados",
 	"cronControlPlaneModelPublished": "Publicado",
 	"cronControlPlaneModelScore": "Puntaje MAP",
-	"cronControlPlaneModelScoreInfo": "Qu\u00e9 tan seguido el modelo sugiri\u00f3 un problema que el usuario despu\u00e9s s\u00ed resolvi\u00f3. Cuanto m\u00e1s alto, mejor. Un modelo nuevo solo se publica si supera el m\u00ednimo y no es claramente peor que el \u00faltimo publicado.",
+	"cronControlPlaneModelScoreInfo": "Precisi\u00f3n media promedio (MAP) de las primeras sugerencias para usuarios que no se usaron en el entrenamiento: qu\u00e9 tan arriba quedaron los problemas que despu\u00e9s resolvieron. Va de 0 a 1, m\u00e1s alto es mejor. Un modelo nuevo solo se publica si supera el m\u00ednimo y no es claramente peor que el \u00faltimo publicado en la misma ruta.",
 	"cronControlPlaneModelSeed": "Semilla",
 	"cronControlPlaneModelSeedUnset": "sin fijar",
 	"cronControlPlaneModelSkipReason": "Raz\u00f3n por la que no se public\u00f3",

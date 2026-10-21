@@ -1,7 +1,9 @@
 <template>
   <div>
     <h5 class="mt-4">{{ T.cronControlPlaneModelHeading }}</h5>
-    <p class="small text-muted">{{ T.cronControlPlaneModelScoreInfo }}</p>
+    <p v-if="modelRuns.length" class="small text-muted">
+      {{ T.cronControlPlaneModelScoreInfo }}
+    </p>
     <table v-if="modelRuns.length" class="table table-sm" data-cron-model-runs>
       <thead>
         <tr>
@@ -15,12 +17,17 @@
       </thead>
       <tbody>
         <tr v-for="modelRun in modelRuns" :key="modelRun.model_run_id">
-          <td>{{ formatDate(modelRun.created_at) }}</td>
+          <td>
+            {{ formatDate(modelRun.created_at) }}
+            <small
+              v-if="modelRun.output_path"
+              class="d-block text-muted"
+              data-model-path
+              >{{ modelRun.output_path }}</small
+            >
+          </td>
           <td>
             <code>{{ formatMapScore(modelRun.map_score) }}</code>
-            <small class="d-block text-muted">{{
-              describeMapScore(modelRun.map_score)
-            }}</small>
           </td>
           <td :title="String(modelRun.dataset_size)">
             {{ formatCount(modelRun.dataset_size) }}
@@ -56,13 +63,6 @@ export default class RecommendationModelRuns extends Vue {
 
   formatMapScore(score: number): string {
     return score.toFixed(4);
-  }
-
-  describeMapScore(score: number): string {
-    return score.toLocaleString(T.locale, {
-      style: 'percent',
-      maximumFractionDigits: 1,
-    });
   }
 
   formatCount(count: number): string {

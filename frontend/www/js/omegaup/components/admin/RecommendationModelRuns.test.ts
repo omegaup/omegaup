@@ -14,6 +14,7 @@ const modelRuns: types.RecommendationModelRun[] = [
     map_score: 0.3419,
     dataset_size: 12345,
     rng_seed: 42,
+    output_path: '/var/lib/omegaup/problem_rec_model.db',
     published: true,
   },
   {
@@ -26,12 +27,6 @@ const modelRuns: types.RecommendationModelRun[] = [
   },
 ];
 
-const asPercent = (score: number): string =>
-  score.toLocaleString(T.locale, {
-    style: 'percent',
-    maximumFractionDigits: 1,
-  });
-
 describe('RecommendationModelRuns.vue', () => {
   it('Should show one row per training run with its score and dataset size', () => {
     const wrapper = mount(RecommendationModelRuns, {
@@ -41,9 +36,11 @@ describe('RecommendationModelRuns.vue', () => {
 
     expect(rows).toHaveLength(2);
     const cells = rows.at(0).findAll('td');
-    expect(cells.at(0).text()).toBe(time.formatDateTime(createdAt));
-    expect(cells.at(1).find('code').text()).toBe('0.3419');
-    expect(cells.at(1).find('small').text()).toBe(asPercent(0.3419));
+    expect(cells.at(0).text()).toContain(time.formatDateTime(createdAt));
+    expect(cells.at(0).find('[data-model-path]').text()).toBe(
+      '/var/lib/omegaup/problem_rec_model.db',
+    );
+    expect(cells.at(1).text()).toBe('0.3419');
     expect(cells.at(2).text()).toBe((12345).toLocaleString(T.locale));
     expect(cells.at(2).attributes('title')).toBe('12345');
     expect(cells.at(4).text()).toBe(T.wordsYes);
@@ -75,6 +72,7 @@ describe('RecommendationModelRuns.vue', () => {
     expect(rows.at(1).findAll('td').at(3).text()).toBe(
       T.cronControlPlaneModelSeedUnset,
     );
+    expect(rows.at(1).find('[data-model-path]').exists()).toBe(false);
   });
 
   it('Should show a placeholder when no model has been trained yet', () => {
@@ -82,5 +80,6 @@ describe('RecommendationModelRuns.vue', () => {
 
     expect(wrapper.find('[data-cron-model-runs]').exists()).toBe(false);
     expect(wrapper.text()).toContain(T.cronControlPlaneModelNoRuns);
+    expect(wrapper.text()).not.toContain(T.cronControlPlaneModelScoreInfo);
   });
 });
