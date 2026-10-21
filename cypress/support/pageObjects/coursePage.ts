@@ -54,7 +54,7 @@ export class CoursePage {
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
 
-    cy.get('button[data-course-add-new-content]').click();
+    cy.get('button[data-course-add-new-content]:visible').click();
 
     cy.get('.omegaup-course-assignmentdetails').should('be.visible');
     cy.get('[data-course-assignment-name]').type(assignmentAlias);
