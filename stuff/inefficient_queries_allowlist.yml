@@ -392,6 +392,14 @@ entries:
   table: u
   issue: 10108
   reason: Detected in the initial main baseline
+- normalized_query: SELECT username, user_id FROM Identities WHERE username IN (?, ?, ?, ?, ?, ?)
+  table: Identities
+  issue: 10108
+  reason: Detected in the initial main baseline
+- normalized_query: SELECT username, user_id FROM Identities WHERE username IN (?, ?, ?, ?, ?, ?, ?, ?)
+  table: Identities
+  issue: 10108
+  reason: Detected in the initial main baseline
 - normalized_query: UPDATE Assignments a SET a.max_points = ( SELECT IFNULL(SUM(psp.points), ?.?) FROM Problemset_Problems psp WHERE psp.problemset_id = a.problemset_id ) WHERE a.alias = ? AND a.course_id = ?
   table: psp
   issue: 10108
