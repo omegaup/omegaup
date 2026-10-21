@@ -192,8 +192,8 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public static function invalidInputProvider(): array {
         return [
             'malformedJson' => ['invalid-json', 'parameterInvalid'],
-            'nullValue' => ['[null]', 'parameterInvalidAlias'],
-            'objectValue' => ['[{}]', 'parameterInvalidAlias'],
+            'nullValue' => ['[null]', 'parameterInvalid'],
+            'objectValue' => ['[{}]', 'parameterInvalid'],
         ];
     }
 
