@@ -5,10 +5,10 @@ import type Vue from 'vue';
 import identity_ChangePassword from './ChangePassword.vue';
 
 describe('ChangePassword.vue', () => {
-  const Component = identity_ChangePassword as ComponentOptions<Vue>;
+  const ChangePassword = identity_ChangePassword as ComponentOptions<Vue>;
 
   it('Should handle change password view for an identity given', () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(ChangePassword, {
       propsData: {
         username: 'hello omegaUp',
       },
@@ -18,7 +18,7 @@ describe('ChangePassword.vue', () => {
   });
 
   it('Should emit emit-change-password on form submit', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(ChangePassword, {
       propsData: {
         username: 'hello omegaUp',
       },
@@ -38,7 +38,7 @@ describe('ChangePassword.vue', () => {
   });
 
   it('Should emit emit-cancel on cancel button click', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(ChangePassword, {
       propsData: {
         username: 'hello omegaUp',
       },

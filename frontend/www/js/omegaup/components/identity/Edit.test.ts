@@ -7,10 +7,10 @@ import { dao, types } from '../../api_types';
 import identity_Edit from './Edit.vue';
 
 describe('Edit.vue', () => {
-  const Component = identity_Edit as ComponentOptions<Vue>;
+  const Edit = identity_Edit as ComponentOptions<Vue>;
 
   it('Should handle edit identity view with an identity given', () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'hello',
@@ -28,7 +28,7 @@ describe('Edit.vue', () => {
   });
 
   it('Should handle correct username for a normal identity', () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'group:hello',
@@ -46,7 +46,7 @@ describe('Edit.vue', () => {
   });
 
   it('Should handle correct username for an identity as team', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'teams:group:hello',
@@ -64,7 +64,7 @@ describe('Edit.vue', () => {
   });
 
   it('Should update username when identityName setter is invoked', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'group:oldname',
@@ -81,7 +81,7 @@ describe('Edit.vue', () => {
   });
 
   it('Should emit edit-identity-member on form submit', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'group:hello',
@@ -104,7 +104,7 @@ describe('Edit.vue', () => {
   });
 
   it('Should emit cancel on cancel button click', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'group:hello',
@@ -120,7 +120,7 @@ describe('Edit.vue', () => {
   });
 
   it('Should update selectedIdentity when identity prop changes', async () => {
-    const wrapper = shallowMount(Component, {
+    const wrapper = shallowMount(Edit, {
       propsData: {
         identity: {
           username: 'group:initial',
