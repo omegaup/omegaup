@@ -11,6 +11,10 @@ const REFRESH_INTERVAL_MS = 15000;
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CronsDetailsPayload();
 
+  let latestRefresh = 0;
+  let refreshing = false;
+  let refreshFailed = false;
+
   const app = new Vue({
     el: '#main-container',
     components: {
@@ -45,7 +49,14 @@ OmegaUp.on('ready', () => {
                 app.jobs = app.jobs.map((job) =>
                   job.name === name ? { ...job, enabled } : job,
                 );
-                ui.success(T.cronControlPlaneEnabledUpdated);
+                ui.success(
+                  ui.formatString(
+                    enabled
+                      ? T.cronControlPlaneJobNowEnabled
+                      : T.cronControlPlaneJobNowDisabled,
+                    { name },
+                  ),
+                );
               })
               .catch(ui.apiError);
           },
@@ -59,7 +70,6 @@ OmegaUp.on('ready', () => {
                 } else {
                   ui.info(T.cronControlPlaneRerunAlreadyQueued);
                 }
-                refresh();
               })
               .catch(ui.apiError)
               .finally(() => {
@@ -73,12 +83,15 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  let latestRefresh = 0;
-
   function refresh(): void {
+    if (refreshing || document.hidden) {
+      return;
+    }
+    refreshing = true;
     const sequence = ++latestRefresh;
     api.Admin.getCrons()
       .then((response) => {
+        refreshFailed = false;
         // An answer older than the newest request or change is out of date.
         if (sequence !== latestRefresh) {
           return;
@@ -87,13 +100,18 @@ OmegaUp.on('ready', () => {
         app.runs = response.runs;
         app.problemHealthFindings = response.problemHealthFindings;
       })
-      // A failed background refresh keeps what is on screen.
-      .catch(() => undefined);
+      .catch((error) => {
+        // Said once, so an expired session does not repeat it every tick.
+        if (!refreshFailed) {
+          refreshFailed = true;
+          ui.apiError(error);
+        }
+      })
+      .finally(() => {
+        refreshing = false;
+      });
   }
 
-  window.setInterval(() => {
-    if (!document.hidden) {
-      refresh();
-    }
-  }, REFRESH_INTERVAL_MS);
+  window.setInterval(refresh, REFRESH_INTERVAL_MS);
+  document.addEventListener('visibilitychange', refresh);
 });

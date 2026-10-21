@@ -145,7 +145,7 @@
         >
           <option value="">{{ T.cronControlPlaneAllStatuses }}</option>
           <option v-for="status in runStatuses" :key="status" :value="status">
-            {{ status }}
+            {{ statusTitle(status) }}
           </option>
         </select>
       </div>
@@ -536,7 +536,16 @@ export default class Crons extends Vue {
 
   successRate(name: string): string {
     const rate = cronJobs.successRate(this.runs, name);
-    return rate === null ? '—' : `${rate}%`;
+    if (rate === null) {
+      return '—';
+    }
+    // A weekly job has only a run or two in the list, so show the sample.
+    const percent = Math.round((100 * rate.succeeded) / rate.finished);
+    return `${percent}% (${rate.succeeded}/${rate.finished})`;
+  }
+
+  statusTitle(status: string): string {
+    return cronJobs.statusTitle(status);
   }
 
   avgDuration(name: string): string {

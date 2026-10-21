@@ -129,7 +129,7 @@ describe('Crons.vue', () => {
     const figures = wrapper.findAll('[data-cron-health] dd');
 
     // The run still in flight counts for neither figure.
-    expect(figures.at(0).text()).toBe('50%');
+    expect(figures.at(0).text()).toBe('50% (1/2)');
     expect(figures.at(1).text()).toBe('0.25s');
   });
 
