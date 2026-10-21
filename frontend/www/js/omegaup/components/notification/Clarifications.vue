@@ -118,7 +118,7 @@ export default defineComponent({
       }
     },
   },
-  beforeUnmount() {
+  beforeDestroy() {
     if (this.flashInterval) {
       clearInterval(this.flashInterval);
       this.flashInterval = 0;

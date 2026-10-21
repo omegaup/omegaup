@@ -68,4 +68,16 @@ describe('Clarifications.vue', () => {
     // There is only one notification, so "Mark as all read" button does not appear
     expect(wrapper.text()).not.toContain(T.notificationsMarkAllAsRead);
   });
+
+  it('Should clean up flashInterval and document title on destroy', async () => {
+    document.title = '! Test Title';
+    const wrapper = mount(Component, {
+      propsData: {
+        clarifications,
+      },
+    });
+    (wrapper.vm as any).flashInterval = 12345;
+    wrapper.destroy();
+    expect(document.title).toBe('Test Title');
+  });
 });
