@@ -3,17 +3,22 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
 from process_mysql_explain_logs import (
     AllowlistValidationError,
+    InefficientQueryResult,
+    KnownQuery,
     _main,
     build_inefficiency_key,
     build_query_family,
+    compare_results_with_allowlist,
     deduplicate_results,
+    get_comparison_exit_code,
     load_allowlist,
+    log_allowlist_comparison,
     normalize_query,
     save_to_csv,
     sort_results_for_csv,
@@ -24,12 +29,24 @@ def _result(
     query_id: str,
     normalized_query: str,
     table: str,
-) -> Dict[str, str]:
+) -> InefficientQueryResult:
     return {
         'Query ID': query_id,
         'Normalized Query': normalized_query,
         'Query Family': build_query_family(normalized_query),
         'Table': table,
+    }
+
+
+def _allowlist_entry(
+    normalized_query: str,
+    table: str,
+) -> KnownQuery:
+    return {
+        'normalized_query': normalized_query,
+        'table': table,
+        'issue': 10108,
+        'reason': 'Known query pending optimization',
     }
 
 
@@ -70,6 +87,22 @@ def test_normalize_query_collapses_whitespace() -> None:
     expected = 'SELECT * FROM Users WHERE user_id = ?'
     assert normalize_query(single_line) == expected
     assert normalize_query(multiline) == expected
+
+
+def test_normalize_query_handles_complex_collisions() -> None:
+    '''Complex quote, number, and space variants normalize identically.'''
+    query1 = (
+        "SELECT * FROM Users WHERE name = 'Alice' AND id = 10 AND "
+        "status = 'active'"
+    )
+    query2 = (
+        'SELECT *  FROM   Users\nWHERE  name = "Alice"   AND id = 9999\n'
+        'AND status = "active"'
+    )
+    assert normalize_query(query1) == normalize_query(query2)
+    assert normalize_query(query1) == (
+        'SELECT * FROM Users WHERE name = ? AND id = ? AND status = ?'
+    )
 
 
 def test_normalize_query_preserves_query_structure() -> None:
@@ -118,6 +151,126 @@ def test_inefficiency_key_includes_table() -> None:
     courses = _result('1', 'SELECT * FROM Users JOIN Courses', 'Courses')
 
     assert build_inefficiency_key(users) != build_inefficiency_key(courses)
+
+
+def test_compare_results_with_allowlist_classifies_each_identity() -> None:
+    '''Results are grouped using the normalized query and table.'''
+    normalized_query = 'SELECT * FROM Users JOIN Courses'
+    known = _result('1', normalized_query, 'Users')
+    new = _result('1', normalized_query, 'Courses')
+    not_detected = _allowlist_entry(
+        'SELECT * FROM Problems',
+        'Problems',
+    )
+
+    comparison = compare_results_with_allowlist(
+        [known, new],
+        [
+            _allowlist_entry(normalized_query, 'Users'),
+            not_detected,
+        ],
+    )
+
+    assert comparison.known_results == [known]
+    assert comparison.new_results == [new]
+    assert comparison.not_detected_entries == [not_detected]
+
+
+def test_compare_results_with_allowlist_does_not_use_query_family() -> None:
+    '''Queries in one family still need their own allowlist entry.'''
+    detected = _result(
+        '1',
+        'SELECT * FROM Users WHERE user_id IN (?, ?, ?)',
+        'Users',
+    )
+    allowlist_entry = _allowlist_entry(
+        'SELECT * FROM Users WHERE user_id IN (?, ?)',
+        'Users',
+    )
+
+    comparison = compare_results_with_allowlist(
+        [detected],
+        [allowlist_entry],
+    )
+
+    assert not comparison.known_results
+    assert comparison.new_results == [detected]
+    assert comparison.not_detected_entries == [allowlist_entry]
+
+
+def test_compare_results_multi_table_join_partial_and_full_allowlist() -> None:
+    '''Multi-table joins with multiple tables evaluate each independently.'''
+    join_query = (
+        'SELECT * FROM Users u INNER JOIN Identities i '
+        'ON u.user_id = i.user_id '
+        'INNER JOIN Problemsets p ON p.problemset_id = ?'
+    )
+    result_users = _result('1', join_query, 'u')
+    result_identities = _result('1', join_query, 'i')
+    result_problemsets = _result('1', join_query, 'p')
+
+    # Scenario A: partial allowlist ('u' and 'i' allowlisted, 'p' is not)
+    partial_allowlist = [
+        _allowlist_entry(join_query, 'u'),
+        _allowlist_entry(join_query, 'i'),
+    ]
+    comparison_partial = compare_results_with_allowlist(
+        [result_users, result_identities, result_problemsets],
+        partial_allowlist,
+    )
+    assert comparison_partial.known_results == [
+        result_users,
+        result_identities,
+    ]
+    assert comparison_partial.new_results == [result_problemsets]
+    assert get_comparison_exit_code(comparison_partial) == 1
+
+    # Scenario B: full allowlist (all 3 tables allowlisted)
+    full_allowlist = partial_allowlist + [_allowlist_entry(join_query, 'p')]
+    comparison_full = compare_results_with_allowlist(
+        [result_users, result_identities, result_problemsets],
+        full_allowlist,
+    )
+    assert comparison_full.known_results == [
+        result_users,
+        result_identities,
+        result_problemsets,
+    ]
+    assert not comparison_full.new_results
+    assert get_comparison_exit_code(comparison_full) == 0
+
+
+def test_log_allowlist_comparison_reports_new_results(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''The summary identifies new inefficient query-table pairs.'''
+    detected = _result('1', 'SELECT * FROM Users', 'Users')
+    comparison = compare_results_with_allowlist([detected], [])
+
+    with caplog.at_level(logging.WARNING):
+        log_allowlist_comparison(comparison)
+
+    assert '0 known, 1 new, 0 allowlist entries not detected' in (
+        caplog.messages
+    )
+    assert 'New inefficient query for table Users: SELECT * FROM Users' in (
+        caplog.messages
+    )
+
+
+def test_comparison_exit_code_only_fails_for_new_results() -> None:
+    '''Only results missing from the allowlist should fail the process.'''
+    normalized_query = 'SELECT * FROM Users WHERE user_id = ?'
+    detected = _result('1', normalized_query, 'Users')
+    allowlist_entry = _allowlist_entry(normalized_query, 'Users')
+
+    known = compare_results_with_allowlist([detected], [allowlist_entry])
+    not_detected = compare_results_with_allowlist([], [allowlist_entry])
+    new = compare_results_with_allowlist([detected], [])
+
+    assert get_comparison_exit_code(known) == 0
+    assert get_comparison_exit_code(not_detected) == 0
+    assert get_comparison_exit_code(new) == 1
 
 
 def test_deduplicate_results_uses_query_and_table() -> None:
@@ -251,6 +404,30 @@ def test_load_allowlist_rejects_invalid_yaml(
     ('content', 'message'),
     [
         (
+            '',
+            'must be a mapping',
+        ),
+        (
+            '   \n   \n',
+            'must be a mapping',
+        ),
+        (
+            '- version: 1\n- entries: []\n',
+            'must be a mapping',
+        ),
+        (
+            'version: 1\n',
+            'must contain exactly the fields',
+        ),
+        (
+            'entries: []\n',
+            'must contain exactly the fields',
+        ),
+        (
+            'version: 1\nentries: []\nextra_field: true\n',
+            'must contain exactly the fields',
+        ),
+        (
             'version: 2\nentries: []\n',
             'version must be 1',
         ),
@@ -262,11 +439,86 @@ def test_load_allowlist_rejects_invalid_yaml(
             '''
 version: 1
 entries:
+  - "not a mapping"
+'''.lstrip(),
+            'must be a mapping',
+        ),
+        (
+            '''
+version: 1
+entries:
   - normalized_query: SELECT * FROM Contests
     table: Contests
     issue: 10130
 '''.lstrip(),
             'must contain exactly',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: 10130
+    reason: Known query
+    extra_field: unexpected
+'''.lstrip(),
+            'must contain exactly',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: ""
+    table: Contests
+    issue: 10130
+    reason: Known query
+'''.lstrip(),
+            'must be a non-empty string',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: " Contests "
+    issue: 10130
+    reason: Known query
+'''.lstrip(),
+            'must not have leading or trailing whitespace',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: 0
+    reason: Known query
+'''.lstrip(),
+            'issue.*must be a positive integer',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: -10
+    reason: Known query
+'''.lstrip(),
+            'issue.*must be a positive integer',
+        ),
+        (
+            '''
+version: 1
+entries:
+  - normalized_query: SELECT * FROM Contests
+    table: Contests
+    issue: true
+    reason: Known query
+'''.lstrip(),
+            'issue.*must be a positive integer',
         ),
         (
             '''
@@ -382,7 +634,7 @@ def test_main_exits_nonzero_when_csv_save_fails(
     '''A CSV write failure must produce a non-zero exit code.'''
     monkeypatch.setattr(
         'process_mysql_explain_logs.load_allowlist',
-        lambda path: None,
+        lambda path: [_allowlist_entry('SELECT * FROM Users', 'Users')],
     )
     monkeypatch.setattr(
         'process_mysql_explain_logs.create_connection',
@@ -415,10 +667,46 @@ def test_main_exits_nonzero_when_csv_save_fails(
 def test_main_exits_zero_when_csv_save_succeeds(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    '''A successful CSV write keeps the zero exit code.'''
+    '''A successful CSV write keeps code 0 when queries are allowlisted.'''
+    normalized_query = 'SELECT * FROM Users'
     monkeypatch.setattr(
         'process_mysql_explain_logs.load_allowlist',
-        lambda path: None,
+        lambda path: [_allowlist_entry(normalized_query, 'Users')],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.create_connection',
+        lambda **kwargs: _FakeConnection(),
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.get_queries_from_general_log',
+        lambda connection: [normalized_query],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.explain_queries',
+        lambda connection, queries: [
+            _result('1', normalized_query, 'Users'),
+        ],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.save_to_csv',
+        lambda results: 'stuff/inefficient_queries.csv',
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        _main()
+
+    exit_exception: SystemExit = excinfo.value
+    assert exit_exception.code == 0
+
+
+def test_main_exits_nonzero_when_new_inefficient_query_detected(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''A new query not in allowlist causes _main() to exit with 1.'''
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.load_allowlist',
+        lambda path: [],
     )
     monkeypatch.setattr(
         'process_mysql_explain_logs.create_connection',
@@ -439,8 +727,82 @@ def test_main_exits_zero_when_csv_save_succeeds(
         lambda results: 'stuff/inefficient_queries.csv',
     )
 
-    with pytest.raises(SystemExit) as excinfo:
-        _main()
+    with caplog.at_level(logging.WARNING):
+        with pytest.raises(SystemExit) as excinfo:
+            _main()
+
+    exit_exception: SystemExit = excinfo.value
+    assert exit_exception.code == 1
+    assert 'New inefficient query for table Users' in caplog.text
+
+
+def test_main_exits_zero_when_no_queries_in_log(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''When no queries are present in the general log, _main() exits with 0.'''
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.load_allowlist',
+        lambda path: [],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.create_connection',
+        lambda **kwargs: _FakeConnection(),
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.get_queries_from_general_log',
+        lambda connection: [],
+    )
+
+    with caplog.at_level(logging.WARNING):
+        with pytest.raises(SystemExit) as excinfo:
+            _main()
 
     exit_exception: SystemExit = excinfo.value
     assert exit_exception.code == 0
+    assert 'No queries found in the general log' in caplog.text
+
+
+def test_main_exits_nonzero_when_connection_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''When database connection fails, _main() exits with 1.'''
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.load_allowlist',
+        lambda path: [],
+    )
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.create_connection',
+        lambda **kwargs: None,
+    )
+
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(SystemExit) as excinfo:
+            _main()
+
+    exit_exception: SystemExit = excinfo.value
+    assert exit_exception.code == 1
+    assert 'Could not connect to MySQL' in caplog.text
+
+
+def test_main_exits_nonzero_when_allowlist_fails_to_load(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    '''When allowlist cannot be loaded, _main() exits with 1.'''
+    def _fail_load(path: str) -> Any:
+        raise AllowlistValidationError('Corrupt allowlist file')
+
+    monkeypatch.setattr(
+        'process_mysql_explain_logs.load_allowlist',
+        _fail_load,
+    )
+
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(SystemExit) as excinfo:
+            _main()
+
+    exit_exception: SystemExit = excinfo.value
+    assert exit_exception.code == 1
+    assert 'Failed to load allowlist' in caplog.text
