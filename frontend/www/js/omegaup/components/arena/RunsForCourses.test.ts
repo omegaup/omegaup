@@ -5,7 +5,9 @@ import { types } from '../../api_types';
 
 import T from '../../lang';
 
-import arena_RunsForCourses from './RunsForCourses.vue';
+import arena_RunsForCourses, {
+  NumericOutputStatus,
+} from './RunsForCourses.vue';
 import { DisqualificationType } from './Runs.vue';
 
 describe('RunsForCourses.vue', () => {
@@ -499,5 +501,113 @@ describe('RunsForCourses.vue', () => {
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
       expect(wrapper.vm.filterUsername).toBeFalsy();
     });
+  });
+
+  it('Should apply run-loading class and spinner icon when run status is not ready', () => {
+    const runsWithLoading: types.Run[] = [
+      {
+        ...runs[0],
+        guid: 'loading_run_course',
+        status: 'new',
+      },
+      ...runs,
+    ];
+    const wrapper = mount(arena_RunsForCourses, {
+      propsData: {
+        contestAlias: 'admin',
+        runs: runsWithLoading,
+        createdGuid: 'loading_run_course',
+      },
+    });
+
+    const loadingRows = wrapper.findAll('tbody tr.run-loading');
+    expect(loadingRows.length).toBe(1);
+
+    expect(loadingRows.at(0).find('svg.fa-spinner').exists()).toBe(true);
+    expect(loadingRows.at(0).text()).toContain('new');
+    expect(loadingRows.at(0).classes()).not.toContain('selected');
+  });
+
+  it('Should display correct execution, output, and icon upon evaluation when status becomes ready', () => {
+    const evaluatedRunAC: types.Run = {
+      ...runs[0],
+      guid: 'evaluated_run_ac',
+      time: new Date('2024-01-01'),
+      status: 'ready',
+      verdict: 'AC',
+      score: 1,
+      execution: 'EXECUTION_JUDGE_ERROR',
+      output: 'OUTPUT_INTERRUPTED',
+    };
+    const wrapper = mount(arena_RunsForCourses, {
+      propsData: {
+        contestAlias: 'admin',
+        runs: [evaluatedRunAC],
+        createdGuid: 'evaluated_run_ac',
+      },
+    });
+
+    const row = wrapper.find('tbody tr');
+    expect(row.classes()).not.toContain('run-loading');
+    expect(row.classes()).toContain('selected');
+    expect(row.find('svg.fa-spinner').exists()).toBe(false);
+
+    expect(wrapper.vm.execution(evaluatedRunAC)).toBe(T.runDetailsFinished);
+    expect(wrapper.vm.output(evaluatedRunAC)).toBe(T.runDetailsCorrect);
+    expect(wrapper.vm.outputIconColorStatus(evaluatedRunAC)).toBe(
+      NumericOutputStatus.Correct,
+    );
+    expect(wrapper.vm.percentage(evaluatedRunAC)).toBe('100.00%');
+    expect(row.find('svg.fa-check-circle').exists()).toBe(true);
+
+    const evaluatedRunWA: types.Run = {
+      ...runs[0],
+      guid: 'evaluated_run_wa',
+      time: new Date('2024-01-01'),
+      status: 'ready',
+      verdict: 'WA',
+      score: 0,
+      execution: 'EXECUTION_JUDGE_ERROR',
+      output: 'OUTPUT_INTERRUPTED',
+    };
+    expect(wrapper.vm.execution(evaluatedRunWA)).toBe(T.runDetailsFinished);
+    expect(wrapper.vm.output(evaluatedRunWA)).toBe(T.runDetailsIncorrect);
+    expect(wrapper.vm.outputIconColorStatus(evaluatedRunWA)).toBe(
+      NumericOutputStatus.Incorrect,
+    );
+
+    const evaluatedRunCE: types.Run = {
+      ...runs[0],
+      guid: 'evaluated_run_ce',
+      time: new Date('2024-01-01'),
+      status: 'ready',
+      verdict: 'CE',
+      score: 0,
+      execution: 'EXECUTION_JUDGE_ERROR',
+      output: 'OUTPUT_INTERRUPTED',
+    };
+    expect(wrapper.vm.execution(evaluatedRunCE)).toBe(
+      T.runDetailsCompilationError,
+    );
+    expect(wrapper.vm.output(evaluatedRunCE)).toBe(T.runDetailsInterrupted);
+    expect(wrapper.vm.outputIconColorStatus(evaluatedRunCE)).toBe(
+      NumericOutputStatus.Interrupted,
+    );
+
+    const evaluatedRunTLE: types.Run = {
+      ...runs[0],
+      guid: 'evaluated_run_tle',
+      time: new Date('2024-01-01'),
+      status: 'ready',
+      verdict: 'TLE',
+      score: 0,
+      execution: 'EXECUTION_JUDGE_ERROR',
+      output: 'OUTPUT_INTERRUPTED',
+    };
+    expect(wrapper.vm.execution(evaluatedRunTLE)).toBe(T.runDetailsInterrupted);
+    expect(wrapper.vm.output(evaluatedRunTLE)).toBe(T.runDetailsInterrupted);
+    expect(wrapper.vm.outputIconColorStatus(evaluatedRunTLE)).toBe(
+      NumericOutputStatus.Interrupted,
+    );
   });
 });

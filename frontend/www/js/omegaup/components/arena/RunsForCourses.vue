@@ -257,7 +257,10 @@
             <tr
               v-for="run in paginatedRuns"
               :key="run.guid"
-              :class="{ selected: createdGuid === run.guid }"
+              :class="{
+                selected: createdGuid === run.guid && run.status === 'ready',
+                'run-loading': run.status !== 'ready',
+              }"
             >
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td v-show="showGUID">
@@ -350,7 +353,15 @@
               >
                 {{ percentage(run) }}
               </td>
-              <td class="numeric">{{ execution(run) }}</td>
+              <td class="numeric">
+                <font-awesome-icon
+                  v-if="run.status !== 'ready'"
+                  :icon="['fas', 'spinner']"
+                  spin
+                  class="mr-1"
+                />
+                {{ execution(run) }}
+              </td>
               <td class="numeric">
                 {{ output(run) }}
                 <br
@@ -532,6 +543,7 @@ import {
   faCalendarAlt,
   faCheckCircle,
   faTimesCircle,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faQuestionCircle);
@@ -545,6 +557,7 @@ library.add(faClock);
 library.add(faCalendarAlt);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
+library.add(faSpinner);
 
 Vue.use(PaginationPlugin);
 
@@ -873,16 +886,87 @@ export default class RunsForCourses extends Vue {
     return `${verdict}: ${verdictHelp}`;
   }
 
+  resolveExecution(run: types.Run): string | undefined {
+    if (run.status === 'ready') {
+      if (
+        (!run.execution || run.execution === ExecutionStatus.JudgeError) &&
+        run.verdict &&
+        run.verdict !== 'JE'
+      ) {
+        switch (run.verdict) {
+          case 'VE':
+            return ExecutionStatus.ValidatorError;
+          case 'CE':
+            return ExecutionStatus.CompilationError;
+          case 'OF':
+          case 'RFE':
+            return ExecutionStatus.RuntimeFunctionError;
+          case 'RE':
+          case 'RTE':
+            return ExecutionStatus.RuntimeError;
+          case 'ML':
+          case 'MLE':
+          case 'TLE':
+          case 'OLE':
+          case 'TO':
+          case 'OL':
+            return ExecutionStatus.Interrupted;
+          case 'AC':
+          case 'WA':
+          case 'PA':
+          case 'PE':
+            return 'EXECUTION_FINISHED';
+        }
+      }
+    }
+    return run.execution;
+  }
+
+  resolveOutput(run: types.Run): string | undefined {
+    if (run.status === 'ready') {
+      if (
+        (!run.output || run.output === StringOutputStatus.Interrupted) &&
+        run.verdict &&
+        run.verdict !== 'JE' &&
+        run.verdict !== 'CE' &&
+        run.verdict !== 'VE' &&
+        run.verdict !== 'TLE' &&
+        run.verdict !== 'MLE' &&
+        run.verdict !== 'TO' &&
+        run.verdict !== 'ML' &&
+        run.verdict !== 'RE' &&
+        run.verdict !== 'RTE' &&
+        run.verdict !== 'RFE' &&
+        run.verdict !== 'OF' &&
+        run.verdict !== 'FO'
+      ) {
+        switch (run.verdict) {
+          case 'AC':
+            return 'OUTPUT_CORRECT';
+          case 'WA':
+          case 'PA':
+          case 'PE':
+          case 'NO-AC':
+            return StringOutputStatus.Incorrect;
+          case 'OLE':
+          case 'OL':
+            return StringOutputStatus.Exceeded;
+        }
+      }
+    }
+    return run.output;
+  }
+
   execution(run: types.Run): string {
     if (run.time < this.newFieldsLaunchDate) {
       return T.runDetailsNotAvailable;
     }
 
     if (run.status !== 'ready') {
-      return '—';
+      return this.status(run);
     }
 
-    switch (run.execution) {
+    switch (this.resolveExecution(run)) {
       case ExecutionStatus.JudgeError:
         return T.runDetailsJudgeError;
       case ExecutionStatus.ValidatorError:
@@ -909,7 +993,7 @@ export default class RunsForCourses extends Vue {
       return '—';
     }
 
-    switch (run.output) {
+    switch (this.resolveOutput(run)) {
       case StringOutputStatus.Exceeded:
         return T.runDetailsExceeded;
       case StringOutputStatus.Incorrect:
@@ -959,16 +1043,17 @@ export default class RunsForCourses extends Vue {
   }
 
   outputIconColorStatus(run: types.Run): number {
+    const output = this.resolveOutput(run);
     if (
-      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
+      !(run.status === 'ready' && output !== StringOutputStatus.Exceeded) ||
       run.time < this.newFieldsLaunchDate
     ) {
       return NumericOutputStatus.None;
     }
 
-    if (run.output === StringOutputStatus.Incorrect) {
+    if (output === StringOutputStatus.Incorrect) {
       return NumericOutputStatus.Incorrect;
-    } else if (run.output === StringOutputStatus.Interrupted) {
+    } else if (output === StringOutputStatus.Interrupted) {
       return NumericOutputStatus.Interrupted;
     }
 
@@ -1263,5 +1348,27 @@ export default class RunsForCourses extends Vue {
 .status-rfe {
   background: var(--arena-runs-table-status-rfe-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
+}
+
+tr.run-loading td {
+  animation: run-loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes run-loading-pulse {
+  0% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>
