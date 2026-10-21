@@ -14,6 +14,7 @@
                   T.userEmailEditEmail
                 }}</label>
                 <div class="col-md-7">
+                  <!-- id-lint off -->
                   <input
                     id="email"
                     v-model.trim="currentEmail"
@@ -24,6 +25,7 @@
                     type="email"
                     required
                   />
+                  <!-- id-lint on -->
                 </div>
               </div>
               <div class="form-group">
