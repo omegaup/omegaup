@@ -346,7 +346,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         $encodedTeamIdentities = $r->ensureString('team_identities');
 
-        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
+        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames?: null|string}>|null $teamIdentities */
         $teamIdentities = json_decode($encodedTeamIdentities, true);
         if (!is_array($teamIdentities) || empty($teamIdentities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -359,6 +359,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
         /** @var array<string, bool> $seenMemberUsernames */
         $seenMemberUsernames = [];
         foreach ($teamIdentities as $username => $teamIdentity) {
+            /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
+            if (
+                !is_array($teamIdentity)
+                || !isset($teamIdentity['username'])
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'team_identities'
+                );
+            }
             if (isset($seenUsernames[$teamIdentity['username']])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'teamAliasInUse'
@@ -366,14 +376,35 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             $seenUsernames[$teamIdentity['username']] = true;
 
-            if ($teamIdentity['usernames'] == '') {
+            // array_key_exists is intentional: isset() returns false for null values,
+            // which would cause Psalm to think null is unreachable on the next check.
+            if (
+                !array_key_exists('usernames', $teamIdentity)
+                || is_null($teamIdentity['usernames'])
+                || $teamIdentity['usernames'] === ''
+            ) {
                 $teamIdentities[$username]['identityUsernames'] = null;
                 continue;
             }
+
+            // At this point usernames is a non-null, non-empty value from JSON.
+            // Validate it is actually a string (guards against integer/bool inputs).
+            /** @psalm-suppress DocblockTypeContradiction runtime validation for malformed JSON */
+            if (!is_string($teamIdentity['usernames'])) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'usernames'
+                );
+            }
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
-            /** @var list<array{password?: string, username: string}> */
             $identities = json_decode($teamIdentity['usernames'], true);
+            if (!is_array($identities)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'usernames'
+                );
+            }
             if (
                 count(
                     $identities
@@ -384,6 +415,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
             }
             foreach ($identities as $identityMember) {
+                if (
+                    !is_array($identityMember)
+                    || !isset($identityMember['username'])
+                    || !is_string($identityMember['username'])
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'usernames'
+                    );
+                }
                 if (
                     isset(
                         $seenMemberUsernames[$identityMember['username']]
@@ -397,6 +438,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 }
                 $seenMemberUsernames[$identityMember['username']] = true;
             }
+            /** @var list<array{password?: string, username: string}> $identities */
             $teamIdentities[$username]['identityUsernames'] = $identities;
         }
 
@@ -523,7 +565,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
+        } catch (\Throwable $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
