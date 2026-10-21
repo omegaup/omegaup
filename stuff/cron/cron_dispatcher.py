@@ -12,12 +12,13 @@ import json
 import logging
 import os
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
 import types
 
-from typing import (Callable, Iterator, List, NamedTuple, Optional, Set,
+from typing import (Callable, Dict, Iterator, List, NamedTuple, Optional,
                     Tuple)
 
 import mysql.connector.cursor
@@ -38,13 +39,10 @@ DEFAULT_RUN_TIMEOUT_SECONDS = 6 * 3600
 # A picked request is only abandoned once its run can no longer be alive.
 REAP_MARGIN_SECONDS = 600
 
-# A request nothing claimed means no dispatcher was running when it was made.
-STALE_PENDING_HOURS = 1
-
 _STALE_PICK_ERROR = 'the dispatcher did not finish this run'
 _INTERRUPTED_ERROR = 'the dispatcher stopped before this run finished'
-_STALE_PENDING_ERROR = 'no dispatcher picked up this run'
 _UNREGISTERED_ERROR = 'job is not registered'
+_DISABLED_ERROR = 'the job is disabled'
 _UNCONFIGURED_ERROR = 'the dispatcher was not told where this job writes'
 _SKIPPED_ERROR = 'the job did not run: it is disabled or already running'
 
@@ -109,7 +107,7 @@ def get_pending_requests(
         WHERE
             status = %s
         ORDER BY
-            requested_at ASC;''',
+            requested_at ASC, request_id ASC;''',
         (RequestStatus.PENDING.value,))
     return [
         RerunRequest(row['request_id'], row['name'], row['requested_by'])
@@ -119,13 +117,13 @@ def get_pending_requests(
 
 def get_registered_jobs(
     cur: mysql.connector.cursor.MySQLCursorDict,
-) -> Set[str]:
-    '''Returns the job names the registry knows about.'''
-    cur.execute('SELECT name FROM Cron_Jobs;')
-    return {row['name'] for row in cur.fetchall()}
+) -> Dict[str, bool]:
+    '''Returns whether each job the registry knows about is enabled.'''
+    cur.execute('SELECT name, enabled FROM Cron_Jobs;')
+    return {row['name']: bool(row['enabled']) for row in cur.fetchall()}
 
 
-def is_launchable(name: str, registered: Set[str]) -> bool:
+def is_launchable(name: str, registered: Dict[str, bool]) -> bool:
     '''Whether a request names a known script installed in this checkout.
 
     A launchable name has to be in the compiled-in allowlist, in the registry
@@ -151,9 +149,8 @@ def job_args(args: argparse.Namespace, name: str) -> Optional[List[str]]:
 def _stale_requests(
     cur: mysql.connector.cursor.MySQLCursorDict,
     stale_pick_seconds: int,
-) -> List[Tuple[RerunRequest, RequestStatus, str]]:
-    '''Returns the requests no dispatcher is going to finish.'''
-    stale = []
+) -> List[RerunRequest]:
+    '''Returns the picked requests whose run can no longer be alive.'''
     cur.execute(
         '''
         SELECT
@@ -164,25 +161,10 @@ def _stale_requests(
             status = %s
             AND picked_at < DATE_SUB(NOW(), INTERVAL %s SECOND);''',
         (RequestStatus.PICKED.value, stale_pick_seconds))
-    for row in cur.fetchall():
-        stale.append((
-            RerunRequest(row['request_id'], row['name'], row['requested_by']),
-            RequestStatus.PICKED, _STALE_PICK_ERROR))
-    cur.execute(
-        '''
-        SELECT
-            request_id, name, requested_by
-        FROM
-            Cron_Run_Requests
-        WHERE
-            status = %s
-            AND requested_at < DATE_SUB(NOW(), INTERVAL %s HOUR);''',
-        (RequestStatus.PENDING.value, STALE_PENDING_HOURS))
-    for row in cur.fetchall():
-        stale.append((
-            RerunRequest(row['request_id'], row['name'], row['requested_by']),
-            RequestStatus.PENDING, _STALE_PENDING_ERROR))
-    return stale
+    return [
+        RerunRequest(row['request_id'], row['name'], row['requested_by'])
+        for row in cur.fetchall()
+    ]
 
 
 def fail_stale_requests(
@@ -190,26 +172,26 @@ def fail_stale_requests(
     cur: mysql.connector.cursor.MySQLCursorDict,
     stale_pick_seconds: int,
 ) -> int:
-    '''Fails the requests nothing is going to finish, and says so.
+    '''Fails the picked requests whose dispatcher died, and says so.
 
-    Either status blocks `getActiveByName`, so an abandoned row leaves the
-    job's Rerun button dead until something resolves it. Returns how many
-    were failed.
+    A picked row blocks `getActiveByName`, so an abandoned one leaves the
+    job's Rerun button dead until something resolves it. Pending rows are
+    left alone: they may only be waiting behind a long rerun. Returns how
+    many were failed.
     '''
     failed = 0
-    for request, status, error_text in _stale_requests(cur,
-                                                       stale_pick_seconds):
+    for request in _stale_requests(cur, stale_pick_seconds):
         cur.execute(
             '''
             UPDATE Cron_Run_Requests
             SET status = %s, finished_at = NOW(), error_text = %s
             WHERE request_id = %s AND status = %s;''',
-            (RequestStatus.FAILED.value, error_text, request.request_id,
-             status.value))
+            (RequestStatus.FAILED.value, _STALE_PICK_ERROR,
+             request.request_id, RequestStatus.PICKED.value))
         if cur.rowcount != 1:
             continue
-        logging.warning('Request %d for %s was abandoned: %s',
-                        request.request_id, request.name, error_text)
+        logging.warning('Request %d for %s was abandoned',
+                        request.request_id, request.name)
         _notify_requester(cur, request.requested_by, request.name,
                           RequestStatus.FAILED)
         failed += 1
@@ -238,28 +220,39 @@ def _claim_request(
     return claimed
 
 
-def _latest_run_id(
-    cur: mysql.connector.cursor.MySQLCursorDict,
-    name: str,
-) -> Optional[int]:
-    '''Returns the newest run recorded for a job, if any.'''
-    cur.execute(
-        'SELECT MAX(run_id) AS run_id FROM Cron_Runs WHERE name = %s;',
-        (name,))
+def _latest_run_id(cur: mysql.connector.cursor.MySQLCursorDict) -> int:
+    '''Returns the newest run recorded for any job, or 0 if there is none.'''
+    cur.execute('SELECT MAX(run_id) AS run_id FROM Cron_Runs;')
     row = cur.fetchone()
     if row is None or row['run_id'] is None:
-        return None
+        return 0
     return int(row['run_id'])
 
 
-def _is_still_running(
+def _own_run_id(
     cur: mysql.connector.cursor.MySQLCursorDict,
-    run_id: int,
-) -> bool:
-    '''Whether a run has not recorded how it ended.'''
-    cur.execute('SELECT status FROM Cron_Runs WHERE run_id = %s;', (run_id,))
+    name: str,
+    previous_run_id: int,
+) -> Optional[int]:
+    '''Returns the run the child recorded, if it got that far.
+
+    The child runs on this host and scheduled runs run in their own pods, so
+    the host name tells them apart even when both start around the same time.
+    '''
+    cur.execute(
+        '''
+        SELECT
+            run_id
+        FROM
+            Cron_Runs
+        WHERE
+            name = %s AND hostname = %s AND run_id > %s
+        ORDER BY
+            run_id ASC
+        LIMIT 1;''',
+        (name, socket.gethostname(), previous_run_id))
     row = cur.fetchone()
-    return bool(row is not None and row['status'] == 'running')
+    return None if row is None else int(row['run_id'])
 
 
 @contextlib.contextmanager
@@ -353,8 +346,11 @@ def _reject_request(
     cur: mysql.connector.cursor.MySQLCursorDict,
     request: RerunRequest,
     error_text: str,
-) -> None:
-    '''Fails a request that must not be launched at all, and says so.'''
+) -> bool:
+    '''Fails a request that must not be launched at all, and says so.
+
+    Returns False if another dispatcher resolved it first.
+    '''
     cur.execute(
         '''
         UPDATE Cron_Run_Requests
@@ -362,10 +358,12 @@ def _reject_request(
         WHERE request_id = %s AND status = %s;''',
         (RequestStatus.FAILED.value, error_text, request.request_id,
          RequestStatus.PENDING.value))
-    if cur.rowcount == 1:
+    rejected = cur.rowcount == 1
+    if rejected:
         _notify_requester(cur, request.requested_by, request.name,
                           RequestStatus.FAILED)
     dbconn.conn.commit()
+    return rejected
 
 
 def _run_claimed(
@@ -376,7 +374,7 @@ def _run_claimed(
     run_command: RunCommand,
 ) -> Outcome:
     '''Runs a claimed request and works out how it ended.'''
-    previous_run_id = _latest_run_id(cur, request.name)
+    previous_run_id = _latest_run_id(cur)
     # Ends the read view, which REPEATABLE READ would otherwise reuse.
     dbconn.conn.commit()
     logging.info('Running rerun of %s', request.name)
@@ -388,13 +386,7 @@ def _run_claimed(
     status = RequestStatus.DONE if returncode == 0 else RequestStatus.FAILED
     # The connection sat idle for the whole run and may have been dropped.
     dbconn.conn.ping(reconnect=True, attempts=3, delay=1)
-    run_id = _latest_run_id(cur, request.name)
-    if run_id == previous_run_id:
-        run_id = None
-    elif (run_id is not None and status is RequestStatus.DONE
-          and _is_still_running(cur, run_id)):
-        # A scheduled run of the same job took the lock first. It is not ours.
-        run_id = None
+    run_id = _own_run_id(cur, request.name, previous_run_id)
     if run_id is None and status is RequestStatus.DONE:
         # lib.runner exits 0 when it skips, so this never ran.
         status = RequestStatus.FAILED
@@ -416,6 +408,9 @@ def _finish_request(
         WHERE request_id = %s AND status = %s;''',
         (outcome.status.value, outcome.run_id, outcome.error_text,
          request.request_id, RequestStatus.PICKED.value))
+    if outcome.status is RequestStatus.FAILED:
+        logging.warning('Rerun of %s failed: %s', request.name,
+                        outcome.error_text)
     if cur.rowcount == 1:
         _notify_requester(cur, request.requested_by, request.name,
                           outcome.status)
@@ -432,22 +427,28 @@ def process_requests(
     run_command: RunCommand = run_script,
 ) -> Summary:
     '''Claims and runs every pending request.'''
+    # Another dispatcher may run with a longer timeout than this one.
     failed = fail_stale_requests(
-        dbconn, cur, args.run_timeout_seconds + REAP_MARGIN_SECONDS)
+        dbconn, cur,
+        max(args.run_timeout_seconds, DEFAULT_RUN_TIMEOUT_SECONDS)
+        + REAP_MARGIN_SECONDS)
     registered = get_registered_jobs(cur)
     processed = 0
     for request in get_pending_requests(cur):
         rejection = None
         if not is_launchable(request.name, registered):
             rejection = _UNREGISTERED_ERROR
+        elif not registered[request.name]:
+            # It was disabled after the request was queued.
+            rejection = _DISABLED_ERROR
         elif job_args(args, request.name) is None:
             rejection = _UNCONFIGURED_ERROR
         if rejection is not None:
-            _reject_request(dbconn, cur, request, rejection)
-            logging.warning('Rejected rerun of %s: %s', request.name,
-                            rejection)
-            processed += 1
-            failed += 1
+            if _reject_request(dbconn, cur, request, rejection):
+                logging.warning('Rejected rerun of %s: %s', request.name,
+                                rejection)
+                processed += 1
+                failed += 1
             continue
 
         if not _claim_request(dbconn, cur, request.request_id):
