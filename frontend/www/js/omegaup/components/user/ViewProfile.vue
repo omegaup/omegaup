@@ -183,7 +183,23 @@
                   :items-per-page="30"
                   :title="T.profileBookmarkedProblems"
                   class="mb-3"
-                ></omegaup-grid-paginator>
+                >
+                  <template #item-data="slotProps">
+                    <a :href="slotProps.item.getUrl()">{{
+                      slotProps.item.toString()
+                    }}</a>
+                    <span
+                      v-if="slotProps.item.solved"
+                      class="badge badge-success ml-1"
+                      >{{ T.problemStatusSolved }}</span
+                    >
+                    <span
+                      v-else-if="slotProps.item.attempted"
+                      class="badge badge-warning ml-1"
+                      >{{ T.problemStatusAttempted }}</span
+                    >
+                  </template>
+                </omegaup-grid-paginator>
               </div>
               <div
                 v-show="currentSelectedTab == ViewProfileTabs.Contests"
@@ -315,6 +331,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
+  BookmarkedProblem,
   Contest,
   ContestResult,
   Course,
@@ -450,10 +467,10 @@ export default class ViewProfile extends Vue {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
-  get bookmarkedProblems(): Problem[] {
+  get bookmarkedProblems(): BookmarkedProblem[] {
     if (!this.data?.bookmarkedProblems) return [];
     return this.data.bookmarkedProblems.map(
-      (problem: types.BookmarkProblem) => new Problem(problem as types.Problem),
+      (problem: types.BookmarkProblem) => new BookmarkedProblem(problem),
     );
   }
   get rank(): string {

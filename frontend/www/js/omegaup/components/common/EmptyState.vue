@@ -10,10 +10,20 @@
     <p v-if="description" class="text-muted mb-4">{{ description }}</p>
     <slot name="action">
       <template v-if="buttonText">
-        <a v-if="buttonLink" class="btn btn-primary btn-lg" :href="buttonLink">
+        <a
+          v-if="buttonLink"
+          class="btn btn-primary btn-lg"
+          :href="buttonLink"
+          v-bind="buttonDataAttributes"
+        >
           {{ buttonText }}
         </a>
-        <button v-else class="btn btn-primary btn-lg" @click="$emit('action')">
+        <button
+          v-else
+          class="btn btn-primary btn-lg"
+          v-bind="buttonDataAttributes"
+          @click="$emit('action')"
+        >
           {{ buttonText }}
         </button>
       </template>
@@ -45,6 +55,17 @@ export default class EmptyState extends Vue {
   @Prop() description!: string;
   @Prop({ default: '' }) buttonText!: string;
   @Prop({ default: '' }) buttonLink!: string;
+  @Prop({ default: '' }) buttonDataAttribute!: string;
+
+  get buttonDataAttributes(): { [key: string]: string } {
+    if (!this.buttonDataAttribute) {
+      return {};
+    }
+    const attr = this.buttonDataAttribute.startsWith('data-')
+      ? this.buttonDataAttribute
+      : `data-${this.buttonDataAttribute}`;
+    return { [attr]: '' };
+  }
 }
 </script>
 

@@ -147,6 +147,125 @@ describe('Scoreboard.vue', () => {
     expect(wrapper.find('.clock').text()).toBe('∞');
   });
 
+  it('Should show the per-problem solve statistics row', () => {
+    const wrapper = shallowMount(arena_Scoreboard, {
+      propsData: Object.assign(
+        {
+          showInvitedUsersFilter: false,
+        },
+        baseScoreboardProps,
+      ),
+    });
+
+    const statsRow = wrapper.find('[data-table-scoreboard-solve-stats]');
+    expect(statsRow.exists()).toBe(true);
+    expect(
+      statsRow.find('[data-solve-stats-count]').text().replace(/\s+/g, ' '),
+    ).toBe('1 / 2 · 50%');
+  });
+
+  it('Should compute solve statistics only for visible contestants', () => {
+    const wrapper = shallowMount(arena_Scoreboard, {
+      propsData: Object.assign(
+        {
+          showInvitedUsersFilter: true,
+        },
+        baseScoreboardProps,
+      ),
+    });
+
+    const statsRow = wrapper.find('[data-table-scoreboard-solve-stats]');
+    expect(
+      statsRow.find('[data-solve-stats-count]').text().replace(/\s+/g, ' '),
+    ).toBe('1 / 1 · 100%');
+  });
+
+  it('Should show the first contestant that solved each problem', () => {
+    const wrapper = shallowMount(arena_Scoreboard, {
+      propsData: Object.assign({}, baseScoreboardProps, {
+        showInvitedUsersFilter: false,
+        ranking: [
+          {
+            classname: 'user-rank-master',
+            country: 'xx',
+            is_invited: true,
+            name: 'test_user_0',
+            problems: [
+              {
+                alias: 'sumas',
+                first_solved: 75.2,
+                penalty: 0,
+                percent: 100,
+                points: 100,
+                runs: 3,
+              },
+            ],
+            total: { penalty: 0, points: 100 },
+            username: 'test_user_0',
+          },
+          {
+            classname: 'user-rank-master',
+            country: 'xx',
+            is_invited: true,
+            name: 'test_user_1',
+            problems: [
+              {
+                alias: 'sumas',
+                first_solved: 12.4,
+                penalty: 0,
+                percent: 100,
+                points: 100,
+                runs: 1,
+              },
+            ],
+            total: { penalty: 0, points: 100 },
+            username: 'test_user_1',
+          },
+        ],
+      }),
+    });
+
+    const statsRow = wrapper.find('[data-table-scoreboard-solve-stats]');
+    expect(
+      statsRow.find('[data-solve-stats-count]').text().replace(/\s+/g, ' '),
+    ).toBe('2 / 2 · 100%');
+    expect(
+      statsRow
+        .find('[data-solve-stats-first-solver]')
+        .text()
+        .replace(/\s+/g, ' '),
+    ).toBe('test_user_1 @ 00:12');
+  });
+
+  it('Should handle the solve statistics row when nobody has solved a problem', () => {
+    const wrapper = shallowMount(arena_Scoreboard, {
+      propsData: Object.assign({}, baseScoreboardProps, {
+        showInvitedUsersFilter: false,
+        ranking: [
+          {
+            classname: 'user-rank-master',
+            country: 'xx',
+            is_invited: true,
+            name: 'test_user_0',
+            problems: [
+              { alias: 'sumas', penalty: 0, percent: 0, points: 0, runs: 2 },
+            ],
+            total: { penalty: 0, points: 0 },
+            username: 'test_user_0',
+          },
+        ],
+      }),
+    });
+
+    const statsRow = wrapper.find('[data-table-scoreboard-solve-stats]');
+    expect(
+      statsRow.find('[data-solve-stats-count]').text().replace(/\s+/g, ' '),
+    ).toBe('0 / 1 · 0%');
+    expect(
+      statsRow.find('[data-solve-stats-first-solver]').exists(),
+    ).toBeFalsy();
+  });
+
   it('Should handle scoreboard when socket status changes', async () => {
     const wrapper = mount(arena_Scoreboard, {
       propsData: baseScoreboardProps,
