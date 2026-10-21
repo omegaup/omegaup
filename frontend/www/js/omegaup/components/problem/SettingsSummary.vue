@@ -35,7 +35,7 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
       <button
-        v-if="userLoggedIn && !inContestOrCourse && problem.accepts_submissions"
+        v-if="userLoggedIn && problem.accepts_submissions"
         data-bookmark-button
         class="btn btn-link p-0 ml-2"
         :title="isBookmarked ? T.problemBookmarkRemove : T.problemBookmarkAdd"

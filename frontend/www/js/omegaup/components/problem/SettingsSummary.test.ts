@@ -113,7 +113,7 @@ describe('SettingsSummary.vue', () => {
     expect(wrapper.find('button[data-bookmark-button]').exists()).toBeFalsy();
   });
 
-  it('Should hide the bookmark button inside contests or courses', () => {
+  it('Should show the bookmark button inside contests or courses', () => {
     const wrapper = mount(problem_SettingsSummary, {
       propsData: {
         ...baseSettingsSummaryProps,
@@ -122,7 +122,7 @@ describe('SettingsSummary.vue', () => {
       },
     });
 
-    expect(wrapper.find('button[data-bookmark-button]').exists()).toBeFalsy();
+    expect(wrapper.find('button[data-bookmark-button]').exists()).toBeTruthy();
   });
 
   it('Should show the bookmark button with the add title when not bookmarked', () => {
