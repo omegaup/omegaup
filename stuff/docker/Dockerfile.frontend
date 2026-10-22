@@ -48,11 +48,11 @@ RUN set -eu; \
     done
 
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
-    apt-get install -y nodejs && \
+    apt-get install -y nodejs=24.22.1-1nodesource1 && \
     corepack enable
 
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y nginx nodejs && \
+    apt-get install --no-install-recommends -y nginx nodejs=24.22.1-1nodesource1 && \
     apt-get autoremove -y && \
     apt-get clean
 

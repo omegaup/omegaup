@@ -1,11 +1,11 @@
 ## Preliminary Steps
 
-You need to have Node.js 24 (LTS) installed to use Cypress. The project pins the version in [`.nvmrc`](https://github.com/omegaup/omegaup/blob/main/.nvmrc). We recommend [nvm](https://github.com/nvm-sh/nvm):
+You need to have Node.js 24.22.1 (LTS) installed to use Cypress. The project pins the version in [`.nvmrc`](https://github.com/omegaup/omegaup/blob/main/.nvmrc). We recommend [nvm](https://github.com/nvm-sh/nvm):
 
 ```bash
-nvm install    # reads .nvmrc and installs Node 24
+nvm install    # reads .nvmrc and installs Node 24.22.1
 nvm use        # switches to the version in .nvmrc
-node -v        # should print v24.x.x
+node -v        # should print v24.22.1
 pnpm install
 ```
 
