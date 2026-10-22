@@ -1,8 +1,6 @@
 <a href="https://omegaup.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="frontend/www/media/omegaup_dark.png">
-    <img alt="omegaUp" src="frontend/www/media/omegaup.png" width="203">
-  </picture>
+  <img alt="omegaUp" src="frontend/www/media/omegaup_dark.png#gh-dark-mode-only" width="203">
+  <img alt="omegaUp" src="frontend/www/media/omegaup.png#gh-light-mode-only" width="203">
 </a>
 
 [![Contributors](https://img.shields.io/github/contributors/omegaup/omegaup)](https://github.com/omegaup/omegaup/graphs/contributors) [![Issues open](https://img.shields.io/github/issues/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen) [![Issues closed](https://img.shields.io/github/issues-closed/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed)
