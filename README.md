@@ -1,7 +1,5 @@
-<a href="https://omegaup.com">
-  <img alt="omegaUp" src="frontend/www/media/omegaup_dark.png#gh-dark-mode-only" width="203">
-  <img alt="omegaUp" src="frontend/www/media/omegaup.png#gh-light-mode-only" width="203">
-</a>
+[![omegaUp](frontend/www/media/omegaup.png#gh-light-mode-only)](https://omegaup.com)
+[![omegaUp](frontend/www/media/omegaup_dark.png#gh-dark-mode-only)](https://omegaup.com)
 
 [![Contributors](https://img.shields.io/github/contributors/omegaup/omegaup)](https://github.com/omegaup/omegaup/graphs/contributors) [![Issues open](https://img.shields.io/github/issues/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen) [![Issues closed](https://img.shields.io/github/issues-closed/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed)
 
