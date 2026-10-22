@@ -5,7 +5,7 @@ import T from '../lang';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
-import { AccessLevel, getModuleFromHash } from './operations_modules';
+import { getAccessLevel, getModuleFromHash } from './operations_modules';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload();
@@ -22,9 +22,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-admin-operations-dashboard', {
         props: {
-          accessLevel: payload.isAdmin
-            ? AccessLevel.Admin
-            : AccessLevel.Support,
+          accessLevel: getAccessLevel(payload.isAdmin),
           selectedModule: this.module,
           ephemeralGraderEnabled: this.ephemeralGraderEnabled,
         },

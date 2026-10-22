@@ -42,7 +42,7 @@ describe('OperationsDashboard.vue', () => {
     expect(wrapper.findComponent(admin_Settings).exists()).toBe(false);
   });
 
-  it('Should not show settings to support users', () => {
+  it('Should show settings to support users', () => {
     const wrapper = mount(admin_OperationsDashboard, {
       propsData: {
         accessLevel: AccessLevel.Support,
@@ -50,7 +50,7 @@ describe('OperationsDashboard.vue', () => {
       },
     });
 
-    expect(wrapper.findComponent(admin_Settings).exists()).toBe(false);
+    expect(wrapper.findComponent(admin_Settings).exists()).toBe(true);
   });
 
   it('Should forward the ephemeral grader event from settings', () => {

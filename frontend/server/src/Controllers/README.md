@@ -430,7 +430,8 @@ _Nothing_
 
 ### Description
 
-Updates system settings. Only available to system admins.
+Updates system settings. Available to system admins and, temporarily,
+to the support team.
 
 ### Parameters
 

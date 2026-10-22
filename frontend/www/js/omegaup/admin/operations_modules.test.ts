@@ -1,6 +1,7 @@
 import {
   AccessLevel,
   AvailableModules,
+  getAccessLevel,
   getModuleFromHash,
   hasAccessLevel,
 } from './operations_modules';
@@ -43,6 +44,16 @@ describe('operations_modules', () => {
       expect(hasAccessLevel(AccessLevel.Support, AccessLevel.Admin)).toBe(
         false,
       );
+    });
+  });
+
+  describe('getAccessLevel', () => {
+    it('Should return admin for admins', () => {
+      expect(getAccessLevel(true)).toBe(AccessLevel.Admin);
+    });
+
+    it('Should return support for everyone else', () => {
+      expect(getAccessLevel(false)).toBe(AccessLevel.Support);
     });
   });
 });

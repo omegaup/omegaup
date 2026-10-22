@@ -27,13 +27,14 @@ describe('AdminLayout.vue', () => {
     ]);
   });
 
-  it('Should hide admin-only sections from support users', () => {
+  it('Should hide the crons section from support users', () => {
     const wrapper = mount(admin_AdminLayout, {
       propsData: { accessLevel: AccessLevel.Support },
     });
 
     expect(getHrefs(wrapper)).toEqual([
       '#home',
+      '#settings',
       '/admin/user/',
       '/admin/support/',
     ]);
