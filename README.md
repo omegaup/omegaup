@@ -1,4 +1,10 @@
-[![omegaUp](frontend/www/media/omegaup.png)](https://omegaup.com)
+<a href="https://omegaup.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend/www/media/omegaup_dark.png">
+    <img alt="omegaUp" src="frontend/www/media/omegaup.png" width="203">
+  </picture>
+</a>
+
 [![Contributors](https://img.shields.io/github/contributors/omegaup/omegaup)](https://github.com/omegaup/omegaup/graphs/contributors) [![Issues open](https://img.shields.io/github/issues/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen) [![Issues closed](https://img.shields.io/github/issues-closed/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed)
 
 [![Forks](https://img.shields.io/github/forks/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/network/members) [![Stars](https://img.shields.io/github/stars/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/stargazers) [![Twitter](https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow)](https://twitter.com/omegaup)
