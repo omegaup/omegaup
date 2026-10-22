@@ -714,18 +714,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData,
             $identity
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        // Simulate the grader populating the execution time of the run.
-        $submission = \OmegaUp\DAO\Submissions::getByGuid(
-            $runData['response']['guid']
-        );
-        $this->assertNotNull($submission);
-        $this->assertNotNull($submission->current_run_id);
-        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
-        $this->assertNotNull($run);
-        $run->runtime = 1234;
-        \OmegaUp\DAO\Runs::update($run);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, runtime: 1234);
 
         \OmegaUp\Time::setTimeForTesting($originalTime->time);
 
