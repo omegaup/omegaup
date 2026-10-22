@@ -12,6 +12,9 @@ namespace OmegaUp\DAO;
 class CronRunRequests extends \OmegaUp\DAO\Base\CronRunRequests {
     /**
      * Returns the pending or in-flight request for a job, if any.
+     *
+     * It is a locking read, so it sees requests committed after the
+     * transaction started instead of an older snapshot.
      */
     public static function getActiveByName(
         string $name
@@ -23,7 +26,8 @@ class CronRunRequests extends \OmegaUp\DAO\Base\CronRunRequests {
         $sql = "SELECT {$fields}
                 FROM Cron_Run_Requests
                 WHERE name = ? AND status IN (?, ?)
-                LIMIT 1;";
+                LIMIT 1
+                FOR UPDATE;";
         /** @var array{error_text: null|string, finished_at: \OmegaUp\Timestamp|null, name: string, picked_at: \OmegaUp\Timestamp|null, request_id: int, requested_at: \OmegaUp\Timestamp, requested_by: int|null, run_id: int|null, status: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [
             $name,

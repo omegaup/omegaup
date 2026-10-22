@@ -155,6 +155,10 @@ export const Admin = {
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  rerunCron: apiCall<
+    messages.AdminRerunCronRequest,
+    messages.AdminRerunCronResponse
+  >('/api/admin/rerunCron/'),
   setMaintenanceMode: apiCall<
     messages.AdminSetMaintenanceModeRequest,
     messages.AdminSetMaintenanceModeResponse
