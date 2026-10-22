@@ -210,11 +210,20 @@ class Reset extends \OmegaUp\Controllers\Controller {
             $r['password']
         );
 
-        \OmegaUp\DAO\Identities::update($identity);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
 
-        $user->reset_digest = null;
-        $user->reset_sent_at = null;
-        \OmegaUp\DAO\Users::update($user);
+            \OmegaUp\DAO\Identities::update($identity);
+
+            $user->reset_digest = null;
+            $user->reset_sent_at = null;
+            \OmegaUp\DAO\Users::update($user);
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         /** @psalm-suppress TypeDoesNotContainType IS_TEST may be defined as true in tests. */
         return [
