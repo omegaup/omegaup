@@ -141,6 +141,118 @@ describe('BasicInformationEdit.vue', () => {
     ]);
   });
 
+  it('Should display localized country name from translation key', () => {
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: basicInformationEditProps,
+    });
+    const mxOption = wrapper
+      .find('select[data-countries]')
+      .find('option[value="MX"]');
+    expect(mxOption.exists()).toBe(true);
+    expect(mxOption.text().trim()).toBe(T.countryMX);
+  });
+
+  it('Should fall back to stored country name for unknown country code', () => {
+    const unknownCountryProps = {
+      ...basicInformationEditProps,
+      countries: [
+        { country_id: 'ZZ', name: 'Unknown Territory' },
+        { country_id: 'MX', name: 'México' },
+      ],
+      data: {
+        ...basicInformationEditProps.data,
+        countries: [
+          { country_id: 'ZZ', name: 'Unknown Territory' },
+          { country_id: 'MX', name: 'México' },
+        ],
+      },
+    };
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: unknownCountryProps,
+    });
+    const zzOption = wrapper
+      .find('select[data-countries]')
+      .find('option[value="ZZ"]');
+    expect(zzOption.exists()).toBe(true);
+    expect(zzOption.text().trim()).toBe('Unknown Territory');
+  });
+
+  it('Should display countryNotSet for the xx country code', () => {
+    const xxCountryProps = {
+      ...basicInformationEditProps,
+      countries: [
+        { country_id: 'xx', name: '' },
+        { country_id: 'MX', name: 'México' },
+      ],
+      data: {
+        ...basicInformationEditProps.data,
+        countries: [
+          { country_id: 'xx', name: '' },
+          { country_id: 'MX', name: 'México' },
+        ],
+      },
+    };
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: xxCountryProps,
+    });
+    const xxOption = wrapper
+      .find('select[data-countries]')
+      .find('option[value="xx"]');
+    expect(xxOption.exists()).toBe(true);
+    expect(xxOption.text().trim()).toBe(T.countryNotSet);
+  });
+
+  it('Should sort countries alphabetically by localized name', () => {
+    const unorderedProps = {
+      ...basicInformationEditProps,
+      countries: [
+        { country_id: 'ZW', name: 'Zimbabwe' },
+        { country_id: 'AF', name: 'Afghanistan' },
+        { country_id: 'MX', name: 'México' },
+      ],
+      data: {
+        ...basicInformationEditProps.data,
+        countries: [
+          { country_id: 'ZW', name: 'Zimbabwe' },
+          { country_id: 'AF', name: 'Afghanistan' },
+          { country_id: 'MX', name: 'México' },
+        ],
+      },
+    };
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: unorderedProps,
+    });
+    const vm = wrapper.vm as any;
+    const names = vm.localizedCountries.map(
+      (c: dao.Countries) => T['country' + c.country_id] || c.name,
+    );
+    expect(names).toEqual([...names].sort(new Intl.Collator().compare));
+  });
+
+  it('Should pin xx to the top of the sorted country list', () => {
+    const withXxProps = {
+      ...basicInformationEditProps,
+      countries: [
+        { country_id: 'MX', name: 'México' },
+        { country_id: 'xx', name: '' },
+        { country_id: 'AF', name: 'Afghanistan' },
+      ],
+      data: {
+        ...basicInformationEditProps.data,
+        countries: [
+          { country_id: 'MX', name: 'México' },
+          { country_id: 'xx', name: '' },
+          { country_id: 'AF', name: 'Afghanistan' },
+        ],
+      },
+    };
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: withXxProps,
+    });
+    const vm = wrapper.vm as any;
+    expect(vm.localizedCountries[0].country_id).toBe('xx');
+  });
+
   it('Should show error when username is invalid', async () => {
     const wrapper = mount(user_Basic_Information_Edit, {
       propsData: basicInformationEditProps,
