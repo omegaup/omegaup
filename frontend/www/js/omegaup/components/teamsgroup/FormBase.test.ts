@@ -24,7 +24,7 @@ describe('FormBase.vue', () => {
   };
 
   it('Should handle form base', async () => {
-    const wrapper = shallowMount(teamsgroup_FormBase, {
+    const wrapper = shallowMount(teamsgroup_FormBase as any, {
       attachTo: '#root',
       propsData,
     });
