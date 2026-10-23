@@ -49,7 +49,7 @@ describe('User.vue', () => {
     const verifyButton = wrapper.find('button.btn');
     await verifyButton.trigger('click');
 
-    expect(wrapper.emitted('verify-user')).toBeTruthy();
+    expect(wrapper.emitted('verify-user')).toEqual([[]]);
   });
 
   it('Should disable verify button when user is already verified', () => {
@@ -78,11 +78,14 @@ describe('User.vue', () => {
     inputElement.checked = true;
     await reviewerCheckbox.trigger('change');
 
-    expect(wrapper.emitted('change-role')).toBeTruthy();
-    expect(wrapper.emitted('change-role')?.[0]?.[0]).toEqual({
-      value: defaultProps.roleNames[1],
-      selected: true,
-    });
+    expect(wrapper.emitted('change-role')).toEqual([
+      [
+        {
+          value: defaultProps.roleNames[1],
+          selected: true,
+        },
+      ],
+    ]);
   });
 
   it('Should emit change-experiment event when experiment checkbox is toggled', async () => {
@@ -98,10 +101,13 @@ describe('User.vue', () => {
     inputElement.checked = false;
     await expCheckbox.trigger('change');
 
-    expect(wrapper.emitted('change-experiment')).toBeTruthy();
-    expect(wrapper.emitted('change-experiment')?.[0]?.[0]).toEqual({
-      value: defaultProps.systemExperiments[0],
-      selected: false,
-    });
+    expect(wrapper.emitted('change-experiment')).toEqual([
+      [
+        {
+          value: defaultProps.systemExperiments[0],
+          selected: false,
+        },
+      ],
+    ]);
   });
 });

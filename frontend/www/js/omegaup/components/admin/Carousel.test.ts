@@ -110,10 +110,9 @@ describe('Carousel.vue', () => {
     vm.confirmDelete(activeItem);
     vm.archiveSelectedItem();
 
-    expect(wrapper.emitted('delete-item')).toBeTruthy();
-    expect(wrapper.emitted('delete-item')?.[0]?.[0]).toBe(
-      activeItem.carousel_item_id,
-    );
+    expect(wrapper.emitted('delete-item')).toEqual([
+      [activeItem.carousel_item_id],
+    ]);
   });
 
   it('Should populate edit modal state correctly when editItem is called', () => {

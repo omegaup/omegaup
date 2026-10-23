@@ -42,11 +42,14 @@ describe('Roles.vue', () => {
     inputElement.checked = true;
     await roleInput.trigger('change');
 
-    expect(wrapper.emitted('change-role')).toBeTruthy();
-    expect(wrapper.emitted('change-role')?.[0]?.[0]).toEqual({
-      value: roles[0],
-      selected: true,
-    });
+    expect(wrapper.emitted('change-role')).toEqual([
+      [
+        {
+          value: roles[0],
+          selected: true,
+        },
+      ],
+    ]);
   });
 
   it('Should emit change-group event when a group checkbox changes', async () => {
@@ -63,10 +66,13 @@ describe('Roles.vue', () => {
     inputElement.checked = true;
     await groupInput.trigger('change');
 
-    expect(wrapper.emitted('change-group')).toBeTruthy();
-    expect(wrapper.emitted('change-group')?.[0]?.[0]).toEqual({
-      value: groups[0],
-      selected: true,
-    });
+    expect(wrapper.emitted('change-group')).toEqual([
+      [
+        {
+          value: groups[0],
+          selected: true,
+        },
+      ],
+    ]);
   });
 });

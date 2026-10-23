@@ -147,9 +147,6 @@ export default defineComponent({
         selected: (ev.target as HTMLInputElement).checked,
       } as omegaup.Selectable<types.UserRole>);
     },
-    onChangePassword(): void {
-      // Legacy handler preserved for template form submit
-    },
     onVerifyUser(): void {
       this.$emit('verify-user');
     },
