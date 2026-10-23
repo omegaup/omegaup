@@ -1,8 +1,11 @@
 <template>
-  <omegaup-overlay-popup @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup
+    class="run-submit-popup overlay-popup--wide"
+    @dismiss="$emit('dismiss')"
+  >
     <form
       data-run-submit
-      class="d-flex flex-column h-100"
+      class="modal-form d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
       <div class="form-group row">
@@ -12,7 +15,7 @@
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
-            class="form-control"
+            class="form-control modal-form__control"
             name="language"
           >
             <option
@@ -36,7 +39,7 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="h-100">
+      <div class="h-100 run-submit-code-view">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
@@ -49,7 +52,12 @@
           {{ T.arenaRunSubmitUpload }}
         </label>
         <div class="col-sm-7">
-          <input ref="inputFile" class="w-100" type="file" name="file" />
+          <input
+            ref="inputFile"
+            class="w-100 modal-form__control"
+            type="file"
+            name="file"
+          />
         </div>
       </div>
       <div class="form-group row">
@@ -313,3 +321,29 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@media (max-height: 706px), (max-width: 475px) {
+  .run-submit-popup form[data-run-submit] {
+    height: calc(90vh - 54px) !important;
+    max-height: none;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .run-submit-popup form[data-run-submit] > * {
+    flex-shrink: 0;
+  }
+
+  .run-submit-popup form[data-run-submit] > .run-submit-code-view {
+    height: auto !important;
+    flex: 1 1 0;
+    min-height: 100px;
+    flex-shrink: 1;
+  }
+
+  .run-submit-popup .run-submit-code-view .CodeMirror-scroll {
+    height: 100% !important;
+  }
+}
+</style>

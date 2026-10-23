@@ -5,3 +5,5 @@ pika>=1.2.0
 omegaup>=1.5.4
 pytest-mock>=3.7.0
 mypy>=0.931
+numpy==1.24.1
+pandas==2.0.3
