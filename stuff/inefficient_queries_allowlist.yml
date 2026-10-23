@@ -260,7 +260,7 @@ entries:
   table: s
   issue: 10108
   reason: Detected in the initial main baseline
-- normalized_query: SELECT cm.time, i.username, IFNULL(i.country_id, ?) AS country_id, e.email, IFNULL(ur.classname, ?) AS classname FROM Coder_Of_The_Month cm INNER JOIN Users u ON u.user_id = cm.user_id INNER JOIN Identities i ON i.identity_id = u.main_identity_id LEFT JOIN Emails e ON e.user_id = u.user_id LEFT JOIN User_Rank ur ON ur.user_id = cm.user_id WHERE (cm.selected_by IS NOT NULL OR ( cm.`ranking` = ? AND NOT EXISTS ( SELECT * FROM Coder_Of_The_Month WHERE time = cm.time AND selected_by IS NOT NULL AND category = ? ) ) ) AND cm.category = ? AND cm.time <= ? ORDER BY cm.time DESC
+- normalized_query: SELECT cm.time, i.username, IFNULL(i.country_id, ?) AS country_id, e.email, IFNULL(ur.classname, ?) AS classname FROM Coder_Of_The_Month cm INNER JOIN Users u ON u.user_id = cm.user_id INNER JOIN Identities i ON i.identity_id = u.main_identity_id LEFT JOIN Emails e ON e.user_id = u.user_id LEFT JOIN User_Rank ur ON ur.user_id = cm.user_id WHERE (cm.selected_by IS NOT NULL OR ( cm.`ranking` = ? AND NOT EXISTS ( SELECT * FROM Coder_Of_The_Month WHERE time = cm.time AND selected_by IS NOT NULL AND category = ? ) )) AND cm.category = ? AND cm.time <= ? ORDER BY cm.time DESC
   table: e
   issue: 10108
   reason: Detected in the initial main baseline
