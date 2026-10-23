@@ -3,6 +3,7 @@ import T from '../../lang';
 
 import teamsgroup_FormCreate from './FormCreate.vue';
 import teamsgroup_FormBase from './FormBase.vue';
+import Vue, { ComponentOptions } from 'vue';
 
 describe('FormCreate.vue', () => {
   beforeEach(() => {
@@ -19,7 +20,7 @@ describe('FormCreate.vue', () => {
   });
 
   it('Should handle form create', async () => {
-    const wrapper = mount(teamsgroup_FormCreate as any, {
+    const wrapper = mount(teamsgroup_FormCreate as ComponentOptions<Vue>, {
       attachTo: '#root',
     });
 
@@ -48,7 +49,7 @@ describe('FormCreate.vue', () => {
   });
 
   it('Should handle changes in name field', async () => {
-    const wrapper = mount(teamsgroup_FormCreate as any);
+    const wrapper = mount(teamsgroup_FormCreate as ComponentOptions<Vue>);
 
     const formBase = wrapper.findComponent(teamsgroup_FormBase);
     formBase.setData({

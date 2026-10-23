@@ -131,12 +131,7 @@ import {
   faUserPlus,
   faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
-import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 import { getBlogUrl } from '../../urlHelper';
-
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
 import {
@@ -145,8 +140,6 @@ import {
   BadgePlugin,
   CardPlugin,
   BForm,
-  BRow,
-  BCol,
 } from 'bootstrap-vue';
 Vue.use(TablePlugin);
 Vue.use(ButtonPlugin);
@@ -163,11 +156,8 @@ export default defineComponent({
   name: 'Upload',
   components: {
     FontAwesomeIcon,
-    'omegaup-common-multi-typeahead': common_MultiTypeahead,
     'omegaup-markdown': omegaup_Markdown,
     BForm,
-    BRow,
-    BCol,
   },
   props: {
     userErrorRow: {
