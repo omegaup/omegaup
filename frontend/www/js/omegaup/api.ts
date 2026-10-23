@@ -2276,6 +2276,21 @@ export const User = {
       x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
     return x;
   }),
+  follow: apiCall<messages.UserFollowRequest, messages.UserFollowResponse>(
+    '/api/user/follow/',
+  ),
+  followStatus: apiCall<
+    messages.UserFollowStatusRequest,
+    messages.UserFollowStatusResponse
+  >('/api/user/followStatus/'),
+  followers: apiCall<
+    messages.UserFollowersRequest,
+    messages.UserFollowersResponse
+  >('/api/user/followers/'),
+  following: apiCall<
+    messages.UserFollowingRequest,
+    messages.UserFollowingResponse
+  >('/api/user/following/'),
   generateGitToken: apiCall<
     messages.UserGenerateGitTokenRequest,
     messages.UserGenerateGitTokenResponse
@@ -2387,6 +2402,10 @@ export const User = {
     messages.UserStatusVerifiedRequest,
     messages.UserStatusVerifiedResponse
   >('/api/user/statusVerified/'),
+  unfollow: apiCall<
+    messages.UserUnfollowRequest,
+    messages.UserUnfollowResponse
+  >('/api/user/unfollow/'),
   update: apiCall<messages.UserUpdateRequest, messages.UserUpdateResponse>(
     '/api/user/update/',
   ),

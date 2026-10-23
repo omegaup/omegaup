@@ -3972,6 +3972,12 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface FollowUser {
+    classname: string;
+    name?: string;
+    username: string;
+  }
+
   export interface FullIDEPayload {
     acceptedLanguages: string[];
     preferredLanguage?: string;
@@ -6438,6 +6444,24 @@ export namespace messages {
     verified: boolean;
     within_last_day: boolean;
   };
+  export type UserFollowRequest = { [key: string]: any };
+  export type UserFollowResponse = {};
+  export type UserFollowStatusRequest = { [key: string]: any };
+  export type UserFollowStatusResponse = {
+    followersCount: number;
+    followingCount: number;
+    isFollowing: boolean;
+  };
+  export type UserFollowersRequest = { [key: string]: any };
+  export type UserFollowersResponse = {
+    followers: types.FollowUser[];
+    totalRows: number;
+  };
+  export type UserFollowingRequest = { [key: string]: any };
+  export type UserFollowingResponse = {
+    following: types.FollowUser[];
+    totalRows: number;
+  };
   export type UserGenerateGitTokenRequest = { [key: string]: any };
   export type UserGenerateGitTokenResponse = { token: string };
   export type UserGenerateOmiUsersRequest = { [key: string]: any };
@@ -6505,6 +6529,8 @@ export namespace messages {
     username: string;
     verified: boolean;
   };
+  export type UserUnfollowRequest = { [key: string]: any };
+  export type UserUnfollowResponse = {};
   export type UserUpdateRequest = { [key: string]: any };
   export type UserUpdateResponse = {};
   export type UserUpdateBasicInfoRequest = { [key: string]: any };
@@ -7339,6 +7365,18 @@ export namespace controllers {
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
+    follow: (
+      params?: messages.UserFollowRequest,
+    ) => Promise<messages.UserFollowResponse>;
+    followStatus: (
+      params?: messages.UserFollowStatusRequest,
+    ) => Promise<messages.UserFollowStatusResponse>;
+    followers: (
+      params?: messages.UserFollowersRequest,
+    ) => Promise<messages.UserFollowersResponse>;
+    following: (
+      params?: messages.UserFollowingRequest,
+    ) => Promise<messages.UserFollowingResponse>;
     generateGitToken: (
       params?: messages.UserGenerateGitTokenRequest,
     ) => Promise<messages.UserGenerateGitTokenResponse>;
@@ -7405,6 +7443,9 @@ export namespace controllers {
     statusVerified: (
       params?: messages.UserStatusVerifiedRequest,
     ) => Promise<messages.UserStatusVerifiedResponse>;
+    unfollow: (
+      params?: messages.UserUnfollowRequest,
+    ) => Promise<messages.UserUnfollowResponse>;
     update: (
       params?: messages.UserUpdateRequest,
     ) => Promise<messages.UserUpdateResponse>;
