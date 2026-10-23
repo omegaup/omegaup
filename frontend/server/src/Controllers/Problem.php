@@ -3951,7 +3951,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, sortOrder: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>, authors: list<string>}
+     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, sortOrder: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>, authors: list<string>, excludedTags: list<string>, solvedStatus: string, matchAnyLanguage: bool}
      *
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
@@ -3963,6 +3963,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
+     * @omegaup-request-param list<string>|null $excluded_tag
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
@@ -3990,6 +3991,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ) ?? '';
 
         $tags = $r->getStringList('tag', []);
+        $excludedTags = $r->getStringList('excluded_tag', []);
         $authors = $r->getStringList('author', []);
 
         $keyword = substr($r->ensureOptionalString('query') ?? '', 0, 256);
@@ -4052,6 +4054,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
             'authors' => $authors,
+            'excludedTags' => $excludedTags,
             'solvedStatus' => $solvedStatus,
         ];
     }
@@ -4118,6 +4121,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
+     * @omegaup-request-param list<string>|null $excluded_tag
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
@@ -4154,6 +4158,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'orderBy' => $orderBy,
             'language' => $language,
             'tags' => $tags,
+            'excludedTags' => $excludedTags,
             'keyword' => $keyword,
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
@@ -4184,7 +4189,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $level,
             $difficulty,
             $authors,
-            $solvedStatus
+            $solvedStatus,
+            $excludedTags
         );
     }
 
@@ -4193,6 +4199,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $authors
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $programmingLanguages
+     * @param list<string> $excludedTags
      * @return array{results: list<ProblemListItem>, total: int}
      */
     private static function getListImpl(
@@ -4215,7 +4222,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?string $level,
         string $difficulty,
         array $authors,
-        string $solvedStatus
+        string $solvedStatus,
+        array $excludedTags = []
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -4271,7 +4279,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficulty,
             $authors,
             $matchAnyLanguage,
-            $solvedStatus
+            $solvedStatus,
+            $excludedTags
         );
         return [
             'total' => $count,
@@ -6603,6 +6612,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
+     * @omegaup-request-param list<string>|null $excluded_tag
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
@@ -6641,6 +6651,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'orderBy' => $orderBy,
             'language' => $language,
             'tags' => $tags,
+            'excludedTags' => $excludedTags,
             'keyword' => $keyword,
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
@@ -6671,7 +6682,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             level: $collectionLevel,
             difficulty: $difficulty,
             authors: $authors,
-            solvedStatus: 'all'
+            solvedStatus: 'all',
+            excludedTags: $excludedTags
         );
 
         $frequentTags = \OmegaUp\Controllers\Tag::getFrequentQualityTagsByLevel(
@@ -6737,6 +6749,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $programmingLanguages
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $authors
+     * @param list<string> $excludedTags
      *
      * @return array{column: string, columns: list<string>, selectedTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PageItem>, tagData: list<Tag>, tags: list<string>, difficulty: string, authors: list<string>}
      */
@@ -6761,7 +6774,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?string $level,
         string $difficulty,
         array $authors,
-        string $solvedStatus
+        string $solvedStatus,
+        array $excludedTags = []
     ) {
         $response = self::getListImpl(
             $page ?: 1,
@@ -6783,7 +6797,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $level,
             $difficulty,
             $authors,
-            $solvedStatus
+            $solvedStatus,
+            $excludedTags
         );
 
         $params = [
@@ -6792,6 +6807,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order_by' => $orderBy,
             'sort_order' => $sortOrder,
             'tag' => $tags,
+            'excluded_tag' => $excludedTags,
             'author' => $authors,
             'difficulty' => $difficulty,
             'solved_status' => $solvedStatus

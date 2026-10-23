@@ -135,6 +135,73 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testProblemListWithExcludedTags() {
+        $includedTag = 'problemTagArrays';
+        $excludedTag = 'problemTagBigData';
+        $problemData = [];
+        foreach (range(0, 2) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'visibility' => 'promoted',
+                ])
+            );
+        }
+
+        \OmegaUp\Test\Factories\Problem::addTag(
+            $problemData[0],
+            $includedTag,
+            public: 1
+        );
+        \OmegaUp\Test\Factories\Problem::addTag(
+            $problemData[1],
+            $excludedTag,
+            public: 1
+        );
+        \OmegaUp\Test\Factories\Problem::addTag(
+            $problemData[2],
+            $includedTag,
+            public: 1
+        );
+        \OmegaUp\Test\Factories\Problem::addTag(
+            $problemData[2],
+            $excludedTag,
+            public: 1
+        );
+
+        $excludedAliases = [
+            $problemData[0]['request']['problem_alias'],
+        ];
+
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'excluded_tag' => [$excludedTag],
+            'rowcount' => 1000,
+        ]));
+        $aliases = array_column($response['results'], 'alias');
+        $this->assertContains(
+            $problemData[0]['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertNotContains(
+            $problemData[1]['request']['problem_alias'],
+            $aliases
+        );
+        $this->assertNotContains(
+            $problemData[2]['request']['problem_alias'],
+            $aliases
+        );
+
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'tag' => [$includedTag],
+            'require_all_tags' => true,
+            'excluded_tag' => [$excludedTag],
+            'rowcount' => 1000,
+        ]));
+        $this->assertSame(
+            $excludedAliases,
+            array_column($response['results'], 'alias')
+        );
+    }
+
     /**
      * Gets the list of problems
      */
