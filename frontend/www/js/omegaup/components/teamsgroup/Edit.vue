@@ -118,7 +118,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import teamsgroup_FormUpdate from './FormUpdate.vue';
 import teamsgroup_Upload from './Upload.vue';
 import teamsgroup_Teams from './Teams.vue';
@@ -132,52 +133,109 @@ export enum AvailableTabs {
   Upload = 'upload',
 }
 
-@Component({
+export default defineComponent({
+  name: 'TeamsGroupEdit',
   components: {
     'omegaup-teams-group-form': teamsgroup_FormUpdate,
     'omegaup-teams-group-upload': teamsgroup_Upload,
     'omegaup-teams-group-teams': teamsgroup_Teams,
   },
-})
-export default class TeamsGroupEdit extends Vue {
-  @Prop() alias!: string;
-  @Prop() name!: string;
-  @Prop() description!: string;
-  @Prop() numberOfContestants!: number;
-  @Prop() countries!: dao.Countries[];
-  @Prop() isOrganizer!: boolean;
-  @Prop() tab!: AvailableTabs;
-  @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
-  @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
-  @Prop() teamErrorRow!: null | string;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop() isLoading!: boolean;
+  props: {
+    alias: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    numberOfContestants: {
+      type: Number,
+      required: true,
+    },
+    countries: {
+      type: Array as PropType<dao.Countries[]>,
+      required: true,
+    },
+    isOrganizer: {
+      type: Boolean,
+      required: true,
+    },
+    tab: {
+      type: String as PropType<AvailableTabs>,
+      required: true,
+    },
+    teamsIdentities: {
+      type: Array as PropType<types.Identity[]>,
+      default: () => [],
+    },
+    teamsMembers: {
+      type: Array as PropType<types.TeamMember[]>,
+      default: () => [],
+    },
+    teamErrorRow: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      required: true,
+    },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:tab',
+    'update-teams-group',
+    'update-identity-team',
+    'update-search-result-users',
+    'update-search-result-schools',
+    'edit-identity-team',
+    'change-password-identity-team',
+    'change-password-identity',
+    'add-members',
+    'remove-member',
+    'remove',
+    'cancel',
+    'bulk-identities',
+    'download-teams',
+    'read-csv',
+    'invalid-file',
+  ],
+  data() {
+    return {
+      T,
+      ui,
+      AvailableTabs,
+      selectedTab: this.tab as AvailableTabs,
+      currentTeamsIdentities: this.teamsIdentities as types.Identity[],
+    };
+  },
+  watch: {
+    tab(newValue: AvailableTabs): void {
+      if (!Object.values(AvailableTabs).includes(newValue)) {
+        this.selectedTab = AvailableTabs.Teams;
+        return;
+      }
 
-  T = T;
-  ui = ui;
-  AvailableTabs = AvailableTabs;
-  selectedTab: AvailableTabs = this.tab;
-  currentTeamsIdentities = this.teamsIdentities;
-
-  @Watch('tab')
-  onTabChanged(newValue: AvailableTabs): void {
-    if (!Object.values(AvailableTabs).includes(newValue)) {
-      this.selectedTab = AvailableTabs.Teams;
-      return;
-    }
-
-    this.selectedTab = newValue;
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabChanged(newValue: AvailableTabs): void {
-    this.$emit('update:tab', newValue);
-  }
-
-  @Watch('teamsIdentities')
-  onTeamsIdentitiesChanged(newValue: types.Identity[]): void {
-    this.currentTeamsIdentities = newValue;
-  }
-}
+      this.selectedTab = newValue;
+    },
+    selectedTab(newValue: AvailableTabs): void {
+      this.$emit('update:tab', newValue);
+    },
+    teamsIdentities(newValue: types.Identity[]): void {
+      this.currentTeamsIdentities = newValue;
+    },
+  },
+});
 </script>
