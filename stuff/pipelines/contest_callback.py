@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
@@ -14,6 +14,7 @@ from mysql.connector import errorcode
 import pika
 
 import database.contest
+import rabbitmq_client
 import verification_code
 
 
@@ -54,9 +55,14 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        response = json.loads(body)
+        response = self._parse_body(body)
 
         try:
+            self.dbconn.ping(  # type: ignore[attr-defined]
+                reconnect=True,
+                attempts=3,
+                delay=5,
+            )
             ranking = []
             for user_ranking in response['ranking']:
                 ranking.append(database.contest.Ranking(**user_ranking))
@@ -193,16 +199,35 @@ class ContestsCallback:
                 channel.connection.close()
 
         except:  # noqa: bare-except
-            with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
-                cur.execute('''
-                    UPDATE
-                        `Contests`
-                    SET
-                        `certificates_status` = 'retryable_error'
-                    WHERE
-                        `contest_id` = %s;
-                    ''', (response['contest_id'],))
-                self.dbconn.commit()
+            self._mark_retryable_error(response['contest_id'])
+            # Re-raise so the RabbitMQ consumer does not ack this message.
+            # This way the request is requeued instead of being lost.
+            raise
+
+    @staticmethod
+    def _parse_body(body: bytes) -> Any:
+        '''Parses the message body, discarding it if it is not valid JSON.'''
+        try:
+            return json.loads(body)
+        except json.JSONDecodeError as err:
+            # A malformed body can never be processed, so discard it instead
+            # of requeueing it forever.
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message body is not valid JSON'
+            ) from err
+
+    def _mark_retryable_error(self, contest_id: int) -> None:
+        '''Marks the given contest's certificates as a retryable error.'''
+        with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            cur.execute('''
+                UPDATE
+                    `Contests`
+                SET
+                    `certificates_status` = 'retryable_error'
+                WHERE
+                    `contest_id` = %s;
+                ''', (contest_id,))
+            self.dbconn.commit()
 
 
 def generate_contest_code() -> str:
