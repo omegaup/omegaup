@@ -8,27 +8,34 @@
         <div class="card">
           <h2 class="card-header">{{ T.userEmailEditEmail }}</h2>
           <div class="card-body">
-            <form
-              class="form-horizontal"
-              @submit.prevent="$emit('submit', currentEmail)"
-            >
+            <form class="form-horizontal" @submit.prevent="onSubmit">
               <div class="form-group">
                 <label class="col-md-3 control-label" for="email">{{
                   T.userEmailEditEmail
                 }}</label>
                 <div class="col-md-7">
+                  <!-- id-lint off -->
                   <input
-                    v-model="currentEmail"
+                    id="email"
+                    v-model.trim="currentEmail"
+                    data-email-input
                     class="form-control"
                     name="email"
                     size="30"
-                    type="text"
+                    type="email"
+                    required
                   />
+                  <!-- id-lint on -->
                 </div>
               </div>
               <div class="form-group">
                 <div class="col-md-offset-3 col-md-7">
-                  <button class="btn btn-primary" type="submit">
+                  <button
+                    data-submit-email
+                    class="btn btn-primary"
+                    type="submit"
+                    :disabled="submitDisabled"
+                  >
                     {{ T.wordsSaveChanges }}
                   </button>
                 </div>
@@ -42,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import user_MainInfo from './MainInfo.vue';
@@ -53,9 +60,27 @@ import user_MainInfo from './MainInfo.vue';
   },
 })
 export default class UserEmailEdit extends Vue {
-  @Prop() email!: string;
+  @Prop({ default: '' }) email!: string;
   @Prop() profile!: types.UserProfileInfo;
   T = T;
-  currentEmail: string = this.email;
+  currentEmail: string = this.email ?? '';
+
+  @Watch('email')
+  onEmailChanged(newValue: string): void {
+    this.currentEmail = newValue ?? '';
+  }
+
+  get submitDisabled(): boolean {
+    const trimmedEmail = (this.currentEmail ?? '').trim();
+    const initialEmail = (this.email ?? '').trim();
+    return trimmedEmail.length === 0 || trimmedEmail === initialEmail;
+  }
+
+  onSubmit(): void {
+    if (this.submitDisabled) {
+      return;
+    }
+    this.$emit('submit', (this.currentEmail ?? '').trim());
+  }
 }
 </script>
