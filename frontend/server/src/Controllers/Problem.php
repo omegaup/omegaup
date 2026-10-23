@@ -7062,6 +7062,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return null|CDP
      */
+
     private static function getProblemCDPImpl(array $params) {
         if ($params['alias'] === '') {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -7092,6 +7093,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'utf-8'
                 );
                 $result = json_decode($jsonContent, associative: true);
+                /** @var array|null $result */
             }
             if (!is_array($result)) {
                 return null;
