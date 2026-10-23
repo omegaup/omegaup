@@ -8,6 +8,10 @@ entries:
   table: ur
   issue: 10108
   reason: Detected in the initial main baseline
+- normalized_query: SELECT ? AS gender, COUNT(DISTINCT ill.identity_id) AS users FROM Identity_Login_Log ill WHERE ill.time BETWEEN ? AND ? UNION SELECT IFNULL(i.gender, ?) AS gender, COUNT(DISTINCT ill.identity_id) AS users FROM Identity_Login_Log ill INNER JOIN Identities i ON i.identity_id = ill.identity_id WHERE ill.time BETWEEN ? AND ? GROUP BY gender
+  table: i
+  issue: 10108
+  reason: Detected in the initial main baseline
 - normalized_query: SELECT COUNT(*) FROM (WITH course_assignments AS ( SELECT assignment_id, problemset_id FROM Assignments WHERE course_id = ? ) ( SELECT i.username, NULL AS alias, pal.ip, pal.`time`, IFNULL(ur.classname, ?) AS classname, ? AS event_type, NULL AS clone_result, NULL AS clone_token_payload, NULL AS name FROM Problemset_Access_Log pal INNER JOIN course_assignments a ON a.problemset_id = pal.problemset_id INNER JOIN Identities i ON i.identity_id = pal.identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id ) UNION ALL ( SELECT i.username, p.alias, sl.ip, sl.`time`, IFNULL(ur.classname, ?) AS classname, ? AS event_type, NULL AS clone_result, NULL AS clone_token_payload, NULL AS name FROM Submission_Log sl INNER JOIN course_assignments a ON a.problemset_id = sl.problemset_id INNER JOIN Identities i ON i.identity_id = sl.identity_id INNER JOIN Submissions s ON s.submission_id = sl.submission_id INNER JOIN Problems p ON p.problem_id = s.problem_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id ) UNION ALL ( SELECT i.username, c.alias, INET_ATON(ccl.ip) AS `ip`, ccl.`timestamp` AS `time`, IFNULL(ur.classname, ?) AS classname, ? AS event_type, ccl.result AS clone_result, ccl.token_payload AS clone_token_payload, c.name FROM Course_Clone_Log ccl INNER JOIN Users u ON u.user_id = ccl.user_id INNER JOIN Identities i ON i.identity_id = u.main_identity_id LEFT JOIN User_Rank ur ON ur.user_id = i.user_id LEFT JOIN Courses c ON c.course_id = ccl.new_course_id WHERE ccl.course_id = ? )) AS total
   table: i
   issue: 10108
