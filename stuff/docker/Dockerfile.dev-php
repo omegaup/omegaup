@@ -12,10 +12,22 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
+# Minimum Node.js version required at build time.
+ARG NODE_MIN_SECURE_VERSION=24.22.1
+
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
-    apt-get install -y nodejs=24.22.1-1nodesource1 && \
+    apt-get install -y nodejs && \
     corepack enable && \
     corepack enable
+
+RUN set -eu; \
+    min="${NODE_MIN_SECURE_VERSION}"; \
+    ver="$(node -v)"; \
+    ver="${ver#v}"; \
+    if ! dpkg --compare-versions "$ver" ge "$min"; then \
+        echo "FATAL: node $ver is older than $min"; exit 1; \
+    fi; \
+    echo "OK: node $ver >= $min"
 
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
