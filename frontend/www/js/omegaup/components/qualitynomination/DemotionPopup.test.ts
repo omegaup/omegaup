@@ -74,4 +74,31 @@ describe('DemotionPopup.vue', () => {
     (wrapper.vm as DemotionPopupVm).onHide();
     expect(wrapper.emitted('dismiss')).toBeTruthy();
   });
+
+  it('Should emit dismiss after timeout following a successful submission', async () => {
+    jest.useFakeTimers();
+    try {
+      const wrapper = shallowMount(DemotionPopup);
+
+      await wrapper.setData({
+        selectedReason: 'poorly-described',
+        rationale: 'Needs more examples',
+      });
+
+      const submitBtn = wrapper.find('[data-submit-report-button]');
+      await submitBtn.trigger('click');
+
+      expect(wrapper.emitted('submit')).toBeTruthy();
+      expect((wrapper.vm as DemotionPopupVm).currentView).toBe(
+        AvailableViews.Thanks,
+      );
+      expect(wrapper.emitted('dismiss')).toBeUndefined();
+
+      jest.advanceTimersByTime(2000);
+
+      expect(wrapper.emitted('dismiss')).toBeTruthy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });
