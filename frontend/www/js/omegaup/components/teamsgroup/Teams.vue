@@ -190,10 +190,7 @@ export default defineComponent({
       this.username = username;
     },
 
-    onChangePasswordTeam(
-      newPassword: string,
-      newPasswordRepeat: string,
-    ): void {
+    onChangePasswordTeam(newPassword: string, newPasswordRepeat: string): void {
       this.$emit('change-password-identity-team', {
         username: this.username,
         newPassword,
