@@ -115,7 +115,7 @@ const LANGUAGE_PATTERNS: LanguagePattern[] = [
   },
   {
     language: 'rs',
-    displayName: 'Rust (1.56.1)',
+    displayName: 'Rust (1.98.1)',
     patterns: [
       /^\s*fn\s+main\s*\(/m,
       /println!\s*\(/,
