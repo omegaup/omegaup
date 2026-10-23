@@ -11,7 +11,7 @@ localVue.use(BootstrapVue);
 
 describe('List.vue', () => {
   it('Should handle an empty list of teams groups', () => {
-    const wrapper = shallowMount(teamsgroup_List, {
+    const wrapper = shallowMount(teamsgroup_List as any, {
       localVue,
       propsData: {
         teamsGroups: [] as types.TeamsGroup[],
@@ -22,7 +22,7 @@ describe('List.vue', () => {
   });
 
   it('Should handle a list of teams groups', () => {
-    const wrapper = shallowMount(teamsgroup_List, {
+    const wrapper = shallowMount(teamsgroup_List as any, {
       localVue,
       propsData: {
         teamsGroups: [

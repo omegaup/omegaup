@@ -38,7 +38,7 @@ describe('Teams.vue', () => {
   };
 
   it('Should handle an empty list of members and identities', () => {
-    const wrapper = shallowMount(teamsgroup_Teams, {
+    const wrapper = shallowMount(teamsgroup_Teams as any, {
       propsData: {
         teams: [] as types.Identity[],
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
@@ -51,7 +51,7 @@ describe('Teams.vue', () => {
   });
 
   it('Should handle a list of teams as identities', () => {
-    const wrapper = mount(teamsgroup_Teams, {
+    const wrapper = mount(teamsgroup_Teams as any, {
       propsData,
     });
 
@@ -61,7 +61,7 @@ describe('Teams.vue', () => {
   });
 
   it('Should handle edit identity form', async () => {
-    const wrapper = mount(teamsgroup_Teams, {
+    const wrapper = mount(teamsgroup_Teams as any, {
       attachTo: '#root',
       propsData,
     });
@@ -70,18 +70,18 @@ describe('Teams.vue', () => {
       .find('button[data-edit-identity="omegaUp:user"]')
       .trigger('click');
 
-    expect(wrapper.vm.identity).toEqual({
+    expect((wrapper.vm as any).identity).toEqual({
       username: 'omegaUp:user',
       name: 'user',
     });
-    expect(wrapper.vm.formToShow).toBe(AvailableForms.Edit);
-    expect(wrapper.vm.username).toBe('omegaUp:user');
+    expect((wrapper.vm as any).formToShow).toBe(AvailableForms.Edit);
+    expect((wrapper.vm as any).username).toBe('omegaUp:user');
 
     await wrapper.find('button[type="reset"]').trigger('click');
 
-    expect(wrapper.vm.identity).toBe(null);
-    expect(wrapper.vm.formToShow).toBe(AvailableForms.None);
-    expect(wrapper.vm.username).toBe(null);
+    expect((wrapper.vm as any).identity).toBe(null);
+    expect((wrapper.vm as any).formToShow).toBe(AvailableForms.None);
+    expect((wrapper.vm as any).username).toBe(null);
 
     await wrapper
       .find('button[data-edit-identity="omegaUp:user"]')

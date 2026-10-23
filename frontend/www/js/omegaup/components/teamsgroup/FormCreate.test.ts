@@ -19,7 +19,7 @@ describe('FormCreate.vue', () => {
   });
 
   it('Should handle form create', async () => {
-    const wrapper = mount(teamsgroup_FormCreate, {
+    const wrapper = mount(teamsgroup_FormCreate as any, {
       attachTo: '#root',
     });
 
@@ -48,7 +48,7 @@ describe('FormCreate.vue', () => {
   });
 
   it('Should handle changes in name field', async () => {
-    const wrapper = mount(teamsgroup_FormCreate);
+    const wrapper = mount(teamsgroup_FormCreate as any);
 
     const formBase = wrapper.findComponent(teamsgroup_FormBase);
     formBase.setData({
