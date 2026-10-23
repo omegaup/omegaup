@@ -125,19 +125,27 @@ export default class TablePaginator extends Vue {
     this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
 
   private nextPage(): void {
-    this.currentPageNumber++;
+    if (this.currentPageNumber < this.totalPagesCount - 1) {
+      this.currentPageNumber++;
+    }
   }
 
   private previousPage(): void {
-    this.currentPageNumber--;
+    if (this.currentPageNumber > 0) {
+      this.currentPageNumber--;
+    }
   }
 
   private get totalPagesCount(): number {
-    return Math.ceil(this.items.length / this.rowsPerPage);
+    if (this.rowsPerPage <= 0) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.items.length / this.rowsPerPage));
   }
 
   private get rowsPerPage(): number {
-    return Math.floor(this.itemsPerPage);
+    const rows = Math.floor(this.itemsPerPage);
+    return rows > 0 ? rows : 1;
   }
 
   private get itemsRows(): LinkableResource[][] {
@@ -149,13 +157,38 @@ export default class TablePaginator extends Vue {
   }
 
   private get paginatedItems(): LinkableResource[][] {
-    const start = this.currentPageNumber * this.rowsPerPage;
+    if (this.rowsPerPage <= 0) {
+      return this.itemsRows;
+    }
+    const page = Math.max(
+      0,
+      Math.min(this.currentPageNumber, this.totalPagesCount - 1),
+    );
+    const start = page * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     return this.itemsRows.slice(start, end);
   }
 
+  @Watch('items')
+  onItemsChange(): void {
+    this.currentPageNumber = 0;
+  }
+
+  @Watch('itemsPerPage')
+  onItemsPerPageChange(): void {
+    this.currentPageNumber = 0;
+  }
+
+  @Watch('totalPagesCount')
+  onTotalPagesCountChange(newTotalPagesCount: number): void {
+    if (this.currentPageNumber >= newTotalPagesCount) {
+      this.currentPageNumber = Math.max(0, newTotalPagesCount - 1);
+    }
+  }
+
   @Watch('currentSortOption')
-  onCurrentSortOptionChange(newSelector: string) {
+  onCurrentSortOptionChange(newSelector: string): void {
+    this.currentPageNumber = 0;
     this.$emit('sort-option-change', newSelector);
   }
 }
