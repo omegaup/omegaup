@@ -94,7 +94,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -105,60 +106,71 @@ import {
   faBoxOpen,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faArchive, faBoxOpen);
-@Component({
+
+export default defineComponent({
+  name: 'TeamsGroupList',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class TeamsGroupList extends Vue {
-  @Prop() teamsGroups!: types.TeamsGroup[];
-  T = T;
-  showArchiveModal = false;
-  selectedTeamsGroup: types.TeamsGroup | null = null;
-
-  teamsGroupUrl(teamsGroup: types.TeamsGroup): string {
-    return `/teamsgroup/${teamsGroup.alias}/edit/#teams`;
-  }
-  teamsGroupEditUrl(teamsGroup: types.TeamsGroup): string {
-    return `/teamsgroup/${teamsGroup.alias}/edit/#edit`;
-  }
-  get hasTeamsGroups(): boolean {
-    return this.visibleTeamsGroups && this.visibleTeamsGroups.length > 0;
-  }
-  showArchived: boolean = false;
-  get visibleTeamsGroups(): types.TeamsGroup[] {
-    if (this.showArchived) {
-      return this.teamsGroups.filter((g) => g.archived);
-    }
-    return this.teamsGroups.filter((g) => !g.archived);
-  }
-
-  get archiveModalTitle(): string {
-    if (!this.selectedTeamsGroup) return '';
-    return this.selectedTeamsGroup.archived ? T.wordsUnarchive : T.wordsArchive;
-  }
-
-  get archiveModalBody(): string {
-    if (!this.selectedTeamsGroup) return '';
-    return this.selectedTeamsGroup.archived
-      ? T.teamsGroupUnarchiveConfirmText
-      : T.teamsGroupArchiveConfirmText;
-  }
-
-  archiveGroup(teamsGroup: types.TeamsGroup) {
-    this.selectedTeamsGroup = teamsGroup;
-    this.showArchiveModal = true;
-  }
-
-  confirmArchive() {
-    if (!this.selectedTeamsGroup) return;
-    this.$emit('archive-group', {
-      teamsGroup: this.selectedTeamsGroup,
-      archived: !this.selectedTeamsGroup.archived,
-    });
-    this.selectedTeamsGroup = null;
-  }
-}
+  props: {
+    teamsGroups: {
+      type: Array as PropType<types.TeamsGroup[]>,
+      required: true,
+    },
+  },
+  emits: ['archive-group'],
+  data() {
+    return {
+      T,
+      showArchiveModal: false,
+      selectedTeamsGroup: null as types.TeamsGroup | null,
+      showArchived: false,
+    };
+  },
+  computed: {
+    hasTeamsGroups(): boolean {
+      return this.visibleTeamsGroups && this.visibleTeamsGroups.length > 0;
+    },
+    visibleTeamsGroups(): types.TeamsGroup[] {
+      if (this.showArchived) {
+        return this.teamsGroups.filter((g) => g.archived);
+      }
+      return this.teamsGroups.filter((g) => !g.archived);
+    },
+    archiveModalTitle(): string {
+      if (!this.selectedTeamsGroup) return '';
+      return this.selectedTeamsGroup.archived
+        ? T.wordsUnarchive
+        : T.wordsArchive;
+    },
+    archiveModalBody(): string {
+      if (!this.selectedTeamsGroup) return '';
+      return this.selectedTeamsGroup.archived
+        ? T.teamsGroupUnarchiveConfirmText
+        : T.teamsGroupArchiveConfirmText;
+    },
+  },
+  methods: {
+    teamsGroupUrl(teamsGroup: types.TeamsGroup): string {
+      return `/teamsgroup/${teamsGroup.alias}/edit/#teams`;
+    },
+    teamsGroupEditUrl(teamsGroup: types.TeamsGroup): string {
+      return `/teamsgroup/${teamsGroup.alias}/edit/#edit`;
+    },
+    archiveGroup(teamsGroup: types.TeamsGroup): void {
+      this.selectedTeamsGroup = teamsGroup;
+      this.showArchiveModal = true;
+    },
+    confirmArchive(): void {
+      if (!this.selectedTeamsGroup) return;
+      this.$emit('archive-group', {
+        teamsGroup: this.selectedTeamsGroup,
+        archived: !this.selectedTeamsGroup.archived,
+      });
+      this.selectedTeamsGroup = null;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

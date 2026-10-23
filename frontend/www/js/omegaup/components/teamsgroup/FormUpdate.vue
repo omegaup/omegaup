@@ -14,25 +14,46 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import teamsgroup_FormBase from './FormBase.vue';
-import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
-@Component({
+export default defineComponent({
+  name: 'TeamsGroupForm',
   components: {
     'omegaup-teams-group-form': teamsgroup_FormBase,
   },
-})
-export default class TeamsGroupForm extends Vue {
-  @Prop({ default: null }) alias!: null | string;
-  @Prop({ default: null }) description!: null | string;
-  @Prop({ default: null }) name!: null | string;
-  @Prop({ default: 3 }) numberOfContestants!: number;
-  @Prop({ default: 10 }) maxNumberOfContestants!: number;
-
-  T = T;
-  currentDescription: null | string = this.description;
-  currentName: null | string = this.name;
-  currentNumberOfContestants: number = this.numberOfContestants;
-}
+  props: {
+    alias: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    description: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    name: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    numberOfContestants: {
+      type: Number,
+      default: 3,
+    },
+    maxNumberOfContestants: {
+      type: Number,
+      default: 10,
+    },
+  },
+  emits: ['update-teams-group'],
+  data() {
+    return {
+      T,
+      currentDescription: this.description as null | string,
+      currentName: this.name as null | string,
+      currentNumberOfContestants: this.numberOfContestants,
+    };
+  },
+});
 </script>

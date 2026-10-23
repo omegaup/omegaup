@@ -22,7 +22,7 @@ describe('Members.vue', () => {
 
   it('Should handle an empty list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = shallowMount(teamsgroup_Members, {
+    const wrapper = shallowMount(teamsgroup_Members as any, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -62,7 +62,7 @@ describe('Members.vue', () => {
 
   it('Should handle a list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = mount(teamsgroup_Members, {
+    const wrapper = mount(teamsgroup_Members as any, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -97,7 +97,7 @@ describe('Members.vue', () => {
 
   it('Should handle change password form', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = mount(teamsgroup_Members, {
+    const wrapper = mount(teamsgroup_Members as any, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -122,8 +122,8 @@ describe('Members.vue', () => {
       .find('.input-group input[type="password"]')
       .setValue('new_pass');
 
-    expect(wrapper.vm.username).toBe('user_1');
-    expect(wrapper.vm.password).toBe('new_pass');
+    expect((wrapper.vm as any).username).toBe('user_1');
+    expect((wrapper.vm as any).password).toBe('new_pass');
 
     await wrapper
       .find('button[data-save-new-password-identity="user_1"]')

@@ -18,34 +18,39 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import teamsgroup_FormBase from './FormBase.vue';
-import { Vue, Component, Watch, Emit, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { generateAlias } from '../../alias';
 
-@Component({
+export default defineComponent({
+  name: 'TeamsGroupFormCreate',
   components: {
     'omegaup-teams-group-form': teamsgroup_FormBase,
   },
-})
-export default class TeamsGroupFormCreate extends Vue {
-  @Prop({ default: 10 }) maxNumberOfContestants!: number;
-
-  T = T;
-  alias: null | string = null;
-  description: null | string = null;
-  name: null | string = null;
-  numberOfContestants: number = 3;
-
-  @Watch('alias')
-  @Emit('validate-unused-alias')
-  onAliasChanged(newValue: string): string {
-    return newValue;
-  }
-
-  @Watch('name')
-  onNameChanged(newValue: string): void {
-    this.alias = generateAlias(newValue);
-  }
-}
+  props: {
+    maxNumberOfContestants: {
+      type: Number,
+      default: 10,
+    },
+  },
+  emits: ['validate-unused-alias', 'create-teams-group'],
+  data() {
+    return {
+      T,
+      alias: null as null | string,
+      description: null as null | string,
+      name: null as null | string,
+      numberOfContestants: 3,
+    };
+  },
+  watch: {
+    alias(newValue: string): void {
+      this.$emit('validate-unused-alias', newValue);
+    },
+    name(newValue: string): void {
+      this.alias = generateAlias(newValue);
+    },
+  },
+});
 </script>
