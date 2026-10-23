@@ -16,6 +16,7 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
      * @return array{status: 'ok', bookmarked: bool}
      */
     public static function apiToggle(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $problemAlias = $r->ensureString(
             'problem_alias',

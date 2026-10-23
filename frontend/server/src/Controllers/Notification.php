@@ -124,6 +124,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiReadNotifications(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         if (empty($r['notifications'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
