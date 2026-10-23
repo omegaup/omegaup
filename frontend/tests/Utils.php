@@ -44,7 +44,8 @@ class Utils {
         int $problemsetPoints = 100,
         ?string $outputFileContents = null,
         string $problemsetScoreMode = 'partial',
-        array $runScoreByGroups = []
+        array $runScoreByGroups = [],
+        ?int $runtime = null
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
@@ -83,6 +84,18 @@ class Utils {
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
+        }
+
+        if (!is_null($runtime)) {
+            $run->runtime = $runtime;
+            if (!is_null($submission->problemset_id)) {
+                $contest = \OmegaUp\DAO\Contests::getByProblemset(
+                    $submission->problemset_id
+                );
+                if (!is_null($contest) && $contest->penalty_type === 'runtime') {
+                    $run->penalty = $runtime;
+                }
+            }
         }
 
         \OmegaUp\DAO\Submissions::update($submission);
