@@ -192,6 +192,17 @@ jobs:
           name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
 
+      - name: Upload PHPUnit results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phpunit-results-${{ github.run_attempt }}
+          path: |
+            frontend/tests/runfiles/phpunit-junit.xml
+            coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload inefficient queries
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

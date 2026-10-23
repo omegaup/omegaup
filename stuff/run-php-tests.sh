@@ -24,8 +24,11 @@ else
         ARGS="$@"
 fi
 
+mkdir -p "${OMEGAUP_ROOT}/frontend/tests/runfiles"
+
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
 	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
 	--coverage-clover="${OMEGAUP_ROOT}/coverage.xml" \
+	--log-junit="${OMEGAUP_ROOT}/frontend/tests/runfiles/phpunit-junit.xml" \
 	"${ARGS[@]}"
