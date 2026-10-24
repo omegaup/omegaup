@@ -74,7 +74,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import latinize from 'latinize';
 import { types } from '../../api_types';
@@ -84,46 +85,58 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit);
 
-@Component({
+export default defineComponent({
+  name: 'GroupScoreboards',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class GroupScoreboards extends Vue {
-  @Prop() scoreboards!: types.GroupScoreboard[];
-  @Prop() groupAlias!: string;
+  props: {
+    scoreboards: {
+      type: Array as PropType<types.GroupScoreboard[]>,
+      required: true,
+    },
+    groupAlias: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['create-scoreboard'],
+  data() {
+    return {
+      T,
+      title: null as null | string,
+      alias: null as null | string,
+      description: null as null | string,
+    };
+  },
+  watch: {
+    title(newValue: string, oldValue: string): void {
+      if (newValue === null || newValue === oldValue) {
+        return;
+      }
 
-  T = T;
-  title: null | string = null;
-  alias: null | string = null;
-  description: null | string = null;
+      this.alias = latinize(newValue) // Remove accents
+        .replace(/\s+/g, '-') // Replace whitespace
+        .replace(/[^a-zA-Z0-9_-]/g, '') // Remove invalid characters
+        .substring(0, 32);
+    },
+  },
+  methods: {
+    onSubmit(): void {
+      this.$emit(
+        'create-scoreboard',
+        this,
+        this.title,
+        this.alias,
+        this.description,
+      );
+    },
 
-  @Watch('title')
-  onTitleChanged(newValue: string, oldValue: string): void {
-    if (newValue === null || newValue === oldValue) {
-      return;
-    }
-
-    this.alias = latinize(newValue) // Remove accents
-      .replace(/\s+/g, '-') // Replace whitespace
-      .replace(/[^a-zA-Z0-9_-]/g, '') // Remove invalid characters
-      .substring(0, 32);
-  }
-
-  onSubmit(): void {
-    this.$emit(
-      'create-scoreboard',
-      this,
-      this.title,
-      this.alias,
-      this.description,
-    );
-  }
-
-  reset(): void {
-    this.title = null;
-    this.alias = null;
-    this.description = null;
-  }
-}
+    reset(): void {
+      this.title = null;
+      this.alias = null;
+      this.description = null;
+    },
+  },
+});
 </script>

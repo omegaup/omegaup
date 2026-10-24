@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
+import { ComponentOptions } from 'vue';
 import group_ScoreboardDetails from './ScoreboardDetails.vue';
 
 describe('ScoreboardDetails.vue', () => {
@@ -61,7 +62,7 @@ describe('ScoreboardDetails.vue', () => {
       weight: 1,
       window_length: 0,
     };
-    const wrapper = shallowMount(group_ScoreboardDetails, {
+    const wrapper = shallowMount(group_ScoreboardDetails as ComponentOptions<Vue>, {
       propsData: {
         groupAlias: 'groupAlias',
         scoreboardAlias: 'scoreboardAlias',

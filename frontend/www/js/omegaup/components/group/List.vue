@@ -38,7 +38,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -47,22 +48,30 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit);
 
-@Component({
+export default defineComponent({
+  name: 'GroupList',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class GroupList extends Vue {
-  @Prop() groups!: types.Group[];
+  props: {
+    groups: {
+      type: Array as PropType<types.Group[]>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  methods: {
+    groupScoreboardUrl(group: types.Group): string {
+      return `/group/${group.alias}/edit/#scoreboards`;
+    },
 
-  T = T;
-
-  groupScoreboardUrl(group: types.Group): string {
-    return `/group/${group.alias}/edit/#scoreboards`;
-  }
-
-  groupEditUrl(group: types.Group): string {
-    return `/group/${group.alias}/edit/#edit`;
-  }
-}
+    groupEditUrl(group: types.Group): string {
+      return `/group/${group.alias}/edit/#edit`;
+    },
+  },
+});
 </script>
