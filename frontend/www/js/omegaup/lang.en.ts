@@ -811,6 +811,7 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneAvgDurationInfo: "Average time of this job's runs in the list below.",
   cronControlPlaneDuration: "Duration",
   cronControlPlaneDurationInfo: "How long this run took from start to finish.",
+  cronControlPlaneEnableJob: "Enable %(name)",
   cronControlPlaneEnabled: "Enabled",
   cronControlPlaneHost: "Machine",
   cronControlPlaneHostInfo: "The machine that ran this job.",

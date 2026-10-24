@@ -89,7 +89,7 @@ describe('Crons.vue', () => {
     expect(cells.at(0).text()).toContain(T.cronControlPlaneJobUpdateRanks);
     expect(cells.at(1).find('code').text()).toBe('19 8 * * *');
     expect(cells.at(1).text()).toContain('08:19');
-    expect(cells.at(2).text()).toBe('success');
+    expect(cells.at(2).text()).toBe(T.cronControlPlaneStatusSuccess);
     expect(cells.at(2).find('.badge-success').exists()).toBe(true);
     expect(cells.at(3).find('span').attributes('title')).toBe(
       time.formatDateTime(startedAt),
@@ -106,13 +106,17 @@ describe('Crons.vue', () => {
     expect(rows.at(0).findAll('td').at(1).text()).toContain(
       T.cronControlPlaneJobUpdateRanks,
     );
-    expect(rows.at(0).find('.badge-success').text()).toBe('success');
+    expect(rows.at(0).find('.badge-success').text()).toBe(
+      T.cronControlPlaneStatusSuccess,
+    );
     expect(
       rows.at(0).findAll('td').at(3).find('span').attributes('title'),
     ).toBe(time.formatDateTime(startedAt));
     expect(rows.at(0).findAll('td').at(4).text()).toBe('0.19s');
     expect(rows.at(0).findAll('td').at(5).text()).toBe('5');
-    expect(rows.at(1).find('.badge-danger').text()).toBe('failure');
+    expect(rows.at(1).find('.badge-danger').text()).toBe(
+      T.cronControlPlaneStatusFailure,
+    );
   });
 
   it('Should show a health card per job with its rate and average', () => {
@@ -214,7 +218,7 @@ describe('Crons.vue', () => {
     const phase = wrapper.findAll('[data-cron-phases] tbody tr td');
     expect(phase.at(0).find('code').text()).toBe('update_users_stats');
     expect(phase.at(0).text()).toContain('Update users stats');
-    expect(phase.at(1).text()).toBe('success');
+    expect(phase.at(1).text()).toBe(T.cronControlPlaneStatusSuccess);
     expect(phase.at(2).text()).toBe('0.05s');
   });
 
@@ -411,6 +415,19 @@ describe('Crons.vue', () => {
     expect(describedSchedule('@daily')).toBeNull();
   });
 
+  it('Should name the job on its switch and keep the raw status', () => {
+    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+
+    expect(wrapper.find('[data-cron-enabled]').attributes('aria-label')).toBe(
+      ui.formatString(T.cronControlPlaneEnableJob, {
+        name: 'update_ranks.py',
+      }),
+    );
+    expect(
+      wrapper.find('[data-cron-runs] .badge-success').attributes('title'),
+    ).toBe('success');
+  });
+
   it('Should take the newest run as the status of a job', () => {
     const wrapper = mount(Crons, {
       propsData: {
@@ -423,7 +440,7 @@ describe('Crons.vue', () => {
     });
 
     expect(wrapper.findAll('[data-cron-jobs] tbody tr td').at(2).text()).toBe(
-      'running',
+      T.cronControlPlaneStatusRunning,
     );
   });
 

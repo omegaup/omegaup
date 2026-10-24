@@ -811,6 +811,7 @@ const translations: { [key: string]: string; } = {
   cronControlPlaneAvgDurationInfo: "(Av3rag3 7im3 0f 7hi5 j0b'5 run5 in 7h3 1i57 b310w.)",
   cronControlPlaneDuration: "(Dura7i0n)",
   cronControlPlaneDurationInfo: "(H0w 10ng 7hi5 run 700k fr0m 57ar7 70 fini5h.)",
+  cronControlPlaneEnableJob: "(Enab13 %(name))",
   cronControlPlaneEnabled: "(Enab13d)",
   cronControlPlaneHost: "(Machin3)",
   cronControlPlaneHostInfo: "(Th3 machin3 7ha7 ran 7hi5 j0b.)",

@@ -14,9 +14,11 @@
               <code class="small d-block text-truncate mb-2">{{
                 job.name
               }}</code>
-              <span :class="statusClass(latestStatus(job.name))">{{
-                latestStatus(job.name) || '—'
-              }}</span>
+              <span
+                :class="statusClass(latestStatus(job.name))"
+                :title="latestStatus(job.name)"
+                >{{ statusLabel(latestStatus(job.name)) }}</span
+              >
               <dl class="row small mb-0 mt-2">
                 <dt class="col-7 font-weight-normal">
                   {{ T.cronControlPlaneSuccessRate }}
@@ -81,9 +83,11 @@
               <span v-else>—</span>
             </td>
             <td>
-              <span :class="statusClass(latestStatus(job.name))">{{
-                latestStatus(job.name) || '—'
-              }}</span>
+              <span
+                :class="statusClass(latestStatus(job.name))"
+                :title="latestStatus(job.name)"
+                >{{ statusLabel(latestStatus(job.name)) }}</span
+              >
             </td>
             <td>
               <span :title="latestStartedAt(job.name)">{{
@@ -100,6 +104,7 @@
                   type="checkbox"
                   :checked="job.enabled"
                   data-cron-enabled
+                  :aria-label="enableLabel(job.name)"
                   @click.prevent="setEnabled(job)"
                 />
                 <label
@@ -201,7 +206,9 @@
                 }}</small>
               </td>
               <td>
-                <span :class="statusClass(run.status)">{{ run.status }}</span>
+                <span :class="statusClass(run.status)" :title="run.status">{{
+                  statusLabel(run.status)
+                }}</span>
               </td>
               <td>
                 <span :title="formatDate(run.started_at)">{{
@@ -256,9 +263,11 @@
                         }}</small>
                       </td>
                       <td>
-                        <span :class="statusClass(phase.status)">{{
-                          phase.status
-                        }}</span>
+                        <span
+                          :class="statusClass(phase.status)"
+                          :title="phase.status"
+                          >{{ statusLabel(phase.status) }}</span
+                        >
                       </td>
                       <td>{{ formatDuration(phase.duration) }}</td>
                     </tr>
@@ -546,6 +555,14 @@ export default class Crons extends Vue {
 
   statusTitle(status: string): string {
     return cronJobs.statusTitle(status);
+  }
+
+  statusLabel(status: string | null): string {
+    return status ? cronJobs.statusTitle(status) : '—';
+  }
+
+  enableLabel(name: string): string {
+    return ui.formatString(T.cronControlPlaneEnableJob, { name });
   }
 
   avgDuration(name: string): string {
