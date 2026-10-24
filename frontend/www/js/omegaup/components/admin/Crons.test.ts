@@ -328,4 +328,24 @@ describe('Crons.vue', () => {
       'running',
     );
   });
+
+  it('Should hand the training runs to the model quality table', () => {
+    const wrapper = mount(Crons, {
+      propsData: {
+        jobs,
+        runs,
+        recommendationModelRuns: [
+          {
+            model_run_id: 1,
+            created_at: startedAt,
+            map_score: 0.3419,
+            dataset_size: 12345,
+            published: true,
+          },
+        ],
+      },
+    });
+
+    expect(wrapper.findAll('[data-cron-model-runs] tbody tr')).toHaveLength(1);
+  });
 });
