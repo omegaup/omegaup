@@ -2,12 +2,12 @@ import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 
 import { types } from '../../api_types';
-
+import { ComponentOptions } from 'vue';
 import group_ScoreboardContests from './ScoreboardContests.vue';
 
 describe('ScoreboardContests.vue', () => {
   it('Should handle empty scoreboard contest view', () => {
-    const wrapper = shallowMount(group_ScoreboardContests, {
+    const wrapper = shallowMount(group_ScoreboardContests as ComponentOptions<Vue>, {
       propsData: {
         scoreboard: 'Hello',
         availableContests: [] as types.ContestListItem[],
@@ -19,7 +19,7 @@ describe('ScoreboardContests.vue', () => {
   });
 
   it('Should handle scoreboard contest view with one contest', () => {
-    const wrapper = shallowMount(group_ScoreboardContests, {
+    const wrapper = shallowMount(group_ScoreboardContests as ComponentOptions<Vue>, {
       propsData: {
         scoreboard: 'Hello',
         availableContests: [] as types.ContestListItem[],

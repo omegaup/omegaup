@@ -98,7 +98,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'create-scoreboard': (
-            source: group_Scoreboards,
+            source: InstanceType<typeof group_Scoreboards>,
             scoreboardName: string,
             scoreboardAlias: string,
             scoreboardDescription: string,
@@ -116,7 +116,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-member': (source: group_Members, username: string) => {
+          'add-member': (source: InstanceType<typeof group_Members>, username: string) => {
             api.Group.addUser({
               group_alias: payload.groupAlias,
               usernameOrEmail: username,
@@ -129,7 +129,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'edit-identity': (
-            source: group_Members,
+            source: InstanceType<typeof group_Members>,
             identity: types.Identity,
           ) => {
             source.showEditForm = true;
@@ -163,7 +163,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'change-password-identity': (
-            source: group_Members,
+            source: InstanceType<typeof group_Members>,
             username: string,
           ) => {
             source.showEditForm = false;
@@ -171,7 +171,7 @@ OmegaUp.on('ready', () => {
             source.username = username;
           },
           'change-password-identity-member': (
-            source: group_Members,
+            source: InstanceType<typeof group_Members>,
             username: string,
             newPassword: string,
             newPasswordRepeat: string,
@@ -205,7 +205,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          cancel: (source: group_Members) => {
+          cancel: (source: InstanceType<typeof group_Members>) => {
             this.refreshMemberList();
             source.showEditForm = false;
             source.showChangePasswordForm = false;
