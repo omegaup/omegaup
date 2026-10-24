@@ -229,7 +229,13 @@
                 ></omegaup-common-empty-state>
               </td>
             </tr>
-            <tr v-for="run in filteredRuns" :key="run.guid">
+            <tr
+              v-for="run in filteredRuns"
+              :key="run.guid"
+              :class="{
+                'run-loading': run.status !== 'ready',
+              }"
+            >
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td>
                 <acronym :title="run.guid" data-run-guid>
@@ -293,6 +299,12 @@
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
               >
+                <font-awesome-icon
+                  v-if="run.status !== 'ready'"
+                  :icon="['fas', 'spinner']"
+                  spin
+                  class="mr-1"
+                />
                 <span class="mr-1">{{ status(run) }}</span>
                 <button
                   v-if="!!statusHelp(run)"
@@ -471,6 +483,7 @@ import {
   faSearchPlus,
   faExternalLinkAlt,
   faTimes,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faQuestionCircle);
 library.add(faRedoAlt);
@@ -478,6 +491,7 @@ library.add(faBan);
 library.add(faSearchPlus);
 library.add(faExternalLinkAlt);
 library.add(faTimes);
+library.add(faSpinner);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1029,6 +1043,27 @@ export default class Runs extends Vue {
   }
   100% {
     background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+}
+tr.run-loading td {
+  animation: run-loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes run-loading-pulse {
+  0% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background-color: var(
       --arena-submissions-list-skeletonloader-initial-background-color
     );
   }
