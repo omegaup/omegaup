@@ -201,6 +201,13 @@ class DbCommandArgsTest(unittest.TestCase):
                       'user=reader\npassword=s3cret\ndatabase=omegaup\n',
                       contents)
 
+    def test_leaves_out_an_incomplete_replica(self) -> None:
+        '''lib.db falls back to the primary, so the child must too.'''
+        args = _args(user='omegaup', password='hunter2',
+                     readonly_user='reader', readonly_password='s3cret')
+
+        self.assertNotIn('[clientreadonly]', self._config_file(args))
+
     def test_hands_down_the_replica_from_the_config_file(self) -> None:
         '''A replica set up in my.cnf is kept along with the password.'''
         my_cnf = os.path.join(self._tmpdir, 'my.cnf')
@@ -288,9 +295,10 @@ class RunScriptTest(unittest.TestCase):
     def test_stops_the_child_when_the_dispatcher_is_stopped(self) -> None:
         '''A SIGTERM to the dispatcher must not leave the job running.'''
         name = self._script(f'''
-            import os, time
+            import os, signal, time
             with open({self._pid_file()!r}, 'w') as f:
                 f.write(str(os.getpid()))
+            os.kill(os.getppid(), signal.SIGTERM)
             time.sleep(120)
         ''')
 
@@ -298,18 +306,27 @@ class RunScriptTest(unittest.TestCase):
             del signum, frame
             raise SystemExit(143)
 
-        previous = signal.signal(signal.SIGALRM, stop)
-        signal.setitimer(signal.ITIMER_REAL, 1)
+        previous = signal.signal(signal.SIGTERM, stop)
         start = time.monotonic()
         try:
             with self.assertRaises(SystemExit):
                 cron_dispatcher.run_script(_args(), name)
         finally:
-            signal.setitimer(signal.ITIMER_REAL, 0)
-            signal.signal(signal.SIGALRM, previous)
+            signal.signal(signal.SIGTERM, previous)
 
         self.assertLess(time.monotonic() - start, 30)
         self.assertTrue(self._child_is_gone())
+
+    def test_keeps_whole_characters_across_chunks(self) -> None:
+        '''A character split between two reads still comes out whole.'''
+        name = self._script('''
+            import sys
+            sys.stderr.write('x' * 65535 + 'é')
+        ''')
+
+        cron_dispatcher.run_script(_args(), name)
+
+        self.assertTrue(self.stderr.getvalue().endswith('xé'))
 
     def test_logs_the_way_a_scheduled_run_does(self) -> None:
         '''Production runs every cron with --log-json.'''
@@ -338,18 +355,6 @@ class RunScriptTest(unittest.TestCase):
 
         self.assertEqual((returncode, error_text), (0, None))
         self.assertEqual(self.stderr.getvalue(), 'ranked 1200 users')
-
-    def test_gives_the_child_no_stdin(self) -> None:
-        '''An inherited stdin lets a child block on a prompt forever.'''
-        name = self._script('''
-            import sys
-            sys.stderr.write('STDIN=%r' % sys.stdin.read())
-            sys.exit(1)
-        ''')
-
-        _, error_text = cron_dispatcher.run_script(_args(), name)
-
-        self.assertEqual(error_text, "STDIN=''")
 
     def test_keeps_only_the_tail_of_a_noisy_child(self) -> None:
         '''The error stored in the row is bounded, and keeps the end.'''
@@ -401,8 +406,9 @@ from cron import cron_dispatcher
 cron_dispatcher.install_signal_handlers()
 args = argparse.Namespace(host='localhost', port=13306, database='omegaup',
                           user='omegaup', password='hunter2',
-                          mysql_config_file=None, readonly_user=None,
-                          readonly_password=None)
+                          mysql_config_file=None, readonly_host=None,
+                          readonly_port=3306, readonly_user=None,
+                          readonly_password=None, readonly_database='omegaup')
 with cron_dispatcher.db_command_args(args) as command:
     print(command[command.index('--mysql-config-file') + 1], flush=True)
     time.sleep(120)

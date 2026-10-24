@@ -6,6 +6,7 @@ the single place that actually launches a job.
 '''
 
 import argparse
+import codecs
 import configparser
 import contextlib
 import enum
@@ -261,10 +262,14 @@ def _own_run_id(
 
 
 def _readonly_section(args: argparse.Namespace) -> str:
-    '''The replica settings, so the child's heavy reads skip the primary.'''
-    if args.readonly_user and args.readonly_password:
+    '''The replica settings, so the child's heavy reads skip the primary.
+
+    Written only when complete, which is when lib.db would use a replica.
+    '''
+    if (args.readonly_host and args.readonly_port and args.readonly_user
+            and args.readonly_password and args.readonly_database):
         return (f'[clientreadonly]\n'
-                f'host={args.readonly_host or args.host}\n'
+                f'host={args.readonly_host}\n'
                 f'port={args.readonly_port}\n'
                 f'user={args.readonly_user}\n'
                 f'password={args.readonly_password}\n'
@@ -321,19 +326,24 @@ def _stop(process: 'subprocess.Popen[bytes]') -> None:
     lib.runner turns SIGINT into a failed `Cron_Runs` row and releases its
     lock. SIGKILL skips both and leaves the run `running` forever.
     '''
-    os.killpg(process.pid, signal.SIGINT)
+    # The child may exit on its own between the check and the signal.
+    with contextlib.suppress(ProcessLookupError):
+        os.killpg(process.pid, signal.SIGINT)
     try:
         process.wait(timeout=_STOP_GRACE_SECONDS)
     except subprocess.TimeoutExpired:
-        os.killpg(process.pid, signal.SIGKILL)
+        with contextlib.suppress(ProcessLookupError):
+            os.killpg(process.pid, signal.SIGKILL)
         process.wait()
 
 
 def _forward_and_tail(stderr_file: IO[bytes]) -> str:
-    '''Copies the child's stderr to ours and returns its last part.'''
+    '''Copies the child's stderr to ours once it exits, returns its end.'''
     stderr_file.seek(0)
+    decoder = codecs.getincrementaldecoder('utf-8')(errors='replace')
     while chunk := stderr_file.read(1 << 16):
-        sys.stderr.write(chunk.decode('utf-8', errors='replace'))
+        sys.stderr.write(decoder.decode(chunk))
+    sys.stderr.write(decoder.decode(b'', final=True))
     sys.stderr.flush()
     end = stderr_file.seek(0, os.SEEK_END)
     stderr_file.seek(max(0, end - 4 * _MAX_ERROR_LENGTH))
