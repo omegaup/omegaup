@@ -98,7 +98,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue, { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 import 'intro.js/introjs.css';
@@ -107,24 +108,54 @@ import VueCookies from 'vue-cookies';
 
 Vue.use(VueCookies, { expires: -1 });
 
-@Component({
+export default defineComponent({
+  name: 'Login',
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class Login extends Vue {
-  @Prop() facebookUrl!: string;
-  @Prop({ default: '' }) githubClientId!: string;
-  @Prop({ default: null }) githubState!: string | null;
-  @Prop() googleClientId!: string;
-  @Prop({ default: 'login' }) activeTab!: string;
-
-  usernameOrEmail: string = '';
-  password: string = '';
-  T = T;
-  githubCsrfState: string | null = null;
-  introStarted: boolean = false;
-
+  props: {
+    facebookUrl: {
+      type: String,
+      default: undefined,
+    },
+    githubClientId: {
+      type: String,
+      default: '',
+    },
+    githubState: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    googleClientId: {
+      type: String,
+      default: undefined,
+    },
+    activeTab: {
+      type: String,
+      default: 'login',
+    },
+  },
+  data() {
+    return {
+      usernameOrEmail: '',
+      password: '',
+      T,
+      githubCsrfState: null as string | null,
+      introStarted: false,
+    };
+  },
+  computed: {
+    loginUri(): string {
+      return document.location.href;
+    },
+  },
+  watch: {
+    activeTab(newValue: string): void {
+      if (newValue === 'login') {
+        this.maybeStartIntro();
+      }
+    },
+  },
   mounted() {
     // The reason for loading the script here instead of the `template.tpl` file
     // is that sometimes the script runs after the DOM is ready, and the element
@@ -135,153 +166,140 @@ export default class Login extends Vue {
 
     this.initializeGithubCsrfToken();
     this.maybeStartIntro();
-  }
-
-  @Watch('activeTab')
-  onActiveTabChanged(newValue: string): void {
-    if (newValue === 'login') {
-      this.maybeStartIntro();
-    }
-  }
-
-  maybeStartIntro(): void {
-    if (this.introStarted || this.$cookies.get('has-visited-login')) {
-      return;
-    }
-    if (this.activeTab !== 'login') {
-      return;
-    }
-
-    this.$nextTick(() => {
+  },
+  methods: {
+    maybeStartIntro(): void {
       if (this.introStarted || this.$cookies.get('has-visited-login')) {
         return;
       }
-      const title = T.loginFormInteractiveGuideTitle;
-      const steps: Array<{
-        title: string;
-        intro: string;
-        element?: Element;
-      }> = [
-        {
-          title,
-          intro: T.loginFormInteractiveGuideWelcome,
-        },
-      ];
-      const addStep = (selector: string, intro: string): void => {
-        const element = document.querySelector(selector);
-        if (!element) {
-          return;
-        }
-        steps.push({
-          element,
-          title,
-          intro,
-        });
-      };
-
-      addStep('.introjs-federated', T.loginFormInteractiveGuideFederated);
-      addStep('.introjs-google', T.loginFormInteractiveGuideGoogle);
-      addStep('.introjs-github', T.loginFormInteractiveGuideGithub);
-      addStep('.introjs-native', T.loginFormInteractiveGuideNative);
-      addStep('[data-login-username]', T.loginFormInteractiveGuideUsername);
-      addStep('[data-login-password]', T.loginFormInteractiveGuidePassword);
-      addStep('[data-login-recover]', T.loginFormInteractiveGuideRecover);
-      addStep('[data-login-submit]', T.loginFormInteractiveGuideSubmit);
-
-      if (steps.length <= 1) {
+      if (this.activeTab !== 'login') {
         return;
       }
-      this.introStarted = true;
-      introJs()
-        .setOptions({
-          nextLabel: T.interactiveGuideNextButton,
-          prevLabel: T.interactiveGuidePreviousButton,
-          doneLabel: T.interactiveGuideDoneButton,
-          steps,
-        })
-        .start();
-      this.$cookies.set('has-visited-login', true, -1);
-    });
-  }
 
-  get loginUri(): string {
-    return document.location.href;
-  }
+      this.$nextTick(() => {
+        if (this.introStarted || this.$cookies.get('has-visited-login')) {
+          return;
+        }
+        const title = T.loginFormInteractiveGuideTitle;
+        const steps: Array<{
+          title: string;
+          intro: string;
+          element?: Element;
+        }> = [
+          {
+            title,
+            intro: T.loginFormInteractiveGuideWelcome,
+          },
+        ];
+        const addStep = (selector: string, intro: string): void => {
+          const element = document.querySelector(selector);
+          if (!element) {
+            return;
+          }
+          steps.push({
+            element,
+            title,
+            intro,
+          });
+        };
 
-  initializeGithubCsrfToken(): void {
-    const storedState = sessionStorage.getItem('github_oauth_state');
-    if (storedState) {
-      this.githubCsrfState = storedState;
-    } else if (this.githubState) {
-      this.githubCsrfState = this.githubState;
-      sessionStorage.setItem('github_oauth_state', this.githubState);
-    } else {
-      const generatedState = this.generateSecureRandomString();
-      this.githubCsrfState = generatedState;
-      sessionStorage.setItem('github_oauth_state', generatedState);
-    }
+        addStep('.introjs-federated', T.loginFormInteractiveGuideFederated);
+        addStep('.introjs-google', T.loginFormInteractiveGuideGoogle);
+        addStep('.introjs-github', T.loginFormInteractiveGuideGithub);
+        addStep('.introjs-native', T.loginFormInteractiveGuideNative);
+        addStep('[data-login-username]', T.loginFormInteractiveGuideUsername);
+        addStep('[data-login-password]', T.loginFormInteractiveGuidePassword);
+        addStep('[data-login-recover]', T.loginFormInteractiveGuideRecover);
+        addStep('[data-login-submit]', T.loginFormInteractiveGuideSubmit);
 
-    if (this.githubCsrfState) {
-      document.cookie = `github_oauth_state=${this.githubCsrfState};path=/;SameSite=Lax`;
-    }
-  }
+        if (steps.length <= 1) {
+          return;
+        }
+        this.introStarted = true;
+        introJs()
+          .setOptions({
+            nextLabel: T.interactiveGuideNextButton,
+            prevLabel: T.interactiveGuidePreviousButton,
+            doneLabel: T.interactiveGuideDoneButton,
+            steps,
+          })
+          .start();
+        this.$cookies.set('has-visited-login', true, -1);
+      });
+    },
+    initializeGithubCsrfToken(): void {
+      const storedState = sessionStorage.getItem('github_oauth_state');
+      if (storedState) {
+        this.githubCsrfState = storedState;
+      } else if (this.githubState) {
+        this.githubCsrfState = this.githubState;
+        sessionStorage.setItem('github_oauth_state', this.githubState);
+      } else {
+        const generatedState = this.generateSecureRandomString();
+        this.githubCsrfState = generatedState;
+        sessionStorage.setItem('github_oauth_state', generatedState);
+      }
 
-  loginWithGithub(): void {
-    if (!this.githubClientId) {
-      return;
-    }
+      if (this.githubCsrfState) {
+        document.cookie = `github_oauth_state=${this.githubCsrfState};path=/;SameSite=Lax`;
+      }
+    },
+    loginWithGithub(): void {
+      if (!this.githubClientId) {
+        return;
+      }
 
-    const state =
-      sessionStorage.getItem('github_oauth_state') ||
-      this.githubCsrfState ||
-      this.generateSecureRandomString();
-    sessionStorage.setItem('github_oauth_state', state);
-    document.cookie = `github_oauth_state=${state};path=/;SameSite=Lax`;
+      const state =
+        sessionStorage.getItem('github_oauth_state') ||
+        this.githubCsrfState ||
+        this.generateSecureRandomString();
+      sessionStorage.setItem('github_oauth_state', state);
+      document.cookie = `github_oauth_state=${state};path=/;SameSite=Lax`;
 
-    const redirectUri = new URL('/login', window.location.origin);
-    redirectUri.searchParams.set('third_party_login', 'github');
+      const redirectUri = new URL('/login', window.location.origin);
+      redirectUri.searchParams.set('third_party_login', 'github');
 
-    const currentParams = new URLSearchParams(window.location.search);
-    const redirectParam = currentParams.get('redirect');
-    if (redirectParam) {
-      redirectUri.searchParams.set('redirect', redirectParam);
-    }
+      const currentParams = new URLSearchParams(window.location.search);
+      const redirectParam = currentParams.get('redirect');
+      if (redirectParam) {
+        redirectUri.searchParams.set('redirect', redirectParam);
+      }
 
-    const params = new URLSearchParams({
-      client_id: this.githubClientId,
-      redirect_uri: redirectUri.toString(),
-      scope: 'read:user user:email',
-      state,
-      allow_signup: 'true',
-    });
+      const params = new URLSearchParams({
+        client_id: this.githubClientId,
+        redirect_uri: redirectUri.toString(),
+        scope: 'read:user user:email',
+        state,
+        allow_signup: 'true',
+      });
 
-    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
-  }
+      window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
+    },
+    generateSecureRandomString(): string {
+      const validChars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const len = 16;
 
-  generateSecureRandomString(): string {
-    const validChars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const len = 16;
+      if (typeof window.crypto === 'object') {
+        const arr = new Uint8Array(len);
+        window.crypto.getRandomValues(arr);
+        return Array.from(
+          arr,
+          (value) => validChars[value % validChars.length],
+        ).join('');
+      }
 
-    if (typeof window.crypto === 'object') {
-      const arr = new Uint8Array(len);
-      window.crypto.getRandomValues(arr);
-      return Array.from(
-        arr,
-        (value) => validChars[value % validChars.length],
-      ).join('');
-    }
-
-    // Without window.crypto
-    let result = '';
-    for (let i = 0; i < len; i++) {
-      result += validChars.charAt(
-        Math.floor(Math.random() * validChars.length),
-      );
-    }
-    return result;
-  }
-}
+      // Without window.crypto
+      let result = '';
+      for (let i = 0; i < len; i++) {
+        result += validChars.charAt(
+          Math.floor(Math.random() * validChars.length),
+        );
+      }
+      return result;
+    },
+  },
+});
 </script>
 
 <style scoped>
