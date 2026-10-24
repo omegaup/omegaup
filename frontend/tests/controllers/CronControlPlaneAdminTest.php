@@ -410,24 +410,43 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         $name = \OmegaUp\CronJobName::AssignBadges->value;
-        $connection = \OmegaUp\MySQLConnection::getInstance();
 
         // Another request for the same job is still holding the job row.
+        $this->assertWaitsForTheJobRow(
+            "SELECT job_id FROM Cron_Jobs WHERE name = '{$name}' FOR UPDATE;",
+            fn () => \OmegaUp\Controllers\Admin::apiRerunCron(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => $name,
+                ])
+            )
+        );
+        $this->assertNull(
+            \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+        );
+    }
+
+    /**
+     * Holds the job row from another connection, as a concurrent request
+     * would, and checks that `$request` waits for it instead of going ahead.
+     *
+     * @param callable():mixed $request
+     */
+    private function assertWaitsForTheJobRow(
+        string $lockingStatement,
+        callable $request
+    ): void {
+        $connection = \OmegaUp\MySQLConnection::getInstance();
         $other = self::otherConnection();
         $other->begin_transaction();
-        $other->query(
-            "SELECT job_id FROM Cron_Jobs WHERE name = '{$name}' FOR UPDATE;"
-        );
+        $other->query($lockingStatement);
         /** @var int|null */
         $timeout = $connection->GetOne(
             'SELECT @@SESSION.innodb_lock_wait_timeout;'
         );
         $connection->Execute('SET SESSION innodb_lock_wait_timeout = 1;');
         try {
-            \OmegaUp\Controllers\Admin::apiRerunCron(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'name' => $name,
-            ]));
+            $request();
             $this->fail('Should have waited for the other request');
         } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
             $this->assertStringContainsString(
@@ -441,9 +460,6 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
             $other->rollback();
             $other->close();
         }
-        $this->assertNull(
-            \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
-        );
     }
 
     private static function otherConnection(): \mysqli {
@@ -605,6 +621,112 @@ class CronControlPlaneAdminTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             $this->assertSame('cronControlPlaneJobDisabled', $e->getMessage());
         }
+    }
+
+    public function testDisablingWaitsForARerunBeingQueued() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $name = \OmegaUp\CronJobName::AssignBadges->value;
+
+        // The test transaction is still open, so this request keeps its lock
+        // on the job row.
+        $response = \OmegaUp\Controllers\Admin::apiRerunCron(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+            ])
+        );
+        $this->assertTrue($response['queued']);
+
+        // The same statement CronJobs::setEnabled() runs, from another request.
+        $other = self::otherConnection();
+        $other->query('SET SESSION innodb_lock_wait_timeout = 1;');
+        $disabled = false;
+        try {
+            $other->query(
+                "UPDATE Cron_Jobs SET enabled = 0 WHERE name = '{$name}';"
+            );
+            $disabled = true;
+        } catch (\mysqli_sql_exception $e) {
+            // ER_LOCK_WAIT_TIMEOUT
+            $this->assertSame(1205, $e->getCode());
+        } finally {
+            if ($disabled) {
+                // Cron_Jobs is seeded and never cleaned, so undo the change.
+                $other->query(
+                    "UPDATE Cron_Jobs SET enabled = 1 WHERE name = '{$name}';"
+                );
+            }
+            $other->close();
+        }
+        $this->assertFalse(
+            $disabled,
+            'The disable should have waited for the rerun request'
+        );
+    }
+
+    public function testRerunWaitsForADisableInProgress() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $name = \OmegaUp\CronJobName::AssignBadges->value;
+
+        // The other connection is disabling the job and has not committed.
+        $this->assertWaitsForTheJobRow(
+            "UPDATE Cron_Jobs SET enabled = 0 WHERE name = '{$name}';",
+            fn () => \OmegaUp\Controllers\Admin::apiRerunCron(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => $name,
+                ])
+            )
+        );
+        $this->assertNull(
+            \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+        );
+    }
+
+    public function testRerunSeesAJobDisabledByAnotherConnection() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $name = \OmegaUp\CronJobName::AssignBadges->value;
+        $connection = \OmegaUp\MySQLConnection::getInstance();
+        // A plain read here would fix the snapshot the rest of the request sees.
+        $connection->Execute('SELECT COUNT(*) FROM Cron_Jobs;');
+
+        $other = self::otherConnection();
+        try {
+            $other->query(
+                "UPDATE Cron_Jobs SET enabled = 0 WHERE name = '{$name}';"
+            );
+        } finally {
+            $other->close();
+        }
+
+        try {
+            \OmegaUp\Controllers\Admin::apiRerunCron(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+            ]));
+            $this->fail('Should not have queued a rerun of a disabled job');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertSame('cronControlPlaneJobDisabled', $e->getMessage());
+        } finally {
+            // The failed request already marked this transaction to roll back,
+            // so this only ends it and releases the job row.
+            \OmegaUp\Test\Utils::commit();
+            // Cron_Jobs is seeded and never cleaned, so undo the change.
+            $other = self::otherConnection();
+            try {
+                $other->query(
+                    "UPDATE Cron_Jobs SET enabled = 1 WHERE name = '{$name}';"
+                );
+            } finally {
+                $other->close();
+            }
+        }
+        $this->assertNull(
+            \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+        );
     }
 
     public function testSetCronJobEnabledRejectsUnknownJob() {
