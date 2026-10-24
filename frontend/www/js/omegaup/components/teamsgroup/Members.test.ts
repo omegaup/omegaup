@@ -1,5 +1,5 @@
 import { mount, shallowMount } from '@vue/test-utils';
-
+import { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -22,7 +22,7 @@ describe('Members.vue', () => {
 
   it('Should handle an empty list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = shallowMount(teamsgroup_Members as any, {
+    const wrapper = shallowMount(teamsgroup_Members as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -62,7 +62,7 @@ describe('Members.vue', () => {
 
   it('Should handle a list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = mount(teamsgroup_Members as any, {
+    const wrapper = mount(teamsgroup_Members as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -97,7 +97,7 @@ describe('Members.vue', () => {
 
   it('Should handle change password form', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = mount(teamsgroup_Members as any, {
+    const wrapper = mount(teamsgroup_Members as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -121,9 +121,11 @@ describe('Members.vue', () => {
     await wrapper
       .find('.input-group input[type="password"]')
       .setValue('new_pass');
+    type TeamsgroupMembersInstance = InstanceType<typeof teamsgroup_Members>;
+    const vm = wrapper.vm as unknown as TeamsgroupMembersInstance;
 
-    expect((wrapper.vm as any).username).toBe('user_1');
-    expect((wrapper.vm as any).password).toBe('new_pass');
+    expect((vm as any).username).toBe('user_1');
+    expect((vm as any).password).toBe('new_pass');
 
     await wrapper
       .find('button[data-save-new-password-identity="user_1"]')

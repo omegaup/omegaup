@@ -20,7 +20,7 @@ import teamsgroup_FormBase from './FormBase.vue';
 import T from '../../lang';
 
 export default defineComponent({
-  name: 'TeamsGroupForm',
+  name: 'teamsGroupFormUpdate',
   components: {
     'omegaup-teams-group-form': teamsgroup_FormBase,
   },

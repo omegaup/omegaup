@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
+import { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -19,7 +20,7 @@ describe('Edit.vue', () => {
   };
 
   it('Should handle edit view with empty teams list', () => {
-    const wrapper = shallowMount(teamsgroup_Edit as any, {
+    const wrapper = shallowMount(teamsgroup_Edit as ComponentOptions<Vue>, {
       propsData,
     });
 
@@ -29,25 +30,30 @@ describe('Edit.vue', () => {
   });
 
   it('Should change a valid tab', async () => {
-    const wrapper = shallowMount(teamsgroup_Edit as any, {
+    const wrapper = shallowMount(teamsgroup_Edit as ComponentOptions<Vue>, {
       propsData,
     });
 
     await wrapper.setProps({ tab: AvailableTabs.Edit });
-    expect((wrapper.vm as any).selectedTab).toBe(AvailableTabs.Edit);
+    type TeamsGroupEditInstance = InstanceType<typeof teamsgroup_Edit>;
+    const vm = wrapper.vm as unknown as TeamsGroupEditInstance;
+    expect(vm.selectedTab).toBe(AvailableTabs.Edit);
   });
 
   it('Should change an invalid tab', async () => {
-    const wrapper = shallowMount(teamsgroup_Edit as any, {
+    const wrapper = shallowMount(teamsgroup_Edit as ComponentOptions<Vue>, {
       propsData,
     });
 
     await wrapper.setProps({ tab: 'wrong' });
-    expect((wrapper.vm as any).selectedTab).toBe(AvailableTabs.Teams);
+    type TeamsGroupEditInstance = InstanceType<typeof teamsgroup_Edit>;
+    const vm = wrapper.vm as unknown as TeamsGroupEditInstance;
+
+    expect(vm.selectedTab).toBe(AvailableTabs.Teams);
   });
 
   it('Should change teams identities list', async () => {
-    const wrapper = shallowMount(teamsgroup_Edit as any, {
+    const wrapper = shallowMount(teamsgroup_Edit as ComponentOptions<Vue>, {
       propsData,
     });
     const teamsIdentities: types.Identity[] = [
@@ -61,11 +67,14 @@ describe('Edit.vue', () => {
     ];
 
     await wrapper.setProps({ teamsIdentities });
-    expect((wrapper.vm as any).currentTeamsIdentities).toBe(teamsIdentities);
+    type TeamsGroupEditInstance = InstanceType<typeof teamsgroup_Edit>;
+    const vm = wrapper.vm as unknown as TeamsGroupEditInstance;
+
+    expect(vm.currentTeamsIdentities).toBe(teamsIdentities);
   });
 
   it('Should keep the updated contestants count across tabs', async () => {
-    const wrapper = shallowMount(teamsgroup_Edit as any, {
+    const wrapper = shallowMount(teamsgroup_Edit as ComponentOptions<Vue>, {
       propsData: {
         ...propsData,
         numberOfContestants: 3,

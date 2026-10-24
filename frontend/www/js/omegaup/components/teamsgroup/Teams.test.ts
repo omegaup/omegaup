@@ -1,5 +1,5 @@
 import { mount, shallowMount } from '@vue/test-utils';
-
+import { ComponentOptions } from 'vue';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 
@@ -38,7 +38,7 @@ describe('Teams.vue', () => {
   };
 
   it('Should handle an empty list of members and identities', () => {
-    const wrapper = shallowMount(teamsgroup_Teams as any, {
+    const wrapper = shallowMount(teamsgroup_Teams as ComponentOptions<Vue>, {
       propsData: {
         teams: [] as types.Identity[],
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
@@ -51,7 +51,7 @@ describe('Teams.vue', () => {
   });
 
   it('Should handle a list of teams as identities', () => {
-    const wrapper = mount(teamsgroup_Teams as any, {
+    const wrapper = mount(teamsgroup_Teams as ComponentOptions<Vue>, {
       propsData,
     });
 
@@ -61,7 +61,7 @@ describe('Teams.vue', () => {
   });
 
   it('Should handle edit identity form', async () => {
-    const wrapper = mount(teamsgroup_Teams as any, {
+    const wrapper = mount(teamsgroup_Teams as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData,
     });
@@ -70,18 +70,21 @@ describe('Teams.vue', () => {
       .find('button[data-edit-identity="omegaUp:user"]')
       .trigger('click');
 
-    expect((wrapper.vm as any).identity).toEqual({
+    type TeamsgroupTeamsInstance = InstanceType<typeof teamsgroup_Teams>;
+    const vm = wrapper.vm as unknown as TeamsgroupTeamsInstance;
+
+    expect(vm.identity).toEqual({
       username: 'omegaUp:user',
       name: 'user',
     });
-    expect((wrapper.vm as any).formToShow).toBe(AvailableForms.Edit);
-    expect((wrapper.vm as any).username).toBe('omegaUp:user');
+    expect(vm.formToShow).toBe(AvailableForms.Edit);
+    expect(vm.username).toBe('omegaUp:user');
 
     await wrapper.find('button[type="reset"]').trigger('click');
 
-    expect((wrapper.vm as any).identity).toBe(null);
-    expect((wrapper.vm as any).formToShow).toBe(AvailableForms.None);
-    expect((wrapper.vm as any).username).toBe(null);
+    expect(vm.identity).toBe(null);
+    expect(vm.formToShow).toBe(AvailableForms.None);
+    expect(vm.username).toBe(null);
 
     await wrapper
       .find('button[data-edit-identity="omegaUp:user"]')

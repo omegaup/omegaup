@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
-
+import { ComponentOptions } from 'vue';
 import teamsgroup_FormBase from './FormBase.vue';
 
 describe('FormBase.vue', () => {
@@ -24,7 +24,7 @@ describe('FormBase.vue', () => {
   };
 
   it('Should handle form base', async () => {
-    const wrapper = shallowMount(teamsgroup_FormBase as any, {
+    const wrapper = shallowMount(teamsgroup_FormBase as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData,
     });

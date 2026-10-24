@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import T from '../../lang';
-
+import { ComponentOptions } from 'vue';
 import teamsgroup_FormUpdate from './FormUpdate.vue';
 import teamsgroup_FormBase from './FormBase.vue';
 
@@ -19,7 +19,7 @@ describe('FormUpdate.vue', () => {
   });
 
   it('Should handle form update', async () => {
-    const wrapper = mount(teamsgroup_FormUpdate as any, {
+    const wrapper = mount(teamsgroup_FormUpdate as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         alias: 'Hello',

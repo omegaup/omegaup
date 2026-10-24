@@ -217,8 +217,8 @@ export default defineComponent({
       T,
       ui,
       AvailableTabs,
-      selectedTab: this.tab as AvailableTabs,
-      currentTeamsIdentities: this.teamsIdentities as types.Identity[],
+      selectedTab: this.tab,
+      currentTeamsIdentities: this.teamsIdentities,
     };
   },
   watch: {

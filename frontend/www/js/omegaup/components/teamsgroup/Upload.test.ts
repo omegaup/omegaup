@@ -1,6 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
-
+import { ComponentOptions } from 'vue';
 import T from '../../lang';
 
 import teamsgroup_Upload from './Upload.vue';
@@ -9,7 +9,7 @@ import { CsvTeam } from '../../teamsgroup/edit';
 
 describe('Upload.vue', () => {
   it('Should handle upload teams view with identities', async () => {
-    const wrapper = shallowMount(teamsgroup_Upload as any, {
+    const wrapper = shallowMount(teamsgroup_Upload as ComponentOptions<Vue>, {
       propsData: {
         searchResultUsers: [] as types.ListItem[],
       },
@@ -34,7 +34,9 @@ describe('Upload.vue', () => {
       'teams:group:team_1': [{ username: 'user_1' }, { username: 'user_2' }],
     };
     await wrapper.setData({ identities, identitiesTeams });
-    expect((wrapper.vm as any).items).toEqual([
+    type TeamsgroupUploadInstance = InstanceType<typeof teamsgroup_Upload>;
+    const vm = wrapper.vm as unknown as TeamsgroupUploadInstance;
+    expect(vm.items).toEqual([
       {
         username: 'teams:group:team_1',
         name: 'user 1',
@@ -48,7 +50,7 @@ describe('Upload.vue', () => {
   });
 
   it('Should handle download identities to csv file', async () => {
-    const wrapper = shallowMount(teamsgroup_Upload as any, {
+    const wrapper = shallowMount(teamsgroup_Upload as ComponentOptions<Vue>, {
       propsData: {
         searchResultUsers: [] as types.ListItem[],
       },
@@ -106,7 +108,7 @@ describe('Upload.vue', () => {
   });
 
   it('Should handle an invalid csv file', async () => {
-    const wrapper = mount(teamsgroup_Upload as any, {
+    const wrapper = mount(teamsgroup_Upload as ComponentOptions<Vue>, {
       propsData: {
         searchResultUsers: [] as types.ListItem[],
       },
@@ -114,7 +116,12 @@ describe('Upload.vue', () => {
 
     const invalidFile = new File([''], 'fake.html', { type: 'text/html' });
     const mockReadFileMethod = jest
-      .spyOn(wrapper.vm as any, 'readFile')
+      .spyOn(
+        wrapper.vm as unknown as {
+          readFile: (e: HTMLInputElement) => File | null;
+        },
+        'readFile',
+      )
       .mockImplementation(() => invalidFile);
     const fileInput = wrapper.find('input[type=file]');
     await fileInput.trigger('change');
@@ -124,7 +131,7 @@ describe('Upload.vue', () => {
   });
 
   it('Should handle a valid csv file', async () => {
-    const wrapper = mount(teamsgroup_Upload as any, {
+    const wrapper = mount(teamsgroup_Upload as ComponentOptions<Vue>, {
       propsData: {
         searchResultUsers: [] as types.ListItem[],
       },
@@ -132,7 +139,12 @@ describe('Upload.vue', () => {
 
     const validFile = new File([''], 'users.csv', { type: 'text/csv' });
     const mockReadFileMethod = jest
-      .spyOn(wrapper.vm as any, 'readFile')
+      .spyOn(
+        wrapper.vm as unknown as {
+          readFile: (e: HTMLInputElement) => File | null;
+        },
+        'readFile',
+      )
       .mockImplementation(() => validFile);
     const fileInput = wrapper.find('input[type=file]');
     await fileInput.trigger('change');
@@ -142,7 +154,7 @@ describe('Upload.vue', () => {
   });
 
   it('Should emit the updated contestants limit when reading a csv file', async () => {
-    const wrapper = mount(teamsgroup_Upload as any, {
+    const wrapper = mount(teamsgroup_Upload as ComponentOptions<Vue>, {
       propsData: {
         numberOfContestants: 3,
         searchResultUsers: [] as types.ListItem[],
@@ -155,7 +167,12 @@ describe('Upload.vue', () => {
 
     const validFile = new File([''], 'users.csv', { type: 'text/csv' });
     const mockReadFileMethod = jest
-      .spyOn(wrapper.vm as any, 'readFile')
+      .spyOn(
+        wrapper.vm as unknown as {
+          readFile: (e: HTMLInputElement) => File | null;
+        },
+        'readFile',
+      )
       .mockImplementation(() => validFile);
 
     await wrapper.find('input[type=file]').trigger('change');
