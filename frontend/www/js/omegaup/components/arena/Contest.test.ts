@@ -2,6 +2,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
+import * as api from '../../api';
 import { SocketStatus } from '../../arena/events_socket';
 import T from '../../lang';
 import * as time from '../../time';
@@ -297,5 +298,35 @@ describe('Contest.vue', () => {
       },
     });
     expect(wrapper.find('.edit-contest-button').exists()).toBeFalsy();
+  });
+
+  it('Should render the bookmark button and handle toggling within a contest', async () => {
+    const toggleSpy = jest
+      .spyOn(api.ProblemBookmark, 'toggle')
+      .mockResolvedValue({ bookmarked: true });
+
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        contest,
+        problems,
+        problem: problems[0],
+        problemInfo: {
+          ...problemInfo,
+          is_bookmarked: false,
+        },
+      },
+    });
+
+    const bookmarkButton = wrapper.find('button[data-bookmark-button]');
+    expect(bookmarkButton.exists()).toBeTruthy();
+
+    await bookmarkButton.trigger('click');
+
+    expect(toggleSpy).toHaveBeenCalledWith({
+      problem_alias: problemInfo.alias,
+      contest_alias: contest.alias,
+    });
+    expect(wrapper.emitted('toggle-bookmark')).toBeTruthy();
+    toggleSpy.mockRestore();
   });
 });

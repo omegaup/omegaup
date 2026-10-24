@@ -400,4 +400,270 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
             $extraProfileDetails3['bookmarkedProblems']
         );
     }
+
+    /**
+     * Tests that toggling a bookmark on a private problem without permission fails
+     */
+    public function testToggleBookmarkPrivateProblemWithoutPermissionFails() {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $author,
+            ])
+        );
+
+        $contestantLogin = self::login($contestant);
+
+        try {
+            \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+                new \OmegaUp\Request([
+                    'auth_token' => $contestantLogin->auth_token,
+                    'problem_alias' => $problemData['problem']->alias,
+                ])
+            );
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('problemIsPrivate', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\ProblemBookmark::apiExists(
+                new \OmegaUp\Request([
+                    'auth_token' => $contestantLogin->auth_token,
+                    'problem_alias' => $problemData['problem']->alias,
+                ])
+            );
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('problemIsPrivate', $e->getMessage());
+        }
+    }
+
+    /**
+     * Tests that a problem admin can bookmark their own private problem
+     */
+    public function testToggleBookmarkPrivateProblemAsProblemAdmin() {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $author,
+            ])
+        );
+
+        $authorLogin = self::login($author);
+
+        $toggleResponse = \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+        $this->assertTrue($toggleResponse['bookmarked']);
+
+        $existsResponse = \OmegaUp\Controllers\ProblemBookmark::apiExists(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+        $this->assertTrue($existsResponse['bookmarked']);
+    }
+
+    /**
+     * Tests that a contestant can bookmark a private problem within an active contest
+     */
+    public function testToggleBookmarkPrivateProblemInContest() {
+        ['identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $contestData['director'],
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $contestant
+        );
+
+        $contestantLogin = self::login($contestant);
+
+        $response = \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $contestantLogin->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+        $this->assertTrue($response['bookmarked']);
+
+        $existsResponse = \OmegaUp\Controllers\ProblemBookmark::apiExists(
+            new \OmegaUp\Request([
+                'auth_token' => $contestantLogin->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+        $this->assertTrue($existsResponse['bookmarked']);
+    }
+
+    /**
+     * Tests that bookmarking a private problem in an unstarted contest fails
+     */
+    public function testToggleBookmarkPrivateProblemInUnstartedContestFails() {
+        ['identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() + 3600
+                ),
+                'finishTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() + 7200
+                ),
+            ])
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $contestData['director'],
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        $contestantLogin = self::login($contestant);
+
+        try {
+            \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+                new \OmegaUp\Request([
+                    'auth_token' => $contestantLogin->auth_token,
+                    'problem_alias' => $problemData['problem']->alias,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('contestNotStarted', $e->getMessage());
+        }
+    }
+
+    /**
+     * Regression test: bookmarking a private problem should NEVER grant additional
+     * access to it. It remains hidden in public profile/list and restricted on direct URL.
+     */
+    public function testPrivateBookmarkedProblemNeverExposedInProfileOrList() {
+        ['identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $contestData['director'],
+            ])
+        );
+        $publicProblemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $privateProblemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $contestant
+        );
+
+        $contestantLogin = self::login($contestant);
+
+        // Bookmark both problems
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $contestantLogin->auth_token,
+                'problem_alias' => $privateProblemData['problem']->alias,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $contestantLogin->auth_token,
+                'problem_alias' => $publicProblemData['problem']->alias,
+            ])
+        );
+
+        // List bookmarked problems: only public problem should be listed
+        $listResponse = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $contestantLogin->auth_token,
+            ])
+        );
+        $aliases = array_map(
+            fn($p) => $p['alias'],
+            $listResponse['problems']
+        );
+        $this->assertContains($publicProblemData['problem']->alias, $aliases);
+        $this->assertNotContains(
+            $privateProblemData['problem']->alias,
+            $aliases
+        );
+
+        // Accessing the private problem directly without contest should remain forbidden
+        try {
+            \OmegaUp\Controllers\Problem::apiDetails(
+                new \OmegaUp\Request([
+                    'auth_token' => $contestantLogin->auth_token,
+                    'problem_alias' => $privateProblemData['problem']->alias,
+                ])
+            );
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('problemIsPrivate', $e->getMessage());
+        }
+    }
+
+    /**
+     * Tests that Problem::apiDetails returns is_bookmarked correctly
+     */
+    public function testProblemApiDetailsIncludesIsBookmarked() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $login = self::login($identity);
+
+        // Initially not bookmarked
+        $details = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+        $this->assertFalse($details['is_bookmarked']);
+
+        // Bookmark it
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+
+        // Now is_bookmarked should be true
+        $detailsAfter = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+        $this->assertTrue($detailsAfter['is_bookmarked']);
+    }
 }

@@ -4007,9 +4007,11 @@ Check if a problem is bookmarked by the current user
 
 ### Parameters
 
-| Name            | Type     | Description | Required |
-| --------------- | -------- | ----------- | -------- |
-| `problem_alias` | `string` |             | ✓        |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `problem_alias` | `string`       |             | ✓        |
+| `contest_alias` | `null\|string` |             |          |
+| `problemset_id` | `int\|null`    |             |          |
 
 ### Returns
 
@@ -4038,9 +4040,11 @@ Toggle a bookmark for the current user
 
 ### Parameters
 
-| Name            | Type     | Description | Required |
-| --------------- | -------- | ----------- | -------- |
-| `problem_alias` | `string` |             | ✓        |
+| Name            | Type           | Description | Required |
+| --------------- | -------------- | ----------- | -------- |
+| `problem_alias` | `string`       |             | ✓        |
+| `contest_alias` | `null\|string` |             |          |
+| `problemset_id` | `int\|null`    |             |          |
 
 ### Returns
 
