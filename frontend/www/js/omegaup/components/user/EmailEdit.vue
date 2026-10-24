@@ -63,16 +63,16 @@ export default class UserEmailEdit extends Vue {
   @Prop({ default: '' }) email!: string;
   @Prop() profile!: types.UserProfileInfo;
   T = T;
-  currentEmail: string = this.email ?? '';
+  currentEmail: string = this.email;
 
   @Watch('email')
   onEmailChanged(newValue: string): void {
-    this.currentEmail = newValue ?? '';
+    this.currentEmail = newValue;
   }
 
   get submitDisabled(): boolean {
-    const trimmedEmail = (this.currentEmail ?? '').trim();
-    const initialEmail = (this.email ?? '').trim();
+    const trimmedEmail = this.currentEmail.trim();
+    const initialEmail = this.email.trim();
     return trimmedEmail.length === 0 || trimmedEmail === initialEmail;
   }
 
@@ -80,7 +80,7 @@ export default class UserEmailEdit extends Vue {
     if (this.submitDisabled) {
       return;
     }
-    this.$emit('submit', (this.currentEmail ?? '').trim());
+    this.$emit('submit', this.currentEmail.trim());
   }
 }
 </script>
