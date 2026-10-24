@@ -259,7 +259,7 @@ def test_log_allowlist_comparison_reports_new_results(
 
 
 def test_comparison_exit_code_returns_zero_even_for_new_results() -> None:
-    '''New results return exit code 0 while detection is non-blocking (#10406).'''
+    '''New results return 0 while detection is non-blocking (#10406).'''
     normalized_query = 'SELECT * FROM Users WHERE user_id = ?'
     detected = _result('1', normalized_query, 'Users')
     allowlist_entry = _allowlist_entry(normalized_query, 'Users')
