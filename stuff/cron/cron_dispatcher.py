@@ -238,6 +238,7 @@ def _own_run_id(
 
     The child runs on this host and scheduled runs run in their own pods, so
     the host name tells them apart even when both start around the same time.
+    On a single dev machine a manual run of the same job can still match.
     '''
     cur.execute(
         '''
@@ -401,6 +402,8 @@ def _finish_request(
     outcome: Outcome,
 ) -> None:
     '''Records how a claimed request ended and tells whoever asked.'''
+    # A stop in the middle of a run skips the check in _run_claimed.
+    dbconn.conn.ping(reconnect=True, attempts=3, delay=1)
     cur.execute(
         '''
         UPDATE Cron_Run_Requests

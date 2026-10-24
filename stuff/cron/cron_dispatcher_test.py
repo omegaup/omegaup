@@ -181,8 +181,7 @@ class RealSqlTest(unittest.TestCase):
 
     def test_a_run_that_left_no_row_is_a_failure(self) -> None:
         '''An older run of the same job is not mistaken for this one.'''
-        self.dbconn.conn.execute(
-            "INSERT INTO Cron_Runs (name) VALUES ('update_ranks.py');")
+        self._record_run('update_ranks.py')
         request_id = self._queue()
 
         summary = self._process(_fake_run)
@@ -224,6 +223,19 @@ class RealSqlTest(unittest.TestCase):
         row = self._request(request_id)
         self.assertEqual(row['status'], RequestStatus.DONE.value)
         self.assertEqual(row['run_id'], 1)
+
+    def test_the_first_run_on_this_host_is_ours(self) -> None:
+        '''A later manual run on the same machine is not taken for it.'''
+        request_id = self._queue()
+
+        def ran_twice(args: argparse.Namespace, name: str) -> RunResult:
+            self._child_records_a_run(args, name)
+            self._record_run(name)
+            return (0, None)
+
+        self._process(ran_twice)
+
+        self.assertEqual(self._request(request_id)['run_id'], 1)
 
     def test_a_failed_child_keeps_its_error_and_its_run(self) -> None:
         '''The admin can see why it failed and which run it was.'''
