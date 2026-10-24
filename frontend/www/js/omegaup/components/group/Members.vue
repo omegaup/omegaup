@@ -225,7 +225,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
@@ -238,7 +239,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEdit, faLock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faLock, faTrashAlt);
 
-@Component({
+export default defineComponent({
+  name: 'Members',
   components: {
     FontAwesomeIcon,
     'omegaup-common-typeahead': common_Typeahead,
@@ -246,63 +248,96 @@ library.add(faEdit, faLock, faTrashAlt);
     'omegaup-identity-edit': identity_Edit,
     'omegaup-identity-change-password': identity_ChangePassword,
   },
-})
-export default class Members extends Vue {
-  @Prop() identities!: types.Identity[];
-  @Prop({ default: () => [] }) identitiesCsv!: types.Identity[];
-  @Prop() groupAlias!: string;
-  @Prop() countries!: Array<dao.Countries>;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() searchResultSchools!: types.SchoolListItem[];
+  props: {
+    identities: {
+      type: Array as PropType<types.Identity[]>,
+      required: true,
+    },
+    identitiesCsv: {
+      type: Array as PropType<types.Identity[]>,
+      default: () => [],
+    },
+    groupAlias: {
+      type: String,
+      required: true,
+    },
+    countries: {
+      type: Array as PropType<dao.Countries[]>,
+      required: true,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'add-member',
+    'cancel',
+    'change-password-identity',
+    'change-password-identity-member',
+    'edit-identity',
+    'edit-identity-member',
+    'remove',
+    'update-search-result-schools',
+    'update-search-result-users',
+  ],
+  data() {
+    return {
+      T,
+      identity: {},
+      username: '',
+      showEditForm: false,
+      showChangePasswordForm: false,
+      searchedUsername: null as null | types.ListItem,
+    };
+  },
+  methods: {
+    onAddMember(): void {
+      this.$emit('add-member', this, this.searchedUsername?.key);
+      this.reset();
+    },
 
-  T = T;
-  identity = {};
-  username = '';
-  showEditForm = false;
-  showChangePasswordForm = false;
-  searchedUsername: null | types.ListItem = null;
+    onEdit(identity: types.Identity): void {
+      this.$emit('edit-identity', this, identity);
+    },
 
-  onAddMember(): void {
-    this.$emit('add-member', this, this.searchedUsername?.key);
-    this.reset();
-  }
+    onChangePass(username: string): void {
+      this.$emit('change-password-identity', this, username);
+    },
 
-  onEdit(identity: types.Identity): void {
-    this.$emit('edit-identity', this, identity);
-  }
+    onChildChangePasswordMember(
+      newPassword: string,
+      newPasswordRepeat: string,
+    ): void {
+      this.$emit(
+        'change-password-identity-member',
+        this,
+        this.username,
+        newPassword,
+        newPasswordRepeat,
+      );
+    },
 
-  onChangePass(username: string): void {
-    this.$emit('change-password-identity', this, username);
-  }
+    onChildEditIdentityMember(
+      originalUsername: string,
+      identity: types.Identity,
+    ): void {
+      this.$emit('edit-identity-member', this, originalUsername, identity);
+    },
 
-  onChildChangePasswordMember(
-    newPassword: string,
-    newPasswordRepeat: string,
-  ): void {
-    this.$emit(
-      'change-password-identity-member',
-      this,
-      this.username,
-      newPassword,
-      newPasswordRepeat,
-    );
-  }
+    onChildCancel(): void {
+      this.$emit('cancel', this);
+    },
 
-  onChildEditIdentityMember(
-    originalUsername: string,
-    identity: types.Identity,
-  ): void {
-    this.$emit('edit-identity-member', this, originalUsername, identity);
-  }
-
-  onChildCancel(): void {
-    this.$emit('cancel', this);
-  }
-
-  reset(): void {
-    this.searchedUsername = null;
-  }
-}
+    reset(): void {
+      this.searchedUsername = null;
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
