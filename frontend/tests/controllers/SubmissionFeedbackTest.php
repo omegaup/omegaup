@@ -856,4 +856,132 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('feedback_list', $e->parameter);
         }
     }
+
+    /**
+     * A PHPUnit data provider for malformed feedback lists.
+     *
+     * @return list<list<string>>
+     */
+    public function malformedFeedbackListProvider(): array {
+        return [
+            ['"a string"'],
+            ['[1]'],
+            ['[{"feedback":"ok"}]'],
+            ['[{"lineNumber":5}]'],
+            ['[{"lineNumber":"abc","feedback":"ok"}]'],
+            ['[{"lineNumber":5,"feedback":10}]'],
+        ];
+    }
+
+    /**
+     * @dataProvider malformedFeedbackListProvider
+     */
+    public function testSetFeedbackListWithMalformedElements(
+        string $malformedFeedbackList
+    ) {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+        $student = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        try {
+            \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+                new \OmegaUp\Request([
+                    'auth_token' => self::login(
+                        $admin['identity']
+                    )->auth_token,
+                    'guid' => $runData['response']['guid'],
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment_alias'],
+                    'feedback_list' => $malformedFeedbackList,
+                ])
+            );
+            $this->fail(
+                "Should have thrown an InvalidParameterException for {$malformedFeedbackList}"
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('invalidParameters', $e->getMessage());
+            $this->assertSame('feedback_list', $e->parameter);
+        }
+    }
+
+    public function testSetFeedbackListWithValidFeedbackList() {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+        $student = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($admin['identity']);
+        $response = \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback_list' => json_encode([
+                    ['lineNumber' => 1, 'feedback' => 'First line feedback'],
+                    ['lineNumber' => 5, 'feedback' => 'Fifth line feedback'],
+                ]),
+            ])
+        );
+
+        $this->assertSame('ok', $response['status']);
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $this->assertCount(2, $feedbackList);
+        $feedbackByLine = [];
+        foreach ($feedbackList as $entry) {
+            $feedbackByLine[$entry['range_bytes_start']] = $entry['feedback'];
+        }
+        $this->assertSame('First line feedback', $feedbackByLine[1]);
+        $this->assertSame('Fifth line feedback', $feedbackByLine[5]);
+    }
 }
