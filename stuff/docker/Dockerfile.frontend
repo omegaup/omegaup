@@ -1,5 +1,9 @@
 FROM ubuntu:jammy AS build
 
+# Minimum php8.1 package revision that ships the PHP2Shell fixes
+# (CVE-2026-109618 / CVE-2026-109619), per Ubuntu USN-8948-1 for jammy.
+ARG PHP_MIN_SECURE_VERSION=8.1.2-1ubuntu2.28
+
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
@@ -23,6 +27,25 @@ RUN apt-get update -y && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean
+
+# Fail the build unless the required php8.1 core packages are installed AND
+# at or above the PHP2Shell-fixed revision (CVE-2026-109618/109619).
+# Each required package is checked explicitly: a missing package or a version
+# below ${PHP_MIN_SECURE_VERSION} aborts the build. Third-party extensions
+# (e.g. php8.1-apcu) carry their own upstream versioning and are not checked.
+RUN set -eu; \
+    min="${PHP_MIN_SECURE_VERSION}"; \
+    for pkg in php8.1-cli php8.1-common php8.1-curl php8.1-gmp php8.1-mbstring php8.1-xml php8.1-zip; do \
+        ver="$(dpkg-query -W -f='${db:Status-Abbrev} ${Version}' "$pkg" 2>/dev/null || true)"; \
+        case "$ver" in \
+            "ii "*) ver="${ver#ii }";; \
+            *) echo "FATAL: required package $pkg is not installed (PHP2Shell check)"; exit 1;; \
+        esac; \
+        if ! dpkg --compare-versions "$ver" ge "$min"; then \
+            echo "FATAL: $pkg $ver is older than $min (PHP2Shell fix missing)"; exit 1; \
+        fi; \
+        echo "OK: $pkg $ver >= $min"; \
+    done
 
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
@@ -84,6 +107,10 @@ CMD ["/usr/sbin/nginx"]
 
 FROM ubuntu:jammy AS php
 
+# Minimum php8.1 package revision that ships the PHP2Shell fixes
+# (CVE-2026-109618 / CVE-2026-109619), per Ubuntu USN-8948-1 for jammy.
+ARG PHP_MIN_SECURE_VERSION=8.1.2-1ubuntu2.28
+
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
@@ -112,6 +139,29 @@ RUN apt-get update -y && \
         && \
     apt-get autoremove -y && \
     apt-get clean
+
+# Fail the build unless the required php8.1 core packages are installed AND
+# at or above the PHP2Shell-fixed revision (CVE-2026-109618/109619), per
+# Ubuntu USN-8948-1 for jammy. Each required core package is checked
+# explicitly: a missing package or a version below ${PHP_MIN_SECURE_VERSION}
+# aborts the build. Third-party extensions (php8.1-apcu, php8.1-redis, ...)
+# carry their own upstream versioning and are intentionally not checked.
+RUN set -eu; \
+    min="${PHP_MIN_SECURE_VERSION}"; \
+    for pkg in php8.1-cli php8.1-common php8.1-curl php8.1-fpm php8.1-gmp \
+               php8.1-mbstring php8.1-mysql php8.1-opcache php8.1-readline \
+               php8.1-xml php8.1-zip; do \
+        ver="$(dpkg-query -W -f='${db:Status-Abbrev} ${Version}' "$pkg" 2>/dev/null || true)"; \
+        case "$ver" in \
+            "ii "*) ver="${ver#ii }";; \
+            *) echo "FATAL: required package $pkg is not installed (PHP2Shell check)"; exit 1;; \
+        esac; \
+        if ! dpkg --compare-versions "$ver" ge "$min"; then \
+            echo "FATAL: $pkg $ver is older than $min (PHP2Shell fix missing)"; exit 1; \
+        fi; \
+        echo "OK: $pkg $ver >= $min"; \
+    done; \
+    php-fpm8.1 -v
 
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
         -o /usr/share/java/libinteractive.jar
