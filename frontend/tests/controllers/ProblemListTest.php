@@ -135,69 +135,105 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testProblemListWithExcludedTags() {
-        $includedTag = 'problemTagArrays';
-        $excludedTag = 'problemTagBigData';
+    /**
+     * @return list<array{0: list<list<string>>, 1: list<string>, 2: list<string>, 3: list<int>}>
+     */
+    public function problemListWithExcludedTagsProvider(): array {
+        return [
+            // No included tags and one excluded tag.
+            [
+                [
+                    ['problemTagArrays'],
+                    ['problemTagBigData'],
+                    ['problemTagArrays', 'problemTagBigData'],
+                    ['problemTagGreedyAlgorithms'],
+                ],
+                [],
+                ['problemTagBigData'],
+                [0, 3],
+            ],
+            // One included tag and two excluded tags.
+            [
+                [
+                    ['problemTagArrays'],
+                    ['problemTagArrays', 'problemTagBigData'],
+                    ['problemTagArrays', 'problemTagGreedyAlgorithms'],
+                    ['problemTagArrays', 'problemTagBigData', 'problemTagGreedyAlgorithms'],
+                ],
+                ['problemTagArrays'],
+                ['problemTagBigData', 'problemTagGreedyAlgorithms'],
+                [0],
+            ],
+            // Two included tags and one excluded tag.
+            [
+                [
+                    ['problemTagArrays', 'problemTagBigData'],
+                    ['problemTagArrays', 'problemTagBigData', 'problemTagGreedyAlgorithms'],
+                    ['problemTagArrays'],
+                    ['problemTagBigData', 'problemTagGreedyAlgorithms'],
+                ],
+                ['problemTagArrays', 'problemTagBigData'],
+                ['problemTagGreedyAlgorithms'],
+                [0],
+            ],
+            // One included tag and no excluded tags.
+            [
+                [
+                    ['problemTagArrays'],
+                    ['problemTagArrays', 'problemTagBigData'],
+                    ['problemTagBigData'],
+                    ['problemTagArrays', 'problemTagGreedyAlgorithms'],
+                ],
+                ['problemTagArrays'],
+                [],
+                [0, 1, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<list<string>> $problemTags
+     * @param list<string> $includedTags
+     * @param list<string> $excludedTags
+     * @param list<int> $expectedProblemIndexes
+     *
+     * @dataProvider problemListWithExcludedTagsProvider
+     */
+    public function testProblemListWithExcludedTags(
+        array $problemTags,
+        array $includedTags,
+        array $excludedTags,
+        array $expectedProblemIndexes
+    ) {
         $problemData = [];
-        foreach (range(0, 2) as $i) {
+        foreach ($problemTags as $i => $tags) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
                 new \OmegaUp\Test\Factories\ProblemParams([
                     'visibility' => 'promoted',
                 ])
             );
+            foreach ($tags as $tag) {
+                \OmegaUp\Test\Factories\Problem::addTag(
+                    $problemData[$i],
+                    $tag,
+                    public: 1
+                );
+            }
         }
 
-        \OmegaUp\Test\Factories\Problem::addTag(
-            $problemData[0],
-            $includedTag,
-            public: 1
-        );
-        \OmegaUp\Test\Factories\Problem::addTag(
-            $problemData[1],
-            $excludedTag,
-            public: 1
-        );
-        \OmegaUp\Test\Factories\Problem::addTag(
-            $problemData[2],
-            $includedTag,
-            public: 1
-        );
-        \OmegaUp\Test\Factories\Problem::addTag(
-            $problemData[2],
-            $excludedTag,
-            public: 1
-        );
-
-        $excludedAliases = [
-            $problemData[0]['request']['problem_alias'],
-        ];
-
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
-            'excluded_tag' => [$excludedTag],
-            'rowcount' => 1000,
-        ]));
-        $aliases = array_column($response['results'], 'alias');
-        $this->assertContains(
-            $problemData[0]['request']['problem_alias'],
-            $aliases
-        );
-        $this->assertNotContains(
-            $problemData[1]['request']['problem_alias'],
-            $aliases
-        );
-        $this->assertNotContains(
-            $problemData[2]['request']['problem_alias'],
-            $aliases
-        );
-
-        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
-            'tag' => [$includedTag],
+            'tag' => $includedTags,
             'require_all_tags' => true,
-            'excluded_tag' => [$excludedTag],
+            'excluded_tag' => $excludedTags,
             'rowcount' => 1000,
         ]));
-        $this->assertSame(
-            $excludedAliases,
+        $expectedAliases = array_map(
+            fn ($i) => $problemData[$i]['request']['problem_alias'],
+            $expectedProblemIndexes
+        );
+
+        $this->assertEqualsCanonicalizing(
+            $expectedAliases,
             array_column($response['results'], 'alias')
         );
     }
