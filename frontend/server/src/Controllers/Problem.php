@@ -3924,11 +3924,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param list<string>|null $excluded_tag
      * @omegaup-request-param bool|null $require_all_tags
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
-     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         $sortOrder = $r->ensureOptionalEnum(
@@ -4082,12 +4081,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param list<string>|null $excluded_tag
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
-     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -5200,9 +5198,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
-     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
@@ -6573,7 +6571,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param list<string>|null $excluded_tag
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
@@ -6835,9 +6832,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
-     * @omegaup-request-param 'all'|'attempted'|'solved'|'unsolved'|null $solved_status
      */
     public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate request
