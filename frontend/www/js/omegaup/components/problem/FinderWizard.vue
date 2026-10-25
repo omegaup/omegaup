@@ -26,14 +26,22 @@
               :value="karel"
               :width="160"
             ></toggle-button>
-            <tags-input
+            <multiselect
               v-model="selectedTags"
-              element-id="tags"
-              :existing-tags="tagObjects"
-              :only-existing-tags="true"
+              :options="filteredTags"
+              :multiple="true"
+              :internal-search="false"
+              :close-on-select="false"
+              :clear-on-select="false"
+              :preserve-search="true"
               :placeholder="T.wordsAddTag"
-              :typeahead="true"
-            ></tags-input
+              :show-labels="false"
+              :show-no-results="false"
+              :show-no-options="false"
+              label="value"
+              track-by="key"
+              @search-change="onTagSearch"
+            ></multiselect
           ></tab-content>
           <tab-content :title="T.wizardStepTwo"
             ><vue-slider
@@ -80,9 +88,8 @@ import { FormWizard, TabContent } from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 // https://www.npmjs.com/package/vue-js-toggle-button
 import { ToggleButton } from 'vue-js-toggle-button';
-// https://github.com/voerro/vue-tagsinput
-import VoerroTagsInput from '../common/VoerroTagsInput.vue';
-import '@voerro/vue-tagsinput/dist/style.css';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 // https://nightcatsama.github.io/vue-slider-component/
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
@@ -97,12 +104,19 @@ interface TagObject {
   value: string;
 }
 
+function normalizeForSearch(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
 @Component({
   components: {
     FormWizard,
     TabContent,
     ToggleButton,
-    'tags-input': VoerroTagsInput,
+    Multiselect,
     VueSlider,
   },
 })
@@ -113,6 +127,7 @@ export default class ProblemFinderWizard extends Vue {
   T = T;
   karel = false;
   selectedTags: TagObject[] = [];
+  tagQuery = '';
   difficultyRange = [0, 4];
   SLIDER_MARKS: { [key: string]: string } = {
     '0': T.qualityFormDifficultyVeryEasy,
@@ -136,6 +151,18 @@ export default class ProblemFinderWizard extends Vue {
       text: T.wizardPriorityPopularity,
     },
   ];
+
+  get filteredTags(): TagObject[] {
+    const query = normalizeForSearch(this.tagQuery);
+    if (!query) return this.tagObjects;
+    return this.tagObjects.filter((tag) =>
+      normalizeForSearch(tag.value).includes(query),
+    );
+  }
+
+  onTagSearch(query: string): void {
+    this.tagQuery = query;
+  }
 
   get tagObjects(): TagObject[] {
     const tagObjects: TagObject[] = [];
@@ -180,8 +207,8 @@ export default class ProblemFinderWizard extends Vue {
     if (event.key !== 'Escape' || !this.show) {
       return;
     }
-    // Let form elements handle ESC themselves (e.g. dismissing the tags-input
-    // typeahead) instead of closing the whole wizard.
+    // Let form elements handle ESC themselves (e.g. dismissing the typeahead)
+    // instead of closing the whole wizard.
     const target = event.target as HTMLElement | null;
     if (
       target &&
@@ -231,30 +258,24 @@ export default class ProblemFinderWizard extends Vue {
   text-align: center;
 }
 
-.tags-input {
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .multiselect {
   margin: 1em 0 3em;
 }
 
-.tags-input input {
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .multiselect__input {
   padding-left: 0.25em;
 }
 
-.tags-input-remove {
-  width: 1rem;
-  height: 1rem;
-}
-
-.tags-input-badge {
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .multiselect__tag {
   font-size: 1em;
+  background-color: var(--finder-wizard-slider-process-background-color);
 }
 
-.typeahead-badges {
-  margin-top: 0.35em;
-}
-
-.tags-input-remove::before,
-.tags-input-remove::after,
-.tags-input-typeahead-item-highlighted-default,
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .multiselect__option--highlight,
 .vue-slider-process {
   background-color: var(--finder-wizard-slider-process-background-color);
 }

@@ -1,35 +1,63 @@
 <template>
-  <tags-input
-    v-model="selectedOptions"
-    :existing-tags="existingOptions"
-    :typeahead="true"
-    :typeahead-style="'dropdown'"
-    :typeahead-max-results="maxResults"
-    :typeahead-activation-threshold="activationThreshold"
-    :placeholder="placeholder"
-    :limit="1"
-    :disabled="readonly"
-    :hide-input-on-limit="true"
-    :only-existing-tags="onlyExistingTags"
-    :typeahead-hide-discard="typeaheadHideDiscard"
+  <multiselect
+    :value="selectedOption"
+    class="omegaup-typeahead"
     :class="{ 'is-invalid': isInvalid }"
-    @change="updateExistingOptions"
-    @tag-added="onTagAdded"
-    @tag-removed="onTagRemoved"
+    :options="existingOptions"
+    :multiple="false"
+    :searchable="true"
+    :internal-search="false"
+    :close-on-select="true"
+    :clear-on-select="true"
+    :options-limit="maxResults"
+    :placeholder="placeholder"
+    :disabled="isDisabled"
+    :taggable="allowNewTags"
+    :show-labels="false"
+    :show-no-results="false"
+    :show-no-options="false"
+    :allow-empty="true"
+    label="value"
+    track-by="key"
+    @search-change="updateExistingOptions"
+    @input="onInput"
+    @tag="onTag"
   >
-  </tags-input>
+    <template slot="singleLabel" slot-scope="{ option }">
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <span class="omegaup-typeahead-label" v-html="optionLabel(option)"></span>
+      <button
+        type="button"
+        class="omegaup-typeahead-remove"
+        @mousedown.prevent.stop="clearSelection"
+      ></button>
+    </template>
+    <template slot="option" slot-scope="{ option }">
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <span v-html="optionLabel(option)"></span>
+    </template>
+  </multiselect>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import VoerroTagsInput from './VoerroTagsInput.vue';
-import '@voerro/vue-tagsinput/dist/style.css';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 import T from '../../lang';
 import { types } from '../../api_types';
 
+function optionLabel(option: { value?: string; label?: string }): string {
+  return option.value || option.label || '';
+}
+
+function hasContent(item: null | types.ListItem): item is types.ListItem {
+  if (!item) return false;
+  return String(item.key) !== '' || item.value !== '';
+}
+
 @Component({
   components: {
-    'tags-input': VoerroTagsInput,
+    Multiselect,
   },
 })
 export default class Typeahead extends Vue {
@@ -40,55 +68,66 @@ export default class Typeahead extends Vue {
   @Prop({ default: null }) value!: null | types.ListItem;
   @Prop({ default: true }) onlyExistingTags!: boolean;
   @Prop({ default: false }) readonly!: boolean;
+  @Prop({ default: false }) disabled!: boolean;
   @Prop({ default: true }) typeaheadHideDiscard!: boolean;
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
   @Prop({ default: 300 }) debounceDelay!: number;
   @Prop({ default: false }) isInvalid!: boolean;
 
   T = T;
-  selectedOptions = this.options;
+  optionLabel = optionLabel;
+  selectedOption: null | types.ListItem = hasContent(this.value)
+    ? this.value
+    : null;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  get isDisabled(): boolean {
+    return this.readonly || this.disabled;
+  }
+
+  // Free-text entry stays off unless a caller asks for it. Search results come
+  // from the server, which already ignores accents.
+  get allowNewTags(): boolean {
+    return !this.onlyExistingTags && !this.typeaheadHideDiscard;
+  }
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
 
-    // Clear any existing debounce timer
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
 
-    // Set new debounce timer
     this.debounceTimer = setTimeout(() => {
       this.$emit('update-existing-options', query);
     }, this.debounceDelay);
   }
 
+  onInput(option: null | types.ListItem): void {
+    this.selectedOption = option;
+    this.$emit('update:value', option);
+  }
+
+  onTag(query: string): void {
+    const item: types.ListItem = { key: query, value: query };
+    this.selectedOption = item;
+    this.$emit('update:value', item);
+  }
+
+  clearSelection(): void {
+    this.selectedOption = null;
+    this.$emit('update:value', null);
+  }
+
   beforeDestroy(): void {
-    // Clean up timer on component destruction
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
   }
 
-  onTagAdded(): void {
-    if (this.selectedOptions.length < 1) return;
-    this.$emit('update:value', this.selectedOptions[0]);
-  }
-
-  onTagRemoved(): void {
-    this.$emit('update:value', null);
-  }
-
   @Watch('value')
   onValueChanged(newValue: null | types.ListItem): void {
-    if (!newValue) {
-      this.selectedOptions = [];
-      return;
-    }
-    this.existingOptions.push(newValue);
-    this.selectedOptions = this.existingOptions.filter(
-      (option) => option.key === newValue.key,
-    );
+    this.selectedOption = hasContent(newValue) ? newValue : null;
   }
 }
 </script>
@@ -96,23 +135,68 @@ export default class Typeahead extends Vue {
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-.tags-input-remove::before,
-.tags-input-remove::after,
-.tags-input-typeahead-item-highlighted-default {
-  background-color: $omegaup-primary--darker;
-}
-
-.tags-input-wrapper-default {
+.omegaup-typeahead {
   min-height: 38px;
-  padding: 0.375rem 0.75rem !important;
+
+  .multiselect__tags {
+    min-height: 38px;
+    padding: 0.375rem 2rem 0.375rem 0.75rem;
+  }
+
+  .multiselect__single {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    background: transparent;
+  }
+
+  .multiselect__option--highlight {
+    background: $omegaup-primary--darker;
+  }
+
+  &.multiselect--disabled {
+    background-color: var(--typeahead-disabled);
+    opacity: 1;
+  }
+
+  &.is-invalid .multiselect__tags {
+    border-color: var(--form-input-error-color);
+  }
 }
 
-.tags-input.disabled {
-  background-color: var(--typeahead-disabled);
-  opacity: 1;
+.omegaup-typeahead-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tags-input.is-invalid .tags-input-wrapper-default {
-  border-color: var(--form-input-error-color);
+.omegaup-typeahead-remove {
+  position: relative;
+  flex: 0 0 auto;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-left: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.omegaup-typeahead-remove::before,
+.omegaup-typeahead-remove::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: $omegaup-primary--darker;
+}
+
+.omegaup-typeahead-remove::before {
+  transform: rotate(45deg);
+}
+
+.omegaup-typeahead-remove::after {
+  transform: rotate(-45deg);
 }
 </style>

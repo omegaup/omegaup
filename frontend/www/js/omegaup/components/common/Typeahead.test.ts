@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import common_Typeahead from './Typeahead.vue';
-import VoerroTagsInput from './VoerroTagsInput.vue';
+import Multiselect from 'vue-multiselect';
 import Vue from 'vue';
 
 describe('Typeahead.vue', () => {
@@ -11,8 +11,8 @@ describe('Typeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'qu');
+    const tagsInput = wrapper.findComponent(Multiselect);
+    tagsInput.vm.$emit('search-change', 'qu');
     expect(wrapper.emitted()).toEqual({});
   });
 
@@ -25,10 +25,9 @@ describe('Typeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'query');
+    const tagsInput = wrapper.findComponent(Multiselect);
+    tagsInput.vm.$emit('search-change', 'query');
 
-    // Fast-forward past the debounce delay
     jest.advanceTimersByTime(300);
 
     expect(wrapper.emitted()).toEqual({
@@ -45,9 +44,8 @@ describe('Typeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('input', [{ key: 'key', value: 'value' }]);
-    tagsInput.vm.$emit('tag-added');
+    const tagsInput = wrapper.findComponent(Multiselect);
+    tagsInput.vm.$emit('input', { key: 'key', value: 'value' });
     expect(wrapper.emitted()).toEqual({
       'update:value': [[{ key: 'key', value: 'value' }]],
     });
@@ -60,9 +58,8 @@ describe('Typeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('input', []);
-    tagsInput.vm.$emit('tag-removed');
+    const tagsInput = wrapper.findComponent(Multiselect);
+    tagsInput.vm.$emit('input', null);
     await Vue.nextTick();
     expect(wrapper.emitted()).toEqual({
       'update:value': [[null]],

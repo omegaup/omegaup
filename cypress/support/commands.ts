@@ -159,8 +159,9 @@ Cypress.Commands.add(
       // the end date input should be disabled
       cy.get('[name="end-date"]').should('be.disabled');
     }
-    cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.get('.omegaup-typeahead').first().click();
+    cy.get('.omegaup-typeahead .multiselect__input').first().type(school);
+    cy.get('.omegaup-typeahead .multiselect__element').first().click();
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -242,8 +243,11 @@ Cypress.Commands.add(
     ); // no | optional | required
     if (contestForTeams) {
       cy.get('[data-contest-for-teams]').click();
-      cy.get('.tags-input input[type="text"]').first().type(teamGroupAlias);
-      cy.get('.typeahead-dropdown li').first().click();
+      cy.get('.omegaup-typeahead').first().click();
+      cy.get('.omegaup-typeahead .multiselect__input')
+        .first()
+        .type(teamGroupAlias);
+      cy.get('.omegaup-typeahead .multiselect__element').first().click();
     }
     cy.get('button[type="submit"]').click();
   },
@@ -254,8 +258,11 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
   cy.get('a.nav-link.problems').click();
 
   for (const idx in problems) {
-    cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.get('.omegaup-typeahead:visible').first().click();
+    cy.get('.omegaup-typeahead:visible .multiselect__input')
+      .first()
+      .type(problems[idx].problemAlias);
+    cy.get('.omegaup-typeahead:visible .multiselect__element').first().click();
     cy.get('.add-problem').click();
   }
 });

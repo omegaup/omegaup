@@ -1,54 +1,82 @@
 <template>
-  <tags-input
-    v-model="selectedOptions"
-    :existing-tags="existingOptions"
-    :typeahead="true"
-    :typeahead-style="'dropdown'"
-    :typeahead-max-results="maxResults"
-    :typeahead-activation-threshold="activationThreshold"
+  <multiselect
+    :value="selectedOptions"
+    class="omegaup-typeahead"
+    :options="existingOptions"
+    :multiple="true"
+    :searchable="true"
+    :internal-search="false"
+    :close-on-select="false"
+    :clear-on-select="true"
+    :options-limit="maxResults"
     :placeholder="T.typeaheadSearchPlaceholder"
-    :limit="0"
-    :hide-input-on-limit="true"
-    :only-existing-tags="true"
-    :typeahead-hide-discard="true"
-    @change="updateExistingOptions"
-    @tag-added="$emit('update:value', selectedOptions)"
-    @tag-removed="$emit('update:value', selectedOptions)"
+    :show-labels="false"
+    :show-no-results="false"
+    :show-no-options="false"
+    label="value"
+    track-by="key"
+    @search-change="updateExistingOptions"
+    @input="onInput"
   >
-  </tags-input>
+    <template slot="tag" slot-scope="{ option, remove }">
+      <span class="multiselect__tag">
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-html="optionLabel(option)"></span>
+        <i
+          aria-hidden="true"
+          tabindex="1"
+          class="multiselect__tag-icon"
+          @keypress.enter.prevent="remove(option)"
+          @mousedown.prevent="remove(option)"
+        ></i>
+      </span>
+    </template>
+    <template slot="option" slot-scope="{ option }">
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <span v-html="optionLabel(option)"></span>
+    </template>
+  </multiselect>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import VoerroTagsInput from './VoerroTagsInput.vue';
-import '@voerro/vue-tagsinput/dist/style.css';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 import T from '../../lang';
 import { types } from '../../api_types';
 
+function optionLabel(option: { value?: string; label?: string }): string {
+  return option.value || option.label || '';
+}
+
 @Component({
   components: {
-    'tags-input': VoerroTagsInput,
+    Multiselect,
   },
 })
 export default class MultiTypeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 10 }) maxResults!: number;
-  @Prop({ default: () => [] }) value!: types.ListItem[];
+  @Prop({ default: () => [] }) value!: null | types.ListItem[];
 
   T = T;
-  selectedOptions: types.ListItem[] = [];
+  optionLabel = optionLabel;
+  selectedOptions: types.ListItem[] = this.value ?? [];
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
     this.$emit('update-existing-options', query);
   }
 
+  onInput(options: null | types.ListItem[]): void {
+    this.selectedOptions = options ?? [];
+    this.$emit('update:value', this.selectedOptions);
+  }
+
   @Watch('value')
-  onValueChanged(newValue: types.ListItem[]): void {
-    this.selectedOptions = this.existingOptions.filter((option) =>
-      newValue?.some((opt) => option.key === opt['key']),
-    );
+  onValueChanged(newValue: null | types.ListItem[]): void {
+    this.selectedOptions = newValue ?? [];
   }
 }
 </script>
@@ -56,9 +84,10 @@ export default class MultiTypeahead extends Vue {
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-.tags-input-remove::before,
-.tags-input-remove::after,
-.tags-input-typeahead-item-highlighted-default {
-  background-color: $omegaup-primary--darker;
+.omegaup-typeahead {
+  .multiselect__tag,
+  .multiselect__option--highlight {
+    background: $omegaup-primary--darker;
+  }
 }
 </style>

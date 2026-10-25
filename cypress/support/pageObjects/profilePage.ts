@@ -125,8 +125,10 @@ export class ProfilePage {
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#manage-schools"]').click();
     cy.get('[data-school-name]').click();
-    cy.get('[data-school-name]').type(schoolDetails.name);
-    cy.get('.tags-input-typeahead-item-highlighted-default').first().click();
+    cy.get('[data-school-name] .multiselect__input').type(schoolDetails.name);
+    cy.get('[data-school-name] .multiselect__option--highlight')
+      .first()
+      .click();
     cy.get('[data-school-grade]').select(schoolDetails.grade);
     if (schoolDetails.enrolledStatus) {
       cy.get('[type="radio"]').check('true');
