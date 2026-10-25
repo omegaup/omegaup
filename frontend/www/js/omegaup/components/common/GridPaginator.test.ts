@@ -1,7 +1,25 @@
 import { shallowMount } from '@vue/test-utils';
 
-import common_GridPaginator from './GridPaginator.vue';
+import T from '../../lang';
 import { LinkableResource, Problem } from '../../linkable_resource';
+import * as ui from '../../ui';
+import common_GridPaginator from './GridPaginator.vue';
+
+function pageRange(
+  low: number,
+  high: number,
+  total: number,
+  page: number,
+  pages: number,
+): string {
+  return ui.formatString(T.gridPaginatorPageRange, {
+    low,
+    high,
+    total,
+    page,
+    pages,
+  });
+}
 
 describe('GridPaginator.vue', () => {
   const title = 'Coder of the month';
@@ -67,6 +85,9 @@ describe('GridPaginator.vue', () => {
     expect(
       wrapper.find('button[data-button-next]').attributes('disabled'),
     ).toBe('disabled');
+    expect(wrapper.find('[data-page-range]').text()).toBe(
+      pageRange(1, 3, 3, 1, 1),
+    );
   });
 
   it('Should handle a grid with information divided in multiple pages', async () => {
@@ -90,6 +111,14 @@ describe('GridPaginator.vue', () => {
     expect(
       wrapper.find('button[data-button-next]').attributes('disabled'),
     ).toBeUndefined();
+    expect(wrapper.find('[data-page-range]').text()).toBe(
+      pageRange(1, 2, 3, 1, 2),
+    );
+
+    await wrapper.find('button[data-button-next]').trigger('click');
+    expect(wrapper.find('[data-page-range]').text()).toBe(
+      pageRange(3, 3, 3, 2, 2),
+    );
   });
 
   it('Should reset to the first page when a filter is applied from a later page', async () => {
@@ -114,5 +143,48 @@ describe('GridPaginator.vue', () => {
     expect(
       wrapper.find('button[data-button-previous]').attributes('disabled'),
     ).toBe('disabled');
+    expect(wrapper.find('[data-page-range]').text()).toBe(
+      pageRange(1, 1, 1, 1, 1),
+    );
+  });
+
+  it('Should render the filter input above the grid', () => {
+    const wrapper = shallowMount(common_GridPaginator, {
+      propsData: {
+        items,
+        itemsPerPage,
+        columns,
+        title,
+        shouldShowFilterInput: true,
+      },
+    });
+
+    const html = wrapper.html();
+    expect(html.indexOf('<input')).toBeLessThan(html.indexOf('<table'));
+  });
+
+  it('Should keep the filter focused when nothing matches', async () => {
+    const wrapper = shallowMount(common_GridPaginator, {
+      attachTo: document.body,
+      propsData: {
+        items,
+        itemsPerPage,
+        columns,
+        title,
+        shouldShowFilterInput: true,
+      },
+    });
+
+    const input = wrapper.find('input[type="search"]')
+      .element as HTMLInputElement;
+    input.focus();
+    expect(input).toHaveFocus();
+
+    await wrapper.setData({ filter: 'no-such-problem' });
+
+    expect(wrapper.find('table').exists()).toBeFalsy();
+    expect(wrapper.find('[data-page-range]').exists()).toBeFalsy();
+    expect(input).toHaveFocus();
+    wrapper.destroy();
   });
 });

@@ -23,6 +23,19 @@
         </label>
       </div>
     </div>
+    <form
+      v-if="shouldShowFilterInput"
+      class="form-inline m-3"
+      @submit.prevent=""
+    >
+      <input
+        ref="filterInput"
+        v-model="filter"
+        class="form-control mr-sm-2 mb-2"
+        type="search"
+        :placeholder="filterByProblemText"
+      />
+    </form>
     <table
       v-if="filteredItems.length > 0"
       class="table table-striped mb-0 table-responsive col-12 table-typo"
@@ -52,19 +65,8 @@
         </tr>
       </tbody>
     </table>
-    <form
-      v-if="shouldShowFilterInput"
-      class="form-inline m-3"
-      @submit.prevent=""
-    >
-      <input
-        v-model="filter"
-        class="form-control mr-sm-2 mb-2"
-        type="search"
-        :placeholder="filterByProblemText"
-      />
-    </form>
     <div v-if="filteredItems.length > 0" class="card-footer text-center">
+      <p class="mb-2" data-page-range>{{ pageRangeText }}</p>
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"
@@ -95,6 +97,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { LinkableResource } from '../../linkable_resource';
+import * as ui from '../../ui';
 
 interface SortOption {
   value: string;
@@ -164,12 +167,33 @@ export default class GridPaginator extends Vue {
     return T.userProfileProblemsFilter;
   }
 
+  get pageRangeText(): string {
+    const total = this.filteredItems.length;
+    const pageSize =
+      this.rowsPerPage === 0 ? total : this.rowsPerPage * this.columns;
+    const low = this.currentPageNumber * pageSize + 1;
+    const high = Math.min(low + pageSize - 1, total);
+    return ui.formatString(T.gridPaginatorPageRange, {
+      low,
+      high,
+      total,
+      page: this.currentPageNumber + 1,
+      pages: Math.max(this.totalPagesCount, 1),
+    });
+  }
+
   @Watch('filter')
   onFilterChange(newFilter: string) {
     this.currentPageNumber = 0;
     this.filteredItems = this.items.filter((item: LinkableResource) =>
       item.toString().toLowerCase().includes(newFilter.toLowerCase()),
     );
+    if (this.filteredItems.length === 0 && this.shouldShowFilterInput) {
+      this.$nextTick(() => {
+        const input = this.$refs.filterInput as HTMLInputElement | undefined;
+        input?.focus();
+      });
+    }
   }
 
   @Watch('currentSortOption')
