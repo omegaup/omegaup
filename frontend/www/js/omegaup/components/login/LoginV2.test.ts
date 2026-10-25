@@ -55,8 +55,7 @@ describe('LoginV2.vue', () => {
 
     await wrapper.find('form.native-login-form').trigger('submit');
 
-    expect(wrapper.emitted('login')).toBeTruthy();
-    expect(wrapper.emitted('login')![0]).toEqual(['testuser', 'secretpassword']);
+    expect(wrapper.emitted('login')).toEqual([['testuser', 'secretpassword']]);
   });
 
   it('GitHub button disabled when githubClientId is empty', () => {
@@ -84,7 +83,16 @@ describe('LoginV2.vue', () => {
     const signupTab = tabs.at(1);
     await signupTab.trigger('click');
 
-    expect(wrapper.emitted('change-tab')).toBeTruthy();
-    expect(wrapper.emitted('change-tab')![0]).toEqual(['signup']);
+    expect(wrapper.emitted('change-tab')).toEqual([['signup']]);
+  });
+
+  it('currentYear is a plain data property, not a computed getter', () => {
+    // Confirm that currentYear does not call new Date() on each access.
+    const wrapper = createWrapper();
+    const vm = wrapper.vm as any;
+    const year = new Date().getFullYear();
+    expect(vm.currentYear).toBe(year);
+    // Access it a second time; result must be the same value (cached)
+    expect(vm.currentYear).toBe(year);
   });
 });

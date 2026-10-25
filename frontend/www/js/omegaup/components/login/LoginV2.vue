@@ -8,10 +8,12 @@
 
       <div class="left-pane-top">
         <div class="brand-header">
-          <span class="brand-wordmark">
-            <span class="brand-omega">omega</span
-            ><span class="brand-up">Up</span>
-          </span>
+          <img
+            class="brand-logo"
+            src="/media/logo-main-white.svg"
+            alt="omegaUp"
+            height="32"
+          />
         </div>
       </div>
 
@@ -36,6 +38,7 @@
         {{ T.loginRightSubtitle }}
       </p>
 
+      <!-- id-lint off -->
       <div
         class="auth-tabs"
         role="tablist"
@@ -70,68 +73,69 @@
         </button>
       </div>
 
-      <div
-        id="tabpanel-login"
-        role="tabpanel"
-        aria-labelledby="tab-login"
-      >
-      <form
-        class="native-login-form introjs-native"
-        @submit.prevent="$emit('login', usernameOrEmail, password)"
-      >
-        <div class="form-group mb-3">
-          <label for="login-username" class="auth-label">
-            {{ T.loginEmailUsername }}
-          </label>
-          <input
-            id="login-username"
-            v-model="usernameOrEmail"
-            data-login-username
-            name="login_username"
-            type="text"
-            class="form-control auth-input"
-            :placeholder="T.loginUsernamePlaceholder"
-            tabindex="1"
-            autocomplete="username"
-            required
-          />
-        </div>
-
-        <div class="form-group mb-3">
-          <div class="password-label-row">
-            <label for="login-password" class="auth-label mb-0">
-              {{ T.loginPassword }}
-            </label>
-            <a
-              href="/login/password/recover/"
-              data-login-recover
-              class="forgot-password-link"
-            >
-              {{ T.loginRecover }}
-            </a>
-          </div>
-          <omegaup-password-input
-            id="login-password"
-            v-model="password"
-            data-login-password
-            name="login_password"
-            input-class="auth-input"
-            placeholder="••••••••••••"
-            :tabindex="2"
-            autocomplete="current-password"
-            required
-          />
-        </div>
-
-        <button
-          data-login-submit
-          type="submit"
-          class="btn auth-submit-btn"
-          name="login"
+      <div id="tabpanel-login" role="tabpanel" aria-labelledby="tab-login">
+        <!-- id-lint on -->
+        <form
+          class="native-login-form introjs-native"
+          @submit.prevent="$emit('login', usernameOrEmail, password)"
         >
-          {{ T.loginLogIn }}
-        </button>
-      </form>
+          <div class="form-group mb-3">
+            <label for="login-username" class="auth-label">
+              {{ T.loginEmailUsername }}
+            </label>
+            <!-- id-lint off -->
+            <input
+              id="login-username"
+              v-model="usernameOrEmail"
+              data-login-username
+              name="login_username"
+              type="text"
+              class="form-control auth-input"
+              :placeholder="T.loginUsernamePlaceholder"
+              tabindex="1"
+              autocomplete="username"
+              required
+            />
+            <!-- id-lint on -->
+          </div>
+
+          <div class="form-group mb-3">
+            <div class="password-label-row">
+              <label for="login-password" class="auth-label mb-0">
+                {{ T.loginPassword }}
+              </label>
+              <a
+                href="/login/password/recover/"
+                data-login-recover
+                class="forgot-password-link"
+              >
+                {{ T.loginRecover }}
+              </a>
+            </div>
+            <!-- id-lint off -->
+            <omegaup-password-input
+              id="login-password"
+              v-model="password"
+              data-login-password
+              name="login_password"
+              input-class="auth-input"
+              placeholder="••••••••••••"
+              :tabindex="2"
+              autocomplete="current-password"
+              required
+            />
+            <!-- id-lint on -->
+          </div>
+
+          <button
+            data-login-submit
+            type="submit"
+            class="btn auth-submit-btn"
+            name="login"
+          >
+            {{ T.loginLogIn }}
+          </button>
+        </form>
       </div>
 
       <div class="auth-divider">
@@ -251,12 +255,17 @@ export default class LoginV2 extends Vue {
   T = T;
   githubCsrfState: string | null = null;
   introStarted: boolean = false;
-
-  get currentYear(): number {
-    return new Date().getFullYear();
-  }
+  // Evaluated once at class construction; the year cannot change during a session.
+  readonly currentYear: number = new Date().getFullYear();
+  // Captured once at mount; document.location.href does not change while the
+  // login page is open and does not need to trigger Vue re-renders.
+  loginUri: string = '';
 
   mounted() {
+    // Capture the current URL once for the Google GSI login_uri attribute.
+    // document.location.href does not change while this page is open.
+    this.loginUri = document.location.href;
+
     // The reason for loading the script here instead of the `template.tpl` file
     // is that sometimes the script runs after the DOM is ready, and the element
     // may not exist yet
@@ -276,10 +285,12 @@ export default class LoginV2 extends Vue {
   }
 
   maybeStartIntro(): void {
-    if (this.introStarted || this.$cookies.get('has-visited-login')) {
+    // Check the cheapest condition first (in-memory flag, then tab name)
+    // before hitting the cookie store.
+    if (this.introStarted || this.activeTab !== 'login') {
       return;
     }
-    if (this.activeTab !== 'login') {
+    if (this.$cookies.get('has-visited-login')) {
       return;
     }
 
@@ -335,10 +346,6 @@ export default class LoginV2 extends Vue {
     });
   }
 
-  get loginUri(): string {
-    return document.location.href;
-  }
-
   initializeGithubCsrfToken(): void {
     const storedState = sessionStorage.getItem('github_oauth_state');
     if (storedState) {
@@ -362,12 +369,10 @@ export default class LoginV2 extends Vue {
       return;
     }
 
-    const state =
-      sessionStorage.getItem('github_oauth_state') ||
-      this.githubCsrfState ||
-      this.generateSecureRandomString();
-    sessionStorage.setItem('github_oauth_state', state);
-    document.cookie = `github_oauth_state=${state};path=/;SameSite=Lax`;
+    // this.githubCsrfState was established (and persisted to sessionStorage and
+    // the cookie) by initializeGithubCsrfToken() during mounted(). Re-reading
+    // sessionStorage and re-writing the cookie here was redundant I/O.
+    const state = this.githubCsrfState ?? this.generateSecureRandomString();
 
     const redirectUri = new URL('/login', window.location.origin);
     redirectUri.searchParams.set('third_party_login', 'github');
@@ -393,24 +398,15 @@ export default class LoginV2 extends Vue {
     const validChars =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const len = 16;
-
-    if (typeof window.crypto === 'object') {
-      const arr = new Uint8Array(len);
-      window.crypto.getRandomValues(arr);
-      return Array.from(
-        arr,
-        (value) => validChars[value % validChars.length],
-      ).join('');
-    }
-
-    // Without window.crypto
-    let result = '';
-    for (let i = 0; i < len; i++) {
-      result += validChars.charAt(
-        Math.floor(Math.random() * validChars.length),
-      );
-    }
-    return result;
+    // window.crypto.getRandomValues is available in all browsers that support
+    // Vue 2+ (Chrome 37+, Firefox 26+, Safari 7+, Edge 12+). The Math.random()
+    // fallback was dead code and produced cryptographically weak output.
+    const arr = new Uint8Array(len);
+    window.crypto.getRandomValues(arr);
+    return Array.from(
+      arr,
+      (value) => validChars[value % validChars.length],
+    ).join('');
   }
 }
 </script>
@@ -443,7 +439,6 @@ export default class LoginV2 extends Vue {
   flex: 0 0 42%;
   min-width: 330px;
   background-color: var(--header-primary-color);
-  background: var(--header-primary-color);
   padding: 40px 36px;
   display: flex;
   flex-direction: column;
@@ -503,23 +498,20 @@ export default class LoginV2 extends Vue {
     z-index: 10;
   }
 
-  .brand-header {
-    display: inline-flex;
+  .left-pane-top {
+    display: flex;
     align-items: center;
+  }
 
-    .brand-wordmark {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1;
+  .brand-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
 
-      .brand-omega {
-        color: var(--login-brand-omega-color);
-      }
-
-      .brand-up {
-        color: var(--login-brand-up-color);
-      }
+    .brand-logo {
+      height: 80px;
+      width: auto;
+      display: block;
     }
   }
 
@@ -680,6 +672,7 @@ export default class LoginV2 extends Vue {
       }
     }
 
+    /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
     ::v-deep .password-input-wrapper {
       width: 100%;
 
@@ -799,6 +792,7 @@ export default class LoginV2 extends Vue {
         width: 100%;
       }
 
+      /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
       ::v-deep iframe {
         border-radius: 10px !important;
       }

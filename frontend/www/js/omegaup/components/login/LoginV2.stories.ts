@@ -7,10 +7,6 @@ const meta: Meta<typeof LoginV2> = {
   argTypes: {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore FIXME: vue-property-decorator is deprecated
-    facebookUrl: {
-      control: 'text',
-      description: 'Facebook OAuth login URL',
-    },
     githubClientId: {
       control: 'text',
       description: 'GitHub OAuth Client ID',
@@ -37,7 +33,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    facebookUrl: 'https://facebook.com',
     githubClientId: 'dummy-github-client-id',
     githubState: 'dummy-github-state',
     googleClientId: 'dummy-google-client-id',
@@ -47,7 +42,6 @@ export const Default: Story = {
 
 export const WithoutGithub: Story = {
   args: {
-    facebookUrl: 'https://facebook.com',
     githubClientId: '',
     githubState: null,
     googleClientId: 'dummy-google-client-id',
