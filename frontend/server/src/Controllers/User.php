@@ -3140,12 +3140,13 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
+            $email = null;
             if (!is_null($user->main_email_id)) {
                 $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-                if (!is_null($email)) {
-                    $email->email = $emailParam;
-                    \OmegaUp\DAO\Emails::update($email);
-                }
+            }
+            if (!is_null($email)) {
+                $email->email = $emailParam;
+                \OmegaUp\DAO\Emails::update($email);
             } else {
                 $email = new \OmegaUp\DAO\VO\Emails([
                     'user_id' => $user->user_id,
@@ -3153,28 +3154,14 @@ class User extends \OmegaUp\Controllers\Controller {
                 ]);
                 \OmegaUp\DAO\Emails::create($email);
                 $user->main_email_id = $email->email_id;
-                \OmegaUp\DAO\Users::update($user);
             }
 
-            // Add verification_id if not there
-            if (!$user->verified) {
-                self::$log->info('User not verified.');
-
-                if (is_null($user->verification_id)) {
-                    self::$log->info(
-                        'User does not have verification id. Generating.'
-                    );
-
-                    try {
-                        $user->verification_id = \OmegaUp\SecurityTools::randomString(
-                            50
-                        );
-                        \OmegaUp\DAO\Users::update($user);
-                    } catch (\Exception $e) {
-                        // best effort, eat exception
-                    }
-                }
-            }
+            // Invalidate verification status and generate a new token
+            $user->verified = false;
+            $user->verification_id = \OmegaUp\SecurityTools::randomString(
+                50
+            );
+            \OmegaUp\DAO\Users::update($user);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
