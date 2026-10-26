@@ -80,11 +80,15 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
                     WHERE
                         `follower_user_id` = ?
                 ) AS `followingCount`;';
-        /** @var array{followersCount: int, followingCount: int} */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{followersCount: int|null, followingCount: int|null}|null */
+        $counts = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$userId, $userId]
         );
+        return [
+            'followersCount' => $counts['followersCount'] ?? 0,
+            'followingCount' => $counts['followingCount'] ?? 0,
+        ];
     }
 
     /**
