@@ -2,7 +2,12 @@
   <multiselect
     :value="selectedOption"
     class="omegaup-typeahead"
-    :class="{ 'is-invalid': isInvalid }"
+    :class="{
+      'is-invalid': isInvalid,
+      'omegaup-typeahead--filled': !!selectedOption,
+    }"
+    open-direction="bottom"
+    :tag-placeholder="''"
     :options="existingOptions"
     :multiple="false"
     :searchable="true"
@@ -85,10 +90,10 @@ export default class Typeahead extends Vue {
     return this.readonly || this.disabled;
   }
 
-  // Free-text entry stays off unless a caller asks for it. Search results come
-  // from the server, which already ignores accents.
+  // Callers that allow new tags (the problem keyword search) keep the typed
+  // text on Enter. Everyone else can only pick a server result.
   get allowNewTags(): boolean {
-    return !this.onlyExistingTags && !this.typeaheadHideDiscard;
+    return !this.onlyExistingTags;
   }
 
   updateExistingOptions(query: string): void {
@@ -143,6 +148,15 @@ export default class Typeahead extends Vue {
     padding: 0.375rem 2rem 0.375rem 0.75rem;
   }
 
+  // The library collapses the search box to 0px until the menu opens. Keep it
+  // typeable while nothing is selected, which is how the old tags input worked.
+  &:not(.omegaup-typeahead--filled) .multiselect__input {
+    position: relative !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin-bottom: 0;
+  }
+
   .multiselect__single {
     display: flex;
     align-items: center;
@@ -152,6 +166,15 @@ export default class Typeahead extends Vue {
 
   .multiselect__option--highlight {
     background: $omegaup-primary--darker;
+  }
+
+  .multiselect__content-wrapper {
+    z-index: 1060;
+  }
+
+  .multiselect__option {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   &.multiselect--disabled {

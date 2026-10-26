@@ -9,6 +9,24 @@ import {
   Status,
 } from './types';
 
+// Types into a typeahead and chooses the result that contains the query.
+// The search box is visible before the menu opens, so this does not click the
+// widget first (that click opens a layer that can cover the input).
+Cypress.Commands.add(
+  'chooseTypeaheadOption',
+  (rootSelector: string, query: string) => {
+    cy.get(rootSelector)
+      .first()
+      .scrollIntoView({ block: 'center' })
+      .find('.multiselect__input')
+      .type(query, { delay: 40 });
+    cy.get(rootSelector)
+      .first()
+      .contains('.multiselect__option', query, { timeout: 10000 })
+      .click({ position: 'left' });
+  },
+);
+
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   cy.request({
@@ -159,9 +177,7 @@ Cypress.Commands.add(
       // the end date input should be disabled
       cy.get('[name="end-date"]').should('be.disabled');
     }
-    cy.get('.omegaup-typeahead').first().click();
-    cy.get('.omegaup-typeahead .multiselect__input').first().type(school);
-    cy.get('.omegaup-typeahead .multiselect__element').first().click();
+    cy.chooseTypeaheadOption('.omegaup-typeahead', school);
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -243,11 +259,7 @@ Cypress.Commands.add(
     ); // no | optional | required
     if (contestForTeams) {
       cy.get('[data-contest-for-teams]').click();
-      cy.get('.omegaup-typeahead').first().click();
-      cy.get('.omegaup-typeahead .multiselect__input')
-        .first()
-        .type(teamGroupAlias);
-      cy.get('.omegaup-typeahead .multiselect__element').first().click();
+      cy.chooseTypeaheadOption('.omegaup-typeahead', teamGroupAlias);
     }
     cy.get('button[type="submit"]').click();
   },
@@ -258,11 +270,7 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
   cy.get('a.nav-link.problems').click();
 
   for (const idx in problems) {
-    cy.get('.omegaup-typeahead:visible').first().click();
-    cy.get('.omegaup-typeahead:visible .multiselect__input')
-      .first()
-      .type(problems[idx].problemAlias);
-    cy.get('.omegaup-typeahead:visible .multiselect__element').first().click();
+    cy.chooseTypeaheadOption('.omegaup-typeahead', problems[idx].problemAlias);
     cy.get('.add-problem').click();
   }
 });
