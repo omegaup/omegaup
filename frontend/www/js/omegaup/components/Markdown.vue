@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import * as markdown from '../markdown';
 import * as ui from '../ui';
 import T from '../lang';
@@ -30,77 +30,91 @@ declare global {
   }
 }
 
-@Component
-export default class Markdown extends Vue {
-  @Prop() markdown!: string;
-  @Ref() root!: HTMLElement;
-  @Prop({ default: false }) fullWidth!: boolean;
-
-  markdownConverter = new markdown.Converter();
-
-  get html(): string {
-    return this.markdownConverter.makeHtml(this.markdown);
-  }
-
+export default defineComponent({
+  name: 'Markdown',
+  props: {
+    markdown: {
+      type: String,
+      required: true,
+    },
+    fullWidth: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      markdownConverter: new markdown.Converter(),
+    };
+  },
+  computed: {
+    html(): string {
+      return this.markdownConverter.makeHtml(this.markdown);
+    },
+  },
+  watch: {
+    markdown(): void {
+      const root = this.$refs.root as HTMLElement;
+      root.innerHTML = this.html;
+      this.injectCopyButtons();
+    },
+  },
   mounted(): void {
-    this.root.innerHTML = this.html;
+    const root = this.$refs.root as HTMLElement;
+    root.innerHTML = this.html;
     this.injectCopyButtons();
-  }
-
-  @Watch('markdown')
-  onMarkdownChanged(): void {
-    this.root.innerHTML = this.html;
-    this.injectCopyButtons();
-  }
-
-  private injectCopyButtons(): void {
-    if (!this.root) {
-      return;
-    }
-
-    const codeElements = this.root.querySelectorAll('span > code');
-    if (!codeElements.length) {
-      return;
-    }
-
-    codeElements.forEach((element) => {
-      const codeElement = element as HTMLElement;
-      const parentSpan = codeElement.parentElement;
-      if (!parentSpan) {
+  },
+  methods: {
+    injectCopyButtons(): void {
+      const root = this.$refs.root as HTMLElement;
+      if (!root) {
         return;
       }
 
-      if (parentSpan.querySelector('.copy-btn')) {
+      const codeElements = root.querySelectorAll('span > code');
+      if (!codeElements.length) {
         return;
       }
 
-      const copyButton = document.createElement('button');
-      copyButton.type = 'button';
-      copyButton.className = 'btn btn-link btn-sm ml-2 copy-btn';
-      copyButton.textContent = T.wordsCopyToClipboard;
+      codeElements.forEach((element) => {
+        const codeElement = element as HTMLElement;
+        const parentSpan = codeElement.parentElement;
+        if (!parentSpan) {
+          return;
+        }
 
-      const copyHint = document.createElement('span');
-      copyHint.className = 'copy-hint';
-      copyHint.textContent = T.wordsCopiedToClipboard;
+        if (parentSpan.querySelector('.copy-btn')) {
+          return;
+        }
 
-      copyButton.addEventListener('click', () => {
-        const codeText = (codeElement.textContent || '').trim();
-        ui.copyToClipboard(codeText);
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'btn btn-link btn-sm ml-2 copy-btn';
+        copyButton.textContent = T.wordsCopyToClipboard;
 
-        copyHint.classList.remove('fade-out');
-        copyHint.classList.add('fade-in');
+        const copyHint = document.createElement('span');
+        copyHint.className = 'copy-hint';
+        copyHint.textContent = T.wordsCopiedToClipboard;
 
-        window.setTimeout(() => {
-          copyHint.classList.remove('fade-in');
-          copyHint.classList.add('fade-out');
-        }, 1500);
+        copyButton.addEventListener('click', () => {
+          const codeText = (codeElement.textContent || '').trim();
+          ui.copyToClipboard(codeText);
+
+          copyHint.classList.remove('fade-out');
+          copyHint.classList.add('fade-in');
+
+          window.setTimeout(() => {
+            copyHint.classList.remove('fade-in');
+            copyHint.classList.add('fade-out');
+          }, 1500);
+        });
+
+        parentSpan.appendChild(copyButton);
+        parentSpan.appendChild(copyHint);
       });
-
-      parentSpan.appendChild(copyButton);
-      parentSpan.appendChild(copyHint);
-    });
-  }
-}
+    },
+  },
+});
 </script>
 
 <style lang="scss">

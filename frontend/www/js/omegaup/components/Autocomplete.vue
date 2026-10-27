@@ -11,35 +11,50 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-@Component
-export default class Autocomplete extends Vue {
-  @Ref() input!: HTMLInputElement;
-  @Prop() value!: string;
-  @Prop() placeholder!: string;
-  @Prop() name!: string;
-  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
-  @Prop() init!: (el: JQuery<HTMLElement>) => void;
-
+export default defineComponent({
+  name: 'Autocomplete',
+  props: {
+    value: {
+      type: String,
+      default: '',
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    name: {
+      type: String,
+      default: '',
+    },
+    init: {
+      // eslint-disable-next-line no-undef -- This is defined in TypeScript.
+      type: Function as PropType<(el: JQuery<HTMLElement>) => void>,
+      required: true,
+    },
+  },
+  watch: {
+    value(newValue: string) {
+      (this.$refs.input as HTMLInputElement).value = newValue;
+    },
+  },
   mounted() {
     this.init($(this.$refs.input as HTMLElement));
-  }
-
-  @Emit('input')
-  onUpdateInput(): string {
-    const value = this.input.getAttribute('data-value');
-    if (value !== null) {
-      this.$emit('update:value', value);
-    }
-    return this.input.value;
-  }
-
-  @Watch('value')
-  onPropertyChanged(newValue: string) {
-    this.input.value = newValue;
-  }
-}
+  },
+  methods: {
+    onUpdateInput(): string {
+      const input = this.$refs.input as HTMLInputElement;
+      const value = input.getAttribute('data-value');
+      if (value !== null) {
+        this.$emit('update:value', value);
+      }
+      this.$emit('input', input.value);
+      return input.value;
+    },
+  },
+});
 </script>
 
 <style lang="scss">
