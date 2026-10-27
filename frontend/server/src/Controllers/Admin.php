@@ -609,6 +609,28 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Enables or disables a cron job. A disabled job skips its scheduled runs
+     * and new rerun requests for it are refused.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param bool $enabled
+     * @omegaup-request-param string $name
+     */
+    public static function apiSetCronJobEnabled(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $job = self::cronJobFromRequest($r);
+        \OmegaUp\DAO\CronJobs::setEnabled(
+            strval($job->name),
+            $r->ensureBool('enabled')
+        );
+        return ['status' => 'ok'];
+    }
+
+    /**
      * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
