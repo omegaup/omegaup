@@ -223,7 +223,7 @@ def test_compare_results_multi_table_join_partial_and_full_allowlist() -> None:
         result_identities,
     ]
     assert comparison_partial.new_results == [result_problemsets]
-    assert get_comparison_exit_code(comparison_partial) == 1
+    assert get_comparison_exit_code(comparison_partial) == 0
 
     # Scenario B: full allowlist (all 3 tables allowlisted)
     full_allowlist = partial_allowlist + [_allowlist_entry(join_query, 'p')]
@@ -258,8 +258,8 @@ def test_log_allowlist_comparison_reports_new_results(
     )
 
 
-def test_comparison_exit_code_only_fails_for_new_results() -> None:
-    '''Only results missing from the allowlist should fail the process.'''
+def test_comparison_exit_code_returns_zero_even_for_new_results() -> None:
+    '''New results return 0 while detection is non-blocking (#10406).'''
     normalized_query = 'SELECT * FROM Users WHERE user_id = ?'
     detected = _result('1', normalized_query, 'Users')
     allowlist_entry = _allowlist_entry(normalized_query, 'Users')
@@ -270,7 +270,7 @@ def test_comparison_exit_code_only_fails_for_new_results() -> None:
 
     assert get_comparison_exit_code(known) == 0
     assert get_comparison_exit_code(not_detected) == 0
-    assert get_comparison_exit_code(new) == 1
+    assert get_comparison_exit_code(new) == 0
 
 
 def test_deduplicate_results_uses_query_and_table() -> None:
@@ -699,11 +699,11 @@ def test_main_exits_zero_when_csv_save_succeeds(
     assert exit_exception.code == 0
 
 
-def test_main_exits_nonzero_when_new_inefficient_query_detected(
+def test_main_exits_zero_when_new_inefficient_query_detected(
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    '''A new query not in allowlist causes _main() to exit with 1.'''
+    '''A new query not in allowlist keeps exit code 0 while non-blocking.'''
     monkeypatch.setattr(
         'process_mysql_explain_logs.load_allowlist',
         lambda path: [],
@@ -732,7 +732,7 @@ def test_main_exits_nonzero_when_new_inefficient_query_detected(
             _main()
 
     exit_exception: SystemExit = excinfo.value
-    assert exit_exception.code == 1
+    assert exit_exception.code == 0
     assert 'New inefficient query for table Users' in caplog.text
 
 
