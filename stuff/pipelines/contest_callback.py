@@ -56,6 +56,7 @@ class ContestsCallback:
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
         response = self._parse_body(body)
+        self._validate_structure(response)
 
         try:
             self.dbconn.ping(  # type: ignore[attr-defined]
@@ -199,10 +200,25 @@ class ContestsCallback:
                 channel.connection.close()
 
         except:  # noqa: bare-except
-            self._mark_retryable_error(response['contest_id'])
-            # Re-raise so the RabbitMQ consumer does not ack this message.
-            # This way the request is requeued instead of being lost.
+            self._handle_processing_error(response)
             raise
+
+    def _handle_processing_error(self, response: Any) -> None:
+        '''Marks the contest as retryable when it can be identified.'''
+        contest_id = (
+            response.get('contest_id')
+            if isinstance(response, dict) else None
+        )
+        if contest_id is not None:
+            self._mark_retryable_error(contest_id)
+
+    _REQUIRED_FIELDS = (
+        'certificate_cutoff',
+        'alias',
+        'scoreboard_url',
+        'contest_id',
+        'ranking',
+    )
 
     @staticmethod
     def _parse_body(body: bytes) -> Any:
@@ -210,11 +226,28 @@ class ContestsCallback:
         try:
             return json.loads(body)
         except json.JSONDecodeError as err:
-            # A malformed body can never be processed, so discard it instead
-            # of requeueing it forever.
             raise rabbitmq_client.UnrecoverableMessageError(
                 'Message body is not valid JSON'
             ) from err
+
+    @classmethod
+    def _validate_structure(cls, response: Any) -> None:
+        '''Validates the minimum structure of a contest message.'''
+        if not isinstance(response, dict):
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message body is not a JSON object'
+            )
+        missing = [
+            field for field in cls._REQUIRED_FIELDS if field not in response
+        ]
+        if missing:
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message is missing required fields: ' + ', '.join(missing)
+            )
+        if not isinstance(response['ranking'], list):
+            raise rabbitmq_client.UnrecoverableMessageError(
+                "Message field 'ranking' is not a list"
+            )
 
     def _mark_retryable_error(self, contest_id: int) -> None:
         '''Marks the given contest's certificates as a retryable error.'''
