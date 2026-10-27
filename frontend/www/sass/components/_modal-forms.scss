@@ -1,0 +1,53 @@
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__title {
+    width: 100%;
+    margin: 0 0 $omegaup-unit-1;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  &__field {
+    width: 100%;
+    margin-bottom: $omegaup-unit-2;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: $omegaup-unit-1;
+    font-weight: 600;
+  }
+
+  &__control {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &__hint {
+    display: block;
+    margin-top: $omegaup-unit-1;
+    font-size: 0.875rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    gap: $omegaup-unit-1;
+
+    .btn {
+      min-width: 120px;
+    }
+  }
+}
+
+textarea.modal-form__control {
+  min-height: 6rem;
+  resize: vertical;
+}

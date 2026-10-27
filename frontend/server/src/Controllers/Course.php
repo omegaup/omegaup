@@ -444,10 +444,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description',
             $isRequired
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['objective'],
+        $r->ensureOptionalString(
             'objective',
-            required: false // TODO: This should be $isRequired when the UI is ready
+            $isRequired,
+            fn (string $objective) => $objective !== ''
         );
 
         $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
@@ -1549,7 +1549,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problems = $r->ensureString('problems');
+        $aliases = $r->ensureJsonStringList(
+            'problems',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1569,15 +1572,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
-            );
-        }
-
-        /** @var list<string>|null */
-        $aliases = json_decode($problems, associative: true);
-        if (!is_array($aliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'problems'
             );
         }
 
@@ -1629,10 +1623,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $assignments = $r->ensureString('assignments');
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['assignments'],
-            'assignments'
+        $aliases = $r->ensureJsonStringList(
+            'assignments',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
@@ -1643,15 +1636,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        /** @var list<string>|null */
-        $aliases = json_decode($assignments, associative: true);
-        if (!is_array($aliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'assignments'
-            );
         }
 
         \OmegaUp\DAO\DAO::transBegin();

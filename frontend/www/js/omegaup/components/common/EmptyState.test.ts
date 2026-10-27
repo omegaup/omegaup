@@ -58,4 +58,18 @@ describe('EmptyState.vue', () => {
     expect(wrapper.find('#custom-btn').exists()).toBe(true);
     expect(wrapper.find('#custom-btn').text()).toBe('Custom Action Button');
   });
+
+  it('Should render action button with custom data attribute', () => {
+    const wrapper = shallowMount(common_EmptyState, {
+      propsData: {
+        title: 'Empty List',
+        buttonText: 'Click Me',
+        buttonDataAttribute: 'data-custom-action',
+      },
+    });
+
+    const button = wrapper.find('button.btn-primary');
+    expect(button.exists()).toBe(true);
+    expect(button.attributes('data-custom-action')).toBeDefined();
+  });
 });
