@@ -26,32 +26,25 @@
               >
               </vue-typeahead-bootstrap>
               <br />
-              <div class="card-body table-responsive w-100">
-                <table class="table table-striped w-100">
-                  <thead>
-                    <th class="text-center" scope="col">
-                      {{ T.contestEditTagName }}
-                    </th>
-                    <th class="text-center" scope="col">
-                      {{ T.contestEditTagDelete }}
-                    </th>
-                  </thead>
-                  <tbody>
-                    <tr v-for="tag in publicTagsList" :key="tag">
-                      <td data-tag-name>{{ getName(tag) }}</td>
-                      <td class="text-center">
-                        <button
-                          type="button"
-                          class="btn btn-danger"
-                          :disabled="publicTagsList.length < 2"
-                          @click="removeTag(tag)"
-                        >
-                          <font-awesome-icon :icon="['fas', 'trash']" />
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="selected-tags-container w-100">
+                <ul class="selected-tags-list">
+                  <li
+                    v-for="tag in publicTagsList"
+                    :key="tag"
+                    class="selected-tag-chip"
+                  >
+                    <span data-tag-name>{{ getName(tag) }}</span>
+                    <button
+                      type="button"
+                      class="selected-tag-remove btn btn-link btn-sm p-0 ml-2 text-danger"
+                      :aria-label="`${T.contestEditTagDelete}: ${getName(tag)}`"
+                      :disabled="publicTagsList.length < 2"
+                      @click="removeTag(tag)"
+                    >
+                      <font-awesome-icon :icon="['fas', 'trash']" />
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
             <div class="modal-form__actions">
@@ -228,6 +221,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 ul.tag-select {
   height: 225px;
   overflow: auto;
@@ -240,5 +234,38 @@ ul.tag-select {
   width: -webkit-fill-available;
   margin-bottom: 0;
   padding-bottom: 0.5rem;
+}
+
+.selected-tags-container {
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.selected-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.selected-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--quality-nomination-tag-select-border-color);
+  border-radius: 1rem;
+  background: var(--quality-nomination-tag-select-background-color);
+}
+
+.selected-tag-chip [data-tag-name] {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.selected-tag-remove {
+  flex-shrink: 0;
 }
 </style>
