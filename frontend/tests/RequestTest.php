@@ -61,4 +61,77 @@ class RequestTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $request->ensureUserHasAdministrativeAccess();
     }
+
+    /**
+     * @return array<string, array{0: string}>
+     */
+    public static function invalidJsonStringListProvider(): array {
+        return [
+            'malformed json' => ['invalid-json'],
+            'json object' => ['{"a":"b"}'],
+            'json scalar' => ['"abc"'],
+            'null element' => ['[null]'],
+            'object element' => ['[{}]'],
+            'number element' => ['[1]'],
+            'nested list' => ['[["a"]]'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidJsonStringListProvider
+     */
+    public function testEnsureJsonStringListRejectsInvalidInput(
+        string $value
+    ): void {
+        $request = new \OmegaUp\Request(['problems' => $value]);
+
+        try {
+            $request->ensureJsonStringList('problems');
+            $this->fail('Expected InvalidParameterException was not thrown');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('problems', $e->parameter);
+        }
+    }
+
+    public function testEnsureJsonStringListRejectsMissingParameter(): void {
+        $request = new \OmegaUp\Request([]);
+
+        try {
+            $request->ensureJsonStringList('problems');
+            $this->fail('Expected InvalidParameterException was not thrown');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    public function testEnsureJsonStringListAcceptsValidLists(): void {
+        $request = new \OmegaUp\Request([
+            'problems' => '["alias-1","alias-2"]',
+            'empty' => '[]',
+        ]);
+
+        $this->assertSame(
+            ['alias-1', 'alias-2'],
+            $request->ensureJsonStringList('problems')
+        );
+        $this->assertSame([], $request->ensureJsonStringList('empty'));
+    }
+
+    public function testEnsureJsonStringListAppliesValidatorToEachElement(): void {
+        $request = new \OmegaUp\Request([
+            'problems' => '["good","bad"]',
+        ]);
+
+        try {
+            $request->ensureJsonStringList(
+                'problems',
+                fn (string $alias): bool => $alias !== 'bad'
+            );
+            $this->fail('Expected InvalidParameterException was not thrown');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('problems', $e->parameter);
+        }
+    }
 }

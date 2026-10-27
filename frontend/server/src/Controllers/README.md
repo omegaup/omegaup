@@ -6,6 +6,7 @@
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/rerunCron/`](#apiadminreruncron)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
@@ -352,16 +353,17 @@ Returns the detail of a single cron run.
 
 ### Description
 
-Lists the registered cron jobs, their most recent runs and the open
-problem health findings.
+Lists the registered cron jobs, their most recent runs, the open problem
+health findings and the quality of the recommendation models.
 
 ### Returns
 
-| Name                    | Type                               |
-| ----------------------- | ---------------------------------- |
-| `jobs`                  | `List[types.CronJob]`              |
-| `problemHealthFindings` | `List[types.ProblemHealthFinding]` |
-| `runs`                  | `List[types.CronRun]`              |
+| Name                      | Type                                 |
+| ------------------------- | ------------------------------------ |
+| `jobs`                    | `List[types.CronJob]`                |
+| `problemHealthFindings`   | `List[types.ProblemHealthFinding]`   |
+| `recommendationModelRuns` | `List[types.RecommendationModelRun]` |
+| `runs`                    | `List[types.CronRun]`                |
 
 ## `/api/admin/getMaintenanceMode/`
 
@@ -405,6 +407,25 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/rerunCron/`
+
+### Description
+
+Queues a manual rerun of a registered cron job for a worker to pick up.
+`queued` is false when the job already had a rerun waiting or running.
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `name` | `string` |             | ✓        |
+
+### Returns
+
+| Name     | Type      |
+| -------- | --------- |
+| `queued` | `boolean` |
 
 ## `/api/admin/setMaintenanceMode/`
 
