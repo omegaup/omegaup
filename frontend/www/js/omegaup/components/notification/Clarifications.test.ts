@@ -1,10 +1,13 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
 import notification_Clarifications from './Clarifications.vue';
 
 describe('Clarifications.vue', () => {
+  const Component = notification_Clarifications as ComponentOptions<Vue>;
   const clarifications = [
     {
       answer: 'yes',
@@ -26,7 +29,7 @@ describe('Clarifications.vue', () => {
     },
   ] as types.Clarification[];
   it('Should handle empty notifications list for clarifications', () => {
-    const wrapper = mount(notification_Clarifications, {
+    const wrapper = mount(Component, {
       propsData: {
         clarifications: [],
       },
@@ -36,7 +39,7 @@ describe('Clarifications.vue', () => {
   });
 
   it('Should handle mark all as read button for clarifications', async () => {
-    const wrapper = mount(notification_Clarifications, {
+    const wrapper = mount(Component, {
       propsData: {
         clarifications,
       },
@@ -50,7 +53,7 @@ describe('Clarifications.vue', () => {
   });
 
   it('Should handle close button for a certain clarification', async () => {
-    const wrapper = mount(notification_Clarifications, {
+    const wrapper = mount(Component, {
       propsData: {
         clarifications,
       },
@@ -64,5 +67,17 @@ describe('Clarifications.vue', () => {
       .trigger('click');
     // There is only one notification, so "Mark as all read" button does not appear
     expect(wrapper.text()).not.toContain(T.notificationsMarkAllAsRead);
+  });
+
+  it('Should clean up flashInterval and document title on destroy', async () => {
+    document.title = '! Test Title';
+    const wrapper = mount(Component, {
+      propsData: {
+        clarifications,
+      },
+    });
+    (wrapper.vm as any).flashInterval = 12345;
+    wrapper.destroy();
+    expect(document.title).toBe('Test Title');
   });
 });
