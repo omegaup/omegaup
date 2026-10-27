@@ -15,13 +15,6 @@ export const MODULE_ACCESS_LEVELS: Record<AvailableModules, AccessLevel> = {
   [AvailableModules.Settings]: AccessLevel.Support,
 };
 
-// TODO: The backend should send the access level in the dashboard payload
-// (together with the Maintenance Mode data) and this function should be
-// removed.
-export function getAccessLevel(isAdmin: boolean): AccessLevel {
-  return isAdmin ? AccessLevel.Admin : AccessLevel.Support;
-}
-
 export function hasAccessLevel(
   userLevel: AccessLevel,
   requiredLevel: AccessLevel,

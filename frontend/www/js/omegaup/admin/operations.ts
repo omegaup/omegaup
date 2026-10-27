@@ -1,14 +1,16 @@
 import admin_OperationsDashboard from '../components/admin/OperationsDashboard.vue';
+import { MaintenanceSettings } from '../components/admin/MaintenanceMode.vue';
 import { OmegaUp } from '../omegaup';
 import Vue from 'vue';
 import T from '../lang';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
-import { getAccessLevel, getModuleFromHash } from './operations_modules';
+import { AccessLevel, getModuleFromHash } from './operations_modules';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CommonPayload();
+  const payload = types.payloadParsers.OperationsDashboardPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
 
   const operationsDashboard = new Vue({
     el: '#main-container',
@@ -17,14 +19,29 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       module: getModuleFromHash(window.location.hash),
-      ephemeralGraderEnabled: payload.ephemeralGraderEnabled,
+      ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
+      maintenanceMode: payload.maintenanceMode,
     }),
+    methods: {
+      saveMaintenance(settings: MaintenanceSettings, message: string): void {
+        api.Admin.setMaintenanceMode(settings)
+          .then(() => {
+            this.maintenanceMode = { ...settings };
+            ui.success(message);
+          })
+          .catch(ui.apiError);
+      },
+    },
     render: function (createElement) {
       return createElement('omegaup-admin-operations-dashboard', {
         props: {
-          accessLevel: getAccessLevel(payload.isAdmin),
+          accessLevel: payload.accessLevel as AccessLevel,
           selectedModule: this.module,
           ephemeralGraderEnabled: this.ephemeralGraderEnabled,
+          maintenanceMode: this.maintenanceMode,
+          maintenancePredefinedTemplates:
+            payload.maintenancePredefinedTemplates,
+          preferredLanguage: commonPayload.preferredLanguage,
         },
         on: {
           'update-ephemeral-grader': (value: boolean) => {
@@ -34,6 +51,24 @@ OmegaUp.on('ready', () => {
                 ui.success(T.ephemeralGraderUpdated);
               })
               .catch(ui.apiError);
+          },
+          'toggle-maintenance': (enabled: boolean) => {
+            if (enabled) {
+              return;
+            }
+            this.saveMaintenance(
+              {
+                enabled: false,
+                message_es: '',
+                message_en: '',
+                message_pt: '',
+                type: 'info',
+              },
+              T.maintenanceModeInactive,
+            );
+          },
+          'save-maintenance': (settings: MaintenanceSettings) => {
+            this.saveMaintenance(settings, T.maintenanceModeActive);
           },
         },
       });
