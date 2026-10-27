@@ -36,7 +36,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import CountryFlag from '../CountryFlag.vue';
 import T from '../../lang';
@@ -47,21 +48,29 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 
-@Component({
+export default defineComponent({
+  name: 'HomepageSchoolOfTheMonth',
   components: {
     FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
   },
-})
-export default class SchoolOfTheMonth extends Vue {
-  @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
-
-  T = T;
-
-  get NewSchoolofTheMonthFeatureURL(): string {
-    return getBlogUrl('NewSchoolofTheMonthFeatureURL');
-  }
-}
+  props: {
+    schoolOfTheMonth: {
+      type: Object as PropType<omegaup.SchoolOfTheMonth>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    NewSchoolofTheMonthFeatureURL(): string {
+      return getBlogUrl('NewSchoolofTheMonthFeatureURL');
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
