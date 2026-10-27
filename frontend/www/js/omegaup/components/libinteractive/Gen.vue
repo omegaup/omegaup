@@ -71,7 +71,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import T from '../../lang';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -80,37 +82,63 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
 import { ButtonPlugin, CardPlugin, BIconCloudDownload } from 'bootstrap-vue';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 Vue.use(ButtonPlugin);
 Vue.use(CardPlugin);
 
-@Component({
+export default defineComponent({
+  name: 'LibinteractiveGen',
   components: {
     BIconCloudDownload,
   },
-})
-export default class LibinteractiveGen extends Vue {
-  @Prop({ default: null }) error!: null | types.LibinteractiveError;
-  @Prop() language!: string;
-  @Prop() os!: string;
-  @Prop() name!: string;
-  @Prop() idl!: string;
-
-  T = T;
-  currentLanguage = this.language;
-  currentOs = this.os;
-  currentName = this.name;
-  currentIdl = this.idl;
-  currentError = this.error;
-
-  get errorDescription(): null | string {
-    return this.currentError?.description ?? null;
-  }
-
-  get errorField(): null | string {
-    return this.currentError?.field ?? null;
-  }
-}
+  props: {
+    error: {
+      type: Object as PropType<null | types.LibinteractiveError>,
+      default: null,
+    },
+    language: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    os: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    name: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    idl: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+  },
+  data(): {
+    T: typeof T;
+    currentLanguage: null | string;
+    currentOs: null | string;
+    currentName: null | string;
+    currentIdl: null | string;
+    currentError: null | types.LibinteractiveError;
+  } {
+    return {
+      T,
+      currentLanguage: this.language,
+      currentOs: this.os,
+      currentName: this.name,
+      currentIdl: this.idl,
+      currentError: this.error,
+    };
+  },
+  computed: {
+    errorDescription(): null | string {
+      return this.currentError?.description ?? null;
+    },
+    errorField(): null | string {
+      return this.currentError?.field ?? null;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
