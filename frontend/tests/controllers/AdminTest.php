@@ -47,7 +47,7 @@ class AdminTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
     }
 
-    public function testUpdateSystemSettingsRequiresAdminOrSupport() {
+    public function testUpdateSystemSettingsRequiresSupport() {
         [
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
