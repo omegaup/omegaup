@@ -36,7 +36,7 @@ export default defineComponent({
   props: {
     pagerItems: {
       type: Array as PropType<types.PageItem[]>,
-      required: true,
+      default: () => [] as types.PageItem[],
     },
   },
   emits: ['page-changed'],
