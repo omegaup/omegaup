@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import * as markdown from '../markdown';
 import * as ui from '../ui';
 import T from '../lang';
@@ -34,8 +35,8 @@ export default defineComponent({
   name: 'Markdown',
   props: {
     markdown: {
-      type: String,
-      required: true,
+      type: String as PropType<string | null>,
+      default: null,
     },
     fullWidth: {
       type: Boolean,
@@ -49,7 +50,7 @@ export default defineComponent({
   },
   computed: {
     html(): string {
-      return this.markdownConverter.makeHtml(this.markdown);
+      return this.markdownConverter.makeHtml(this.markdown || '');
     },
   },
   watch: {

@@ -1,8 +1,12 @@
 import { mount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import * as ui from '../ui';
 
 import omegaup_Markdown from './Markdown.vue';
+
+const Markdown = omegaup_Markdown as ComponentOptions<Vue>;
 
 jest.mock('../ui', () => {
   const actual = jest.requireActual('../ui');
@@ -19,7 +23,7 @@ describe('Markdown.vue', () => {
   });
 
   it('Should render markdown contents', () => {
-    const wrapper = mount(omegaup_Markdown, {
+    const wrapper = mount(Markdown, {
       propsData: {
         markdown: '_Hello_, **World**!',
       },
@@ -35,7 +39,7 @@ describe('Markdown.vue', () => {
 
     const markdown = ui.formatString(template, { token });
 
-    const wrapper = mount(omegaup_Markdown, {
+    const wrapper = mount(Markdown, {
       propsData: {
         markdown,
       },
