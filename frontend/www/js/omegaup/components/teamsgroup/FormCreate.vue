@@ -45,8 +45,8 @@ export default defineComponent({
     };
   },
   watch: {
-    alias(newValue: string): void {
-      this.$emit('validate-unused-alias', newValue);
+    alias(newValue: string, oldValue: null | string): void {
+      this.$emit('validate-unused-alias', newValue, newValue, oldValue);
     },
     name(newValue: string): void {
       this.alias = generateAlias(newValue);

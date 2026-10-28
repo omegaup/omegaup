@@ -143,31 +143,31 @@ export default defineComponent({
   props: {
     alias: {
       type: String,
-      required: true,
+      default: undefined,
     },
     name: {
       type: String,
-      required: true,
+      default: undefined,
     },
     description: {
       type: String,
-      required: true,
+      default: undefined,
     },
     numberOfContestants: {
       type: Number,
-      required: true,
+      default: undefined,
     },
     countries: {
       type: Array as PropType<dao.Countries[]>,
-      required: true,
+      default: undefined,
     },
     isOrganizer: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     tab: {
       type: String as PropType<AvailableTabs>,
-      required: true,
+      default: undefined,
     },
     teamsIdentities: {
       type: Array as PropType<types.Identity[]>,
@@ -183,11 +183,11 @@ export default defineComponent({
     },
     searchResultUsers: {
       type: Array as PropType<types.ListItem[]>,
-      required: true,
+      default: undefined,
     },
     searchResultSchools: {
       type: Array as PropType<types.SchoolListItem[]>,
-      required: true,
+      default: undefined,
     },
     isLoading: {
       type: Boolean,
@@ -217,8 +217,8 @@ export default defineComponent({
       T,
       ui,
       AvailableTabs,
-      selectedTab: this.tab,
-      currentTeamsIdentities: this.teamsIdentities,
+      selectedTab: this.tab as AvailableTabs,
+      currentTeamsIdentities: this.teamsIdentities as types.Identity[],
     };
   },
   watch: {

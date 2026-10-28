@@ -133,6 +133,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { getBlogUrl } from '../../urlHelper';
 
+// Import Bootstrap an BootstrapVue CSS files (order is important)
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
 // Import Only Required Plugins
 import {
   TablePlugin,
@@ -166,11 +170,11 @@ export default defineComponent({
     },
     searchResultUsers: {
       type: Array as PropType<types.ListItem[]>,
-      required: true,
+      default: undefined,
     },
     numberOfContestants: {
       type: Number,
-      required: true,
+      default: undefined,
     },
     isLoading: {
       type: Boolean,

@@ -36,7 +36,7 @@ describe('Edit.vue', () => {
 
     await wrapper.setProps({ tab: AvailableTabs.Edit });
     type TeamsGroupEditInstance = InstanceType<typeof teamsgroup_Edit>;
-    const vm = wrapper.vm as unknown as TeamsGroupEditInstance;
+    const vm = (wrapper.vm as unknown) as TeamsGroupEditInstance;
     expect(vm.selectedTab).toBe(AvailableTabs.Edit);
   });
 
@@ -47,7 +47,7 @@ describe('Edit.vue', () => {
 
     await wrapper.setProps({ tab: 'wrong' });
     type TeamsGroupEditInstance = InstanceType<typeof teamsgroup_Edit>;
-    const vm = wrapper.vm as unknown as TeamsGroupEditInstance;
+    const vm = (wrapper.vm as unknown) as TeamsGroupEditInstance;
 
     expect(vm.selectedTab).toBe(AvailableTabs.Teams);
   });
@@ -68,7 +68,7 @@ describe('Edit.vue', () => {
 
     await wrapper.setProps({ teamsIdentities });
     type TeamsGroupEditInstance = InstanceType<typeof teamsgroup_Edit>;
-    const vm = wrapper.vm as unknown as TeamsGroupEditInstance;
+    const vm = (wrapper.vm as unknown) as TeamsGroupEditInstance;
 
     expect(vm.currentTeamsIdentities).toBe(teamsIdentities);
   });

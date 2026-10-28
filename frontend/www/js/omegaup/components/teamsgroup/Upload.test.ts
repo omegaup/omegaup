@@ -35,7 +35,7 @@ describe('Upload.vue', () => {
     };
     await wrapper.setData({ identities, identitiesTeams });
     type TeamsgroupUploadInstance = InstanceType<typeof teamsgroup_Upload>;
-    const vm = wrapper.vm as unknown as TeamsgroupUploadInstance;
+    const vm = (wrapper.vm as unknown) as TeamsgroupUploadInstance;
     expect(vm.items).toEqual([
       {
         username: 'teams:group:team_1',
@@ -117,7 +117,7 @@ describe('Upload.vue', () => {
     const invalidFile = new File([''], 'fake.html', { type: 'text/html' });
     const mockReadFileMethod = jest
       .spyOn(
-        wrapper.vm as unknown as {
+        (wrapper.vm as unknown) as {
           readFile: (e: HTMLInputElement) => File | null;
         },
         'readFile',
@@ -140,7 +140,7 @@ describe('Upload.vue', () => {
     const validFile = new File([''], 'users.csv', { type: 'text/csv' });
     const mockReadFileMethod = jest
       .spyOn(
-        wrapper.vm as unknown as {
+        (wrapper.vm as unknown) as {
           readFile: (e: HTMLInputElement) => File | null;
         },
         'readFile',
@@ -168,7 +168,7 @@ describe('Upload.vue', () => {
     const validFile = new File([''], 'users.csv', { type: 'text/csv' });
     const mockReadFileMethod = jest
       .spyOn(
-        wrapper.vm as unknown as {
+        (wrapper.vm as unknown) as {
           readFile: (e: HTMLInputElement) => File | null;
         },
         'readFile',

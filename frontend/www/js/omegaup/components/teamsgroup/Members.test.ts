@@ -122,7 +122,7 @@ describe('Members.vue', () => {
       .find('.input-group input[type="password"]')
       .setValue('new_pass');
     type TeamsgroupMembersInstance = InstanceType<typeof teamsgroup_Members>;
-    const vm = wrapper.vm as unknown as TeamsgroupMembersInstance;
+    const vm = (wrapper.vm as unknown) as TeamsgroupMembersInstance;
 
     expect((vm as any).username).toBe('user_1');
     expect((vm as any).password).toBe('new_pass');

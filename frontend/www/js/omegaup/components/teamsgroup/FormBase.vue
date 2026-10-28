@@ -31,7 +31,7 @@
             <label class="control-label w-100">
               {{ T.contestNewFormShortTitleAlias }}
               <input
-                v-model="alias"
+                :value="alias"
                 name="alias"
                 required
                 type="text"
@@ -139,17 +139,17 @@ export default defineComponent({
     };
   },
   watch: {
-    currentAlias(newValue: string): void {
-      this.$emit('update:alias', newValue);
+    currentAlias(newValue: string, oldValue: string): void {
+      this.$emit('update:alias', newValue, newValue, oldValue);
     },
-    currentDescription(newValue: string): void {
-      this.$emit('update:description', newValue);
+    currentDescription(newValue: string, oldValue: string): void {
+      this.$emit('update:description', newValue, newValue, oldValue);
     },
-    currentName(newValue: string): void {
-      this.$emit('update:name', newValue);
+    currentName(newValue: string, oldValue: string): void {
+      this.$emit('update:name', newValue, newValue, oldValue);
     },
-    currentNumberOfContestants(newValue: number): void {
-      this.$emit('update:numberOfContestants', newValue);
+    currentNumberOfContestants(newValue: number, oldValue: number): void {
+      this.$emit('update:numberOfContestants', newValue, newValue, oldValue);
     },
   },
 });

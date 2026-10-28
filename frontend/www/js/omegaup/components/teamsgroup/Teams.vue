@@ -15,42 +15,42 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in teams" :key="identity.username">
+        <tr v-for="team in teams" :key="team.username">
           <td>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="team.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="team.username"
             ></omegaup-user-username>
           </td>
-          <td data-group-team-name>{{ identity.name }}</td>
+          <td data-group-team-name>{{ team.name }}</td>
           <td>
-            {{ identity.country === 'xx' ? T.countryNotSet : identity.country }}
+            {{ team.country === 'xx' ? T.countryNotSet : team.country }}
           </td>
-          <td>{{ identity.state }}</td>
-          <td>{{ identity.school }}</td>
+          <td>{{ team.state }}</td>
+          <td>{{ team.school }}</td>
           <td>
             <button
               class="btn btn-link"
-              :data-edit-identity="identity.username"
+              :data-edit-identity="team.username"
               :title="T.groupEditMembersEdit"
-              @click="onEdit(identity)"
+              @click="onEdit(team)"
             >
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
             <button
               class="btn btn-link"
-              :data-add-members-identity="identity.username"
+              :data-add-members-identity="team.username"
               :title="T.groupEditMembersAddMembers"
-              @click="onAddMembers(identity.username)"
+              @click="onAddMembers(team.username)"
             >
               <font-awesome-icon :icon="['fas', 'users']" />
             </button>
             <button
               class="btn btn-link"
-              :data-remove-identity="identity.username"
+              :data-remove-identity="team.username"
               :title="T.groupEditMembersRemove"
-              @click="$emit('remove', identity.username)"
+              @click="$emit('remove', team.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>
@@ -133,19 +133,19 @@ export default defineComponent({
   props: {
     teams: {
       type: Array as PropType<types.Identity[]>,
-      required: true,
+      default: undefined,
     },
     countries: {
       type: Array as PropType<dao.Countries[]>,
-      required: true,
+      default: undefined,
     },
     searchResultUsers: {
       type: Array as PropType<types.ListItem[]>,
-      required: true,
+      default: undefined,
     },
     searchResultSchools: {
       type: Array as PropType<types.SchoolListItem[]>,
-      required: true,
+      default: undefined,
     },
     teamsMembers: {
       type: Array as PropType<types.TeamMember[]>,

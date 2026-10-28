@@ -71,7 +71,7 @@ describe('Teams.vue', () => {
       .trigger('click');
 
     type TeamsgroupTeamsInstance = InstanceType<typeof teamsgroup_Teams>;
-    const vm = wrapper.vm as unknown as TeamsgroupTeamsInstance;
+    const vm = (wrapper.vm as unknown) as TeamsgroupTeamsInstance;
 
     expect(vm.identity).toEqual({
       username: 'omegaUp:user',
