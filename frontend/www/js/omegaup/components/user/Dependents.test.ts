@@ -83,4 +83,3 @@ describe('Dependents.vue', () => {
     expect(wrapper.find('small').text()).toBe(T.dependentsBlockedMessage);
   });
 });
-
