@@ -31,30 +31,55 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import CountryFlag from '../CountryFlag.vue';
 
-@Component({
+export default defineComponent({
+  name: 'Username',
   components: {
     'omegaup-countryflag': CountryFlag,
   },
-})
-export default class Username extends Vue {
-  @Prop() username!: string;
-  @Prop({ default: null }) name!: string;
-  @Prop() classname!: string;
-  @Prop() linkify!: boolean;
-  @Prop({ default: '#' }) href!: string;
-  @Prop() country!: string;
-  @Prop({ default: false }) emitClickEvent!: boolean;
-
-  get nameWithUsername(): string {
-    if (this.name) {
-      return `${this.name} (${this.username})`;
-    }
-    return this.username;
-  }
-}
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    classname: {
+      type: String,
+      default: '',
+    },
+    linkify: {
+      type: Boolean,
+      default: false,
+    },
+    href: {
+      type: String,
+      default: '#',
+    },
+    country: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    emitClickEvent: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['click'],
+  computed: {
+    nameWithUsername(): string {
+      if (this.name) {
+        return `${this.name} (${this.username})`;
+      }
+      return this.username;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scope>

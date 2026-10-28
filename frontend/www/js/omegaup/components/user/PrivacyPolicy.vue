@@ -24,22 +24,44 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 
 import omegaup_Markdown from '../Markdown.vue';
 
-@Component({
+export default defineComponent({
+  name: 'UserPrivacyPolicy',
   components: {
     'omegaup-markdown': omegaup_Markdown,
   },
-})
-export default class UserPrivacyPolicy extends Vue {
-  @Prop() policyMarkdown!: string;
-  @Prop({ default: false }) agreed!: boolean;
-  @Prop() saved!: boolean;
-
-  T = T;
-  currentAgreed = this.agreed;
-}
+  props: {
+    policyMarkdown: {
+      type: String,
+      required: true,
+    },
+    agreed: {
+      type: Boolean,
+      default: false,
+    },
+    saved: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['submit'],
+  data(): {
+    T: typeof T;
+    currentAgreed: boolean;
+  } {
+    return {
+      T,
+      currentAgreed: this.agreed,
+    };
+  },
+  watch: {
+    agreed(newValue: boolean): void {
+      this.currentAgreed = newValue;
+    },
+  },
+});
 </script>

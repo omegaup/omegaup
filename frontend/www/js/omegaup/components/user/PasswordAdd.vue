@@ -54,50 +54,68 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component({
+export default defineComponent({
+  name: 'UserPasswordAdd',
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class UserPasswordAdd extends Vue {
-  @Prop() username!: string;
-
-  T = T;
-  newUsername = this.username;
-  newPassword = '';
-  newPassword2 = '';
-
-  get passwordMismatch(): boolean {
-    return this.newPassword != this.newPassword2;
-  }
-
-  get invalidPasswordClass(): string {
-    return this.passwordMismatch ? 'invalid-input' : '';
-  }
-
-  get submitDisabled(): boolean {
-    return (
-      this.passwordMismatch ||
-      this.newPassword.length === 0 ||
-      this.newPassword2.length === 0 ||
-      this.newUsername.trim().length === 0
-    );
-  }
-
-  onAddPassword(): void {
-    if (this.passwordMismatch) {
-      return;
-    }
-    this.$emit('add-password', {
-      username: this.newUsername,
-      password: this.newPassword,
-    });
-  }
-}
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['add-password'],
+  data(): {
+    T: typeof T;
+    newUsername: string;
+    newPassword: string;
+    newPassword2: string;
+  } {
+    return {
+      T,
+      newUsername: this.username,
+      newPassword: '',
+      newPassword2: '',
+    };
+  },
+  computed: {
+    passwordMismatch(): boolean {
+      return this.newPassword !== this.newPassword2;
+    },
+    invalidPasswordClass(): string {
+      return this.passwordMismatch ? 'invalid-input' : '';
+    },
+    submitDisabled(): boolean {
+      return (
+        this.passwordMismatch ||
+        this.newPassword.length === 0 ||
+        this.newPassword2.length === 0 ||
+        this.newUsername.trim().length === 0
+      );
+    },
+  },
+  watch: {
+    username(newValue: string): void {
+      this.newUsername = newValue;
+    },
+  },
+  methods: {
+    onAddPassword(): void {
+      if (this.passwordMismatch) {
+        return;
+      }
+      this.$emit('add-password', {
+        username: this.newUsername,
+        password: this.newPassword,
+      });
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

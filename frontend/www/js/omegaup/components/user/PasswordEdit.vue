@@ -55,48 +55,57 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component({
+export default defineComponent({
+  name: 'UserPasswordEdit',
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class UserPasswordEdit extends Vue {
-  T = T;
-  oldPassword = '';
-  newPassword = '';
-  newPassword2 = '';
-
-  get passwordMismatch(): boolean {
-    return this.newPassword != this.newPassword2;
-  }
-
-  get invalidPasswordClass(): string {
-    return this.passwordMismatch ? 'invalid-input' : '';
-  }
-
-  get submitDisabled(): boolean {
-    return (
-      this.passwordMismatch ||
-      this.newPassword.length === 0 ||
-      this.newPassword2.length === 0 ||
-      this.oldPassword.length === 0
-    );
-  }
-
-  onUpdatePassword(): void {
-    if (this.passwordMismatch) {
-      return;
-    }
-    this.$emit('update-password', {
-      oldPassword: this.oldPassword,
-      newPassword: this.newPassword,
-    });
-  }
-}
+  emits: ['update-password'],
+  data(): {
+    T: typeof T;
+    oldPassword: string;
+    newPassword: string;
+    newPassword2: string;
+  } {
+    return {
+      T,
+      oldPassword: '',
+      newPassword: '',
+      newPassword2: '',
+    };
+  },
+  computed: {
+    passwordMismatch(): boolean {
+      return this.newPassword !== this.newPassword2;
+    },
+    invalidPasswordClass(): string {
+      return this.passwordMismatch ? 'invalid-input' : '';
+    },
+    submitDisabled(): boolean {
+      return (
+        this.passwordMismatch ||
+        this.newPassword.length === 0 ||
+        this.newPassword2.length === 0 ||
+        this.oldPassword.length === 0
+      );
+    },
+  },
+  methods: {
+    onUpdatePassword(): void {
+      if (this.passwordMismatch) {
+        return;
+      }
+      this.$emit('update-password', {
+        oldPassword: this.oldPassword,
+        newPassword: this.newPassword,
+      });
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

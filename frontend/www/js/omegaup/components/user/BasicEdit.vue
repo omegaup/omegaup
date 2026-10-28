@@ -58,29 +58,51 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component({
+export default defineComponent({
+  name: 'UserBasicEdit',
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class UserBasicEdit extends Vue {
-  @Prop() username!: string;
-
-  T = T;
-  newPassword1 = '';
-  newPassword2 = '';
-
-  formSubmit(): void {
-    if (this.newPassword1 != this.newPassword2) {
-      ui.error(T.userPasswordMustBeSame);
-      return;
-    }
-    this.$emit('update', this.username, this.newPassword1);
-  }
-}
+  props: {
+    initialUsername: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update'],
+  data(): {
+    T: typeof T;
+    username: string;
+    newPassword1: string;
+    newPassword2: string;
+  } {
+    return {
+      T,
+      username:
+        this.initialUsername ||
+        ((this.$attrs.username as string | undefined) ?? ''),
+      newPassword1: '',
+      newPassword2: '',
+    };
+  },
+  watch: {
+    initialUsername(val: string): void {
+      this.username = val;
+    },
+  },
+  methods: {
+    formSubmit(): void {
+      if (this.newPassword1 !== this.newPassword2) {
+        ui.error(T.userPasswordMustBeSame);
+        return;
+      }
+      this.$emit('update', this.username, this.newPassword1);
+    },
+  },
+});
 </script>
