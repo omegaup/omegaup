@@ -640,9 +640,28 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         // set RabbitMQ client parameters
         $routingKey = 'ContestQueue';
         $exchange = 'certificates';
+        $queue = 'contest';
 
         // connection to rabbitmq
         $channel = \OmegaUp\RabbitMQConnection::getInstance()->channel();
+
+        $channel->exchange_declare(
+            $exchange,
+            'direct',
+            false,
+            true,
+            false,
+        );
+
+        $channel->queue_declare(
+            $queue,
+            false,
+            true,
+            false,
+            false
+        );
+
+        $channel->queue_bind('contest', $exchange, $routingKey);
 
         $scoreboard = \OmegaUp\Controllers\Contest::getScoreboard(
             $contest,

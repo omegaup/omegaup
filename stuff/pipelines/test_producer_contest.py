@@ -138,7 +138,8 @@ def test_contest_producer(mocker: pytest_mock.MockerFixture,
                                          exchange='certificates',
                                          routing_key='ContestQueue',
                                          channel=channel,
-                                         callback=callback)
+                                         callback=callback,
+                                         stop_after_message=True)
 
         if callback.message is not None:
             ranking: List[Dict[str, str]] = []
