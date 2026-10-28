@@ -33,19 +33,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identities" :key="identity.username">
+        <tr v-for="member in identities" :key="member.username">
           <td>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </td>
           <td>
             <button
               class="btn btn-link"
               :title="T.groupEditMembersRemove"
-              @click="$emit('remove', identity.username)"
+              @click="$emit('remove', member.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>
@@ -68,24 +68,24 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identitiesCsv" :key="identity.username">
+        <tr v-for="member in identitiesCsv" :key="member.username">
           <td data-members-username>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </td>
-          <td>{{ identity.name }}</td>
-          <td>{{ identity.country }}</td>
-          <td>{{ identity.state }}</td>
-          <td>{{ identity.school }}</td>
+          <td>{{ member.name }}</td>
+          <td>{{ member.country }}</td>
+          <td>{{ member.state }}</td>
+          <td>{{ member.school }}</td>
           <td class="actions-cell">
             <div class="actions-wrapper">
               <button
                 class="btn btn-link"
                 :title="T.groupEditMembersEdit"
-                @click="onEdit(identity)"
+                @click="onEdit(member)"
               >
                 <font-awesome-icon :icon="['fas', 'edit']" />
               </button>
@@ -94,7 +94,7 @@
                 data-identity-change-password
                 class="btn btn-link"
                 :title="T.groupEditMembersChangePassword"
-                @click="onChangePass(identity.username)"
+                @click="onChangePass(member.username)"
               >
                 <font-awesome-icon :icon="['fas', 'lock']" />
               </button>
@@ -102,7 +102,7 @@
               <button
                 class="btn btn-link"
                 :title="T.groupEditMembersRemove"
-                @click="$emit('remove', identity.username)"
+                @click="$emit('remove', member.username)"
               >
                 <font-awesome-icon :icon="['fas', 'trash-alt']" />
               </button>
@@ -115,8 +115,8 @@
     <div class="d-md-none">
       <!-- Members added from search -->
       <div
-        v-for="identity in identities"
-        :key="identity.username"
+        v-for="member in identities"
+        :key="member.username"
         class="card mb-3 shadow-sm"
       >
         <div
@@ -129,16 +129,16 @@
 
             <omegaup-user-username
               class="h6 mb-0"
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </div>
 
           <button
             class="btn btn-link text-primary"
             :title="T.groupEditMembersRemove"
-            @click="$emit('remove', identity.username)"
+            @click="$emit('remove', member.username)"
           >
             <font-awesome-icon :icon="['fas', 'trash-alt']" />
           </button>
@@ -147,38 +147,38 @@
 
       <!-- CSV identities -->
       <div
-        v-for="identity in identitiesCsv"
-        :key="'csv-' + identity.username"
+        v-for="member in identitiesCsv"
+        :key="'csv-' + member.username"
         class="card mb-3"
       >
         <div class="card-body">
           <p>
             <strong>{{ T.groupEditMembersCoder }}: </strong>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </p>
 
           <p class="mb-1">
-            <strong>{{ T.wordsName }}:</strong> {{ identity.name }}
+            <strong>{{ T.wordsName }}:</strong> {{ member.name }}
           </p>
           <p>
-            <strong>{{ T.profileCountry }}:</strong> {{ identity.country }}
+            <strong>{{ T.profileCountry }}:</strong> {{ member.country }}
           </p>
           <p>
-            <strong>{{ T.profileState }}:</strong> {{ identity.state }}
+            <strong>{{ T.profileState }}:</strong> {{ member.state }}
           </p>
           <p>
-            <strong>{{ T.profileSchool }}:</strong> {{ identity.school }}
+            <strong>{{ T.profileSchool }}:</strong> {{ member.school }}
           </p>
 
           <div class="d-flex justify-content-between mt-3">
             <button
               class="btn btn-link"
               :title="T.groupEditMembersEdit"
-              @click="onEdit(identity)"
+              @click="onEdit(member)"
             >
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
@@ -186,7 +186,7 @@
             <button
               class="btn btn-link"
               :title="T.groupEditMembersChangePassword"
-              @click="onChangePass(identity.username)"
+              @click="onChangePass(member.username)"
             >
               <font-awesome-icon :icon="['fas', 'lock']" />
             </button>
@@ -194,7 +194,7 @@
             <button
               class="btn btn-link text-primary"
               :title="T.groupEditMembersRemove"
-              @click="$emit('remove', identity.username)"
+              @click="$emit('remove', member.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>

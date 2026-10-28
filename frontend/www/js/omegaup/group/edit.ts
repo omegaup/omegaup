@@ -116,7 +116,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-member': (source: InstanceType<typeof group_Members>, username: string) => {
+          'add-member': (
+            source: InstanceType<typeof group_Members>,
+            username: string,
+          ) => {
             api.Group.addUser({
               group_alias: payload.groupAlias,
               usernameOrEmail: username,
