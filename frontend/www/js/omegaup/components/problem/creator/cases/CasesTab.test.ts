@@ -3,12 +3,9 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import CasesTab from './CasesTab.vue';
 import Sidebar from './Sidebar.vue';
 import AddPanel from './AddPanel.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import Vue from 'vue';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('Tabs.vue', () => {
   it('Should contain 3 buttons and Groups text', async () => {
