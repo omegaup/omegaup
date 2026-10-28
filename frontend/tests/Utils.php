@@ -92,7 +92,11 @@ class Utils {
                 $contest = \OmegaUp\DAO\Contests::getByProblemset(
                     $submission->problemset_id
                 );
-                if (!is_null($contest) && $contest->penalty_type === 'runtime') {
+                if (
+                    !is_null(
+                        $contest
+                    ) && $contest->penalty_type === 'runtime'
+                ) {
                     $run->penalty = $runtime;
                 }
             }
