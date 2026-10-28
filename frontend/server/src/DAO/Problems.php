@@ -340,6 +340,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
+     * @param list<string> $excludedTags
      * @param list<string> $authors
      * @return array{count: int, problems: list<array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
@@ -363,7 +364,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         string $difficulty,
         array $authors,
         bool $matchAnyLanguage = false,
-        ?string $solvedStatus = null
+        ?string $solvedStatus = null,
+        array $excludedTags = []
     ) {
         $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -584,6 +586,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $args,
                 $clauses
             );
+        }
+
+        if (!empty($excludedTags)) {
+            $excludedTagPlaceholders = implode(
+                ',',
+                array_fill(0, count($excludedTags), '?')
+            );
+            $clauses[] = [
+                'NOT EXISTS (
+                    SELECT 1
+                    FROM Problems_Tags excluded_pt
+                    INNER JOIN Tags excluded_t
+                        ON excluded_t.tag_id = excluded_pt.tag_id
+                    WHERE excluded_pt.problem_id = p.problem_id
+                        AND excluded_t.name IN (' . $excludedTagPlaceholders . ')
+                )',
+                $excludedTags,
+            ];
         }
 
         if (!empty($authors)) {
