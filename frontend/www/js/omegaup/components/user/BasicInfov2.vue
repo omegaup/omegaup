@@ -109,38 +109,49 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
 import * as ui from '../../ui';
 import { getBlogUrl } from '../../urlHelper';
-@Component({
+
+export default defineComponent({
+  name: 'UserBasicInfo',
   components: {
     'omegaup-user-username': user_Username,
   },
-})
-export default class UserBasicInfo extends Vue {
-  @Prop() profile!: types.UserProfile;
-  @Prop() rank!: string;
-  T = T;
-  ui = ui;
-
-  get CategoriesFeatureGuideURL(): string {
-    return getBlogUrl('CategoriesFeatureGuideURL');
-  }
-
-  get urlUsername(): string {
-    return `https://omegaup.com/profile/${this.profile.username}/`;
-  }
-
-  get graduationDate(): string {
-    if (!this.profile.graduation_date) {
-      return '';
-    }
-    return this.profile.graduation_date.toLocaleDateString(T.locale);
-  }
-}
+  props: {
+    profile: {
+      type: Object as PropType<types.UserProfile>,
+      required: true,
+    },
+    rank: {
+      type: String,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+    };
+  },
+  computed: {
+    CategoriesFeatureGuideURL(): string {
+      return getBlogUrl('CategoriesFeatureGuideURL');
+    },
+    urlUsername(): string {
+      return `https://omegaup.com/profile/${this.profile.username}/`;
+    },
+    graduationDate(): string {
+      if (!this.profile.graduation_date) {
+        return '';
+      }
+      return this.profile.graduation_date.toLocaleDateString(T.locale);
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

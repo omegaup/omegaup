@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import { dao, types } from '../../api_types';
 import user_Basic_Information_Edit from './BasicInformationEdit.vue';
 import date_Picker from '../DatePicker.vue';
@@ -62,16 +63,22 @@ const basicInformationEditProps: {
 
 describe('BasicInformationEdit.vue', () => {
   it('Should disable states select when no country is selected', () => {
-    const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
-    });
+    const wrapper = mount(
+      (user_Basic_Information_Edit as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: basicInformationEditProps,
+      },
+    );
     expect(wrapper.find('select[data-states]').element).toBeDisabled();
   });
 
   it('Should enable states select when country is selected', async () => {
-    const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
-    });
+    const wrapper = mount(
+      (user_Basic_Information_Edit as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: basicInformationEditProps,
+      },
+    );
     await wrapper
       .find('select[data-countries]')
       .find('option[value="CA"]')
@@ -80,9 +87,12 @@ describe('BasicInformationEdit.vue', () => {
   });
 
   it('Should emit user update basic information', async () => {
-    const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
-    });
+    const wrapper = mount(
+      (user_Basic_Information_Edit as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: basicInformationEditProps,
+      },
+    );
 
     await wrapper.find('input[data-username]').setValue('omegaup_modified');
     await wrapper.find('input[data-name]').setValue('omegaUp admin modified');
@@ -117,9 +127,12 @@ describe('BasicInformationEdit.vue', () => {
   });
 
   it('Should show message error when a long name is given', async () => {
-    const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
-    });
+    const wrapper = mount(
+      (user_Basic_Information_Edit as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: basicInformationEditProps,
+      },
+    );
 
     await wrapper
       .find('input[data-name]')
@@ -142,9 +155,12 @@ describe('BasicInformationEdit.vue', () => {
   });
 
   it('Should show error when username is invalid', async () => {
-    const wrapper = mount(user_Basic_Information_Edit, {
-      propsData: basicInformationEditProps,
-    });
+    const wrapper = mount(
+      (user_Basic_Information_Edit as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: basicInformationEditProps,
+      },
+    );
 
     // Test invalid characters
     await wrapper.find('input[data-username]').setValue('invalid@username');

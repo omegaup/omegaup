@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -68,9 +69,12 @@ const propsData = {
 
 describe('MainInfo.vue', () => {
   it('Should display profile edit button', () => {
-    const wrapper = shallowMount(user_MainInfo, {
-      propsData,
-    });
+    const wrapper = shallowMount(
+      (user_MainInfo as unknown) as ComponentOptions<Vue>,
+      {
+        propsData,
+      },
+    );
     expect(
       wrapper.find('a[href="/profile/#edit-basic-information"]').exists(),
     ).toBe(true);
@@ -81,9 +85,12 @@ describe('MainInfo.vue', () => {
 
   it('Should display profile see button', () => {
     propsData.edit = true;
-    const wrapper = shallowMount(user_MainInfo, {
-      propsData,
-    });
+    const wrapper = shallowMount(
+      (user_MainInfo as unknown) as ComponentOptions<Vue>,
+      {
+        propsData,
+      },
+    );
     expect(wrapper.find('a[href="/profile/"]').exists()).toBe(true);
     expect(wrapper.find('a[href="/profile/"]').text()).toBe(
       T.userEditViewProfile,
@@ -91,16 +98,22 @@ describe('MainInfo.vue', () => {
   });
 
   it('Should display number of solved problems', () => {
-    const wrapper = shallowMount(user_MainInfo, {
-      propsData,
-    });
+    const wrapper = shallowMount(
+      (user_MainInfo as unknown) as ComponentOptions<Vue>,
+      {
+        propsData,
+      },
+    );
     expect(wrapper.text()).toContain('3');
   });
 
   it('Should display correct rank', () => {
-    const wrapper = shallowMount(user_MainInfo, {
-      propsData,
-    });
+    const wrapper = shallowMount(
+      (user_MainInfo as unknown) as ComponentOptions<Vue>,
+      {
+        propsData,
+      },
+    );
     expect(wrapper.text()).toContain(T.profileRankMaster);
   });
 });

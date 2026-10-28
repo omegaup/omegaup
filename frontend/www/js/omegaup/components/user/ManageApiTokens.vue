@@ -123,44 +123,37 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
-library.add(fas);
-
-@Component({
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
+export default defineComponent({
+  name: 'ManageApiTokens',
+  props: {
+    apiTokens: {
+      type: Array as PropType<types.ApiToken[]>,
+      default: () => [],
+    },
   },
-})
-export default class ManageApiTokens extends Vue {
-  @Prop({ default: () => [] }) apiTokens!: types.ApiToken[];
-
-  T = T;
-  time = time;
-
-  tokenName = null;
-
-  handleCreateApiToken() {
-    this.$emit('create-api-token', this.tokenName);
-    this.tokenName = null; // Clear the tokenName value
-  }
-
-  formatTime(value: Date) {
-    return time.formatDateTime(value);
-  }
-}
+  emits: ['create-api-token', 'revoke-api-token'],
+  data() {
+    return {
+      T,
+      time,
+      tokenName: null as string | null,
+    };
+  },
+  methods: {
+    handleCreateApiToken(): void {
+      this.$emit('create-api-token', this.tokenName);
+      this.tokenName = null;
+    },
+    formatTime(value: Date): string {
+      return time.formatDateTime(value);
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

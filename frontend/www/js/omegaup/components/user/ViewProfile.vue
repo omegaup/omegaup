@@ -327,7 +327,7 @@
 
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
@@ -342,15 +342,12 @@ import * as ui from '../../ui';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
-import country_Flag from '../CountryFlag.vue';
 import common_Markdown from '../Markdown.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Charts from './Charts.vue';
-import user_MainInfo from './MainInfo.vue';
 import problem_SolvingProgress from './ProblemSolvingProgress.vue';
 import tags_SolvedChart from './TagsSolvedChart.vue';
 import user_Heatmap from './UserHeatmap.vue';
-import user_Username from './Username.vue';
 
 export enum ViewProfileTabs {
   Badges = 'badges',
@@ -371,168 +368,210 @@ function getInitialSelectedTab(
   return selectedTab ?? ViewProfileTabs.Badges;
 }
 
-@Component({
+export default defineComponent({
+  name: 'ViewProfile',
   components: {
     'omegaup-markdown': common_Markdown,
     'omegaup-user-basicinfo': user_BasicInfo,
-    'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-user-heatmap': user_Heatmap,
-    'omegaup-user-maininfo': user_MainInfo,
     'omegaup-problem-solving-progress': problem_SolvingProgress,
     'omegaup-tags-solved-chart': tags_SolvedChart,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
     'omegaup-table-paginator': common_TablePaginator,
-    'omegaup-countryflag': country_Flag,
   },
-})
-export default class ViewProfile extends Vue {
-  @Prop() data!: types.ExtraProfileDetails | null;
-  @Prop() profile!: types.UserProfileInfo;
-  @Prop() profileBadges!: Set<string>;
-  @Prop() visitorBadges!: Set<string>;
-  @Prop({ default: null }) selectedTab!: string | null;
-  @Prop({ default: () => [] }) availableYears!: number[];
-  @Prop({ default: null }) profileStatistics!: {
-    solved: number;
-    attempting: number;
-    difficulty: {
-      easy: number;
-      medium: number;
-      hard: number;
-      unlabelled: number;
+  props: {
+    data: {
+      type: Object as PropType<types.ExtraProfileDetails | null>,
+      default: null,
+    },
+    profile: {
+      type: Object as PropType<types.UserProfileInfo>,
+      required: true,
+    },
+    profileBadges: {
+      type: (Set as unknown) as PropType<Set<string>>,
+      default: () => new Set<string>(),
+    },
+    visitorBadges: {
+      type: (Set as unknown) as PropType<Set<string>>,
+      default: () => new Set<string>(),
+    },
+    selectedTab: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    availableYears: {
+      type: Array as PropType<number[]>,
+      default: () => [],
+    },
+    profileStatistics: {
+      type: Object as PropType<{
+        solved: number;
+        attempting: number;
+        difficulty: {
+          easy: number;
+          medium: number;
+          hard: number;
+          unlabelled: number;
+        };
+        tags: Array<{ name: string; count: number }>;
+      } | null>,
+      default: null,
+    },
+  },
+  emits: [
+    'heatmap-year-changed',
+    'save-readme',
+    'report-readme',
+    'update:selectedTab',
+  ],
+  data() {
+    const contests = Object.values(
+      this.data?.contests ?? ({} as types.UserProfileContests),
+    )
+      .map((contest) => {
+        const now = new Date();
+        if (contest.place === null || now <= contest.data.finish_time) {
+          return null;
+        }
+        return new ContestResult(contest);
+      })
+      .filter((contest) => Boolean(contest));
+
+    return {
+      contests,
+      charts: (this.data?.stats ?? []) as types.UserProfileStats[],
+      ViewProfileTabs,
+      T,
+      ui,
+      columns: 3,
+      currentSelectedTab: getInitialSelectedTab(this.profile, this.selectedTab),
+      normalizedRunCounts: [] as Highcharts.PointOptionsObject[],
+      currentReadme: this.profile.readme ?? null,
+      isEditingReadme: false,
+      readmeEditContent: null as string | null,
+      readmeReportSubmitted: false,
+      isReadmeEnabled: Experiments.loadGlobal().isEnabled('user_readme'),
     };
-    tags: Array<{ name: string; count: number }>;
-  } | null;
-  contests = Object.values(
-    this.data?.contests ?? ({} as types.UserProfileContests),
-  )
-    .map((contest) => {
-      const now = new Date();
-      if (contest.place === null || now <= contest.data.finish_time) {
-        return null;
+  },
+  computed: {
+    createdContests(): Contest[] {
+      if (!this.data?.createdContests) return [];
+      let contests = this.data.createdContests;
+      if (!this.profile.is_own_profile) {
+        contests = contests.filter(
+          (contest) => contest.admission_mode === 'public',
+        );
       }
-      return new ContestResult(contest);
-    })
-    .filter((contest) => Boolean(contest));
-  charts: types.UserProfileStats[] = this.data?.stats ?? [];
-  ViewProfileTabs = ViewProfileTabs;
-  T = T;
-  ui = ui;
-  columns = 3;
-  currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
-  normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-  currentReadme: string | null = this.profile.readme ?? null;
-  isEditingReadme = false;
-  readmeEditContent: string | null = null;
-  readmeReportSubmitted = false;
-  isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
-
-  get createdContests(): Contest[] {
-    if (!this.data?.createdContests) return [];
-    let contests = this.data.createdContests;
-    if (!this.profile.is_own_profile) {
-      contests = contests.filter(
-        (contest) => contest.admission_mode === 'public',
+      return contests.map((contest) => new Contest(contest));
+    },
+    createdCourses(): Course[] {
+      if (!this.data?.createdCourses) return [];
+      let courses = this.data.createdCourses;
+      if (!this.profile.is_own_profile) {
+        courses = courses.filter(
+          (course) => course.admission_mode === 'public',
+        );
+      }
+      return courses.map((course) => new Course(course));
+    },
+    createdProblems(): Problem[] {
+      if (!this.data?.createdProblems) return [];
+      return this.data.createdProblems.map((problem) => new Problem(problem));
+    },
+    unsolvedProblems(): Problem[] {
+      if (!this.data?.unsolvedProblems) return [];
+      return this.data.unsolvedProblems.map((problem) => new Problem(problem));
+    },
+    columnNames(): Array<{ name: string; style: string }> {
+      return [
+        { name: T.profileContestsTableContest, style: 'text-left' },
+        { name: T.profileContestsTablePlace, style: 'text-right' },
+      ];
+    },
+    solvedProblems(): Problem[] {
+      if (!this.data?.solvedProblems) return [];
+      return this.data.solvedProblems.map((problem) => new Problem(problem));
+    },
+    bookmarkedProblems(): BookmarkedProblem[] {
+      if (!this.data?.bookmarkedProblems) return [];
+      return this.data.bookmarkedProblems.map(
+        (problem: types.BookmarkProblem) => new BookmarkedProblem(problem),
       );
-    }
-    return contests.map((contest) => new Contest(contest));
-  }
-  get createdCourses(): Course[] {
-    if (!this.data?.createdCourses) return [];
-    let courses = this.data.createdCourses;
-    if (!this.profile.is_own_profile) {
-      courses = courses.filter((course) => course.admission_mode === 'public');
-    }
-    return courses.map((course) => new Course(course));
-  }
-  get createdProblems(): Problem[] {
-    if (!this.data?.createdProblems) return [];
-    return this.data.createdProblems.map((problem) => new Problem(problem));
-  }
-  get unsolvedProblems(): Problem[] {
-    if (!this.data?.unsolvedProblems) return [];
-    return this.data.unsolvedProblems.map((problem) => new Problem(problem));
-  }
-
-  get columnNames(): Array<{ name: string; style: string }> {
-    return [
-      { name: T.profileContestsTableContest, style: 'text-left' },
-      { name: T.profileContestsTablePlace, style: 'text-right' },
-    ];
-  }
-
-  get solvedProblems(): Problem[] {
-    if (!this.data?.solvedProblems) return [];
-    return this.data.solvedProblems.map((problem) => new Problem(problem));
-  }
-  get bookmarkedProblems(): BookmarkedProblem[] {
-    if (!this.data?.bookmarkedProblems) return [];
-    return this.data.bookmarkedProblems.map(
-      (problem: types.BookmarkProblem) => new BookmarkedProblem(problem),
-    );
-  }
-  get rank(): string {
-    switch (this.profile.classname) {
-      case 'user-rank-beginner':
-        return T.profileRankBeginner;
-      case 'user-rank-specialist':
-        return T.profileRankSpecialist;
-      case 'user-rank-expert':
-        return T.profileRankExpert;
-      case 'user-rank-master':
-        return T.profileRankMaster;
-      case 'user-rank-international-master':
-        return T.profileRankInternationalMaster;
-      default:
-        return T.profileRankUnrated;
-    }
-  }
-
-  startEditReadme(): void {
-    this.readmeEditContent = this.currentReadme;
-    this.isEditingReadme = true;
-  }
-
-  cancelEditReadme(): void {
-    this.isEditingReadme = false;
-    this.readmeEditContent = null;
-  }
-
-  saveReadme(): void {
-    const content = this.readmeEditContent ?? '';
-    this.$emit('save-readme', {
-      readme: content,
-      onSuccess: () => {
-        this.currentReadme = content;
-        this.isEditingReadme = false;
-      },
-    });
-  }
-
-  reportReadme(): void {
-    this.$emit('report-readme', {
-      username: this.profile.username ?? '',
-      onSuccess: () => {
-        this.readmeReportSubmitted = true;
-        ui.success(T.profileAboutSectionReportSuccess);
-      },
-    });
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabPropChanged(newValue: string | null) {
-    if (newValue !== null) {
-      this.currentSelectedTab = getInitialSelectedTab(this.profile, newValue);
-    }
-  }
-
-  @Watch('currentSelectedTab')
-  onCurrentSelectedTabChanged(newValue: string) {
-    this.$emit('update:selectedTab', newValue);
-  }
-}
+    },
+    rank(): string {
+      switch (this.profile.classname) {
+        case 'user-rank-beginner':
+          return T.profileRankBeginner;
+        case 'user-rank-specialist':
+          return T.profileRankSpecialist;
+        case 'user-rank-expert':
+          return T.profileRankExpert;
+        case 'user-rank-master':
+          return T.profileRankMaster;
+        case 'user-rank-international-master':
+          return T.profileRankInternationalMaster;
+        default:
+          return T.profileRankUnrated;
+      }
+    },
+  },
+  watch: {
+    selectedTab(newValue: string | null): void {
+      if (newValue !== null) {
+        this.currentSelectedTab = getInitialSelectedTab(this.profile, newValue);
+      }
+    },
+    currentSelectedTab(newValue: string): void {
+      this.$emit('update:selectedTab', newValue);
+    },
+    data(newData: types.ExtraProfileDetails | null): void {
+      this.contests = Object.values(
+        newData?.contests ?? ({} as types.UserProfileContests),
+      )
+        .map((contest) => {
+          const now = new Date();
+          if (contest.place === null || now <= contest.data.finish_time) {
+            return null;
+          }
+          return new ContestResult(contest);
+        })
+        .filter((contest) => Boolean(contest));
+      this.charts = newData?.stats ?? [];
+    },
+  },
+  methods: {
+    startEditReadme(): void {
+      this.readmeEditContent = this.currentReadme;
+      this.isEditingReadme = true;
+    },
+    cancelEditReadme(): void {
+      this.isEditingReadme = false;
+      this.readmeEditContent = null;
+    },
+    saveReadme(): void {
+      const content = this.readmeEditContent ?? '';
+      this.$emit('save-readme', {
+        readme: content,
+        onSuccess: () => {
+          this.currentReadme = content;
+          this.isEditingReadme = false;
+        },
+      });
+    },
+    reportReadme(): void {
+      this.$emit('report-readme', {
+        username: this.profile.username ?? '',
+        onSuccess: () => {
+          this.readmeReportSubmitted = true;
+          ui.success(T.profileAboutSectionReportSuccess);
+        },
+      });
+    },
+  },
+});
 </script>
 
 <style lang="scss">
