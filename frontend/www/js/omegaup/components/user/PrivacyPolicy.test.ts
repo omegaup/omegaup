@@ -56,3 +56,4 @@ describe('PrivacyPolicy.vue', () => {
     expect(wrapper.emitted('submit')?.length).toBe(1);
   });
 });
+
