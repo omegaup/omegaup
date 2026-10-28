@@ -69,4 +69,3 @@ describe('Username.vue', () => {
     expect(flag.exists()).toBe(true);
   });
 });
-

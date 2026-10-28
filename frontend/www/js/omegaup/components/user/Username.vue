@@ -43,7 +43,7 @@ export default defineComponent({
   props: {
     username: {
       type: String,
-      required: true,
+      default: '',
     },
     name: {
       type: String as PropType<null | string>,

@@ -39,4 +39,3 @@ describe('DeleteAccount.vue', () => {
     expect(wrapper.emitted('request-delete-account')?.length).toBe(1);
   });
 });
-
