@@ -101,75 +101,104 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 import common_Typeahead from '../common/Typeahead.vue';
 
-@Component({
+export default defineComponent({
+  name: 'IdentityEdit',
   components: {
     'omegaup-common-typeahead': common_Typeahead,
   },
-})
-export default class IdentityEdit extends Vue {
-  @Prop({ default: null }) identity!: types.Identity | null;
-  @Prop() countries!: iso3166.Country[];
-  @Prop() searchResultSchools!: types.SchoolListItem[];
-
-  T = T;
-  selectedIdentity = Object.assign(
-    {
-      username: '',
-      classname: '',
-      name: '',
-      gender: '',
-      school: '',
-      country_id: 'MX',
-      state_id: '',
-    } as types.Identity,
-    this.identity,
-  );
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
-
-  get groupName(): string {
-    const teamUsername = this.selectedIdentity.username.split(':');
-    if (teamUsername.length === 2) {
-      return teamUsername[0];
-    }
-    return `${teamUsername[0]}:${teamUsername[1]}`;
-  }
-
-  get identityName(): string {
-    const teamUsername = this.selectedIdentity.username.split(':');
-    if (teamUsername.length === 2) {
-      return teamUsername[1];
-    }
-    return teamUsername[2];
-  }
-  set identityName(username: string) {
-    this.selectedIdentity.username = `${this.groupName}:${username}`;
-  }
-
-  get countryStates(): iso3166.Subdivisions {
-    const countryId = this.selectedIdentity.country_id || 'MX';
-    const countrySelected = iso3166.country(countryId);
-    return countrySelected.sub;
-  }
-
-  onEditMember(): void {
-    this.$emit('edit-identity-member', {
-      originalUsername: this.identity?.username,
-      identity: {
-        ...this.selectedIdentity,
-        school: this.school?.value,
+  props: {
+    identity: {
+      type: Object as PropType<types.Identity | null>,
+      default: null,
+    },
+    countries: {
+      type: Array as PropType<iso3166.Country[]>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      default: () => [],
+    },
+  },
+  emits: ['edit-identity-member', 'cancel', 'update-search-result-schools'],
+  data() {
+    return {
+      T,
+      selectedIdentity: Object.assign(
+        {
+          username: '',
+          classname: '',
+          name: '',
+          gender: '',
+          school: '',
+          country_id: 'MX',
+          state_id: '',
+        } as types.Identity,
+        this.identity,
+      ),
+      school: (this.searchResultSchools[0] ??
+        null) as null | types.SchoolListItem,
+    };
+  },
+  computed: {
+    groupName(): string {
+      const teamUsername = this.selectedIdentity.username.split(':');
+      if (teamUsername.length === 2) {
+        return teamUsername[0];
+      }
+      return `${teamUsername[0]}:${teamUsername[1]}`;
+    },
+    identityName: {
+      get(): string {
+        const teamUsername = this.selectedIdentity.username.split(':');
+        if (teamUsername.length === 2) {
+          return teamUsername[1];
+        }
+        return teamUsername[2];
       },
-    });
-  }
-
-  @Watch('identity')
-  onIdentityChanged(newValue: types.Identity): void {
-    this.selectedIdentity = newValue;
-  }
-}
+      set(username: string): void {
+        this.selectedIdentity.username = `${this.groupName}:${username}`;
+      },
+    },
+    countryStates(): iso3166.Subdivisions {
+      const countryId = this.selectedIdentity.country_id || 'MX';
+      const countrySelected = iso3166.country(countryId);
+      return countrySelected.sub;
+    },
+  },
+  watch: {
+    identity(newValue: types.Identity | null): void {
+      this.selectedIdentity = Object.assign(
+        {
+          username: '',
+          classname: '',
+          name: '',
+          gender: '',
+          school: '',
+          country_id: 'MX',
+          state_id: '',
+        } as types.Identity,
+        newValue,
+      );
+    },
+  },
+  methods: {
+    onEditMember(): void {
+      this.$emit('edit-identity-member', {
+        originalUsername: this.identity?.username,
+        identity: {
+          ...this.selectedIdentity,
+          school: this.school?.value,
+        },
+      });
+    },
+  },
+});
 </script>
