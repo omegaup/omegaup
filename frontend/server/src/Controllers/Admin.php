@@ -375,17 +375,16 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Updates system settings. Only available to system admins.
+     * Updates system settings. Temporarily available to the support team.
      *
      * @omegaup-request-param null|bool $ephemeral_grader_enabled
      *
      * @return array{status: string}
      */
     public static function apiUpdateSystemSettings(\OmegaUp\Request $r): array {
-        $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        // TODO: Restrict this endpoint to system admins again once the
+        // permissions of the Operations Dashboard are redefined.
+        $r->ensureUserHasAdministrativeAccess();
 
         $ephemeralGraderEnabled = $r->ensureOptionalBool(
             'ephemeral_grader_enabled'
