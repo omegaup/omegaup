@@ -259,11 +259,17 @@
                 :title="T.courseNewFormObjectiveDesc"
                 icon="info-circle"
               />
+              <div
+                v-show="!readOnly"
+                ref="objectiveButtonBar"
+                class="wmd-button-bar"
+              ></div>
               <textarea
+                ref="objectiveInput"
                 v-model="objective"
                 :disabled="readOnly"
                 data-course-objective
-                class="form-control"
+                class="form-control wmd-input"
                 :class="{
                   'is-invalid': invalidParameterName === 'objective',
                 }"
@@ -286,11 +292,17 @@
                 :class="{ 'is-complete': isDescriptionComplete }"
                 >{{ T.courseNewFormDescription }}</span
               >
+              <div
+                v-show="!readOnly"
+                ref="descriptionButtonBar"
+                class="wmd-button-bar"
+              ></div>
               <textarea
+                ref="descriptionInput"
                 v-model="description"
                 :disabled="readOnly"
                 data-course-new-description
-                class="form-control"
+                class="form-control wmd-input"
                 :class="{
                   'is-invalid': invalidParameterName === 'description',
                 }"
@@ -328,9 +340,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Ref } from 'vue-property-decorator';
 import { types, messages } from '../../api_types';
 import T from '../../lang';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdownModule from '../../markdown';
 import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
@@ -374,6 +388,8 @@ const MAX_LENGTH = {
 
 const DANGER_THRESHOLD_PERCENTAGE = 0.9;
 
+const markdownConverter = new markdownModule.Converter({ preview: true });
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -393,6 +409,12 @@ export default class CourseDetails extends Vue {
   @Prop() allLanguages!: string[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop({ default: true }) hasVisitedSection!: boolean;
+  @Ref() readonly objectiveButtonBar!: HTMLDivElement;
+  @Ref() readonly objectiveInput!: HTMLTextAreaElement;
+  @Ref() readonly descriptionButtonBar!: HTMLDivElement;
+  @Ref() readonly descriptionInput!: HTMLTextAreaElement;
+  objectiveEditor: Markdown.Editor | null = null;
+  descriptionEditor: Markdown.Editor | null = null;
 
   T = T;
   alias = this.course.alias;
@@ -460,6 +482,23 @@ export default class CourseDetails extends Vue {
   }
 
   mounted() {
+    this.objectiveEditor = this.setUpMarkdownEditor(
+      '-objective',
+      this.objectiveButtonBar,
+      this.objectiveInput,
+      (value: string) => {
+        this.objective = value;
+      },
+    );
+    this.descriptionEditor = this.setUpMarkdownEditor(
+      '-description',
+      this.descriptionButtonBar,
+      this.descriptionInput,
+      (value: string) => {
+        this.description = value;
+      },
+    );
+
     const title = T.createCourseInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
       introJs()
@@ -559,6 +598,52 @@ export default class CourseDetails extends Vue {
     }
   }
 
+  setUpMarkdownEditor(
+    idPostfix: string,
+    buttonBar: HTMLDivElement,
+    input: HTMLTextAreaElement,
+    onChange: (value: string) => void,
+  ): Markdown.Editor {
+    const editor = new Markdown.Editor(
+      markdownConverter.converter,
+      idPostfix,
+      {
+        panels: {
+          buttonBar,
+          preview: null,
+          input,
+        },
+      },
+    );
+    editor.run();
+
+    // Courses cannot embed uploaded images, so the image button is removed.
+    const imageButton = buttonBar.querySelector('[id^="wmd-image-button"]');
+    if (imageButton) {
+      imageButton.remove();
+    }
+    input.addEventListener(
+      'keydown',
+      (event: KeyboardEvent) => {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key.toLowerCase() === 'g'
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
+
+    // Keep the model in sync when the toolbar or a shortcut edits the text.
+    buttonBar.addEventListener('click', () => {
+      this.$nextTick(() => onChange(input.value));
+    });
+    input.addEventListener('keyup', () => onChange(input.value));
+    return editor;
+  }
+
   reset(): void {
     this.alias = this.course.alias;
     this.description = this.course.description;
@@ -625,6 +710,16 @@ export default class CourseDetails extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+
+.wmd-button-bar {
+  background-color: var(--wmd-button-bar-background-color);
+}
+
+.wmd-input {
+  min-height: 120px;
+  resize: vertical;
+}
 
 .multiselect__tag {
   background: var(--multiselect-tag-background-color);
