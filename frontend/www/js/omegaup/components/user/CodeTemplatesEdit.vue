@@ -47,8 +47,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import type { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import {
@@ -59,74 +60,89 @@ import {
 import { sourceTemplates } from '../../grader/GraderTemplates';
 import { supportedLanguages } from '../../grader/util';
 
-@Component
-export default class UserCodeTemplatesEdit extends Vue {
-  @Prop() profile!: types.UserProfileInfo;
-
-  T = T;
-  selectedLanguage: null | string = this.initialLanguage;
-  source = '';
-
-  get programmingLanguages(): { [key: string]: string } {
-    return this.profile.programming_languages ?? {};
-  }
-
-  get initialLanguage(): null | string {
-    const languages = Object.keys(this.programmingLanguages);
+export default defineComponent({
+  name: 'UserCodeTemplatesEdit',
+  props: {
+    profile: {
+      type: Object as PropType<types.UserProfileInfo>,
+      required: true,
+    },
+  },
+  data(): {
+    T: typeof T;
+    selectedLanguage: null | string;
+    source: string;
+  } {
+    const programmingLanguages = this.profile.programming_languages ?? {};
+    const languages = Object.keys(programmingLanguages);
+    let initialLanguage: null | string = null;
     if (
       this.profile.preferred_language &&
       languages.includes(this.profile.preferred_language)
     ) {
-      return this.profile.preferred_language;
+      initialLanguage = this.profile.preferred_language;
+    } else {
+      initialLanguage = languages[0] ?? null;
     }
-    return languages[0] ?? null;
-  }
 
-  get username(): null | string {
-    return this.profile.username ?? null;
-  }
-
-  getExtension(language: string): string {
-    const languageInfo = supportedLanguages[language];
-    if (languageInfo) {
-      return languageInfo.extension;
-    }
-    return language;
-  }
-
-  @Watch('selectedLanguage', { immediate: true })
-  onSelectedLanguageChanged(language: null | string): void {
-    if (!language) {
-      this.source = '';
-      return;
-    }
-    const extension = this.getExtension(language);
-    const customTemplate = getCodeTemplate(extension, this.username);
-    if (customTemplate !== null) {
-      this.source = customTemplate;
-      return;
-    }
-    this.source = sourceTemplates[extension] ?? '';
-  }
-
-  onSave(): void {
-    if (!this.selectedLanguage) {
-      return;
-    }
-    const extension = this.getExtension(this.selectedLanguage);
-    if (setCodeTemplate(extension, this.source, this.username)) {
-      ui.success(T.codeTemplatesSaveSuccess);
-    }
-  }
-
-  onRestoreDefault(): void {
-    if (!this.selectedLanguage) {
-      return;
-    }
-    const extension = this.getExtension(this.selectedLanguage);
-    removeCodeTemplate(extension, this.username);
-    this.source = sourceTemplates[extension] ?? '';
-    ui.success(T.codeTemplatesRestoreSuccess);
-  }
-}
+    return {
+      T,
+      selectedLanguage: initialLanguage,
+      source: '',
+    };
+  },
+  computed: {
+    programmingLanguages(): { [key: string]: string } {
+      return this.profile.programming_languages ?? {};
+    },
+    username(): null | string {
+      return this.profile.username ?? null;
+    },
+  },
+  watch: {
+    selectedLanguage: {
+      immediate: true,
+      handler(language: null | string): void {
+        if (!language) {
+          this.source = '';
+          return;
+        }
+        const extension = this.getExtension(language);
+        const customTemplate = getCodeTemplate(extension, this.username);
+        if (customTemplate !== null) {
+          this.source = customTemplate;
+          return;
+        }
+        this.source = sourceTemplates[extension] ?? '';
+      },
+    },
+  },
+  methods: {
+    getExtension(language: string): string {
+      const languageInfo = supportedLanguages[language];
+      if (languageInfo) {
+        return languageInfo.extension;
+      }
+      return language;
+    },
+    onSave(): void {
+      if (!this.selectedLanguage) {
+        return;
+      }
+      const extension = this.getExtension(this.selectedLanguage);
+      if (setCodeTemplate(extension, this.source, this.username)) {
+        ui.success(T.codeTemplatesSaveSuccess);
+      }
+    },
+    onRestoreDefault(): void {
+      if (!this.selectedLanguage) {
+        return;
+      }
+      const extension = this.getExtension(this.selectedLanguage);
+      removeCodeTemplate(extension, this.username);
+      this.source = sourceTemplates[extension] ?? '';
+      ui.success(T.codeTemplatesRestoreSuccess);
+    },
+  },
+});
 </script>

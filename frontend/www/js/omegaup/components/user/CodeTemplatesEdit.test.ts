@@ -1,4 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import { types } from '../../api_types';
 import user_CodeTemplates_Edit from './CodeTemplatesEdit.vue';
 import { sourceTemplates } from '../../grader/GraderTemplates';
@@ -37,9 +39,12 @@ describe('CodeTemplatesEdit.vue', () => {
   });
 
   it('Should preselect the preferred language and show the system boilerplate', () => {
-    const wrapper = shallowMount(user_CodeTemplates_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_CodeTemplates_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
 
     const vm = wrapper.vm as any;
     expect(vm.selectedLanguage).toBe('py2');
@@ -50,9 +55,12 @@ describe('CodeTemplatesEdit.vue', () => {
   });
 
   it('Should save a custom template for the selected language', async () => {
-    const wrapper = shallowMount(user_CodeTemplates_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_CodeTemplates_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
 
     await wrapper
       .find('textarea[data-code-templates-source]')
@@ -67,9 +75,12 @@ describe('CodeTemplatesEdit.vue', () => {
   it('Should load a previously saved template', () => {
     localStorage.setItem('codeTemplates:omegaup:py', 'print("mine")');
 
-    const wrapper = shallowMount(user_CodeTemplates_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_CodeTemplates_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
 
     expect(
       (wrapper.find('textarea[data-code-templates-source]')
@@ -80,9 +91,12 @@ describe('CodeTemplatesEdit.vue', () => {
   it('Should load the template of the newly selected language', async () => {
     localStorage.setItem('codeTemplates:omegaup:rb', 'puts "mine"');
 
-    const wrapper = shallowMount(user_CodeTemplates_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_CodeTemplates_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
 
     await wrapper
       .find('select[data-code-templates-language]')
@@ -98,9 +112,12 @@ describe('CodeTemplatesEdit.vue', () => {
   it('Should restore the system boilerplate and remove the custom template', async () => {
     localStorage.setItem('codeTemplates:omegaup:py', 'print("mine")');
 
-    const wrapper = shallowMount(user_CodeTemplates_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_CodeTemplates_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
 
     await wrapper.find('button[data-code-templates-restore]').trigger('click');
 
