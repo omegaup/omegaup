@@ -8,6 +8,19 @@ import * as api from '../api';
 import * as ui from '../ui';
 import { AccessLevel, getModuleFromHash } from './operations_modules';
 
+function saveMaintenance(
+  settings: MaintenanceSettings,
+  message: string,
+  onSaved: () => void,
+): void {
+  api.Admin.setMaintenanceMode(settings)
+    .then(() => {
+      onSaved();
+      ui.success(message);
+    })
+    .catch(ui.apiError);
+}
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.OperationsDashboardPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
@@ -22,16 +35,6 @@ OmegaUp.on('ready', () => {
       ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
       maintenanceMode: payload.maintenanceMode,
     }),
-    methods: {
-      saveMaintenance(settings: MaintenanceSettings, message: string): void {
-        api.Admin.setMaintenanceMode(settings)
-          .then(() => {
-            this.maintenanceMode = { ...settings };
-            ui.success(message);
-          })
-          .catch(ui.apiError);
-      },
-    },
     render: function (createElement) {
       return createElement('omegaup-admin-operations-dashboard', {
         props: {
@@ -53,22 +56,28 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'toggle-maintenance': (enabled: boolean) => {
+            // Enabling is saved with the "save" button, once the message is
+            // written. Disabling is saved right away.
             if (enabled) {
               return;
             }
-            this.saveMaintenance(
-              {
-                enabled: false,
-                message_es: '',
-                message_en: '',
-                message_pt: '',
-                type: 'info',
-              },
-              T.maintenanceModeInactive,
-            );
+            const settings = {
+              enabled: false,
+              message_es: '',
+              message_en: '',
+              message_pt: '',
+              type: 'info',
+            };
+            saveMaintenance(settings, T.maintenanceModeInactive, () => {
+              // Keep the saved state, so it is not lost when the user
+              // switches between sections of the dashboard.
+              this.maintenanceMode = { ...settings };
+            });
           },
           'save-maintenance': (settings: MaintenanceSettings) => {
-            this.saveMaintenance(settings, T.maintenanceModeActive);
+            saveMaintenance(settings, T.maintenanceModeActive, () => {
+              this.maintenanceMode = { ...settings };
+            });
           },
         },
       });
