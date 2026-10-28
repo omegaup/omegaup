@@ -24,14 +24,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class PasswordRecover extends Vue {
-  T = T;
-  email: string = '';
-}
+export default defineComponent({
+  name: 'PasswordRecover',
+  data() {
+    return {
+      T,
+      email: '',
+    };
+  },
+});
 </script>
 
 <style scoped>
