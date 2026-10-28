@@ -78,6 +78,9 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
                 $contest
             )
         );
+        if ($contest->penalty_type === 'runtime') {
+            \OmegaUp\DAO\Runs::recalculatePenaltyForContest($contest);
+        }
         return ['status' => 'ok'];
     }
 }
