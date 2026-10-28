@@ -1,7 +1,12 @@
 import { types } from '../../api_types';
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import omegaup_SubmissionFeedback from './Feedback.vue';
+
+const Feedback = omegaup_SubmissionFeedback as ComponentOptions<Vue>;
+
 describe('Feedback.vue', () => {
   const savedFeedbackMessage = 'This is a saved feedback message';
   const feedbackOptions: types.SubmissionFeedback[] = [
@@ -16,7 +21,7 @@ describe('Feedback.vue', () => {
   ];
 
   it('Should handle existing feedback for admin', async () => {
-    const wrapper = shallowMount(omegaup_SubmissionFeedback, {
+    const wrapper = shallowMount(Feedback, {
       propsData: { feedbackOptions, guid: 'afa569', isAdmin: true },
     });
 
@@ -26,7 +31,7 @@ describe('Feedback.vue', () => {
   });
 
   it('Should handle existing feedback for user', async () => {
-    const wrapper = shallowMount(omegaup_SubmissionFeedback, {
+    const wrapper = shallowMount(Feedback, {
       propsData: { feedbackOptions, guid: 'afa569', isAdmin: false },
     });
 
