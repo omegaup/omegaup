@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="mb-2">
-        <label class="mr-2">{{ T.wordsLanguage }}:</label>
+        <label class="mr-2">{{ T.userEditLanguage }}:</label>
         <select
           v-model="currentLanguage"
           class="form-control d-inline-block w-auto"
