@@ -38,7 +38,7 @@ const testimonialsConfig: {
       es:
         '¡omegaUp me ayudó mucho! Me entrené como un loco y comencé a sentir cómo mi nivel, poco a poco, estaba mejorando, cómo se abrieron las puertas para mí, cómo otros comenzaron a decirme "oye, ¿puedes ayudarnos a entrenar?"',
       pt:
-        'omegaUp me ajudou muito! Treinei como um louco e comecei a sentir como meu nível, aos poucos, estava melhorando, como as portas se abriam para mim, como os outros começaram a falar: "Ei, você pode nos ajudar a treinar?"',
+        'omegaUp me ajudou muito! Treinei como um louco e comecei a sentir como meu nível, aos poucos, estava melhorando, como as portas se abriam para mim, como os outros começaram a me dizer: "Ei, você pode nos ajudar a treinar?"',
     },
     author: {
       name: 'Diego',
