@@ -200,8 +200,6 @@
 
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
-  --finder-wizard-modal-container-background-color: #eee;
-  --finder-wizard-modal-container-border-color: #ccc;
   --finder-wizard-slider-process-background-color: #678dd7;
   --finder-wizard-tab-select-el-border-color: #678dd7;
   --finder-wizard-tab-select-el-font-color: #678dd7;
@@ -305,6 +303,9 @@
   // HOMEPAGE
   --homepage-carousel-font-color: #fff;
   --homepage-carousel-background-color: #466aaf;
+  --homepage-getting-started-card-border-color: #e8e8e8;
+  --homepage-getting-started-title-color: #1a1a2e;
+  --homepage-getting-started-description-color: #6b7280;
 
   // GRADER
   --grader-status-submissions-link-background-color: #fff;
@@ -404,4 +405,11 @@
   --problem-creator-modal-content-background-color: #fff;
   --problem-creator-modal-box-shadow-color: rgba(0, 0, 0, 0.1);
   --problem-creator-modal-footer-border-color: #dee2e6;
+
+  // OPERATIONS DASHBOARD
+  --admin-dashboard-sidebar-background-color: #f8f9fa;
+  --admin-dashboard-sidebar-border-color: #dee2e6;
+  --admin-dashboard-sidebar-item-color: #495057;
+  --admin-dashboard-sidebar-item-hover-background-color: #e9ecef;
+  --admin-dashboard-sidebar-item-hover-color: #0d6efd;
 }

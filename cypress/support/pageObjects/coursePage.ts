@@ -25,6 +25,7 @@ export class CoursePage {
 
   addStudents(users: Array<string>): void {
     cy.get('[data-course-edit-students]').click();
+    cy.get('.omegaup-course-addstudent button.btn-lg').click();
     cy.get('textarea[data-course-multiple-students-add]').type(
       users.join(', '),
     );
@@ -53,7 +54,7 @@ export class CoursePage {
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
 
-    cy.get('button[data-course-add-new-content]').click();
+    cy.get('button[data-course-add-new-content]:visible').click();
 
     cy.get('.omegaup-course-assignmentdetails').should('be.visible');
     cy.get('[data-course-assignment-name]').type(assignmentAlias);

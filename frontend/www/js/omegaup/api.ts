@@ -118,6 +118,26 @@ export const Admin = {
     messages._AdminGetCronsServerResponse,
     messages.AdminGetCronsResponse
   >('/api/admin/getCrons/', (x) => {
+    x.problemHealthFindings = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.first_detected_at = ((x: number) => new Date(x * 1000))(
+          x.first_detected_at,
+        );
+        return x;
+      });
+    })(x.problemHealthFindings);
+    x.recommendationModelRuns = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      });
+    })(x.recommendationModelRuns);
     x.runs = ((x) => {
       if (!Array.isArray(x)) {
         return x;
@@ -144,6 +164,10 @@ export const Admin = {
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  rerunCron: apiCall<
+    messages.AdminRerunCronRequest,
+    messages.AdminRerunCronResponse
+  >('/api/admin/rerunCron/'),
   setMaintenanceMode: apiCall<
     messages.AdminSetMaintenanceModeRequest,
     messages.AdminSetMaintenanceModeResponse
@@ -301,28 +325,6 @@ export const CarouselItems = {
     messages._CarouselItemsListServerResponse,
     messages.CarouselItemsListResponse
   >('/api/carouselItems/list/', (x) => {
-    x.carouselItems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.expiration_date !== 'undefined' &&
-          x.expiration_date !== null
-        )
-          x.expiration_date = ((x: number) => new Date(x * 1000))(
-            x.expiration_date,
-          );
-        return x;
-      });
-    })(x.carouselItems);
-    return x;
-  }),
-  listActive: apiCall<
-    messages.CarouselItemsListActiveRequest,
-    messages._CarouselItemsListActiveServerResponse,
-    messages.CarouselItemsListActiveResponse
-  >('/api/carouselItems/listActive/', (x) => {
     x.carouselItems = ((x) => {
       if (!Array.isArray(x)) {
         return x;

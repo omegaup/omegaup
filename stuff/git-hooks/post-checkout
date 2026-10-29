@@ -32,16 +32,17 @@ if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- composer.lock; then
 	fi
 fi
 
-# Whenever yarn.lock is changed, `yarn install` needs to be run.
-if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- yarn.lock; then
-	if which yarn >/dev/null ; then
-		yarn install
+# Whenever pnpm-lock.yaml is changed, `pnpm install` needs to be run.
+if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- pnpm-lock.yaml; then
+	if which pnpm >/dev/null ; then
+		corepack enable
+		pnpm install
 		echo
 		echo "*****************************************************************"
 		echo
-		echo "yarn.lock changed."
+		echo "pnpm-lock.yaml changed."
 		echo
-		echo "Please restart the container OR the \`yarn run dev-all:watch\` command"
+		echo "Please restart the container OR the \`pnpm run dev-all:watch\` command"
 		echo
 		echo "*****************************************************************"
 		echo
@@ -49,10 +50,10 @@ if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- yarn.lock; then
 		echo
 		echo "*****************************************************************"
 		echo
-		echo "yarn.lock changed."
+		echo "pnpm-lock.yaml changed."
 		echo
-		echo "Please restart the container, OR run \`yarn install\` and"
-		echo "restart \`yarn run dev-all:watch\`"
+		echo "Please restart the container, OR run \`pnpm install\` and"
+		echo "restart \`pnpm run dev-all:watch\`"
 		echo
 		echo "*****************************************************************"
 		echo

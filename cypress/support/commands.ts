@@ -94,7 +94,12 @@ Cypress.Commands.add(
     cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
     cy.get('[name="source"]').type(problemAlias);
-    cy.get('[name="problem_contents"]').attachFile(zipFile);
+    // Creation method selector is always on; pick ZIP so the visible
+    // problem_contents input is the upload field (not the hidden Creator one).
+    cy.get('.introjs-creation-method .btn-group button').eq(1).click();
+    cy.get(
+      '.introjs-creation-method .introjs-file input[name="problem_contents"]',
+    ).attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
     if (languagesValue === 'cat') {
@@ -279,7 +284,9 @@ Cypress.Commands.add(
         return;
       }
       cy.visit(`/arena/${contestAlias}/#problems`);
-      cy.get(`a[data-problem="${problem.problemAlias}"]`).click();
+      cy.get(`a[data-problem="${problem.problemAlias}"]`, {
+        timeout: 10000,
+      }).click();
 
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));

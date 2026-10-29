@@ -298,27 +298,11 @@ describe('Problem creator Test', () => {
     });
   });
 
-  it('Should submit create problem using creator-generated zip in feature-flag flow', () => {
+  it('Should submit create problem using creator-generated zip', () => {
     const problemAlias = `creator-${uuid().slice(0, 8)}`;
     const autoCompleteTextTag = 'recur';
     const creatorProblemContentsInput =
       '.introjs-open-creator input[name="problem_contents"]';
-
-    // Enable the experiment via the admin API so the test does not depend on
-    // OMEGAUP_EXPERIMENT_SECRET / HMAC hashes that differ between environments.
-    cy.loginAdmin();
-    cy.request({
-      method: 'POST',
-      url: '/api/user/addExperiment/',
-      form: true,
-      body: {
-        username: loginOptions.username,
-        experiment: 'problem_creation_method_selector',
-      },
-    }).then((response) => {
-      expect(response.status).to.equal(200);
-    });
-    cy.logoutUsingApi();
 
     cy.login(loginOptions);
     cy.setCookie('has-visited-create-problem', true.toString());

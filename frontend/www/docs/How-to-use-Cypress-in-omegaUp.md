@@ -6,7 +6,7 @@ You need to have Node.js 24 (LTS) installed to use Cypress. The project pins the
 nvm install    # reads .nvmrc and installs Node 24
 nvm use        # switches to the version in .nvmrc
 node -v        # should print v24.x.x
-yarn install
+pnpm install
 ```
 
 If you still get:

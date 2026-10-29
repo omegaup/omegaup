@@ -22,7 +22,7 @@
     "*.min.css",
     "*.lock",
     "package-lock.json",
-    "yarn.lock",
+    "pnpm-lock.yaml",
     "composer.lock",
     "frontend/www/js/libs/**",
     "frontend/server/libs/third_party/**",

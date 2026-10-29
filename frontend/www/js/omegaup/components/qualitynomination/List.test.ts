@@ -2,6 +2,7 @@ import { mount, shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 import qualitynomination_List from './List.vue';
 import type { types } from '../../api_types';
+import common_EmptyState from '../common/EmptyState.vue';
 
 const nominations: types.NominationListItem[] = [1, 2, 3].map((x) => ({
   author: {
@@ -216,5 +217,21 @@ describe('List.vue', () => {
         new Date('2021-02-03 00:00:00').getTime(),
       );
     });
+  });
+
+  it('Should display EmptyState when list of nominations is empty', () => {
+    const wrapper = shallowMount(qualitynomination_List, {
+      propsData: {
+        nominations: [],
+        pagerItems: [],
+        pages: 0,
+        length: 100,
+        isAdmin: true,
+        myView: false,
+      },
+    });
+
+    expect(wrapper.findComponent(common_EmptyState).exists()).toBe(true);
+    expect(wrapper.find('table').exists()).toBe(false);
   });
 });

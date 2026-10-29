@@ -21,36 +21,40 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 import Badge3D from './Badge3D.vue';
 
-@Component({
-  directives: {
-    tooltip: VTooltip,
-  },
+export default defineComponent({
+  name: 'Badge',
   components: {
     'badge-3d': Badge3D,
   },
-})
-export default class Badge extends Vue {
-  @Prop() badge!: types.Badge;
-
-  get name(): string {
-    return T[`badge_${this.badge.badge_alias}_name`];
-  }
-
-  get description(): string {
-    return T[`badge_${this.badge.badge_alias}_description`];
-  }
-
-  get iconUrl(): string {
-    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
-  }
-}
+  directives: {
+    tooltip: VTooltip,
+  },
+  props: {
+    badge: {
+      type: Object as PropType<types.Badge>,
+      required: true,
+    },
+  },
+  computed: {
+    name(): string {
+      return T[`badge_${this.badge.badge_alias}_name`];
+    },
+    description(): string {
+      return T[`badge_${this.badge.badge_alias}_description`];
+    },
+    iconUrl(): string {
+      return `/media/dist/badges/${this.badge.badge_alias}.svg`;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

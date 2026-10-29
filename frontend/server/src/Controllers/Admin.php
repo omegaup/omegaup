@@ -12,6 +12,9 @@
   * @psalm-type CronJob=array{name: string, description: null|string, schedule: null|string, enabled: bool}
   * @psalm-type CronRunPhase=array{phase: string, status: string, duration: float, error_class: null|string}
   * @psalm-type CronRun=array{run_id: int, name: string, hostname: null|string, status: string, started_at: \OmegaUp\Timestamp|null, finished_at: \OmegaUp\Timestamp|null, duration_seconds: float|null, rows_affected: int|null, phases: list<CronRunPhase>, error_text: null|string}
+  * @psalm-type ProblemHealthFinding=array{problem_id: int, alias: string, title: string, check_type: string, severity: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp}
+  * @psalm-type RecommendationModelRun=array{model_run_id: int, map_score: float, dataset_size: int, rng_seed: int|null, output_path: null|string, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
+  * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
@@ -29,6 +32,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
         'warning',
         'danger',
     ];
+
+    const CRON_RUNS_LIMIT = 50;
+    const PROBLEM_HEALTH_FINDINGS_LIMIT = 50;
+    const RECOMMENDATION_MODEL_RUNS_LIMIT = 20;
 
     /**
      * Get stats for an overall platform report.
@@ -368,17 +375,16 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Updates system settings. Only available to system admins.
+     * Updates system settings. Temporarily available to the support team.
      *
      * @omegaup-request-param null|bool $ephemeral_grader_enabled
      *
      * @return array{status: string}
      */
     public static function apiUpdateSystemSettings(\OmegaUp\Request $r): array {
-        $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        // TODO: Restrict this endpoint to system admins again once the
+        // permissions of the Operations Dashboard are redefined.
+        $r->ensureUserHasAdministrativeAccess();
 
         $ephemeralGraderEnabled = $r->ensureOptionalBool(
             'ephemeral_grader_enabled'
@@ -398,7 +404,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}}
      */
-    public static function getSettingsForTypeScript(
+    public static function getGlobalSettingsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -407,12 +413,32 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'entrypoint' => 'admin_settings',
+            'entrypoint' => 'admin_global_settings',
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleAdminSettings'
+                    'omegaupTitleAdminGlobalSettings'
                 ),
                 'payload' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     */
+    public static function getOperationsDashboardForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureUserHasAdministrativeAccess();
+
+        return [
+            'entrypoint' => 'admin_operations_dashboard',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminOperations'
+                ),
+                'payload' => [],
+                'fullWidth' => true,
             ],
         ];
     }
@@ -463,21 +489,61 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Lists the registered cron jobs and their most recent runs.
+     * @param list<\OmegaUp\DAO\VO\RecommendationModelRuns> $modelRuns
      *
-     * @return array{jobs: list<CronJob>, runs: list<CronRun>}
+     * @return list<RecommendationModelRun>
+     */
+    private static function recommendationModelRunsPayload(
+        array $modelRuns
+    ): array {
+        $result = [];
+        foreach ($modelRuns as $modelRun) {
+            $result[] = [
+                'model_run_id' => intval($modelRun->model_run_id),
+                'map_score' => floatval($modelRun->map_score),
+                'dataset_size' => intval($modelRun->dataset_size),
+                'rng_seed' => $modelRun->rng_seed,
+                'output_path' => $modelRun->output_path,
+                'published' => boolval($modelRun->published),
+                'skip_reason' => $modelRun->skip_reason,
+                'created_at' => $modelRun->created_at,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
+     */
+    private static function cronsPayload(): array {
+        return [
+            'jobs' => self::cronJobsPayload(),
+            'runs' => self::cronRunsPayload(
+                \OmegaUp\DAO\CronRuns::getRecent(self::CRON_RUNS_LIMIT)
+            ),
+            'problemHealthFindings' => \OmegaUp\DAO\ProblemHealthChecks::getOpenFindings(
+                self::PROBLEM_HEALTH_FINDINGS_LIMIT
+            ),
+            'recommendationModelRuns' => self::recommendationModelRunsPayload(
+                \OmegaUp\DAO\RecommendationModelRuns::getRecent(
+                    self::RECOMMENDATION_MODEL_RUNS_LIMIT
+                )
+            ),
+        ];
+    }
+
+    /**
+     * Lists the registered cron jobs, their most recent runs, the open problem
+     * health findings and the quality of the recommendation models.
+     *
+     * @return array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
      */
     public static function apiGetCrons(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        return [
-            'jobs' => self::cronJobsPayload(),
-            'runs' => self::cronRunsPayload(
-                \OmegaUp\DAO\CronRuns::getRecent(50)
-            ),
-        ];
+        return self::cronsPayload();
     }
 
     /**
@@ -497,5 +563,98 @@ class Admin extends \OmegaUp\Controllers\Controller {
             return ['run' => null];
         }
         return ['run' => self::cronRunsPayload([$run])[0]];
+    }
+
+    /**
+     * Resolves the registered cron job a request names.
+     *
+     * @omegaup-request-param string $name
+     */
+    private static function cronJobFromRequest(
+        \OmegaUp\Request $r
+    ): \OmegaUp\DAO\VO\CronJobs {
+        $jobName = \OmegaUp\CronJobName::tryFrom($r->ensureString('name'));
+        $job = is_null($jobName) ? null : \OmegaUp\DAO\CronJobs::getByName(
+            $jobName->value
+        );
+        if (is_null($job)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'name'
+            );
+        }
+        return $job;
+    }
+
+    /**
+     * Queues a manual rerun of a registered cron job for a worker to pick up.
+     * `queued` is false when the job already had a rerun waiting or running.
+     *
+     * @return array{queued: bool}
+     *
+     * @omegaup-request-param string $name
+     */
+    public static function apiRerunCron(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $name = strval(self::cronJobFromRequest($r)->name);
+
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            // Locking the job row makes concurrent requests for the same job
+            // wait here, so only the first one can queue a rerun.
+            $job = \OmegaUp\DAO\CronJobs::getByNameForUpdate($name);
+            if (is_null($job)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'name'
+                );
+            }
+            // The runner skips a disabled job, so the rerun could never succeed.
+            if (!$job->enabled) {
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'cronControlPlaneJobDisabled'
+                );
+            }
+            $queued = is_null(
+                \OmegaUp\DAO\CronRunRequests::getActiveByName($name)
+            );
+            if ($queued) {
+                \OmegaUp\DAO\CronRunRequests::create(
+                    new \OmegaUp\DAO\VO\CronRunRequests([
+                        'name' => $name,
+                        'requested_by' => $r->user->user_id,
+                        'status' => \OmegaUp\CronRunRequestStatus::Pending->value,
+                    ])
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+        return ['queued' => $queued];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: CronsDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getCronsForTypeScript(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'entrypoint' => 'admin_crons',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminCrons'
+                ),
+                'payload' => self::cronsPayload(),
+            ],
+        ];
     }
 }

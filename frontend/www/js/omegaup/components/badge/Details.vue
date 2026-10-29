@@ -50,58 +50,61 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import omegaup_Markdown from '../Markdown.vue';
 import Badge3D from './Badge3D.vue';
 
-@Component({
+export default defineComponent({
+  name: 'BadgeDetails',
   components: {
     'omegaup-markdown': omegaup_Markdown,
     'badge-3d': Badge3D,
   },
-})
-export default class BadgeDetails extends Vue {
-  @Prop() badge!: types.Badge;
-
-  T = T;
-
-  get name(): string {
-    return T[`badge_${this.badge.badge_alias}_name`];
-  }
-
-  get description(): string {
-    return T[`badge_${this.badge.badge_alias}_description`];
-  }
-
-  get iconUrl(): string {
-    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
-  }
-
-  get ownedMessage(): string {
-    return this.badge.assignation_time
-      ? `<span class="badge-text-icon">😁</span> ${T.badgeAssignationTimeMessage}`
-      : `<span class="badge-text-icon">😞</span> ${T.badgeNotAssignedMessage}`;
-  }
-
-  get firstAssignationDate(): string {
-    return this.badge.first_assignation
-      ? time.formatDate(this.badge.first_assignation)
-      : '';
-  }
-
-  get assignationDate(): string {
-    return this.badge.assignation_time
-      ? time.formatDate(this.badge.assignation_time)
-      : '';
-  }
-
-  get ownersNumber(): string {
-    return `${this.badge.owners_count}/${this.badge.total_users}`;
-  }
-}
+  props: {
+    badge: {
+      type: Object as PropType<types.Badge>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    name(): string {
+      return T[`badge_${this.badge.badge_alias}_name`];
+    },
+    description(): string {
+      return T[`badge_${this.badge.badge_alias}_description`];
+    },
+    iconUrl(): string {
+      return `/media/dist/badges/${this.badge.badge_alias}.svg`;
+    },
+    ownedMessage(): string {
+      return this.badge.assignation_time
+        ? `<span class="badge-text-icon">😁</span> ${T.badgeAssignationTimeMessage}`
+        : `<span class="badge-text-icon">😞</span> ${T.badgeNotAssignedMessage}`;
+    },
+    firstAssignationDate(): string {
+      return this.badge.first_assignation
+        ? time.formatDate(this.badge.first_assignation)
+        : '';
+    },
+    assignationDate(): string {
+      return this.badge.assignation_time
+        ? time.formatDate(this.badge.assignation_time)
+        : '';
+    },
+    ownersNumber(): string {
+      return `${this.badge.owners_count}/${this.badge.total_users}`;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

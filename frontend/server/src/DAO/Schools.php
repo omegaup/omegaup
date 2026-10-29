@@ -13,6 +13,41 @@ namespace OmegaUp\DAO;
  */
 class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
+     * Exact name and location match; a null location only matches a null one.
+     *
+     * @return \OmegaUp\DAO\VO\Schools|null
+     */
+    public static function findByExactInformation(
+        string $name,
+        ?string $countryId,
+        ?string $stateId
+    ): ?\OmegaUp\DAO\VO\Schools {
+        $sql = '
+            SELECT
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Schools::FIELD_NAMES,
+            's'
+        ) . '
+            FROM
+                Schools s
+            WHERE
+                s.name = ?
+                AND s.country_id <=> ?
+                AND s.state_id <=> ?
+            ORDER BY
+                s.school_id ASC
+            LIMIT 1';
+        $args = [$name, $countryId, $stateId];
+
+        /** @var array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float, state_id: null|string}|null $row */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+        if (is_null($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Schools($row);
+    }
+
+    /**
      * Finds schools that contains 'name'
      *
      * @param string $name
