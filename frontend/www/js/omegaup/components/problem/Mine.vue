@@ -17,72 +17,7 @@
     </div>
     <div class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
-      <div class="card-body px-2 px-sm-4">
-        <div class="row align-items-center mb-3">
-          <div class="col-9 col-lg-6">
-            <input
-              v-model="currentQuery"
-              class="typeahead form-control px-1 px-sm-3"
-              :placeholder="T.wordsKeywordSearch"
-            />
-          </div>
-          <a
-            class="btn btn-primary"
-            role="button"
-            :class="{ disabled: currentQuery === '' }"
-            :href="
-              currentQuery
-                ? `/problem/mine/?query=${encodeURIComponent(currentQuery)}`
-                : ''
-            "
-            >{{ T.wordsSearch }}</a
-          >
-        </div>
-        <div class="form-row">
-          <div class="col">
-            <div class="form-check">
-              <label class="form-check-label">
-                <input
-                  v-model="shouldShowAllProblems"
-                  class="form-check-input"
-                  type="checkbox"
-                  @change.prevent="
-                    $emit('change-show-all-problems', shouldShowAllProblems)
-                  "
-                />
-                <span>{{ statementShowAllProblems }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col-8 col-md-6">
-            <select
-              v-model="allProblemsVisibilityOption"
-              data-selected-problems
-              class="custom-select pl-1 pl-sm-3"
-            >
-              <option selected value="-1">{{ T.forSelectedItems }}</option>
-              <option value="1">{{ T.makePublic }}</option>
-              <option value="0">{{ T.makePrivate }}</option>
-              <option v-if="canDeleteSelectedProblems" value="2">
-                {{ T.wordsDelete }}
-              </option>
-            </select>
-          </div>
-          <div class="col px-0">
-            <button
-              :disabled="allProblemsVisibilityOption === -1"
-              data-visibility-action
-              class="btn btn-primary"
-              @click="onChangeVisibility"
-            >
-              {{ T.wordsConfirm }}
-            </button>
-          </div>
-        </div>
-      </div>
-      <div v-if="problems.length === 0" class="card-body border-top">
+      <div v-if="problems.length === 0" class="card-body">
         <omegaup-common-empty-state
           icon="clipboard-list"
           :title="T.problemListEmptyTitle"
@@ -92,6 +27,71 @@
         ></omegaup-common-empty-state>
       </div>
       <template v-else>
+        <div class="card-body px-2 px-sm-4">
+          <div class="row align-items-center mb-3">
+            <div class="col-9 col-lg-6">
+              <input
+                v-model="currentQuery"
+                class="typeahead form-control px-1 px-sm-3"
+                :placeholder="T.wordsKeywordSearch"
+              />
+            </div>
+            <a
+              class="btn btn-primary"
+              role="button"
+              :class="{ disabled: currentQuery === '' }"
+              :href="
+                currentQuery
+                  ? `/problem/mine/?query=${encodeURIComponent(currentQuery)}`
+                  : ''
+              "
+              >{{ T.wordsSearch }}</a
+            >
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <div class="form-check">
+                <label class="form-check-label">
+                  <input
+                    v-model="shouldShowAllProblems"
+                    class="form-check-input"
+                    type="checkbox"
+                    @change.prevent="
+                      $emit('change-show-all-problems', shouldShowAllProblems)
+                    "
+                  />
+                  <span>{{ statementShowAllProblems }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-8 col-md-6">
+              <select
+                v-model="allProblemsVisibilityOption"
+                data-selected-problems
+                class="custom-select pl-1 pl-sm-3"
+              >
+                <option selected value="-1">{{ T.forSelectedItems }}</option>
+                <option value="1">{{ T.makePublic }}</option>
+                <option value="0">{{ T.makePrivate }}</option>
+                <option v-if="canDeleteSelectedProblems" value="2">
+                  {{ T.wordsDelete }}
+                </option>
+              </select>
+            </div>
+            <div class="col px-0">
+              <button
+                :disabled="allProblemsVisibilityOption === -1"
+                data-visibility-action
+                class="btn btn-primary"
+                @click="onChangeVisibility"
+              >
+                {{ T.wordsConfirm }}
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="table-responsive">
           <table class="table mb-0">
             <thead>
