@@ -1877,7 +1877,7 @@ const translations: { [key: string]: string; } = {
   rankRangeHeader: "Coders com maior score obtido (%(lowCount) a %(highCount))",
   rankScore: "Pontua\u00e7\u00e3o",
   rankSeeGeneralRanking: "Ver o ranking geral",
-  rankSolved: "Problemas",
+  rankSolved: "Problemas resolvidos",
   rankingNoUsers: "N\u00e3o temos dados para exibir no gr\u00e1fico de Ranking.",
   recordNotFound: "Registro n\u00e3o foi encontrado.",
   redisAuthenticationFailed: "Falha na autentica\u00e7\u00e3o do Redis",
