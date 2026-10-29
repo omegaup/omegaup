@@ -20,14 +20,14 @@ const testimonialsConfig: {
       es:
         'omegaUp ha sido la plataforma que he usado a lo largo de mi preparación, ya que todos los exámenes selectivos estatales nacionales e internacionales son realizados ahí.',
       pt:
-        'omegaUp tem sido a plataforma que eu mais usei para treinamento, pois todas as provas utilizadas para as eliminatórias estaduais, nacionais e internacionais ocorreram no omegaUp.',
+        'A omegaUp tem sido a plataforma que mais utilizei para treinar, pois todas as provas seletivas estaduais, nacionais e internacionais foram realizadas nela.',
     },
     author: {
       name: 'Mariola',
       title: {
         en: 'Gold Medal Mexican Olympiad in Informatics, 2017',
         es: 'Medalla de Oro Olimpiada Mexicana en Informática, 2017',
-        pt: 'Medalha de Ouro da Olimpíada Mexicana em Informática, 2017',
+        pt: 'Medalha de Ouro na Olimpíada Mexicana de Informática, 2017',
       },
     },
   },
@@ -38,7 +38,7 @@ const testimonialsConfig: {
       es:
         '¡omegaUp me ayudó mucho! Me entrené como un loco y comencé a sentir cómo mi nivel, poco a poco, estaba mejorando, cómo se abrieron las puertas para mí, cómo otros comenzaron a decirme "oye, ¿puedes ayudarnos a entrenar?"',
       pt:
-        'omegaUp me ajudou muito! Treinei como um louco e comecei a sentir como meu nível, aos poucos, estava melhorando, como as portas se abriam para mim, como os outros começaram a ser como eu "ei, você pode nos ajudar a treinar?"',
+        'omegaUp me ajudou muito! Treinei como um louco e comecei a sentir como meu nível, aos poucos, estava melhorando, como as portas se abriam para mim, como os outros começaram a me perguntar: "Ei, você pode nos ajudar a treinar?"',
     },
     author: {
       name: 'Diego',
@@ -56,14 +56,14 @@ const testimonialsConfig: {
       es:
         'omegaUp ha sido testigo tanto de momentos de frustración como de momentos de completa felicidad. Soy participante de la Olimpiada mexicana en informática y tengo que admitir que calificar para el equipo de mi estado el año pasado fue una enfermedad extraña. Fue en omegaUp, donde experimenté esa última prueba que decidió todo. Una vez que terminó, recibí la noticia de que había llegado, ¡me iba al nacional! Nunca olvidaré ese momento, y omegaUp fue parte de él.',
       pt:
-        'omegaUp foi testemunha de momentos de frustração e momentos de completa felicidade. Sou participante da Olimpíada Mexicana de Informática e tenho que admitir que me qualificar para a equipe do meu estado no ano passado foi um acaso. Foi no omegaUp, onde experimentei o último teste que decidiu tudo. Quando acabou, recebi as notícias que tinha feito, estava indo para o nacional! Nunca esquecerei esse momento, e o omegaUp fez parte dele.',
+        'A omegaUp esteve presente tanto nos momentos de frustração quanto nos de grande alegria. Sou participante da Olimpíada Mexicana de Informática e preciso admitir que me classificar para a equipe do meu estado, no ano passado, foi um verdadeiro desafio. Foi na omegaUp que fiz a última prova, aquela que decidiu tudo. Quando a prova terminou, recebi a notícia de que havia conseguido: iria para a etapa nacional! Nunca esquecerei aquele momento, e a omegaUp fez parte dele.',
     },
     author: {
       name: 'André',
       title: {
         en: 'Gold Medal Mexican Olympiad in Informatics',
         es: 'Medalla de Oro Olimpiada Mexicana en Informática',
-        pt: 'Medalha de Ouro da Olimpíada Mexicana em Informática',
+        pt: 'Medalha de Ouro na Olimpíada Mexicana de Informática',
       },
     },
   },
