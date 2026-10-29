@@ -1003,7 +1003,6 @@ const translations: { [key: string]: string; } = {
   loginHeader: "Entrar em omegaUp",
   loginLogIn: "Entrar",
   loginMotivationalHeadline: "Code um futuro melhor. Para todos.",
-  loginMotivationalSubtext: "Bem-vindo de volta \u00e0 plataforma. Escolha sua forma preferida de acessar sua conta.",
   loginNative: "Conta omegaUp",
   loginOrDivider: "OU",
   loginParentEmail: "E-mail de figura parental",
