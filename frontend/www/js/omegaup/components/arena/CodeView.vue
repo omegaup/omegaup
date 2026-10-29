@@ -113,12 +113,33 @@ export default class CodeView extends Vue {
     this.$emit('input', value);
   }
 
+  // CodeMirror cancels every wheel event it receives, so once the editor
+  // reaches the end of its own content the page stops scrolling. When the
+  // editor cannot scroll any further in the wheel direction, keep the event
+  // from reaching CodeMirror so the browser scrolls the surrounding page.
+  onWheel(event: WheelEvent): void {
+    if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore vue-codemirror-lite does not declare `editor`.
+    const editor = this.cmWrapper.editor;
+    if (!editor) return;
+    const info = editor.getScrollInfo();
+    const atTop = info.top <= 0;
+    const atBottom = info.top + info.clientHeight >= info.height - 1;
+    if ((event.deltaY < 0 && atTop) || (event.deltaY > 0 && atBottom)) {
+      event.stopPropagation();
+    }
+  }
+
   @Watch('language')
   onLanguageChange(newLanguage: string) {
     this.mode = languageModeMap[newLanguage];
   }
   mounted() {
     this.refresh();
+    this.$el.addEventListener('wheel', this.onWheel as EventListener, {
+      capture: true,
+    });
     const codeAndLanguage = {
       code: this.value,
       language: this.language,
@@ -130,6 +151,12 @@ export default class CodeView extends Vue {
     this.onInput(codeAndLanguage.code);
     this.onChange(codeAndLanguage.code);
     this.$emit('change-language', codeAndLanguage.language);
+  }
+
+  beforeDestroy() {
+    this.$el.removeEventListener('wheel', this.onWheel as EventListener, {
+      capture: true,
+    });
   }
 }
 </script>
