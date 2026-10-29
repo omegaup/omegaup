@@ -280,6 +280,47 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Malformed entries in the problems JSON must be rejected with an
+     * invalid-parameter error instead of crashing.
+     *
+     * @return list<array{0: string}>
+     */
+    public static function malformedProblemsProvider(): array {
+        return [
+            ['["some_alias"]'],
+            ['[123]'],
+            ['[null]'],
+            ['[{"points": 100}]'],
+            ['[{"problem": "some_alias"}]'],
+            ['[{"problem": ["some_alias"], "points": 100}]'],
+            ['[{"problem": "some_alias", "points": "abc"}]'],
+        ];
+    }
+
+    /**
+     * @dataProvider malformedProblemsProvider
+     */
+    public function testCreateContestWithMalformedProblems(string $problems) {
+        // Create a valid contest Request object
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
+        ));
+        $r = $contestData['request'];
+        $r['problems'] = $problems;
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('invalidParameters', $e->getMessage());
+        }
+    }
+
+    /**
      * Public contest with private problems is not valid.
      */
     public function testCreatePublicContestWithPrivateProblems() {

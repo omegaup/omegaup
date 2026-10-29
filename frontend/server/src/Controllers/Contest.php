@@ -3219,6 +3219,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $problems = [];
 
             foreach ($requestProblems as $requestProblem) {
+                if (
+                    !is_array($requestProblem)
+                    || !isset($requestProblem['problem'])
+                    || !is_string($requestProblem['problem'])
+                    || !isset($requestProblem['points'])
+                    || !is_numeric($requestProblem['points'])
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'invalidParameters',
+                        'problems'
+                    );
+                }
                 $problem = \OmegaUp\DAO\Problems::getByAlias(
                     $requestProblem['problem']
                 );
