@@ -13,11 +13,6 @@ namespace OmegaUp\DAO;
  */
 class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
-     * If a problem has more than this number of problems, none will be assigned.
-     */
-    const MAX_NUM_TOPICS = 5;
-
-    /**
      * @return array{dismissed: bool, dismissedBeforeAc: bool, nominated: bool, nominatedBeforeAc: bool}
      */
     public static function getNominationStatusForProblem(
@@ -483,56 +478,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
-     * This function gets the contents of QualityNomination table
-     *
-     * @return list<array{contents: string}>
-     */
-    public static function getAllNominations(): array {
-        $sql = '
-            SELECT
-                contents
-            FROM
-                QualityNominations
-            WHERE
-                `nomination` = "suggestion";
-        ';
-
-        /** @var list<array{contents: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
-    }
-
-    /**
-     * This function computes the average difficulty and quality among all problems.
-     *
-     * @param list<array{contents: string}> $contents
-     * @return array{0: float, 1: float}
-     */
-    public static function calculateGlobalDifficultyAndQuality(array $contents): array {
-        $qualitySum = 0;
-        $qualityN = 0;
-        $difficultySum = 0;
-        $difficultyN = 0;
-
-        foreach ($contents as $nomination) {
-            /** @var array{quality?: mixed, difficulty?: mixed, tags?: mixed} */
-            $feedback = json_decode($nomination['contents'], associative: true);
-            if (isset($feedback['quality']) && is_int($feedback['quality'])) {
-                $qualitySum += $feedback['quality'];
-                $qualityN++;
-            }
-            if (
-                isset($feedback['difficulty']) &&
-                is_int($feedback['difficulty'])
-            ) {
-                $difficultySum += $feedback['difficulty'];
-                $difficultyN++;
-            }
-        }
-
-        return [$qualitySum / $qualityN, $difficultySum / $difficultyN];
-    }
-
-    /**
      * This function gets contents of QualityNomination table
      *
      * @return list<\OmegaUp\DAO\VO\QualityNominations>
@@ -597,107 +542,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         }
 
         return array_values(array_unique($rationales));
-    }
-    /**
-     * This function gets contents of QualityNomination table
-     *
-     * @return list<array{contents: string}>
-     */
-    public static function getAllSuggestionsPerProblem(int $problemId): array {
-        $sql = '
-            SELECT
-                contents
-            FROM
-                QualityNominations
-            WHERE
-                nomination = "suggestion" AND
-                problem_id = ?;
-        ';
-        /** @var list<array{contents: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$problemId]
-        );
-    }
-
-    /**
-     * This function computes sums of difficulty, quality, and tag votes for
-     * each problem and returns that in the form of a table.
-     *
-     * @param list<array{contents: string}> $contents
-     * @return array{difficulty_n: int, difficulty_sum: int, quality_n: int, quality_sum: int, tags: array<string, int>, tags_n: int}
-     */
-    public static function calculateProblemSuggestionAggregates(array $contents) {
-        $problemAggregates = [
-            'quality_sum' => 0,
-            'quality_n' => 0,
-            'difficulty_sum' => 0,
-            'difficulty_n' => 0,
-            'tags_n' => 0,
-            'tags' => [],
-        ];
-
-        foreach ($contents as $nomination) {
-            /** @var array{quality?: mixed, difficulty?: mixed, tags?: mixed} */
-            $feedback = json_decode($nomination['contents'], associative: true);
-
-            if (isset($feedback['quality']) && is_int($feedback['quality'])) {
-                $problemAggregates['quality_sum'] += intval(
-                    $feedback['quality']
-                );
-                $problemAggregates['quality_n']++;
-            }
-
-            if (
-                isset($feedback['difficulty']) &&
-                is_int($feedback['difficulty'])
-            ) {
-                $problemAggregates['difficulty_sum'] += intval(
-                    $feedback['difficulty']
-                );
-                $problemAggregates['difficulty_n']++;
-            }
-
-            if (isset($feedback['tags']) && is_array($feedback['tags'])) {
-                /** @var string $tag */
-                foreach ($feedback['tags'] as $tag) {
-                    if (!isset($problemAggregates['tags'][$tag])) {
-                        $problemAggregates['tags'][$tag] = 1;
-                    } else {
-                        $problemAggregates['tags'][$tag]++;
-                    }
-                    $problemAggregates['tags_n']++;
-                }
-            }
-        }
-
-        return $problemAggregates;
-    }
-
-    /**
-     * Algorithm that computes the list of tags to be assigned to a problem
-     * based on the number of votes each tag got for each problem.
-     *
-     * @param array<string, int> $tags
-     * @return list<string>
-     */
-    public static function mostVotedTags(array $tags, float $threshold): array {
-        if (empty($tags) || array_sum($tags) < 5) {
-            return [];
-        }
-
-        $max = max($tags);
-        $mostVoted = [];
-        foreach ($tags as $key => $value) {
-            if ($value < $max * $threshold) {
-                continue;
-            }
-            $mostVoted[] = $key;
-            if (count($mostVoted) > self::MAX_NUM_TOPICS) {
-                return [];
-            }
-        }
-        return $mostVoted;
     }
 
     /**
