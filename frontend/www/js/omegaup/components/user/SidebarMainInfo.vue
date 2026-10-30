@@ -91,7 +91,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
 import user_Username from './Username.vue';
@@ -120,93 +120,121 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
 ];
 
-@Component({
+export default defineComponent({
+  name: 'UserSidebarMainInfo',
   components: {
     'omegaup-countryflag': country_Flag,
     'omegaup-user-username': user_Username,
   },
-})
-export default class UserSidebarMainInfo extends Vue {
-  @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
-  @Prop() profile!: types.UserProfileInfo;
-  @Prop() selectedTab!: string;
-  @Prop() hasPassword!: boolean;
-
-  T = T;
-  urlMapping = urlMapping;
-  currentSelectedTab = this.getSelectedValidTab(
-    this.selectedTab,
-    this.currentUrlMapping,
-  );
-
-  get solvedProblems(): Problem[] {
-    if (!this.data?.solvedProblems) return [];
-    return this.data.solvedProblems.map((problem) => new Problem(problem));
-  }
-  get rank(): string {
-    switch (this.profile.classname) {
-      case 'user-rank-beginner':
-        return T.profileRankBeginner;
-      case 'user-rank-specialist':
-        return T.profileRankSpecialist;
-      case 'user-rank-expert':
-        return T.profileRankExpert;
-      case 'user-rank-master':
-        return T.profileRankMaster;
-      case 'user-rank-international-master':
-        return T.profileRankInternationalMaster;
-      default:
-        return T.profileRankUnrated;
-    }
-  }
-
-  get currentUrlMapping(): {
-    key: string;
-    title: string;
-    visible: boolean;
-  }[] {
-    if (!this.profile.is_own_profile) {
-      return [];
-    }
-    const changePasswordRowIndex = urlMapping.findIndex(
-      (url) => url.key === 'change-password',
-    );
-    const addPasswordRowIndex = urlMapping.findIndex(
-      (url) => url.key === 'add-password',
-    );
-    if (!changePasswordRowIndex || !addPasswordRowIndex) {
+  props: {
+    data: {
+      type: Object as PropType<types.ExtraProfileDetails | null>,
+      default: null,
+    },
+    profile: {
+      type: Object as PropType<types.UserProfileInfo>,
+      required: true,
+    },
+    selectedTab: {
+      type: String,
+      default: 'view-profile',
+    },
+    hasPassword: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['update:selectedTab'],
+  data() {
+    return {
+      T,
+      urlMapping,
+      currentSelectedTab: this.selectedTab,
+    };
+  },
+  computed: {
+    solvedProblems(): Problem[] {
+      if (!this.data?.solvedProblems) return [];
+      return this.data.solvedProblems.map((problem) => new Problem(problem));
+    },
+    rank(): string {
+      switch (this.profile.classname) {
+        case 'user-rank-beginner':
+          return T.profileRankBeginner;
+        case 'user-rank-specialist':
+          return T.profileRankSpecialist;
+        case 'user-rank-expert':
+          return T.profileRankExpert;
+        case 'user-rank-master':
+          return T.profileRankMaster;
+        case 'user-rank-international-master':
+          return T.profileRankInternationalMaster;
+        default:
+          return T.profileRankUnrated;
+      }
+    },
+    currentUrlMapping(): {
+      key: string;
+      title: string;
+      visible: boolean;
+    }[] {
+      if (!this.profile.is_own_profile) {
+        return [];
+      }
+      const changePasswordRowIndex = urlMapping.findIndex(
+        (url) => url.key === 'change-password',
+      );
+      const addPasswordRowIndex = urlMapping.findIndex(
+        (url) => url.key === 'add-password',
+      );
+      if (!changePasswordRowIndex || !addPasswordRowIndex) {
+        return urlMapping;
+      }
+      if (this.hasPassword) {
+        urlMapping[changePasswordRowIndex].visible = true;
+        urlMapping[addPasswordRowIndex].visible = false;
+        return urlMapping;
+      }
+      urlMapping[addPasswordRowIndex].visible = true;
+      urlMapping[changePasswordRowIndex].visible = false;
       return urlMapping;
-    }
-    if (this.hasPassword) {
-      urlMapping[changePasswordRowIndex].visible = true;
-      urlMapping[addPasswordRowIndex].visible = false;
-      return urlMapping;
-    }
-    urlMapping[addPasswordRowIndex].visible = true;
-    urlMapping[changePasswordRowIndex].visible = false;
-    return urlMapping;
-  }
-
-  getSelectedValidTab(
-    tab: string,
-    urls: { key: string; title: string; visible: boolean }[],
-  ): string {
-    const validTabs = urls.filter((url) => url.visible).map((url) => url.key);
-    const isValidTab = validTabs.includes(tab);
-    if (!isValidTab) {
-      this.$emit('update:selectedTab', 'view-profile');
-      return 'view-profile';
-    }
-    return tab;
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabChange(newValue: string) {
-    const validTab = this.getSelectedValidTab(newValue, this.currentUrlMapping);
+    },
+  },
+  watch: {
+    selectedTab(newValue: string): void {
+      const validTab = this.getSelectedValidTab(
+        newValue,
+        this.currentUrlMapping,
+      );
+      this.currentSelectedTab = validTab;
+      if (validTab !== newValue) {
+        this.$emit('update:selectedTab', validTab);
+      }
+    },
+  },
+  mounted(): void {
+    const validTab = this.getSelectedValidTab(
+      this.selectedTab,
+      this.currentUrlMapping,
+    );
     this.currentSelectedTab = validTab;
-    if (validTab !== newValue) {
-      this.$emit('update:selectedTab', validTab);
-    }
-  }
-}
+  },
+  methods: {
+    getSelectedValidTab(
+      tab: string,
+      urls?: { key: string; title: string; visible: boolean }[],
+    ): string {
+      const mapping = urls ?? this.currentUrlMapping ?? [];
+      const validTabs = mapping
+        .filter((url) => url.visible)
+        .map((url) => url.key);
+      const isValidTab = validTabs.includes(tab);
+      if (!isValidTab) {
+        this.$emit('update:selectedTab', 'view-profile');
+        return 'view-profile';
+      }
+      return tab;
+    },
+  },
+});
 </script>

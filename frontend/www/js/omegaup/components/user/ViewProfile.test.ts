@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_ViewProfile from './ViewProfile.vue';
@@ -140,27 +141,33 @@ const data: types.ExtraProfileDetails = {
 describe('Profilev2.vue', () => {
   it('Should display navtab', () => {
     const badgeAlias = 'contestManager';
-    const wrapper = mount(user_ViewProfile, {
-      propsData: {
-        profile,
-        data,
-        profileBadges: new Set([badgeAlias]),
-        visitorBadges: new Set([badgeAlias]),
+    const wrapper = mount(
+      (user_ViewProfile as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile,
+          data,
+          profileBadges: new Set([badgeAlias]),
+          visitorBadges: new Set([badgeAlias]),
+        },
       },
-    });
+    );
     expect(wrapper.find('[data-profile-navtabs]').exists()).toBe(true);
   });
 
   it('Should display all contests', async () => {
     const badgeAlias = 'contestManager';
-    const wrapper = mount(user_ViewProfile, {
-      propsData: {
-        profile,
-        data,
-        profileBadges: new Set([badgeAlias]),
-        visitorBadges: new Set([badgeAlias]),
+    const wrapper = mount(
+      (user_ViewProfile as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile,
+          data,
+          profileBadges: new Set([badgeAlias]),
+          visitorBadges: new Set([badgeAlias]),
+        },
       },
-    });
+    );
     await wrapper.find('a[data-created-content-tab]').trigger('click');
     for (const contest of createdContests) {
       expect(wrapper.find(`a[href="/arena/${contest.alias}/"]`)).toBeDefined();
@@ -169,14 +176,17 @@ describe('Profilev2.vue', () => {
 
   it('Should only display public contests', async () => {
     const badgeAlias = 'contestManager';
-    const wrapper = mount(user_ViewProfile, {
-      propsData: {
-        profile: { ...profile, is_own_profile: false },
-        data,
-        profileBadges: new Set([badgeAlias]),
-        visitorBadges: new Set([badgeAlias]),
+    const wrapper = mount(
+      (user_ViewProfile as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile: { ...profile, is_own_profile: false },
+          data,
+          profileBadges: new Set([badgeAlias]),
+          visitorBadges: new Set([badgeAlias]),
+        },
       },
-    });
+    );
     await wrapper.find('a[data-created-content-tab]').trigger('click');
     const publicContests = createdContests.filter(
       (contest) => contest.admission_mode === 'public',
@@ -194,14 +204,17 @@ describe('Profilev2.vue', () => {
 
   it('Should display all Courses', async () => {
     const badgeAlias = 'contestManager';
-    const wrapper = mount(user_ViewProfile, {
-      propsData: {
-        profile,
-        data,
-        profileBadges: new Set([badgeAlias]),
-        visitorBadges: new Set([badgeAlias]),
+    const wrapper = mount(
+      (user_ViewProfile as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile,
+          data,
+          profileBadges: new Set([badgeAlias]),
+          visitorBadges: new Set([badgeAlias]),
+        },
       },
-    });
+    );
     await wrapper.find('a[data-created-content-tab]').trigger('click');
     for (const course of createdCourses) {
       expect(wrapper.find(`a[href="/course/${course.alias}/"]`)).toBeDefined();
@@ -210,14 +223,17 @@ describe('Profilev2.vue', () => {
 
   it('Should only display public Courses', async () => {
     const badgeAlias = 'contestManager';
-    const wrapper = mount(user_ViewProfile, {
-      propsData: {
-        profile: { ...profile, is_own_profile: false },
-        data,
-        profileBadges: new Set([badgeAlias]),
-        visitorBadges: new Set([badgeAlias]),
+    const wrapper = mount(
+      (user_ViewProfile as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile: { ...profile, is_own_profile: false },
+          data,
+          profileBadges: new Set([badgeAlias]),
+          visitorBadges: new Set([badgeAlias]),
+        },
       },
-    });
+    );
     await wrapper.find('a[data-created-content-tab]').trigger('click');
     const publicCourses = createdCourses.filter(
       (course) => course.admission_mode === 'public',
@@ -255,14 +271,17 @@ describe('Profilev2.vue', () => {
         title: 'Problem C',
       },
     ];
-    const wrapper = mount(user_ViewProfile, {
-      propsData: {
-        profile,
-        data: { ...data, bookmarkedProblems },
-        profileBadges: new Set([badgeAlias]),
-        visitorBadges: new Set([badgeAlias]),
+    const wrapper = mount(
+      (user_ViewProfile as unknown) as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile,
+          data: { ...data, bookmarkedProblems },
+          profileBadges: new Set([badgeAlias]),
+          visitorBadges: new Set([badgeAlias]),
+        },
       },
-    });
+    );
     await wrapper.find('a[href="#problems"]').trigger('click');
     for (const problem of bookmarkedProblems) {
       const link = wrapper.find(`a[href="/arena/problem/${problem.alias}/"]`);

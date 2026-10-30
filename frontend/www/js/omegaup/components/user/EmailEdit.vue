@@ -42,20 +42,37 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import user_MainInfo from './MainInfo.vue';
 
-@Component({
+export default defineComponent({
+  name: 'UserEmailEdit',
   components: {
     'omegaup-user-maininfo': user_MainInfo,
   },
-})
-export default class UserEmailEdit extends Vue {
-  @Prop() email!: string;
-  @Prop() profile!: types.UserProfileInfo;
-  T = T;
-  currentEmail: string = this.email;
-}
+  props: {
+    email: {
+      type: String,
+      default: '',
+    },
+    profile: {
+      type: Object as PropType<types.UserProfileInfo>,
+      required: true,
+    },
+  },
+  emits: ['submit'],
+  data() {
+    return {
+      T,
+      currentEmail: this.email,
+    };
+  },
+  watch: {
+    email(newEmail: string): void {
+      this.currentEmail = newEmail;
+    },
+  },
+});
 </script>
