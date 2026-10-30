@@ -11,11 +11,13 @@ import string
 import sys
 import time
 
-from typing import List
+from typing import Any, List
 import omegaup.api
+import pytest
 
 import database.contest
 import contest_callback
+import rabbitmq_client
 import test_credentials
 import rabbitmq_connection
 import test_constants
@@ -146,6 +148,58 @@ def test_insert_contest_certificate() -> None:
 
     for certificate in certificates:
         assert certificate['username'] in usernames
-        # At this moment, there are no submissions for the contest, so all the
-        # participants got the first place
         assert certificate['contest_place'] == 1
+
+
+# mypy has conflict with pytest decorations
+@pytest.mark.parametrize(
+    'body',
+    [
+        b'null',
+        b'[]',
+        b'{}',
+        b'{"alias": "x", "contest_id": 1}',
+        json.dumps({
+            'certificate_cutoff': 3,
+            'alias': 'x',
+            'scoreboard_url': 'abc',
+            'contest_id': 1,
+            'ranking': {},
+        }).encode('utf-8'),
+    ],
+)  # type: ignore
+def test_invalid_structure_raises_unrecoverable(body: bytes) -> None:
+    '''Structurally invalid messages must raise UnrecoverableMessageError.'''
+    callback = contest_callback.ContestsCallback(dbconn=None)  # type: ignore
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=body,
+        )
+
+
+def test_invalid_json_raises_unrecoverable() -> None:
+    '''A non-JSON body keeps raising UnrecoverableMessageError.'''
+    callback = contest_callback.ContestsCallback(dbconn=None)  # type: ignore
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=b'not json at all',
+        )
+
+
+def test_valid_structure_passes_validation() -> None:
+    '''A structurally valid message passes validation without error.'''
+    response: Any = {
+        'certificate_cutoff': 3,
+        'alias': 'x',
+        'scoreboard_url': 'abc',
+        'contest_id': 1,
+        'ranking': [],
+    }
+    # pylint: disable=protected-access
+    contest_callback.ContestsCallback._validate_structure(response)
