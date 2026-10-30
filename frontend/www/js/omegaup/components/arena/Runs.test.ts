@@ -467,4 +467,28 @@ describe('Runs.vue', () => {
 
     expect(wrapper.find('.pager-controls').exists()).toBeFalsy();
   });
+
+  it('Should apply run-loading class and spinner icon when run status is not ready', () => {
+    const runsWithLoading: types.Run[] = [
+      {
+        ...runs[0],
+        guid: 'loading_run',
+        status: 'new',
+      },
+      ...runs,
+    ];
+    const wrapper = mount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs: runsWithLoading,
+      },
+    });
+
+    const loadingRows = wrapper.findAll('tbody tr.run-loading');
+    expect(loadingRows.length).toBe(1);
+
+    const statusCell = loadingRows.at(0).find('[data-run-status]');
+    expect(statusCell.find('span').text()).toBe('new');
+    expect(statusCell.find('svg.fa-spinner').exists()).toBe(true);
+  });
 });
