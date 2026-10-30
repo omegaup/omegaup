@@ -108,8 +108,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     const README_REPORT_THRESHOLD = 10;
 
-    const FOLLOW_LIST_PAGE_SIZE_DEFAULT = 100;
-    const MAX_FOLLOW_LIST_PAGE_SIZE = 1000;
+    const FOLLOW_LIST_PAGE_SIZE_DEFAULT = 20;
+    const MAX_FOLLOW_LIST_PAGE_SIZE = 100;
 
     // User types
     const USER_TYPE_STUDENT = 'student';

@@ -115,7 +115,12 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "SELECT COUNT(*) {$sqlFrom};",
+            'SELECT
+                COUNT(*)
+            FROM
+                `Users_Followers`
+            WHERE
+                `followed_user_id` = ?;',
             [$userId]
         ) ?? 0;
 
@@ -166,7 +171,12 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "SELECT COUNT(*) {$sqlFrom};",
+            'SELECT
+                COUNT(*)
+            FROM
+                `Users_Followers`
+            WHERE
+                `follower_user_id` = ?;',
             [$userId]
         ) ?? 0;
 
