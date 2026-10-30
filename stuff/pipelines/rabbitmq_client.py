@@ -17,13 +17,11 @@ ClientCallback = Callable[
 
 
 class UnrecoverableMessageError(Exception):
-    '''Raised when a message can never be processed and must not be requeued.
+    '''Raised when a message can never be processed; must not be requeued.'''
 
-    A callback should raise this when the failure is permanent (for example,
-    a malformed message body) so the message is discarded instead of being
-    requeued forever. Transient failures should raise any other exception,
-    which causes the message to be requeued and retried.
-    '''
+
+class TransientMessageError(Exception):
+    '''Raised when a message fails temporarily and may be retried.'''
 
 
 def _process_and_ack(
