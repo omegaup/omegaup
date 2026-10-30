@@ -33,14 +33,30 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import Vue from 'vue';
+import { ModalPlugin } from 'bootstrap-vue';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 
-@Component({ components: { 'omegaup-markdown': omegaup_Markdown } })
-export default class UserDeleteAccount extends Vue {
-  T = T;
-  showConfirmationModal = false;
-  username = '';
-}
+Vue.use(ModalPlugin);
+
+export default defineComponent({
+  name: 'UserDeleteAccount',
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+  emits: ['remove', 'request-delete-account'],
+  data(): {
+    T: typeof T;
+    showConfirmationModal: boolean;
+    username: string;
+  } {
+    return {
+      T,
+      showConfirmationModal: false,
+      username: '',
+    };
+  },
+});
 </script>

@@ -22,7 +22,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import Vue from 'vue';
 import T from '../../lang';
 
 import omegaup_Markdown from '../Markdown.vue';
@@ -36,17 +37,29 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 Vue.use(BootstrapVue);
 
-@Component({
+export default defineComponent({
+  name: 'UserVerificationParentalToken',
   components: {
     BIconCheckCircleFill,
     BIconXCircleFill,
     'omegaup-markdown': omegaup_Markdown,
   },
-})
-export default class UserVerificationParentalToken extends Vue {
-  @Prop() message!: string;
-  @Prop() hasParentalVerificationToken!: boolean;
-
-  T = T;
-}
+  props: {
+    message: {
+      type: String,
+      required: true,
+    },
+    hasParentalVerificationToken: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  data(): {
+    T: typeof T;
+  } {
+    return {
+      T,
+    };
+  },
+});
 </script>
