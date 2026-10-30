@@ -1,5 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue, { ComponentOptions } from 'vue';
 import UserHeatmap from './UserHeatmap.vue';
+
+const Heatmap = (UserHeatmap as unknown) as ComponentOptions<Vue>;
 
 // Mock Highcharts to avoid actual chart rendering in tests
 // NOTE: jest.mock() is hoisted above all variable declarations by babel-jest,
@@ -44,7 +47,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should mount and render the container', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -53,7 +56,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should render stats elements', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -63,7 +66,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should render year selector with all available years', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -74,7 +77,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should initialize selectedYear to the first available year', async () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -86,7 +89,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should format date correctly with zero-padding', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -106,7 +109,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should compute setActivityStats correctly with known data', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -132,7 +135,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should compute streak correctly when days are not consecutive', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -159,7 +162,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should return all zeros for empty data in setActivityStats', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: {
         ...defaultProps,
         data: [],
@@ -181,7 +184,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should emit year-changed event when year is changed', async () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -194,7 +197,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should set hasRendered to true after renderHeatmap', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -215,7 +218,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should skip renderHeatmap when hasRendered is true', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -231,7 +234,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should render gracefully with empty data array', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: {
         ...defaultProps,
         data: [],
@@ -248,7 +251,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should reset hasRendered when data watcher fires', async () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -276,7 +279,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should handle single day of data correctly', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: {
         ...defaultProps,
         data: [{ date: '2024-07-15', runs: 10, verdict: 'AC' }],
@@ -299,7 +302,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should only count accepted submissions in the heatmap', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: {
         ...defaultProps,
         data: [
@@ -328,7 +331,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should compute the current streak ending today', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -352,7 +355,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should keep the current streak when today has no activity yet', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -373,7 +376,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should preserve the current streak across year boundaries', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -399,11 +402,19 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should include previous-year data in the map used for the streak', () => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date(2024, 0, 1));
+    const realDate = Date;
+    const mockNow = new realDate(2024, 0, 1);
+    const dateSpy = jest
+      .spyOn(global, 'Date')
+      .mockImplementation((...args: any[]) => {
+        if (args.length) {
+          return new (realDate as any)(...args);
+        }
+        return mockNow;
+      });
 
     try {
-      const wrapper = shallowMount(UserHeatmap, {
+      const wrapper = shallowMount(Heatmap, {
         propsData: {
           ...defaultProps,
           availableYears: [2024, 2023],
@@ -432,12 +443,12 @@ describe('UserHeatmap.vue', () => {
       expect(vm.activeDays).toBe(1);
       expect(vm.maxStreak).toBe(1);
     } finally {
-      jest.useRealTimers();
+      dateSpy.mockRestore();
     }
   });
 
   it('should report a zero current streak after a gap', () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: defaultProps,
     });
 
@@ -459,7 +470,7 @@ describe('UserHeatmap.vue', () => {
   });
 
   it('should only show the current streak for the current year', async () => {
-    const wrapper = shallowMount(UserHeatmap, {
+    const wrapper = shallowMount(Heatmap, {
       propsData: {
         ...defaultProps,
         availableYears: [new Date().getFullYear(), 2023],
