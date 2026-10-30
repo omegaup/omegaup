@@ -8,7 +8,7 @@
     }"
     open-direction="bottom"
     :tag-placeholder="''"
-    :options="existingOptions"
+    :options="visibleOptions"
     :multiple="false"
     :searchable="true"
     :internal-search="false"
@@ -28,18 +28,32 @@
     @input="onInput"
     @tag="onTag"
   >
-    <template slot="singleLabel" slot-scope="{ option }">
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <span class="omegaup-typeahead-label" v-html="optionLabel(option)"></span>
-      <button
-        type="button"
-        class="omegaup-typeahead-remove"
-        @mousedown.prevent.stop="clearSelection"
-      ></button>
+    <template slot="selection">
+      <span v-if="selectedOption" class="omegaup-typeahead-selection">
+        <span class="omegaup-typeahead-label">
+          <span
+            v-for="(part, index) in labelParts(optionLabel(selectedOption))"
+            :key="index"
+          >
+            <strong v-if="part.strong">{{ part.text }}</strong>
+            <template v-else>{{ part.text }}</template>
+          </span>
+        </span>
+        <button
+          type="button"
+          class="omegaup-typeahead-remove"
+          @mousedown.prevent.stop="clearSelection"
+        ></button>
+      </span>
     </template>
     <template slot="option" slot-scope="{ option }">
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <span v-html="optionLabel(option)"></span>
+      <span
+        v-for="(part, index) in labelParts(optionLabel(option))"
+        :key="index"
+      >
+        <strong v-if="part.strong">{{ part.text }}</strong>
+        <template v-else>{{ part.text }}</template>
+      </span>
     </template>
   </multiselect>
 </template>
@@ -50,6 +64,7 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { typeaheadLabelParts } from './typeahead_label';
 
 function optionLabel(option: { value?: string; label?: string }): string {
   return option.value || option.label || '';
@@ -81,9 +96,11 @@ export default class Typeahead extends Vue {
 
   T = T;
   optionLabel = optionLabel;
+  labelParts = typeaheadLabelParts;
   selectedOption: null | types.ListItem = hasContent(this.value)
     ? this.value
     : null;
+  searchQuery = '';
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   get isDisabled(): boolean {
@@ -96,8 +113,21 @@ export default class Typeahead extends Vue {
     return !this.onlyExistingTags;
   }
 
+  // A short or empty query must not keep the previous server results on screen.
+  get visibleOptions(): types.ListItem[] {
+    if (this.searchQuery.length < this.activationThreshold) return [];
+    return this.existingOptions;
+  }
+
   updateExistingOptions(query: string): void {
-    if (query.length < this.activationThreshold) return;
+    this.searchQuery = query;
+    if (query.length < this.activationThreshold) {
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = null;
+      }
+      return;
+    }
 
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -157,11 +187,17 @@ export default class Typeahead extends Vue {
     margin-bottom: 0;
   }
 
+  // Once a value is chosen, keep the label on top of the search box. The
+  // library hides its own label while the menu is open.
+  &.omegaup-typeahead--filled .multiselect__input {
+    position: absolute !important;
+    width: 0 !important;
+    padding: 0 !important;
+  }
+
+  .multiselect__placeholder,
   .multiselect__single {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-    background: transparent;
+    display: none;
   }
 
   .multiselect__option--highlight {
@@ -185,6 +221,12 @@ export default class Typeahead extends Vue {
   &.is-invalid .multiselect__tags {
     border-color: var(--form-input-error-color);
   }
+}
+
+.omegaup-typeahead-selection {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
 }
 
 .omegaup-typeahead-label {

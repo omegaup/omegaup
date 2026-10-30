@@ -51,6 +51,41 @@ describe('Typeahead.vue', () => {
     });
   });
 
+  it('shows the selected value while the menu is open', async () => {
+    const wrapper = mount(common_Typeahead, {
+      propsData: {
+        existingOptions: [],
+      },
+    });
+
+    await wrapper.find('input.multiselect__input').trigger('focus');
+    wrapper.findComponent(Multiselect).vm.$emit('input', {
+      key: 'mit',
+      value: 'MIT',
+    });
+    await Vue.nextTick();
+
+    expect(wrapper.find('.omegaup-typeahead-label').text()).toBe('MIT');
+  });
+
+  it('hides previous results when the search is cleared', async () => {
+    const wrapper = mount(common_Typeahead, {
+      propsData: {
+        existingOptions: [{ key: 'division-ab', value: 'División a/b' }],
+        activationThreshold: 2,
+        debounceDelay: 0,
+      },
+    });
+
+    await wrapper.find('input.multiselect__input').setValue('division');
+    await Vue.nextTick();
+    expect(wrapper.text()).toContain('División a/b');
+
+    await wrapper.find('input.multiselect__input').setValue('');
+    await Vue.nextTick();
+    expect(wrapper.text()).not.toContain('División a/b');
+  });
+
   it('Should call update:value with an empty tag', async () => {
     const wrapper = mount(common_Typeahead, {
       propsData: {
