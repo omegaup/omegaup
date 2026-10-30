@@ -233,14 +233,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
 Vue.use(PopoverPlugin);
-interface Rank {
-  country: string;
-  classname?: string;
-  username: string;
-  name?: string;
-  score: number;
-  problems_solved: number;
-}
+export type Rank = Pick<
+  types.UserRank['rank'][number],
+  'username' | 'name' | 'score' | 'problems_solved'
+> & {
+  classname?: types.UserRank['rank'][number]['classname'];
+  country?: string;
+  rank?: number;
+};
 
 @Component({
   components: {
