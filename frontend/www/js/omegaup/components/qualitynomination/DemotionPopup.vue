@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -94,28 +94,32 @@ export enum AvailableViews {
   Thanks,
 }
 
-@Component({
+export default defineComponent({
+  name: 'QualityNominationDemotionPopup',
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
-})
-export default class QualityNominationDemotionPopup extends Vue {
-  AvailableViews = AvailableViews;
-  T = T;
-  ui = ui;
-  rationale = '';
-  original = '';
-  currentView = AvailableViews.Question;
-  selectedReason = '';
-
-  onHide(): void {
-    this.$emit('dismiss');
-  }
-
-  onSubmit(): void {
-    this.$emit('submit', this);
-    this.currentView = AvailableViews.Thanks;
-    setTimeout(() => this.onHide(), 2000);
-  }
-}
+  emits: ['dismiss', 'submit'],
+  data() {
+    return {
+      AvailableViews,
+      T,
+      ui,
+      rationale: '',
+      original: '',
+      currentView: AvailableViews.Question,
+      selectedReason: '',
+    };
+  },
+  methods: {
+    onHide(): void {
+      this.$emit('dismiss');
+    },
+    onSubmit(): void {
+      this.$emit('submit', this);
+      this.currentView = AvailableViews.Thanks;
+      setTimeout(() => this.onHide(), 2000);
+    },
+  },
+});
 </script>
