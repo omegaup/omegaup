@@ -2124,6 +2124,7 @@ const translations: { [key: string]: string; } = {
   userEditChangePasswordOldPassword: "Contrase\u00f1a anterior",
   userEditChangePasswordRepeatNewPassword: "Repite la contrase\u00f1a de nuevo",
   userEditChangePasswordToUsername: "Cambiar contrase\u00f1a: %(username)",
+  userEditCodeTemplates: "Plantillas de c\u00f3digo",
   userEditCountry: "Pa\u00eds / Regi\u00f3n",
   userEditDeleteAccount: "Eliminar Cuenta",
   userEditDoctorate: "Doctorado",

@@ -358,16 +358,17 @@ Returns the detail of a single cron run.
 
 ### Description
 
-Lists the registered cron jobs, their most recent runs and the open
-problem health findings.
+Lists the registered cron jobs, their most recent runs, the open problem
+health findings and the quality of the recommendation models.
 
 ### Returns
 
-| Name                    | Type                               |
-| ----------------------- | ---------------------------------- |
-| `jobs`                  | `List[types.CronJob]`              |
-| `problemHealthFindings` | `List[types.ProblemHealthFinding]` |
-| `runs`                  | `List[types.CronRun]`              |
+| Name                      | Type                                 |
+| ------------------------- | ------------------------------------ |
+| `jobs`                    | `List[types.CronJob]`                |
+| `problemHealthFindings`   | `List[types.ProblemHealthFinding]`   |
+| `recommendationModelRuns` | `List[types.RecommendationModelRun]` |
+| `runs`                    | `List[types.CronRun]`                |
 
 ## `/api/admin/getMaintenanceMode/`
 
@@ -455,7 +456,7 @@ _Nothing_
 
 ### Description
 
-Updates system settings. Only available to system admins.
+Updates system settings. Temporarily available to the support team.
 
 ### Parameters
 
