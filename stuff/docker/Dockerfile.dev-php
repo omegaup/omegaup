@@ -85,7 +85,6 @@ CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mys
      "/bin/bash", "-c", \
      "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; \
       cd /opt/omegaup && \
-      corepack enable && \
       pnpm install --frozen-lockfile && \
       pnpm run dev-all & \
       exec /usr/bin/supervisord"]
