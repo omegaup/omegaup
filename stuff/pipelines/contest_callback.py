@@ -59,149 +59,174 @@ class ContestsCallback:
         self._validate_structure(response)
 
         try:
-            self.dbconn.ping(  # type: ignore[attr-defined]
-                reconnect=True,
-                attempts=3,
-                delay=5,
-            )
-            ranking = []
-            for user_ranking in response['ranking']:
-                ranking.append(database.contest.Ranking(**user_ranking))
-            response['ranking'] = ranking
-            data = ContestCertificate(**response)
+            self._process(channel, response)
+        except rabbitmq_client.UnrecoverableMessageError:
+            self._handle_processing_error(response)
+            raise
+        except Exception as err:  # pylint: disable=broad-except
+            self._handle_processing_error(response)
+            raise rabbitmq_client.TransientMessageError(
+                'Transient error while processing the message'
+            ) from err
 
-            certificates: List[Certificate] = []
-            usernames: List[str] = []
+    def _process(
+            self,
+            channel: pika.adapters.blocking_connection.BlockingChannel,
+            response: Any) -> None:
+        '''Builds and stores the certificates for a validated message.'''
+        self.dbconn.ping(  # type: ignore[attr-defined]
+            reconnect=True,
+            attempts=3,
+            delay=5,
+        )
+        ranking = []
+        for user_ranking in response['ranking']:
+            ranking.append(database.contest.Ranking(**user_ranking))
+        response['ranking'] = ranking
+        data = ContestCertificate(**response)
 
-            for user_ranking in data.ranking:
-                contest_place: Optional[int] = None
-                place = int(user_ranking.place)
-                cutoff = data.certificate_cutoff
-                if (cutoff and place and place <= cutoff):
-                    contest_place = user_ranking.place
-                certificates.append(Certificate(
-                    certificate_type='contest',
-                    contest_id=data.contest_id,
-                    verification_code=generate_contest_code(),
-                    contest_place=contest_place,
-                    username=user_ranking.username
-                ))
-                usernames.append(user_ranking.username)
+        certificates: List[Certificate] = []
+        usernames: List[str] = []
 
-            notifications = []
-            with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+        for user_ranking in data.ranking:
+            contest_place: Optional[int] = None
+            place = int(user_ranking.place)
+            cutoff = data.certificate_cutoff
+            if (cutoff and place and place <= cutoff):
+                contest_place = user_ranking.place
+            certificates.append(Certificate(
+                certificate_type='contest',
+                contest_id=data.contest_id,
+                verification_code=generate_contest_code(),
+                contest_place=contest_place,
+                username=user_ranking.username
+            ))
+            usernames.append(user_ranking.username)
+
+        notifications: List[Any] = []
+        with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            try:
                 users_ids = database.contest.get_users_ids(
                     cur,
                     usernames
                 )
-                contest_title = database.contest.get_contest_title(
-                    cur,
-                    data.contest_id
-                )
-                for index, user_id in enumerate(users_ids):
-                    notifications.append(
-                        (user_id, json.dumps({
-                            'type': 'certificate-awarded',
-                            'body': {
-                                'localizationString':
-                                    'notificationNewContestCertificate',
-                                'localizationParams': {
-                                    'contest_title': contest_title,
-                                },
-                                'url': '/certificates/mine/#' +
-                                    certificates[index].verification_code,
-                                'iconUrl': '/media/info.png',
+            except KeyError as err:
+                raise rabbitmq_client.UnrecoverableMessageError(
+                    'A username in the ranking does not exist'
+                ) from err
+            contest_title = database.contest.get_contest_title(
+                cur,
+                data.contest_id
+            )
+            for index, user_id in enumerate(users_ids):
+                notifications.append(
+                    (user_id, json.dumps({
+                        'type': 'certificate-awarded',
+                        'body': {
+                            'localizationString':
+                                'notificationNewContestCertificate',
+                            'localizationParams': {
+                                'contest_title': contest_title,
                             },
-                        })))
+                            'url': '/certificates/mine/#' +
+                                certificates[index].verification_code,
+                            'iconUrl': '/media/info.png',
+                        },
+                    })))
 
-                while True:
-                    try:
-                        cur.executemany('''
-                            INSERT INTO
-                                `Certificates` (
-                                    `identity_id`,
-                                    `certificate_type`,
-                                    `contest_id`,
-                                    `verification_code`,
-                                    `contest_place`)
-                            SELECT
-                                `identity_id`,
-                                %s,
-                                %s,
-                                %s,
-                                %s
-                            FROM
-                                `Identities`
-                            WHERE
-                                `username` = %s;
-                            ''',
-                                        [
-                                            dataclasses.astuple(
-                                                certificate
-                                            ) for certificate in certificates])
-                        cur.executemany(
-                            '''
-                            INSERT INTO
-                                Notifications (user_id, contents)
-                            VALUES (%s, %s)''', notifications)
-                        self.dbconn.commit()
-                        break
-                    except errors.IntegrityError as err:
-                        self.dbconn.rollback()
-                        if err.errno != errorcode.ER_DUP_ENTRY:
-                            raise
-                        if err.msg.find(
-                            'Certificates.contest_identity_key'
-                        ) > 0:
-                            logging.exception(
-                                'At least one certificate for this contest is '
-                                'duplicated'
-                            )
-                            break
-                        for index, cert in enumerate(certificates):
-                            cert.verification_code = generate_contest_code()
-                            user_id = notifications[index][0]
-                            notifications[index] = (user_id, json.dumps({
-                                'type': 'certificate-awarded',
-                                'body': {
-                                    'localizationString':
-                                        'notificationNewContestCertificate',
-                                    'localizationParams': {
-                                        'contest_title': contest_title,
-                                    },
-                                    'url': '/certificates/mine/#' +
-                                        cert.verification_code,
-                                    'iconUrl': '/media/info.png',
-                                },
-                            }))
-                        logging.exception(
-                            'At least one of the verification codes had a '
-                            'conflict'
-                        )
-                try:
-                    cur.execute('''
-                        UPDATE
-                            `Contests`
-                        SET
-                            `certificates_status` = 'generated'
-                        WHERE
-                            `contest_id` = %s;
-                        ''', (data.contest_id,))
-                    self.dbconn.commit()
-                except:  # noqa: bare-except
-                    logging.exception(
-                        'Failed to update the certificate status'
-                    )
+            self._insert_certificates(
+                cur, certificates, notifications, contest_title)
 
-            if self.for_testing:
-                logging.info(
-                    'Closing the connection for testing purposes'
+            try:
+                cur.execute('''
+                    UPDATE
+                        `Contests`
+                    SET
+                        `certificates_status` = 'generated'
+                    WHERE
+                        `contest_id` = %s;
+                    ''', (data.contest_id,))
+                self.dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update the certificate status'
                 )
-                channel.connection.close()
 
-        except:  # noqa: bare-except
-            self._handle_processing_error(response)
-            raise
+        if self.for_testing:
+            logging.info(
+                'Closing the connection for testing purposes'
+            )
+            channel.connection.close()
+
+    def _insert_certificates(
+            self,
+            cur: mysql.connector.cursor.MySQLCursorDict,
+            certificates: List[Certificate],
+            notifications: List[Any],
+            contest_title: str) -> None:
+        '''Inserts the certificates, regenerating codes on collision.'''
+        while True:
+            try:
+                cur.executemany('''
+                    INSERT INTO
+                        `Certificates` (
+                            `identity_id`,
+                            `certificate_type`,
+                            `contest_id`,
+                            `verification_code`,
+                            `contest_place`)
+                    SELECT
+                        `identity_id`,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    FROM
+                        `Identities`
+                    WHERE
+                        `username` = %s;
+                    ''',
+                                [
+                                    dataclasses.astuple(
+                                        certificate
+                                    ) for certificate in certificates])
+                cur.executemany(
+                    '''
+                    INSERT INTO
+                        Notifications (user_id, contents)
+                    VALUES (%s, %s)''', notifications)
+                self.dbconn.commit()
+                return
+            except errors.IntegrityError as err:
+                self.dbconn.rollback()
+                if err.errno != errorcode.ER_DUP_ENTRY:
+                    raise
+                if err.msg.find('Certificates.contest_identity_key') > 0:
+                    logging.exception(
+                        'At least one certificate for this contest is '
+                        'duplicated'
+                    )
+                    return
+                for index, cert in enumerate(certificates):
+                    cert.verification_code = generate_contest_code()
+                    user_id = notifications[index][0]
+                    notifications[index] = (user_id, json.dumps({
+                        'type': 'certificate-awarded',
+                        'body': {
+                            'localizationString':
+                                'notificationNewContestCertificate',
+                            'localizationParams': {
+                                'contest_title': contest_title,
+                            },
+                            'url': '/certificates/mine/#' +
+                                cert.verification_code,
+                            'iconUrl': '/media/info.png',
+                        },
+                    }))
+                logging.exception(
+                    'At least one of the verification codes had a '
+                    'conflict'
+                )
 
     def _handle_processing_error(self, response: Any) -> None:
         '''Marks the contest as retryable when it can be identified.'''
@@ -210,7 +235,12 @@ class ContestsCallback:
             if isinstance(response, dict) else None
         )
         if contest_id is not None:
-            self._mark_retryable_error(contest_id)
+            try:
+                self._mark_retryable_error(contest_id)
+            except Exception:  # noqa: bare-except pylint: disable=broad-except
+                logging.exception(
+                    'Failed to mark the contest as retryable_error'
+                )
 
     _REQUIRED_FIELDS = (
         'certificate_cutoff',

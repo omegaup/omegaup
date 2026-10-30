@@ -14,6 +14,7 @@ import time
 from typing import Any, List
 import omegaup.api
 import pytest
+import pytest_mock
 
 import database.contest
 import contest_callback
@@ -203,3 +204,50 @@ def test_valid_structure_passes_validation() -> None:
     }
     # pylint: disable=protected-access
     contest_callback.ContestsCallback._validate_structure(response)
+
+
+def _valid_body() -> bytes:
+    '''Returns a structurally valid contest message body.'''
+    return json.dumps({
+        'certificate_cutoff': 3,
+        'alias': 'x',
+        'scoreboard_url': 'abc',
+        'contest_id': 1,
+        'ranking': [{'username': 'user_1', 'place': '1'}],
+    }).encode('utf-8')
+
+
+def test_processing_error_raises_transient(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''A non-unrecoverable error during processing raises transient.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = RuntimeError('MySQL server is unavailable')
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.TransientMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+
+
+def test_missing_username_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''A username not found in Identities raises UnrecoverableMessageError.'''
+    mocker.patch(
+        'database.contest.get_users_ids',
+        side_effect=KeyError('user_1'),
+    )
+    dbconn = mocker.MagicMock()
+    dbconn.ping.return_value = None
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
