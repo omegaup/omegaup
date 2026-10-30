@@ -1921,6 +1921,14 @@ export namespace types {
       );
     }
 
+    export function OperationsDashboardPayload(
+      elementId: string = 'payload',
+    ): types.OperationsDashboardPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function PrivacyPolicyDetailsPayload(
       elementId: string = 'payload',
     ): types.PrivacyPolicyDetailsPayload {
@@ -4308,6 +4316,12 @@ export namespace types {
     status?: string;
     type: string;
     url?: string;
+  }
+
+  export interface OperationsDashboardPayload {
+    accessLevel: string;
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
   }
 
   export interface PageItem {
