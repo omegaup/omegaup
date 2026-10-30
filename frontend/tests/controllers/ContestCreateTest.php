@@ -524,4 +524,65 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('U13CannotPerform', $e->getMessage());
         }
     }
+
+    /**
+     * @return array<string, array{0: string}>
+     */
+    public function malformedProblemsProvider(): array {
+        return [
+            'string_entry' => ['["some_alias"]'],
+            'numeric_entry' => ['[123]'],
+            'null_entry' => ['[null]'],
+            'missing_problem' => ['[{"points": 100}]'],
+            'missing_points' => ['[{"problem": "some_alias"}]'],
+            'non_string_problem' => ['[{"problem": 123, "points": 100}]'],
+            'non_numeric_points' => ['[{"problem": "some_alias", "points": "non_numeric"}]'],
+        ];
+    }
+
+    /**
+     * @dataProvider malformedProblemsProvider
+     */
+    public function testCreateContestWithMalformedProblems(string $malformedProblems): void {
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
+        ));
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+        $r['problems'] = $malformedProblems;
+
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Expected InvalidParameterException was not thrown');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('invalidParameters', $e->getMessage());
+            $this->assertSame('problems', $e->parameter);
+            $this->assertSame(400, $e->getCode());
+        }
+    }
+
+    /**
+     * @dataProvider malformedProblemsProvider
+     */
+    public function testUpdateContestWithMalformedProblems(string $malformedProblems): void {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $login = self::login($contestData['director']);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problems' => $malformedProblems,
+        ]);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate($r);
+            $this->fail('Expected InvalidParameterException was not thrown');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('invalidParameters', $e->getMessage());
+            $this->assertSame('problems', $e->parameter);
+            $this->assertSame(400, $e->getCode());
+        }
+    }
 }
