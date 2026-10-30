@@ -269,6 +269,7 @@ class Utils {
             'Submission_Log',
             'Team_Groups',
             'Teams',
+            'Team_Users',
             'User_Roles',
             'User_Rank',
             'Users',
@@ -513,6 +514,12 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+            ' --rabbitmq-username ' . escapeshellarg(
+                OMEGAUP_RABBITMQ_USERNAME
+            ) .
+            ' --rabbitmq-password ' . escapeshellarg(
+                OMEGAUP_RABBITMQ_PASSWORD
+            ) .
              ' --test')
         );
     }
