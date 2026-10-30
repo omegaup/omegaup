@@ -10,6 +10,7 @@
         @update-ephemeral-grader="onUpdateEphemeralGrader"
       ></omegaup-admin-settings>
       <omegaup-admin-maintenance-mode
+        :key="maintenanceVersion"
         class="mt-4"
         :maintenance-enabled="maintenanceMode.enabled"
         :maintenance-message-es="maintenanceMode.message_es || ''"
@@ -72,6 +73,7 @@ export default class OperationsDashboard extends Vue {
   @Prop({ default: () => [] })
   maintenancePredefinedTemplates!: types.PredefinedTemplate[];
   @Prop({ default: 'es' }) preferredLanguage!: string;
+  @Prop({ default: 0 }) maintenanceVersion!: number;
 
   T = T;
   AvailableModules = AvailableModules;

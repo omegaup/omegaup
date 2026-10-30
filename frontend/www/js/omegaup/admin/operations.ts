@@ -12,13 +12,17 @@ function saveMaintenance(
   settings: MaintenanceSettings,
   message: string,
   onSaved: () => void,
+  onError?: () => void,
 ): void {
   api.Admin.setMaintenanceMode(settings)
     .then(() => {
       onSaved();
       ui.success(message);
     })
-    .catch(ui.apiError);
+    .catch((error) => {
+      ui.apiError(error);
+      onError?.();
+    });
 }
 
 OmegaUp.on('ready', () => {
@@ -34,6 +38,7 @@ OmegaUp.on('ready', () => {
       module: getModuleFromHash(window.location.hash),
       ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
       maintenanceMode: payload.maintenanceMode,
+      maintenanceVersion: 0,
     }),
     render: function (createElement) {
       return createElement('omegaup-admin-operations-dashboard', {
@@ -42,6 +47,7 @@ OmegaUp.on('ready', () => {
           selectedModule: this.module,
           ephemeralGraderEnabled: this.ephemeralGraderEnabled,
           maintenanceMode: this.maintenanceMode,
+          maintenanceVersion: this.maintenanceVersion,
           maintenancePredefinedTemplates:
             payload.maintenancePredefinedTemplates,
           preferredLanguage: commonPayload.preferredLanguage,
@@ -68,11 +74,21 @@ OmegaUp.on('ready', () => {
               message_pt: '',
               type: 'info',
             };
-            saveMaintenance(settings, T.maintenanceModeInactive, () => {
-              // Keep the saved state, so it is not lost when the user
-              // switches between sections of the dashboard.
-              this.maintenanceMode = { ...settings };
-            });
+            saveMaintenance(
+              settings,
+              T.maintenanceModeInactive,
+              () => {
+                // Keep the saved state, so it is not lost when the user
+                // switches between sections of the dashboard.
+                this.maintenanceMode = { ...settings };
+              },
+              () => {
+                // The request failed: the server still has maintenance
+                // enabled, so the component is recreated from the saved
+                // state instead of showing it as disabled.
+                this.maintenanceVersion += 1;
+              },
+            );
           },
           'save-maintenance': (settings: MaintenanceSettings) => {
             saveMaintenance(settings, T.maintenanceModeActive, () => {

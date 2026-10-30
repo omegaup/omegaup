@@ -439,11 +439,9 @@ class Admin extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleAdminOperations'
                 ),
                 'payload' => [
-                    // The values must match AccessLevel in
-                    // frontend/www/js/omegaup/admin/operations_modules.ts.
-                    'accessLevel' => \OmegaUp\Authorization::isSystemAdmin(
-                        $r->identity
-                    ) ? 'admin' : 'support',
+                        'accessLevel' => \OmegaUp\Authorization::getOperationsAccessLevel(
+                            $r->identity
+                        )->value,
                     'maintenanceMode' => self::getMaintenanceModeStatus(),
                     'maintenancePredefinedTemplates' => self::getMaintenancePredefinedTemplates(),
                 ],

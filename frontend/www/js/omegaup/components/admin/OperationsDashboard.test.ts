@@ -11,6 +11,12 @@ const mountDashboard = (propsData: Record<string, unknown> = {}) =>
     stubs: { 'font-awesome-icon': true },
   });
 
+type MaintenanceVm = {
+  currentMaintenanceEnabled: boolean;
+  currentMaintenanceMessageEs: string;
+  onToggleMaintenance: (enabled: boolean) => void;
+};
+
 describe('OperationsDashboard.vue', () => {
   beforeEach(() => {
     window.matchMedia = jest.fn().mockReturnValue({ matches: true });
@@ -103,5 +109,31 @@ describe('OperationsDashboard.vue', () => {
 
     expect(wrapper.emitted('toggle-maintenance')).toEqual([[false]]);
     expect(wrapper.emitted('save-maintenance')).toEqual([[settings]]);
+  });
+
+  it('Should restore the saved maintenance state when the update fails', async () => {
+    const wrapper = mountDashboard({
+      selectedModule: AvailableModules.Settings,
+      maintenanceMode: {
+        enabled: true,
+        message_es: 'Hola',
+        message_en: 'Hello',
+        message_pt: 'Olá',
+        type: 'warning',
+      },
+    });
+
+    // The user turns maintenance off, but the request fails.
+    const before = (wrapper.findComponent(admin_MaintenanceMode)
+      .vm as unknown) as MaintenanceVm;
+    before.onToggleMaintenance(false);
+    expect(before.currentMaintenanceEnabled).toBe(false);
+
+    await wrapper.setProps({ maintenanceVersion: 1 });
+
+    const after = (wrapper.findComponent(admin_MaintenanceMode)
+      .vm as unknown) as MaintenanceVm;
+    expect(after.currentMaintenanceEnabled).toBe(true);
+    expect(after.currentMaintenanceMessageEs).toBe('Hola');
   });
 });
