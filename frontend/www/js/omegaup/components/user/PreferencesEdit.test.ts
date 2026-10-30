@@ -1,4 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import { types } from '../../api_types';
 import user_Preferences_Edit from './PreferencesEdit.vue';
 import each from 'jest-each';
@@ -34,16 +36,22 @@ const profile: types.UserProfileInfo = {
 
 describe('PreferencesEdit.vue', () => {
   it('Should display user email', () => {
-    const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_Preferences_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
     expect(wrapper.find('[data-email]').text()).toContain('admin@omegaup.com');
   });
 
   it('Should emit user update preferences', async () => {
-    const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_Preferences_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
 
     await wrapper
       .find('select[data-locale]')
@@ -78,9 +86,12 @@ describe('PreferencesEdit.vue', () => {
   });
 
   it('Should disable ScholarCompetitive objective select when "none" option is selected', async () => {
-    const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_Preferences_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
     await wrapper
       .find('select[data-learning-teaching-objective]')
       .find('option[value="none"]')
@@ -117,9 +128,12 @@ describe('PreferencesEdit.vue', () => {
       objectiveLearningTeaching,
       objectiveScholarCompetitiveQuestion,
     }) => {
-      const wrapper = shallowMount(user_Preferences_Edit, {
-        propsData: { profile },
-      });
+      const wrapper = shallowMount(
+        user_Preferences_Edit as ComponentOptions<Vue>,
+        {
+          propsData: { profile },
+        },
+      );
       await wrapper
         .find('select[data-learning-teaching-objective]')
         .find(`option[value="${objectiveLearningTeaching}"]`)
@@ -237,9 +251,12 @@ describe('PreferencesEdit.vue', () => {
       valueScholar,
       valueTeaching,
     }) => {
-      const wrapper = shallowMount(user_Preferences_Edit, {
-        propsData: { profile },
-      });
+      const wrapper = shallowMount(
+        user_Preferences_Edit as ComponentOptions<Vue>,
+        {
+          propsData: { profile },
+        },
+      );
       await wrapper
         .find('select[data-learning-teaching-objective]')
         .find(`option[value="${objectiveLearningTeaching}"]`)
@@ -271,9 +288,12 @@ describe('PreferencesEdit.vue', () => {
   );
 
   it('Should emit correct objectives values when "none" option is selected', async () => {
-    const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile },
-    });
+    const wrapper = shallowMount(
+      user_Preferences_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
     await wrapper
       .find('select[data-learning-teaching-objective]')
       .find('option[value="none"]')

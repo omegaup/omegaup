@@ -63,48 +63,67 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import type { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
 import OmegaupRadioSwitch from '../RadioSwitch.vue';
 
-@Component({
+export default defineComponent({
+  name: 'UserManageSchools',
   components: {
     'omegaup-datepicker': DatePicker,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-radio-switch': OmegaupRadioSwitch,
   },
-})
-export default class UserManageSchools extends Vue {
-  @Prop() profile!: types.UserProfileInfo;
-  @Prop() searchResultSchools!: types.SchoolListItem[];
-
-  T = T;
-  graduationDate = this.profile.graduation_date
-    ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
-    : new Date('');
-  school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
-  scholarDegree = this.profile.scholar_degree;
-  isCurrentlyEnrolled = !this.profile.graduation_date;
-
-  onUpdateUserSchools(): void {
-    this.$emit('update-user-schools', {
-      graduation_date:
-        this.isCurrentlyEnrolled || isNaN(this.graduationDate.getTime())
-          ? null
-          : this.graduationDate,
-      school_id:
-        !this.school ||
-        (this.school.key === this.profile.school_id &&
-          this.school.value !== this.profile.school)
-          ? null
-          : this.school.key,
-      school_name: this.school?.value,
-      scholar_degree: this.scholarDegree,
-    });
-  }
-}
+  props: {
+    profile: {
+      type: Object as PropType<types.UserProfileInfo>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      default: () => [],
+    },
+  },
+  emits: ['update-search-result-schools', 'update-user-schools'],
+  data(): {
+    T: typeof T;
+    graduationDate: Date;
+    school: null | types.SchoolListItem;
+    scholarDegree: string | null | undefined;
+    isCurrentlyEnrolled: boolean;
+  } {
+    return {
+      T,
+      graduationDate: this.profile.graduation_date
+        ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
+        : new Date(''),
+      school: this.searchResultSchools[0] ?? null,
+      scholarDegree: this.profile.scholar_degree,
+      isCurrentlyEnrolled: !this.profile.graduation_date,
+    };
+  },
+  methods: {
+    onUpdateUserSchools(): void {
+      this.$emit('update-user-schools', {
+        graduation_date:
+          this.isCurrentlyEnrolled || isNaN(this.graduationDate.getTime())
+            ? null
+            : this.graduationDate,
+        school_id:
+          !this.school ||
+          (this.school.key === this.profile.school_id &&
+            this.school.value !== this.profile.school)
+            ? null
+            : this.school.key,
+        school_name: this.school?.value,
+        scholar_degree: this.scholarDegree,
+      });
+    },
+  },
+});
 </script>
