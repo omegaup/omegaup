@@ -2,12 +2,12 @@ import { shallowMount } from '@vue/test-utils';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-
+import { ComponentOptions } from 'vue';
 import group_List from './List.vue';
 
 describe('List.vue', () => {
   it('Should handle an empty list of groups', () => {
-    const wrapper = shallowMount(group_List, {
+    const wrapper = shallowMount(group_List as ComponentOptions<Vue>, {
       propsData: {
         groups: [] as types.Group[],
       },
@@ -17,7 +17,7 @@ describe('List.vue', () => {
   });
 
   it('Should handle a list of groups', () => {
-    const wrapper = shallowMount(group_List, {
+    const wrapper = shallowMount(group_List as ComponentOptions<Vue>, {
       propsData: {
         groups: [
           {

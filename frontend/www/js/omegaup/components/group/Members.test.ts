@@ -2,17 +2,19 @@ import { mount, shallowMount } from '@vue/test-utils';
 
 import { dao, types } from '../../api_types';
 import T from '../../lang';
-
+import { ComponentOptions } from 'vue';
 import group_Members from './Members.vue';
 
 describe('Members.vue', () => {
   it('Should handle an empty list of members and identities', () => {
-    const wrapper = shallowMount(group_Members, {
+    const wrapper = shallowMount(group_Members as ComponentOptions<Vue>, {
       propsData: {
         groupAlias: 'omegaUp',
         identities: [] as types.Identity[],
         identitiesCsv: [] as types.Identity[],
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
+        searchResultUsers: [],
+        searchResultSchools: [],
       },
     });
 
@@ -20,7 +22,7 @@ describe('Members.vue', () => {
   });
 
   it('Should handle a list of members and identities', () => {
-    const wrapper = mount(group_Members, {
+    const wrapper = mount(group_Members as ComponentOptions<Vue>, {
       propsData: {
         groupAlias: 'omegaUp',
         identities: [
@@ -36,6 +38,8 @@ describe('Members.vue', () => {
           },
         ] as types.Identity[],
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
+        searchResultUsers: [],
+        searchResultSchools: [],
       },
     });
 
