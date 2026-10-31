@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
@@ -41,37 +41,47 @@ import {
 library.add(faChevronCircleLeft);
 library.add(faChevronCircleRight);
 
-@Component({
+export default defineComponent({
+  name: 'ArenaNavbarAssignments',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class ArenaNavbarAssignments extends Vue {
-  @Prop() assignments!: omegaup.Assignment[];
-  @Prop() currentAssignment!: omegaup.Assignment;
-
-  T = T;
-
-  get previousAssignment(): omegaup.Assignment | null {
-    if (this.currentAssignmentIndex === 0) {
-      return null;
-    }
-    return this.assignments[this.currentAssignmentIndex - 1];
-  }
-
-  get nextAssignment(): omegaup.Assignment | null {
-    if (this.currentAssignmentIndex === this.assignments.length - 1) {
-      return null;
-    }
-    return this.assignments[this.currentAssignmentIndex + 1];
-  }
-
-  private get currentAssignmentIndex(): number {
-    return this.assignments.findIndex(
-      (assignment) => assignment.alias === this.currentAssignment.alias,
-    );
-  }
-}
+  props: {
+    assignments: {
+      type: Array as PropType<omegaup.Assignment[]>,
+      default: () => [],
+    },
+    currentAssignment: {
+      type: Object as PropType<omegaup.Assignment>,
+      required: true,
+    },
+  },
+  emits: ['navigate-to-assignment'],
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    currentAssignmentIndex(): number {
+      return this.assignments.findIndex(
+        (assignment) => assignment.alias === this.currentAssignment.alias,
+      );
+    },
+    previousAssignment(): omegaup.Assignment | null {
+      if (this.currentAssignmentIndex === 0) {
+        return null;
+      }
+      return this.assignments[this.currentAssignmentIndex - 1];
+    },
+    nextAssignment(): omegaup.Assignment | null {
+      if (this.currentAssignmentIndex === this.assignments.length - 1) {
+        return null;
+      }
+      return this.assignments[this.currentAssignmentIndex + 1];
+    },
+  },
+});
 </script>
 
 <style>
