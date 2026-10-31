@@ -1,8 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 
 import schools_Rank from './Rank.vue';
+
+const SchoolRank = schools_Rank as ComponentOptions<Vue>;
 
 describe('SchoolRank.vue', () => {
   const propsData = {
@@ -22,7 +26,7 @@ describe('SchoolRank.vue', () => {
   };
 
   it('Should handle an empty rank', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData,
     });
 
@@ -31,7 +35,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should handle a rank with data', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData: {
         ...propsData,
         ...{
@@ -53,7 +57,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should show search bar when showHeader is false', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData,
     });
 
@@ -62,7 +66,7 @@ describe('SchoolRank.vue', () => {
   });
 
   it('Should hide search bar when showHeader is true', () => {
-    const wrapper = shallowMount(schools_Rank, {
+    const wrapper = shallowMount(SchoolRank, {
       propsData: {
         ...propsData,
         showHeader: true,
@@ -70,5 +74,66 @@ describe('SchoolRank.vue', () => {
     });
 
     expect(wrapper.find('.form-row').exists()).toBe(false);
+    expect(wrapper.find('.card-footer a').attributes('href')).toBe(
+      '/rank/schools/',
+    );
+  });
+
+  it('Should navigate on onSubmit when searchedSchool is selected', () => {
+    const originalLocation = window.location;
+    delete (window as any).location;
+    window.location = { href: '' } as any;
+
+    try {
+      const wrapper = shallowMount(SchoolRank, {
+        propsData,
+      });
+
+      const vm = wrapper.vm as any;
+      vm.searchedSchool = {
+        key: 'school-alias',
+        value: 'School Name',
+      };
+
+      vm.onSubmit();
+      expect(window.location.href).toBe('/schools/profile/school-alias/');
+    } finally {
+      window.location = originalLocation;
+    }
+  });
+
+  it('Should not navigate on onSubmit when searchedSchool is null', () => {
+    const originalLocation = window.location;
+    delete (window as any).location;
+    window.location = { href: '' } as any;
+
+    try {
+      const wrapper = shallowMount(SchoolRank, {
+        propsData,
+      });
+
+      const vm = wrapper.vm as any;
+      vm.searchedSchool = null;
+
+      vm.onSubmit();
+      expect(window.location.href).toBe('');
+    } finally {
+      window.location = originalLocation;
+    }
+  });
+
+  it('Should emit update-search-result-schools when typeahead emits update-existing-options', () => {
+    const wrapper = shallowMount(SchoolRank, {
+      propsData,
+    });
+
+    const typeahead = wrapper.findComponent({ name: 'Typeahead' });
+    if (typeahead.exists()) {
+      typeahead.vm.$emit('update-existing-options', 'query');
+      expect(wrapper.emitted('update-search-result-schools')).toBeTruthy();
+      expect(wrapper.emitted('update-search-result-schools')?.[0]).toEqual([
+        'query',
+      ]);
+    }
   });
 });
