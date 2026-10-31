@@ -888,6 +888,7 @@ const translations: { [key: string]: string; } = {
   graderDiffEditorModified: "(M0difi3d)",
   graderDiffEditorOriginal: "(Origina1)",
   graderDiffEditorReadOnly: "(R3ad-0n1y)",
+  gridPaginatorPageRange: "(%(low)\u2013%(high) 0f %(total) (Pag3 %(page) 0f %(pages)))",
   groupAdminAdded: "(Gr0up admin 5ucc355fu11y add3d.)",
   groupAdminRemoved: "(Gr0up admin 5ucc355fu11y r3m0v3d.)",
   groupAlreadyExists: "(A gr0up wi7h 7ha7 nam3 a1r3ady 3xi575)",

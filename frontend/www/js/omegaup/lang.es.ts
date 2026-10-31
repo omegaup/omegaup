@@ -888,6 +888,7 @@ const translations: { [key: string]: string; } = {
   graderDiffEditorModified: "Modificado",
   graderDiffEditorOriginal: "Original",
   graderDiffEditorReadOnly: "Solo lectura",
+  gridPaginatorPageRange: "%(low)\u2013%(high) de %(total) (P\u00e1gina %(page) de %(pages))",
   groupAdminAdded: "Grupo de administradores agregado correctamente",
   groupAdminRemoved: "Grupo de administradores eliminado correctamente",
   groupAlreadyExists: "Ya existe un grupo con ese nombre",
