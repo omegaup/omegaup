@@ -5,26 +5,37 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class Overlay extends Vue {
-  @Prop({ default: false }) showOverlay!: boolean;
-
-  isOverlayShown = this.showOverlay;
-
-  onOverlayClicked(evt: Event) {
-    if (typeof $(evt.composedPath()[0]).attr('data-overlay') !== 'undefined') {
-      this.isOverlayShown = false;
-      this.$emit('hide-overlay');
-    }
-  }
-
-  @Watch('showOverlay')
-  overlayVisibilityChanged(newValue: boolean): void {
-    this.isOverlayShown = newValue;
-  }
-}
+export default defineComponent({
+  name: 'Overlay',
+  props: {
+    showOverlay: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      isOverlayShown: this.showOverlay,
+    };
+  },
+  watch: {
+    showOverlay(newValue: boolean): void {
+      this.isOverlayShown = newValue;
+    },
+  },
+  methods: {
+    onOverlayClicked(evt: Event) {
+      if (
+        typeof $(evt.composedPath()[0]).attr('data-overlay') !== 'undefined'
+      ) {
+        this.isOverlayShown = false;
+        this.$emit('hide-overlay');
+      }
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
