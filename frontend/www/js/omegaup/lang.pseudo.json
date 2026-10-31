@@ -2122,6 +2122,7 @@
 	"userEditChangePasswordOldPassword": "(O1d pa55w0rd)",
 	"userEditChangePasswordRepeatNewPassword": "(R3p3a7 n3w pa55w0rd)",
 	"userEditChangePasswordToUsername": "(Chang3 pa55w0rd: %(username))",
+	"userEditCodeTemplates": "(C0d3 73mp1a735)",
 	"userEditCountry": "(C0un7ry / R3gi0n)",
 	"userEditDeleteAccount": "(D31373 Acc0un7)",
 	"userEditDoctorate": "(D0c70ra73)",

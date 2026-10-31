@@ -34,19 +34,14 @@ def send_contest_message_to_client(
         date_lower_limit: datetime.datetime = datetime.datetime(2005, 1, 1),
         date_upper_limit: datetime.datetime = datetime.datetime.now(),
         client: omegaup.api.Client,
+        queue: str = 'contest',
+        routing_key: str = 'ContestQueue',
 ) -> None:
-    '''Send messages to contest queue.
-     date-lower-limit: initial time from which to be taken the finish contests.
-     By default. the 2005/01/01 date will be taken.
-     date-upper-limit: finish time from which to be taken the finish contests.
-     By default, the current date will be taken.
-
-     When API token and URL are given, it is possible to send the messages.
-    '''
+    '''Send messages to the given contest queue.'''
     contest_producer = rabbitmq_producer.RabbitmqProducer(
-        queue='client_contest',
+        queue=queue,
         exchange='certificates',
-        routing_key='ContestQueue',
+        routing_key=routing_key,
         channel=channel
     )
 
