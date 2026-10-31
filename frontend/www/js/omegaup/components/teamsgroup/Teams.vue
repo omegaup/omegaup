@@ -15,42 +15,42 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in teams" :key="identity.username">
+        <tr v-for="team in teams" :key="team.username">
           <td>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="team.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="team.username"
             ></omegaup-user-username>
           </td>
-          <td data-group-team-name>{{ identity.name }}</td>
+          <td data-group-team-name>{{ team.name }}</td>
           <td>
-            {{ identity.country === 'xx' ? T.countryNotSet : identity.country }}
+            {{ team.country === 'xx' ? T.countryNotSet : team.country }}
           </td>
-          <td>{{ identity.state }}</td>
-          <td>{{ identity.school }}</td>
+          <td>{{ team.state }}</td>
+          <td>{{ team.school }}</td>
           <td>
             <button
               class="btn btn-link"
-              :data-edit-identity="identity.username"
+              :data-edit-identity="team.username"
               :title="T.groupEditMembersEdit"
-              @click="onEdit(identity)"
+              @click="onEdit(team)"
             >
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
             <button
               class="btn btn-link"
-              :data-add-members-identity="identity.username"
+              :data-add-members-identity="team.username"
               :title="T.groupEditMembersAddMembers"
-              @click="onAddMembers(identity.username)"
+              @click="onAddMembers(team.username)"
             >
               <font-awesome-icon :icon="['fas', 'users']" />
             </button>
             <button
               class="btn btn-link"
-              :data-remove-identity="identity.username"
+              :data-remove-identity="team.username"
               :title="T.groupEditMembersRemove"
-              @click="$emit('remove', identity.username)"
+              @click="$emit('remove', team.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>
@@ -96,7 +96,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
@@ -120,7 +121,8 @@ export enum AvailableForms {
   AddMembers,
 }
 
-@Component({
+export default defineComponent({
+  name: 'Teams',
   components: {
     FontAwesomeIcon,
     'omegaup-user-username': user_Username,
@@ -128,58 +130,88 @@ export enum AvailableForms {
     'omegaup-identity-change-password': identity_ChangePassword,
     'omegaup-identity-members': teamsgroup_Members,
   },
-})
-export default class Teams extends Vue {
-  @Prop() teams!: types.Identity[];
-  @Prop() countries!: Array<dao.Countries>;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
+  props: {
+    teams: {
+      type: Array as PropType<types.Identity[]>,
+      default: undefined,
+    },
+    countries: {
+      type: Array as PropType<dao.Countries[]>,
+      default: undefined,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      default: undefined,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      default: undefined,
+    },
+    teamsMembers: {
+      type: Array as PropType<types.TeamMember[]>,
+      default: () => [],
+    },
+  },
+  emits: [
+    'add-members',
+    'change-password-identity',
+    'change-password-identity-team',
+    'edit-identity-team',
+    'remove',
+    'remove-member',
+    'update-identity-team',
+    'update-search-result-schools',
+    'update-search-result-users',
+  ],
+  data() {
+    return {
+      T,
+      AvailableForms,
+      identity: null as null | types.Identity,
+      username: null as null | string,
+      formToShow: AvailableForms.None as AvailableForms,
+    };
+  },
+  methods: {
+    onEdit(identity: types.Identity): void {
+      this.identity = identity;
+      this.formToShow = AvailableForms.Edit;
+      this.username = identity.username;
+      this.$emit('update-identity-team', this.identity);
+    },
 
-  T = T;
-  AvailableForms = AvailableForms;
-  identity: null | types.Identity = null;
-  username: null | string = null;
-  formToShow: AvailableForms = AvailableForms.None;
+    onChangePass(username: string): void {
+      this.formToShow = AvailableForms.ChangePassword;
+      this.username = username;
+    },
 
-  onEdit(identity: types.Identity): void {
-    this.identity = identity;
-    this.formToShow = AvailableForms.Edit;
-    this.username = identity.username;
-    this.$emit('update-identity-team', this.identity);
-  }
+    onAddMembers(username: string): void {
+      this.formToShow = AvailableForms.AddMembers;
+      this.username = username;
+    },
 
-  onChangePass(username: string): void {
-    this.formToShow = AvailableForms.ChangePassword;
-    this.username = username;
-  }
+    onChangePasswordTeam(newPassword: string, newPasswordRepeat: string): void {
+      this.$emit('change-password-identity-team', {
+        username: this.username,
+        newPassword,
+        newPasswordRepeat,
+      });
+      this.onCancel();
+    },
 
-  onAddMembers(username: string): void {
-    this.formToShow = AvailableForms.AddMembers;
-    this.username = username;
-  }
+    onEditIdentityTeam(response: {
+      originalUsername: string;
+      identity: types.Identity;
+    }): void {
+      this.$emit('edit-identity-team', response);
+      this.onCancel();
+    },
 
-  onChangePasswordTeam(newPassword: string, newPasswordRepeat: string): void {
-    this.$emit('change-password-identity-team', {
-      username: this.username,
-      newPassword,
-      newPasswordRepeat,
-    });
-    this.onCancel();
-  }
-
-  onEditIdentityTeam(response: {
-    originalUsername: string;
-    identity: types.Identity;
-  }): void {
-    this.$emit('edit-identity-team', response);
-    this.onCancel();
-  }
-
-  onCancel(): void {
-    this.identity = null;
-    this.formToShow = AvailableForms.None;
-    this.username = null;
-  }
-}
+    onCancel(): void {
+      this.identity = null;
+      this.formToShow = AvailableForms.None;
+      this.username = null;
+    },
+  },
+});
 </script>

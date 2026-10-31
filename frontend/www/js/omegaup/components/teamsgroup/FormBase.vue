@@ -31,7 +31,7 @@
             <label class="control-label w-100">
               {{ T.contestNewFormShortTitleAlias }}
               <input
-                v-model="alias"
+                :value="alias"
                 name="alias"
                 required
                 type="text"
@@ -90,46 +90,67 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class TeamsGroupFormBase extends Vue {
-  @Prop() alias!: null | string;
-  @Prop() description!: null | string;
-  @Prop() name!: null | string;
-  @Prop({ default: 3 }) numberOfContestants!: number;
-  @Prop({ default: 10 }) maxNumberOfContestants!: number;
-  @Prop({ default: 1 }) minNumberOfContestants!: number;
-
-  T = T;
-  currentAlias: null | string = this.alias;
-  currentDescription: null | string = this.description;
-  currentName: null | string = this.name;
-  currentNumberOfContestants: number = this.numberOfContestants;
-
-  @Watch('currentAlias')
-  @Emit('update:alias')
-  onAliasUpdated(newValue: string): string {
-    return newValue;
-  }
-
-  @Watch('currentDescription')
-  @Emit('update:description')
-  onDescriptionUpdated(newValue: string): string {
-    return newValue;
-  }
-
-  @Watch('currentName')
-  @Emit('update:name')
-  onNameUpdated(newValue: string): string {
-    return newValue;
-  }
-
-  @Watch('currentNumberOfContestants')
-  @Emit('update:numberOfContestants')
-  onNumberOfContestantsUpdated(newValue: number): number {
-    return newValue;
-  }
-}
+export default defineComponent({
+  name: 'TeamsGroupFormBase',
+  props: {
+    alias: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    description: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    name: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    numberOfContestants: {
+      type: Number,
+      default: 3,
+    },
+    maxNumberOfContestants: {
+      type: Number,
+      default: 10,
+    },
+    minNumberOfContestants: {
+      type: Number,
+      default: 1,
+    },
+  },
+  emits: [
+    'submit',
+    'update:alias',
+    'update:description',
+    'update:name',
+    'update:numberOfContestants',
+  ],
+  data() {
+    return {
+      T,
+      currentAlias: this.alias as null | string,
+      currentDescription: this.description as null | string,
+      currentName: this.name as null | string,
+      currentNumberOfContestants: this.numberOfContestants,
+    };
+  },
+  watch: {
+    currentAlias(newValue: string, oldValue: string): void {
+      this.$emit('update:alias', newValue, newValue, oldValue);
+    },
+    currentDescription(newValue: string, oldValue: string): void {
+      this.$emit('update:description', newValue, newValue, oldValue);
+    },
+    currentName(newValue: string, oldValue: string): void {
+      this.$emit('update:name', newValue, newValue, oldValue);
+    },
+    currentNumberOfContestants(newValue: number, oldValue: number): void {
+      this.$emit('update:numberOfContestants', newValue, newValue, oldValue);
+    },
+  },
+});
 </script>
