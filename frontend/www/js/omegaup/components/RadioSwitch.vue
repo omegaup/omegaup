@@ -9,7 +9,6 @@
           type="radio"
           :name="name"
           :value="valueForTrue"
-          @change.prevent="onUpdateInput"
         />{{ textForTrue }}
       </label>
     </div>
@@ -22,7 +21,6 @@
           type="radio"
           :name="name"
           :value="valueForFalse"
-          @change.prevent="onUpdateInput"
         />{{ textForFalse }}
       </label>
     </div>
@@ -73,11 +71,6 @@ export default defineComponent({
   },
   watch: {
     radioValue(newValue: any): void {
-      this.$emit('update:value', newValue);
-    },
-  },
-  methods: {
-    onUpdateInput(newValue: any): void {
       this.$emit('update:value', newValue);
     },
   },

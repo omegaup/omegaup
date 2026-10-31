@@ -31,4 +31,16 @@ describe('RadioSwitch.vue', () => {
     expect(wrapper.text()).not.toContain(T.wordsYes);
     expect(wrapper.text()).not.toContain(T.wordsNo);
   });
+
+  it('Should emit update:value once with the selected value', async () => {
+    const wrapper = shallowMount(RadioSwitch, {
+      propsData: {
+        selectedValue: false,
+      },
+    });
+
+    await wrapper.findAll('input[type="radio"]').at(0).setChecked();
+
+    expect(wrapper.emitted('update:value')).toEqual([[true]]);
+  });
 });
