@@ -1,3 +1,4 @@
+import { ComponentOptions } from 'vue';
 import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
@@ -7,7 +8,7 @@ import type { types } from '../../api_types';
 
 describe('Solvers.vue', () => {
   it('Should handle empty solvers list', () => {
-    const wrapper = shallowMount(arena_Solvers, {
+    const wrapper = shallowMount(arena_Solvers as ComponentOptions<Vue>, {
       propsData: {
         solvers: [] as types.BestSolvers[],
       },
@@ -17,7 +18,7 @@ describe('Solvers.vue', () => {
   });
 
   it('Should handle solvers list', async () => {
-    const wrapper = shallowMount(arena_Solvers, {
+    const wrapper = shallowMount(arena_Solvers as ComponentOptions<Vue>, {
       propsData: {
         solvers: [
           {
