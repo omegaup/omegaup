@@ -78,10 +78,10 @@ export class CoursePage {
       cy.get('[data-course-end-date]').type(getISODateTime(endDate));
     }
     for (let i = 0; i < problemOptions.length; i++) {
-      cy.get('.tags-input input[type="text"]').type(
+      cy.chooseTypeaheadOption(
+        '.omegaup-typeahead',
         problemOptions[i].problemAlias,
       );
-      cy.get('.typeahead-dropdown li').first().click();
       cy.get('button[data-add-problem]').click();
       cy.get('[data-course-problemlist] table.table-striped').should(
         'be.visible',
@@ -120,11 +120,9 @@ export class CoursePage {
     cy.get('input[name="show-scoreboard"][value="true"]')
       .should('be.visible')
       .click();
-    if (courseOptions.school != undefined)
-      cy.get('.tags-input input[type="text"]')
-        .first()
-        .type(courseOptions.school);
-    cy.get('.typeahead-dropdown li').first().click();
+    if (courseOptions.school != undefined) {
+      cy.chooseTypeaheadOption('.omegaup-typeahead', courseOptions.school);
+    }
     cy.get('textarea[data-course-new-description]')
       .should('be.visible')
       .type('course description');
@@ -342,14 +340,7 @@ export class CoursePage {
     cy.get('.omegaup-course-assignmentdetails').should('be.visible');
     const now = new Date();
     cy.get('[data-course-start-date]').type(getISODateTime(now));
-    cy.get('.tags-input input[type="text"]')
-      .should('be.visible')
-      .type(problemAlias, { delay: 100 });
-    cy.get('.typeahead-dropdown li', { timeout: 10000 })
-      .should('be.visible')
-      .should('contain.text', problemAlias)
-      .first()
-      .click();
+    cy.chooseTypeaheadOption('.omegaup-typeahead', problemAlias);
     cy.wait(3000);
     cy.get('button[data-add-problem]').click();
     cy.get('[data-course-problemlist] table.table-striped').should(
@@ -410,8 +401,7 @@ export class CoursePage {
   }
 
   verifySubmissionsFilterUsingNames(users: string[]): void {
-    cy.get('[data-search-username]').type(users[0]);
-    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.chooseTypeaheadOption('[data-search-username]', users[0]);
     cy.get(`td[data-username=${users[0]}]`).should('be.visible');
     cy.get(`td[data-username=${users[1]}]`).should('not.exist');
 
@@ -419,8 +409,7 @@ export class CoursePage {
     cy.get(`td[data-username=${users[0]}]`).should('be.visible');
     cy.get(`td[data-username=${users[1]}]`).should('be.visible');
 
-    cy.get('[data-search-username]').type(users[1]);
-    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.chooseTypeaheadOption('[data-search-username]', users[1]);
     cy.get(`td[data-username=${users[1]}]`).should('be.visible');
     cy.get(`td[data-username=${users[0]}]`).should('not.exist');
     cy.get('[data-remove-all-filters]').click();
@@ -432,8 +421,7 @@ export class CoursePage {
   }
 
   verifySubmissionsFilterUsingProblems(problems: string[]): void {
-    cy.get('[data-search-problem]').type(problems[0]);
-    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.chooseTypeaheadOption('[data-search-problem]', problems[0]);
     cy.get(`a[href="/arena/problem/${problems[0]}/"]`).should('be.visible');
     cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('not.exist');
 
@@ -441,8 +429,7 @@ export class CoursePage {
     cy.get(`a[href="/arena/problem/${problems[0]}/"]`).should('be.visible');
     cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('be.visible');
 
-    cy.get('[data-search-problem]').type(problems[1]);
-    cy.get('.tags-input-typeahead-item-highlighted-default').click();
+    cy.chooseTypeaheadOption('[data-search-problem]', problems[1]);
     cy.get(`a[href="/arena/problem/${problems[1]}/"]`).should('be.visible');
     cy.get(`a[href="/arena/problem/${problems[0]}/]"`).should('not.exist');
   }
@@ -469,7 +456,10 @@ export class CoursePage {
     cy.get('[name="unlimited-duration"]')
       .eq(courseOptions.unlimitedDuration ? 0 : 1)
       .should('be.checked');
-    cy.get('.tags-input').should('have.text', courseOptions.school);
+    cy.get('.omegaup-typeahead-label').should(
+      'have.text',
+      courseOptions.school,
+    );
     cy.get('[name="basic-information"]')
       .eq(courseOptions.basicInformation ? 0 : 1)
       .should('be.checked');

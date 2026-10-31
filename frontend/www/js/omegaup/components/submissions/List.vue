@@ -262,7 +262,7 @@ table.submissions-table > tbody > tr > td {
   font-size: 1.8rem;
 }
 
-[submissions-problem] .tags-input-wrapper-default {
+[submissions-problem] .omegaup-typeahead .multiselect__tags {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 .line {

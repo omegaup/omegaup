@@ -15,9 +15,9 @@ export class ProblemPage {
   }
 
   verifyFilterByAlias(problemAlias: string): void {
-    cy.get('[data-problem-keyword-search] input').type(
-      problemAlias + '{enter}',
-    );
+    cy.get('[data-problem-keyword-search] .multiselect__input')
+      .scrollIntoView()
+      .type(problemAlias + '{enter}');
     cy.get('[data-filter-submit-button]').click();
 
     cy.get('[data-problem-title-list]').first().should('contain', problemAlias);
@@ -81,9 +81,9 @@ export class ProblemPage {
   }
 
   verifyBan(problemAlias: string): void {
-    cy.get('[data-problem-keyword-search] input').type(
-      problemAlias + '{enter}',
-    );
+    cy.get('[data-problem-keyword-search] .multiselect__input')
+      .scrollIntoView()
+      .type(problemAlias + '{enter}');
     cy.get('[data-filter-submit-button]').click();
     cy.get('[data-problem-title-list]').should('not.exist');
   }

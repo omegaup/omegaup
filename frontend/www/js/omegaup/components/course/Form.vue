@@ -636,7 +636,7 @@ export default class CourseDetails extends Vue {
 }
 
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.is-invalid-school ::v-deep .tags-input-wrapper-default {
+.is-invalid-school ::v-deep .omegaup-typeahead .multiselect__tags {
   border-color: var(--form-input-error-color);
 }
 
