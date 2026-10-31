@@ -111,7 +111,7 @@
       <button
         v-if="objective !== ObjectivesAnswers.None"
         type="button"
-        class="btn btn-next-previous btn-welcome-next"
+        class="btn btn-primary"
         @click="onNextModalPage"
       >
         {{ T.userObjectivesModalButtonNext }}
@@ -350,12 +350,6 @@ export default class UserObjectivesQuestions extends Vue {
 .btn-skip,
 .btn-next-previous {
   color: var(--btn-next-previous-font-color);
-}
-
-.btn-welcome-next {
-  color: var(--btn-ok-font-color);
-  background-color: var(--btn-ok-background-color);
-  border-color: var(--btn-ok-background-color);
 }
 
 .btn-next-previous:focus,
