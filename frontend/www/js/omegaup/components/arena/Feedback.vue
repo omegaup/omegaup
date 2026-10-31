@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import * as time from '../../time';
 import user_Username from '../user/Username.vue';
@@ -82,45 +82,52 @@ export interface ArenaCourseFeedback {
   submissionFeedbackId?: number;
 }
 
-@Component({
+export default defineComponent({
+  name: 'Feedback',
   components: {
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-user-username': user_Username,
   },
-})
-export default class Feedback extends Vue {
-  @Prop() feedback!: ArenaCourseFeedback;
-  @Ref('feedback-form') feedbackForm!: HTMLTextAreaElement;
-
-  FeedbackStatus = FeedbackStatus;
-  T = T;
-  time = time;
-  saved: boolean = this.feedback.status == FeedbackStatus.Saved;
-  currentFeedback = this.feedback;
-
-  get currentFeedbackTimestamp(): string {
-    return time.formatDateTimeLocal(this.feedback.timestamp ?? new Date());
-  }
-
+  props: {
+    feedback: {
+      type: Object as PropType<ArenaCourseFeedback>,
+      required: true,
+    },
+  },
+  emits: ['submit', 'cancel', 'delete'],
+  data() {
+    return {
+      FeedbackStatus,
+      T,
+      saved: this.feedback.status === FeedbackStatus.Saved,
+      currentFeedback: this.feedback,
+    };
+  },
+  computed: {
+    currentFeedbackTimestamp(): string {
+      return time.formatDateTimeLocal(this.feedback.timestamp ?? new Date());
+    },
+  },
   mounted() {
     if (this.feedback.status === FeedbackStatus.Saved) return;
-    this.$nextTick(() => this.feedbackForm.focus());
-  }
-
-  onSubmitFeedback() {
-    this.saved = true;
-    this.currentFeedback.status = FeedbackStatus.InProgress;
-    this.$emit('submit', this.currentFeedback);
-  }
-
-  onCancelFeedback() {
-    this.currentFeedback.text = null;
-    this.$emit('cancel');
-  }
-
-  onDeleteFeedback() {
-    this.currentFeedback.text = null;
-    this.$emit('delete', this.currentFeedback);
-  }
-}
+    this.$nextTick(() => {
+      (this.$refs['feedback-form'] as HTMLTextAreaElement)?.focus();
+    });
+  },
+  methods: {
+    onSubmitFeedback(): void {
+      this.saved = true;
+      this.currentFeedback.status = FeedbackStatus.InProgress;
+      this.$emit('submit', this.currentFeedback);
+    },
+    onCancelFeedback(): void {
+      this.currentFeedback.text = null;
+      this.$emit('cancel');
+    },
+    onDeleteFeedback(): void {
+      this.currentFeedback.text = null;
+      this.$emit('delete', this.currentFeedback);
+    },
+  },
+});
 </script>

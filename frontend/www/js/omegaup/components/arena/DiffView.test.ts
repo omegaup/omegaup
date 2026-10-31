@@ -1,12 +1,13 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
+import { ComponentOptions } from 'vue';
 import { shallowMount } from '@vue/test-utils';
 
 import arena_DiffView from './DiffView.vue';
 
 describe('DiffView.vue', () => {
   it('Should handle diffs', async () => {
-    const wrapper = shallowMount(arena_DiffView, {
+    const wrapper = shallowMount(arena_DiffView as ComponentOptions<Vue>, {
       propsData: {
         left: 'hello',
         right: 'hello',

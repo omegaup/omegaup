@@ -108,88 +108,102 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
 
-@Component
-export default class ArenaClarification extends Vue {
-  @Prop() clarification!: types.Clarification;
-  @Prop({ default: false }) isAdmin!: boolean;
-  @Prop({ default: false }) selected!: boolean;
-
-  T = T;
-  time = time;
-
-  isPublic = this.clarification.public;
-  message = '';
-  selectedResponse = 'yes';
-  showUpdateAnswer = false;
-  responses = [
-    {
-      value: 'yes',
-      text: T.wordsYes,
+export default defineComponent({
+  name: 'Clarification',
+  props: {
+    clarification: {
+      type: Object as PropType<types.Clarification>,
+      required: true,
     },
-    {
-      value: 'no',
-      text: T.wordsNo,
+    isAdmin: {
+      type: Boolean,
+      default: false,
     },
-    {
-      value: 'nocomment',
-      text: T.wordsNoComment,
+    selected: {
+      type: Boolean,
+      default: false,
     },
-    {
-      value: 'readAgain',
-      text: T.wordsReadAgain,
-    },
-    {
-      value: 'other',
-      text: T.wordsOther,
-    },
-  ];
-
-  get clarificationAuthorReceiver(): string {
-    if (this.clarification.receiver) {
-      return ui.formatString(T.clarificationsOnBehalf, {
-        author: this.clarification.author,
-        receiver: this.clarification.receiver,
-      });
-    }
-    return this.clarification.author;
-  }
-
-  get isDirectMessage(): boolean {
-    return (
-      this.clarification.answer == null && this.clarification.receiver != null
-    );
-  }
-
-  get responseText(): string {
-    const response = this.responses.find(
-      (response) => response.value === this.selectedResponse,
-    );
-    if (!response) {
-      return this.selectedResponse;
-    }
-    return this.selectedResponse === 'other' ? this.message : response.text;
-  }
-
-  sendClarificationResponse(): void {
-    const response: types.Clarification = {
-      clarification_id: this.clarification.clarification_id,
-      author: this.clarification.author,
-      answer: this.responseText,
-      public: this.isPublic,
-      message: this.message,
-      problem_alias: this.clarification.problem_alias,
-      time: new Date(),
+  },
+  emits: ['clarification-response'],
+  data() {
+    return {
+      T,
+      time,
+      isPublic: this.clarification.public,
+      message: '',
+      selectedResponse: 'yes',
+      showUpdateAnswer: false,
+      responses: [
+        {
+          value: 'yes',
+          text: T.wordsYes,
+        },
+        {
+          value: 'no',
+          text: T.wordsNo,
+        },
+        {
+          value: 'nocomment',
+          text: T.wordsNoComment,
+        },
+        {
+          value: 'readAgain',
+          text: T.wordsReadAgain,
+        },
+        {
+          value: 'other',
+          text: T.wordsOther,
+        },
+      ],
     };
-    this.showUpdateAnswer = false;
-    this.$emit('clarification-response', response);
-  }
-}
+  },
+  computed: {
+    clarificationAuthorReceiver(): string {
+      if (this.clarification.receiver) {
+        return ui.formatString(T.clarificationsOnBehalf, {
+          author: this.clarification.author,
+          receiver: this.clarification.receiver,
+        });
+      }
+      return this.clarification.author;
+    },
+    isDirectMessage(): boolean {
+      return (
+        this.clarification.answer == null && this.clarification.receiver != null
+      );
+    },
+    responseText(): string {
+      const response = this.responses.find(
+        (response) => response.value === this.selectedResponse,
+      );
+      if (!response) {
+        return this.selectedResponse;
+      }
+      return this.selectedResponse === 'other' ? this.message : response.text;
+    },
+  },
+  methods: {
+    sendClarificationResponse(): void {
+      const response: types.Clarification = {
+        clarification_id: this.clarification.clarification_id,
+        author: this.clarification.author,
+        answer: this.responseText,
+        public: this.isPublic,
+        message: this.message,
+        problem_alias: this.clarification.problem_alias,
+        time: new Date(),
+      };
+      this.showUpdateAnswer = false;
+      this.$emit('clarification-response', response);
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

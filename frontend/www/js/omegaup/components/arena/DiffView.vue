@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/merge/merge.css';
@@ -18,17 +18,26 @@ require('codemirror/addon/merge/merge.js');
 const MergeView =
   CodeMirror.MergeView ?? (CodeMirror as any)?.default.MergeView;
 
-@Component
-export default class DiffView extends Vue {
-  @Prop() left!: string;
-  @Prop() right!: string;
-  @Ref('cm-editor') private readonly cmEditor!: HTMLElement;
-
-  private editor: CodeMirror.MergeView.MergeViewEditor | null = null;
-
+export default defineComponent({
+  name: 'DiffView',
+  props: {
+    left: {
+      type: String,
+      required: true,
+    },
+    right: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      editor: null as CodeMirror.MergeView.MergeViewEditor | null,
+    };
+  },
   mounted() {
     if (this.editor) return;
-    this.editor = MergeView(this.cmEditor, {
+    this.editor = MergeView(this.$refs['cm-editor'] as HTMLElement, {
       collapseIdentical: true,
       connect: 'align',
       lineNumbers: true,
@@ -41,6 +50,6 @@ export default class DiffView extends Vue {
       tabSize: 2,
       value: this.right,
     });
-  }
-}
+  },
+});
 </script>
