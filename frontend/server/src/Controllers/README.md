@@ -270,6 +270,10 @@
   - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
   - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
+  - [`/api/user/follow/`](#apiuserfollow)
+  - [`/api/user/followStatus/`](#apiuserfollowstatus)
+  - [`/api/user/followers/`](#apiuserfollowers)
+  - [`/api/user/following/`](#apiuserfollowing)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
@@ -292,6 +296,7 @@
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
+  - [`/api/user/unfollow/`](#apiuserunfollow)
   - [`/api/user/update/`](#apiuserupdate)
   - [`/api/user/updateBasicInfo/`](#apiuserupdatebasicinfo)
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
@@ -5441,6 +5446,85 @@ Gets extra information of the identity:
 | `verified`        | `boolean`      |
 | `within_last_day` | `boolean`      |
 
+## `/api/user/follow/`
+
+### Description
+
+Makes the current user follow the given user.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/followStatus/`
+
+### Description
+
+Gets the follow counters for the given user, plus whether the current
+user follows them. Intended for rendering a profile's follow button.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+| Name             | Type      |
+| ---------------- | --------- |
+| `followersCount` | `number`  |
+| `followingCount` | `number`  |
+| `isFollowing`    | `boolean` |
+
+## `/api/user/followers/`
+
+### Description
+
+Gets the users that follow the given user, most recent first.
+
+### Parameters
+
+| Name       | Type        | Description | Required |
+| ---------- | ----------- | ----------- | -------- |
+| `username` | `string`    |             | ✓        |
+| `page`     | `null\|int` |             |          |
+| `rowcount` | `null\|int` |             |          |
+
+### Returns
+
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `followers` | `List[types.FollowUser]` |
+| `totalRows` | `number`                 |
+
+## `/api/user/following/`
+
+### Description
+
+Gets the users the given user follows, most recent first.
+
+### Parameters
+
+| Name       | Type        | Description | Required |
+| ---------- | ----------- | ----------- | -------- |
+| `username` | `string`    |             | ✓        |
+| `page`     | `null\|int` |             |          |
+| `rowcount` | `null\|int` |             |          |
+
+### Returns
+
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `following` | `List[types.FollowUser]` |
+| `totalRows` | `number`                 |
+
 ## `/api/user/generateGitToken/`
 
 ### Description
@@ -5830,6 +5914,22 @@ Gets verify status of a user
 | ---------- | --------- |
 | `username` | `string`  |
 | `verified` | `boolean` |
+
+## `/api/user/unfollow/`
+
+### Description
+
+Makes the current user stop following the given user.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/user/update/`
 
