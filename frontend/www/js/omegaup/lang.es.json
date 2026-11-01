@@ -1286,7 +1286,7 @@
 	"parameterNotADate": "El campo debe ser una fecha.",
 	"parameterNotANumber": "El campo debe ser un n\u00famero",
 	"parameterNotFound": "No existe en la base de datos",
-	"parameterNotInExpectedSet": "El campo no est\u00e1 en el conjunto v\u00e1lido",
+	"parameterNotInExpectedSet": "El valor (%(bad_elements)) no est\u00e1 en el conjunto esperado (%(expected_set)).",
 	"parameterNumberTooLarge": "El valor excede el l\u00edmite superior de %(upper_bound)",
 	"parameterNumberTooSmall": "El valor es menor al l\u00edmite inferior de %(lower_bound)",
 	"parameterStringTooLong": "La longitud de la cadena no debe exceder %(max_length) caracteres",
