@@ -9,12 +9,13 @@ import argparse
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import tempfile
 import typing
-from typing import (Callable, Dict, Iterable, List, NamedTuple, Sequence,
-                    Tuple, TypedDict)
+from typing import (Callable, Dict, Iterable, List, NamedTuple, Optional,
+                    Sequence, Tuple, TypedDict)
 
 import boto3  # type: ignore
 import copydetect  # type: ignore
@@ -109,6 +110,10 @@ INSERT_INTO_PLAGIARISMS = """
 START_RED = "<span class='highlight-red'>"
 START_GREEN = "<span class='highlight-green'>"
 END = "</span>"
+_TAG_RE = re.compile(
+    rf'(?P<start>{re.escape(START_RED)}|{re.escape(START_GREEN)})|'
+    rf'(?P<end>{re.escape(END)})'
+)
 C_LANGS = [
     'c', 'c11-gcc', 'c11-clang', 'cpp', 'cpp11', 'cpp11-gcc', 'cpp11-clang',
     'cpp17-gcc', 'cpp17-clang', 'cpp20-gcc', 'cpp20-clang'
@@ -139,31 +144,19 @@ class LocalSubmissionDownloader:
 
 
 def get_range(code: Sequence[str]) -> Tuple[Tuple[int, int], ...]:
-    """
-    Function to get the range of lines that are plagiarised.
-    The length of each list should be even.
-    [1, 4, 7, 9] So, the ranges are 1-4 and 7-9.
-    """
-
-    code_range_list: List[int] = []
+    """Function to get the range of lines that are plagiarised."""
+    ranges: List[Tuple[int, int]] = []
+    current_start: Optional[int] = None
     for line_number, line in enumerate(code):
+        for match in _TAG_RE.finditer(line):
+            if match.group('start'):
+                # Discard any prior unclosed span to avoid false positives.
+                current_start = line_number
+            elif match.group('end') and current_start is not None:
+                ranges.append((current_start, line_number))
+                current_start = None
 
-        # If the color is red, then it will be the same for the entire 'code'.
-        # that's why we don't really make a distinction between them.
-
-        if START_RED in line or START_GREEN in line:
-            code_range_list.append(line_number)
-
-        # TODO: replace this with
-        # code_range_list.append((last_start_line, line_number))
-        if END in line:
-            code_range_list.append(line_number)
-
-    # return at one time either the Red lines or green lines range
-    match_pair_of_lines: Tuple[Tuple[int, int], ...] = ()
-    for i in range(0, len(code_range_list), 2):
-        match_pair_of_lines += ((code_range_list[i], code_range_list[i + 1]), )
-    return match_pair_of_lines
+    return tuple(ranges)
 
 
 def filter_and_format_result(dbconn: lib.db.Connection, contest_id: int,
