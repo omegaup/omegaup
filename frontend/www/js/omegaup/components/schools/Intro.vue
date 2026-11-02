@@ -41,14 +41,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
 import T from '../../lang';
 
-@Component
-export default class Intro extends Vue {
-  T = T;
-}
+export default defineComponent({
+  name: 'Intro',
+  data() {
+    return {
+      T,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>
