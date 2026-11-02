@@ -373,7 +373,7 @@ export default class UserRank extends Vue {
   color: var(--arena-contest-list-empty-category-font-color);
 }
 
-[data-user-rank] .tags-input-wrapper-default {
+[data-user-rank] .omegaup-typeahead .multiselect__tags {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
   overflow: hidden;
 }

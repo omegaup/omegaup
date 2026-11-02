@@ -146,7 +146,7 @@ export default class SchoolRank extends Vue {
   margin: 0 auto;
 }
 
-[data-schools-rank] .tags-input-wrapper-default {
+[data-schools-rank] .omegaup-typeahead .multiselect__tags {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 </style>
