@@ -1334,6 +1334,7 @@ const translations: { [key: string]: string; } = {
   problemCollectionRandomKarelProblem: "Random Karel Problem",
   problemCollectionRandomLanguageProblem: "Random Problem",
   problemCollectionSearchProblem: "Problem Finder",
+  problemCollectionTagsFilterTooltip: "Use + to include problems that have all selected tags. Use \u2212 to exclude problems that have any of the marked tags.",
   problemCraetorGroupDownloadIn: "Save .in",
   problemCraetorGroupDownloadTxt: "Save .txt",
   problemCreatorAdd: "Add",
