@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
+import { ComponentOptions } from 'vue';
 import group_ScoreboardDetails from './ScoreboardDetails.vue';
 
 describe('ScoreboardDetails.vue', () => {
@@ -61,27 +62,30 @@ describe('ScoreboardDetails.vue', () => {
       weight: 1,
       window_length: 0,
     };
-    const wrapper = shallowMount(group_ScoreboardDetails, {
-      propsData: {
-        groupAlias: 'groupAlias',
-        scoreboardAlias: 'scoreboardAlias',
-        ranking,
-        scoreboard,
-        contests: [
-          contest,
-          {
+    const wrapper = shallowMount(
+      group_ScoreboardDetails as ComponentOptions<Vue>,
+      {
+        propsData: {
+          groupAlias: 'groupAlias',
+          scoreboardAlias: 'scoreboardAlias',
+          ranking,
+          scoreboard,
+          contests: [
             contest,
-            ...{
-              alias: 'contest_2',
-              title: 'Contest 2',
-              description: 'Conctes 2',
-              contest_id: 2,
-              problemset_id: 2,
+            {
+              contest,
+              ...{
+                alias: 'contest_2',
+                title: 'Contest 2',
+                description: 'Conctes 2',
+                contest_id: 2,
+                problemset_id: 2,
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-    });
+    );
 
     expect(wrapper.find('.card-header').text()).toBe('Scoreboard');
     expect(wrapper.find('tbody').text()).toContain('user_1');

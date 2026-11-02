@@ -153,7 +153,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import group_Identities from './Identities.vue';
 import group_Form from './Form.vue';
 import group_Members from './Members.vue';
@@ -169,66 +170,119 @@ export enum AvailableTabs {
   Identities = 'identities',
 }
 
-@Component({
+export default defineComponent({
+  name: 'GroupEdit',
   components: {
     'omegaup-group-create-identities': group_Identities,
     'omegaup-group-form': group_Form,
     'omegaup-group-members': group_Members,
     'omegaup-group-scoreboards': group_Scoreboards,
   },
-})
-export default class GroupEdit extends Vue {
-  @Prop() groupAlias!: string;
-  @Prop() groupDescription!: string;
-  @Prop() groupName!: string;
-  @Prop() countries!: dao.Countries[];
-  @Prop() isOrganizer!: boolean;
-  @Prop() tab!: AvailableTabs;
-  @Prop() identities!: types.Identity[];
-  @Prop() identitiesCsv!: types.Identity[];
-  @Prop() scoreboards!: types.GroupScoreboard[];
-  @Prop() userErrorRow!: null | string;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop() hasVisitedSection!: boolean;
-
-  T = T;
-  ui = ui;
-  AvailableTabs = AvailableTabs;
-  selectedTab: AvailableTabs = this.tab;
-  currentIdentities = this.identities;
-  currentIdentitiesCsv = this.identitiesCsv;
-  currentScoreboards = this.scoreboards;
-
-  @Watch('tab')
-  onInitialTabChanged(newValue: AvailableTabs): void {
-    if (!Object.values(AvailableTabs).includes(newValue)) {
-      this.selectedTab = AvailableTabs.Members;
-      return;
-    }
-    this.selectedTab = newValue;
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabChanged(newValue: AvailableTabs): void {
-    this.$emit('update:tab', newValue);
-  }
-
-  @Watch('identities')
-  onInitialIdentitiesChanged(newValue: types.Identity[]): void {
-    this.currentIdentities = newValue;
-  }
-
-  @Watch('identitiesCsv')
-  onInitialIdentitiesCsvChanged(newValue: types.Identity[]): void {
-    this.currentIdentitiesCsv = newValue;
-  }
-
-  @Watch('scoreboards')
-  onInitialScoreboardsChanged(newValue: types.GroupScoreboard[]): void {
-    this.currentScoreboards = newValue;
-  }
-}
+  props: {
+    groupAlias: {
+      type: String,
+      required: true,
+    },
+    groupDescription: {
+      type: String,
+      required: true,
+    },
+    groupName: {
+      type: String,
+      required: true,
+    },
+    countries: {
+      type: Array as PropType<dao.Countries[]>,
+      required: true,
+    },
+    isOrganizer: {
+      type: Boolean,
+      required: true,
+    },
+    tab: {
+      type: String as PropType<AvailableTabs>,
+      required: true,
+    },
+    identities: {
+      type: Array as PropType<types.Identity[]>,
+      required: true,
+    },
+    identitiesCsv: {
+      type: Array as PropType<types.Identity[]>,
+      required: true,
+    },
+    scoreboards: {
+      type: Array as PropType<types.GroupScoreboard[]>,
+      required: true,
+    },
+    userErrorRow: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      required: true,
+    },
+    hasVisitedSection: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  emits: [
+    'update:tab',
+    'update-group',
+    'update-search-result-schools',
+    'update-search-result-users',
+    'add-member',
+    'edit-identity',
+    'edit-identity-member',
+    'change-password-identity',
+    'change-password-identity-member',
+    'remove',
+    'cancel',
+    'create-scoreboard',
+    'bulk-identities',
+    'download-identities',
+    'read-csv',
+    'invalid-file',
+  ],
+  data() {
+    return {
+      T,
+      ui,
+      AvailableTabs,
+      selectedTab: this.tab as AvailableTabs,
+      currentIdentities: this.identities as types.Identity[],
+      currentIdentitiesCsv: this.identitiesCsv as types.Identity[],
+      currentScoreboards: this.scoreboards as types.GroupScoreboard[],
+    };
+  },
+  watch: {
+    tab(newValue: AvailableTabs): void {
+      if (!Object.values(AvailableTabs).includes(newValue)) {
+        this.selectedTab = AvailableTabs.Members;
+        return;
+      }
+      this.selectedTab = newValue;
+    },
+    selectedTab(newValue: AvailableTabs): void {
+      this.$emit('update:tab', newValue);
+    },
+    identities(newValue: types.Identity[]): void {
+      this.currentIdentities = newValue;
+    },
+    identitiesCsv(newValue: types.Identity[]): void {
+      this.currentIdentitiesCsv = newValue;
+    },
+    scoreboards(newValue: types.GroupScoreboard[]): void {
+      this.currentScoreboards = newValue;
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
