@@ -42,21 +42,31 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component({
+export default defineComponent({
+  name: 'PasswordReset',
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class PasswordRecover extends Vue {
-  @Prop() email?: string;
-  @Prop() resetToken?: string;
-
-  T = T;
-  password = '';
-  passwordConfirmation = '';
-}
+  props: {
+    email: {
+      type: String,
+      required: true,
+    },
+    resetToken: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      password: '',
+      passwordConfirmation: '',
+    };
+  },
+});
 </script>
