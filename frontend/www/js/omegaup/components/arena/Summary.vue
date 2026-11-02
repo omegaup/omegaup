@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -96,63 +96,104 @@ import * as time from '../../time';
 
 import omegaup_Markdown from '../Markdown.vue';
 
-@Component({
+export default defineComponent({
+  name: 'Summary',
   components: {
     'omegaup-markdown': omegaup_Markdown,
   },
-})
-export default class Summary extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() startTime!: Date;
-  @Prop() finishTime!: Date;
-  @Prop() scoreboard!: number;
-  @Prop() windowLength!: null | number;
-  @Prop() admin!: string;
-  @Prop({ default: true }) showDeadlines!: boolean;
-  @Prop({ default: true }) showRanking!: boolean;
-  @Prop({ default: false }) showLogs!: boolean;
-  @Prop({ default: () => [] }) logs!: types.ContestProblemChangeLog[];
-
-  T = T;
-  ui = ui;
-  time = time;
-
-  get duration(): number {
-    if (!this.startTime || !this.finishTime) {
-      return Infinity;
-    }
-    return this.finishTime.getTime() - this.startTime.getTime();
-  }
-
-  get eventWindowLength(): string {
-    if (this.duration === Infinity) {
-      return T.wordsUnlimitedDuration;
-    }
-    if (this.windowLength) {
-      // Convert minutes to milliseconds
-      return time.formatDelta(this.windowLength * (60 * 1000));
-    }
-    return time.formatDelta(this.duration);
-  }
-
-  get eventDescription(): string {
-    return this.description || '';
-  }
-
-  formatLogMessage(changeType: string, problemAlias: string): string {
-    switch (changeType) {
-      case 'added':
-        return ui.formatString(T.arenaContestProblemAdded, { problemAlias });
-      case 'modified':
-        return ui.formatString(T.arenaContestProblemModified, { problemAlias });
-      case 'removed':
-        return ui.formatString(T.arenaContestProblemRemoved, { problemAlias });
-      default:
-        return `${changeType}: ${problemAlias}`;
-    }
-  }
-}
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    startTime: {
+      type: Date as PropType<Date>,
+      required: true,
+    },
+    finishTime: {
+      type: Date as PropType<null | Date>,
+      default: null,
+    },
+    scoreboard: {
+      type: Number as PropType<null | number>,
+      default: null,
+    },
+    windowLength: {
+      type: Number as PropType<null | number>,
+      default: null,
+    },
+    admin: {
+      type: String,
+      required: true,
+    },
+    showDeadlines: {
+      type: Boolean,
+      default: true,
+    },
+    showRanking: {
+      type: Boolean,
+      default: true,
+    },
+    showLogs: {
+      type: Boolean,
+      default: false,
+    },
+    logs: {
+      type: Array as PropType<types.ContestProblemChangeLog[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+      time,
+    };
+  },
+  computed: {
+    duration(): number {
+      if (!this.startTime || !this.finishTime) {
+        return Infinity;
+      }
+      return this.finishTime.getTime() - this.startTime.getTime();
+    },
+    eventWindowLength(): string {
+      if (this.duration === Infinity) {
+        return T.wordsUnlimitedDuration;
+      }
+      if (this.windowLength) {
+        // Convert minutes to milliseconds
+        return time.formatDelta(this.windowLength * (60 * 1000));
+      }
+      return time.formatDelta(this.duration);
+    },
+    eventDescription(): string {
+      return this.description || '';
+    },
+  },
+  methods: {
+    formatLogMessage(changeType: string, problemAlias: string): string {
+      switch (changeType) {
+        case 'added':
+          return ui.formatString(T.arenaContestProblemAdded, { problemAlias });
+        case 'modified':
+          return ui.formatString(T.arenaContestProblemModified, {
+            problemAlias,
+          });
+        case 'removed':
+          return ui.formatString(T.arenaContestProblemRemoved, {
+            problemAlias,
+          });
+        default:
+          return `${changeType}: ${problemAlias}`;
+      }
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

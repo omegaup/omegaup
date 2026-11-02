@@ -28,12 +28,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-class ArenaContestSkeleton extends Vue {}
-
-export default ArenaContestSkeleton;
+export default defineComponent({
+  name: 'ArenaContestSkeleton',
+});
 </script>
 
 <style lang="scss" scoped>

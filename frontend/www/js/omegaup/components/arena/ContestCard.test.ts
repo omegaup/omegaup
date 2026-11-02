@@ -1,5 +1,6 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
+import { ComponentOptions } from 'vue';
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 import T from '../../lang';
@@ -74,7 +75,7 @@ describe('ContestCard.vue', () => {
   };
 
   it('Should show the current contest card', async () => {
-    const wrapper = mount(arena_ContestCard, {
+    const wrapper = mount(arena_ContestCard as ComponentOptions<Vue>, {
       propsData: {
         contest: currentContest,
         contestTab: currentTab,
@@ -94,7 +95,7 @@ describe('ContestCard.vue', () => {
   });
 
   it('Should show the future contest card', async () => {
-    const wrapper = mount(arena_ContestCard, {
+    const wrapper = mount(arena_ContestCard as ComponentOptions<Vue>, {
       propsData: {
         contest: futureContest,
         contestTab: futureTab,
@@ -121,7 +122,7 @@ describe('ContestCard.vue', () => {
   });
 
   it('Should show the past contest card', async () => {
-    const wrapper = mount(arena_ContestCard, {
+    const wrapper = mount(arena_ContestCard as ComponentOptions<Vue>, {
       propsData: {
         contest: pastContest,
         contestTab: pastTab,
