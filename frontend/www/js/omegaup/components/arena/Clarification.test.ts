@@ -1,3 +1,4 @@
+import { ComponentOptions } from 'vue';
 import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
@@ -19,7 +20,7 @@ describe('Clarification.vue', () => {
   };
 
   it('Should handle contest clarification', async () => {
-    const wrapper = shallowMount(arena_Clarification, {
+    const wrapper = shallowMount(arena_Clarification as ComponentOptions<Vue>, {
       propsData: {
         clarification,
         isAdmin: true,
@@ -31,7 +32,7 @@ describe('Clarification.vue', () => {
   });
 
   it('Should handle contest clarification on behalf', async () => {
-    const wrapper = shallowMount(arena_Clarification, {
+    const wrapper = shallowMount(arena_Clarification as ComponentOptions<Vue>, {
       propsData: {
         clarification: { ...clarification, ...{ receiver: 'user' } },
         isAdmin: true,
@@ -47,7 +48,7 @@ describe('Clarification.vue', () => {
   });
 
   it('Should handle course clarification', async () => {
-    const wrapper = shallowMount(arena_Clarification, {
+    const wrapper = shallowMount(arena_Clarification as ComponentOptions<Vue>, {
       propsData: {
         clarification,
         isAdmin: true,
