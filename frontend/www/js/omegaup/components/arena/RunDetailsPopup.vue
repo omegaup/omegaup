@@ -192,7 +192,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_DiffView from './DiffView.vue';
@@ -215,82 +215,93 @@ interface GroupVisibility {
 
 const EMPTY_FIELD = '∅';
 
-@Component({
+export default defineComponent({
+  name: 'ArenaRunDetailsPopup',
   components: {
     FontAwesomeIcon,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
-})
-export default class ArenaRunDetailsPopup extends Vue {
-  @Prop() data!: types.RunDetails;
-  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
-  feedbackMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
-  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-
-  EMPTY_FIELD = EMPTY_FIELD;
-  T = T;
-  groupVisible: GroupVisibility = {};
-
-  get language(): string | undefined {
-    return this.data?.language;
-  }
-
-  get source(): string | undefined {
-    return this.data?.source;
-  }
-
-  get shortGuid(): string {
-    return this.data.guid.substring(0, 8);
-  }
-
-  toggle(group: string): void {
-    const visible = this.groupVisible[group];
-    this.$set(this.groupVisible, group, !visible);
-  }
-
-  showDataCase(
-    cases: types.ProblemCasesContents,
-    caseName: string,
-    caseType: 'in' | 'out' | 'contestantOutput',
-  ): string {
-    return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
-  }
-
-  shouldShowDiffs(caseName: string): boolean {
-    return (
-      this.data.show_diff === 'all' ||
-      (caseName === 'sample' && this.data.show_diff === 'examples')
-    );
-  }
-
-  getContestantOutput(cases: types.ProblemCasesContents, name: string): string {
-    return cases[name]?.contestantOutput ?? '';
-  }
-
-  contestScore(problemCase: types.CaseResult): number {
-    return problemCase.contest_score ?? problemCase.score;
-  }
-
-  onSaveFeedbackList(
-    feedbackList: { lineNumber: number; feedback: string }[],
-    guid: string,
-  ) {
-    this.$parent?.$parent?.$parent?.$parent?.$emit('save-feedback-list', {
-      feedbackList,
-      guid,
-    });
-  }
-
-  onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string) {
-    this.$parent?.$parent?.$parent?.$parent?.$emit('submit-feedback-thread', {
-      feedback,
-      guid,
-    });
-  }
-}
+  props: {
+    data: {
+      type: (null as unknown) as PropType<
+        (types.RunDetails & { groups?: types.RunDetailsGroup[] }) | null
+      >,
+      default: null,
+    },
+    feedbackMap: {
+      type: (Map as unknown) as PropType<Map<number, ArenaCourseFeedback>>,
+      default: () => new Map<number, ArenaCourseFeedback>(),
+    },
+    feedbackThreadMap: {
+      type: (Map as unknown) as PropType<Map<number, ArenaCourseFeedback>>,
+      default: () => new Map<number, ArenaCourseFeedback>(),
+    },
+  },
+  emits: ['dismiss'],
+  data() {
+    return {
+      EMPTY_FIELD,
+      T,
+      groupVisible: {} as GroupVisibility,
+    };
+  },
+  computed: {
+    language(): string | undefined {
+      return this.data?.language;
+    },
+    source(): string | undefined {
+      return this.data?.source;
+    },
+    shortGuid(): string {
+      return this.data?.guid ? this.data.guid.substring(0, 8) : '';
+    },
+  },
+  methods: {
+    toggle(group: string): void {
+      const visible = this.groupVisible[group];
+      this.$set(this.groupVisible, group, !visible);
+    },
+    showDataCase(
+      cases: types.ProblemCasesContents,
+      caseName: string,
+      caseType: 'in' | 'out' | 'contestantOutput',
+    ): string {
+      return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
+    },
+    shouldShowDiffs(caseName: string): boolean {
+      return (
+        this.data?.show_diff === 'all' ||
+        (caseName === 'sample' && this.data?.show_diff === 'examples')
+      );
+    },
+    getContestantOutput(
+      cases: types.ProblemCasesContents,
+      name: string,
+    ): string {
+      return cases[name]?.contestantOutput ?? '';
+    },
+    contestScore(problemCase: types.CaseResult): number {
+      return problemCase.contest_score ?? problemCase.score;
+    },
+    onSaveFeedbackList(
+      feedbackList: { lineNumber: number; feedback: string }[],
+      guid: string,
+    ): void {
+      this.$parent?.$parent?.$parent?.$parent?.$emit('save-feedback-list', {
+        feedbackList,
+        guid,
+      });
+    },
+    onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string): void {
+      this.$parent?.$parent?.$parent?.$parent?.$emit('submit-feedback-thread', {
+        feedback,
+        guid,
+      });
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

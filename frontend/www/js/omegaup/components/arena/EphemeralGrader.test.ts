@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import type { types } from '../../api_types';
 
 import arena_EphemeralGrader from './EphemeralGrader.vue';
@@ -83,7 +84,7 @@ Here we can add code.
   };
 
   it('Should handle showing the ephemeral grader for a problem upon load', async () => {
-    const wrapper = mount(arena_EphemeralGrader, {
+    const wrapper = mount(arena_EphemeralGrader as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         problem,
@@ -103,7 +104,7 @@ Here we can add code.
   });
 
   it('Should handle showing the ephemeral grader for a problem after changing settings', async () => {
-    const wrapper = mount(arena_EphemeralGrader, {
+    const wrapper = mount(arena_EphemeralGrader as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         problem,
