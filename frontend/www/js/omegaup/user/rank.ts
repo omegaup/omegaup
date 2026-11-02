@@ -1,4 +1,4 @@
-import users_Rank from '../components/user/Rank.vue';
+import users_Rank, { Rank } from '../components/user/Rank.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
@@ -18,7 +18,7 @@ OmegaUp.on('ready', () => {
     availableFilters = payload.availableFilters;
     filter = payload.filter;
   }
-  const ranking = payload.ranking.rank.map((user) => ({
+  const ranking: Rank[] = payload.ranking.rank.map((user) => ({
     rank: user.ranking,
     country: user.country_id,
     username: user.username,
