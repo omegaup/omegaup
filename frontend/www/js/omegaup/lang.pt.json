@@ -887,6 +887,7 @@
 	"graderDiffEditorModified": "Modificado",
 	"graderDiffEditorOriginal": "Original",
 	"graderDiffEditorReadOnly": "Somente leitura",
+	"gridPaginatorPageRange": "%(low)\u2013%(high) de %(total) (P\u00e1gina %(page) de %(pages))",
 	"groupAdminAdded": "Grupo de administradores adicionado com sucesso",
 	"groupAdminRemoved": "Grupo de administradores removido com sucesso",
 	"groupAlreadyExists": "J\u00e1 existe um grupo com esse nome",
