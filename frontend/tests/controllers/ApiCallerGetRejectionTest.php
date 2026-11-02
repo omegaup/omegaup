@@ -127,4 +127,47 @@ class ApiCallerGetRejectionTest extends \OmegaUp\Test\ControllerTestCase {
             'listAssociatedIdentities must allow GET'
         );
     }
+
+    public function testGetToFollowReturns405() {
+        $_SERVER['REQUEST_URI'] = '/api/user/follow';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertSame('error', $response['status']);
+        $this->assertSame(405, $response['errorcode']);
+        $this->assertSame('methodNotAllowed', $response['errorname']);
+    }
+
+    public function testGetToUnfollowReturns405() {
+        $_SERVER['REQUEST_URI'] = '/api/user/unfollow';
+
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
+
+        $this->assertSame('error', $response['status']);
+        $this->assertSame(405, $response['errorcode']);
+        $this->assertSame('methodNotAllowed', $response['errorname']);
+    }
+
+    public function testAllowlistedFollowReadEndpointsAllowGet() {
+        foreach (['followers', 'following', 'followStatus'] as $endpoint) {
+            $_SERVER['REQUEST_URI'] = "/api/user/{$endpoint}";
+
+            $response = json_decode(
+                \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+                true
+            );
+
+            $this->assertNotSame(
+                405,
+                $response['errorcode'] ?? null,
+                "{$endpoint} must allow GET"
+            );
+        }
+    }
 }
