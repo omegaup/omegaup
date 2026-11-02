@@ -412,4 +412,45 @@
   --admin-dashboard-sidebar-item-color: #495057;
   --admin-dashboard-sidebar-item-hover-background-color: #e9ecef;
   --admin-dashboard-sidebar-item-hover-color: #0d6efd;
+
+  // LOGIN V2
+  --login-card-border-color: #eef2f6;
+  --login-card-box-shadow: rgba(0, 0, 0, 0.08);
+  // Left pane (reuses --header-primary-color: #678dd7 for bg)
+  --login-left-pane-font-color: #ffffff;
+  --login-brand-omega-color: #000000;
+  --login-brand-up-color: #ffffff;
+  --login-left-pane-pattern-dot-color: rgba(255, 255, 255, 0.35);
+  --login-left-pane-glow-large-color: rgba(255, 255, 255, 0.12);
+  --login-left-pane-glow-small-color: rgba(147, 197, 253, 0.25);
+  --login-motivational-headline-color: #ffffff;
+  --login-footer-color: #bfdbfe;
+  // Right pane
+  --login-right-pane-bg: #ffffff;
+  --login-title-color: #111827;
+  --login-subtitle-color: #64748b;
+  --login-tabs-border-color: #f1f5f9;
+  --login-tab-inactive-color: #64748b;
+  --login-tab-active-color: #111827;
+  --login-label-color: #1e293b;
+  --login-input-border-color: #e2e8f0;
+  --login-input-bg: #ffffff;
+  --login-input-focus-shadow: rgba(103, 141, 215, 0.2);
+  --login-placeholder-color: #94a3b8;
+  --login-link-color: #678dd7; // same as --header-primary-color
+  --login-link-hover-color: #4a74c2;
+  --login-btn-bg: #678dd7; // same as --header-primary-color
+  --login-btn-hover-bg: #557ec9;
+  --login-btn-shadow: rgba(103, 141, 215, 0.35);
+  --login-btn-shadow-hover: rgba(103, 141, 215, 0.45);
+  --login-btn-font-color: #ffffff;
+  --login-divider-color: #94a3b8;
+  --login-divider-line-color: #e2e8f0;
+  --login-social-heading-color: #475569;
+  --login-social-btn-border-color: #e2e8f0;
+  --login-social-btn-bg: #ffffff;
+  --login-social-btn-font-color: #1e293b;
+  --login-social-btn-hover-border: #cbd5e1;
+  --login-social-btn-hover-bg: #f8fafc;
+  --login-password-toggle-color: #94a3b8;
 }
