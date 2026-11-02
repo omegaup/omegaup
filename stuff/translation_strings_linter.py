@@ -28,8 +28,23 @@ class TranslationStringsLinter(linters.Linter):
 
     def run_one(self, filename: str, contents: bytes) -> linters.SingleResult:
         '''Runs the linter against |contents|.'''
+        try:
+            decoded_contents = contents.decode('utf-8')
+        except UnicodeDecodeError as exc:
+            lineno = contents[:exc.start].count(b'\n') + 1
+            raise linters.LinterException(
+                'Encoding error in translation strings',
+                fixable=False,
+                diagnostics=[
+                    linters.Diagnostic(
+                        f'File is not valid UTF-8: {exc}',
+                        filename,
+                        lineno=lineno,
+                    ),
+                ],
+            )
         diagnostics: List[linters.Diagnostic] = []
-        for lineno, line in enumerate(contents.decode('utf-8').split('\n'),
+        for lineno, line in enumerate(decoded_contents.split('\n'),
                                       start=1):
             if filename.endswith('.tpl'):
                 regex = _TEMPLATE_RE
