@@ -10,6 +10,16 @@ const otherTagName = 'problemTagLoops';
 const tag = { name: tagName, problemCount: 3 };
 const otherTag = { name: otherTagName, problemCount: 2 };
 
+type TagSelectionCase = {
+  description: string;
+  initialSelected: string[];
+  initialExcluded: string[];
+  changedCheckbox: number;
+  checked: boolean;
+  expectedSelected: string[];
+  expectedExcluded: string[];
+};
+
 describe('FilterTags.vue', () => {
   it('Should handle list of tags', () => {
     const wrapper = mount(problem_FilterTags, {
@@ -39,7 +49,7 @@ describe('FilterTags.vue', () => {
     );
   });
 
-  it.each([
+  it.each<TagSelectionCase>([
     {
       description: 'include a tag and clear its exclusion',
       initialSelected: [],
