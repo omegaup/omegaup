@@ -1,6 +1,7 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 jest.mock('vue-infinite-scroll', () => ({}));
 
+import Vue, { ComponentOptions } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
@@ -12,7 +13,7 @@ import user_Username from '../user/Username.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs: [],
@@ -25,7 +26,7 @@ describe('Runs.vue', () => {
 
   it('Should handle runs', async () => {
     const expectedDate = '1/1/2020, 12:00:00 AM';
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs: [
@@ -120,7 +121,7 @@ describe('Runs.vue', () => {
   ];
 
   it('Should handle order runs', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs,
@@ -141,7 +142,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should pass the country of the run to the username', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs: [{ ...baseRunData, country: 'MX' }],
@@ -160,7 +161,7 @@ describe('Runs.vue', () => {
 
   describe.each(filtersMapping)(`A filter:`, (filter) => {
     it(`whose name is ${filter.filter} should have gotten the value ${filter.value}`, async () => {
-      const wrapper = shallowMount(arena_Runs, {
+      const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
         propsData: {
           contestAlias: 'admin',
           runs,
@@ -177,7 +178,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should handle change page control', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'contest',
         runs,
@@ -209,7 +210,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should handle username filter', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'contest',
         runs,
@@ -227,7 +228,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should handle problem filter', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'contest',
         runs,
@@ -245,7 +246,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should handle the new submission button', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         problemAlias: 'alias',
         runs,
@@ -265,7 +266,7 @@ describe('Runs.vue', () => {
       time: new Date('1/3/2020, 12:25:00 AM'),
       type: 'disqualified',
     });
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         problemAlias: 'alias',
@@ -323,7 +324,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should handle disqualify in batch buttons for run actions', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         problemAlias: 'alias',
@@ -355,7 +356,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should handle filterUsername when username changes', async () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs,
@@ -372,16 +373,16 @@ describe('Runs.vue', () => {
     });
 
     await wrapper.setProps({ username: 'username' });
-    expect(wrapper.vm.filterUsername?.key).toBe('username');
+    expect((wrapper.vm as any).filterUsername?.key).toBe('username');
 
     await wrapper.setProps({ username: null });
-    expect(wrapper.vm.filterUsername).toBeFalsy();
+    expect((wrapper.vm as any).filterUsername).toBeFalsy();
   });
 
   const usernamesToBeFiltered = ['username', 'other_username'];
   describe.each(usernamesToBeFiltered)(`A user:`, (username) => {
     it(`whose username is ${username} should be filtered when they are selected.`, async () => {
-      const wrapper = mount(arena_Runs, {
+      const wrapper = mount(arena_Runs as ComponentOptions<Vue>, {
         propsData: {
           contestAlias: 'admin',
           runs,
@@ -415,6 +416,9 @@ describe('Runs.vue', () => {
 
       // Now all runs should appear
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+      expect(wrapper.emitted('filter-changed')).toContainEqual([
+        { filter: 'username', value: '' },
+      ]);
 
       await wrapper
         .findAll(`td[data-username="${username}"]`)
@@ -426,12 +430,15 @@ describe('Runs.vue', () => {
 
       // Now all runs should appear
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
-      expect(wrapper.vm.filterUsername).toBeFalsy();
+      expect((wrapper.vm as any).filterUsername).toBeFalsy();
+      expect(wrapper.emitted('filter-changed')).toContainEqual([
+        { filter: 'username', value: '' },
+      ]);
     });
   });
 
   it('Should show loading skeleton when loading prop is true', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs,
@@ -444,7 +451,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should not show loading skeleton when loading prop is false', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs,
@@ -457,7 +464,7 @@ describe('Runs.vue', () => {
   });
 
   it('Should not show pager when showPager is false', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         contestAlias: 'admin',
         runs,
