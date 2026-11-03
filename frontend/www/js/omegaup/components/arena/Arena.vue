@@ -66,70 +66,94 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { Tab } from '../problem/Details.vue';
 
-@Component
-export default class Arena extends Vue {
-  @Prop({ default: false }) shouldShowRuns!: boolean;
-  @Prop({ default: true }) shouldShowRanking!: boolean;
-  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
-  @Prop() title!: string;
-  @Prop() activeTab!: string;
-  @Prop() backgroundClass!: string;
-
-  T = T;
-  selectedTab = this.activeTab;
-  clarificationsHaveBeenRead = false;
-
-  get unreadClarifications() {
-    return (
-      this.activeTab !== 'clarifications' && !this.clarificationsHaveBeenRead
-    );
-  }
-
-  get availableTabs(): Tab[] {
-    const tabs = [
-      {
-        name: 'problems',
-        text: T.wordsProblems,
-        visible: true,
-      },
-      {
-        name: 'ranking',
-        text: T.wordsRanking,
-        visible: this.shouldShowRanking,
-      },
-      {
-        name: 'runs',
-        text: T.wordsRuns,
-        visible: this.shouldShowRuns,
-      },
-      {
-        name: 'clarifications',
-        text: T.wordsClarifications,
-        visible: true,
-      },
-    ];
-    return tabs.filter((tab) => tab.visible);
-  }
-
-  @Watch('activeTab')
-  onActiveTabChanged(newTab: string) {
-    this.selectedTab = newTab;
-  }
-
-  @Emit('update:activeTab')
-  onTabSelected(tabName: string): string {
-    if (tabName === 'clarifications') {
-      this.clarificationsHaveBeenRead = true;
-    }
-    this.selectedTab = tabName;
-    return this.selectedTab;
-  }
-}
+export default defineComponent({
+  name: 'Arena',
+  props: {
+    shouldShowRuns: {
+      type: Boolean,
+      default: false,
+    },
+    shouldShowRanking: {
+      type: Boolean,
+      default: true,
+    },
+    clarifications: {
+      type: Array as PropType<types.Clarification[]>,
+      default: () => [],
+    },
+    title: {
+      type: (String as unknown) as PropType<string | null>,
+      default: null,
+    },
+    activeTab: {
+      type: String,
+      required: true,
+    },
+    backgroundClass: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update:activeTab'],
+  data() {
+    return {
+      T,
+      selectedTab: this.activeTab,
+      clarificationsHaveBeenRead: false,
+    };
+  },
+  computed: {
+    unreadClarifications(): boolean {
+      return (
+        this.activeTab !== 'clarifications' && !this.clarificationsHaveBeenRead
+      );
+    },
+    availableTabs(): Tab[] {
+      const tabs = [
+        {
+          name: 'problems',
+          text: T.wordsProblems,
+          visible: true,
+        },
+        {
+          name: 'ranking',
+          text: T.wordsRanking,
+          visible: this.shouldShowRanking,
+        },
+        {
+          name: 'runs',
+          text: T.wordsRuns,
+          visible: this.shouldShowRuns,
+        },
+        {
+          name: 'clarifications',
+          text: T.wordsClarifications,
+          visible: true,
+        },
+      ];
+      return tabs.filter((tab) => tab.visible);
+    },
+  },
+  watch: {
+    activeTab(newTab: string): void {
+      this.selectedTab = newTab;
+    },
+  },
+  methods: {
+    onTabSelected(tabName: string): void {
+      if (tabName === 'clarifications') {
+        this.clarificationsHaveBeenRead = true;
+      }
+      this.selectedTab = tabName;
+      this.$emit('update:activeTab', this.selectedTab);
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

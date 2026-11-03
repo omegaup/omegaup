@@ -238,7 +238,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
@@ -246,7 +246,6 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_Runs from './Runs.vue';
 import arena_RunsForCourses from '../arena/RunsForCourses.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -260,13 +259,13 @@ import { SubmissionRequest } from '../../arena/submissions';
 import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 import { ArenaCourseFeedback } from './Feedback.vue';
 
-@Component({
+const ArenaCourse = defineComponent({
+  name: 'ArenaCourse',
   components: {
     'omegaup-arena': arena_Arena,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-navbar-assignments': arena_NavbarAssignments,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
-    'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-runs-for-courses': arena_RunsForCourses,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-overlay': omegaup_Overlay,
@@ -277,204 +276,295 @@ import { ArenaCourseFeedback } from './Feedback.vue';
     'omegaup-countdown': omegaup_Countdown,
     'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
   },
-})
-export default class ArenaCourse extends Vue {
-  @Prop() course!: types.CourseDetails;
-  @Prop() currentAssignment!: types.ArenaAssignment;
-  @Prop() problems!: types.NavbarProblemsetProblem[];
-  @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
-  @Prop({ default: null }) problemInfo!: types.ProblemDetails;
-  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
-  @Prop() activeTab!: string;
-  @Prop({ default: null }) guid!: null | string;
-  @Prop({ default: null }) problemAlias!: null | string;
-  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-  @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop() scoreboard!: null | types.Scoreboard;
-  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
-  @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: null }) allRuns!: null | types.Run[];
-  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
-  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
-  @Prop({ default: null }) nextExecutionTimestamp!: Date | null;
-  @Prop({ default: false })
-  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
-  @Prop({ default: false }) showRanking!: boolean;
-  @Prop() totalRuns!: number;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
-  feedbackMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
-  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Prop() currentUsername!: string;
-  @Prop() currentUserClassName!: string;
+  props: {
+    course: {
+      type: Object as PropType<types.CourseDetails>,
+      required: true,
+    },
+    currentAssignment: {
+      type: Object as PropType<types.ArenaAssignment>,
+      required: true,
+    },
+    problems: {
+      type: Array as PropType<types.NavbarProblemsetProblem[]>,
+      required: true,
+    },
+    users: {
+      type: Array as PropType<types.ContestUser[]>,
+      default: () => [],
+    },
+    problem: {
+      type: (Object as unknown) as PropType<types.NavbarProblemsetProblem | null>,
+      default: null,
+    },
+    problemInfo: {
+      type: (Object as unknown) as PropType<types.ProblemDetails | null>,
+      default: null,
+    },
+    clarifications: {
+      type: Array as PropType<types.Clarification[]>,
+      default: () => [],
+    },
+    activeTab: {
+      type: String,
+      default: 'problems',
+    },
+    guid: {
+      type: (String as unknown) as PropType<null | string>,
+      default: null,
+    },
+    problemAlias: {
+      type: (String as unknown) as PropType<null | string>,
+      default: null,
+    },
+    socketStatus: {
+      type: String as PropType<SocketStatus>,
+      default: SocketStatus.Waiting,
+    },
+    showNewClarificationPopup: {
+      type: Boolean,
+      default: false,
+    },
+    scoreboard: {
+      type: (Object as unknown) as PropType<null | types.Scoreboard>,
+      default: null,
+    },
+    popupDisplayed: {
+      type: (Number as unknown) as PropType<PopupDisplayed>,
+      default: PopupDisplayed.None,
+    },
+    runs: {
+      type: Array as PropType<types.Run[]>,
+      default: () => [],
+    },
+    allRuns: {
+      type: (Array as unknown) as PropType<null | types.Run[]>,
+      default: null,
+    },
+    runDetailsData: {
+      type: (Object as unknown) as PropType<types.RunDetails | null>,
+      default: null,
+    },
+    nextSubmissionTimestamp: {
+      type: (Date as unknown) as PropType<Date | null>,
+      default: null,
+    },
+    nextExecutionTimestamp: {
+      type: (Date as unknown) as PropType<Date | null>,
+      default: null,
+    },
+    shouldShowFirstAssociatedIdentityRunWarning: {
+      type: Boolean,
+      default: false,
+    },
+    showRanking: {
+      type: Boolean,
+      default: false,
+    },
+    totalRuns: {
+      type: Number,
+      default: 0,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    feedbackMap: {
+      type: (Map as unknown) as PropType<Map<number, ArenaCourseFeedback>>,
+      default: () => new Map<number, ArenaCourseFeedback>(),
+    },
+    feedbackThreadMap: {
+      type: (Map as unknown) as PropType<Map<number, ArenaCourseFeedback>>,
+      default: () => new Map<number, ArenaCourseFeedback>(),
+    },
+    currentUsername: {
+      type: String,
+      default: '',
+    },
+    currentUserClassName: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: [
+    'update:activeTab',
+    'navigate-to-assignment',
+    'request-feedback',
+    'reset-hash',
+    'submit-run',
+    'execute-run',
+    'show-run',
+    'submit-promotion',
+    'dismiss-promotion',
+    'new-submission-popup-displayed',
+    'submit-feedback',
+    'set-feedback-status',
+    'submit-feedback-thread',
+    'new-clarification',
+    'clarification-response',
+    'navigate-to-problem',
+  ],
+  data() {
+    return {
+      T,
+      omegaup,
+      PopupDisplayed,
+      currentClarifications: this.clarifications,
+      activeProblem: this.problem as types.NavbarProblemsetProblem | null,
+      currentRunDetailsData: this.runDetailsData as types.RunDetails | null,
+      currentPopupDisplayed: this.popupDisplayed as PopupDisplayed,
+      currentNextSubmissionTimestamp: this
+        .nextSubmissionTimestamp as Date | null,
+      currentNextExecutionTimestamp: this.nextExecutionTimestamp as Date | null,
+      now: new Date(),
+      INF: '∞',
+    };
+  },
+  computed: {
+    isAdmin(): boolean {
+      return Boolean(
+        this.course.is_admin ||
+          this.course.is_curator ||
+          this.course.is_teaching_assistant,
+      );
+    },
+    activeProblemAlias(): null | string {
+      return this.activeProblem?.alias ?? null;
+    },
+    socketClass(): string {
+      if (this.socketStatus === SocketStatus.Connected) {
+        return 'socket-status socket-status-ok';
+      }
+      if (this.socketStatus === SocketStatus.Failed) {
+        return 'socket-status socket-status-error';
+      }
+      return 'socket-status';
+    },
+    socketStatusTitle(): string {
+      if (this.socketStatus === SocketStatus.Connected) {
+        return T.socketStatusConnected;
+      }
+      if (this.socketStatus === SocketStatus.Failed) {
+        return T.socketStatusFailed;
+      }
+      return T.socketStatusWaiting;
+    },
+    deadline(): null | Date {
+      return this.currentAssignment.finish_time ?? null;
+    },
+    problemDetailsPopup(): PopupDisplayed {
+      if (!this.problemInfo) {
+        return this.currentPopupDisplayed;
+      }
 
-  T = T;
-  omegaup = omegaup;
-  PopupDisplayed = PopupDisplayed;
-  isAdmin =
-    this.course.is_admin ||
-    this.course.is_curator ||
-    this.course.is_teaching_assistant;
-  currentClarifications = this.clarifications;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentRunDetailsData = this.runDetailsData;
-  currentPopupDisplayed = this.popupDisplayed;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
-  now = new Date();
-  INF = '∞';
+      // Problem has not been solved or tried
+      if (
+        !this.problemInfo.nominationStatus.solved &&
+        !this.problemInfo.nominationStatus.tried
+      ) {
+        return this.currentPopupDisplayed;
+      }
 
-  get activeProblemAlias(): null | string {
-    return this.activeProblem?.alias ?? null;
-  }
+      // Problem has been dismissed or has been dismissed beforeAC and has not been solved
+      if (
+        this.problemInfo.nominationStatus.dismissed ||
+        (this.problemInfo.nominationStatus.dismissedBeforeAc &&
+          !this.problemInfo.nominationStatus.solved)
+      ) {
+        return this.currentPopupDisplayed;
+      }
 
-  get socketClass(): string {
-    if (this.socketStatus === SocketStatus.Connected) {
-      return 'socket-status socket-status-ok';
-    }
-    if (this.socketStatus === SocketStatus.Failed) {
-      return 'socket-status socket-status-error';
-    }
-    return 'socket-status';
-  }
+      // Problem has been previously nominated
+      if (
+        this.problemInfo.nominationStatus.nominated ||
+        (this.problemInfo.nominationStatus.nominatedBeforeAc &&
+          !this.problemInfo.nominationStatus.solved)
+      ) {
+        return this.currentPopupDisplayed;
+      }
 
-  get socketStatusTitle(): string {
-    if (this.socketStatus === SocketStatus.Connected) {
-      return T.socketStatusConnected;
-    }
-    if (this.socketStatus === SocketStatus.Failed) {
-      return T.socketStatusFailed;
-    }
-    return T.socketStatusWaiting;
-  }
+      // User can't nominate the problem
+      if (!this.problemInfo.nominationStatus.canNominateProblem) {
+        return this.currentPopupDisplayed;
+      }
 
-  get deadline(): null | Date {
-    return this.currentAssignment.finish_time ?? null;
-  }
+      return PopupDisplayed.Promotion;
+    },
+    searchResultProblems(): types.ListItem[] {
+      if (!this.problems.length) {
+        return [];
+      }
+      return this.problems.map((problem) => ({
+        key: problem.alias,
+        value: problem.text,
+      }));
+    },
+    language(): string | undefined {
+      return this.runDetailsData?.language;
+    },
+    source(): string | undefined {
+      return this.runDetailsData?.source;
+    },
+  },
+  watch: {
+    problem(newValue: types.NavbarProblemsetProblem | null): void {
+      const currentProblem = this.currentAssignment.problems?.find(
+        ({ alias }: { alias: string }) => alias === newValue?.alias,
+      );
+      if (!newValue || !currentProblem) {
+        this.activeProblem = null;
+        this.$emit('reset-hash', { selectedTab: 'problems', alias: null });
+        return;
+      }
+      this.onNavigateToProblem(newValue);
+    },
+    problemInfo(newValue: types.ProblemInfo | null): void {
+      if (!newValue) {
+        return;
+      }
+      this.currentNextSubmissionTimestamp =
+        newValue.nextSubmissionTimestamp ?? null;
+      this.currentNextExecutionTimestamp =
+        newValue.nextExecutionTimestamp ?? null;
+    },
+    runDetailsData(newValue: types.RunDetails): void {
+      this.currentRunDetailsData = newValue;
+    },
+  },
+  methods: {
+    onPopupDismissed(): void {
+      this.currentPopupDisplayed = PopupDisplayed.None;
+      this.currentRunDetailsData = null;
+      this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
+    },
+    onNavigateToProblem(problem: types.NavbarProblemsetProblem): void {
+      this.activeProblem = problem;
+      this.$emit('navigate-to-problem', { problem });
+    },
+    onRunSubmitted(run: { code: string; language: string }): void {
+      this.$emit('submit-run', { ...run, problem: this.activeProblem });
+    },
+    onRunAdminDetails(request: SubmissionRequest): void {
+      this.$emit('show-run', {
+        ...request,
+        isAdmin: this.isAdmin,
+        hash: `#runs/all/show-run:${request.guid}`,
+      });
+      this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    },
+    onRunDetails(request: SubmissionRequest): void {
+      this.$emit('show-run', {
+        ...request,
+        hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
+      });
+    },
+    onRunExecuted(): void {
+      this.$emit('execute-run', { target: this });
+    },
+  },
+});
 
-  get problemDetailsPopup(): PopupDisplayed {
-    if (!this.problemInfo) {
-      return this.currentPopupDisplayed;
-    }
-
-    // Problem has not been solved or tried
-    if (
-      !this.problemInfo.nominationStatus.solved &&
-      !this.problemInfo.nominationStatus.tried
-    ) {
-      return this.currentPopupDisplayed;
-    }
-
-    // Problem has been dismissed or has been dismissed beforeAC and has not been solved
-    if (
-      this.problemInfo.nominationStatus.dismissed ||
-      (this.problemInfo.nominationStatus.dismissedBeforeAc &&
-        !this.problemInfo.nominationStatus.solved)
-    ) {
-      return this.currentPopupDisplayed;
-    }
-
-    // Problem has been previously nominated
-    if (
-      this.problemInfo.nominationStatus.nominated ||
-      (this.problemInfo.nominationStatus.nominatedBeforeAc &&
-        !this.problemInfo.nominationStatus.solved)
-    ) {
-      return this.currentPopupDisplayed;
-    }
-
-    // User can't nominate the problem
-    if (!this.problemInfo.nominationStatus.canNominateProblem) {
-      return this.currentPopupDisplayed;
-    }
-
-    return PopupDisplayed.Promotion;
-  }
-
-  get searchResultProblems(): types.ListItem[] {
-    if (!this.problems.length) {
-      return [];
-    }
-    return this.problems.map((problem) => ({
-      key: problem.alias,
-      value: problem.text,
-    }));
-  }
-
-  get language(): string | undefined {
-    return this.runDetailsData?.language;
-  }
-
-  get source(): string | undefined {
-    return this.runDetailsData?.source;
-  }
-
-  onPopupDismissed(): void {
-    this.currentPopupDisplayed = PopupDisplayed.None;
-    this.currentRunDetailsData = null;
-    this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
-  }
-
-  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
-    this.activeProblem = problem;
-    this.$emit('navigate-to-problem', { problem });
-  }
-
-  onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', { ...run, problem: this.activeProblem });
-  }
-
-  onRunAdminDetails(request: SubmissionRequest): void {
-    this.$emit('show-run', {
-      ...request,
-      isAdmin: this.isAdmin,
-      hash: `#runs/all/show-run:${request.guid}`,
-    });
-    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
-  }
-
-  onRunDetails(request: SubmissionRequest): void {
-    this.$emit('show-run', {
-      ...request,
-      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
-    });
-  }
-
-  onRunExecuted(): void {
-    this.$emit('execute-run', { target: this });
-  }
-
-  @Watch('problem')
-  onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
-    const currentProblem = this.currentAssignment.problems?.find(
-      ({ alias }: { alias: string }) => alias === newValue?.alias,
-    );
-    if (!newValue || !currentProblem) {
-      this.activeProblem = null;
-      this.$emit('reset-hash', { selectedTab: 'problems', alias: null });
-      return;
-    }
-    this.onNavigateToProblem(newValue);
-  }
-
-  @Watch('problemInfo')
-  onProblemInfoChanged(newValue: types.ProblemInfo | null): void {
-    if (!newValue) {
-      return;
-    }
-    this.currentNextSubmissionTimestamp =
-      newValue.nextSubmissionTimestamp ?? null;
-    this.currentNextExecutionTimestamp =
-      newValue.nextExecutionTimestamp ?? null;
-  }
-
-  @Watch('runDetailsData')
-  onRunDetailsChanged(newValue: types.RunDetails): void {
-    this.currentRunDetailsData = newValue;
-  }
-}
+export default ArenaCourse;
 </script>
 
 <style lang="scss" scoped>
