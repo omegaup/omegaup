@@ -112,10 +112,12 @@
               <template #best-solvers-list>
                 <div></div>
               </template>
-              <template #feedback="{ guid, isAdmin, feedback }">
+              <template
+                #feedback="{ guid: runGuid, isAdmin: userIsAdmin, feedback }"
+              >
                 <omegaup-submission-feedback
-                  :guid="guid"
-                  :is-admin="isAdmin"
+                  :guid="runGuid"
+                  :is-admin="userIsAdmin"
                   :feedback-options="feedback"
                   @set-feedback="(request) => $emit('set-feedback', request)"
                 ></omegaup-submission-feedback>
@@ -174,15 +176,17 @@
             :data="currentRunDetailsData"
             @dismiss="onPopupDismissed"
           >
-            <template #feedback="{ guid, isAdmin, feedback }">
+            <template
+              #feedback="{ guid: runGuid, isAdmin: userIsAdmin, feedback }"
+            >
               <omegaup-submission-feedback
-                :guid="guid"
-                :is-admin="isAdmin"
+                :guid="runGuid"
+                :is-admin="userIsAdmin"
                 :feedback-options="feedback"
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
-            <template #code-view="{ guid }">
+            <template #code-view="{ guid: runGuid }">
               <omegaup-arena-feedback-code-view
                 :language="language"
                 :value="source"
@@ -193,11 +197,17 @@
                 :current-username="currentUsername"
                 @save-feedback-list="
                   (feedbackList) =>
-                    $emit('save-feedback-list', { feedbackList, guid })
+                    $emit('save-feedback-list', {
+                      feedbackList,
+                      guid: runGuid,
+                    })
                 "
                 @submit-feedback-thread="
                   (feedback) =>
-                    $emit('submit-feedback-thread', { feedback, guid })
+                    $emit('submit-feedback-thread', {
+                      feedback,
+                      guid: runGuid,
+                    })
                 "
               ></omegaup-arena-feedback-code-view>
             </template>
