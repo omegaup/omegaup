@@ -417,7 +417,7 @@
 
 <script lang="ts">
 import debounce from 'lodash/debounce';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import T from '../../lang';
@@ -477,7 +477,8 @@ export interface UrlParams {
   replaceState?: boolean; // When true, use replaceState instead of pushState (for browser navigation)
 }
 
-@Component({
+const ArenaContestList = defineComponent({
+  name: 'ArenaContestList',
   components: {
     'omegaup-contest-card': ContestCard,
     'omegaup-contest-skeleton': ContestSkeleton,
@@ -486,294 +487,309 @@ export interface UrlParams {
   directives: {
     infiniteScroll,
   },
-})
-class ArenaContestList extends Vue {
-  @Prop({ default: null }) countContests!: { [key: string]: number } | null;
-  @Prop() contests!: types.ContestList;
-  @Prop() query!: string;
-  @Prop() tab!: ContestTab;
-  @Prop({ default: ContestOrder.None }) sortOrder!: ContestOrder;
-  @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
-  @Prop() page!: number;
-  @Prop({ default: 10 }) pageSize!: number;
-  @Prop({ default: false }) loading!: boolean;
-
-  T = T;
-  ContestTab = ContestTab;
-  ContestOrder = ContestOrder;
-  ContestFilter = ContestFilter;
-  currentTab: ContestTab = this.tab;
-  currentQuery: string = this.query;
-  currentOrder: ContestOrder = this.sortOrder;
-  currentFilter: ContestFilter = this.filter;
-  currentPage: number = this.page;
-  refreshing: boolean = false;
-  isScrollLoading: boolean = false;
-  hasMore: boolean = true;
-  // Flag to track if state change came from browser navigation (back/forward button)
-  // When true, we should use replaceState instead of pushState to avoid corrupting history
-  isFromBrowserNavigation: boolean = false;
-  // Flag to track the very first load — initial URL normalization should use
-  // replaceState to avoid creating an extra history entry (see issue #9161)
-  isInitialLoad: boolean = true;
-  onSearchQueryDebounced = debounce(() => {
-    this.onSearchQuery();
-  }, 300);
-
-  titleLinkClass(tab: ContestTab) {
-    if (this.currentTab === tab) {
-      return ['text-center', 'active-title-link'];
-    } else {
-      return ['text-center', 'title-link'];
-    }
-  }
-
-  onSearchQuery() {
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
-      tab_name: this.currentTab,
-      query: this.currentQuery,
-      sort_order: this.currentOrder,
-      filter: this.currentFilter,
+  props: {
+    countContests: {
+      type: Object as PropType<{ [key: string]: number } | null>,
+      default: null,
+    },
+    contests: {
+      type: Object as PropType<types.ContestList>,
+      required: true,
+    },
+    query: {
+      type: String,
+      default: '',
+    },
+    tab: {
+      type: String as PropType<ContestTab>,
+      default: ContestTab.Current,
+    },
+    sortOrder: {
+      type: String as PropType<ContestOrder>,
+      default: ContestOrder.None,
+    },
+    filter: {
+      type: String as PropType<ContestFilter>,
+      default: ContestFilter.All,
+    },
+    page: {
+      type: Number,
+      default: 1,
+    },
+    pageSize: {
+      type: Number,
+      default: 10,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['fetch-page'],
+  data() {
+    return {
+      T,
+      ContestTab,
+      ContestOrder,
+      ContestFilter,
+      currentTab: this.tab as ContestTab,
+      currentQuery: this.query as string,
+      currentOrder: this.sortOrder as ContestOrder,
+      currentFilter: this.filter as ContestFilter,
+      currentPage: this.page as number,
+      refreshing: false,
+      isScrollLoading: false,
+      hasMore: true,
+      // Flag to track if state change came from browser navigation (back/forward button)
+      // When true, we should use replaceState instead of pushState to avoid corrupting history
+      isFromBrowserNavigation: false,
+      // Flag to track the very first load — initial URL normalization should use
+      // replaceState to avoid creating an extra history entry (see issue #9161)
+      isInitialLoad: true,
+      debouncedSearch: null as any,
     };
-    // Reset the contest list for this tab to avoid stale data
-    Vue.set(this.contests, this.currentTab, []);
-    this.currentPage = 1;
-    this.hasMore = true;
-    this.fetchPage(params, urlObj);
-  }
-  onReset() {
-    this.currentQuery = '';
-    this.onSearchQuery();
-  }
-  fetchInitialContests() {
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
-      tab_name: this.currentTab,
-      query: this.currentQuery,
-      sort_order: this.currentOrder,
-      filter: this.currentFilter,
-      replaceState: this.isFromBrowserNavigation || this.isInitialLoad,
-    };
-    // Reset the contest list for this tab to avoid stale data
-    Vue.set(this.contests, this.currentTab, []);
-    this.currentPage = 1;
-    this.hasMore = true;
-    // Reset the navigation and initial load flags after using them
-    this.isFromBrowserNavigation = false;
-    this.isInitialLoad = false;
-    this.fetchPage(params, urlObj);
-  }
-  mounted() {
+  },
+  computed: {
+    showMoreContestButtonText(): string {
+      if (this.isScrollLoading) {
+        return T.contestsListLoading;
+      }
+      return T.contestsListShowMore;
+    },
+    contestList(): types.ContestListItem[] {
+      switch (this.currentTab) {
+        case ContestTab.Current:
+          return this.contests.current;
+        case ContestTab.Past:
+          return this.contests.past;
+        case ContestTab.Future:
+          return this.contests.future;
+        default:
+          return this.contests.current;
+      }
+    },
+    contestListEmpty(): boolean {
+      if (!this.contestList) return true;
+      return this.contestList.length === 0;
+    },
+    isNonDefaultOrder(): boolean {
+      return (
+        this.currentOrder !== ContestOrder.Ends &&
+        this.currentOrder !== ContestOrder.None
+      );
+    },
+    isNonDefaultFilter(): boolean {
+      return this.currentFilter !== ContestFilter.All;
+    },
+    activeOrderLabel(): string {
+      const orderLabels: Record<ContestOrder, string> = {
+        [ContestOrder.Ends]: T.contestOrderByEnds,
+        [ContestOrder.Title]: T.contestOrderByTitle,
+        [ContestOrder.Duration]: T.contestOrderByDuration,
+        [ContestOrder.Organizer]: T.contestOrderByOrganizer,
+        [ContestOrder.Contestants]: T.contestOrderByContestants,
+        [ContestOrder.SignedUp]: T.contestOrderBySignedUp,
+        [ContestOrder.None]: T.contestOrderBy,
+      };
+      return orderLabels[this.currentOrder] ?? T.contestOrderBy;
+    },
+    activeFilterLabel(): string {
+      const filterLabels: Record<ContestFilter, string> = {
+        [ContestFilter.All]: T.contestFilterBy,
+        [ContestFilter.SignedUp]: T.contestFilterBySignedUp,
+        [ContestFilter.OnlyRecommended]: T.contestFilterByRecommended,
+      };
+      return filterLabels[this.currentFilter] ?? T.contestFilterBy;
+    },
+  },
+  watch: {
+    // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
+    // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
+    tab(newValue: ContestTab) {
+      this.isFromBrowserNavigation = true;
+      this.currentTab = newValue;
+    },
+    sortOrder(newValue: ContestOrder) {
+      this.isFromBrowserNavigation = true;
+      this.currentOrder = newValue;
+    },
+    filter(newValue: ContestFilter) {
+      this.isFromBrowserNavigation = true;
+      this.currentFilter = newValue;
+    },
+    page(newValue: number) {
+      this.isFromBrowserNavigation = true;
+      this.currentPage = newValue;
+    },
+    // Watchers for internal state - fetch data when user interacts with UI
+    currentTab: {
+      immediate: true,
+      deep: true,
+      handler(newValue: ContestTab, oldValue: undefined | ContestTab) {
+        if (typeof oldValue === 'undefined') return;
+        this.fetchInitialContests();
+      },
+    },
+    currentOrder: {
+      immediate: true,
+      deep: true,
+      handler(newValue: ContestOrder, oldValue: undefined | ContestOrder) {
+        if (typeof oldValue === 'undefined') return;
+        this.fetchInitialContests();
+      },
+    },
+    currentFilter: {
+      immediate: true,
+      deep: true,
+      handler(newValue: ContestFilter, oldValue: undefined | ContestFilter) {
+        if (typeof oldValue === 'undefined') return;
+        this.fetchInitialContests();
+      },
+    },
+  },
+  created(): void {
+    this.debouncedSearch = debounce(() => {
+      this.onSearchQuery();
+    }, 300);
+  },
+  mounted(): void {
     this.fetchInitialContests();
-  }
+  },
+  beforeDestroy(): void {
+    this.debouncedSearch?.cancel?.();
+  },
+  methods: {
+    titleLinkClass(tab: ContestTab): string[] {
+      if (this.currentTab === tab) {
+        return ['text-center', 'active-title-link'];
+      } else {
+        return ['text-center', 'title-link'];
+      }
+    },
+    onSearchQuery(): void {
+      const urlObj = new URL(window.location.href);
+      const params: UrlParams = {
+        page: 1,
+        tab_name: this.currentTab,
+        query: this.currentQuery,
+        sort_order: this.currentOrder,
+        filter: this.currentFilter,
+      };
+      // Reset the contest list for this tab to avoid stale data
+      Vue.set(this.contests, this.currentTab, []);
+      this.currentPage = 1;
+      this.hasMore = true;
+      this.fetchPage(params, urlObj);
+    },
+    onSearchQueryDebounced(): void {
+      if (this.debouncedSearch) {
+        this.debouncedSearch();
+      }
+    },
+    onReset(): void {
+      this.currentQuery = '';
+      this.onSearchQuery();
+    },
+    fetchInitialContests(): void {
+      const urlObj = new URL(window.location.href);
+      const params: UrlParams = {
+        page: 1,
+        tab_name: this.currentTab,
+        query: this.currentQuery,
+        sort_order: this.currentOrder,
+        filter: this.currentFilter,
+        replaceState: this.isFromBrowserNavigation || this.isInitialLoad,
+      };
+      // Reset the contest list for this tab to avoid stale data
+      Vue.set(this.contests, this.currentTab, []);
+      this.currentPage = 1;
+      this.hasMore = true;
+      // Reset the navigation and initial load flags after using them
+      this.isFromBrowserNavigation = false;
+      this.isInitialLoad = false;
+      this.fetchPage(params, urlObj);
+    },
+    async loadMoreContests(): Promise<void> {
+      if (this.isScrollLoading || !this.hasMore || this.loading) return;
 
-  beforeDestroy() {
-    this.onSearchQueryDebounced.cancel();
-  }
-  async loadMoreContests() {
-    if (this.isScrollLoading || !this.hasMore || this.loading) return;
+      this.isScrollLoading = true;
+      const nextPage = this.currentPage + 1;
+      const urlObj = new URL(window.location.href);
+      const params: UrlParams = {
+        page: nextPage,
+        tab_name: this.currentTab,
+        query: this.currentQuery,
+        sort_order: this.currentOrder,
+        filter: this.currentFilter,
+      };
 
-    this.isScrollLoading = true;
-    const nextPage = this.currentPage + 1;
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: nextPage,
-      tab_name: this.currentTab,
-      query: this.currentQuery,
-      sort_order: this.currentOrder,
-      filter: this.currentFilter,
-    };
+      try {
+        await this.fetchPage(params, urlObj);
+        this.currentPage = nextPage;
 
-    try {
-      await this.fetchPage(params, urlObj);
-      this.currentPage = nextPage;
-
-      // Check if there are more contests to load (based on pageSize)
-      this.hasMore = this.contestList.length % this.pageSize === 0;
-    } catch (error) {
-      console.error('Error loading more contests:', error);
-      // On error, re-enable the button after a delay to prevent spam
-      setTimeout(() => {
+        // Check if there are more contests to load (based on pageSize)
+        this.hasMore = this.contestList.length % this.pageSize === 0;
+      } catch (error) {
+        console.error('Error loading more contests:', error);
+        // On error, re-enable the button after a delay to prevent spam
+        setTimeout(() => {
+          this.isScrollLoading = false;
+        }, 2000);
+        return;
+      } finally {
         this.isScrollLoading = false;
-      }, 2000);
-      return;
-    } finally {
-      this.isScrollLoading = false;
-    }
-  }
-
-  fetchPage(params: UrlParams, urlObj: URL) {
-    this.$emit('fetch-page', { params, urlObj });
-    // Turn off refreshing after a short delay to allow parent component to respond
-    setTimeout(() => {
-      this.refreshing = false;
-    }, 1000);
-  }
-
-  currentContestDate(contest: types.ContestListItem): string {
-    return time.getDisplayForCurrentContest(contest.finish_time);
-  }
-
-  futureContestDate(contest: types.ContestListItem): string {
-    return time.getDisplayForFutureContest(contest.start_time);
-  }
-
-  pastContestDate(contest: types.ContestListItem): string {
-    return time.getDisplayForPastContest(contest.finish_time);
-  }
-
-  getTimeLink(time: Date): string {
-    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${time.toISOString()}`;
-  }
-
-  orderByTitle() {
-    this.currentOrder = ContestOrder.Title;
-  }
-
-  orderByEnds() {
-    this.currentOrder = ContestOrder.Ends;
-  }
-
-  orderByDuration() {
-    this.currentOrder = ContestOrder.Duration;
-  }
-
-  orderByOrganizer() {
-    this.currentOrder = ContestOrder.Organizer;
-  }
-
-  orderByContestants() {
-    this.currentOrder = ContestOrder.Contestants;
-  }
-
-  orderBySignedUp() {
-    this.currentOrder = ContestOrder.SignedUp;
-  }
-
-  filterBySignedUp() {
-    this.currentFilter = ContestFilter.SignedUp;
-  }
-
-  filterByRecommended() {
-    this.currentFilter = ContestFilter.OnlyRecommended;
-  }
-
-  filterByAll() {
-    this.currentFilter = ContestFilter.All;
-  }
-
-  get showMoreContestButtonText(): string {
-    if (this.isScrollLoading) {
-      return T.contestsListLoading;
-    }
-    return T.contestsListShowMore;
-  }
-
-  get contestList(): types.ContestListItem[] {
-    switch (this.currentTab) {
-      case ContestTab.Current:
-        return this.contests.current;
-      case ContestTab.Past:
-        return this.contests.past;
-      case ContestTab.Future:
-        return this.contests.future;
-      default:
-        return this.contests.current;
-    }
-  }
-
-  get contestListEmpty(): boolean {
-    if (!this.contestList) return true;
-    return this.contestList.length === 0;
-  }
-
-  get isNonDefaultOrder(): boolean {
-    return (
-      this.currentOrder !== ContestOrder.Ends &&
-      this.currentOrder !== ContestOrder.None
-    );
-  }
-
-  get isNonDefaultFilter(): boolean {
-    return this.currentFilter !== ContestFilter.All;
-  }
-
-  get activeOrderLabel(): string {
-    const orderLabels: Record<ContestOrder, string> = {
-      [ContestOrder.Ends]: T.contestOrderByEnds,
-      [ContestOrder.Title]: T.contestOrderByTitle,
-      [ContestOrder.Duration]: T.contestOrderByDuration,
-      [ContestOrder.Organizer]: T.contestOrderByOrganizer,
-      [ContestOrder.Contestants]: T.contestOrderByContestants,
-      [ContestOrder.SignedUp]: T.contestOrderBySignedUp,
-      [ContestOrder.None]: T.contestOrderBy,
-    };
-    return orderLabels[this.currentOrder] ?? T.contestOrderBy;
-  }
-
-  get activeFilterLabel(): string {
-    const filterLabels: Record<ContestFilter, string> = {
-      [ContestFilter.All]: T.contestFilterBy,
-      [ContestFilter.SignedUp]: T.contestFilterBySignedUp,
-      [ContestFilter.OnlyRecommended]: T.contestFilterByRecommended,
-    };
-    return filterLabels[this.currentFilter] ?? T.contestFilterBy;
-  }
-
-  // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
-  // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
-  @Watch('tab')
-  onTabPropChanged(newValue: ContestTab) {
-    this.isFromBrowserNavigation = true;
-    this.currentTab = newValue;
-  }
-
-  @Watch('sortOrder')
-  onSortOrderPropChanged(newValue: ContestOrder) {
-    this.isFromBrowserNavigation = true;
-    this.currentOrder = newValue;
-  }
-
-  @Watch('filter')
-  onFilterPropChanged(newValue: ContestFilter) {
-    this.isFromBrowserNavigation = true;
-    this.currentFilter = newValue;
-  }
-
-  @Watch('page')
-  onPagePropChanged(newValue: number) {
-    this.isFromBrowserNavigation = true;
-    this.currentPage = newValue;
-  }
-
-  // Watchers for internal state - fetch data when user interacts with UI
-  @Watch('currentTab', { immediate: true, deep: true })
-  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-
-  @Watch('currentOrder', { immediate: true, deep: true })
-  onCurrentOrderChanged(
-    newValue: ContestOrder,
-    oldValue: undefined | ContestOrder,
-  ) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-
-  @Watch('currentFilter', { immediate: true, deep: true })
-  onCurrentFilterChanged(
-    newValue: ContestFilter,
-    oldValue: undefined | ContestFilter,
-  ) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-}
+      }
+    },
+    fetchPage(params: UrlParams, urlObj: URL): void {
+      this.$emit('fetch-page', { params, urlObj });
+      // Turn off refreshing after a short delay to allow parent component to respond
+      setTimeout(() => {
+        this.refreshing = false;
+      }, 1000);
+    },
+    currentContestDate(contest: types.ContestListItem): string {
+      return time.getDisplayForCurrentContest(contest.finish_time);
+    },
+    futureContestDate(contest: types.ContestListItem): string {
+      return time.getDisplayForFutureContest(contest.start_time);
+    },
+    pastContestDate(contest: types.ContestListItem): string {
+      return time.getDisplayForPastContest(contest.finish_time);
+    },
+    getTimeLink(time: Date): string {
+      return `${getExternalUrl(
+        'TimeAndDateBaseURL',
+      )}?iso=${time.toISOString()}`;
+    },
+    orderByTitle(): void {
+      this.currentOrder = ContestOrder.Title;
+    },
+    orderByEnds(): void {
+      this.currentOrder = ContestOrder.Ends;
+    },
+    orderByDuration(): void {
+      this.currentOrder = ContestOrder.Duration;
+    },
+    orderByOrganizer(): void {
+      this.currentOrder = ContestOrder.Organizer;
+    },
+    orderByContestants(): void {
+      this.currentOrder = ContestOrder.Contestants;
+    },
+    orderBySignedUp(): void {
+      this.currentOrder = ContestOrder.SignedUp;
+    },
+    filterBySignedUp(): void {
+      this.currentFilter = ContestFilter.SignedUp;
+    },
+    filterByRecommended(): void {
+      this.currentFilter = ContestFilter.OnlyRecommended;
+    },
+    filterByAll(): void {
+      this.currentFilter = ContestFilter.All;
+    },
+  },
+});
 
 export default ArenaContestList;
 </script>
