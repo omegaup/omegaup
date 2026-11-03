@@ -1,8 +1,16 @@
 import { mount, shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 import T from '../../lang';
 import qualitynomination_List from './List.vue';
 import type { types } from '../../api_types';
 import common_EmptyState from '../common/EmptyState.vue';
+
+const List = qualitynomination_List as ComponentOptions<Vue>;
+
+type ListVm = Vue & {
+  orderedNominations: types.NominationListItem[];
+};
 
 const nominations: types.NominationListItem[] = [1, 2, 3].map((x) => ({
   author: {
@@ -31,7 +39,7 @@ const nominations: types.NominationListItem[] = [1, 2, 3].map((x) => ({
 
 describe('List.vue', () => {
   it('Should handle list of nominations', async () => {
-    const wrapper = shallowMount(qualitynomination_List, {
+    const wrapper = shallowMount(List, {
       propsData: {
         nominations: [
           {
@@ -79,7 +87,7 @@ describe('List.vue', () => {
   });
 
   it('Should handle my list of nominations', async () => {
-    const wrapper = shallowMount(qualitynomination_List, {
+    const wrapper = shallowMount(List, {
       propsData: {
         nominations: [
           {
@@ -126,7 +134,7 @@ describe('List.vue', () => {
 
   describe('Sort controls', () => {
     it('Should sort by problem title by default', async () => {
-      const wrapper = shallowMount(qualitynomination_List, {
+      const wrapper = shallowMount(List, {
         propsData: {
           nominations,
           pagerItems: [
@@ -143,11 +151,13 @@ describe('List.vue', () => {
         },
       });
 
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 1');
+      expect((wrapper.vm as ListVm).orderedNominations[0].problem.title).toBe(
+        'Problem 1',
+      );
     });
 
     it('Should sort by problem title in descending order', async () => {
-      const wrapper = mount(qualitynomination_List, {
+      const wrapper = mount(List, {
         propsData: {
           nominations,
           pagerItems: [
@@ -164,7 +174,9 @@ describe('List.vue', () => {
         },
       });
 
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 1');
+      expect((wrapper.vm as ListVm).orderedNominations[0].problem.title).toBe(
+        'Problem 1',
+      );
 
       const sortControlByTitle = wrapper.findComponent({
         ref: 'sortControlByTitle',
@@ -176,11 +188,13 @@ describe('List.vue', () => {
 
       button.trigger('click');
 
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 3');
+      expect((wrapper.vm as ListVm).orderedNominations[0].problem.title).toBe(
+        'Problem 3',
+      );
     });
 
     it('Should sort by time', async () => {
-      const wrapper = mount(qualitynomination_List, {
+      const wrapper = mount(List, {
         propsData: {
           nominations,
           pagerItems: [
@@ -197,8 +211,10 @@ describe('List.vue', () => {
         },
       });
 
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 1');
-      expect(wrapper.vm.orderedNominations[0].time.getTime()).toBe(
+      expect((wrapper.vm as ListVm).orderedNominations[0].problem.title).toBe(
+        'Problem 1',
+      );
+      expect((wrapper.vm as ListVm).orderedNominations[0].time.getTime()).toBe(
         new Date('2021-02-01 00:00:00').getTime(),
       );
 
@@ -212,15 +228,17 @@ describe('List.vue', () => {
 
       button.trigger('click');
 
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 3');
-      expect(wrapper.vm.orderedNominations[0].time.getTime()).toBe(
+      expect((wrapper.vm as ListVm).orderedNominations[0].problem.title).toBe(
+        'Problem 3',
+      );
+      expect((wrapper.vm as ListVm).orderedNominations[0].time.getTime()).toBe(
         new Date('2021-02-03 00:00:00').getTime(),
       );
     });
   });
 
   it('Should display EmptyState when list of nominations is empty', () => {
-    const wrapper = shallowMount(qualitynomination_List, {
+    const wrapper = shallowMount(List, {
       propsData: {
         nominations: [],
         pagerItems: [],
