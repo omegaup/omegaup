@@ -1,5 +1,6 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
+import Vue, { ComponentOptions } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
 import { SocketStatus } from '../../arena/events_socket';
 import T from '../../lang';
@@ -78,7 +79,7 @@ const baseScoreboardProps = {
 
 describe('Scoreboard.vue', () => {
   it('Should handle scoreboard in a contest', async () => {
-    const wrapper = shallowMount(arena_Scoreboard, {
+    const wrapper = shallowMount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: Object.assign(
         {
           showInvitedUsersFilter: true,
@@ -109,7 +110,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should handle scoreboard in a course', () => {
-    const wrapper = shallowMount(arena_Scoreboard, {
+    const wrapper = shallowMount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: Object.assign(
         {
           showInvitedUsersFilter: false,
@@ -132,7 +133,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should handle scoreboard with limited finishTime', () => {
-    const wrapper = mount(arena_Scoreboard, {
+    const wrapper = mount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: baseScoreboardProps,
     });
 
@@ -140,7 +141,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should handle scoreboard with unlimited finishTime', () => {
-    const wrapper = mount(arena_Scoreboard, {
+    const wrapper = mount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: { ...baseScoreboardProps, ...{ finishTime: null } },
     });
 
@@ -148,7 +149,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should show the per-problem solve statistics row', () => {
-    const wrapper = shallowMount(arena_Scoreboard, {
+    const wrapper = shallowMount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: Object.assign(
         {
           showInvitedUsersFilter: false,
@@ -165,7 +166,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should compute solve statistics only for visible contestants', () => {
-    const wrapper = shallowMount(arena_Scoreboard, {
+    const wrapper = shallowMount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: Object.assign(
         {
           showInvitedUsersFilter: true,
@@ -181,7 +182,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should show the first contestant that solved each problem', () => {
-    const wrapper = shallowMount(arena_Scoreboard, {
+    const wrapper = shallowMount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: Object.assign({}, baseScoreboardProps, {
         showInvitedUsersFilter: false,
         ranking: [
@@ -238,7 +239,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should handle the solve statistics row when nobody has solved a problem', () => {
-    const wrapper = shallowMount(arena_Scoreboard, {
+    const wrapper = shallowMount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: Object.assign({}, baseScoreboardProps, {
         showInvitedUsersFilter: false,
         ranking: [
@@ -267,7 +268,7 @@ describe('Scoreboard.vue', () => {
   });
 
   it('Should handle scoreboard when socket status changes', async () => {
-    const wrapper = mount(arena_Scoreboard, {
+    const wrapper = mount(arena_Scoreboard as ComponentOptions<Vue>, {
       propsData: baseScoreboardProps,
     });
 

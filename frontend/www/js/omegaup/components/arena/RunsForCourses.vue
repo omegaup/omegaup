@@ -504,7 +504,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -596,7 +596,8 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
-@Component({
+export default defineComponent({
+  name: 'ArenaRunsForCourses',
   components: {
     FontAwesomeIcon,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
@@ -605,560 +606,625 @@ export enum PopupDisplayed {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
   },
-})
-export default class RunsForCourses extends Vue {
-  @Prop({ default: false }) isContestFinished!: boolean;
-  @Prop({ default: true }) isProblemsetOpened!: boolean;
-  @Prop({ default: false }) showContest!: boolean;
-  @Prop({ default: false }) showDetails!: boolean;
-  @Prop({ default: false }) showDisqualify!: boolean;
-  @Prop({ default: false }) showFilters!: boolean;
-  @Prop({ default: false }) showPoints!: boolean;
-  @Prop({ default: false }) showProblem!: boolean;
-  @Prop({ default: false }) showRejudge!: boolean;
-  @Prop({ default: false }) showUser!: boolean;
-  @Prop({ default: false }) useNewSubmissionButton!: boolean;
-  @Prop({ default: null }) contestAlias!: string | null;
-  @Prop({ default: null }) problemAlias!: string | null;
-  @Prop({ default: () => [] }) problemsetProblems!: types.ProblemsetProblem[];
-  @Prop({ default: null }) username!: string | null;
-  @Prop({ default: 100 }) rowCount!: number;
-  @Prop() runs!: null | types.Run[];
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
-  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
-  @Prop({ default: null }) guid!: null | string;
-  @Prop({ default: false }) showAllRuns!: boolean;
-  @Prop() totalRuns!: number;
-  @Prop() searchResultProblems!: types.ListItem[];
-  @Prop() requestFeedback!: boolean;
-  @Prop({ default: 10 }) itemsPerPage!: number;
-  @Prop({ default: false }) showGUID!: boolean;
-  @Prop({ default: null }) createdGuid!: null | string;
-  @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
-
-  NumericOutputStatus = NumericOutputStatus;
-  PopupDisplayed = PopupDisplayed;
-  T = T;
-  time = time;
-  DisqualificationType = DisqualificationType;
-  omegaup = omegaup;
-
-  filterLanguage: string = '';
-  filterOffset: number = 0;
-  filterProblem: null | types.ListItem = null;
-  filterUsername: null | types.ListItem = null;
-  filterContest: string = '';
-  filterExecution: string = '';
-  filterOutput: string = '';
-  filters: { name: string; value: string }[] = [];
-  currentRunDetailsData = this.runDetailsData;
-  currentPopupDisplayed = this.popupDisplayed;
-  currentPage: number = 1;
-  currentDataPage: number = 1;
-  newFieldsLaunchDate: Date = new Date('2023-10-22');
-  now: number = Date.now();
-
-  get totalRows(): number {
-    if (this.totalRuns === undefined) {
-      return this.filteredRuns.length;
-    }
-    return this.totalRuns;
-  }
-
-  get totalPages(): number {
-    if (this.totalRows > 0) {
-      return Math.ceil(this.totalRows / this.itemsPerPage);
-    }
-    return 1;
-  }
-
-  get canSubmit(): boolean {
-    if (!this.nextSubmissionTimestamp) {
-      return true;
-    }
-    return this.nextSubmissionTimestamp.getTime() <= this.now;
-  }
-
-  onPageClick(bvEvent: any, page: number): void {
-    if (page == this.currentPage - 1 || page == this.currentPage + 1) {
-      if (this.currentPage + 1 == page) {
-        this.filterOffset++;
-      } else if (this.currentPage - 1 == page) {
-        this.filterOffset--;
+  props: {
+    isContestFinished: {
+      type: Boolean,
+      default: false,
+    },
+    isProblemsetOpened: {
+      type: Boolean,
+      default: true,
+    },
+    showContest: {
+      type: Boolean,
+      default: false,
+    },
+    showDetails: {
+      type: Boolean,
+      default: false,
+    },
+    showDisqualify: {
+      type: Boolean,
+      default: false,
+    },
+    showFilters: {
+      type: Boolean,
+      default: false,
+    },
+    showPoints: {
+      type: Boolean,
+      default: false,
+    },
+    showProblem: {
+      type: Boolean,
+      default: false,
+    },
+    showRejudge: {
+      type: Boolean,
+      default: false,
+    },
+    showUser: {
+      type: Boolean,
+      default: false,
+    },
+    useNewSubmissionButton: {
+      type: Boolean,
+      default: false,
+    },
+    contestAlias: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    problemAlias: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    problemsetProblems: {
+      type: Array as PropType<types.ProblemsetProblem[]>,
+      default: () => [],
+    },
+    username: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    rowCount: {
+      type: Number,
+      default: 100,
+    },
+    runs: {
+      type: Array as PropType<null | types.Run[]>,
+      default: null,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    runDetailsData: {
+      type: Object as PropType<null | types.RunDetails>,
+      default: null,
+    },
+    popupDisplayed: {
+      type: (Number as unknown) as PropType<PopupDisplayed>,
+      default: PopupDisplayed.None,
+    },
+    guid: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    showAllRuns: {
+      type: Boolean,
+      default: false,
+    },
+    totalRuns: {
+      type: Number,
+      default: undefined,
+    },
+    searchResultProblems: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    requestFeedback: {
+      type: Boolean,
+      default: false,
+    },
+    itemsPerPage: {
+      type: Number,
+      default: 10,
+    },
+    showGUID: {
+      type: Boolean,
+      default: false,
+    },
+    createdGuid: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    nextSubmissionTimestamp: {
+      type: (Date as unknown) as PropType<null | Date>,
+      default: null,
+    },
+  },
+  emits: [
+    'details',
+    'reset-hash',
+    'filter-changed',
+    'update-search-result-users-contest',
+    'update-search-result-users',
+    'update-search-result-problems',
+    'new-submission',
+    'request-feedback',
+    'rejudge',
+    'disqualify',
+    'requalify',
+  ],
+  data() {
+    return {
+      NumericOutputStatus,
+      PopupDisplayed,
+      T,
+      time,
+      DisqualificationType,
+      omegaup,
+      filterLanguage: '',
+      filterOffset: 0,
+      filterProblem: null as null | types.ListItem,
+      filterUsername: null as null | types.ListItem,
+      filterContest: '',
+      filterExecution: '',
+      filterOutput: '',
+      filters: [] as { name: string; value: string }[],
+      currentRunDetailsData: this.runDetailsData,
+      currentPopupDisplayed: this.popupDisplayed,
+      currentPage: 1,
+      currentDataPage: 1,
+      newFieldsLaunchDate: new Date('2023-10-22'),
+      now: Date.now(),
+    };
+  },
+  computed: {
+    totalRows(): number {
+      if (this.totalRuns === undefined) {
+        return this.filteredRuns.length;
       }
-    } else {
-      bvEvent.preventDefault();
-    }
-  }
-
-  get paginatedRuns(): types.Run[] {
-    if (!this.showFilters) {
-      this.currentDataPage = this.currentPage;
-    }
-    const startIndex = (this.currentDataPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.filteredRuns.slice(startIndex, endIndex);
-  }
-
-  getShortGuid(guid: string): string {
-    return guid.substring(0, 8);
-  }
-
-  get filteredRuns(): types.Run[] {
-    if (
-      !this.filterLanguage &&
-      !this.filterProblem &&
-      !this.filterUsername &&
-      !this.filterContest &&
-      !this.filterExecution &&
-      !this.filterOutput
-    ) {
-      return this.sortedRuns;
-    }
-    return this.sortedRuns.filter((run) => {
-      if (this.filterLanguage && run.language !== this.filterLanguage) {
-        return false;
+      return this.totalRuns;
+    },
+    totalPages(): number {
+      if (this.totalRows > 0) {
+        return Math.ceil(this.totalRows / this.itemsPerPage);
       }
-      if (this.filterProblem && run.alias !== this.filterProblem.key) {
-        return false;
+      return 1;
+    },
+    canSubmit(): boolean {
+      if (!this.nextSubmissionTimestamp) {
+        return true;
       }
-      if (this.filterUsername && run.username !== this.filterUsername.key) {
-        return false;
+      return this.nextSubmissionTimestamp.getTime() <= this.now;
+    },
+    paginatedRuns(): types.Run[] {
+      const page = this.showFilters ? this.currentDataPage : this.currentPage;
+      const startIndex = (page - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredRuns.slice(startIndex, endIndex);
+    },
+    filteredRuns(): types.Run[] {
+      if (
+        !this.filterLanguage &&
+        !this.filterProblem &&
+        !this.filterUsername &&
+        !this.filterContest &&
+        !this.filterExecution &&
+        !this.filterOutput
+      ) {
+        return this.sortedRuns;
       }
-      if (this.filterContest && run.contest_alias !== this.filterContest) {
-        return false;
-      }
-      if (this.filterExecution && run.execution !== this.filterExecution) {
-        return false;
-      }
-      if (this.filterOutput && run.output !== this.filterOutput) {
-        return false;
-      }
-      return true;
-    });
-  }
-
-  get filtersExcludingOffset(): { name: string; value: string }[] {
-    return this.filters.filter((filter) => filter.name !== 'offset');
-  }
-
-  get sortedRuns(): types.Run[] {
-    if (!this.runs) {
-      return [];
-    }
-    return this.runs
-      .slice()
-      .sort((a, b) => b.time.getTime() - a.time.getTime());
-  }
-
-  get newSubmissionUrl(): string {
-    if (this.isProblemsetOpened) {
-      return `#problems/${this.problemAlias}/new-run`;
-    }
-    return `/arena/${this.contestAlias}/`;
-  }
-
-  get newSubmissionDescription(): string {
-    if (this.isProblemsetOpened) {
-      return T.wordsNewSubmissions;
-    }
-    return T.arenaContestNotOpened;
-  }
-
-  memory(run: types.Run): string {
-    if (
-      run.status !== 'ready' ||
-      run.status_memory === MemoryStatus.NotAvailable
-    )
-      return '—';
-    if (run.status_memory === MemoryStatus.Exceeded)
-      return T.runDetailsExceeded;
-    return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
-  }
-
-  penalty(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      return run.penalty.toFixed(2);
-    }
-    return '—';
-  }
-
-  percentage(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      return `${(run.score * 100).toFixed(2)}%`;
-    }
-    return '—';
-  }
-
-  points(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE' &&
-      typeof run.contest_score !== 'undefined'
-    ) {
-      return run.contest_score.toFixed(2);
-    }
-    return '—';
-  }
-
-  runtime(run: types.Run): string {
-    if (
-      run.status !== 'ready' ||
-      run.status_runtime === RuntimeStatus.NotAvailable
-    ) {
-      return '—';
-    }
-
-    if (run.status_runtime === RuntimeStatus.Exceeded) {
-      return T.runDetailsExceeded;
-    }
-
-    return `${(run.runtime / 1000).toFixed(2)} s`;
-  }
-
-  showVerdictHelp(ev: Event): void {
-    $(ev.target as HTMLElement).popover('show');
-  }
-
-  statusClass(run: types.Run): string {
-    if (run.status != 'ready') return '';
-    if (run.type == 'disqualified') return 'status-disqualified';
-    if (run.verdict == 'AC') {
-      return 'status-ac';
-    }
-    if (run.verdict == 'CE') {
-      return 'status-ce';
-    }
-    if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return 'status-je-ve';
-    }
-    return '';
-  }
-
-  status(run: types.Run): string {
-    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
-
-    return run.status == 'ready' ? run.verdict : run.status;
-  }
-
-  statusHelp(run: types.Run): string {
-    if (run.status != 'ready' || run.verdict == 'AC') {
-      return '';
-    }
-
-    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
-      if (run.verdict == 'RTE' || run.verdict == 'RE') {
-        return T.verdictHelpKarelRTE;
-      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
-        return T.verdictHelpKarelTLE;
-      }
-    }
-    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
-    const verdict = T[`verdict${run.verdict}`];
-    const verdictHelp = T[`verdictHelp${run.verdict}`];
-
-    return `${verdict}: ${verdictHelp}`;
-  }
-
-  execution(run: types.Run): string {
-    if (run.time < this.newFieldsLaunchDate) {
-      return T.runDetailsNotAvailable;
-    }
-
-    if (run.status !== 'ready') {
-      return '—';
-    }
-
-    switch (run.execution) {
-      case ExecutionStatus.JudgeError:
-        return T.runDetailsJudgeError;
-      case ExecutionStatus.ValidatorError:
-        return T.runDetailsValidatorError;
-      case ExecutionStatus.CompilationError:
-        return T.runDetailsCompilationError;
-      case ExecutionStatus.RuntimeFunctionError:
-        return T.runDetailsRuntimeFunctionError;
-      case ExecutionStatus.RuntimeError:
-        return T.runDetailsRuntimeError;
-      case ExecutionStatus.Interrupted:
-        return T.runDetailsInterrupted;
-      default:
-        return T.runDetailsFinished;
-    }
-  }
-
-  output(run: types.Run): string {
-    if (run.time < this.newFieldsLaunchDate) {
-      return T.runDetailsNotAvailable;
-    }
-
-    if (run.status !== 'ready') {
-      return '—';
-    }
-
-    switch (run.output) {
-      case StringOutputStatus.Exceeded:
-        return T.runDetailsExceeded;
-      case StringOutputStatus.Incorrect:
-        return T.runDetailsIncorrect;
-      case StringOutputStatus.Interrupted:
-        return T.runDetailsInterrupted;
-      default:
-        return T.runDetailsCorrect;
-    }
-  }
-
-  statusPercentageClass(run: types.Run): string {
-    if (run.status !== 'ready') {
-      return '';
-    }
-
-    if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return 'status-je-ve';
-    }
-
-    if (run.verdict == 'CE') {
-      return 'status-ce';
-    }
-
-    if (run.type === 'disqualified') {
-      return 'status-disqualified';
-    }
-
-    const scorePercentage = (run.score * 100).toFixed(2);
-
-    if (scorePercentage !== '100.00') {
-      return '';
-    }
-    if (run.verdict == 'AC') {
-      return 'status-ac';
-    }
-    if (run.verdict == 'TLE') {
-      return 'status-tle';
-    }
-    if (run.verdict == 'MLE') {
-      return 'status-mle';
-    }
-    if (run.verdict == 'WA') {
-      return 'status-wa';
-    }
-    return 'status-ac';
-  }
-
-  outputIconColorStatus(run: types.Run): number {
-    if (
-      !(run.status === 'ready' && run.output !== StringOutputStatus.Exceeded) ||
-      run.time < this.newFieldsLaunchDate
-    ) {
-      return NumericOutputStatus.None;
-    }
-
-    if (run.output === StringOutputStatus.Incorrect) {
-      return NumericOutputStatus.Incorrect;
-    } else if (run.output === StringOutputStatus.Interrupted) {
-      return NumericOutputStatus.Interrupted;
-    }
-
-    return NumericOutputStatus.Correct;
-  }
-
-  onRunDetails(run: types.Run): void {
-    this.$emit('details', {
-      guid: run.guid,
-      isAdmin: true,
-      hash: `#runs/all/show-run:${run.guid}`,
-    });
-    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
-  }
-
-  onPopupDismissed(): void {
-    this.currentPopupDisplayed = PopupDisplayed.None;
-    this.currentRunDetailsData = null;
-    this.$emit('reset-hash');
-  }
-
-  @Watch('runDetailsData')
-  onRunDetailsChanged(newValue: types.RunDetails): void {
-    this.currentRunDetailsData = newValue;
-  }
-
-  @Watch('username')
-  onUsernameChanged(newValue: string | null) {
-    if (!newValue) {
-      this.filterUsername = null;
-      return;
-    }
-    this.filterUsername = { key: newValue, value: newValue };
-  }
-
-  @Watch('problemAlias')
-  onProblemAliasChanged(newValue: string | null) {
-    if (!newValue) {
-      this.filterProblem = null;
-      return;
-    }
-    this.filterProblem = { key: newValue, value: newValue };
-  }
-
-  @Watch('filterLanguage')
-  onFilterLanguageChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'language', value: newValue });
-  }
-
-  @Watch('filterOffset')
-  onFilterOffsetChanged(newValue: number) {
-    this.$emit('filter-changed', { filter: 'offset', value: `${newValue}` });
-  }
-
-  @Watch('filterProblem')
-  onFilterProblemChanged(newValue: null | types.ListItem) {
-    if (!newValue) {
-      this.onEmitFilterChanged({ filter: 'problem', value: null });
-      return;
-    }
-    this.onEmitFilterChanged({ filter: 'problem', value: newValue.key });
-  }
-
-  @Watch('filterUsername')
-  onFilterUsernameChanged(newValue: null | types.ListItem) {
-    if (!newValue) {
-      this.onEmitFilterChanged({ filter: 'username', value: null });
-      return;
-    }
-    this.onEmitFilterChanged({ filter: 'username', value: newValue.key });
-  }
-
-  @Watch('filterExecution')
-  onFilterExecutionChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'execution', value: newValue });
-  }
-
-  @Watch('filterOutput')
-  onfilterOutputChanged(newValue: string) {
-    this.onEmitFilterChanged({ filter: 'output', value: newValue });
-  }
-
-  @Emit('filter-changed')
-  onEmitFilterChanged({
-    filter,
-    value,
-  }: {
-    filter: string;
-    value: null | string;
-  }): void {
-    this.filterOffset = 0;
-    if (!value) {
-      this.filters = this.filters.filter((item) => item.name !== filter);
-      return;
-    }
-    if (filter === 'contest') {
-      // This field does not appear as filter
-      this.filterContest = value;
-    }
-    const currentFilter = this.filters.find((item) => item.name === filter);
-    if (!currentFilter) {
-      this.filters.push({ name: filter, value: value });
-    } else {
-      currentFilter.value = value;
-    }
-  }
-
-  @Watch('createdGuid')
-  onCreatedGuidChanged(newValue: null | string) {
-    if (!newValue) {
-      return;
-    }
-
-    const singleProblemRuns = document.getElementsByClassName(
-      'single-problem-runs',
-    );
-    if (singleProblemRuns.length === 0) {
-      return;
-    }
-    singleProblemRuns[0].scrollIntoView({ behavior: 'smooth' });
-    const selectedElements = document.getElementsByClassName('selected');
-    setTimeout(() => {
-      Array.from(selectedElements).forEach((element) => {
-        element.classList.remove('selected');
+      return this.sortedRuns.filter((run) => {
+        if (this.filterLanguage && run.language !== this.filterLanguage) {
+          return false;
+        }
+        if (this.filterProblem && run.alias !== this.filterProblem.key) {
+          return false;
+        }
+        if (this.filterUsername && run.username !== this.filterUsername.key) {
+          return false;
+        }
+        if (this.filterContest && run.contest_alias !== this.filterContest) {
+          return false;
+        }
+        if (this.filterExecution && run.execution !== this.filterExecution) {
+          return false;
+        }
+        if (this.filterOutput && run.output !== this.filterOutput) {
+          return false;
+        }
+        return true;
       });
-    }, 10000);
-  }
-
-  onSubmit(): void {
-    if (!this.canSubmit && this.nextSubmissionTimestamp) {
-      ui.warning(
-        ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: Math.ceil(
-            (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
-          ),
-        }),
-      );
-      return;
-    }
-    this.$emit('new-submission');
-  }
-
-  onRemoveFilter(filter: string): void {
-    this.currentPage = 1;
-    this.currentDataPage = 1;
-    if (filter === 'all') {
-      this.filterLanguage = '';
-      this.filterProblem = null;
-      this.filterUsername = null;
-      this.filterContest = '';
-      this.filterExecution = '';
-      this.filterOutput = '';
-      this.filterOffset = 0;
-
-      this.filters = [];
-      return;
-    }
-    switch (filter) {
-      case 'language':
-        this.filterLanguage = '';
-        break;
-      case 'problem':
-        this.filterProblem = null;
-        break;
-      case 'username':
+    },
+    filtersExcludingOffset(): { name: string; value: string }[] {
+      return this.filters.filter((filter) => filter.name !== 'offset');
+    },
+    sortedRuns(): types.Run[] {
+      if (!this.runs) {
+        return [];
+      }
+      return this.runs
+        .slice()
+        .sort((a, b) => b.time.getTime() - a.time.getTime());
+    },
+    newSubmissionUrl(): string {
+      if (this.isProblemsetOpened) {
+        return `#problems/${this.problemAlias}/new-run`;
+      }
+      return `/arena/${this.contestAlias}/`;
+    },
+    newSubmissionDescription(): string {
+      if (this.isProblemsetOpened) {
+        return T.wordsNewSubmissions;
+      }
+      return T.arenaContestNotOpened;
+    },
+  },
+  watch: {
+    runDetailsData(newValue: types.RunDetails | null): void {
+      this.currentRunDetailsData = newValue;
+    },
+    popupDisplayed(newValue: PopupDisplayed): void {
+      this.currentPopupDisplayed = newValue;
+    },
+    username(newValue: string | null) {
+      if (!newValue) {
         this.filterUsername = null;
-        break;
-      case 'contest':
-        this.filterContest = '';
-        break;
-      case 'execution':
-        this.filterExecution = '';
-        break;
-      case 'output':
-        this.filterOutput = '';
-    }
-    this.filters = this.filters.filter((item) => item.name !== filter);
-  }
+        return;
+      }
+      this.filterUsername = { key: newValue, value: newValue };
+    },
+    problemAlias(newValue: string | null) {
+      if (!newValue) {
+        this.filterProblem = null;
+        return;
+      }
+      this.filterProblem = { key: newValue, value: newValue };
+    },
+    filterLanguage(newValue: string) {
+      this.onEmitFilterChanged({ filter: 'language', value: newValue });
+    },
+    filterOffset(newValue: number) {
+      this.$emit('filter-changed', { filter: 'offset', value: `${newValue}` });
+    },
+    filterProblem(newValue: null | types.ListItem) {
+      if (!newValue) {
+        this.onEmitFilterChanged({ filter: 'problem', value: null });
+        return;
+      }
+      this.onEmitFilterChanged({ filter: 'problem', value: newValue.key });
+    },
+    filterUsername(newValue: null | types.ListItem) {
+      if (!newValue) {
+        this.onEmitFilterChanged({ filter: 'username', value: null });
+        return;
+      }
+      this.onEmitFilterChanged({ filter: 'username', value: newValue.key });
+    },
+    filterExecution(newValue: string) {
+      this.onEmitFilterChanged({ filter: 'execution', value: newValue });
+    },
+    filterOutput(newValue: string) {
+      this.onEmitFilterChanged({ filter: 'output', value: newValue });
+    },
+    createdGuid(newValue: null | string) {
+      if (!newValue) {
+        return;
+      }
 
-  updateSearchResultUsers(query: string): void {
-    if (this.problemsetProblems.length !== 0 && this.contestAlias) {
-      this.$emit('update-search-result-users-contest', {
-        query,
-        contestAlias: this.contestAlias,
+      const singleProblemRuns = document.getElementsByClassName(
+        'single-problem-runs',
+      );
+      if (singleProblemRuns.length === 0) {
+        return;
+      }
+      singleProblemRuns[0].scrollIntoView({ behavior: 'smooth' });
+      const selectedElements = document.getElementsByClassName('selected');
+      setTimeout(() => {
+        Array.from(selectedElements).forEach((element) => {
+          element.classList.remove('selected');
+        });
+      }, 10000);
+    },
+  },
+  methods: {
+    onPageClick(bvEvent: any, page: number): void {
+      if (page == this.currentPage - 1 || page == this.currentPage + 1) {
+        if (this.currentPage + 1 == page) {
+          this.filterOffset++;
+        } else if (this.currentPage - 1 == page) {
+          this.filterOffset--;
+        }
+      } else {
+        bvEvent.preventDefault();
+      }
+    },
+    getShortGuid(guid: string): string {
+      return guid.substring(0, 8);
+    },
+    memory(run: types.Run): string {
+      if (
+        run.status !== 'ready' ||
+        run.status_memory === MemoryStatus.NotAvailable
+      )
+        return '—';
+      if (run.status_memory === MemoryStatus.Exceeded)
+        return T.runDetailsExceeded;
+      return `${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
+    },
+    penalty(run: types.Run): string {
+      if (
+        run.status == 'ready' &&
+        run.verdict != 'JE' &&
+        run.verdict != 'VE' &&
+        run.verdict != 'CE'
+      ) {
+        return run.penalty.toFixed(2);
+      }
+      return '—';
+    },
+    percentage(run: types.Run): string {
+      if (
+        run.status == 'ready' &&
+        run.verdict != 'JE' &&
+        run.verdict != 'VE' &&
+        run.verdict != 'CE'
+      ) {
+        return `${(run.score * 100).toFixed(2)}%`;
+      }
+      return '—';
+    },
+    points(run: types.Run): string {
+      if (
+        run.status == 'ready' &&
+        run.verdict != 'JE' &&
+        run.verdict != 'VE' &&
+        run.verdict != 'CE' &&
+        typeof run.contest_score !== 'undefined'
+      ) {
+        return run.contest_score.toFixed(2);
+      }
+      return '—';
+    },
+    runtime(run: types.Run): string {
+      if (
+        run.status !== 'ready' ||
+        run.status_runtime === RuntimeStatus.NotAvailable
+      ) {
+        return '—';
+      }
+
+      if (run.status_runtime === RuntimeStatus.Exceeded) {
+        return T.runDetailsExceeded;
+      }
+
+      return `${(run.runtime / 1000).toFixed(2)} s`;
+    },
+    showVerdictHelp(ev: Event): void {
+      $(ev.target as HTMLElement).popover('show');
+    },
+    statusClass(run: types.Run): string {
+      if (run.status != 'ready') return '';
+      if (run.type == 'disqualified') return 'status-disqualified';
+      if (run.verdict == 'AC') {
+        return 'status-ac';
+      }
+      if (run.verdict == 'CE') {
+        return 'status-ce';
+      }
+      if (run.verdict == 'JE' || run.verdict == 'VE') {
+        return 'status-je-ve';
+      }
+      return '';
+    },
+    status(run: types.Run): string {
+      if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
+
+      return run.status == 'ready' ? run.verdict : run.status;
+    },
+    statusHelp(run: types.Run): string {
+      if (run.status != 'ready' || run.verdict == 'AC') {
+        return '';
+      }
+
+      if (
+        run.language == 'kj' ||
+        run.language == 'kp' ||
+        run.language == 'rk'
+      ) {
+        if (run.verdict == 'RTE' || run.verdict == 'RE') {
+          return T.verdictHelpKarelRTE;
+        } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
+          return T.verdictHelpKarelTLE;
+        }
+      }
+      if (run.type == 'disqualified') return T.verdictHelpDisqualified;
+      const verdict = T[`verdict${run.verdict}`];
+      const verdictHelp = T[`verdictHelp${run.verdict}`];
+
+      return `${verdict}: ${verdictHelp}`;
+    },
+    execution(run: types.Run): string {
+      if (run.time < this.newFieldsLaunchDate) {
+        return T.runDetailsNotAvailable;
+      }
+
+      if (run.status !== 'ready') {
+        return '—';
+      }
+
+      switch (run.execution) {
+        case ExecutionStatus.JudgeError:
+          return T.runDetailsJudgeError;
+        case ExecutionStatus.ValidatorError:
+          return T.runDetailsValidatorError;
+        case ExecutionStatus.CompilationError:
+          return T.runDetailsCompilationError;
+        case ExecutionStatus.RuntimeFunctionError:
+          return T.runDetailsRuntimeFunctionError;
+        case ExecutionStatus.RuntimeError:
+          return T.runDetailsRuntimeError;
+        case ExecutionStatus.Interrupted:
+          return T.runDetailsInterrupted;
+        default:
+          return T.runDetailsFinished;
+      }
+    },
+    output(run: types.Run): string {
+      if (run.time < this.newFieldsLaunchDate) {
+        return T.runDetailsNotAvailable;
+      }
+
+      if (run.status !== 'ready') {
+        return '—';
+      }
+
+      switch (run.output) {
+        case StringOutputStatus.Exceeded:
+          return T.runDetailsExceeded;
+        case StringOutputStatus.Incorrect:
+          return T.runDetailsIncorrect;
+        case StringOutputStatus.Interrupted:
+          return T.runDetailsInterrupted;
+        default:
+          return T.runDetailsCorrect;
+      }
+    },
+    statusPercentageClass(run: types.Run): string {
+      if (run.status !== 'ready') {
+        return '';
+      }
+
+      if (run.verdict == 'JE' || run.verdict == 'VE') {
+        return 'status-je-ve';
+      }
+
+      if (run.verdict == 'CE') {
+        return 'status-ce';
+      }
+
+      if (run.type === 'disqualified') {
+        return 'status-disqualified';
+      }
+
+      const scorePercentage = (run.score * 100).toFixed(2);
+
+      if (scorePercentage !== '100.00') {
+        return '';
+      }
+      if (run.verdict == 'AC') {
+        return 'status-ac';
+      }
+      if (run.verdict == 'TLE') {
+        return 'status-tle';
+      }
+      if (run.verdict == 'MLE') {
+        return 'status-mle';
+      }
+      if (run.verdict == 'WA') {
+        return 'status-wa';
+      }
+      return 'status-ac';
+    },
+    outputIconColorStatus(run: types.Run): number {
+      if (
+        !(
+          run.status === 'ready' && run.output !== StringOutputStatus.Exceeded
+        ) ||
+        run.time < this.newFieldsLaunchDate
+      ) {
+        return NumericOutputStatus.None;
+      }
+
+      if (run.output === StringOutputStatus.Incorrect) {
+        return NumericOutputStatus.Incorrect;
+      } else if (run.output === StringOutputStatus.Interrupted) {
+        return NumericOutputStatus.Interrupted;
+      }
+
+      return NumericOutputStatus.Correct;
+    },
+    onRunDetails(run: types.Run): void {
+      this.$emit('details', {
+        guid: run.guid,
+        isAdmin: true,
+        hash: `#runs/all/show-run:${run.guid}`,
       });
-      return;
-    }
-    this.$emit('update-search-result-users', { query });
-  }
-}
+      this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    },
+    onPopupDismissed(): void {
+      this.currentPopupDisplayed = PopupDisplayed.None;
+      this.currentRunDetailsData = null;
+      this.$emit('reset-hash');
+    },
+    onEmitFilterChanged({
+      filter,
+      value,
+    }: {
+      filter: string;
+      value: null | string;
+    }): void {
+      this.filterOffset = 0;
+      if (!value) {
+        this.filters = this.filters.filter((item) => item.name !== filter);
+        return;
+      }
+      if (filter === 'contest') {
+        // This field does not appear as filter
+        this.filterContest = value;
+      }
+      const currentFilter = this.filters.find((item) => item.name === filter);
+      if (!currentFilter) {
+        this.filters.push({ name: filter, value: value });
+      } else {
+        currentFilter.value = value;
+      }
+      this.$emit('filter-changed', { filter, value });
+    },
+    onSubmit(): void {
+      if (!this.canSubmit && this.nextSubmissionTimestamp) {
+        ui.warning(
+          ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+            submissionGap: Math.ceil(
+              (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
+            ),
+          }),
+        );
+        return;
+      }
+      this.$emit('new-submission');
+    },
+    onRemoveFilter(filter: string): void {
+      this.currentPage = 1;
+      this.currentDataPage = 1;
+      if (filter === 'all') {
+        this.filterLanguage = '';
+        this.filterProblem = null;
+        this.filterUsername = null;
+        this.filterContest = '';
+        this.filterExecution = '';
+        this.filterOutput = '';
+        this.filterOffset = 0;
+
+        this.filters = [];
+        return;
+      }
+      switch (filter) {
+        case 'language':
+          this.filterLanguage = '';
+          break;
+        case 'problem':
+          this.filterProblem = null;
+          break;
+        case 'username':
+          this.filterUsername = null;
+          break;
+        case 'contest':
+          this.filterContest = '';
+          break;
+        case 'execution':
+          this.filterExecution = '';
+          break;
+        case 'output':
+          this.filterOutput = '';
+      }
+      this.filters = this.filters.filter((item) => item.name !== filter);
+    },
+    updateSearchResultUsers(query: string): void {
+      if (this.problemsetProblems.length !== 0 && this.contestAlias) {
+        this.$emit('update-search-result-users-contest', {
+          query,
+          contestAlias: this.contestAlias,
+        });
+        return;
+      }
+      this.$emit('update-search-result-users', { query });
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
