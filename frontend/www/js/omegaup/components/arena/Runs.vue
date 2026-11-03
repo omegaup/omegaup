@@ -931,6 +931,7 @@ export default defineComponent({
       this.filterOffset = 0;
       if (!value) {
         this.filters = this.filters.filter((item) => item.name !== filter);
+        this.$emit('filter-changed', { filter, value: value ?? '' });
         return;
       }
       if (filter === 'contest') {

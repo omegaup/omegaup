@@ -511,6 +511,9 @@ describe('RunsForCourses.vue', () => {
 
       // Now all runs should appear
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
+      expect(wrapper.emitted('filter-changed')).toContainEqual([
+        { filter: 'username', value: '' },
+      ]);
 
       await wrapper
         .findAll(`td[data-username="${username}"]`)
@@ -523,6 +526,9 @@ describe('RunsForCourses.vue', () => {
       // Now all runs should appear
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
       expect((wrapper.vm as any).filterUsername).toBeFalsy();
+      expect(wrapper.emitted('filter-changed')).toContainEqual([
+        { filter: 'username', value: '' },
+      ]);
     });
   });
 });
