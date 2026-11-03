@@ -1,6 +1,7 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 
 import arena_Course from './Course.vue';
 import { types } from '../../api_types';
@@ -225,7 +226,7 @@ describe('Course.vue', () => {
     },
   };
   it('Should handle course in arena', async () => {
-    const wrapper = mount(arena_Course, {
+    const wrapper = mount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'problems',
         clarifications: [],
@@ -248,7 +249,7 @@ describe('Course.vue', () => {
   });
 
   it('Should emit reset-hash function in arena course', async () => {
-    const wrapper = mount(arena_Course, {
+    const wrapper = mount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'problems',
         clarifications: [],
@@ -272,7 +273,7 @@ describe('Course.vue', () => {
   });
 
   it('Should handle run details button as student', async () => {
-    const wrapper = mount(arena_Course, {
+    const wrapper = mount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'problems',
         clarifications: [],
@@ -305,7 +306,7 @@ describe('Course.vue', () => {
   });
 
   it('Should handle run details button as admin', async () => {
-    const wrapper = mount(arena_Course, {
+    const wrapper = mount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'runs',
         clarifications: [],
