@@ -163,19 +163,19 @@
         {{ T.contestListEmpty }}
       </div>
       <div
-        v-for="(tab, index) in visibleContestTabs"
-        :key="tab"
+        v-for="(categoryTab, index) in visibleContestTabs"
+        :key="categoryTab"
         class="mb-5 section-container"
         :class="{ 'section-separator': index < visibleContestTabs.length - 1 }"
       >
         <div
           class="d-flex justify-content-between align-items-center mb-3 px-3"
         >
-          <h3 class="m-0">{{ getTabTitle(tab) }}</h3>
+          <h3 class="m-0">{{ getTabTitle(categoryTab) }}</h3>
           <b-button
-            v-if="getContestsForTab(tab).length > 0"
+            v-if="getContestsForTab(categoryTab).length > 0"
             variant="link"
-            @click="setViewAll(tab)"
+            @click="setViewAll(categoryTab)"
           >
             {{ T.wordsViewAll }}
           </b-button>
@@ -183,22 +183,25 @@
 
         <div class="position-relative scroll-wrapper">
           <b-button
-            v-if="canScrollLeft(tab)"
+            v-if="canScrollLeft(categoryTab)"
             variant="light"
             class="scroll-btn scroll-left shadow-sm"
-            @click="scrollLeft(tab)"
+            @click="scrollLeft(categoryTab)"
           >
             <font-awesome-icon icon="chevron-left" />
           </b-button>
 
           <div
-            :ref="`scrollContainer_${tab}`"
+            :ref="`scrollContainer_${categoryTab}`"
             class="horizontal-scroll-container px-3 pb-3"
-            @scroll="onScroll(tab)"
+            @scroll="onScroll(categoryTab)"
           >
             <div class="d-flex">
               <div
-                v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
+                v-for="contestItem in getContestsForTab(categoryTab).slice(
+                  0,
+                  10,
+                )"
                 :key="contestItem.contest_id"
                 class="mr-3"
                 style="min-width: 300px; max-width: 300px"
@@ -208,13 +211,14 @@
                   <template #contest-button-scoreboard>
                     <div
                       v-if="
-                        tab === ContestTab.Current || tab === ContestTab.Future
+                        categoryTab === ContestTab.Current ||
+                        categoryTab === ContestTab.Future
                       "
                     ></div>
                   </template>
 
                   <template #text-contest-date>
-                    <b-card-text v-if="tab === ContestTab.Current">
+                    <b-card-text v-if="categoryTab === ContestTab.Current">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.finish_time)"
@@ -223,7 +227,7 @@
                         {{ currentContestDate(contestItem) }}
                       </a>
                     </b-card-text>
-                    <b-card-text v-else-if="tab === ContestTab.Future">
+                    <b-card-text v-else-if="categoryTab === ContestTab.Future">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.start_time)"
@@ -232,7 +236,7 @@
                         {{ futureContestDate(contestItem) }}
                       </a>
                     </b-card-text>
-                    <b-card-text v-else-if="tab === ContestTab.Past">
+                    <b-card-text v-else-if="categoryTab === ContestTab.Past">
                       <font-awesome-icon icon="calendar-alt" />
                       <a
                         :href="getTimeLink(contestItem.finish_time)"
@@ -246,7 +250,8 @@
                   <template #contest-dropdown>
                     <div
                       v-if="
-                        tab === ContestTab.Current || tab === ContestTab.Future
+                        categoryTab === ContestTab.Current ||
+                        categoryTab === ContestTab.Future
                       "
                     ></div>
                   </template>
@@ -254,7 +259,8 @@
                   <template #contest-button-enter>
                     <div
                       v-if="
-                        tab === ContestTab.Future || tab === ContestTab.Past
+                        categoryTab === ContestTab.Future ||
+                        categoryTab === ContestTab.Past
                       "
                     ></div>
                   </template>
@@ -262,7 +268,8 @@
                   <template #contest-button-virtual>
                     <div
                       v-if="
-                        tab === ContestTab.Current || tab === ContestTab.Future
+                        categoryTab === ContestTab.Current ||
+                        categoryTab === ContestTab.Future
                       "
                     ></div>
                   </template>
@@ -270,17 +277,18 @@
                   <template #contest-button-practice>
                     <div
                       v-if="
-                        tab === ContestTab.Current || tab === ContestTab.Future
+                        categoryTab === ContestTab.Current ||
+                        categoryTab === ContestTab.Future
                       "
                     ></div>
                   </template>
 
                   <template #contest-enroll-status>
-                    <div v-if="tab === ContestTab.Past"></div>
+                    <div v-if="categoryTab === ContestTab.Past"></div>
                   </template>
 
                   <template #contest-button-see-details>
-                    <div v-if="tab === ContestTab.Past"></div>
+                    <div v-if="categoryTab === ContestTab.Past"></div>
                   </template>
                 </omegaup-contest-card>
               </div>
@@ -288,10 +296,10 @@
           </div>
 
           <b-button
-            v-if="canScrollRight(tab)"
+            v-if="canScrollRight(categoryTab)"
             variant="light"
             class="scroll-btn scroll-right shadow-sm"
-            @click="scrollRight(tab)"
+            @click="scrollRight(categoryTab)"
           >
             <font-awesome-icon icon="chevron-right" />
           </b-button>
