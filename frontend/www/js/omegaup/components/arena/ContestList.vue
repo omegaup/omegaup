@@ -451,19 +451,7 @@
 </template>
 
 <script lang="ts">
-const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
-  let timer: number | null = null;
-  return (...args: any[]) => {
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = setTimeout(() => {
-      fn(...args);
-    }, waitTime) as any;
-  };
-};
-
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
@@ -492,6 +480,25 @@ Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
 library.add(fas);
+
+const debounce = (fn: (...args: any[]) => void, waitTime: number) => {
+  let timer: number | null = null;
+  const debounced = (...args: any[]) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn(...args);
+    }, waitTime) as any;
+  };
+  debounced.cancel = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+  return debounced;
+};
 
 export enum ContestTab {
   Current = 'current',
@@ -523,7 +530,8 @@ export interface UrlParams {
   filter: ContestFilter;
 }
 
-@Component({
+const ArenaContestList = defineComponent({
+  name: 'ArenaContestList',
   components: {
     'omegaup-contest-card': ContestCard,
     'omegaup-contest-skeleton': ContestSkeleton,
@@ -532,364 +540,377 @@ export interface UrlParams {
   directives: {
     infiniteScroll,
   },
-})
-class ArenaContestList extends Vue {
-  @Prop({ default: null }) countContests!: { [key: string]: number } | null;
-  @Prop() contests!: types.ContestList;
-  @Prop() query!: string;
-  @Prop() tab!: ContestTab;
-  @Prop({ default: ContestOrder.None }) sortOrder!: ContestOrder;
-  @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
-  @Prop() page!: number;
-  @Prop({ default: 10 }) pageSize!: number;
-  @Prop({ default: false }) loading!: boolean;
-
-  T = T;
-  ui = ui;
-  ContestTab = ContestTab;
-  ContestOrder = ContestOrder;
-  ContestFilter = ContestFilter;
-  currentTab: ContestTab = this.tab;
-  currentQuery: string = this.query;
-  currentOrder: ContestOrder = this.sortOrder;
-  currentFilter: ContestFilter = this.filter;
-  currentPage: number = this.page;
-  refreshing: boolean = false;
-  isScrollLoading: boolean = false;
-  hasMore: boolean = true;
-  columnsPerRow: number = 3;
-  viewAllCategory: ContestTab | null = null;
-  scrollPositions: { [key: string]: number } = {};
-  maxScrollPositions: { [key: string]: number } = {};
-
-  $refs!: {
-    [key: string]: HTMLElement | HTMLElement[];
-  };
-
-  titleLinkClass(tab: ContestTab) {
-    if (this.currentTab === tab) {
-      return ['text-center', 'active-title-link'];
-    } else {
-      return ['text-center', 'title-link'];
-    }
-  }
-
-  setViewAll(category: ContestTab | null) {
-    this.viewAllCategory = category;
-    if (category) {
-      this.currentTab = category;
-      this.fetchInitialContests();
-      window.scrollTo(0, 0);
-    } else {
-      // Returning to summary, ensure we have data for all
-      this.fetchInitialContests();
-    }
-  }
-
-  getTabTitle(tab: ContestTab | null): string {
-    if (!tab) return '';
-    switch (tab) {
-      case ContestTab.Current:
-        return this.T.contestListCurrent;
-      case ContestTab.Future:
-        return this.T.contestListFuture;
-      case ContestTab.Past:
-        return this.T.contestListPast;
-      default:
-        return '';
-    }
-  }
-
-  getContestsForTab(tab: ContestTab): types.ContestListItem[] {
-    switch (tab) {
-      case ContestTab.Current:
-        return this.contests.current || [];
-      case ContestTab.Future:
-        return this.contests.future || [];
-      case ContestTab.Past:
-        return this.contests.past || [];
-      default:
-        return [];
-    }
-  }
-
-  get visibleContestTabs(): ContestTab[] {
-    return [ContestTab.Current, ContestTab.Future, ContestTab.Past].filter(
-      (tab) => this.getContestsForTab(tab).length > 0,
-    );
-  }
-
-  onSearchQuery() {
+  props: {
+    countContests: {
+      type: Object as PropType<{ [key: string]: number } | null>,
+      default: null,
+    },
+    contests: {
+      type: Object as PropType<types.ContestList>,
+      required: true,
+    },
+    query: {
+      type: String,
+      default: '',
+    },
+    tab: {
+      type: String as PropType<ContestTab>,
+      default: ContestTab.Current,
+    },
+    sortOrder: {
+      type: String as PropType<ContestOrder>,
+      default: ContestOrder.None,
+    },
+    filter: {
+      type: String as PropType<ContestFilter>,
+      default: ContestFilter.All,
+    },
+    page: {
+      type: Number,
+      default: 1,
+    },
+    pageSize: {
+      type: Number,
+      default: 10,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['fetch-page'],
+  data() {
+    return {
+      T,
+      ui,
+      ContestTab,
+      ContestOrder,
+      ContestFilter,
+      currentTab: this.tab as ContestTab,
+      currentQuery: this.query as string,
+      currentOrder: this.sortOrder as ContestOrder,
+      currentFilter: this.filter as ContestFilter,
+      currentPage: this.page as number,
+      refreshing: false,
+      isScrollLoading: false,
+      hasMore: true,
+      columnsPerRow: 3,
+      viewAllCategory: null as ContestTab | null,
+      scrollPositions: {} as { [key: string]: number },
+      maxScrollPositions: {} as { [key: string]: number },
+      debouncedSearch: null as any,
+    };
+  },
+  computed: {
+    visibleContestTabs(): ContestTab[] {
+      return [ContestTab.Current, ContestTab.Future, ContestTab.Past].filter(
+        (tab) => this.getContestsForTab(tab).length > 0,
+      );
+    },
+    showMoreContestButtonText(): string {
+      if (this.isScrollLoading) {
+        return T.contestsListLoading;
+      }
+      return T.contestsListShowMore;
+    },
+    showMoreThreshold(): number {
+      return this.columnsPerRow * 2;
+    },
+    contestList(): types.ContestListItem[] {
+      const tab = this.viewAllCategory || this.currentTab;
+      switch (tab) {
+        case ContestTab.Current:
+          return this.contests.current;
+        case ContestTab.Past:
+          return this.contests.past;
+        case ContestTab.Future:
+          return this.contests.future;
+        default:
+          return this.contests.current;
+      }
+    },
+    contestListEmpty(): boolean {
+      if (!this.contestList) return true;
+      return this.contestList.length === 0;
+    },
+  },
+  watch: {
+    currentTab: {
+      immediate: true,
+      deep: true,
+      handler(newValue: ContestTab, oldValue: undefined | ContestTab) {
+        if (typeof oldValue === 'undefined') return;
+        this.fetchInitialContests();
+      },
+    },
+    currentOrder: {
+      immediate: true,
+      deep: true,
+      handler(newValue: ContestOrder, oldValue: undefined | ContestOrder) {
+        if (typeof oldValue === 'undefined') return;
+        this.fetchInitialContests();
+      },
+    },
+    currentFilter: {
+      immediate: true,
+      deep: true,
+      handler(newValue: ContestFilter, oldValue: undefined | ContestFilter) {
+        if (typeof oldValue === 'undefined') return;
+        this.fetchInitialContests();
+      },
+    },
+  },
+  created(): void {
+    this.debouncedSearch = debounce(() => {
+      this.onSearchQuery();
+    }, 300);
+  },
+  mounted(): void {
     this.fetchInitialContests();
-  }
+    this.updateColumnsPerRow();
+    window.addEventListener('resize', this.updateColumnsPerRow);
+  },
+  updated(): void {
+    this.visibleContestTabs.forEach((tab) => {
+      this.onScroll(tab);
+    });
+  },
+  beforeDestroy(): void {
+    window.removeEventListener('resize', this.updateColumnsPerRow);
+    this.debouncedSearch?.cancel?.();
+  },
+  methods: {
+    titleLinkClass(tab: ContestTab): string[] {
+      if (this.currentTab === tab) {
+        return ['text-center', 'active-title-link'];
+      } else {
+        return ['text-center', 'title-link'];
+      }
+    },
+    setViewAll(category: ContestTab | null): void {
+      this.viewAllCategory = category;
+      if (category) {
+        this.currentTab = category;
+        this.fetchInitialContests();
+        window.scrollTo(0, 0);
+      } else {
+        this.fetchInitialContests();
+      }
+    },
+    getTabTitle(tab: ContestTab | null): string {
+      if (!tab) return '';
+      switch (tab) {
+        case ContestTab.Current:
+          return this.T.contestListCurrent;
+        case ContestTab.Future:
+          return this.T.contestListFuture;
+        case ContestTab.Past:
+          return this.T.contestListPast;
+        default:
+          return '';
+      }
+    },
+    getContestsForTab(tab: ContestTab): types.ContestListItem[] {
+      switch (tab) {
+        case ContestTab.Current:
+          return this.contests.current || [];
+        case ContestTab.Future:
+          return this.contests.future || [];
+        case ContestTab.Past:
+          return this.contests.past || [];
+        default:
+          return [];
+      }
+    },
+    onSearchQuery(): void {
+      this.fetchInitialContests();
+    },
+    onSearchQueryDebounced(): void {
+      if (this.debouncedSearch) {
+        this.debouncedSearch();
+      }
+    },
+    onReset(): void {
+      this.currentQuery = '';
+    },
+    fetchInitialContests(): void {
+      if (this.viewAllCategory) {
+        const urlObj = new URL(window.location.href);
+        const params: UrlParams = {
+          page: 1,
+          tab_name: this.viewAllCategory,
+          query: this.currentQuery,
+          sort_order: this.currentOrder,
+          filter: this.currentFilter,
+        };
+        Vue.set(this.contests, this.viewAllCategory, []);
+        this.currentPage = 1;
+        this.hasMore = true;
+        this.fetchPage(params, urlObj);
+      } else {
+        [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(
+          (tab) => {
+            const urlObj = new URL(window.location.href);
+            const params: UrlParams = {
+              page: 1,
+              tab_name: tab,
+              query: this.currentQuery,
+              sort_order: this.currentOrder,
+              filter: this.currentFilter,
+            };
+            this.fetchPage(params, urlObj, tab === ContestTab.Current);
+          },
+        );
+      }
+    },
+    updateColumnsPerRow(): void {
+      if (window.innerWidth >= 992) {
+        this.columnsPerRow = 3;
+      } else if (window.innerWidth >= 768) {
+        this.columnsPerRow = 2;
+      } else {
+        this.columnsPerRow = 1;
+      }
+    },
+    scrollLeft(tab: ContestTab): void {
+      const refs = this.$refs as Record<
+        string,
+        HTMLElement | HTMLElement[] | undefined
+      >;
+      const container = (refs[`scrollContainer_${tab}`] as
+        | HTMLElement[]
+        | undefined)?.[0];
+      if (container) {
+        container.scrollBy({ left: -600, behavior: 'smooth' });
+      }
+    },
+    scrollRight(tab: ContestTab): void {
+      const refs = this.$refs as Record<
+        string,
+        HTMLElement | HTMLElement[] | undefined
+      >;
+      const container = (refs[`scrollContainer_${tab}`] as
+        | HTMLElement[]
+        | undefined)?.[0];
+      if (container) {
+        container.scrollBy({ left: 600, behavior: 'smooth' });
+      }
+    },
+    onScroll(tab: ContestTab): void {
+      const refs = this.$refs as Record<
+        string,
+        HTMLElement | HTMLElement[] | undefined
+      >;
+      const container = (refs[`scrollContainer_${tab}`] as
+        | HTMLElement[]
+        | undefined)?.[0];
+      if (container) {
+        this.$set(this.scrollPositions, tab, container.scrollLeft);
+        this.$set(
+          this.maxScrollPositions,
+          tab,
+          container.scrollWidth - container.clientWidth,
+        );
+      }
+    },
+    canScrollLeft(tab: ContestTab): boolean {
+      return (this.scrollPositions[tab] || 0) > 0;
+    },
+    canScrollRight(tab: ContestTab): boolean {
+      const contests = this.getContestsForTab(tab);
+      if (contests.length <= 3) return false;
 
-  onSearchQueryDebounced = debounce(this.onSearchQuery, 300);
+      const currentScroll = this.scrollPositions[tab] || 0;
+      const maxScroll = this.maxScrollPositions[tab] || 0;
+      if (maxScroll === 0) {
+        return true;
+      }
+      return currentScroll < maxScroll - 10;
+    },
+    async loadMoreContests(): Promise<void> {
+      if (this.isScrollLoading || !this.hasMore || this.loading) return;
 
-  onReset() {
-    this.currentQuery = '';
-  }
-  fetchInitialContests() {
-    if (this.viewAllCategory) {
+      this.isScrollLoading = true;
+      const nextPage = this.currentPage + 1;
       const urlObj = new URL(window.location.href);
       const params: UrlParams = {
-        page: 1,
-        tab_name: this.viewAllCategory,
+        page: nextPage,
+        tab_name: this.currentTab,
         query: this.currentQuery,
         sort_order: this.currentOrder,
         filter: this.currentFilter,
       };
-      Vue.set(this.contests, this.viewAllCategory, []);
-      this.currentPage = 1;
-      this.hasMore = true;
-      this.fetchPage(params, urlObj);
-    } else {
-      // Fetch all for summary view
-      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(
-        (tab) => {
-          const urlObj = new URL(window.location.href);
-          const params: UrlParams = {
-            page: 1,
-            tab_name: tab,
-            query: this.currentQuery,
-            sort_order: this.currentOrder,
-            filter: this.currentFilter,
-          };
-          // Only update URL for the Current tab to avoid overwriting it multiple times
-          // or setting it to 'past' which might be confusing.
-          // Actually, if we are in summary view, we probably don't want to set tab_name in URL at all?
-          // But the parent logic sets it based on params.tab_name.
-          // Let's just update for Current.
-          this.fetchPage(params, urlObj, tab === ContestTab.Current);
-        },
-      );
-    }
-  }
-  mounted() {
-    this.fetchInitialContests();
-    this.updateColumnsPerRow();
-    window.addEventListener('resize', this.updateColumnsPerRow);
-  }
 
-  beforeDestroy() {
-    window.removeEventListener('resize', this.updateColumnsPerRow);
-  }
-
-  updateColumnsPerRow() {
-    if (window.innerWidth >= 992) {
-      this.columnsPerRow = 3;
-    } else if (window.innerWidth >= 768) {
-      this.columnsPerRow = 2;
-    } else {
-      this.columnsPerRow = 1;
-    }
-  }
-
-  scrollLeft(tab: ContestTab) {
-    const container = (this.$refs[`scrollContainer_${tab}`] as
-      | HTMLElement[]
-      | undefined)?.[0];
-    if (container) {
-      container.scrollBy({ left: -600, behavior: 'smooth' });
-    }
-  }
-
-  scrollRight(tab: ContestTab) {
-    const container = (this.$refs[`scrollContainer_${tab}`] as
-      | HTMLElement[]
-      | undefined)?.[0];
-    if (container) {
-      container.scrollBy({ left: 600, behavior: 'smooth' });
-    }
-  }
-
-  onScroll(tab: ContestTab) {
-    const container = (this.$refs[`scrollContainer_${tab}`] as
-      | HTMLElement[]
-      | undefined)?.[0];
-    if (container) {
-      this.$set(this.scrollPositions, tab, container.scrollLeft);
-      this.$set(
-        this.maxScrollPositions,
-        tab,
-        container.scrollWidth - container.clientWidth,
-      );
-    }
-  }
-
-  canScrollLeft(tab: ContestTab): boolean {
-    return (this.scrollPositions[tab] || 0) > 0;
-  }
-
-  canScrollRight(tab: ContestTab): boolean {
-    const contests = this.getContestsForTab(tab);
-    if (contests.length <= 3) return false;
-
-    const currentScroll = this.scrollPositions[tab] || 0;
-    const maxScroll = this.maxScrollPositions[tab] || 0;
-    // If maxScroll is 0, we might not have calculated it yet, so check if we have enough items
-    if (maxScroll === 0) {
-      return true;
-    }
-    return currentScroll < maxScroll - 10; // -10 for tolerance
-  }
-
-  updated() {
-    // Recalculate scroll limits when DOM updates. Only iterate the tabs that
-    // are actually rendered; hidden (empty) tabs have no scrollContainer ref.
-    this.visibleContestTabs.forEach((tab) => {
-      this.onScroll(tab);
-    });
-  }
-
-  async loadMoreContests() {
-    if (this.isScrollLoading || !this.hasMore || this.loading) return;
-
-    this.isScrollLoading = true;
-    const nextPage = this.currentPage + 1;
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: nextPage,
-      tab_name: this.currentTab,
-      query: this.currentQuery,
-      sort_order: this.currentOrder,
-      filter: this.currentFilter,
-    };
-
-    try {
-      await this.fetchPage(params, urlObj);
-      this.currentPage = nextPage;
-
-      // Check if there are more contests to load (based on pageSize)
-      this.hasMore = this.contestList.length % this.pageSize === 0;
-    } catch (error) {
-      console.error('Error loading more contests:', error);
-      // On error, re-enable the button after a delay to prevent spam
-      setTimeout(() => {
+      try {
+        await this.fetchPage(params, urlObj);
+        this.currentPage = nextPage;
+        this.hasMore = this.contestList.length % this.pageSize === 0;
+      } catch (error) {
+        console.error('Error loading more contests:', error);
+        setTimeout(() => {
+          this.isScrollLoading = false;
+        }, 2000);
+        return;
+      } finally {
         this.isScrollLoading = false;
-      }, 2000);
-      return;
-    } finally {
-      this.isScrollLoading = false;
-    }
-  }
-
-  fetchPage(params: UrlParams, urlObj: URL, shouldUpdateUrl: boolean = true) {
-    this.$emit('fetch-page', { params, urlObj, shouldUpdateUrl });
-    // Turn off refreshing after a short delay to allow parent component to respond
-    setTimeout(() => {
-      this.refreshing = false;
-    }, 1000);
-  }
-
-  currentContestDate(contest: types.ContestListItem): string {
-    return time.getDisplayForCurrentContest(contest.finish_time);
-  }
-
-  futureContestDate(contest: types.ContestListItem): string {
-    return time.getDisplayForFutureContest(contest.start_time);
-  }
-
-  pastContestDate(contest: types.ContestListItem): string {
-    return time.getDisplayForPastContest(contest.finish_time);
-  }
-
-  exactContestDateTime(date: Date): string {
-    return `${time.formatDateForContest(date)}, ${date.toLocaleTimeString()}`;
-  }
-
-  getTimeLink(time: Date): string {
-    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${time.toISOString()}`;
-  }
-
-  orderByTitle() {
-    this.currentOrder = ContestOrder.Title;
-  }
-
-  orderByEnds() {
-    this.currentOrder = ContestOrder.Ends;
-  }
-
-  orderByDuration() {
-    this.currentOrder = ContestOrder.Duration;
-  }
-
-  orderByOrganizer() {
-    this.currentOrder = ContestOrder.Organizer;
-  }
-
-  orderByContestants() {
-    this.currentOrder = ContestOrder.Contestants;
-  }
-
-  orderBySignedUp() {
-    this.currentOrder = ContestOrder.SignedUp;
-  }
-
-  filterBySignedUp() {
-    this.currentFilter = ContestFilter.SignedUp;
-  }
-
-  filterByRecommended() {
-    this.currentFilter = ContestFilter.OnlyRecommended;
-  }
-
-  filterByAll() {
-    this.currentFilter = ContestFilter.All;
-  }
-
-  get showMoreContestButtonText(): string {
-    if (this.isScrollLoading) {
-      return T.contestsListLoading;
-    }
-    return T.contestsListShowMore;
-  }
-
-  get showMoreThreshold(): number {
-    return this.columnsPerRow * 2;
-  }
-
-  get contestList(): types.ContestListItem[] {
-    const tab = this.viewAllCategory || this.currentTab;
-    switch (tab) {
-      case ContestTab.Current:
-        return this.contests.current;
-      case ContestTab.Past:
-        return this.contests.past;
-      case ContestTab.Future:
-        return this.contests.future;
-      default:
-        return this.contests.current;
-    }
-  }
-
-  get contestListEmpty(): boolean {
-    if (!this.contestList) return true;
-    return this.contestList.length === 0;
-  }
-  @Watch('currentTab', { immediate: true, deep: true })
-  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-
-  @Watch('currentOrder', { immediate: true, deep: true })
-  onCurrentOrderChanged(
-    newValue: ContestOrder,
-    oldValue: undefined | ContestOrder,
-  ) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-
-  @Watch('currentFilter', { immediate: true, deep: true })
-  onCurrentFilterChanged(
-    newValue: ContestFilter,
-    oldValue: undefined | ContestFilter,
-  ) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-}
+      }
+    },
+    fetchPage(
+      params: UrlParams,
+      urlObj: URL,
+      shouldUpdateUrl: boolean = true,
+    ): void {
+      this.$emit('fetch-page', { params, urlObj, shouldUpdateUrl });
+      setTimeout(() => {
+        this.refreshing = false;
+      }, 1000);
+    },
+    currentContestDate(contest: types.ContestListItem): string {
+      return time.getDisplayForCurrentContest(contest.finish_time);
+    },
+    futureContestDate(contest: types.ContestListItem): string {
+      return time.getDisplayForFutureContest(contest.start_time);
+    },
+    pastContestDate(contest: types.ContestListItem): string {
+      return time.getDisplayForPastContest(contest.finish_time);
+    },
+    exactContestDateTime(date: Date): string {
+      return `${time.formatDateForContest(date)}, ${date.toLocaleTimeString()}`;
+    },
+    getTimeLink(time: Date): string {
+      return `${getExternalUrl(
+        'TimeAndDateBaseURL',
+      )}?iso=${time.toISOString()}`;
+    },
+    orderByTitle(): void {
+      this.currentOrder = ContestOrder.Title;
+    },
+    orderByEnds(): void {
+      this.currentOrder = ContestOrder.Ends;
+    },
+    orderByDuration(): void {
+      this.currentOrder = ContestOrder.Duration;
+    },
+    orderByOrganizer(): void {
+      this.currentOrder = ContestOrder.Organizer;
+    },
+    orderByContestants(): void {
+      this.currentOrder = ContestOrder.Contestants;
+    },
+    orderBySignedUp(): void {
+      this.currentOrder = ContestOrder.SignedUp;
+    },
+    filterBySignedUp(): void {
+      this.currentFilter = ContestFilter.SignedUp;
+    },
+    filterByRecommended(): void {
+      this.currentFilter = ContestFilter.OnlyRecommended;
+    },
+    filterByAll(): void {
+      this.currentFilter = ContestFilter.All;
+    },
+  },
+});
 
 export default ArenaContestList;
 </script>
