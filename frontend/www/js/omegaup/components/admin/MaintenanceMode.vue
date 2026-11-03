@@ -1,29 +1,37 @@
 <template>
   <div class="card">
-    <div class="card-header bg-warning text-dark">
-      <h5 class="mb-0">
-        <font-awesome-icon icon="wrench" />
-        {{ T.maintenanceModeTitle }}
-      </h5>
-    </div>
     <div class="card-body">
-      <div class="form-group">
-        <omegaup-toggle-switch
-          :checked-value="currentMaintenanceEnabled"
-          @update:value="onToggleMaintenance"
-        >
-          <template #switch-text>
-            <span class="switch-text">
-              <strong>{{
-                currentMaintenanceEnabled
-                  ? T.maintenanceModeActive
-                  : T.maintenanceModeInactive
-              }}</strong>
-            </span>
-          </template>
-        </omegaup-toggle-switch>
+      <div class="d-flex align-items-start justify-content-between">
+        <div class="d-flex">
+          <font-awesome-icon icon="bullhorn" class="setting-icon mr-3 mt-1" />
+          <div>
+            <h5 class="mb-1">{{ T.maintenanceModeTitle }}</h5>
+            <p class="text-muted mb-0">{{ T.maintenanceModeDescription }}</p>
+          </div>
+        </div>
+        <div class="d-flex align-items-center ml-auto pl-3 flex-shrink-0">
+          <strong class="mr-3 text-nowrap">{{
+            currentMaintenanceEnabled
+              ? T.maintenanceModeActive
+              : T.maintenanceModeInactive
+          }}</strong>
+          <omegaup-toggle-switch
+            :checked-value="currentMaintenanceEnabled"
+            @update:value="onToggleMaintenance"
+          >
+            <template #switch-text>
+              <span class="sr-only">{{ T.maintenanceModeTitle }}</span>
+            </template>
+          </omegaup-toggle-switch>
+        </div>
       </div>
-      <div v-if="currentMaintenanceEnabled" class="form-group">
+
+      <div v-if="currentMaintenanceEnabled" class="mt-4">
+        <div class="notice d-flex align-items-center mb-3" role="note">
+          <font-awesome-icon icon="info-circle" class="mr-2" />
+          {{ T.maintenanceModeNotice }}
+        </div>
+
         <select
           v-model="selectedTemplateId"
           class="form-control mb-3"
@@ -44,24 +52,27 @@
           </option>
         </select>
 
-        <div class="mb-2">
-          <span
+        <div class="mb-3">
+          <label class="d-block">{{ T.maintenanceModeTypeLabel }}</label>
+          <button
             v-for="type in maintenanceTypes"
             :key="type.value"
+            type="button"
             :class="[
-              'badge',
-              'mr-3',
-              'p-2',
-              badgeClass(type.value),
-              {
-                'badge-selected': currentMaintenanceType === type.value,
-              },
+              'btn',
+              'mr-2',
+              typeButtonClass(type.value),
+              { active: currentMaintenanceType === type.value },
             ]"
+            :aria-pressed="
+              currentMaintenanceType === type.value ? 'true' : 'false'
+            "
             @click="currentMaintenanceType = type.value"
           >
             {{ type.label }}
-          </span>
+          </button>
         </div>
+
         <label>{{ T.maintenanceModeMessage }}</label>
         <div class="row mb-2">
           <div class="col-auto d-flex align-items-center">
@@ -108,15 +119,45 @@
             ></textarea>
           </div>
         </div>
+
+        <div v-if="previewLines.length > 0" class="mt-3">
+          <label class="mb-1">{{ T.wordsPreview }}</label>
+          <div
+            :class="['alert', 'mb-1', badgeClass(currentMaintenanceType)]"
+            data-maintenance-preview
+          >
+            <div v-for="(line, index) in previewLines" :key="index">
+              {{ line }}
+            </div>
+          </div>
+          <small class="form-text text-muted">
+            {{ T.maintenanceModePreviewHelp }}
+          </small>
+        </div>
+
+        <small class="form-text text-muted mt-3">
+          {{ T.maintenanceModeSaveHelp }}
+        </small>
+
+        <div class="mt-3">
+          <button
+            class="btn btn-secondary mr-2"
+            type="button"
+            data-maintenance-cancel
+            @click="onCancel"
+          >
+            {{ T.wordsCancel }}
+          </button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            data-maintenance-save
+            @click="onSaveMaintenance"
+          >
+            {{ T.wordsSaveChanges }}
+          </button>
+        </div>
       </div>
-      <button
-        v-if="currentMaintenanceEnabled"
-        class="btn btn-primary"
-        type="button"
-        @click="onSaveMaintenance"
-      >
-        {{ T.wordsSaveChanges }}
-      </button>
     </div>
   </div>
 </template>
@@ -181,6 +222,24 @@ export default class AdminMaintenanceMode extends Vue {
     { value: MaintenanceType.Error, label: this.T.maintenanceModeTypeError },
   ];
 
+  get previewLines(): string[] {
+    const messages: { [language: string]: string } = {
+      es: this.currentMaintenanceMessageEs,
+      en: this.currentMaintenanceMessageEn,
+      pt: this.currentMaintenanceMessagePt,
+    };
+    const message =
+      messages[this.preferredLanguage] ||
+      this.currentMaintenanceMessageEs ||
+      this.currentMaintenanceMessageEn ||
+      this.currentMaintenanceMessagePt ||
+      '';
+    return message
+      .split(/<br\s*\/?>/i)
+      .map((line) => line.trim())
+      .filter((line) => line !== '');
+  }
+
   badgeClass(type: string) {
     switch (type) {
       case 'warning':
@@ -189,6 +248,17 @@ export default class AdminMaintenanceMode extends Vue {
         return 'alert-danger';
       default:
         return 'alert-info';
+    }
+  }
+
+  typeButtonClass(type: string): string {
+    switch (type) {
+      case 'warning':
+        return 'btn-outline-warning';
+      case 'danger':
+        return 'btn-outline-danger';
+      default:
+        return 'btn-outline-info';
     }
   }
 
@@ -246,6 +316,15 @@ export default class AdminMaintenanceMode extends Vue {
     };
   }
 
+  onCancel(): void {
+    this.currentMaintenanceEnabled = this.maintenanceEnabled;
+    this.currentMaintenanceMessageEs = this.maintenanceMessageEs;
+    this.currentMaintenanceMessageEn = this.maintenanceMessageEn;
+    this.currentMaintenanceMessagePt = this.maintenanceMessagePt;
+    this.currentMaintenanceType = this.maintenanceType || 'info';
+    this.selectedTemplateId = '';
+  }
+
   onSelectTemplate() {
     const template = this.maintenancePredefinedTemplates.find(
       (t) => t.id === this.selectedTemplateId,
@@ -266,8 +345,18 @@ export default class AdminMaintenanceMode extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.badge {
-  cursor: pointer;
+.setting-icon {
+  font-size: 1.5rem;
+  color: var(--admin-dashboard-setting-icon-color);
+}
+
+.notice {
+  background: var(--admin-dashboard-notice-background-color);
+  border: 1px solid var(--admin-dashboard-notice-border-color);
+  border-radius: 0.375rem;
+  color: var(--admin-dashboard-notice-font-color);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
 }
 
 .row.mb-2 {

@@ -118,4 +118,83 @@ describe('MaintenanceMode.vue', () => {
     expect(firstEventPayload(wrapper, 'toggle-maintenance')).toBe(false);
     expect(wrapper.find('textarea').exists()).toBe(false);
   });
+
+  it('Should show the notice only when enabled', () => {
+    const disabled = mountMaintenance();
+    expect(disabled.text()).not.toContain(T.maintenanceModeNotice);
+
+    const enabled = mountMaintenance({ maintenanceEnabled: true });
+    expect(enabled.text()).toContain(T.maintenanceModeNotice);
+  });
+
+  it('Should select the message type with the buttons', async () => {
+    const wrapper = mountMaintenance({ maintenanceEnabled: true });
+
+    const dangerButton = wrapper.find('button.btn-outline-danger');
+    expect(dangerButton.attributes('aria-pressed')).toBe('false');
+
+    await dangerButton.trigger('click');
+    expect(dangerButton.attributes('aria-pressed')).toBe('true');
+
+    await wrapper.find('button.btn-primary').trigger('click');
+    expect(firstEventPayload(wrapper, 'save-maintenance')).toMatchObject({
+      type: 'danger',
+    });
+  });
+
+  it('Should preview the message in the preferred language', () => {
+    const wrapper = mountMaintenance({
+      maintenanceEnabled: true,
+      maintenanceMessageEs: 'Titulo<br>Detalle',
+      maintenanceMessageEn: 'Title<br>Detail',
+      preferredLanguage: 'en',
+    });
+
+    const lines = wrapper
+      .findAll('[data-maintenance-preview] > div')
+      .wrappers.map((line) => line.text());
+    expect(lines).toEqual(['Title', 'Detail']);
+  });
+
+  it('Should not render HTML in the preview', () => {
+    const wrapper = mountMaintenance({
+      maintenanceEnabled: true,
+      maintenanceMessageEs: '<b>Hola</b>',
+    });
+
+    const preview = wrapper.find('[data-maintenance-preview]');
+    expect(preview.text()).toBe('<b>Hola</b>');
+    expect(preview.find('b').exists()).toBe(false);
+  });
+
+  it('Should hide the preview when there is no message', () => {
+    const wrapper = mountMaintenance({ maintenanceEnabled: true });
+
+    expect(wrapper.find('[data-maintenance-preview]').exists()).toBe(false);
+  });
+
+  it('Should restore the saved values when cancelling', async () => {
+    const wrapper = mountMaintenance({
+      maintenanceEnabled: true,
+      maintenanceMessageEs: 'Hola',
+    });
+
+    await wrapper.find('textarea').setValue('Cambio sin guardar');
+    await wrapper.find('[data-maintenance-cancel]').trigger('click');
+
+    expect(
+      (wrapper.find('textarea').element as HTMLTextAreaElement).value,
+    ).toBe('Hola');
+    expect(wrapper.emitted('save-maintenance')).toBeUndefined();
+  });
+
+  it('Should hide the fields when cancelling a switch that was not saved', async () => {
+    const wrapper = mountMaintenance();
+
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
+    expect(wrapper.find('textarea').exists()).toBe(true);
+
+    await wrapper.find('[data-maintenance-cancel]').trigger('click');
+    expect(wrapper.find('textarea').exists()).toBe(false);
+  });
 });
