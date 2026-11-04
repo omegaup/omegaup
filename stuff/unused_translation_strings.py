@@ -18,6 +18,24 @@ _FRONTEND_RE = re.compile(r'\bT\.(\w+)')
 _TEMPLATE_RE = re.compile(r'\{#(\w+)#\}')
 _LANG_RE = re.compile(r'^(\w+)\s*=', flags=re.MULTILINE)
 _EXCLUDED_STRINGS = set(('lang', 'hasOwnProperty'))
+# Cron scripts name notification strings as literals, not `T.` lookups.
+_PYTHON_RE = re.compile(r'[\'"](notification\w+)[\'"]')
+_EXCLUDED_DIRS = set(('venv', 'node_modules', 'third_party'))
+
+
+def _get_python_strings() -> Set[str]:
+    """Obtains the notification strings named by the scripts under stuff/."""
+    strings: Set[str] = set()
+    for root, dirnames, filenames in os.walk('stuff'):
+        dirnames[:] = [d for d in dirnames if d not in _EXCLUDED_DIRS]
+        for filename in filenames:
+            if not filename.endswith('.py'):
+                continue
+            with open(os.path.join(root, filename), encoding='utf-8') as f:
+                for line in f:
+                    for linematch in _PYTHON_RE.finditer(line):
+                        strings.add(linematch[1])
+    return strings
 
 
 def _get_expected_strings() -> Set[str]:
@@ -41,6 +59,8 @@ def _get_expected_strings() -> Set[str]:
                         if linematch[1] in _EXCLUDED_STRINGS:
                             continue
                         expected_strings.add(linematch[1])
+
+    expected_strings.update(_get_python_strings())
 
     # Now get the Psalm-obtained translation strings from PHP.
     for filename in os.listdir('frontend/tests/runfiles/translation_strings'):
