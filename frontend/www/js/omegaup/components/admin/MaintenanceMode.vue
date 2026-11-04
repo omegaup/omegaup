@@ -1,16 +1,14 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="d-flex align-items-start justify-content-between">
-        <div class="d-flex">
-          <font-awesome-icon icon="bullhorn" class="setting-icon mr-3 mt-1" />
-          <div>
-            <h5 class="mb-1">{{ T.maintenanceModeTitle }}</h5>
-            <p class="text-muted mb-0">{{ T.maintenanceModeDescription }}</p>
-          </div>
-        </div>
-        <div class="d-flex align-items-center ml-auto pl-3 flex-shrink-0">
-          <strong class="mr-3 text-nowrap">{{
+      <div class="setting-card">
+        <font-awesome-icon icon="bullhorn" class="setting-icon" />
+        <h5 class="setting-title">{{ T.maintenanceModeTitle }}</h5>
+        <p class="setting-description text-muted mb-0">
+          {{ T.maintenanceModeDescription }}
+        </p>
+        <div class="setting-control">
+          <strong class="mr-3">{{
             currentMaintenanceEnabled
               ? T.maintenanceModeActive
               : T.maintenanceModeInactive
@@ -61,6 +59,7 @@
             :class="[
               'btn',
               'mr-2',
+              'mb-2',
               typeButtonClass(type.value),
               { active: currentMaintenanceType === type.value },
             ]"
@@ -139,9 +138,9 @@
           {{ T.maintenanceModeSaveHelp }}
         </small>
 
-        <div class="mt-3">
+        <div class="mt-3 d-flex flex-column-reverse flex-md-row">
           <button
-            class="btn btn-secondary mr-2"
+            class="btn btn-secondary mt-2 mt-md-0 mr-md-2"
             type="button"
             data-maintenance-cancel
             @click="onCancel"
@@ -345,9 +344,66 @@ export default class AdminMaintenanceMode extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.setting-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'icon title control'
+    'icon description control';
+  column-gap: 1rem;
+  align-items: center;
+}
+
 .setting-icon {
+  grid-area: icon;
   font-size: 1.5rem;
   color: var(--admin-dashboard-setting-icon-color);
+}
+
+.setting-title {
+  grid-area: title;
+  align-self: end;
+  margin-bottom: 0.25rem;
+}
+
+.setting-description {
+  grid-area: description;
+  align-self: start;
+}
+
+.setting-control {
+  grid-area: control;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  .switch-container {
+    width: auto;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .setting-card {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'icon title'
+      'description description'
+      'control control';
+    row-gap: 0.75rem;
+  }
+
+  .setting-title {
+    align-self: center;
+    margin-bottom: 0;
+  }
+
+  .setting-control {
+    justify-content: space-between;
+    border-top: 1px solid var(--admin-dashboard-sidebar-border-color);
+    padding-top: 0.75rem;
+  }
 }
 
 .notice {
