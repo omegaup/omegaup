@@ -1,4 +1,6 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import { types } from '../../api_types';
 import userManageSchools from './ManageSchools.vue';
 import omegaupRadioSwitch from '../RadioSwitch.vue';
@@ -26,7 +28,7 @@ const profile: types.UserProfileInfo = {
 
 describe('ManageSchools.vue', () => {
   it('Should enable graduation date', async () => {
-    const wrapper = mount(userManageSchools, {
+    const wrapper = mount(userManageSchools as ComponentOptions<Vue>, {
       propsData: {
         profile,
         searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
@@ -42,7 +44,7 @@ describe('ManageSchools.vue', () => {
   });
 
   it('Should emit user update schools', async () => {
-    const wrapper = mount(userManageSchools, {
+    const wrapper = mount(userManageSchools as ComponentOptions<Vue>, {
       propsData: {
         profile,
         searchResultSchools: [{ key: 1, value: 'escuela' }],
