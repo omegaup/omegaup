@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -80,32 +80,53 @@ import common_Paginator from '../common/Paginator.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';
 
-@Component({
+export default defineComponent({
+  name: 'AuthorsRank',
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-typeahead': common_Typeahead,
   },
-})
-export default class AuthorsRank extends Vue {
-  @Prop() page!: number;
-  @Prop() length!: number;
-  @Prop() rankingData!: types.AuthorsRank;
-  @Prop() pagerItems!: types.PageItem[];
-  @Prop() searchResultUsers!: types.ListItem[];
-
-  T = T;
-  ui = ui;
-  searchedUsername: null | types.ListItem = null;
-
-  onSubmit(): void {
-    if (!this.searchedUsername) return;
-    window.location.href = `/profile/${encodeURIComponent(
-      this.searchedUsername.key,
-    )}`;
-  }
-}
+  props: {
+    page: {
+      type: Number,
+      required: true,
+    },
+    length: {
+      type: Number,
+      required: true,
+    },
+    rankingData: {
+      type: Object as PropType<types.AuthorsRank>,
+      required: true,
+    },
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      required: true,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      required: true,
+    },
+  },
+  emits: ['update-search-result-users'],
+  data() {
+    return {
+      T,
+      ui,
+      searchedUsername: null as null | types.ListItem,
+    };
+  },
+  methods: {
+    onSubmit(): void {
+      if (!this.searchedUsername) return;
+      window.location.href = `/profile/${encodeURIComponent(
+        this.searchedUsername.key,
+      )}`;
+    },
+  },
+});
 </script>
 
 <style scoped>

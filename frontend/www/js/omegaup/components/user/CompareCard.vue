@@ -94,45 +94,62 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 import user_Username from './Username.vue';
 
-@Component({
+export default defineComponent({
+  name: 'CompareCard',
   components: {
     'omegaup-user-username': user_Username,
   },
-})
-export default class CompareCard extends Vue {
-  @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: null }) solvedProblemsCount!: number | null;
-  @Prop({ default: null }) contestsCount!: number | null;
-  @Prop({ default: '' }) comparisonClass!: string;
+  props: {
+    profile: {
+      type: Object as PropType<types.UserProfileInfo>,
+      required: true,
+    },
+    solvedProblemsCount: {
+      type: Number as PropType<number | null>,
+      default: null,
+    },
+    contestsCount: {
+      type: Number as PropType<number | null>,
+      default: null,
+    },
+    comparisonClass: {
+      type: String,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    profileUrl(): string {
+      return `/profile/${encodeURIComponent(this.profile.username || '')}/`;
+    },
 
-  T = T;
+    profileImageAlt(): string {
+      if (this.profile.username) {
+        return UI.formatString(T.profileImageAltWithUsername, {
+          username: this.profile.username,
+        });
+      }
+      return T.profileImageAltGeneric;
+    },
 
-  get profileUrl(): string {
-    return `/profile/${encodeURIComponent(this.profile.username || '')}/`;
-  }
-
-  get profileImageAlt(): string {
-    if (this.profile.username) {
-      return UI.formatString(T.profileImageAltWithUsername, {
-        username: this.profile.username,
-      });
-    }
-    return T.profileImageAltGeneric;
-  }
-
-  get rankDisplay(): string {
-    if (!this.profile.rankinfo) return T.profileRankUnrated;
-    const rank = this.profile.rankinfo.rank;
-    if (rank == null) return T.profileRankUnrated;
-    return `#${rank}`;
-  }
-}
+    rankDisplay(): string {
+      if (!this.profile.rankinfo) return T.profileRankUnrated;
+      const rank = this.profile.rankinfo.rank;
+      if (rank == null) return T.profileRankUnrated;
+      return `#${rank}`;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

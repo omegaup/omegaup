@@ -1,8 +1,11 @@
 import { shallowMount, mount } from '@vue/test-utils';
+import Vue, { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 
 import user_Rank from './Rank.vue';
+
+const UserRank = user_Rank as ComponentOptions<Vue>;
 
 describe('Rank.vue', () => {
   const propsData = {
@@ -25,7 +28,7 @@ describe('Rank.vue', () => {
   };
 
   it('Should handle an empty rank', () => {
-    const wrapper = shallowMount(user_Rank, {
+    const wrapper = shallowMount(UserRank, {
       propsData,
     });
 
@@ -34,7 +37,7 @@ describe('Rank.vue', () => {
   });
 
   it('Should handle a rank with data', () => {
-    const wrapper = mount(user_Rank, {
+    const wrapper = mount(UserRank, {
       propsData: {
         ...propsData,
         ...{

@@ -202,7 +202,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -233,6 +233,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
 Vue.use(PopoverPlugin);
+
 interface Rank {
   country: string;
   classname?: string;
@@ -242,7 +243,8 @@ interface Rank {
   problems_solved: number;
 }
 
-@Component({
+export default defineComponent({
+  name: 'UserRank',
   components: {
     FontAwesomeIcon,
     'omegaup-common-typeahead': common_Typeahead,
@@ -250,120 +252,163 @@ interface Rank {
     'omegaup-user-username': user_Username,
     'omegaup-common-paginator': common_Paginator,
   },
-})
-export default class UserRank extends Vue {
-  @Prop() page!: number;
-  @Prop() length!: number;
-  @Prop({ default: false }) isIndex!: boolean;
-  @Prop() isLogged!: boolean;
-  @Prop({ default: () => ({}) }) availableFilters!: { [key: string]: string };
-  @Prop({ default: null }) filter!: string | null;
-  @Prop() ranking!: Rank[];
-  @Prop() lastUpdated!: Date;
-  @Prop() resultTotal!: number;
-  @Prop() pagerItems!: types.PageItem[];
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: '' }) currentUsername!: string;
+  props: {
+    page: {
+      type: Number,
+      required: true,
+    },
+    length: {
+      type: Number,
+      required: true,
+    },
+    isIndex: {
+      type: Boolean,
+      default: false,
+    },
+    isLogged: {
+      type: Boolean,
+      default: false,
+    },
+    availableFilters: {
+      type: Object as PropType<{ [key: string]: string }>,
+      default: () => ({}),
+    },
+    filter: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    ranking: {
+      type: Array as PropType<Rank[]>,
+      required: true,
+    },
+    lastUpdated: {
+      type: Date as PropType<Date>,
+      default: undefined,
+    },
+    resultTotal: {
+      type: Number,
+      required: true,
+    },
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      required: true,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      required: true,
+    },
+    currentUsername: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update-search-result-users'],
+  data() {
+    return {
+      T,
+      ui,
+      searchedUsername: null as null | types.ListItem,
+      showPopover: false,
+      currentFilter: this.filter,
+      isSelectionMode: false,
+      selectedUsers: [] as string[],
+    };
+  },
+  computed: {
+    UserRankingFeatureGuideURL(): string {
+      // Use the key defined in blog.json
+      return getBlogUrl('UserRankingFeatureGuideURL');
+    },
 
-  T = T;
-  ui = ui;
-  searchedUsername: null | types.ListItem = null;
-  showPopover: boolean = false;
-  currentFilter = this.filter;
-  isSelectionMode: boolean = false;
-  selectedUsers: string[] = [];
+    lastUpdatedText(): null | string {
+      if (!this.lastUpdated) {
+        return null;
+      }
+      return ui.formatString(T.userRankLastUpdated, {
+        datetime: time.formatDateLocalHHMM(this.lastUpdated),
+      });
+    },
 
-  get UserRankingFeatureGuideURL(): string {
-    // Use the key defined in blog.json
-    return getBlogUrl('UserRankingFeatureGuideURL');
-  }
+    nextPageFilter(): string {
+      if (this.currentFilter)
+        return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(
+          this.currentFilter,
+        )}`;
+      else return `/rank?page=${this.page + 1}`;
+    },
 
-  get lastUpdatedText(): null | string {
-    if (!this.lastUpdated) {
-      return null;
-    }
-    return ui.formatString(T.userRankLastUpdated, {
-      datetime: time.formatDateLocalHHMM(this.lastUpdated),
-    });
-  }
-  onSubmit(): void {
-    if (!this.searchedUsername) return;
-    window.location.href = `/profile/${encodeURIComponent(
-      this.searchedUsername.key,
-    )}`;
-  }
-
-  @Watch('currentFilter')
-  onFilterChange(newFilter: string): void {
-    // change url parameters with jquery
-    // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
-    let queryParameters: { [key: string]: string } = {};
-    const re = /([^&=]+)=([^&]*)/g;
-    const queryString = location.search.substring(1);
-    let m: string[] | null = null;
-    while ((m = re.exec(queryString))) {
-      queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-    }
-    if (newFilter !== '') {
-      queryParameters['filter'] = newFilter;
-      // When a filter is selected, the parameter 'page' must be reset.
-      delete queryParameters['page'];
-    } else {
-      delete queryParameters['filter'];
-    }
-    window.location.search = ui.buildURLQuery(queryParameters);
-  }
-
-  toggleUserSelection(username: string): void {
-    const index = this.selectedUsers.indexOf(username);
-    if (index > -1) {
-      this.selectedUsers.splice(index, 1);
-    } else if (this.selectedUsers.length < 2) {
-      this.selectedUsers.push(username);
-    }
-  }
-
-  isUserSelected(username: string): boolean {
-    return this.selectedUsers.includes(username);
-  }
-
-  cancelSelection(): void {
-    this.isSelectionMode = false;
-    this.selectedUsers = [];
-  }
-
-  compareSelectedUsers(): void {
-    if (this.selectedUsers.length === 2) {
-      window.location.href = `/rank/compare/?username1=${encodeURIComponent(
-        this.selectedUsers[0],
-      )}&username2=${encodeURIComponent(this.selectedUsers[1])}`;
-    }
-  }
-
-  compareVsMe(): void {
-    if (this.selectedUsers.length === 1 && this.currentUsername) {
-      window.location.href = `/rank/compare/?username1=${encodeURIComponent(
-        this.selectedUsers[0],
-      )}&username2=${encodeURIComponent(this.currentUsername)}`;
-    }
-  }
-
-  get nextPageFilter(): string {
-    if (this.currentFilter)
-      return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(
-        this.currentFilter,
+    prevPageFilter(): string {
+      if (this.currentFilter)
+        return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(
+          this.currentFilter,
+        )}`;
+      else return `/rank?page=${this.page - 1}`;
+    },
+  },
+  watch: {
+    currentFilter(newFilter: string): void {
+      // change url parameters with jquery
+      // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
+      let queryParameters: { [key: string]: string } = {};
+      const re = /([^&=]+)=([^&]*)/g;
+      const queryString = location.search.substring(1);
+      let m: string[] | null = null;
+      while ((m = re.exec(queryString))) {
+        queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+      }
+      if (newFilter !== '') {
+        queryParameters['filter'] = newFilter;
+        // When a filter is selected, the parameter 'page' must be reset.
+        delete queryParameters['page'];
+      } else {
+        delete queryParameters['filter'];
+      }
+      window.location.search = ui.buildURLQuery(queryParameters);
+    },
+  },
+  methods: {
+    onSubmit(): void {
+      if (!this.searchedUsername) return;
+      window.location.href = `/profile/${encodeURIComponent(
+        this.searchedUsername.key,
       )}`;
-    else return `/rank?page=${this.page + 1}`;
-  }
+    },
 
-  get prevPageFilter(): string {
-    if (this.currentFilter)
-      return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(
-        this.currentFilter,
-      )}`;
-    else return `/rank?page=${this.page - 1}`;
-  }
-}
+    toggleUserSelection(username: string): void {
+      const index = this.selectedUsers.indexOf(username);
+      if (index > -1) {
+        this.selectedUsers.splice(index, 1);
+      } else if (this.selectedUsers.length < 2) {
+        this.selectedUsers.push(username);
+      }
+    },
+
+    isUserSelected(username: string): boolean {
+      return this.selectedUsers.includes(username);
+    },
+
+    cancelSelection(): void {
+      this.isSelectionMode = false;
+      this.selectedUsers = [];
+    },
+
+    compareSelectedUsers(): void {
+      if (this.selectedUsers.length === 2) {
+        window.location.href = `/rank/compare/?username1=${encodeURIComponent(
+          this.selectedUsers[0],
+        )}&username2=${encodeURIComponent(this.selectedUsers[1])}`;
+      }
+    },
+
+    compareVsMe(): void {
+      if (this.selectedUsers.length === 1 && this.currentUsername) {
+        window.location.href = `/rank/compare/?username1=${encodeURIComponent(
+          this.selectedUsers[0],
+        )}&username2=${encodeURIComponent(this.currentUsername)}`;
+      }
+    },
+  },
+});
 </script>
 
 <style lang="scss">

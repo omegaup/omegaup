@@ -1,12 +1,15 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue, { ComponentOptions } from 'vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import each from 'jest-each';
 import user_ObjectivesQuestions from './ObjectivesQuestions.vue';
 
+const UserObjectivesQuestions = user_ObjectivesQuestions as ComponentOptions<Vue>;
+
 describe('ObjectivesQuestions.vue', () => {
   it('Should only display next modal page button', async () => {
-    const wrapper = shallowMount(user_ObjectivesQuestions);
+    const wrapper = shallowMount(UserObjectivesQuestions);
     const buttonNext = wrapper.find('button.btn-next-previous');
     expect(buttonNext.exists()).toBe(true);
     expect(buttonNext.text()).toBe(T.userObjectivesModalButtonNext);
@@ -14,14 +17,14 @@ describe('ObjectivesQuestions.vue', () => {
   });
 
   it('Should only display submit button', async () => {
-    const wrapper = shallowMount(user_ObjectivesQuestions);
+    const wrapper = shallowMount(UserObjectivesQuestions);
     await wrapper.find('input[type="radio"][value="none"]').setChecked();
     expect(wrapper.find('button.btn-primary').exists()).toBe(true);
     expect(wrapper.find('button.btn-next-previous').exists()).toBe(false);
   });
 
   it('Should display previous modal page and submit buttons', async () => {
-    const wrapper = shallowMount(user_ObjectivesQuestions);
+    const wrapper = shallowMount(UserObjectivesQuestions);
     await wrapper.find('input[type="radio"][value="learning"]').setChecked();
 
     const buttonNext = wrapper.find('button.btn-next-previous');
@@ -35,7 +38,7 @@ describe('ObjectivesQuestions.vue', () => {
   });
 
   it('Should display 2 as the last modal page counter', () => {
-    const wrapper = shallowMount(user_ObjectivesQuestions);
+    const wrapper = shallowMount(UserObjectivesQuestions);
     expect(wrapper.text()).toContain(
       ui.formatString(T.userObjectivesModalPageCounter, {
         current: 1,
@@ -45,7 +48,7 @@ describe('ObjectivesQuestions.vue', () => {
   });
 
   it('Should display 1 as the last modal page counter', async () => {
-    const wrapper = shallowMount(user_ObjectivesQuestions);
+    const wrapper = shallowMount(UserObjectivesQuestions);
     await wrapper.find('input[type="radio"][value="none"]').setChecked();
     expect(wrapper.text()).toContain(
       ui.formatString(T.userObjectivesModalPageCounter, {
@@ -71,7 +74,7 @@ describe('ObjectivesQuestions.vue', () => {
   ]).test(
     'Should display correct description when "$objective" radio button is checked',
     async ({ objective, description }) => {
-      const wrapper = shallowMount(user_ObjectivesQuestions);
+      const wrapper = shallowMount(UserObjectivesQuestions);
       expect(wrapper.text()).toContain(T.userObjectivesModalDescriptionUsage);
       await wrapper
         .find(`input[type="radio"][value="${objective}"]`)
@@ -190,7 +193,7 @@ describe('ObjectivesQuestions.vue', () => {
       valueScholar,
       valueTeaching,
     }) => {
-      const wrapper = shallowMount(user_ObjectivesQuestions);
+      const wrapper = shallowMount(UserObjectivesQuestions);
       await wrapper
         .find(`input[type="radio"][value="${objectiveA}"]`)
         .setChecked();
@@ -212,7 +215,7 @@ describe('ObjectivesQuestions.vue', () => {
   );
 
   it('Should emit correct objectives values when "none" radio button is checked', async () => {
-    const wrapper = shallowMount(user_ObjectivesQuestions);
+    const wrapper = shallowMount(UserObjectivesQuestions);
     await wrapper.find(`input[type="radio"][value="none"]`).setChecked();
     await wrapper.find('button.btn-primary').trigger('click');
     expect(wrapper.emitted('submit')).toBeDefined();
