@@ -763,7 +763,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         0,
                         r.score
                 ) AS score,
-                r.penalty,
+                IFNULL(r.penalty, 0) AS penalty,
                 IFNULL(
                     IF(
                         c.score_mode = 'all_or_nothing' AND r.score <> 1,
