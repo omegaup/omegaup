@@ -133,4 +133,44 @@ class RunsVersionChangeDAOTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $scoreboardRuns);
         $this->assertSame(self::SUBMIT_DELAY, $scoreboardRuns[0]['penalty']);
     }
+
+    public function testProblemsetRunsPreserveGroupScores() {
+        [
+            'problemsetProblem' => $problemsetProblem,
+            'submission' => $submission,
+            'run' => $run,
+        ] = $this->createContestSubmission();
+
+        $problemsetId = intval($problemsetProblem->problemset_id);
+        $scoreboardRuns = \OmegaUp\DAO\Runs::getProblemsetRuns($problemsetId);
+        $this->assertCount(1, $scoreboardRuns);
+        $this->assertSame($submission->guid, $scoreboardRuns[0]['guid']);
+        $this->assertSame(
+            ['' => null],
+            json_decode($scoreboardRuns[0]['score_by_group'], true)
+        );
+
+        foreach (['easy' => 0.25, 'hard' => 0.75] as $groupName => $score) {
+            \OmegaUp\DAO\RunsGroups::create(
+                new \OmegaUp\DAO\VO\RunsGroups([
+                    'run_id' => $run->run_id,
+                    'group_name' => $groupName,
+                    'score' => $score,
+                    'verdict' => 'PA',
+                ])
+            );
+        }
+
+        $scoreboardRuns = \OmegaUp\DAO\Runs::getProblemsetRuns($problemsetId);
+        $this->assertCount(1, $scoreboardRuns);
+        $this->assertSame($submission->guid, $scoreboardRuns[0]['guid']);
+        $this->assertEqualsCanonicalizing(
+            ['easy' => 0.25, 'hard' => 0.75],
+            json_decode($scoreboardRuns[0]['score_by_group'], true)
+        );
+        $this->assertSame(
+            [],
+            \OmegaUp\DAO\Runs::getProblemsetRuns($problemsetId, true)
+        );
+    }
 }
