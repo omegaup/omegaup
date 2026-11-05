@@ -54,7 +54,12 @@ def send_contest_message_to_client(
 
     for data in contestants:
         message = json.dumps(data._asdict())
-        contest_producer.send_message(message)
+        try:
+            contest_producer.send_message(message)
+        except rabbitmq_producer.MessageNotConfirmedError:
+            logging.exception(
+                'Contest %s was not confirmed by the broker',
+                data.contest_id)
 
 
 def get_contests_from_db(
