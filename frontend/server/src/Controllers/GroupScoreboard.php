@@ -88,6 +88,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param float $weight
      */
     public static function apiAddContest(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $groupAlias = $r->ensureString(
             'group_alias',
@@ -138,6 +139,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $scoreboard_alias
      */
     public static function apiRemoveContest(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $groupAlias = $r->ensureString(
             'group_alias',
