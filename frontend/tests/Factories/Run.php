@@ -392,7 +392,8 @@ class Run {
         int $problemsetPoints = 100,
         ?string $outputFilesContent = null,
         string $problemsetScoreMode = 'partial',
-        array $runScoreByGroups = []
+        array $runScoreByGroups = [],
+        ?int $runtime = null
     ): void {
         if (!is_null($runGuid)) {
             $guid = $runGuid;
@@ -410,7 +411,8 @@ class Run {
             $problemsetPoints,
             $outputFilesContent,
             $problemsetScoreMode,
-            $runScoreByGroups
+            $runScoreByGroups,
+            $runtime
         );
     }
 
