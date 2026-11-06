@@ -4378,6 +4378,7 @@ export namespace types {
     difficulty?: number;
     email_clarifications: boolean;
     input_limit: number;
+    is_bookmarked?: boolean;
     karel_problem: boolean;
     languages: string[];
     letter?: string;
@@ -4521,6 +4522,7 @@ export namespace types {
     alias: string;
     commit: string;
     input_limit: number;
+    is_bookmarked?: boolean;
     karel_problem: boolean;
     languages: string[];
     letter?: string;
