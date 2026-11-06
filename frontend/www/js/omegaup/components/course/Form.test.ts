@@ -59,4 +59,29 @@ describe('Form.vue', () => {
 
     expect(wrapper.find(selector).text()).toBe(T.courseNewFormScheduleCourse);
   });
+
+  it('Should add Markdown controls to the objective and description', () => {
+    const wrapper = shallowMount(course_Form, {
+      propsData: baseCourseFormProps,
+    });
+
+    const buttonBars = wrapper.findAll('.wmd-button-bar');
+    expect(buttonBars).toHaveLength(2);
+    expect(buttonBars.at(0).element.children.length).toBeGreaterThan(0);
+    expect(buttonBars.at(1).element.children.length).toBeGreaterThan(0);
+    expect(wrapper.find('textarea[data-course-objective]').exists()).toBe(
+      true,
+    );
+    expect(
+      wrapper.find('textarea[data-course-new-description]').exists(),
+    ).toBe(true);
+  });
+
+  it('Should hide the Markdown controls when the form is read only', () => {
+    const wrapper = shallowMount(course_Form, {
+      propsData: Object.assign({}, baseCourseFormProps, { readOnly: true }),
+    });
+
+    expect(wrapper.find('.wmd-button-bar').isVisible()).toBe(false);
+  });
 });
