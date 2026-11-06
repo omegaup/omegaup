@@ -1050,7 +1050,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         $groupAlias = self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
-        self::validateTargetIdentityBelongsToGroup($identity, $groupAlias);
+        self::validateTargetIdentityBelongsToGroupOrTeam(
+            $identity,
+            $groupAlias
+        );
 
         \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $identity->password = \OmegaUp\SecurityTools::hashString(
@@ -1158,6 +1161,27 @@ class Identity extends \OmegaUp\Controllers\Controller {
         bool $isTeam = false
     ): void {
         if (!self::isGroupManagedIdentity($identity, $groupAlias, $isTeam)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+    }
+
+    /**
+     * Identity creators change team passwords through the same endpoint as
+     * regular group passwords, so the target identity may use either the
+     * `<group_alias>:<name>` or the `teams:<group_alias>:<name>` namespace.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    private static function validateTargetIdentityBelongsToGroupOrTeam(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $groupAlias
+    ): void {
+        if (
+            !self::isGroupManagedIdentity($identity, $groupAlias, false)
+            && !self::isGroupManagedIdentity($identity, $groupAlias, true)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
