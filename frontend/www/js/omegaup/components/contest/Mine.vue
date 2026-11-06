@@ -60,122 +60,137 @@
           </select>
         </div>
       </div>
-      <div class="table-responsive">
-        <table class="table mb-0">
-          <thead>
-            <tr>
-              <th scope="col" class="text-center align-middle">
-                {{ T.wordsTitle }}
-              </th>
-              <th scope="col" class="text-center align-middle">
-                {{ T.arenaPracticeStartTime }}
-              </th>
-              <th scope="col" class="text-center align-middle">
-                {{ T.arenaPracticeEndtime }}
-              </th>
-              <th scope="col" class="text-center align-middle">
-                {{ T.contestNewFormAdmissionMode }}
-              </th>
-              <th scope="col" class="text-center align-middle">
-                {{ T.wordsScoreboard }}
-              </th>
-              <th scope="col" class="text-center align-middle">
-                {{ T.wordsActions }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="contest in contests" :key="contest.alias">
-              <td class="d-flex align-items-center">
-                <input
-                  v-model="selectedContests"
-                  type="checkbox"
-                  :value="contest.alias"
-                />
-                <div class="d-inline-block ml-2">
-                  <a class="mr-1" :href="ui.contestURL(contest)">{{
-                    ui.contestTitle(contest)
-                  }}</a>
-                </div>
-              </td>
-              <td>
-                <a
-                  :href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`"
-                  >{{ time.formatDateTime(contest.start_time) }}</a
-                >
-              </td>
-              <td>
-                <a
-                  :href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`"
-                  >{{ time.formatDateTime(contest.finish_time) }}</a
-                >
-              </td>
-              <td class="text-center">
-                {{ getAdmissionModeText(contest.admission_mode) }}
-              </td>
-              <td>
-                <a
-                  v-if="contest.scoreboard_url"
-                  :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
-                >
-                  <font-awesome-icon
-                    :title="T.contestScoreboardLink"
-                    :icon="['fas', 'link']"
-                  />{{ T.wordsPublic }}
-                </a>
-                <a
-                  v-if="contest.scoreboard_url_admin"
-                  class="ml-1"
-                  :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
-                >
-                  <font-awesome-icon
-                    :title="T.contestScoreboardAdminLink"
-                    :icon="['fas', 'link']"
-                  />{{ T.wordsAdmin }}
-                </a>
-              </td>
-              <td>
-                <a :href="`/contest/${contest.alias}/edit/`">
-                  <font-awesome-icon
-                    :title="T.wordsEdit"
-                    :icon="['fas', 'edit']"
-                  />
-                </a>
-                <a class="ml-2" :href="`/arena/${contest.alias}/#runs`">
-                  <font-awesome-icon
-                    :title="T.contestListSubmissions"
-                    :icon="['fas', 'tachometer-alt']"
-                  />
-                </a>
-                <a class="ml-2" :href="`/contest/${contest.alias}/stats/`">
-                  <font-awesome-icon
-                    :title="T.profileStatistics"
-                    :icon="['fas', 'chart-bar']"
-                  />
-                </a>
-                <a class="ml-2" :href="`/contest/${contest.alias}/activity/`">
-                  <font-awesome-icon
-                    :title="T.activityReport"
-                    :icon="['fas', 'clock']"
-                  />
-                </a>
-                <a class="ml-2" :href="`/arena/${contest.alias}/print/`">
-                  <font-awesome-icon
-                    :title="T.contestPrintableVersion"
-                    :icon="['fas', 'print']"
-                  />
-                </a>
-                <a class="ml-2" href="#" @click="onDownloadCsv(contest.alias)">
-                  <font-awesome-icon
-                    :title="T.contestDownloadListOfUsersInContest"
-                    :icon="['fas', 'file-download']"
-                  />
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-if="contests.length === 0" class="card-body border-top">
+        <omegaup-common-empty-state
+          icon="clipboard-list"
+          :title="T.contestListEmptyTitle"
+          :description="T.contestListEmptyDescription"
+          :button-text="T.buttonCreateContest"
+          button-link="/contest/new/"
+        ></omegaup-common-empty-state>
       </div>
+      <template v-else>
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center align-middle">
+                  {{ T.wordsTitle }}
+                </th>
+                <th scope="col" class="text-center align-middle">
+                  {{ T.arenaPracticeStartTime }}
+                </th>
+                <th scope="col" class="text-center align-middle">
+                  {{ T.arenaPracticeEndtime }}
+                </th>
+                <th scope="col" class="text-center align-middle">
+                  {{ T.contestNewFormAdmissionMode }}
+                </th>
+                <th scope="col" class="text-center align-middle">
+                  {{ T.wordsScoreboard }}
+                </th>
+                <th scope="col" class="text-center align-middle">
+                  {{ T.wordsActions }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="contest in contests" :key="contest.alias">
+                <td class="d-flex align-items-center">
+                  <input
+                    v-model="selectedContests"
+                    type="checkbox"
+                    :value="contest.alias"
+                  />
+                  <div class="d-inline-block ml-2">
+                    <a class="mr-1" :href="ui.contestURL(contest)">{{
+                      ui.contestTitle(contest)
+                    }}</a>
+                  </div>
+                </td>
+                <td>
+                  <a
+                    :href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`"
+                    >{{ time.formatDateTime(contest.start_time) }}</a
+                  >
+                </td>
+                <td>
+                  <a
+                    :href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`"
+                    >{{ time.formatDateTime(contest.finish_time) }}</a
+                  >
+                </td>
+                <td class="text-center">
+                  {{ getAdmissionModeText(contest.admission_mode) }}
+                </td>
+                <td>
+                  <a
+                    v-if="contest.scoreboard_url"
+                    :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
+                  >
+                    <font-awesome-icon
+                      :title="T.contestScoreboardLink"
+                      :icon="['fas', 'link']"
+                    />{{ T.wordsPublic }}
+                  </a>
+                  <a
+                    v-if="contest.scoreboard_url_admin"
+                    class="ml-1"
+                    :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
+                  >
+                    <font-awesome-icon
+                      :title="T.contestScoreboardAdminLink"
+                      :icon="['fas', 'link']"
+                    />{{ T.wordsAdmin }}
+                  </a>
+                </td>
+                <td>
+                  <a :href="`/contest/${contest.alias}/edit/`">
+                    <font-awesome-icon
+                      :title="T.wordsEdit"
+                      :icon="['fas', 'edit']"
+                    />
+                  </a>
+                  <a class="ml-2" :href="`/arena/${contest.alias}/#runs`">
+                    <font-awesome-icon
+                      :title="T.contestListSubmissions"
+                      :icon="['fas', 'tachometer-alt']"
+                    />
+                  </a>
+                  <a class="ml-2" :href="`/contest/${contest.alias}/stats/`">
+                    <font-awesome-icon
+                      :title="T.profileStatistics"
+                      :icon="['fas', 'chart-bar']"
+                    />
+                  </a>
+                  <a class="ml-2" :href="`/contest/${contest.alias}/activity/`">
+                    <font-awesome-icon
+                      :title="T.activityReport"
+                      :icon="['fas', 'clock']"
+                    />
+                  </a>
+                  <a class="ml-2" :href="`/arena/${contest.alias}/print/`">
+                    <font-awesome-icon
+                      :title="T.contestPrintableVersion"
+                      :icon="['fas', 'print']"
+                    />
+                  </a>
+                  <a
+                    class="ml-2"
+                    href="#"
+                    @click="onDownloadCsv(contest.alias)"
+                  >
+                    <font-awesome-icon
+                      :title="T.contestDownloadListOfUsersInContest"
+                      :icon="['fas', 'file-download']"
+                    />
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -186,6 +201,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import common_EmptyState from '../common/EmptyState.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -211,6 +227,7 @@ library.add(
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class List extends Vue {
