@@ -3,6 +3,11 @@
 '''Implementation of rabbitmq producer.'''
 
 import pika
+import pika.exceptions
+
+
+class MessageNotConfirmedError(Exception):
+    '''Raised when the broker does not confirm a published message.'''
 
 
 class RabbitmqProducer:
@@ -25,12 +30,27 @@ class RabbitmqProducer:
             auto_delete=False,
             durable=True,
             exchange_type='direct')
+        self.channel.confirm_delivery()
 
     def send_message(self, message: str) -> None:
-        '''Send message to any queue'''
+        '''Publish a persistent message and wait for broker confirmation.'''
         body = message.encode()
-        self.channel.basic_publish(
-            exchange=self.exchange,
-            routing_key=self.routing_key,
-            body=body,
-            properties=pika.BasicProperties(delivery_mode=2))
+        try:
+            self.channel.basic_publish(
+                exchange=self.exchange,
+                routing_key=self.routing_key,
+                body=body,
+                properties=pika.BasicProperties(delivery_mode=2),
+                mandatory=True)
+        except pika.exceptions.UnroutableError as err:
+            raise MessageNotConfirmedError(
+                'The broker could not route the message to any queue'
+            ) from err
+        except pika.exceptions.NackError as err:
+            raise MessageNotConfirmedError(
+                'The broker rejected the message (nack)'
+            ) from err
+        except pika.exceptions.AMQPError as err:
+            raise MessageNotConfirmedError(
+                'The message could not be confirmed by the broker'
+            ) from err
