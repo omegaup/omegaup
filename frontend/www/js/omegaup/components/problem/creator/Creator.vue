@@ -1,38 +1,41 @@
 <template>
-  <b-container fluid="lg">
-    <b-row>
-      <b-col>
-        <b-card :header="T.problemCreatorTitle" header-class="h3">
-          <creator-header
-            ref="creatorHeader"
-            :hide-header-actions="hideHeaderActions"
-            @download-zip-file="
-              (zipObject) => $emit('download-zip-file', zipObject)
-            "
-            @upload-zip-file="populateProps"
-          />
-          <creator-tabs
-            ref="creatorTabs"
-            data-problem-creator-tabs
-            :code-prop="codeProp"
-            :extension-prop="extensionProp"
-            :current-solution-markdown-prop="currentSolutionMarkdownProp"
-            :current-markdown-prop="currentMarkdownProp"
-            :hide-save-buttons="hideSaveButtons"
-            @show-update-success-message="
-              () => $emit('show-update-success-message')
-            "
-            @download-zip-file="
-              (zipObject) => $emit('download-zip-file', zipObject)
-            "
-            @download-input-file="
-              (fileObject) => $emit('download-input-file', fileObject)
-            "
-          />
-        </b-card>
-      </b-col>
-    </b-row>
-  </b-container>
+  <div class="container-lg">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header h3">{{ T.problemCreatorTitle }}</div>
+          <div class="card-body">
+            <creator-header
+              ref="creatorHeader"
+              :hide-header-actions="hideHeaderActions"
+              @download-zip-file="
+                (zipObject) => $emit('download-zip-file', zipObject)
+              "
+              @upload-zip-file="populateProps"
+            />
+            <creator-tabs
+              ref="creatorTabs"
+              data-problem-creator-tabs
+              :code-prop="codeProp"
+              :extension-prop="extensionProp"
+              :current-solution-markdown-prop="currentSolutionMarkdownProp"
+              :current-markdown-prop="currentMarkdownProp"
+              :hide-save-buttons="hideSaveButtons"
+              @show-update-success-message="
+                () => $emit('show-update-success-message')
+              "
+              @download-zip-file="
+                (zipObject) => $emit('download-zip-file', zipObject)
+              "
+              @download-input-file="
+                (fileObject) => $emit('download-input-file', fileObject)
+              "
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
