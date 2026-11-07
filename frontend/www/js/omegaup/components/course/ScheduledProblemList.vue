@@ -7,8 +7,12 @@
       <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
-      <div v-if="problems.length == 0" class="empty-table-message">
-        {{ emptyTableLabel }}
+      <div v-if="problems.length == 0" class="empty-table-message text-center py-5">
+        <h5>{{ emptyTableLabel }}</h5>
+        <p class="text-muted">{{ T.courseProblemListEmptyDescription }}</p>
+        <button class="btn btn-primary" type="button" @click.prevent="focusAddProblem">
+         {{ addButtonLabel }}
+        </button>
       </div>
       <div v-else>
         <table class="table table-striped">
@@ -41,7 +45,7 @@
         </table>
       </div>
     </div>
-    <div class="card-footer" data-course-add-problem>
+    <div class="card-footer" ref="addProblemFooter" data-course-add-problem>
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -182,6 +186,14 @@ export default class CourseScheduledProblemList extends Vue {
     return this.assignment.assignment_type === 'lesson'
       ? T.courseEditAddLectures
       : T.courseEditAddProblems;
+  }
+
+  focusAddProblem(): void {
+   const footer = this.$refs.addProblemFooter as HTMLElement | undefined;
+   if (!footer) return;
+   footer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+   const searchInput = footer.querySelector('input');
+   if (searchInput) searchInput.focus();
   }
 
   onAddProblem(problem: types.AddedProblem): void {
