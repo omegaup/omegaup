@@ -722,6 +722,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormUserInformationRequiredDesc: "(Enab13 7hi5 0p7i0n 70 r3qu357 acc355 70 7h3 inf0rma7i0n 0f 7h3 par7icipan75 7ha7 b310ng 70 7h3 c0ur53 in 0rd3r 70 b3 c0n7ac73d 1a73r. K33p in mind 7ha7 7h3 par7icipan75 can ch0053 wh37h3r 7h3y wan7 70 giv3 acc355 70 7h3ir inf0rma7i0n 0r n07.)",
   courseNotFound: "(C0ur53 n07 f0und)",
   coursePrivacyConsent: "(C0ur53 privacy c0n53n7)",
+  courseProblemListEmptyDescription: "(Add y0ur fir57 pr0b13m 70 g37 57ar73d.)",
   courseProgressGlobalScore: "(G10ba1 Sc0r3)",
   courseRegistrationPreAcceptedDescription: "(Thi5 acc0un7 ha5 b33n 3xp1ici71y invi73d 70 7h3 c0ur53)",
   courseRequestFeedback: "(D0 y0u hav3 d0ub75? r3qu357 f33dback 0n y0ur c0d3!)",
