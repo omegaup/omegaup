@@ -382,11 +382,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Prepare Environment
-        uses: ./.github/actions/prepare-env
-        with:
-          install_host_python_deps: true
-
       - name: Enable Corepack
         run: corepack enable
 
@@ -399,11 +394,30 @@ jobs:
       - name: Activate pinned pnpm
         run: corepack prepare --activate
 
-      - name: Install pnpm dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Start frontend build in background
+        run: |
+          rm -f /tmp/frontend-build.exit /tmp/frontend-build.log
+          setsid nohup bash -c '
+            pnpm install --frozen-lockfile && pnpm build
+            echo $? > /tmp/frontend-build.exit
+          ' > /tmp/frontend-build.log 2>&1 < /dev/null &
 
-      - name: Build webpack resources
-        run: pnpm build
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+        with:
+          install_host_python_deps: true
+
+      - name: Wait for frontend build
+        run: |
+          for i in $(seq 1 600); do
+            [ -f /tmp/frontend-build.exit ] && break
+            sleep 1
+          done
+          echo "::group::frontend build log"
+          cat /tmp/frontend-build.log
+          echo "::endgroup::"
+          [ "$(cat /tmp/frontend-build.exit 2>/dev/null)" = "0" ] \
+            || { echo "::error::frontend build failed or timed out"; exit 1; }
 
       - name: Wait for dependencies
         run: |
