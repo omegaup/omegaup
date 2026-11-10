@@ -555,6 +555,17 @@ class Authorization {
         );
     }
 
+    public static function getOperationsAccessLevel(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): \OmegaUp\OperationsAccessLevel {
+        switch (true) {
+            case self::isSystemAdmin($identity):
+                return \OmegaUp\OperationsAccessLevel::Admin;
+            default:
+                return \OmegaUp\OperationsAccessLevel::Support;
+        }
+    }
+
     public static function isGroupAdmin(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Groups $group
