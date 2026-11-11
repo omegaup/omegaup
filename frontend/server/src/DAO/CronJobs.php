@@ -33,6 +33,30 @@ class CronJobs extends \OmegaUp\DAO\Base\CronJobs {
     }
 
     /**
+     * Returns a cron job and locks its row until the transaction ends, so
+     * concurrent changes to the same job run one after the other.
+     */
+    public static function getByNameForUpdate(
+        string $name
+    ): ?\OmegaUp\DAO\VO\CronJobs {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\CronJobs::FIELD_NAMES,
+            'Cron_Jobs'
+        );
+        $sql = "SELECT {$fields}
+                FROM Cron_Jobs
+                WHERE name = ?
+                LIMIT 1
+                FOR UPDATE;";
+        /** @var array{created_at: \OmegaUp\Timestamp, description: null|string, enabled: bool, job_id: int, name: string, schedule: null|string, updated_at: \OmegaUp\Timestamp}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        if (empty($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\CronJobs($row);
+    }
+
+    /**
      * Returns every registered cron job ordered by name.
      *
      * @return list<\OmegaUp\DAO\VO\CronJobs>

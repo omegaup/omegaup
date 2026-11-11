@@ -126,7 +126,13 @@ export class EventsSocket {
 
     if (data.message == '/run/update/') {
       const { run } = data;
+      const rankingEntry = rankingStore.state.ranking.find(
+        (rank) => rank.username === run.username,
+      );
       const updatedRun = {
+        ...(rankingEntry
+          ? { country: rankingEntry.country, classname: rankingEntry.classname }
+          : {}),
         ...run,
         time: time.remoteTime(run.time * 1000),
       };

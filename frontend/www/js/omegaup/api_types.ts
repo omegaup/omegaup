@@ -1633,6 +1633,26 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CronsDetailsPayload {
       return ((x) => {
+        x.problemHealthFindings = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.first_detected_at = ((x: number) => new Date(x * 1000))(
+              x.first_detected_at,
+            );
+            return x;
+          });
+        })(x.problemHealthFindings);
+        x.recommendationModelRuns = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+            return x;
+          });
+        })(x.recommendationModelRuns);
         x.runs = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1896,6 +1916,14 @@ export namespace types {
     export function LoginDetailsPayload(
       elementId: string = 'payload',
     ): types.LoginDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function OperationsDashboardPayload(
+      elementId: string = 'payload',
+    ): types.OperationsDashboardPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
@@ -3005,6 +3033,8 @@ export namespace types {
 
   export interface BookmarkProblem {
     alias: string;
+    attempted: boolean;
+    solved: boolean;
     title: string;
   }
 
@@ -3218,6 +3248,7 @@ export namespace types {
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
     isReviewer: boolean;
+    isSupportTeamMember: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
     maintenanceMessage?: types.MaintenanceMessage;
@@ -3889,6 +3920,8 @@ export namespace types {
 
   export interface CronsDetailsPayload {
     jobs: types.CronJob[];
+    problemHealthFindings: types.ProblemHealthFinding[];
+    recommendationModelRuns: types.RecommendationModelRun[];
     runs: types.CronRun[];
   }
 
@@ -4285,6 +4318,12 @@ export namespace types {
     url?: string;
   }
 
+  export interface OperationsDashboardPayload {
+    accessLevel: string;
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
+  }
+
   export interface PageItem {
     class: string;
     label: string;
@@ -4479,6 +4518,16 @@ export namespace types {
     alias: string;
     name: string;
     role: string;
+  }
+
+  export interface ProblemHealthFinding {
+    alias: string;
+    check_type: string;
+    detail?: string;
+    first_detected_at: Date;
+    problem_id: number;
+    severity: string;
+    title: string;
   }
 
   export interface ProblemInfo {
@@ -4738,6 +4787,17 @@ export namespace types {
   export interface Progress {
     max_score: number;
     score: number;
+  }
+
+  export interface RecommendationModelRun {
+    created_at: Date;
+    dataset_size: number;
+    map_score: number;
+    model_run_id: number;
+    output_path?: string;
+    published: boolean;
+    rng_seed?: number;
+    skip_reason?: string;
   }
 
   export interface Run {
@@ -5034,6 +5094,7 @@ export namespace types {
 
   export interface ScoreboardRankingProblem {
     alias: string;
+    first_solved?: number;
     penalty: number;
     pending?: number;
     percent: number;
@@ -5482,6 +5543,8 @@ export namespace messages {
   export type _AdminGetCronsServerResponse = any;
   export type AdminGetCronsResponse = {
     jobs: types.CronJob[];
+    problemHealthFindings: types.ProblemHealthFinding[];
+    recommendationModelRuns: types.RecommendationModelRun[];
     runs: types.CronRun[];
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
@@ -5504,6 +5567,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminRerunCronRequest = { [key: string]: any };
+  export type AdminRerunCronResponse = { queued: boolean };
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
   export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
@@ -6518,6 +6583,9 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    rerunCron: (
+      params?: messages.AdminRerunCronRequest,
+    ) => Promise<messages.AdminRerunCronResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;

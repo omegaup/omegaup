@@ -123,8 +123,8 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $newIdentityName,
-            'country_id' => 'US',
-            'state_id' => 'CA',
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
             'gender' => 'female',
             'school_name' => $schoolName,
             'group_alias' => $group['group']->alias,
@@ -480,5 +480,112 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
+    }
+
+    /**
+     * Owning a group does not give an identity creator access to accounts
+     * outside that group. Changing the password of a main identity would be an
+     * account takeover, so it has to be rejected.
+     */
+    public function testChangePasswordOfMainIdentityIsRejected() {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        [
+            'identity' => $victimIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'password' => 'OriginalPass123!',
+            ])
+        );
+
+        $newPassword = 'AttackerPass123!';
+        try {
+            \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => $victimIdentity->username,
+                'password' => $newPassword,
+                'group_alias' => $group['group']->alias,
+            ]));
+            $this->fail(
+                'Identity creators should not change passwords of main identities'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+
+        // The victim's password must remain untouched.
+        $victim = \OmegaUp\DAO\Identities::findByUsername(
+            $victimIdentity->username
+        );
+        $this->assertNotNull($victim);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Identity::testPassword(
+                $victim,
+                'OriginalPass123!'
+            )
+        );
+        $this->assertFalse(
+            \OmegaUp\Controllers\Identity::testPassword(
+                $victim,
+                $newPassword
+            )
+        );
+    }
+
+    /**
+     * Renaming a main identity into the creator's group would let them manage
+     * (and take over) that account afterwards, so it has to be rejected too.
+     */
+    public function testUpdateMainIdentityIsRejected() {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        ['identity' => $victimIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $newUsername = "{$group['group']->alias}:stolen";
+
+        try {
+            \OmegaUp\Controllers\Identity::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+                'original_username' => $victimIdentity->username,
+                'username' => $newUsername,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'gender' => 'male',
+                'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail(
+                'Identity creators should not rename identities outside their group'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+
+        // The victim keeps their username and the attacker's username was not
+        // created.
+        $this->assertNotNull(
+            \OmegaUp\DAO\Identities::findByUsername($victimIdentity->username)
+        );
+        $this->assertNull(
+            \OmegaUp\DAO\Identities::findByUsername($newUsername)
+        );
     }
 }

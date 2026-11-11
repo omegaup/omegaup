@@ -655,9 +655,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         } else {
             $val = [$problemsetId];
             if (is_null($filterUsersBy)) {
-                $sqlUserFilter = '';
+                $whereUserFilter = '';
             } else {
-                $sqlUserFilter = ' AND i.username LIKE ?';
+                $whereUserFilter = ' WHERE i.username LIKE ?';
                 $val[] = $filterUsersBy . '%';
             }
             $sql = "
@@ -669,19 +669,22 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     FALSE AS is_invited,
                     IFNULL(ur.classname, 'user-rank-unranked') AS classname
                 FROM
-                    Submissions s
+                    (
+                        SELECT DISTINCT
+                            s.identity_id
+                        FROM
+                            Submissions s
+                        WHERE
+                            s.problemset_id = ? AND
+                            s.type = 'normal' AND
+                            s.status = 'ready' AND
+                            s.verdict NOT IN ('CE', 'JE', 'VE')
+                    ) AS s
                 INNER JOIN
                     Identities i ON i.identity_id = s.identity_id
                 LEFT JOIN
                     User_Rank ur ON ur.user_id = i.user_id
-                WHERE
-                    s.problemset_id = ? AND
-                    s.type = 'normal' AND
-                    s.status = 'ready' AND
-                    s.verdict NOT IN ('CE', 'JE', 'VE')
-                    $sqlUserFilter
-                GROUP BY
-                    s.identity_id;";
+                $whereUserFilter;";
         }
 
         $result = [];
@@ -1427,12 +1430,17 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
-                    submission_id, version, commit, verdict
+                    submission_id, version, commit, verdict, penalty, `time`
                 )
             SELECT
-                s.submission_id, ?, ?, "JE"
+                s.submission_id, ?, ?, "JE",
+                IFNULL(r.penalty, s.submit_delay), s.`time`
             FROM
                 Submissions s
+            LEFT JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
             WHERE
                 s.problem_id = ?
             ORDER BY

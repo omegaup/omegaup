@@ -20,6 +20,10 @@
               >
               <span class="stat-value">{{ activeDays }}</span>
             </div>
+            <div v-if="isCurrentYearSelected" class="secondary-item">
+              <span class="stat-label">{{ T.userHeatmapCurrentStreak }}:</span>
+              <span class="stat-value">{{ currentStreak }}</span>
+            </div>
             <div class="secondary-item">
               <span class="stat-label">{{ T.userHeatmapMaxStreak }}:</span>
               <span class="stat-value">{{ maxStreak }}</span>
@@ -75,6 +79,7 @@ export default class UserHeatmap extends Vue {
   totalSubmissions = 0;
   activeDays = 0;
   maxStreak = 0;
+  currentStreak = 0;
   hasRendered: boolean = false;
   T = T;
   ui = ui;
@@ -156,19 +161,21 @@ export default class UserHeatmap extends Vue {
     const startDate = new Date(this.selectedYear, 0, 1);
     const firstDayOffset = startDate.getDay();
 
-    // Create a map for faster lookups, using the same format as bar chart
+    // Create a map for faster lookups, using the same format as bar chart.
+    // The map keeps every year so the current streak can cross year
+    // boundaries; per-year stats and cells only look up selected-year dates.
     const dateMap = new Map<string, number>();
 
     if (stats?.length) {
       for (const run of stats) {
         if (!run.date) continue;
 
-        // Only include data for the selected year
-        if (run.date.startsWith(this.selectedYear.toString())) {
-          // Sum runs by date
-          const currentCount = dateMap.get(run.date) || 0;
-          dateMap.set(run.date, currentCount + run.runs);
-        }
+        // Only count accepted submissions as activity
+        if (run.verdict !== 'AC') continue;
+
+        // Sum runs by date
+        const currentCount = dateMap.get(run.date) || 0;
+        dateMap.set(run.date, currentCount + run.runs);
       }
     }
 
@@ -272,6 +279,30 @@ export default class UserHeatmap extends Vue {
     this.totalSubmissions = totalSubmissionsCount;
     this.activeDays = activeDays;
     this.maxStreak = bestStreak;
+    this.currentStreak = this.computeCurrentStreak(dateMap, lastDay);
+  }
+
+  get isCurrentYearSelected(): boolean {
+    return this.selectedYear === new Date().getFullYear();
+  }
+
+  computeCurrentStreak(dateMap: Map<string, number>, lastDay: Date): number {
+    const cursor = new Date(lastDay.getTime());
+
+    // A missing submission today should not break the streak yet: fall back
+    // to the streak ending yesterday.
+    if (!(dateMap.get(this.formatDateToString(cursor)) || 0)) {
+      cursor.setDate(cursor.getDate() - 1);
+    }
+
+    // Walk backwards without a lower bound so the streak survives year
+    // boundaries (e.g. Dec 31 -> Jan 1).
+    let streak = 0;
+    while ((dateMap.get(this.formatDateToString(cursor)) || 0) > 0) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
   }
 
   beforeDestroy(): void {

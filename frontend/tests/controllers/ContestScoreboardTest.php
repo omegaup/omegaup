@@ -205,6 +205,23 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame(1, $response['ranking'][0]['problems'][1]['runs']);
 
+        $this->assertArrayHasKey(
+            'first_solved',
+            $response['ranking'][0]['problems'][0]
+        );
+        $this->assertArrayHasKey(
+            'first_solved',
+            $response['ranking'][1]['problems'][0]
+        );
+        $this->assertArrayNotHasKey(
+            'first_solved',
+            $response['ranking'][2]['problems'][0]
+        );
+        $this->assertLessThan(
+            $response['ranking'][1]['problems'][0]['first_solved'],
+            $response['ranking'][0]['problems'][0]['first_solved']
+        );
+
         // Now get the scoreboard as an contest director
         $login = self::login($testData['contestData']['director']);
         $r = new \OmegaUp\Request([
@@ -1709,5 +1726,98 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 $lastExpectedScore = $run['expectedScore'];
             }
         }
+    }
+
+    /**
+     * Tests getAllRelevantIdentities deduplicates contestants and respects filterUsersBy.
+     */
+    public function testGetAllRelevantIdentitiesDeduplication() {
+        $runMap = [
+            // Contestant 0 submits 3 times (CE, AC, AC)
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
+            ],
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 120,
+            ],
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 180,
+            ],
+            // Contestant 1 submits 2 times (PA, WA)
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 1,
+                'points' => .5,
+                'verdict' => 'PA',
+                'submit_delay' => 60,
+            ],
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 1,
+                'points' => 0,
+                'verdict' => 'WA',
+                'submit_delay' => 120,
+            ],
+            // Contestant 2 submits only CE (should NOT be included)
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 2,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
+            ],
+        ];
+        $testData = $this->prepareContestScoreboardData(3, $runMap);
+        $problemsetId = intval(
+            $testData['contestData']['contest']->problemset_id
+        );
+        $aclId = intval($testData['contestData']['contest']->acl_id);
+
+        $identities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
+            $problemsetId,
+            $aclId,
+            showAllRuns: false
+        );
+
+        // Only contestant 0 and contestant 1 should be returned, exactly once each
+        $this->assertCount(2, $identities);
+        $returnedUsernames = array_column($identities, 'username');
+        $this->assertContains(
+            $testData['contestants'][0]->username,
+            $returnedUsernames
+        );
+        $this->assertContains(
+            $testData['contestants'][1]->username,
+            $returnedUsernames
+        );
+        $this->assertNotContains(
+            $testData['contestants'][2]->username,
+            $returnedUsernames
+        );
+
+        // Test filtering by prefix
+        $filteredIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
+            $problemsetId,
+            $aclId,
+            showAllRuns: false,
+            filterUsersBy: $testData['contestants'][0]->username
+        );
+        $this->assertCount(1, $filteredIdentities);
+        $this->assertSame(
+            $testData['contestants'][0]->username,
+            $filteredIdentities[0]['username']
+        );
     }
 }

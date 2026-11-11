@@ -49,6 +49,7 @@ OmegaUp.on('ready', () => {
           currentName: payload.currentName,
           currentUsername: mainStore.state.username,
           isAdmin: payload.isAdmin,
+          isSupportTeamMember: payload.isSupportTeamMember,
           isMainUserIdentity: payload.isMainUserIdentity,
           lockDownImage: payload.lockDownImage,
           navbarSection: payload.navbarSection,

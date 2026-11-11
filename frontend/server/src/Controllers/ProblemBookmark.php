@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * ProblemBookmarkController
  *
- * @psalm-type BookmarkProblem=array{alias: string, title: string}
+ * @psalm-type BookmarkProblem=array{alias: string, attempted: bool, solved: bool, title: string}
  */
 class ProblemBookmark extends \OmegaUp\Controllers\Controller {
     /**

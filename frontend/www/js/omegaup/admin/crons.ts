@@ -16,6 +16,7 @@ OmegaUp.on('ready', () => {
         props: {
           jobs: payload.jobs,
           runs: payload.runs,
+          problemHealthFindings: payload.problemHealthFindings,
         },
       });
     },

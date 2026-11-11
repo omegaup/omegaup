@@ -1,3 +1,4 @@
+import type { SeriesLineOptions } from 'highcharts/highstock';
 import * as ui from '../ui';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
@@ -39,12 +40,12 @@ export function onRankingEvents({
   finishTimestamp?: number;
   placesToShowInChart?: number;
 }): {
-  series: (Highcharts.SeriesLineOptions & { rank: number })[];
+  series: (SeriesLineOptions & { rank: number })[];
   navigatorData: number[][];
 } {
   const dataInSeries: { [name: string]: number[][] } = {};
   const navigatorData: number[][] = [[startTimestamp, 0]];
-  const series: (Highcharts.SeriesLineOptions & { rank: number })[] = [];
+  const series: (SeriesLineOptions & { rank: number })[] = [];
   const usernames: { [name: string]: string } = {};
 
   // Don't trust input data (data might not be sorted)
@@ -107,7 +108,7 @@ export function createChart({
   startTimestamp,
   finishTimestamp,
 }: {
-  series: (Highcharts.SeriesLineOptions & { rank: number })[];
+  series: (SeriesLineOptions & { rank: number })[];
   navigatorData: number[][];
   maxPoints: number;
   startTimestamp: number;

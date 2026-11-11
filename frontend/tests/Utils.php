@@ -231,6 +231,8 @@ class Utils {
             'Course_Clone_Log',
             'Course_Identity_Request',
             'Course_Identity_Request_History',
+            'Cron_Run_Requests',
+            'Cron_Runs',
             'Emails',
             'Group_Roles',
             'Groups_Identities',
@@ -243,6 +245,7 @@ class Utils {
             'Notifications',
             'PrivacyStatement_Consent_Log',
             'Problems',
+            'Problem_Health_Checks',
             'Problem_Of_The_Week',
             'Problems_Forfeited',
             'Problems_Languages',
@@ -258,6 +261,7 @@ class Utils {
             'QualityNomination_Log',
             'QualityNomination_Reviewers',
             'QualityNominations',
+            'Recommendation_Model_Runs',
             'Runs',
             'Schools',
             'School_Of_The_Month',
@@ -265,6 +269,7 @@ class Utils {
             'Submission_Log',
             'Team_Groups',
             'Teams',
+            'Team_Users',
             'User_Roles',
             'User_Rank',
             'Users',
@@ -509,6 +514,12 @@ class Utils {
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+            ' --rabbitmq-username ' . escapeshellarg(
+                OMEGAUP_RABBITMQ_USERNAME
+            ) .
+            ' --rabbitmq-password ' . escapeshellarg(
+                OMEGAUP_RABBITMQ_PASSWORD
+            ) .
              ' --test')
         );
     }

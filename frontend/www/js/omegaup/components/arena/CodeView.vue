@@ -70,6 +70,7 @@ export interface EditorOptions {
   mode?: string;
   readOnly: boolean;
   gutters?: string[];
+  viewportMargin?: number;
 }
 
 @Component({

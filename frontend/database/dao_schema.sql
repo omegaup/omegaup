@@ -402,6 +402,27 @@ CREATE TABLE `Cron_Jobs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Cron_Run_Requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL COMMENT 'Nombre del script cuya reejecución se solicita',
+  `requested_by` int DEFAULT NULL COMMENT 'El administrador que la solicitó, NULL si su cuenta ya no existe',
+  `status` enum('pending','picked','done','failed') NOT NULL DEFAULT 'pending' COMMENT 'pending mientras espera al despachador, picked mientras corre',
+  `requested_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `picked_at` datetime DEFAULT NULL COMMENT 'Cuando el despachador tomó la solicitud',
+  `finished_at` datetime DEFAULT NULL COMMENT 'Cuando terminó la ejecución, haya salido bien o mal',
+  `run_id` int DEFAULT NULL COMMENT 'La ejecución que produjo, NULL si no llegó a correr o si el historial ya se purgó',
+  `error_text` text COMMENT 'El final de stderr cuando la ejecución falló',
+  PRIMARY KEY (`request_id`),
+  KEY `idx_cron_run_requests_status` (`status`),
+  KEY `idx_cron_run_requests_name` (`name`),
+  KEY `fk_crr_requested_by` (`requested_by`),
+  KEY `fk_crr_run_id` (`run_id`),
+  CONSTRAINT `fk_crr_requested_by` FOREIGN KEY (`requested_by`) REFERENCES `Users` (`user_id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_crr_run_id` FOREIGN KEY (`run_id`) REFERENCES `Cron_Runs` (`run_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Solicitudes de reejecución manual de trabajos cron';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Cron_Runs` (
   `run_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'Nombre del script (parser.prog). Denormalizado a propósito: el historial se registra aunque el trabajo no esté en Cron_Jobs y sobrevive a renombres o borrados del registro',
@@ -767,7 +788,7 @@ CREATE TABLE `Problem_Health_Checks` (
   `severity` enum('warning','error') NOT NULL DEFAULT 'warning',
   `detail` varchar(255) DEFAULT NULL COMMENT 'Explicación legible de lo que se detectó',
   `first_detected_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La primera vez que se detectó, se conserva entre ejecuciones',
-  `last_seen_at` datetime NOT NULL COMMENT 'La última ejecución en la que se seguía detectando',
+  `last_seen_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'La última ejecución en la que se seguía detectando',
   `resolved_at` datetime DEFAULT NULL COMMENT 'Cuando dejó de detectarse, NULL si sigue vigente',
   PRIMARY KEY (`check_id`),
   UNIQUE KEY `unique_problem_check` (`problem_id`,`check_type`),
@@ -1343,6 +1364,7 @@ CREATE TABLE `Team_Groups` (
   KEY `idx_create_time` (`create_time`),
   KEY `idx_team_groups_name` (`name`),
   KEY `idx_team_groups_alias_name` (`alias`,`name`),
+  KEY `idx_team_groups_acl_create_alias_desc_name` (`acl_id`,`create_time`,`alias`,`description`,`name`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1534,6 +1556,21 @@ CREATE TABLE `Users_Experiments` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los experimentos habilitados para un usuario.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Users_Followers` (
+  `users_follower_id` int NOT NULL AUTO_INCREMENT,
+  `follower_user_id` int NOT NULL COMMENT 'El usuario que sigue a alguien más',
+  `followed_user_id` int NOT NULL COMMENT 'El usuario que es seguido',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`users_follower_id`),
+  UNIQUE KEY `unique_follow_relationship` (`follower_user_id`,`followed_user_id`),
+  KEY `idx_users_followers_followed_user_id` (`followed_user_id`),
+  CONSTRAINT `fk_uf_followed_user_id` FOREIGN KEY (`followed_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_uf_follower_user_id` FOREIGN KEY (`follower_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_uf_no_self_follow` CHECK ((`follower_user_id` <> `followed_user_id`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Relaciones de seguimiento entre usuarios para el sistema de amigos/seguidos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

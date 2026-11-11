@@ -162,13 +162,27 @@
         </tr>
       </tbody>
     </table>
+    <b-modal
+      v-model="showConfirmationModal"
+      :title="T.wordsConfirm"
+      :ok-title="T.wordsYes"
+      :cancel-title="T.wordsNo"
+      ok-variant="danger"
+      cancel-variant="secondary"
+      @ok="onConfirmRemove"
+      @hidden="selectedProblem = null"
+    >
+      <p>{{ confirmRemoveMessage }}</p>
+    </b-modal>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { ModalPlugin } from 'bootstrap-vue';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import problem_Versions from '../problem/Versions.vue';
 import common_Typeahead from '../common/Typeahead.vue';
@@ -184,6 +198,8 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+
+Vue.use(ModalPlugin);
 
 interface MappedProblems {
   [problemAlias: string]: {
@@ -235,6 +251,8 @@ export default class AddProblem extends Vue {
     { key: SearchTypes.TITLE, value: T.contestEditAddProblemSearchByTitle },
     { key: SearchTypes.ID, value: T.contestEditAddProblemSearchById },
   ];
+  showConfirmationModal = false;
+  selectedProblem: types.ProblemsetProblemWithVersions | null = null;
 
   get problemMapping(): MappedProblems {
     let problemMapping: MappedProblems = {};
@@ -289,7 +307,21 @@ export default class AddProblem extends Vue {
   }
 
   onRemove(problem: types.ProblemsetProblemWithVersions): void {
-    this.$emit('remove-problem', problem.alias);
+    this.selectedProblem = problem;
+    this.showConfirmationModal = true;
+  }
+
+  onConfirmRemove(): void {
+    if (!this.selectedProblem) return;
+    this.$emit('remove-problem', this.selectedProblem.alias);
+    this.selectedProblem = null;
+  }
+
+  get confirmRemoveMessage(): string {
+    if (!this.selectedProblem) return '';
+    return ui.formatString(T.contestAddproblemProblemConfirmRemove, {
+      problem: this.selectedProblem.title || this.selectedProblem.alias,
+    });
   }
 
   onRunsDiff(

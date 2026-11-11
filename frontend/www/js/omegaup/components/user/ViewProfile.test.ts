@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
+import T from '../../lang';
 import user_ViewProfile from './ViewProfile.vue';
 
 const profile: types.UserProfileInfo = {
@@ -229,6 +230,52 @@ describe('Profilev2.vue', () => {
     }
     for (const course of otherCourses) {
       expect(!wrapper.find(`a[href="/course/${course.alias}/"]`));
+    }
+  });
+
+  it('Should display bookmarked problems with their solve status', async () => {
+    const badgeAlias = 'contestManager';
+    const bookmarkedProblems: types.BookmarkProblem[] = [
+      {
+        alias: 'solved-problem',
+        attempted: true,
+        solved: true,
+        title: 'Problem A',
+      },
+      {
+        alias: 'attempted-problem',
+        attempted: true,
+        solved: false,
+        title: 'Problem B',
+      },
+      {
+        alias: 'pending-problem',
+        attempted: false,
+        solved: false,
+        title: 'Problem C',
+      },
+    ];
+    const wrapper = mount(user_ViewProfile, {
+      propsData: {
+        profile,
+        data: { ...data, bookmarkedProblems },
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
+      },
+    });
+    await wrapper.find('a[href="#problems"]').trigger('click');
+    for (const problem of bookmarkedProblems) {
+      const link = wrapper.find(`a[href="/arena/problem/${problem.alias}/"]`);
+      expect(link.exists()).toBe(true);
+      const cellText = link.element.parentElement?.textContent ?? '';
+      if (problem.solved) {
+        expect(cellText).toContain(T.problemStatusSolved);
+      } else if (problem.attempted) {
+        expect(cellText).toContain(T.problemStatusAttempted);
+      } else {
+        expect(cellText).not.toContain(T.problemStatusSolved);
+        expect(cellText).not.toContain(T.problemStatusAttempted);
+      }
     }
   });
 });
