@@ -393,13 +393,14 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             $params[] = addcslashes($query, '%_\\') . '%';
         }
 
-        $total = intval(\OmegaUp\MySQLConnection::getInstance()->GetOne(
+        /** @var int|null */
+        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*)
              FROM User_Roles ur
              INNER JOIN Identities i ON i.user_id = ur.user_id
              WHERE {$where};",
             $params
-        ));
+        );
 
         $sql = "
             SELECT
@@ -428,7 +429,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             LEFT JOIN Groups_ g ON g.acl_id = page.acl_id
             ORDER BY page.name, page.acl_id;";
 
-        /** @var list<array{name: string, acl_id: int, resource_type: string, resource_alias: null|string}> */
+        /** @var list<array{acl_id: int, name: string, resource_alias: null|string, resource_type: string}> */
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             array_merge(
@@ -438,6 +439,6 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             )
         );
 
-        return ['assignments' => $rows, 'total_rows' => $total];
+        return ['assignments' => $rows, 'total_rows' => intval($total)];
     }
 }

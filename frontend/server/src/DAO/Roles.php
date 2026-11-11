@@ -51,8 +51,20 @@ class Roles extends \OmegaUp\DAO\Base\Roles {
             ORDER BY
                 r.role_id;';
 
-        /** @var list<array{role_id: int, name: string, description: string, users_count: int, groups_count: int, permissions_count: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        /** @var list<array{description: null|string, groups_count: int|null, name: null|string, permissions_count: int|null, role_id: int|null, users_count: int|null}> */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+
+        return array_map(
+            fn (array $row): array => [
+                'role_id' => intval($row['role_id']),
+                'name' => strval($row['name']),
+                'description' => strval($row['description']),
+                'users_count' => intval($row['users_count']),
+                'groups_count' => intval($row['groups_count']),
+                'permissions_count' => intval($row['permissions_count']),
+            ],
+            $rows
+        );
     }
 
     /**
@@ -73,7 +85,19 @@ class Roles extends \OmegaUp\DAO\Base\Roles {
             ORDER BY
                 p.permission_id;';
 
-        /** @var list<array{permission_id: int, name: string, description: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$roleId]);
+        /** @var list<array{description: string, name: string, permission_id: int}> */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$roleId]
+        );
+
+        return array_map(
+            fn (array $row): array => [
+                'permission_id' => $row['permission_id'],
+                'name' => $row['name'],
+                'description' => $row['description'],
+            ],
+            $rows
+        );
     }
 }

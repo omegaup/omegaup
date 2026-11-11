@@ -57,7 +57,10 @@ class Role extends \OmegaUp\Controllers\Controller {
                 ];
             }
         }
-        throw new \OmegaUp\Exceptions\NotFoundException('roleNotFound');
+        throw new \OmegaUp\Exceptions\InvalidParameterException(
+            'parameterNotFound',
+            'role'
+        );
     }
 
     /**
@@ -75,6 +78,7 @@ class Role extends \OmegaUp\Controllers\Controller {
         self::ensureCanConsultRoles($r->identity);
 
         $roleVO = \OmegaUp\DAO\Roles::getByName($r->ensureString('role'));
+        $roleId = intval($roleVO->role_id);
         $type = $r->ensureString('assignment_type');
         if (!in_array($type, ['user', 'group'], true)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -92,7 +96,7 @@ class Role extends \OmegaUp\Controllers\Controller {
 
         if ($type === 'user') {
             return \OmegaUp\DAO\UserRoles::getAssignmentsByRole(
-                $roleVO->role_id,
+                $roleId,
                 $aclId,
                 $query,
                 $page,
@@ -100,7 +104,7 @@ class Role extends \OmegaUp\Controllers\Controller {
             );
         }
         return \OmegaUp\DAO\GroupRoles::getAssignmentsByRole(
-            $roleVO->role_id,
+            $roleId,
             $aclId,
             $query,
             $page,

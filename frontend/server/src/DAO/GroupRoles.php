@@ -232,13 +232,14 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             $params[] = addcslashes($query, '%_\\') . '%';
         }
 
-        $total = intval(\OmegaUp\MySQLConnection::getInstance()->GetOne(
+        /** @var int|null */
+        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*)
              FROM Group_Roles gr
              INNER JOIN Groups_ gm ON gm.group_id = gr.group_id
              WHERE {$where};",
             $params
-        ));
+        );
 
         $sql = "
             SELECT
@@ -267,7 +268,7 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             LEFT JOIN Groups_ g ON g.acl_id = page.acl_id
             ORDER BY page.name, page.acl_id;";
 
-        /** @var list<array{name: string, acl_id: int, resource_type: string, resource_alias: null|string}> */
+        /** @var list<array{acl_id: int, name: string, resource_alias: null|string, resource_type: string}> */
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             array_merge(
@@ -277,6 +278,6 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             )
         );
 
-        return ['assignments' => $rows, 'total_rows' => $total];
+        return ['assignments' => $rows, 'total_rows' => intval($total)];
     }
 }
