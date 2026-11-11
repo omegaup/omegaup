@@ -21,9 +21,22 @@ import verification_code
 _TRANSIENT_ERRORS = (
     errors.OperationalError,  # type: ignore[attr-defined]
     errors.InterfaceError,  # type: ignore[attr-defined]
-    ConnectionError,
-    TimeoutError,
+    OSError,
 )
+
+_TRANSIENT_MYSQL_ERRNOS = frozenset({
+    errorcode.ER_LOCK_DEADLOCK,  # type: ignore[attr-defined]
+    errorcode.ER_LOCK_WAIT_TIMEOUT,  # type: ignore[attr-defined]
+    errorcode.CR_SERVER_GONE_ERROR,  # type: ignore[attr-defined]
+    errorcode.CR_SERVER_LOST,  # type: ignore[attr-defined]
+})
+
+
+def _is_transient(err: Exception) -> bool:
+    '''Tells infrastructure failures apart from permanent errors.'''
+    if isinstance(err, _TRANSIENT_ERRORS):
+        return True
+    return getattr(err, 'errno', None) in _TRANSIENT_MYSQL_ERRNOS
 
 
 @dataclasses.dataclass
@@ -71,12 +84,12 @@ class ContestsCallback:
         except rabbitmq_client.UnrecoverableMessageError:
             self._handle_processing_error(response, 'fatal_error')
             raise
-        except _TRANSIENT_ERRORS as err:
-            self._handle_processing_error(response, 'retryable_error')
-            raise rabbitmq_client.TransientMessageError(
-                'Transient infrastructure error while processing the message'
-            ) from err
         except Exception as err:  # pylint: disable=broad-except
+            if _is_transient(err):
+                self._handle_processing_error(response, 'retryable_error')
+                raise rabbitmq_client.TransientMessageError(
+                    'Transient error while processing the message'
+                ) from err
             logging.exception('Unexpected error while processing the message')
             self._handle_processing_error(response, 'fatal_error')
             raise rabbitmq_client.UnrecoverableMessageError(

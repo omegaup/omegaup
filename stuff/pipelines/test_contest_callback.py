@@ -232,8 +232,17 @@ def _marked_status(dbconn: Any) -> Any:
             'MySQL server is unavailable'),
         errors.OperationalError(  # type: ignore[attr-defined]
             'Lost connection to MySQL server'),
+        errors.InternalError(  # type: ignore[attr-defined]
+            'Deadlock found', errno=1213),
+        errors.DatabaseError(  # type: ignore[attr-defined]
+            'Lock wait timeout', errno=1205),
+        errors.DatabaseError(  # type: ignore[attr-defined]
+            'MySQL server has gone away', errno=2006),
+        errors.DatabaseError(  # type: ignore[attr-defined]
+            'Lost connection to MySQL server', errno=2013),
         ConnectionError('connection reset'),
         TimeoutError('timed out'),
+        OSError('name resolution failed'),
     ],
 )  # type: ignore
 def test_infrastructure_error_raises_transient(
@@ -252,6 +261,35 @@ def test_infrastructure_error_raises_transient(
             body=_valid_body(),
         )
     assert _marked_status(dbconn) == ('retryable_error', 1)
+
+
+@pytest.mark.parametrize(
+    'error',
+    [
+        errors.IntegrityError(  # type: ignore[attr-defined]
+            'Cannot add or update a child row', errno=1452),
+        errors.DataError(  # type: ignore[attr-defined]
+            'Data too long for column', errno=1406),
+        errors.ProgrammingError(  # type: ignore[attr-defined]
+            'Unknown column', errno=1054),
+    ],
+)  # type: ignore
+def test_mysql_data_error_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture,
+        error: Exception
+) -> None:
+    '''A MySQL error that is not transient is permanent, not retried.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
 
 
 def test_unexpected_error_raises_unrecoverable(
