@@ -43,8 +43,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import type { types } from '../../api_types';
 import T from '../../lang';
 import Notification from './Notification.vue';
 
@@ -53,20 +54,32 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 library.add(faBell);
 
-@Component({
+export default defineComponent({
+  name: 'NotificationList',
   components: {
     FontAwesomeIcon,
     'omegaup-notification': Notification,
   },
-})
-export default class NotificationList extends Vue {
-  @Prop() notifications!: types.Notification[];
-  T = T;
-
-  readSingleNotification(notification: types.Notification, url?: string): void {
-    this.$emit('read', [notification], url);
-  }
-}
+  props: {
+    notifications: {
+      type: Array as PropType<types.Notification[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  methods: {
+    readSingleNotification(
+      notification: types.Notification,
+      url?: string,
+    ): void {
+      this.$emit('read', [notification], url);
+    },
+  },
+});
 </script>
 
 <style scoped>

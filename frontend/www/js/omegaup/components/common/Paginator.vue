@@ -27,14 +27,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
-@Component
-export default class Paginator extends Vue {
-  @Prop() pagerItems!: types.PageItem[];
-
-  T = T;
-}
+export default defineComponent({
+  name: 'Paginator',
+  props: {
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      default: () => [] as types.PageItem[],
+    },
+  },
+  emits: ['page-changed'],
+  data() {
+    return {
+      T,
+    };
+  },
+});
 </script>

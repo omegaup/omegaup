@@ -39,14 +39,26 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class Paginator extends Vue {
-  @Prop() question!: string;
-  @Prop() answerYes!: string;
-  @Prop() answerNo!: string;
-}
+export default defineComponent({
+  name: 'Confirmation',
+  props: {
+    question: {
+      type: String,
+      required: true,
+    },
+    answerYes: {
+      type: String,
+      required: true,
+    },
+    answerNo: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['close', 'yes', 'no'],
+});
 </script>
 
 <style lang="scss" scoped>

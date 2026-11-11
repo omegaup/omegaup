@@ -195,8 +195,6 @@ class Reset extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $user->reset_digest = null;
-        $user->reset_sent_at = null;
         if (is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
@@ -212,7 +210,20 @@ class Reset extends \OmegaUp\Controllers\Controller {
             $r['password']
         );
 
-        \OmegaUp\DAO\Identities::update($identity);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\Identities::update($identity);
+
+            $user->reset_digest = null;
+            $user->reset_sent_at = null;
+            \OmegaUp\DAO\Users::update($user);
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         /** @psalm-suppress TypeDoesNotContainType IS_TEST may be defined as true in tests. */
         return [
