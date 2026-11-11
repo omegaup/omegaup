@@ -164,6 +164,7 @@ settings:
 
 overrides:
   marked: ^12.0.0
+  loader-utils@2: 2.0.4
 
 importers:
 
@@ -5921,8 +5922,8 @@ packages:
     resolution: {integrity: sha512-I5d00Pd/jwMD2QCduo657+YM/6L3KZu++pmX9VFncxaxvHcru9jx1lBaFft+r4Mt2jK0Yhp41XlRAihzPxHNCg==}
     engines: {node: '>=4.0.0'}
 
-  loader-utils@2.0.0:
-    resolution: {integrity: sha512-rP4F0h2RaWSvPEkD7BLDFQnvSf+nK+wr3ESUjNTyAGobqrijmW92zc+SO6d4p4B1wh7+B/Jg1mkQe5NYUEHtHQ==}
+  loader-utils@2.0.4:
+    resolution: {integrity: sha512-xXqpXoINfFhgua9xiqD8fPFHgkoq1mmmpE92WlDbm9rNRd/EbRb+Gqf908T2DMfuHjjJlksiK2RbHVOdD/MqSw==}
     engines: {node: '>=8.9.0'}
 
   locate-path@3.0.0:
@@ -12808,7 +12809,7 @@ snapshots:
       find-cache-dir: 3.3.2
       glob-parent: 5.1.2
       globby: 11.1.0
-      loader-utils: 2.0.0
+      loader-utils: 2.0.4
       normalize-path: 3.0.0
       p-limit: 3.0.2
       schema-utils: 3.3.0
@@ -13928,7 +13929,7 @@ snapshots:
 
   file-loader@6.2.0(webpack@5.105.1):
     dependencies:
-      loader-utils: 2.0.0
+      loader-utils: 2.0.4
       schema-utils: 3.3.0
       webpack: 5.105.1(@swc/core@1.3.92)(esbuild@0.18.20)(uglify-js@3.17.4)(webpack-cli@4.2.0)
 
@@ -15503,7 +15504,7 @@ snapshots:
       emojis-list: 3.0.0
       json5: 1.0.1
 
-  loader-utils@2.0.0:
+  loader-utils@2.0.4:
     dependencies:
       big.js: 5.2.2
       emojis-list: 3.0.0
@@ -15938,7 +15939,7 @@ snapshots:
 
   mini-css-extract-plugin@1.3.1(webpack@5.105.1):
     dependencies:
-      loader-utils: 2.0.0
+      loader-utils: 2.0.4
       schema-utils: 3.3.0
       webpack: 5.105.1(@swc/core@1.3.92)(esbuild@0.18.20)(uglify-js@3.17.4)(webpack-cli@4.2.0)
       webpack-sources: 1.4.3
@@ -16021,7 +16022,7 @@ snapshots:
 
   monaco-editor-webpack-plugin@2.1.0(monaco-editor@0.21.3)(webpack@5.105.1):
     dependencies:
-      loader-utils: 2.0.0
+      loader-utils: 2.0.4
       monaco-editor: 0.21.3
       webpack: 5.105.1(@swc/core@1.3.92)(esbuild@0.18.20)(uglify-js@3.17.4)(webpack-cli@4.2.0)
 
@@ -17510,7 +17511,7 @@ snapshots:
 
   style-loader@2.0.0(webpack@5.105.1):
     dependencies:
-      loader-utils: 2.0.0
+      loader-utils: 2.0.4
       schema-utils: 3.3.0
       webpack: 5.105.1(@swc/core@1.3.92)(esbuild@0.18.20)(uglify-js@3.17.4)(webpack-cli@4.2.0)
 
