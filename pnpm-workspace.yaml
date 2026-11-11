@@ -18,3 +18,4 @@ allowBuilds:
 
 overrides:
   marked: ^12.0.0
+  "loader-utils@2": "2.0.4"
