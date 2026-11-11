@@ -27,7 +27,8 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 s.state_id,
                 sc.name as school,
                 sc.school_id as school_id,
-                IFNULL(ur.classname, "user-rank-unranked") AS classname
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
+                gi.is_origin
             FROM
                 Groups_Identities gi
             INNER JOIN
@@ -45,14 +46,16 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             WHERE
                 gi.group_id = ?;';
 
-        /** @var list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
+        /** @var list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, is_origin: bool, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$group->group_id]
         );
         $identities = [];
         foreach ($rs as $row) {
-            if (!str_contains($row['username'], ':')) {
+            $isOrigin = boolval($row['is_origin']);
+            unset($row['is_origin']);
+            if (!$isOrigin) {
                 $identities[] = [
                     'username' => $row['username'],
                     'name' => $row['name'],
@@ -127,7 +130,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 group_id = ?;';
 
         $groupsIdentities = [];
-        /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, is_invited: bool, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */
+        /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, is_invited: bool, is_origin: bool, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -191,5 +194,54 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
+    }
+
+    /**
+     * Returns whether $identityId was originally created inside $groupId.
+     */
+    public static function isOriginIdentityInGroup(
+        int $identityId,
+        int $groupId
+    ): bool {
+        $groupIdentity = self::getByPK($groupId, $identityId);
+        return !is_null($groupIdentity) && $groupIdentity->is_origin;
+    }
+
+    /**
+     * Returns whether $identityId already has an origin group recorded.
+     */
+    public static function hasOriginGroup(int $identityId): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Groups_Identities
+            WHERE
+                identity_id = ?
+                AND is_origin = 1;';
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$identityId]
+        );
+        return $count > 0;
+    }
+
+    /**
+     * Saves a Groups_Identities row while never clearing an existing is_origin flag.
+     */
+    public static function upsertPreservingOrigin(
+        \OmegaUp\DAO\VO\GroupsIdentities $groupIdentity
+    ): void {
+        $existing = self::getByPK(
+            $groupIdentity->group_id,
+            $groupIdentity->identity_id
+        );
+        if (is_null($existing)) {
+            self::create($groupIdentity);
+            return;
+        }
+        $groupIdentity->is_origin = $existing->is_origin || $groupIdentity->is_origin;
+        self::update($groupIdentity);
     }
 }

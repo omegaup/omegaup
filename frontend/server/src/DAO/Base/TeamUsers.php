@@ -19,6 +19,89 @@ namespace OmegaUp\DAO\Base;
  */
 abstract class TeamUsers {
     /**
+     * Guardar registros.
+     *
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\TeamUsers}
+     * pasado en la base de datos. La llave primaria indicará qué instancia va
+     * a ser actualizada en base de datos. Si la llave primara o combinación de
+     * llaves primarias que describen una fila que no se encuentra en la base de
+     * datos, entonces replace() creará una nueva fila.
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
+     * llave primaria están vacías.
+     *
+     * @param \OmegaUp\DAO\VO\TeamUsers $Team_Users El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\TeamUsers}.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     */
+    final public static function replace(
+        \OmegaUp\DAO\VO\TeamUsers $Team_Users
+    ): int {
+        if (
+            empty($Team_Users->team_id) ||
+            empty($Team_Users->identity_id)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+        $sql = '
+            REPLACE INTO
+                Team_Users (
+                    `team_id`,
+                    `identity_id`,
+                    `is_origin`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
+        $params = [
+            $Team_Users->team_id,
+            $Team_Users->identity_id,
+            intval($Team_Users->is_origin),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Actualizar registros.
+     *
+     * @param \OmegaUp\DAO\VO\TeamUsers $Team_Users El objeto de tipo TeamUsers a actualizar.
+     *
+     * @return int Número de filas afectadas
+     */
+    final public static function update(
+        \OmegaUp\DAO\VO\TeamUsers $Team_Users
+    ): int {
+        $sql = '
+            UPDATE
+                `Team_Users`
+            SET
+                `is_origin` = ?
+            WHERE
+                (
+                    `team_id` = ? AND
+                    `identity_id` = ?
+                );';
+        $params = [
+            intval($Team_Users->is_origin),
+            (
+                is_null($Team_Users->team_id) ?
+                null :
+                intval($Team_Users->team_id)
+            ),
+            (
+                is_null($Team_Users->identity_id) ?
+                null :
+                intval($Team_Users->identity_id)
+            ),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
      * Obtener {@link \OmegaUp\DAO\VO\TeamUsers} por llave primaria.
      *
      * Este método cargará un objeto {@link \OmegaUp\DAO\VO\TeamUsers}
@@ -35,7 +118,8 @@ abstract class TeamUsers {
         $sql = '
             SELECT
                 `Team_Users`.`team_id`,
-                `Team_Users`.`identity_id`
+                `Team_Users`.`identity_id`,
+                `Team_Users`.`is_origin`
             FROM
                 `Team_Users`
             WHERE
@@ -182,7 +266,8 @@ abstract class TeamUsers {
         $sql = "
             SELECT
                 `Team_Users`.`team_id`,
-                `Team_Users`.`identity_id`
+                `Team_Users`.`identity_id`,
+                `Team_Users`.`is_origin`
             FROM
                 `Team_Users`
             ORDER BY
@@ -228,8 +313,10 @@ abstract class TeamUsers {
             INSERT INTO
                 `Team_Users` (
                     `team_id`,
-                    `identity_id`
+                    `identity_id`,
+                    `is_origin`
                 ) VALUES (
+                    ?,
                     ?,
                     ?
                 );';
@@ -244,6 +331,7 @@ abstract class TeamUsers {
                 null :
                 intval($Team_Users->identity_id)
             ),
+            intval($Team_Users->is_origin),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

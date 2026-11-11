@@ -19,6 +19,8 @@ class UserReadmeReportLog extends \OmegaUp\DAO\VO\VO {
         'readme_id' => true,
         'reporter_user_id' => true,
         'report_time' => true,
+        'reason' => true,
+        'detail' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -56,6 +58,16 @@ class UserReadmeReportLog extends \OmegaUp\DAO\VO\VO {
                 \OmegaUp\Time::get()
             );
         }
+        if (isset($data['reason'])) {
+            $this->reason = is_scalar(
+                $data['reason']
+            ) ? strval($data['reason']) : '';
+        }
+        if (isset($data['detail'])) {
+            $this->detail = is_scalar(
+                $data['detail']
+            ) ? strval($data['detail']) : '';
+        }
     }
 
     /**
@@ -80,4 +92,18 @@ class UserReadmeReportLog extends \OmegaUp\DAO\VO\VO {
      * @var \OmegaUp\Timestamp
      */
     public $report_time;  // CURRENT_TIMESTAMP
+
+    /**
+     * Motivo por el cual se reportó el README
+     *
+     * @var string|null
+     */
+    public $reason = null;
+
+    /**
+     * Detalles adicionales sobre el reporte proporcionados por el usuario
+     *
+     * @var string|null
+     */
+    public $detail = null;
 }

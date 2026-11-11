@@ -35,20 +35,59 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     }
 
     /**
-     * @param list<string> $usernames
+     * Links identities to a team in bulk without clearing an existing origin flag.
+     *
+     * @param string[] $usernames
      */
     public static function createTeamUsersBulk(
         int $teamId,
-        array $usernames
+        array $usernames,
+        bool $isOrigin = false
     ): int {
-        $placeholders = array_fill(0, count($usernames), '?');
-        $placeholders = join(',', $placeholders);
-        $sql = "REPLACE INTO Team_Users (team_id, identity_id)
-                SELECT ? AS team_id, identity_id FROM Identities
-                WHERE username IN ($placeholders);";
-        $params = array_merge([$teamId], $usernames);
+        if (empty($usernames)) {
+            return 0;
+        }
+        $originFlag = $isOrigin ? 1 : 0;
+        $placeholders = join(',', array_fill(0, count($usernames), '?'));
+        $sql = "INSERT INTO Team_Users (team_id, identity_id, is_origin)
+                SELECT ?, identity_id, ? FROM Identities
+                WHERE username IN ($placeholders)
+                ON DUPLICATE KEY UPDATE
+                    is_origin = GREATEST(is_origin, ?);";
+        $params = array_merge(
+            [$teamId, $originFlag],
+            $usernames,
+            [$originFlag]
+        );
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Returns whether $identityId was originally created as a member of a team
+     * in $teamGroupId.
+     */
+    public static function isOriginIdentityInTeamGroup(
+        int $identityId,
+        int $teamGroupId
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Team_Users AS tu
+            INNER JOIN
+                Teams AS t ON t.team_id = tu.team_id
+            WHERE
+                tu.identity_id = ?
+                AND tu.is_origin = 1
+                AND t.team_group_id = ?;';
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$identityId, $teamGroupId]
+        );
+        return $count > 0;
     }
 
     /**

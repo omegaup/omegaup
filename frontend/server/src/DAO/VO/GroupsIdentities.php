@@ -22,6 +22,7 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
         'privacystatement_consent_id' => true,
         'accept_teacher' => true,
         'is_invited' => true,
+        'is_origin' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -64,10 +65,15 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
                 $data['is_invited']
             );
         }
+        if (isset($data['is_origin'])) {
+            $this->is_origin = boolval(
+                $data['is_origin']
+            );
+        }
     }
 
     /**
-     * [Campo no documentado]
+     * Id del grupo
      * Llave Primaria
      *
      * @var int|null
@@ -75,7 +81,7 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
     public $group_id = null;
 
     /**
-     * Identidad del usuario
+     * Id de la identidad miembro del grupo
      * Llave Primaria
      *
      * @var int|null
@@ -83,7 +89,7 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
     public $identity_id = null;
 
     /**
-     * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
+     * Almacena la respuesta de la identidad miembro sobre si está de acuerdo en divulgar su información.
      *
      * @var bool|null
      */
@@ -97,16 +103,23 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
     public $privacystatement_consent_id = null;
 
     /**
-     * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
+     * Almacena la respuesta de la identidad miembro sobre si acepta al organizador como su maestro.
      *
      * @var bool|null
      */
     public $accept_teacher = null;
 
     /**
-     * Indica si la identidad ingresará al curso por invitación o le fue compartido el link del curso abierto con registro
+     * Indica si la identidad ingresó al grupo por invitación o mediante registro abierto
      *
      * @var bool
      */
     public $is_invited = false;
+
+    /**
+     * Indica si la identidad fue creada originalmente en este grupo
+     *
+     * @var bool
+     */
+    public $is_origin = false;
 }
