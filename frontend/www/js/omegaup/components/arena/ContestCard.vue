@@ -88,18 +88,39 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
-            <slot name="contest-button-see-details">
-              <b-button
-                v-if="!contest.participating"
-                ref="contestButtonSeeDetails"
-                :href="getContestURL(contest.alias)"
-                variant="primary"
-                class="d-flex align-items-center justify-content-center"
-              >
-                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-                {{ T.contestButtonSeeDetails }}
-              </b-button>
-            </slot>
+            <div class="d-flex flex-column">
+              <slot name="contest-button-calendar">
+                <b-dropdown
+                  variant="primary"
+                  class="d-flex align-items-center justify-content-center mb-2"
+                >
+                  <template #button-content>
+                    <font-awesome-icon class="mr-1" icon="calendar-alt" />
+                    {{ T.contestAddToCalendar }}
+                  </template>
+                  <b-dropdown-item @click="subscribeToCalendar(contest.alias)">
+                    <font-awesome-icon class="mr-1" icon="sync" />
+                    {{ T.calendarSubscribe }}
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="downloadCalendar(contest.alias)">
+                    <font-awesome-icon class="mr-1" icon="download" />
+                    {{ T.calendarDownload }}
+                  </b-dropdown-item>
+                </b-dropdown>
+              </slot>
+              <slot name="contest-button-see-details">
+                <b-button
+                  v-if="!contest.participating"
+                  ref="contestButtonSeeDetails"
+                  :href="getContestURL(contest.alias)"
+                  variant="primary"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                  {{ T.contestButtonSeeDetails }}
+                </b-button>
+              </slot>
+            </div>
           </div>
           <slot name="contest-dropdown">
             <b-dropdown variant="primary" class="d-inline-block">
@@ -128,7 +149,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
+// Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
@@ -174,6 +195,14 @@ export default class ContestCard extends Vue {
 
   getPracticeContestURL(alias: string): string {
     return `/arena/${encodeURIComponent(alias)}/practice/`;
+  }
+
+  downloadCalendar(alias: string): void {
+    this.$emit('download-calendar', alias);
+  }
+
+  subscribeToCalendar(alias: string): void {
+    this.$emit('subscribe-calendar', alias);
   }
 }
 </script>
