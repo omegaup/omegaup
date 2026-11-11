@@ -91,4 +91,28 @@ describe('GridPaginator.vue', () => {
       wrapper.find('button[data-button-next]').attributes('disabled'),
     ).toBeUndefined();
   });
+
+  it('Should reset to the first page when a filter is applied from a later page', async () => {
+    const wrapper = shallowMount(common_GridPaginator, {
+      propsData: {
+        items,
+        itemsPerPage,
+        columns,
+        title,
+        shouldShowFilterInput: true,
+      },
+    });
+
+    await wrapper.find('button[data-button-next]').trigger('click');
+    expect(wrapper.text()).toContain('Divisiones');
+    expect(wrapper.text()).not.toContain('Colas');
+
+    await wrapper.setData({ filter: 'Colas' });
+
+    expect(wrapper.text()).toContain('Colas');
+    expect(wrapper.text()).not.toContain('Divisiones');
+    expect(
+      wrapper.find('button[data-button-previous]').attributes('disabled'),
+    ).toBe('disabled');
+  });
 });

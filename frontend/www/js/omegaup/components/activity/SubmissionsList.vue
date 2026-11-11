@@ -60,7 +60,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
@@ -72,31 +73,43 @@ interface GroupedCourseProblems {
   [user: string]: omegaup.Problem[][];
 }
 
-@Component
-export default class ActivitySubmissionsList extends Vue {
-  @Prop() solvedProblems!: CourseProblems;
-  @Prop() unsolvedProblems!: CourseProblems;
-
-  T = T;
-  readonly NUM_COLUMNS = 3;
-
-  get groupedSolvedProblems(): GroupedCourseProblems {
-    return this.groupElements(this.solvedProblems);
-  }
-
-  get groupedUnsolvedProblems(): GroupedCourseProblems {
-    return this.groupElements(this.unsolvedProblems);
-  }
-
-  groupElements(elements: CourseProblems): GroupedCourseProblems {
-    let groups: GroupedCourseProblems = {};
-    for (let user in elements) {
-      groups[user] = [];
-      for (let i = 0; i < elements[user].length; i += this.NUM_COLUMNS) {
-        groups[user].push(elements[user].slice(i, i + this.NUM_COLUMNS));
+export default defineComponent({
+  name: 'ActivitySubmissionsList',
+  props: {
+    solvedProblems: {
+      type: Object as PropType<CourseProblems>,
+      required: true,
+    },
+    unsolvedProblems: {
+      type: Object as PropType<CourseProblems>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      NUM_COLUMNS: 3 as const,
+    };
+  },
+  computed: {
+    groupedSolvedProblems(): GroupedCourseProblems {
+      return this.groupElements(this.solvedProblems);
+    },
+    groupedUnsolvedProblems(): GroupedCourseProblems {
+      return this.groupElements(this.unsolvedProblems);
+    },
+  },
+  methods: {
+    groupElements(elements: CourseProblems): GroupedCourseProblems {
+      let groups: GroupedCourseProblems = {};
+      for (let user in elements) {
+        groups[user] = [];
+        for (let i = 0; i < elements[user].length; i += this.NUM_COLUMNS) {
+          groups[user].push(elements[user].slice(i, i + this.NUM_COLUMNS));
+        }
       }
-    }
-    return groups;
-  }
-}
+      return groups;
+    },
+  },
+});
 </script>

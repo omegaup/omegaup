@@ -2,15 +2,15 @@
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
     <form
       data-new-clarification
-      class="d-flex flex-column h-100"
+      class="modal-form h-100"
       @submit.prevent="onSubmit"
     >
       <div class="form-group row mt-5">
-        <label class="col-md-6 col-form-label font-weight-bold">
+        <label class="col-md-6 col-form-label modal-form__label">
           {{ T.wordsProblem }}
           <select
             v-model="currentProblemAlias"
-            class="form-control"
+            class="form-control modal-form__control"
             required="required"
             data-new-clarification-problem
           >
@@ -25,12 +25,12 @@
         </label>
         <label
           v-if="users.length != 0"
-          class="col-md-6 col-form-label font-weight-bold"
+          class="col-md-6 col-form-label modal-form__label"
         >
           {{ T.wordsMessageTo }}
           <select
             v-model="currentUsername"
-            class="form-control"
+            class="form-control modal-form__control"
             :required="users"
             data-new-clarification-user
           >
@@ -45,11 +45,11 @@
         </label>
       </div>
       <div class="form-group row">
-        <label class="col-md-12 col-form-label font-weight-bold">
+        <label class="col-md-12 col-form-label modal-form__label">
           {{ T.arenaClarificationCreate }}
           <textarea
             v-model="message"
-            class="w-100"
+            class="form-control modal-form__control"
             maxlength="200"
             required="required"
             :placeholder="T.arenaClarificationMaxLength"
@@ -58,7 +58,7 @@
         </label>
       </div>
       <div class="form-group row">
-        <div class="col-sm-10">
+        <div class="col-sm-12 modal-form__actions">
           <button
             type="submit"
             class="btn btn-primary"

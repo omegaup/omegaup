@@ -74,6 +74,7 @@ export default class FeedbackCodeView extends Vue {
       mode: this.mode,
       readOnly: true,
       gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
+      viewportMargin: Infinity,
     };
   }
 

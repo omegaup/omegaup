@@ -121,6 +121,34 @@
             </tr>
           </template>
         </tbody>
+        <tfoot v-if="visibleRanking.length">
+          <tr data-table-scoreboard-solve-stats class="solve-stats">
+            <td class="legend"></td>
+            <td></td>
+            <td class="user">{{ T.scoreboardSolvedRowTitle }}</td>
+            <td></td>
+            <td v-for="problem in problems" :key="problem.alias">
+              <div
+                class="points"
+                :title="T.scoreboardSolvedCountTooltip"
+                data-solve-stats-count
+              >
+                {{ solveStats[problem.alias].solved }} /
+                {{ visibleRanking.length }} ·
+                {{ solveStats[problem.alias].percentage }}%
+              </div>
+              <div
+                v-if="solveStats[problem.alias].firstSolver"
+                class="penalty"
+                :title="firstSolverTitle(problem.alias)"
+                data-solve-stats-first-solver
+              >
+                {{ solveStats[problem.alias].firstSolver.username }} @
+                {{ solveStats[problem.alias].firstSolver.time }}
+              </div>
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
     <div class="footer">
@@ -195,6 +223,81 @@ export default class ArenaScoreboard extends Vue {
       return T.socketStatusFailed;
     }
     return T.socketStatusWaiting;
+  }
+
+  get visibleRanking(): types.ScoreboardRankingEntry[] {
+    return (this.ranking ?? []).filter((user) =>
+      this.showUser(user.is_invited),
+    );
+  }
+
+  get solveStats(): {
+    [alias: string]: {
+      solved: number;
+      percentage: number;
+      firstSolver: { username: string; time: string } | null;
+    };
+  } {
+    const stats: {
+      [alias: string]: {
+        solved: number;
+        percentage: number;
+        firstSolver: { username: string; time: string } | null;
+      };
+    } = {};
+    const participants = this.visibleRanking.length;
+    for (const problem of this.problems) {
+      let solved = 0;
+      let firstSolver: { username: string; minutes: number } | null = null;
+      for (const user of this.visibleRanking) {
+        const userProblem = this.getUserProblem(user, problem.alias);
+        if (!userProblem) continue;
+        if (userProblem.percent === 100) {
+          solved++;
+        }
+        if (
+          typeof userProblem.first_solved === 'number' &&
+          (firstSolver === null ||
+            userProblem.first_solved < firstSolver.minutes)
+        ) {
+          firstSolver = {
+            username: user.username,
+            minutes: userProblem.first_solved,
+          };
+        }
+      }
+      stats[problem.alias] = {
+        solved,
+        percentage: participants
+          ? Math.round((solved / participants) * 100)
+          : 0,
+        firstSolver: firstSolver
+          ? {
+              username: firstSolver.username,
+              time: this.formatContestTime(firstSolver.minutes),
+            }
+          : null,
+      };
+    }
+    return stats;
+  }
+
+  formatContestTime(minutes: number): string {
+    const totalMinutes = Math.max(0, Math.floor(minutes));
+    const hours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(
+      remainingMinutes,
+    ).padStart(2, '0')}`;
+  }
+
+  firstSolverTitle(alias: string): string {
+    const firstSolver = this.solveStats[alias]?.firstSolver;
+    if (!firstSolver) return '';
+    return ui.formatString(T.scoreboardFirstSolvedTooltip, {
+      username: firstSolver.username,
+      time: firstSolver.time,
+    });
   }
 
   legendClass(idx: number): string {
@@ -298,6 +401,10 @@ export default class ArenaScoreboard extends Vue {
     .penalty {
       font-size: 70%;
     }
+  }
+
+  tfoot td {
+    border-top: 2px solid var(--arena-scoreboard-td-border-color);
   }
 
   .user {

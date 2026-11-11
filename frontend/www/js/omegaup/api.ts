@@ -129,6 +129,15 @@ export const Admin = {
         return x;
       });
     })(x.problemHealthFindings);
+    x.recommendationModelRuns = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      });
+    })(x.recommendationModelRuns);
     x.runs = ((x) => {
       if (!Array.isArray(x)) {
         return x;
@@ -155,6 +164,10 @@ export const Admin = {
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  rerunCron: apiCall<
+    messages.AdminRerunCronRequest,
+    messages.AdminRerunCronResponse
+  >('/api/admin/rerunCron/'),
   setMaintenanceMode: apiCall<
     messages.AdminSetMaintenanceModeRequest,
     messages.AdminSetMaintenanceModeResponse

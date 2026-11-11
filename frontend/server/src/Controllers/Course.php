@@ -20,7 +20,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
- * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, first_solved?: float, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
@@ -444,10 +444,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description',
             $isRequired
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['objective'],
+        $r->ensureOptionalString(
             'objective',
-            required: false // TODO: This should be $isRequired when the UI is ready
+            $isRequired,
+            fn (string $objective) => $objective !== ''
         );
 
         $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
@@ -1549,7 +1549,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problems = $r->ensureString('problems');
+        $aliases = $r->ensureJsonStringList(
+            'problems',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1569,15 +1572,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
-            );
-        }
-
-        /** @var list<string>|null */
-        $aliases = json_decode($problems, associative: true);
-        if (!is_array($aliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'problems'
             );
         }
 
@@ -1629,10 +1623,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $assignments = $r->ensureString('assignments');
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['assignments'],
-            'assignments'
+        $aliases = $r->ensureJsonStringList(
+            'assignments',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
@@ -1643,15 +1636,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        /** @var list<string>|null */
-        $aliases = json_decode($assignments, associative: true);
-        if (!is_array($aliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'assignments'
-            );
         }
 
         \OmegaUp\DAO\DAO::transBegin();
