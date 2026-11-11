@@ -18,6 +18,14 @@ import rabbitmq_client
 import verification_code
 
 
+_TRANSIENT_ERRORS = (
+    errors.OperationalError,  # type: ignore[attr-defined]
+    errors.InterfaceError,  # type: ignore[attr-defined]
+    ConnectionError,
+    TimeoutError,
+)
+
+
 @dataclasses.dataclass
 class Certificate:
     '''A dataclass for certificate.'''
@@ -61,12 +69,18 @@ class ContestsCallback:
         try:
             self._process(channel, response)
         except rabbitmq_client.UnrecoverableMessageError:
-            self._handle_processing_error(response)
+            self._handle_processing_error(response, 'fatal_error')
             raise
-        except Exception as err:  # pylint: disable=broad-except
-            self._handle_processing_error(response)
+        except _TRANSIENT_ERRORS as err:
+            self._handle_processing_error(response, 'retryable_error')
             raise rabbitmq_client.TransientMessageError(
-                'Transient error while processing the message'
+                'Transient infrastructure error while processing the message'
+            ) from err
+        except Exception as err:  # pylint: disable=broad-except
+            logging.exception('Unexpected error while processing the message')
+            self._handle_processing_error(response, 'fatal_error')
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Unexpected error while processing the message'
             ) from err
 
     def _process(
@@ -228,18 +242,18 @@ class ContestsCallback:
                     'conflict'
                 )
 
-    def _handle_processing_error(self, response: Any) -> None:
-        '''Marks the contest as retryable when it can be identified.'''
+    def _handle_processing_error(self, response: Any, status: str) -> None:
+        '''Sets the certificates status when the contest can be identified.'''
         contest_id = (
             response.get('contest_id')
             if isinstance(response, dict) else None
         )
         if contest_id is not None:
             try:
-                self._mark_retryable_error(contest_id)
+                self._mark_status(contest_id, status)
             except Exception:  # noqa: bare-except pylint: disable=broad-except
                 logging.exception(
-                    'Failed to mark the contest as retryable_error'
+                    'Failed to mark the contest as %s', status
                 )
 
     _REQUIRED_FIELDS = (
@@ -279,17 +293,18 @@ class ContestsCallback:
                 "Message field 'ranking' is not a list"
             )
 
-    def _mark_retryable_error(self, contest_id: int) -> None:
-        '''Marks the given contest's certificates as a retryable error.'''
+    def _mark_status(self, contest_id: int, status: str) -> None:
+        '''Sets the certificates status of the given contest.'''
+        self.dbconn.rollback()
         with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
             cur.execute('''
                 UPDATE
                     `Contests`
                 SET
-                    `certificates_status` = 'retryable_error'
+                    `certificates_status` = %s
                 WHERE
                     `contest_id` = %s;
-                ''', (contest_id,))
+                ''', (status, contest_id))
             self.dbconn.commit()
 
 

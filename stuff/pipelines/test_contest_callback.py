@@ -15,6 +15,7 @@ from typing import Any, List
 import omegaup.api
 import pytest
 import pytest_mock
+from mysql.connector import errors
 
 import database.contest
 import contest_callback
@@ -217,12 +218,31 @@ def _valid_body() -> bytes:
     }).encode('utf-8')
 
 
-def test_processing_error_raises_transient(
-        mocker: pytest_mock.MockerFixture
+def _marked_status(dbconn: Any) -> Any:
+    '''Returns the arguments of the single status UPDATE that was executed.'''
+    cur = dbconn.cursor.return_value.__enter__.return_value
+    cur.execute.assert_called_once()
+    return cur.execute.call_args.args[1]
+
+
+@pytest.mark.parametrize(
+    'error',
+    [
+        errors.InterfaceError(  # type: ignore[attr-defined]
+            'MySQL server is unavailable'),
+        errors.OperationalError(  # type: ignore[attr-defined]
+            'Lost connection to MySQL server'),
+        ConnectionError('connection reset'),
+        TimeoutError('timed out'),
+    ],
+)  # type: ignore
+def test_infrastructure_error_raises_transient(
+        mocker: pytest_mock.MockerFixture,
+        error: Exception
 ) -> None:
-    '''A non-unrecoverable error during processing raises transient.'''
+    '''An infrastructure failure is transient and marks retryable_error.'''
     dbconn = mocker.MagicMock()
-    dbconn.ping.side_effect = RuntimeError('MySQL server is unavailable')
+    dbconn.ping.side_effect = error
     callback = contest_callback.ContestsCallback(dbconn=dbconn)
     with pytest.raises(rabbitmq_client.TransientMessageError):
         callback(
@@ -231,6 +251,67 @@ def test_processing_error_raises_transient(
             _properties=None,
             body=_valid_body(),
         )
+    assert _marked_status(dbconn) == ('retryable_error', 1)
+
+
+def test_unexpected_error_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''An unexpected exception is permanent and marks fatal_error.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = RuntimeError('unexpected')
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
+
+
+def test_error_discards_pending_changes_before_marking(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''Pending changes are rolled back before the status is committed.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = RuntimeError('unexpected')
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    calls = [call[0] for call in dbconn.method_calls]
+    assert calls.index('rollback') < calls.index('commit')
+
+
+@pytest.mark.parametrize('place', ['abc', 'None', None])  # type: ignore
+def test_invalid_place_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture,
+        place: Any
+) -> None:
+    '''An invalid place is a data error and marks fatal_error.'''
+    dbconn = mocker.MagicMock()
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    body = json.dumps({
+        'certificate_cutoff': 3,
+        'alias': 'x',
+        'scoreboard_url': 'abc',
+        'contest_id': 1,
+        'ranking': [{'username': 'user_1', 'place': place}],
+    }).encode('utf-8')
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=body,
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
 
 
 def test_missing_username_raises_unrecoverable(
@@ -251,3 +332,4 @@ def test_missing_username_raises_unrecoverable(
             _properties=None,
             body=_valid_body(),
         )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
