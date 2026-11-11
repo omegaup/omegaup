@@ -18,6 +18,7 @@ class TeamUsers extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'team_id' => true,
         'identity_id' => true,
+        'is_origin' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -40,6 +41,11 @@ class TeamUsers extends \OmegaUp\DAO\VO\VO {
                 $data['identity_id']
             );
         }
+        if (isset($data['is_origin'])) {
+            $this->is_origin = boolval(
+                $data['is_origin']
+            );
+        }
     }
 
     /**
@@ -57,4 +63,11 @@ class TeamUsers extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $identity_id = null;
+
+    /**
+     * Indica si la identidad fue creada originalmente en este equipo
+     *
+     * @var bool
+     */
+    public $is_origin = false;
 }

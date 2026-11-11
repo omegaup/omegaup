@@ -664,4 +664,185 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $profileResponse['name']
         );
     }
+
+    public function testOriginGroupFlagOnCreateBulkAndExternalAdd(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $originGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            login: $creatorLogin
+        );
+        $otherGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            login: $creatorLogin
+        );
+
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        $singleUsername = "{$originGroup['group']->alias}:single_id";
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $singleUsername,
+            'name' => 'Single Identity',
+            'password' => $password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'group_alias' => $originGroup['group']->alias,
+        ]));
+        $singleIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $singleUsername
+        );
+        $originRow = \OmegaUp\DAO\GroupsIdentities::getByPK(
+            $originGroup['group']->group_id,
+            $singleIdentity->identity_id
+        );
+        if (is_null($originRow)) {
+            $this->fail('Expected origin group membership row to exist');
+        }
+        $this->assertTrue($originRow->is_origin);
+        $this->assertTrue(
+            \OmegaUp\DAO\GroupsIdentities::isOriginIdentityInGroup(
+                intval($singleIdentity->identity_id),
+                intval($originGroup['group']->group_id)
+            )
+        );
+
+        // Adding the same identity to another group sets is_origin = false there
+        // while keeping is_origin = true in its origin group.
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $otherGroup['group']->alias,
+            'usernameOrEmail' => $singleUsername,
+        ]));
+        $otherRow = \OmegaUp\DAO\GroupsIdentities::getByPK(
+            $otherGroup['group']->group_id,
+            $singleIdentity->identity_id
+        );
+        if (is_null($otherRow)) {
+            $this->fail('Expected secondary group membership row to exist');
+        }
+        $this->assertFalse($otherRow->is_origin);
+        $this->assertTrue(
+            \OmegaUp\DAO\GroupsIdentities::isOriginIdentityInGroup(
+                intval($singleIdentity->identity_id),
+                intval($originGroup['group']->group_id)
+            )
+        );
+
+        // Adding an external user to the group sets is_origin = false.
+        ['identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $originGroup['group']->alias,
+            'usernameOrEmail' => $externalIdentity->username,
+        ]));
+        $externalRow = \OmegaUp\DAO\GroupsIdentities::getByPK(
+            $originGroup['group']->group_id,
+            $externalIdentity->identity_id
+        );
+        if (is_null($externalRow)) {
+            $this->fail('Expected external user membership row to exist');
+        }
+        $this->assertFalse($externalRow->is_origin);
+
+        // Bulk creating identities sets is_origin = true and re-uploading
+        // preserves it.
+        $bulkGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            login: $creatorLogin
+        );
+        $bulkIdentities = \OmegaUp\Test\Factories\Identity::createIdentitiesFromAGroup(
+            $bulkGroup['group'],
+            $creatorLogin,
+            $password
+        );
+        $this->assertNotEmpty($bulkIdentities);
+        foreach ($bulkIdentities as $bulkIdentity) {
+            $this->assertTrue(
+                \OmegaUp\DAO\GroupsIdentities::isOriginIdentityInGroup(
+                    intval($bulkIdentity->identity_id),
+                    intval($bulkGroup['group']->group_id)
+                )
+            );
+        }
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
+                $bulkGroup['group']->alias,
+                $password
+            ),
+            'group_alias' => $bulkGroup['group']->alias,
+        ]));
+        foreach ($bulkIdentities as $bulkIdentity) {
+            $reloadedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+                strval($bulkIdentity->username)
+            );
+            $this->assertTrue(
+                \OmegaUp\DAO\GroupsIdentities::isOriginIdentityInGroup(
+                    intval($reloadedIdentity->identity_id),
+                    intval($bulkGroup['group']->group_id)
+                )
+            );
+        }
+    }
+
+    public function testCourseAddStudentPreservesOriginGroupFlag(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            admin: $creatorIdentity,
+            adminLogin: $creatorLogin,
+            courseAlias: 'crs_' . substr(
+                \OmegaUp\Test\Utils::createRandomString(),
+                0,
+                8
+            )
+        );
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+        if (is_null($course)) {
+            $this->fail('Expected course to exist');
+        }
+        $courseGroup = \OmegaUp\DAO\Groups::getByPK($course->group_id);
+        if (is_null($courseGroup)) {
+            $this->fail('Expected course backing group to exist');
+        }
+
+        $username = "{$courseGroup->alias}:student_id";
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => 'Course Origin Identity',
+            'password' => $password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'female',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'group_alias' => $courseGroup->alias,
+        ]));
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+
+        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'usernameOrEmail' => $username,
+            'course_alias' => $courseData['course_alias'],
+            'share_user_information' => true,
+        ]));
+
+        $row = \OmegaUp\DAO\GroupsIdentities::getByPK(
+            $courseGroup->group_id,
+            $identity->identity_id
+        );
+        if (is_null($row)) {
+            $this->fail('Expected course group identity row to exist');
+        }
+        $this->assertTrue($row->is_origin);
+        $this->assertTrue($row->share_user_information);
+    }
 }
