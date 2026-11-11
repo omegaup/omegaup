@@ -6304,8 +6304,8 @@ packages:
     resolution: {integrity: sha512-SxIiD2yE/By79p3cNAAXyLQWTvEFNEzcAO7PH+DzRqKSFaplAPFjiQLmw8ofmpCsZf+Rhfn2/xCJagpdGmYdTw==}
     engines: {node: '>= 8'}
 
-  moment@2.29.4:
-    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+  moment@2.31.0:
+    resolution: {integrity: sha512-0acOTfMiWOheYS4eoWb80yYMb/JLvVv9SHbs2PehaDzfUG0Bw855SKyk0IKTnPGa5+U2bmi3W68l1+sGLX/pvw==}
 
   monaco-editor-webpack-plugin@2.1.0:
     resolution: {integrity: sha512-DG7Dpo/ItWEOl/BG2egc/UIiHoCbHjq0EOF0E6eJQT+6QNZBOfSVU4GxaXG+kQJXB8rauxli96Xp1ITnNLZtSw==}
@@ -11346,7 +11346,7 @@ snapshots:
   '@types/bootstrap.v3.datetimepicker@4.17.47':
     dependencies:
       '@types/jquery': 3.3.31
-      moment: 2.29.4
+      moment: 2.31.0
 
   '@types/chai@4.3.0': {}
 
@@ -16018,7 +16018,7 @@ snapshots:
     dependencies:
       url-parse: 1.5.10
 
-  moment@2.29.4: {}
+  moment@2.31.0: {}
 
   monaco-editor-webpack-plugin@2.1.0(monaco-editor@0.21.3)(webpack@5.105.1):
     dependencies:
