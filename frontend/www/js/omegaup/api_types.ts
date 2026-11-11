@@ -4800,6 +4800,38 @@ export namespace types {
     skip_reason?: string;
   }
 
+  export interface RoleAssignment {
+    acl_id: number;
+    name: string;
+    resource_alias?: string;
+    resource_type: string;
+  }
+
+  export interface RoleAssignmentsResponse {
+    assignments: types.RoleAssignment[];
+    total_rows: number;
+  }
+
+  export interface RoleDetails {
+    permissions: types.RolePermission[];
+    role: types.RoleSummary;
+  }
+
+  export interface RolePermission {
+    description: string;
+    name: string;
+    permission_id: number;
+  }
+
+  export interface RoleSummary {
+    description: string;
+    groups_count: number;
+    name: string;
+    permissions_count: number;
+    role_id: number;
+    users_count: number;
+  }
+
   export interface Run {
     alias: string;
     classname: string;
@@ -6291,6 +6323,14 @@ export namespace messages {
   export type ResetUpdateRequest = { [key: string]: any };
   export type ResetUpdateResponse = { message: string };
 
+  // Role
+  export type RoleAssignmentsRequest = { [key: string]: any };
+  export type RoleAssignmentsResponse = types.RoleAssignmentsResponse;
+  export type RoleDetailsRequest = { [key: string]: any };
+  export type RoleDetailsResponse = types.RoleDetails;
+  export type RoleListRequest = { [key: string]: any };
+  export type RoleListResponse = { roles: types.RoleSummary[] };
+
   // Run
   export type RunCountsRequest = { [key: string]: any };
   export type RunCountsResponse = {
@@ -7207,6 +7247,18 @@ export namespace controllers {
     update: (
       params?: messages.ResetUpdateRequest,
     ) => Promise<messages.ResetUpdateResponse>;
+  }
+
+  export interface Role {
+    assignments: (
+      params?: messages.RoleAssignmentsRequest,
+    ) => Promise<messages.RoleAssignmentsResponse>;
+    details: (
+      params?: messages.RoleDetailsRequest,
+    ) => Promise<messages.RoleDetailsResponse>;
+    list: (
+      params?: messages.RoleListRequest,
+    ) => Promise<messages.RoleListResponse>;
   }
 
   export interface Run {

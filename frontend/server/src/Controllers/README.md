@@ -214,6 +214,10 @@
   - [`/api/reset/create/`](#apiresetcreate)
   - [`/api/reset/generateToken/`](#apiresetgeneratetoken)
   - [`/api/reset/update/`](#apiresetupdate)
+- [Role](#role)
+  - [`/api/role/assignments/`](#apiroleassignments)
+  - [`/api/role/details/`](#apiroledetails)
+  - [`/api/role/list/`](#apirolelist)
 - [Run](#run)
   - [`/api/run/counts/`](#apiruncounts)
   - [`/api/run/create/`](#apiruncreate)
@@ -4392,6 +4396,55 @@ the correct parameters are supplied.
 | Name      | Type     |
 | --------- | -------- |
 | `message` | `string` |
+
+# Role
+
+## `/api/role/assignments/`
+
+### Description
+
+### Parameters
+
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `assignment_type` | `string`       |             | ✓        |
+| `page`            | `int`          |             | ✓        |
+| `page_size`       | `int`          |             | ✓        |
+| `role`            | `string`       |             | ✓        |
+| `acl_id`          | `null\|int`    |             |          |
+| `query`           | `null\|string` |             |          |
+
+### Returns
+
+```typescript
+types.RoleAssignmentsResponse;
+```
+
+## `/api/role/details/`
+
+### Description
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `role` | `string` |             | ✓        |
+
+### Returns
+
+```typescript
+types.RoleDetails;
+```
+
+## `/api/role/list/`
+
+### Description
+
+### Returns
+
+| Name    | Type                      |
+| ------- | ------------------------- |
+| `roles` | `List[types.RoleSummary]` |
 
 # Run
 
