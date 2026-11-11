@@ -451,7 +451,7 @@ _Nothing_
 
 ### Description
 
-Updates system settings. Only available to system admins.
+Updates system settings. Temporarily available to the support team.
 
 ### Parameters
 

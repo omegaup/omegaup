@@ -15,6 +15,7 @@
   * @psalm-type ProblemHealthFinding=array{problem_id: int, alias: string, title: string, check_type: string, severity: string, detail: null|string, first_detected_at: \OmegaUp\Timestamp}
   * @psalm-type RecommendationModelRun=array{model_run_id: int, map_score: float, dataset_size: int, rng_seed: int|null, output_path: null|string, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
   * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
+  * @psalm-type OperationsDashboardPayload=array{accessLevel: string, maintenanceMode: MaintenanceModeStatus, maintenancePredefinedTemplates: list<PredefinedTemplate>}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
@@ -375,17 +376,16 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Updates system settings. Only available to system admins.
+     * Updates system settings. Temporarily available to the support team.
      *
      * @omegaup-request-param null|bool $ephemeral_grader_enabled
      *
      * @return array{status: string}
      */
     public static function apiUpdateSystemSettings(\OmegaUp\Request $r): array {
-        $r->ensureMainUserIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        // TODO: Restrict this endpoint to system admins again once the
+        // permissions of the Operations Dashboard are redefined.
+        $r->ensureUserHasAdministrativeAccess();
 
         $ephemeralGraderEnabled = $r->ensureOptionalBool(
             'ephemeral_grader_enabled'
@@ -425,7 +425,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     * @return array{entrypoint: string, templateProperties: array{payload: OperationsDashboardPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
      */
     public static function getOperationsDashboardForTypeScript(
         \OmegaUp\Request $r
@@ -438,7 +438,13 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleAdminOperations'
                 ),
-                'payload' => [],
+                'payload' => [
+                        'accessLevel' => \OmegaUp\Authorization::getOperationsAccessLevel(
+                            $r->identity
+                        )->value,
+                    'maintenanceMode' => self::getMaintenanceModeStatus(),
+                    'maintenancePredefinedTemplates' => self::getMaintenancePredefinedTemplates(),
+                ],
                 'fullWidth' => true,
             ],
         ];
