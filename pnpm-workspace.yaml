@@ -19,3 +19,6 @@ allowBuilds:
 overrides:
   marked: ^12.0.0
   "loader-utils@2": "2.0.4"
+  # vue-jest@3 solo usa este plugin de Babel 6 en una rama que este repo nunca ejecuta
+  # (babelConfig inline). Se reemplaza por el equivalente Babel 7 para eliminar babel-traverse@6.
+  babel-plugin-transform-es2015-modules-commonjs: "npm:@babel/plugin-transform-modules-commonjs@7.28.6"
