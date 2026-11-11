@@ -22,19 +22,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import VueCookieAcceptDecline from 'vue-cookie-accept-decline';
 import 'vue-cookie-accept-decline/dist/vue-cookie-accept-decline.css';
 import T from '../../lang';
-@Component({
+
+export default defineComponent({
+  name: 'HomepageCookieConsent',
   components: {
     'vue-cookie-accept-decline': VueCookieAcceptDecline,
   },
-})
-export default class CookieConsent extends Vue {
-  T = T;
-  cookieRemovedCookie = false;
-}
+  data() {
+    return {
+      T,
+      cookieRemovedCookie: false,
+    };
+  },
+});
 </script>
 
 <style lang="scss">
