@@ -277,8 +277,14 @@ def log_allowlist_comparison(comparison: AllowlistComparison) -> None:
 
 
 def get_comparison_exit_code(comparison: AllowlistComparison) -> int:
-    '''Return a failing exit code when new inefficiencies are detected.'''
-    return 1 if comparison.new_results else 0
+    '''
+    Return the exit code for the allowlist comparison.
+
+    Temporarily returns 0 even when new inefficiencies are detected
+    to make detection non-blocking (issue #10406).
+    '''
+    del comparison  # Unused while non-blocking.
+    return 0
 
 
 def deduplicate_results(

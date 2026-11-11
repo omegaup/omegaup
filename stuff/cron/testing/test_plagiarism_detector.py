@@ -12,6 +12,7 @@ import string
 import sys
 
 from typing import Dict, List, Set
+from unittest import mock
 
 import pytest
 
@@ -343,3 +344,211 @@ def test_plagiarism_detector(
             found_pair_ranges.add(range_of_lines)
 
         assert expected_pair_range == found_pair_ranges
+
+
+# Unit tests for get_range and filter_and_format_result (isolated)
+
+
+def test_get_range_empty() -> None:
+    '''Test that an empty code list returns an empty tuple of ranges.'''
+    assert cron.plagiarism_detector.get_range([]) == ()
+
+
+def test_get_range_no_highlights() -> None:
+    '''Test that code without highlight tags returns an empty tuple.'''
+    code = [
+        'int main() {',
+        '    int a = 1;',
+        '    int b = 2;',
+        '    return a + b;',
+        '}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ()
+
+
+def test_get_range_single_multiline_pair() -> None:
+    '''Test a single highlight span covering multiple lines.'''
+    code = [
+        'int main() {',
+        f'{cron.plagiarism_detector.START_RED}    int a = 1;',
+        '    int b = 2;',
+        f'    return a + b;{cron.plagiarism_detector.END}',
+        '}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((1, 3), )
+
+
+def test_get_range_same_line_pair() -> None:
+    '''Test a highlight span that begins and ends on the same line.'''
+    code = [
+        'int a = 0;',
+        f'{cron.plagiarism_detector.START_RED}int b = 1;'
+        f'{cron.plagiarism_detector.END}',
+        'return b;',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((1, 1), )
+
+
+def test_get_range_multiple_disjoint_pairs() -> None:
+    '''Test multiple distinct highlight ranges in a single file.'''
+    code = [
+        f'{cron.plagiarism_detector.START_RED}int a = 1;'
+        f'{cron.plagiarism_detector.END}',
+        'int b = 2;',
+        f'{cron.plagiarism_detector.START_GREEN}int c = 3;',
+        f'int d = 4;{cron.plagiarism_detector.END}',
+        'return c + d;',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((0, 0), (2, 3))
+
+
+def test_get_range_green_highlight() -> None:
+    '''Test that START_GREEN marks ranges identically to START_RED.'''
+    code = [
+        f'{cron.plagiarism_detector.START_GREEN}line 0',
+        f'line 1{cron.plagiarism_detector.END}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((0, 1), )
+
+
+def test_filter_and_format_result_basic() -> None:
+    '''Test filter_and_format_result formats and inserts results accurately.'''
+    mock_dbconn = mock.MagicMock()
+    mock_cur = mock.MagicMock()
+    mock_dbconn.cursor.return_value.__enter__.return_value = mock_cur
+
+    submissions = [
+        cron.plagiarism_detector.Submission(
+            contest_id=1,
+            submission_id=10,
+            problemset_id=100,
+            problem_id=1000,
+            verdict='AC',
+            guid='guid_a',
+            language='cpp',
+        ),
+        cron.plagiarism_detector.Submission(
+            contest_id=1,
+            submission_id=20,
+            problemset_id=100,
+            problem_id=1000,
+            verdict='AC',
+            guid='guid_b',
+            language='cpp',
+        ),
+    ]
+
+    results = [
+        cron.plagiarism_detector.CopyDetectorResult(
+            test_similarity=0.854,
+            reference_similarity=0.918,
+            test_filename='/tmp/submissions/guid_a.cpp',
+            reference_filename='/tmp/submissions/guid_b.cpp',
+            highlighted_test_code=(
+                f'{cron.plagiarism_detector.START_RED}int x = 1;'
+                f'{cron.plagiarism_detector.END}'
+            ),
+            highlighted_reference_code=(
+                f'{cron.plagiarism_detector.START_GREEN}int y = 2;'
+                f'{cron.plagiarism_detector.END}'
+            ),
+        ),
+    ]
+
+    cron.plagiarism_detector.filter_and_format_result(
+        mock_dbconn, contest_id=1, submissions=submissions, results=results
+    )
+
+    mock_cur.executemany.assert_called_once()
+    query, updated_results = mock_cur.executemany.call_args[0]
+    assert query == cron.plagiarism_detector.INSERT_INTO_PLAGIARISMS
+    assert len(updated_results) == 1
+
+    formatted_result = updated_results[0]
+    assert formatted_result.contest_id == 1
+    assert formatted_result.submission_id_1 == 10
+    assert formatted_result.submission_id_2 == 20
+    assert formatted_result.score_1 == 85
+    assert formatted_result.score_2 == 91
+
+    contents = json.loads(formatted_result.contents)
+    assert contents['file1'] == [[0, 0]]
+    assert contents['file2'] == [[0, 0]]
+
+    mock_dbconn.conn.commit.assert_called_once()
+
+
+def test_filter_and_format_result_swaps_order_when_id1_gt_id2() -> None:
+    '''Test that submissions swap order when submission_id_1 > id_2.'''
+    mock_dbconn = mock.MagicMock()
+    mock_cur = mock.MagicMock()
+    mock_dbconn.cursor.return_value.__enter__.return_value = mock_cur
+
+    submissions = [
+        cron.plagiarism_detector.Submission(
+            contest_id=5,
+            submission_id=50,
+            problemset_id=500,
+            problem_id=5000,
+            verdict='AC',
+            guid='guid_large',
+            language='cpp',
+        ),
+        cron.plagiarism_detector.Submission(
+            contest_id=5,
+            submission_id=15,
+            problemset_id=500,
+            problem_id=5000,
+            verdict='AC',
+            guid='guid_small',
+            language='cpp',
+        ),
+    ]
+
+    results = [
+        cron.plagiarism_detector.CopyDetectorResult(
+            test_similarity=0.75,
+            reference_similarity=0.95,
+            test_filename='/tmp/guid_large.cpp',
+            reference_filename='/tmp/guid_small.cpp',
+            highlighted_test_code='line 0\nline 1',
+            highlighted_reference_code=(
+                f'{cron.plagiarism_detector.START_GREEN}copied line'
+                f'{cron.plagiarism_detector.END}'
+            ),
+        ),
+    ]
+
+    cron.plagiarism_detector.filter_and_format_result(
+        mock_dbconn, contest_id=5, submissions=submissions, results=results
+    )
+
+    _, updated_results = mock_cur.executemany.call_args[0]
+    assert len(updated_results) == 1
+
+    formatted = updated_results[0]
+    # Because 50 > 15, submission IDs, scores, and codes must be swapped
+    assert formatted.submission_id_1 == 15
+    assert formatted.submission_id_2 == 50
+    assert formatted.score_1 == 95
+    assert formatted.score_2 == 75
+
+    contents = json.loads(formatted.contents)
+    assert contents['file1'] == [[0, 0]]
+    assert contents['file2'] == []
+
+
+def test_filter_and_format_result_empty_results() -> None:
+    '''Test that empty results invoke executemany with an empty list.'''
+    mock_dbconn = mock.MagicMock()
+    mock_cur = mock.MagicMock()
+    mock_dbconn.cursor.return_value.__enter__.return_value = mock_cur
+
+    cron.plagiarism_detector.filter_and_format_result(
+        mock_dbconn, contest_id=1, submissions=[], results=[]
+    )
+
+    mock_cur.executemany.assert_called_once_with(
+        cron.plagiarism_detector.INSERT_INTO_PLAGIARISMS, []
+    )
+    mock_dbconn.conn.commit.assert_called_once()

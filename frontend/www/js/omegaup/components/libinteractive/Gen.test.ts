@@ -1,4 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import type { types } from '../../api_types';
 
 import course_LibinteractiveGen from './Gen.vue';
@@ -18,15 +20,18 @@ describe('Gen.vue', () => {
   });
 
   it('Should handle empty form to be filled', async () => {
-    const wrapper = shallowMount(course_LibinteractiveGen, {
-      attachTo: '#root',
-      propsData: {
-        language: null,
-        os: null,
-        name: null,
-        idl: null,
+    const wrapper = shallowMount(
+      course_LibinteractiveGen as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          language: null,
+          os: null,
+          name: null,
+          idl: null,
+        },
       },
-    });
+    );
 
     let language = wrapper.find('select[name="language"]')
       .element as HTMLInputElement;
@@ -66,15 +71,18 @@ describe('Gen.vue', () => {
       field: 'idl',
     };
 
-    const wrapper = shallowMount(course_LibinteractiveGen, {
-      propsData: {
-        language: null,
-        os: null,
-        name: null,
-        idl: null,
-        error,
+    const wrapper = shallowMount(
+      course_LibinteractiveGen as ComponentOptions<Vue>,
+      {
+        propsData: {
+          language: null,
+          os: null,
+          name: null,
+          idl: null,
+          error,
+        },
       },
-    });
+    );
 
     expect(wrapper.find('textarea[name="idl"]').attributes('class')).toContain(
       'is-invalid',
