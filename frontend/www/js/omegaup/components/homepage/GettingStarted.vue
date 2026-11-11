@@ -91,15 +91,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class GettingStarted extends Vue {
-  @Prop({ default: false }) isUnder13User!: boolean;
-
-  T = T;
-}
+export default defineComponent({
+  name: 'HomepageGettingStarted',
+  props: {
+    isUnder13User: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>
