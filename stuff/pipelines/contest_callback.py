@@ -79,19 +79,26 @@ class ContestsCallback:
         response = self._parse_body(body)
         self._validate_structure(response)
 
+        contest_id = response['contest_id']
+
         try:
             self._process(channel, response)
-        except rabbitmq_client.UnrecoverableMessageError:
-            self._handle_processing_error(response, 'fatal_error')
+        except rabbitmq_client.UnrecoverableMessageError as err:
+            logging.error('Contest %s failed permanently: %s', contest_id, err)
+            self._handle_processing_error(contest_id, 'fatal_error')
             raise
         except Exception as err:  # pylint: disable=broad-except
             if _is_transient(err):
-                self._handle_processing_error(response, 'retryable_error')
+                logging.warning(
+                    'Contest %s failed temporarily (%s), it will be retried',
+                    contest_id, type(err).__name__)
+                self._handle_processing_error(contest_id, 'retryable_error')
                 raise rabbitmq_client.TransientMessageError(
                     'Transient error while processing the message'
                 ) from err
-            logging.exception('Unexpected error while processing the message')
-            self._handle_processing_error(response, 'fatal_error')
+            logging.exception(
+                'Contest %s failed with an unexpected error', contest_id)
+            self._handle_processing_error(contest_id, 'fatal_error')
             raise rabbitmq_client.UnrecoverableMessageError(
                 'Unexpected error while processing the message'
             ) from err
@@ -255,18 +262,15 @@ class ContestsCallback:
                     'conflict'
                 )
 
-    def _handle_processing_error(self, response: Any, status: str) -> None:
+    def _handle_processing_error(
+            self, contest_id: Optional[int], status: str) -> None:
         '''Sets the certificates status when the contest can be identified.'''
-        contest_id = (
-            response.get('contest_id')
-            if isinstance(response, dict) else None
-        )
         if contest_id is not None:
             try:
                 self._mark_status(contest_id, status)
             except Exception:  # noqa: bare-except pylint: disable=broad-except
                 logging.exception(
-                    'Failed to mark the contest as %s', status
+                    'Failed to mark contest %s as %s', contest_id, status
                 )
 
     _REQUIRED_FIELDS = (

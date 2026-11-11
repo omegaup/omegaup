@@ -292,6 +292,45 @@ def test_mysql_data_error_raises_unrecoverable(
     assert _marked_status(dbconn) == ('fatal_error', 1)
 
 
+@pytest.mark.parametrize(
+    'error, expected',
+    [
+        (
+            rabbitmq_client.UnrecoverableMessageError('bad data'),
+            'failed permanently',
+        ),
+        (
+            errors.InterfaceError(  # type: ignore[attr-defined]
+                'MySQL server is unavailable'),
+            'failed temporarily',
+        ),
+        (RuntimeError('unexpected'), 'unexpected error'),
+    ],
+)  # type: ignore
+def test_error_logs_include_the_contest(
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+        error: Exception,
+        expected: str
+) -> None:
+    '''Every error path logs which contest failed and the decision taken.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(
+        (rabbitmq_client.TransientMessageError,
+         rabbitmq_client.UnrecoverableMessageError)
+    ):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert 'Contest 1' in caplog.text
+    assert expected in caplog.text
+
+
 def test_unexpected_error_raises_unrecoverable(
         mocker: pytest_mock.MockerFixture
 ) -> None:
