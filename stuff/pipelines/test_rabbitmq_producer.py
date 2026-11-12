@@ -2,12 +2,14 @@
 
 '''test rabbitmq_producer module: publisher confirms.'''
 
-from typing import Any, Tuple
+from typing import Any, Tuple, cast
 
 import pika.exceptions
 import pytest
 import pytest_mock
 
+import database.contest
+import producer_contest
 import rabbitmq_producer
 
 
@@ -64,3 +66,60 @@ def test_send_message_amqp_error_raises(
     channel.basic_publish.side_effect = pika.exceptions.AMQPChannelError()
     with pytest.raises(rabbitmq_producer.MessageNotConfirmedError):
         producer.send_message('{"contest_id": 1}')
+
+
+def _contest(contest_id: int) -> database.contest.ContestCertificate:
+    '''Builds a contest message for the batch tests.'''
+    return database.contest.ContestCertificate(
+        certificate_cutoff=1,
+        alias='contest-%d' % contest_id,
+        scoreboard_url='url',
+        contest_id=contest_id,
+        ranking=[])
+
+
+def test_batch_continues_and_reports_failed_contests(
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture) -> None:
+    '''A failed publication does not stop the batch and is reported.'''
+    mocker.patch(
+        'producer_contest.get_contests_from_db',
+        return_value=[_contest(1), _contest(2), _contest(3)])
+    producer = mocker.MagicMock()
+    producer.send_message.side_effect = [
+        None,
+        rabbitmq_producer.MessageNotConfirmedError('nack'),
+        None,
+    ]
+    mocker.patch('rabbitmq_producer.RabbitmqProducer', return_value=producer)
+
+    with pytest.raises(
+            rabbitmq_producer.UnconfirmedPublicationsError) as raised:
+        producer_contest.send_contest_message_to_client(
+            cur=mocker.MagicMock(),
+            channel=mocker.MagicMock(),
+            client=mocker.MagicMock())
+
+    failure = cast(
+        rabbitmq_producer.UnconfirmedPublicationsError, raised.value)
+    assert producer.send_message.call_count == 3
+    assert failure.failed_ids == [2]
+    assert 'Contest 2 was not confirmed' in caplog.text
+
+
+def test_batch_without_failures_does_not_raise(
+        mocker: pytest_mock.MockerFixture) -> None:
+    '''A batch where every message is confirmed finishes without error.'''
+    mocker.patch(
+        'producer_contest.get_contests_from_db',
+        return_value=[_contest(1), _contest(2)])
+    producer = mocker.MagicMock()
+    producer.send_message.return_value = None
+    mocker.patch('rabbitmq_producer.RabbitmqProducer', return_value=producer)
+
+    producer_contest.send_contest_message_to_client(
+        cur=mocker.MagicMock(),
+        channel=mocker.MagicMock(),
+        client=mocker.MagicMock())
+
+    assert producer.send_message.call_count == 2

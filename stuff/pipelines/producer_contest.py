@@ -52,6 +52,8 @@ def send_contest_message_to_client(
         client=client
     )
 
+    failed_contests: List[int] = []
+
     for data in contestants:
         message = json.dumps(data._asdict())
         try:
@@ -60,6 +62,10 @@ def send_contest_message_to_client(
             logging.exception(
                 'Contest %s was not confirmed by the broker',
                 data.contest_id)
+            failed_contests.append(data.contest_id)
+
+    if failed_contests:
+        raise rabbitmq_producer.UnconfirmedPublicationsError(failed_contests)
 
 
 def get_contests_from_db(
@@ -122,9 +128,9 @@ def main() -> None:
                 date_lower_limit=args.date_lower_limit,
                 date_upper_limit=args.date_upper_limit,
                 client=client)
+        logging.info('Done')
     finally:
         dbconn.conn.close()
-        logging.info('Done')
 
 
 if __name__ == '__main__':

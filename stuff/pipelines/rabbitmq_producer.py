@@ -2,12 +2,24 @@
 
 '''Implementation of rabbitmq producer.'''
 
+from typing import Any, List, Sequence
+
 import pika
 import pika.exceptions
 
 
 class MessageNotConfirmedError(Exception):
     '''Raised when the broker does not confirm a published message.'''
+
+
+class UnconfirmedPublicationsError(Exception):
+    '''Raised when a batch ends with messages the broker did not confirm.'''
+    def __init__(self, failed_ids: Sequence[Any]) -> None:
+        self.failed_ids: List[Any] = list(failed_ids)
+        super().__init__(
+            'The broker did not confirm %d message(s): %s' % (
+                len(self.failed_ids),
+                ', '.join(str(item) for item in self.failed_ids)))
 
 
 class RabbitmqProducer:
