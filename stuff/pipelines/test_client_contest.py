@@ -182,8 +182,6 @@ def test_client_contest() -> None:
             exchange='certificates',
             routing_key='ContestQueue-test',
             channel=channel)
-        # Start from a clean queue so no stale message is consumed instead of
-        # the one published by this test.
         channel.queue_purge(queue='contest-test')
 
         message = _build_contest_message(cur, client, alias)
@@ -192,8 +190,6 @@ def test_client_contest() -> None:
             routing_key='ContestQueue-test',
             body=message.encode())
 
-        # Scope all assertions to this contest so other tests' data cannot
-        # affect the result.
         cur.execute(
             'SELECT contest_id FROM Contests WHERE alias = %s;', (alias,))
         contest_id = cur.fetchone()['contest_id']
@@ -239,7 +235,6 @@ def test_client_contest_with_mocked_codes(
         api_token=test_constants.API_TOKEN,
         url=test_constants.OMEGAUP_API_ENDPOINT,
     )
-    # Four mocked codes -> four contestants.
     alias = _create_finished_contest_with_users(client, num_users=4)
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
@@ -253,8 +248,6 @@ def test_client_contest_with_mocked_codes(
             routing_key='ContestQueue-test',
             channel=channel)
         channel.queue_purge(queue='contest-test')
-        # The mocked codes are fixed, so remove any left over from a previous
-        # run to avoid spurious collisions that would change call_count.
         _delete_verification_codes(
             cur, dbconn,
             ['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F', 'XMCF384X8M'])
@@ -301,9 +294,6 @@ def test_client_contest_with_duplicated_codes(
         api_token=test_constants.API_TOKEN,
         url=test_constants.OMEGAUP_API_ENDPOINT,
     )
-    # The mocked codes include a duplicate ('XMCF384X8C'), which forces the
-    # callback to regenerate the whole batch, so more than four codes are
-    # requested for four contestants.
     alias = _create_finished_contest_with_users(client, num_users=4)
 
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
@@ -317,8 +307,6 @@ def test_client_contest_with_duplicated_codes(
             routing_key='ContestQueue-test',
             channel=channel)
         channel.queue_purge(queue='contest-test')
-        # The mocked codes are fixed, so remove any left over from a previous
-        # run to keep the collision behaviour deterministic.
         _delete_verification_codes(
             cur, dbconn,
             ['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F', 'XMCF384X8C',
