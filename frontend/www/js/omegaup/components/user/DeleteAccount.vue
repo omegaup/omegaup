@@ -34,12 +34,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Vue from 'vue';
-import { ModalPlugin } from 'bootstrap-vue';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
-
-Vue.use(ModalPlugin);
 
 export default defineComponent({
   name: 'UserDeleteAccount',

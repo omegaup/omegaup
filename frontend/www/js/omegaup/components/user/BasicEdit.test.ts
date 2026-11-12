@@ -10,7 +10,7 @@ describe('BasicEdit.vue', () => {
     const errorSpy = jest.spyOn(ui, 'error').mockImplementation(() => {});
     const wrapper = mount(user_BasicEdit as ComponentOptions<Vue>, {
       propsData: {
-        initialUsername: 'john_doe',
+        username: 'john_doe',
       },
     });
 
@@ -31,7 +31,7 @@ describe('BasicEdit.vue', () => {
   it('Should emit update when passwords match', async () => {
     const wrapper = mount(user_BasicEdit as ComponentOptions<Vue>, {
       propsData: {
-        initialUsername: 'john_doe',
+        username: 'john_doe',
       },
     });
 
@@ -49,5 +49,42 @@ describe('BasicEdit.vue', () => {
       'john_doe',
       'matching_password',
     ]);
+  });
+
+  it('Should allow editing username locally without mutating prop and sync prop updates', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = mount(user_BasicEdit as ComponentOptions<Vue>, {
+      propsData: {
+        username: 'john_doe',
+      },
+    });
+
+    await wrapper.find('input[name="username"]').setValue('jane_doe');
+    await wrapper
+      .find('input[name="new-password-1"]')
+      .setValue('matching_password');
+    await wrapper
+      .find('input[name="new-password-2"]')
+      .setValue('matching_password');
+    await wrapper.find('form').trigger('submit');
+
+    expect(wrapper.props('username')).toBe('john_doe');
+    expect(wrapper.emitted('update')?.[0]).toEqual([
+      'jane_doe',
+      'matching_password',
+    ]);
+
+    await wrapper.setProps({ username: 'updated_user' });
+    await wrapper.find('form').trigger('submit');
+
+    expect(wrapper.emitted('update')?.[1]).toEqual([
+      'updated_user',
+      'matching_password',
+    ]);
+    expect(errorSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+    warnSpy.mockRestore();
   });
 });

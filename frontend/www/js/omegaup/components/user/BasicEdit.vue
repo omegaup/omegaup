@@ -11,7 +11,7 @@
           }}</label>
           <div class="col-md-7">
             <input
-              v-model="username"
+              v-model="currentUsername"
               class="form-control"
               name="username"
               size="30"
@@ -69,7 +69,7 @@ export default defineComponent({
     'omegaup-password-input': omegaup_PasswordInput,
   },
   props: {
-    initialUsername: {
+    username: {
       type: String,
       default: '',
     },
@@ -77,22 +77,20 @@ export default defineComponent({
   emits: ['update'],
   data(): {
     T: typeof T;
-    username: string;
+    currentUsername: string;
     newPassword1: string;
     newPassword2: string;
   } {
     return {
       T,
-      username:
-        this.initialUsername ||
-        ((this.$attrs.username as string | undefined) ?? ''),
+      currentUsername: this.username,
       newPassword1: '',
       newPassword2: '',
     };
   },
   watch: {
-    initialUsername(val: string): void {
-      this.username = val;
+    username(newValue: string): void {
+      this.currentUsername = newValue;
     },
   },
   methods: {
@@ -101,7 +99,7 @@ export default defineComponent({
         ui.error(T.userPasswordMustBeSame);
         return;
       }
-      this.$emit('update', this.username, this.newPassword1);
+      this.$emit('update', this.currentUsername, this.newPassword1);
     },
   },
 });
