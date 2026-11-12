@@ -74,4 +74,29 @@ describe('ManageSchools.vue', () => {
       ],
     ]);
   });
+
+  it('Should emit null scholar_degree when omitted from profile', async () => {
+    const profileWithoutDegree: types.UserProfileInfo = {
+      ...profile,
+      scholar_degree: undefined,
+    };
+    const wrapper = mount(userManageSchools as ComponentOptions<Vue>, {
+      propsData: {
+        profile: profileWithoutDegree,
+        searchResultSchools: [{ key: 1, value: 'escuela' }],
+      },
+    });
+
+    await wrapper.find('button[type="submit"]').trigger('submit');
+    expect(wrapper.emitted('update-user-schools')).toEqual([
+      [
+        {
+          graduation_date: null,
+          school_id: 1,
+          school_name: 'escuela',
+          scholar_degree: null,
+        },
+      ],
+    ]);
+  });
 });

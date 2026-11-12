@@ -174,12 +174,12 @@ export default defineComponent({
     show: boolean;
     T: typeof T;
     ObjectivesAnswers: typeof ObjectivesAnswers;
-    email: string | undefined;
-    locale: string | undefined;
+    email: string;
+    locale: null | string;
     preferredLanguage: string;
-    programmingLanguages: { [key: string]: string } | undefined;
-    isPrivate: boolean | undefined;
-    hideProblemTags: boolean | undefined;
+    programmingLanguages: { [key: string]: string };
+    isPrivate: boolean;
+    hideProblemTags: boolean;
     hasCompetitiveObjective: boolean;
     hasLearningObjective: boolean;
     hasScholarObjective: boolean;
@@ -189,10 +189,10 @@ export default defineComponent({
       show: false,
       T,
       ObjectivesAnswers,
-      email: this.profile.email,
-      locale: this.profile.locale,
+      email: this.profile.email ?? '',
+      locale: this.profile.locale ?? null,
       preferredLanguage: this.profile.preferred_language ?? '',
-      programmingLanguages: this.profile.programming_languages,
+      programmingLanguages: this.profile.programming_languages ?? {},
       isPrivate: this.profile.is_private,
       hideProblemTags: this.profile.hide_problem_tags,
       hasCompetitiveObjective: this.profile.has_competitive_objective ?? false,
@@ -305,12 +305,12 @@ export default defineComponent({
           has_scholar_objective: this.hasScholarObjective,
           has_teaching_objective: this.hasTeachingObjective,
         },
-        localeChanged: this.locale !== this.profile.locale,
+        localeChanged: this.locale !== (this.profile.locale ?? null),
       });
     },
 
     handlePrivateProfileCheckboxChange(): void {
-      this.show = Boolean(this.isPrivate);
+      this.show = this.isPrivate;
     },
   },
 });

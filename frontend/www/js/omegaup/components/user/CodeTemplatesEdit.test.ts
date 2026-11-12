@@ -127,4 +127,25 @@ describe('CodeTemplatesEdit.vue', () => {
         .element as HTMLTextAreaElement).value,
     ).toBe(sourceTemplates.py);
   });
+
+  it('Should fall back to first available language in initialLanguage when preferred language is unavailable', () => {
+    const wrapper = shallowMount(
+      user_CodeTemplates_Edit as ComponentOptions<Vue>,
+      {
+        propsData: {
+          profile: {
+            ...profile,
+            preferred_language: 'cpp17-gcc',
+          },
+        },
+      },
+    );
+
+    const vm = wrapper.vm as Vue & {
+      initialLanguage: null | string;
+      selectedLanguage: null | string;
+    };
+    expect(vm.initialLanguage).toBe('py2');
+    expect(vm.selectedLanguage).toBe('py2');
+  });
 });

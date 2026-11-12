@@ -318,4 +318,114 @@ describe('PreferencesEdit.vue', () => {
       ],
     ]);
   });
+
+  it('Should clear scholar and competitive objectives when switching through "none" and allow re-selecting', async () => {
+    const wrapper = shallowMount(
+      user_Preferences_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile },
+      },
+    );
+
+    const learningTeachingSelect = wrapper.find(
+      'select[data-learning-teaching-objective]',
+    );
+    const scholarCompetitiveSelect = wrapper.find(
+      'select[data-scholar-competitive-objective]',
+    );
+
+    await learningTeachingSelect.find('option[value="none"]').setSelected();
+    expect(scholarCompetitiveSelect.element).toBeDisabled();
+    expect((scholarCompetitiveSelect.element as HTMLSelectElement).value).toBe(
+      'other',
+    );
+
+    await learningTeachingSelect.find('option[value="learning"]').setSelected();
+    expect(scholarCompetitiveSelect.element).toBeEnabled();
+    expect((scholarCompetitiveSelect.element as HTMLSelectElement).value).toBe(
+      'other',
+    );
+
+    await scholarCompetitiveSelect
+      .find('option[value="scholar"]')
+      .setSelected();
+    await wrapper.find('button[type="submit"]').trigger('submit');
+
+    expect(wrapper.emitted('update-user-preferences')).toEqual([
+      [
+        {
+          userPreferences: {
+            locale: profile.locale,
+            preferred_language: profile.preferred_language,
+            is_private: profile.is_private,
+            hide_problem_tags: profile.hide_problem_tags,
+            has_competitive_objective: false,
+            has_learning_objective: true,
+            has_scholar_objective: true,
+            has_teaching_objective: false,
+          },
+          localeChanged: false,
+        },
+      ],
+    ]);
+  });
+
+  it('Should use safe defaults when optional profile fields are omitted', async () => {
+    const minimalProfile: types.UserProfileInfo = {
+      classname: 'user-rank-unranked',
+      hide_problem_tags: false,
+      is_own_profile: true,
+      is_private: false,
+      programming_languages: {
+        py2: 'python2',
+        rb: 'ruby',
+      },
+      rankinfo: {
+        name: 'Test',
+        problems_solved: 2,
+        rank: 1,
+      },
+    };
+    const wrapper = shallowMount(
+      user_Preferences_Edit as ComponentOptions<Vue>,
+      {
+        propsData: { profile: minimalProfile },
+      },
+    );
+
+    expect(
+      (wrapper.find('select[data-learning-teaching-objective]')
+        .element as HTMLSelectElement).value,
+    ).toBe('learning');
+    expect(
+      (wrapper.find('select[data-scholar-competitive-objective]')
+        .element as HTMLSelectElement).value,
+    ).toBe('scholar');
+
+    await wrapper
+      .find('select[data-preferred-language]')
+      .find('option[value=""]')
+      .setSelected();
+    await wrapper.find('input[data-is-private]').setChecked(true);
+    await wrapper.find('button[type="submit"]').trigger('submit');
+
+    expect((wrapper.vm as Vue & { show: boolean }).show).toBe(true);
+    expect(wrapper.emitted('update-user-preferences')).toEqual([
+      [
+        {
+          userPreferences: {
+            locale: null,
+            preferred_language: null,
+            is_private: true,
+            hide_problem_tags: false,
+            has_competitive_objective: false,
+            has_learning_objective: true,
+            has_scholar_objective: true,
+            has_teaching_objective: false,
+          },
+          localeChanged: false,
+        },
+      ],
+    ]);
+  });
 });

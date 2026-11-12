@@ -94,7 +94,7 @@ export default defineComponent({
     T: typeof T;
     graduationDate: Date;
     school: null | types.SchoolListItem;
-    scholarDegree: string | null | undefined;
+    scholarDegree: null | string;
     isCurrentlyEnrolled: boolean;
   } {
     return {
@@ -103,7 +103,7 @@ export default defineComponent({
         ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
         : new Date(''),
       school: this.searchResultSchools[0] ?? null,
-      scholarDegree: this.profile.scholar_degree,
+      scholarDegree: this.profile.scholar_degree ?? null,
       isCurrentlyEnrolled: !this.profile.graduation_date,
     };
   },

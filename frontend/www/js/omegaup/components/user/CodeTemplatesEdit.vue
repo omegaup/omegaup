@@ -73,21 +73,9 @@ export default defineComponent({
     selectedLanguage: null | string;
     source: string;
   } {
-    const programmingLanguages = this.profile.programming_languages ?? {};
-    const languages = Object.keys(programmingLanguages);
-    let initialLanguage: null | string = null;
-    if (
-      this.profile.preferred_language &&
-      languages.includes(this.profile.preferred_language)
-    ) {
-      initialLanguage = this.profile.preferred_language;
-    } else {
-      initialLanguage = languages[0] ?? null;
-    }
-
     return {
       T,
-      selectedLanguage: initialLanguage,
+      selectedLanguage: null,
       source: '',
     };
   },
@@ -95,11 +83,28 @@ export default defineComponent({
     programmingLanguages(): { [key: string]: string } {
       return this.profile.programming_languages ?? {};
     },
+    initialLanguage(): null | string {
+      const languages = Object.keys(this.programmingLanguages);
+      if (
+        this.profile.preferred_language &&
+        languages.includes(this.profile.preferred_language)
+      ) {
+        return this.profile.preferred_language;
+      }
+      return languages[0] ?? null;
+    },
     username(): null | string {
       return this.profile.username ?? null;
     },
   },
   watch: {
+    // Runs before selectedLanguage so initialLanguage populates it before the initial source load.
+    initialLanguage: {
+      immediate: true,
+      handler(language: null | string): void {
+        this.selectedLanguage = language;
+      },
+    },
     selectedLanguage: {
       immediate: true,
       handler(language: null | string): void {
