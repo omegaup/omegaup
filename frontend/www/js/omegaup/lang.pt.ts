@@ -1340,7 +1340,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorAddLine: "Adicionar linha",
   problemCreatorAutomaticPoints: "Pontua\u00e7\u00e3o autom\u00e1tica",
   problemCreatorAutomaticPointsHelperCase: "O programa calcular\u00e1 o valor deste caso usando esta f\u00f3rmula: (pontua\u00e7\u00e3o do grupo - (soma dos casos dentro do grupo que t\u00eam uma pontua\u00e7\u00e3o expl\u00edcita)) / (n\u00famero de casos dentro do grupo sem uma pontua\u00e7\u00e3o expl\u00edcita)",
-  problemCreatorAutomaticPointsHelperGroup: "O programa calcular\u00e1 o valor deste grupo usando esta f\u00f3rmula: (100 - (soma dos grupos que t\u00eam uma pontua\u00e7\u00e3o expl\u00edcita) / (n\u00famero de grupos sem uma pontua\u00e7\u00e3o expl\u00edcita))",
+  problemCreatorAutomaticPointsHelperGroup: "O programa calcular\u00e1 os pontos deste grupo usando esta f\u00f3rmula: (100 - (soma dos pontos dos grupos com pontua\u00e7\u00e3o expl\u00edcita)) / (n\u00famero de grupos sem pontua\u00e7\u00e3o expl\u00edcita)",
   problemCreatorAutomaticPointsRecommended: "Pontua\u00e7\u00e3o autom\u00e1tica (recomendado)",
   problemCreatorCannotHaveSameName: "Voc\u00ea n\u00e3o pode ter dois casos/grupos com o mesmo nome",
   problemCreatorCase: "Caso",
