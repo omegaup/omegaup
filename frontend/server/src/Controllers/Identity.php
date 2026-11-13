@@ -661,6 +661,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $schoolName = $r->ensureString('school_name');
 
         $originalIdentity = self::resolveIdentity($originalUsername);
+        self::validateTargetIdentityBelongsToGroup(
+            $originalIdentity,
+            $groupAlias,
+            isTeam: true
+        );
 
         $originalSchoolId = null;
         if (!is_null($originalIdentity->current_identity_school_id)) {
@@ -960,6 +965,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
 
         $originalIdentity = self::resolveIdentity($originalUsername);
+        self::validateTargetIdentityBelongsToGroup(
+            $originalIdentity,
+            $groupAlias
+        );
 
         $originalSchoolId = null;
         if (!is_null($originalIdentity->current_identity_school_id)) {
@@ -1039,8 +1048,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['password'],
             'password'
         );
-        self::validateUpdateRequest($r);
+        $groupAlias = self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
+        self::validateTargetIdentityBelongsToGroup($identity, $groupAlias);
 
         \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $identity->password = \OmegaUp\SecurityTools::hashString(
@@ -1096,14 +1106,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return void
+     * @return string The validated group alias.
      *
      * @omegaup-request-param string $group_alias
      * @omegaup-request-param mixed $identities
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $username
      */
-    private static function validateUpdateRequest(\OmegaUp\Request $r): void {
+    private static function validateUpdateRequest(\OmegaUp\Request $r): string {
         $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -1129,6 +1139,47 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'identities'
             );
         }
+        return $groupAlias;
+    }
+
+    /**
+     * Identity creators can only manage the identities that were created for
+     * their own group, whose usernames are namespaced with the group alias
+     * (`<group_alias>:<name>` for groups, `teams:<group_alias>:<name>` for
+     * teams). Without this check, any identity creator could take over an
+     * unrelated account (including a main account) by changing its password or
+     * renaming it to a username inside their group.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    private static function validateTargetIdentityBelongsToGroup(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $groupAlias,
+        bool $isTeam = false
+    ): void {
+        if (!self::isGroupManagedIdentity($identity, $groupAlias, $isTeam)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+    }
+
+    private static function isGroupManagedIdentity(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $groupAlias,
+        bool $isTeam
+    ): bool {
+        if (!is_null($identity->user_id)) {
+            return false;
+        }
+        $usernameParts = explode(':', strval($identity->username));
+        if ($isTeam) {
+            return count($usernameParts) === 3
+                && $usernameParts[0] === 'teams'
+                && $usernameParts[1] === $groupAlias;
+        }
+        return count($usernameParts) === 2
+            && $usernameParts[0] === $groupAlias;
     }
 
     public static function validateIdentity(

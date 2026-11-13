@@ -31,19 +31,34 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-@Component
-export default class Homepage extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() buttons!: {
-    text: string;
-    href: string;
-  }[];
-  @Prop() imageSrc!: string;
-  @Prop({ default: false }) imageToRight!: boolean;
-}
+export default defineComponent({
+  name: 'HomepageSection',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    buttons: {
+      type: Array as PropType<{ text: string; href: string }[]>,
+      required: true,
+    },
+    imageSrc: {
+      type: String,
+      required: true,
+    },
+    imageToRight: {
+      type: Boolean,
+      default: false,
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
