@@ -68,6 +68,32 @@ describe('Navbar.vue', () => {
     expect(wrapper.find('.navbar-right').text()).toContain(T.navbarRegister);
   });
 
+  it('Should display streak indicator when user is logged in', () => {
+    const wrapper = mount(common_Navbar, {
+      propsData: {
+        ...propsData,
+        isLoggedIn: true,
+        currentStreak: 5,
+      },
+    });
+
+    expect(wrapper.find('[data-streak-indicator]').exists()).toBe(true);
+    expect(wrapper.find('.streak-emoji').text()).toBe('🌱');
+    expect(wrapper.find('.streak-count').text()).toBe('5');
+  });
+
+  it('Should not display streak indicator when user is logged out', () => {
+    const wrapper = mount(common_Navbar, {
+      propsData: {
+        ...propsData,
+        isLoggedIn: false,
+        currentStreak: 0,
+      },
+    });
+
+    expect(wrapper.find('[data-streak-indicator]').exists()).toBe(false);
+  });
+
   it('Should show objectives modal only when a main user identity is logged', async () => {
     const wrapper = shallowMount(common_Navbar, {
       propsData: { ...propsData, ...{ fromLogin: true } },
