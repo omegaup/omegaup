@@ -69,33 +69,40 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import type { types } from '../../api_types';
 import T from '../../lang';
 
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 library.add(fas);
 
-@Component({
+export default defineComponent({
+  name: 'ManageIdentities',
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class ManageIdentities extends Vue {
-  @Prop() identities!: types.Identity[];
-
-  T = T;
-  username = '';
-  password = '';
-}
+  props: {
+    identities: {
+      type: Array as PropType<types.Identity[]>,
+      default: () => [],
+    },
+  },
+  emits: ['add-identity'],
+  data(): {
+    T: typeof T;
+    username: string;
+    password: string;
+  } {
+    return {
+      T,
+      username: '',
+      password: '',
+    };
+  },
+});
 </script>

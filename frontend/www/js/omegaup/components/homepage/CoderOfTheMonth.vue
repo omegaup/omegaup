@@ -66,7 +66,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
@@ -77,21 +78,33 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 
-@Component({
+export default defineComponent({
+  name: 'HomepageCoderOfTheMonth',
   components: {
     FontAwesomeIcon,
     'omegaup-user-username': user_Username,
   },
-})
-export default class CoderOfTheMonth extends Vue {
-  @Prop({ default: 'all' }) category!: string;
-  @Prop() coderOfTheMonth!: types.UserProfile;
-
-  T = T;
-  get CoderOfTheMonthPolicyURL(): string {
-    return getBlogUrl('CoderOfTheMonthPolicyURL');
-  }
-}
+  props: {
+    category: {
+      type: String,
+      default: 'all',
+    },
+    coderOfTheMonth: {
+      type: Object as PropType<types.UserProfile>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    CoderOfTheMonthPolicyURL(): string {
+      return getBlogUrl('CoderOfTheMonthPolicyURL');
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
