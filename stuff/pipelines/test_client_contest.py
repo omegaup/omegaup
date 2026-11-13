@@ -11,7 +11,7 @@ import string
 import sys
 import time
 
-from typing import List
+from typing import Collection, List, Optional
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
 import contest_callback
@@ -153,6 +153,71 @@ def _build_contest_message(
     return json.dumps(dataclasses.asdict(message))
 
 
+def _assert_certificates(
+        cur: mysql.connector.cursor.MySQLCursorDict,
+        message: str,
+        allowed_codes: Optional[Collection[str]] = None,
+        rejected_codes: Collection[str] = (),
+) -> List[str]:
+    '''Checks what was stored for the contest of the published message.'''
+    data = json.loads(message)
+    cutoff = data['certificate_cutoff']
+    expected_places = {}
+    for entry in data['ranking']:
+        place = int(entry['place'])
+        expected_places[entry['username']] = (
+            place if cutoff and place and place <= cutoff else None)
+    assert expected_places
+
+    cur.execute(
+        '''
+        SELECT
+            i.username,
+            i.user_id,
+            c.verification_code,
+            c.contest_place
+        FROM
+            Certificates c
+        INNER JOIN
+            Identities i
+        ON
+            i.identity_id = c.identity_id
+        WHERE
+            c.contest_id = %s;
+        ''', (data['contest_id'],))
+    rows = list(cur.fetchall())
+    codes = [row['verification_code'] for row in rows]
+
+    assert len(rows) == len(expected_places)
+    assert {
+        row['username']: row['contest_place'] for row in rows
+    } == expected_places
+    assert len(set(codes)) == len(codes)
+    if allowed_codes is not None:
+        assert set(codes) <= set(allowed_codes)
+    assert not set(codes) & set(rejected_codes)
+
+    for row in rows:
+        cur.execute(
+            'SELECT COUNT(*) AS count FROM `Notifications` '
+            'WHERE user_id = %s AND contents LIKE %s;',
+            (row['user_id'],
+             f"%/certificates/mine/#{row['verification_code']}%"))
+        assert cur.fetchone()['count'] == 1
+    for code in rejected_codes:
+        cur.execute(
+            'SELECT COUNT(*) AS count FROM `Notifications` '
+            'WHERE contents LIKE %s;',
+            (f'%/certificates/mine/#{code}%',))
+        assert cur.fetchone()['count'] == 0
+
+    cur.execute(
+        'SELECT certificates_status FROM `Contests` WHERE contest_id = %s;',
+        (data['contest_id'],))
+    assert cur.fetchone()['certificates_status'] == 'generated'
+    return codes
+
+
 def test_client_contest() -> None:
     '''Basic test for client contest queue.
 
@@ -195,9 +260,7 @@ def test_client_contest() -> None:
             routing_key='ContestQueue-test',
             body=message.encode())
 
-        cur.execute(
-            'SELECT contest_id FROM Contests WHERE alias = %s;', (alias,))
-        contest_id = cur.fetchone()['contest_id']
+        contest_id = json.loads(message)['contest_id']
 
         cur.execute(
             'SELECT COUNT(*) AS count FROM `Certificates` '
@@ -213,10 +276,7 @@ def test_client_contest() -> None:
             callback=callback,
             stop_after_message=True)
 
-        cur.execute(
-            'SELECT COUNT(*) AS count FROM `Certificates` '
-            'WHERE contest_id = %s;', (contest_id,))
-        assert cur.fetchone()['count'] > 0
+        _assert_certificates(cur, message)
 
 
 def test_client_contest_with_mocked_codes(
@@ -270,6 +330,7 @@ def test_client_contest_with_mocked_codes(
             callback=callback,
             stop_after_message=True)
         assert spy.call_count == 4
+        _assert_certificates(cur, message, allowed_codes=codes)
 
 
 def test_client_contest_with_duplicated_codes(
@@ -326,3 +387,7 @@ def test_client_contest_with_duplicated_codes(
             stop_after_message=True)
 
         assert spy.call_count == 8
+        _assert_certificates(
+            cur, message,
+            allowed_codes=second_batch,
+            rejected_codes=codes[:3])
