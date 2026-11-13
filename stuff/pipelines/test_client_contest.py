@@ -26,6 +26,7 @@ import rabbitmq_connection
 import rabbitmq_client
 import test_constants
 import test_credentials
+import verification_code
 
 sys.path.insert(
     0,
@@ -91,18 +92,22 @@ def _create_finished_contest_with_users(
     return alias
 
 
-def _delete_verification_codes(
+def _new_verification_codes(
         cur: mysql.connector.cursor.MySQLCursorDict,
-        dbconn: lib.db.Connection,
-        codes: List[str],
-) -> None:
-    '''Removes the given verification codes so fixed-code tests stay stable.'''
-    placeholders = ', '.join(['%s'] * len(codes))
-    cur.execute(
-        f'DELETE FROM `Certificates` WHERE verification_code IN '
-        f'({placeholders});',
-        tuple(codes))
-    dbconn.conn.commit()
+        count: int,
+) -> List[str]:
+    '''Returns distinct codes that do not exist yet in Certificates.'''
+    codes: List[str] = []
+    while len(codes) < count:
+        code = verification_code.generate_code()
+        if code in codes:
+            continue
+        cur.execute(
+            'SELECT 1 FROM `Certificates` WHERE verification_code = %s;',
+            (code,))
+        if cur.fetchone() is None:
+            codes.append(code)
+    return codes
 
 
 def _build_contest_message(
@@ -218,9 +223,6 @@ def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
     '''One verification code is generated per contestant (no collisions).'''
-    mocker.patch('contest_callback.generate_contest_code',
-                 side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
-                                   'XMCF384X8M']))
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user=test_credentials.MYSQL_USER,
@@ -248,9 +250,9 @@ def test_client_contest_with_mocked_codes(
             routing_key='ContestQueue-test',
             channel=channel)
         channel.queue_purge(queue='contest-test')
-        _delete_verification_codes(
-            cur, dbconn,
-            ['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F', 'XMCF384X8M'])
+        codes = _new_verification_codes(cur, 4)
+        mocker.patch('contest_callback.generate_contest_code',
+                     side_effect=iter(codes))
 
         message = _build_contest_message(cur, client, alias)
         channel.basic_publish(
@@ -274,12 +276,6 @@ def test_client_contest_with_duplicated_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
     '''A collision in the verification code triggers a regeneration retry.'''
-    mocker.patch('contest_callback.generate_contest_code',
-                 side_effect=iter(['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F',
-                                   'XMCF384X8C', 'XMDF384X8A', 'XMCF384X8D',
-                                   'XMCF384X8E', 'XMCF384X8L', 'XMCF385X8E',
-                                   'XMCF384X8P', 'XMCF384X5F', 'XNCF384X8F',
-                                   'XMCF384X89', 'XMCF384X8M']))
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user=test_credentials.MYSQL_USER,
@@ -307,12 +303,11 @@ def test_client_contest_with_duplicated_codes(
             routing_key='ContestQueue-test',
             channel=channel)
         channel.queue_purge(queue='contest-test')
-        _delete_verification_codes(
-            cur, dbconn,
-            ['XMCF384X8X', 'XMCF384X8C', 'XMCF384X8F', 'XMCF384X8C',
-             'XMDF384X8A', 'XMCF384X8D', 'XMCF384X8E', 'XMCF384X8L',
-             'XMCF385X8E', 'XMCF384X8P', 'XMCF384X5F', 'XNCF384X8F',
-             'XMCF384X89', 'XMCF384X8M'])
+        codes = _new_verification_codes(cur, 7)
+        first_batch = codes[:3] + [codes[1]]
+        second_batch = codes[3:]
+        mocker.patch('contest_callback.generate_contest_code',
+                     side_effect=iter(first_batch + second_batch))
 
         message = _build_contest_message(cur, client, alias)
         channel.basic_publish(
@@ -330,4 +325,4 @@ def test_client_contest_with_duplicated_codes(
             callback=callback,
             stop_after_message=True)
 
-        assert spy.call_count > 4
+        assert spy.call_count == 8
