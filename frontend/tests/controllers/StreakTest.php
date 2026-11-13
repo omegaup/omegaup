@@ -132,8 +132,8 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
         $baseTime = strtotime('2026-05-15 12:00:00');
         $originalTime = \OmegaUp\Time::get();
         try {
-            // 30 consecutive days from day -29 to day 0
-            for ($daysAgo = 29; $daysAgo >= 0; $daysAgo--) {
+            // 31 consecutive days: day -30 up to day 0 in chronological order
+            for ($daysAgo = 30; $daysAgo >= 0; $daysAgo--) {
                 \OmegaUp\Time::setTimeForTesting($baseTime - ($daysAgo * 86400));
                 $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData,
@@ -142,18 +142,12 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\Run::gradeRun($run);
             }
 
-            \OmegaUp\Time::setTimeForTesting($baseTime);
+            // At yesterday (day -1), streak is 30
+            \OmegaUp\Time::setTimeForTesting($baseTime - 86400);
             $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
             $this->assertSame(30, $streak);
 
-            // Add day -30 for a 31-day streak
-            \OmegaUp\Time::setTimeForTesting($baseTime - (30 * 86400));
-            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
-                $problemData,
-                $identity
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run);
-
+            // At today (day 0), streak is 31
             \OmegaUp\Time::setTimeForTesting($baseTime);
             $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
             $this->assertSame(31, $streak);
