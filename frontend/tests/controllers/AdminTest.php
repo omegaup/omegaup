@@ -177,4 +177,37 @@ class AdminTest extends \OmegaUp\Test\ControllerTestCase {
             $exception->getMessage()
         );
     }
+
+    public function testOperationsDashboardPayloadForSupport() {
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $response = \OmegaUp\Controllers\Admin::getOperationsDashboardForTypeScript(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        $payload = $response['templateProperties']['payload'];
+        $this->assertSame('support', $payload['accessLevel']);
+        $this->assertArrayHasKey('enabled', $payload['maintenanceMode']);
+        $this->assertNotEmpty($payload['maintenancePredefinedTemplates']);
+    }
+
+    public function testOperationsDashboardPayloadForAdmin() {
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+        \OmegaUp\Test\Factories\User::addSupportRole($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $response = \OmegaUp\Controllers\Admin::getOperationsDashboardForTypeScript(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        $this->assertSame(
+            'admin',
+            $response['templateProperties']['payload']['accessLevel']
+        );
+    }
 }
