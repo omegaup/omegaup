@@ -14,6 +14,8 @@ import time
 from typing import Any, List
 import omegaup.api
 import pytest
+import pytest_mock
+from mysql.connector import errors
 
 import database.contest
 import contest_callback
@@ -203,3 +205,232 @@ def test_valid_structure_passes_validation() -> None:
     }
     # pylint: disable=protected-access
     contest_callback.ContestsCallback._validate_structure(response)
+
+
+def _valid_body() -> bytes:
+    '''Returns a structurally valid contest message body.'''
+    return json.dumps({
+        'certificate_cutoff': 3,
+        'alias': 'x',
+        'scoreboard_url': 'abc',
+        'contest_id': 1,
+        'ranking': [{'username': 'user_1', 'place': '1'}],
+    }).encode('utf-8')
+
+
+def _marked_status(dbconn: Any) -> Any:
+    '''Returns the arguments of the single status UPDATE that was executed.'''
+    cur = dbconn.cursor.return_value.__enter__.return_value
+    cur.execute.assert_called_once()
+    return cur.execute.call_args.args[1]
+
+
+@pytest.mark.parametrize(
+    'error',
+    [
+        errors.InterfaceError(  # type: ignore[attr-defined]
+            'MySQL server is unavailable'),
+        errors.OperationalError(  # type: ignore[attr-defined]
+            'Lost connection to MySQL server'),
+        errors.InternalError(  # type: ignore[attr-defined]
+            'Deadlock found', errno=1213),
+        errors.DatabaseError(  # type: ignore[attr-defined]
+            'Lock wait timeout', errno=1205),
+        errors.DatabaseError(  # type: ignore[attr-defined]
+            'MySQL server has gone away', errno=2006),
+        errors.DatabaseError(  # type: ignore[attr-defined]
+            'Lost connection to MySQL server', errno=2013),
+        ConnectionError('connection reset'),
+        TimeoutError('timed out'),
+        OSError('name resolution failed'),
+    ],
+)  # type: ignore
+def test_infrastructure_error_raises_transient(
+        mocker: pytest_mock.MockerFixture,
+        error: Exception
+) -> None:
+    '''An infrastructure failure is transient and marks retryable_error.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.TransientMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert _marked_status(dbconn) == ('retryable_error', 1)
+
+
+@pytest.mark.parametrize(
+    'error',
+    [
+        errors.IntegrityError(  # type: ignore[attr-defined]
+            'Cannot add or update a child row', errno=1452),
+        errors.DataError(  # type: ignore[attr-defined]
+            'Data too long for column', errno=1406),
+        errors.ProgrammingError(  # type: ignore[attr-defined]
+            'Unknown column', errno=1054),
+    ],
+)  # type: ignore
+def test_mysql_data_error_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture,
+        error: Exception
+) -> None:
+    '''A MySQL error that is not transient is permanent, not retried.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
+
+
+@pytest.mark.parametrize(
+    'error, expected',
+    [
+        (
+            rabbitmq_client.UnrecoverableMessageError('bad data'),
+            'failed permanently',
+        ),
+        (
+            errors.InterfaceError(  # type: ignore[attr-defined]
+                'MySQL server is unavailable'),
+            'failed temporarily',
+        ),
+        (RuntimeError('unexpected'), 'unexpected error'),
+    ],
+)  # type: ignore
+def test_error_logs_include_the_contest(
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+        error: Exception,
+        expected: str
+) -> None:
+    '''Every error path logs which contest failed and the decision taken.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(
+        (rabbitmq_client.TransientMessageError,
+         rabbitmq_client.UnrecoverableMessageError)
+    ):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert 'Contest 1' in caplog.text
+    assert expected in caplog.text
+
+
+def test_reconnection_failure_logs_the_root_cause(
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture
+) -> None:
+    '''A wrapped reconnection error stays transient and logs its cause.'''
+    error = errors.InterfaceError(  # type: ignore[attr-defined]
+        'Can not reconnect to MySQL after 3 attempt(s)')
+    error.__cause__ = errors.ProgrammingError(  # type: ignore[attr-defined]
+        'Access denied', errno=1045)
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.TransientMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert 'Contest 1' in caplog.text
+    assert 'ProgrammingError' in caplog.text
+    assert 'errno=1045' in caplog.text
+
+
+def test_unexpected_error_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''An unexpected exception is permanent and marks fatal_error.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = RuntimeError('unexpected')
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
+
+
+def test_error_discards_pending_changes_before_marking(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''Pending changes are rolled back before the status is committed.'''
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = RuntimeError('unexpected')
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    calls = [call[0] for call in dbconn.method_calls]
+    assert calls.index('rollback') < calls.index('commit')
+
+
+@pytest.mark.parametrize('place', ['abc', 'None', None])  # type: ignore
+def test_invalid_place_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture,
+        place: Any
+) -> None:
+    '''An invalid place is a data error and marks fatal_error.'''
+    dbconn = mocker.MagicMock()
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    body = json.dumps({
+        'certificate_cutoff': 3,
+        'alias': 'x',
+        'scoreboard_url': 'abc',
+        'contest_id': 1,
+        'ranking': [{'username': 'user_1', 'place': place}],
+    }).encode('utf-8')
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=body,
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
+
+
+def test_missing_username_raises_unrecoverable(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''A username not found in Identities raises UnrecoverableMessageError.'''
+    mocker.patch(
+        'database.contest.get_users_ids',
+        side_effect=KeyError('user_1'),
+    )
+    dbconn = mocker.MagicMock()
+    dbconn.ping.return_value = None
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.UnrecoverableMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert _marked_status(dbconn) == ('fatal_error', 1)
