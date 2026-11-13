@@ -39,6 +39,16 @@ def _is_transient(err: Exception) -> bool:
     return getattr(err, 'errno', None) in _TRANSIENT_MYSQL_ERRNOS
 
 
+def _root_cause(err: BaseException) -> str:
+    '''Describes the original error hidden behind wrapped exceptions.'''
+    root = err
+    for _ in range(10):
+        if root.__cause__ is None:
+            break
+        root = root.__cause__
+    return f'{type(root).__name__} (errno={getattr(root, "errno", None)})'
+
+
 @dataclasses.dataclass
 class Certificate:
     '''A dataclass for certificate.'''
@@ -90,8 +100,9 @@ class ContestsCallback:
         except Exception as err:  # pylint: disable=broad-except
             if _is_transient(err):
                 logging.warning(
-                    'Contest %s failed temporarily (%s), it will be retried',
-                    contest_id, type(err).__name__)
+                    'Contest %s failed temporarily (%s, cause: %s), it will '
+                    'be retried', contest_id, type(err).__name__,
+                    _root_cause(err))
                 self._handle_processing_error(contest_id, 'retryable_error')
                 raise rabbitmq_client.TransientMessageError(
                     'Transient error while processing the message'

@@ -331,6 +331,30 @@ def test_error_logs_include_the_contest(
     assert expected in caplog.text
 
 
+def test_reconnection_failure_logs_the_root_cause(
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture
+) -> None:
+    '''A wrapped reconnection error stays transient and logs its cause.'''
+    error = errors.InterfaceError(  # type: ignore[attr-defined]
+        'Can not reconnect to MySQL after 3 attempt(s)')
+    error.__cause__ = errors.ProgrammingError(  # type: ignore[attr-defined]
+        'Access denied', errno=1045)
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+    with pytest.raises(rabbitmq_client.TransientMessageError):
+        callback(
+            channel=None,  # type: ignore
+            _method=None,
+            _properties=None,
+            body=_valid_body(),
+        )
+    assert 'Contest 1' in caplog.text
+    assert 'ProgrammingError' in caplog.text
+    assert 'errno=1045' in caplog.text
+
+
 def test_unexpected_error_raises_unrecoverable(
         mocker: pytest_mock.MockerFixture
 ) -> None:
