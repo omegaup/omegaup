@@ -32,6 +32,10 @@
             v-if="isLoggedIn"
             class="navbar-nav navbar-right align-items-end d-lg-none"
           >
+            <omegaup-streak-indicator
+              :streak="currentStreak"
+              class="d-flex align-items-center mr-2"
+            ></omegaup-streak-indicator>
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
@@ -103,6 +107,11 @@
                   :notifications="notifications"
                   @read="readNotifications"
                 ></omegaup-notification-list>
+              </li>
+              <li class="nav-item d-none d-lg-flex align-items-center">
+                <omegaup-streak-indicator
+                  :streak="currentStreak"
+                ></omegaup-streak-indicator>
               </li>
               <li
                 class="nav-item dropdown nav-user nav-item-align"
@@ -389,6 +398,7 @@ import notifications_List from '../notification/List.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
+import common_StreakIndicator from './StreakIndicator.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
@@ -410,6 +420,7 @@ export const EventBus = new Vue();
     'omegaup-notifications-clarifications': notifications_Clarifications,
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
+    'omegaup-streak-indicator': common_StreakIndicator,
     'omegaup-user-objectives-questions': user_objectives_questions,
     'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
@@ -428,6 +439,7 @@ export default class Navbar extends Vue {
   @Prop() associatedIdentities!: types.AssociatedIdentity[];
   @Prop() currentEmail!: string;
   @Prop() currentName!: string;
+  @Prop({ default: 0 }) currentStreak!: number;
   @Prop() currentUsername!: string;
   @Prop() isAdmin!: boolean;
   @Prop() isSupportTeamMember!: boolean;
