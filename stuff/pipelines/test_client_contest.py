@@ -11,11 +11,12 @@ import string
 import sys
 import time
 
-from typing import Collection, List, Optional
+from typing import Any, Collection, List, Optional
 
 # pylint indicates pytest_mock should be placed before "import mysql.connector"
 import contest_callback
 import pika
+import producer_contest
 import pytest_mock
 import mysql.connector
 import mysql.connector.cursor
@@ -218,12 +219,12 @@ def _assert_certificates(
     return codes
 
 
-def test_client_contest() -> None:
-    '''Basic test for client contest queue.
+def test_client_contest(mocker: pytest_mock.MockerFixture) -> None:
+    '''Full flow: real producer, RabbitMQ, consumer and database.
 
-    Creates its own isolated contest, publishes a single message for it and
-    verifies that consuming that message inserts certificates only for that
-    contest. The test is self-contained and idempotent.
+    Creates its own isolated contest and lets the real producer publish it.
+    The producer only keeps this contest, so other contests in the database
+    cannot affect the result.
     '''
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
@@ -254,11 +255,29 @@ def test_client_contest() -> None:
             channel=channel)
         channel.queue_purge(queue='contest-test')
 
-        message = _build_contest_message(cur, client, alias)
-        channel.basic_publish(
-            exchange='certificates',
-            routing_key='ContestQueue-test',
-            body=message.encode())
+        original = producer_contest.get_contests_from_db
+        selected: List[database.contest.ContestCertificate] = []
+
+        def only_this_contest(
+                **kwargs: Any) -> List[database.contest.ContestCertificate]:
+            selected.extend(
+                contest for contest in original(**kwargs)
+                if contest.alias == alias)
+            return list(selected)
+
+        mocker.patch('producer_contest.get_contests_from_db',
+                     side_effect=only_this_contest)
+        producer_contest.send_contest_message_to_client(
+            cur=cur,
+            channel=channel,
+            date_lower_limit=(
+                datetime.datetime.now() - datetime.timedelta(hours=1)),
+            date_upper_limit=datetime.datetime.now(),
+            client=client,
+            queue='contest-test',
+            routing_key='ContestQueue-test')
+        assert len(selected) == 1
+        message = json.dumps(selected[0]._asdict())
 
         contest_id = json.loads(message)['contest_id']
 
@@ -277,12 +296,14 @@ def test_client_contest() -> None:
             stop_after_message=True)
 
         _assert_certificates(cur, message)
+        method, _, _ = channel.basic_get(queue='contest-test', auto_ack=True)
+        assert method is None
 
 
 def test_client_contest_with_mocked_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
-    '''One verification code is generated per contestant (no collisions).'''
+    '''Consumer: one verification code per contestant (no collisions).'''
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user=test_credentials.MYSQL_USER,
@@ -336,7 +357,7 @@ def test_client_contest_with_mocked_codes(
 def test_client_contest_with_duplicated_codes(
         mocker: pytest_mock.MockerFixture
 ) -> None:
-    '''A collision in the verification code triggers a regeneration retry.'''
+    '''Consumer: a verification code collision regenerates the batch.'''
     dbconn = lib.db.connect(
         lib.db.DatabaseConnectionArguments(
             user=test_credentials.MYSQL_USER,
