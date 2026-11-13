@@ -48,7 +48,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import homepageSlide from './Slide.vue';
 import { types } from '../../api_types';
@@ -76,98 +77,107 @@ interface SlideData {
   };
 }
 
-@Component({
+export default defineComponent({
+  name: 'HomepageCarousel',
   components: {
     'omegaup-homepage-slide': homepageSlide,
   },
-})
-export default class Carousel extends Vue {
-  @Prop({ default: () => [] }) carouselItems!: types.CarouselItem[];
-
-  T = T;
-
-  get slides(): SlideData[] {
-    return this.carouselItems
-      .map((item) => this.transformCarouselItem(item))
-      .filter((slide): slide is SlideData => slide !== null);
-  }
-
-  parseJsonField(field: string): { [key: string]: string } {
-    if (!field) {
-      return { en: '', es: '', pt: '' };
-    }
-    try {
-      const parsed = typeof field === 'string' ? JSON.parse(field) : field;
-      return {
-        en: parsed.en || '',
-        es: parsed.es || '',
-        pt: parsed.pt || '',
-      };
-    } catch (e) {
-      // If it's not valid JSON, treat it as a plain string for English
-      return {
-        en: typeof field === 'string' ? field : '',
-        es: '',
-        pt: '',
-      };
-    }
-  }
-
-  isExternalUrl(url: string): boolean {
-    try {
-      const urlObj = new URL(url, window.location.origin);
-      return urlObj.origin !== window.location.origin;
-    } catch (e) {
-      // If URL parsing fails, assume it's relative (internal)
-      return false;
-    }
-  }
-
-  transformCarouselItem(item: types.CarouselItem): SlideData | null {
-    const title = this.parseJsonField(item.title);
-    const description = this.parseJsonField(item.excerpt);
-    const buttonTitle = this.parseJsonField(item.button_title);
-
-    // Check if we have at least one language with content
-    const hasContent =
-      (title.en || title.es || title.pt) &&
-      (description.en || description.es || description.pt);
-
-    if (!hasContent || !item.image_url) {
-      return null;
-    }
-
-    const slide: SlideData = {
-      image: item.image_url,
-      title: {
-        en: title.en || title.es || title.pt || '',
-        es: title.es || title.en || title.pt || '',
-        pt: title.pt || title.en || title.es || '',
-      },
-      description: {
-        en: description.en || description.es || description.pt || '',
-        es: description.es || description.en || description.pt || '',
-        pt: description.pt || description.en || description.es || '',
-      },
+  props: {
+    carouselItems: {
+      type: Array as PropType<types.CarouselItem[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
     };
+  },
+  computed: {
+    slides(): SlideData[] {
+      return this.carouselItems
+        .map((item) => this.transformCarouselItem(item))
+        .filter((slide): slide is SlideData => slide !== null);
+    },
+  },
+  methods: {
+    parseJsonField(field: string): { [key: string]: string } {
+      if (!field) {
+        return { en: '', es: '', pt: '' };
+      }
+      try {
+        const parsed = typeof field === 'string' ? JSON.parse(field) : field;
+        return {
+          en: parsed.en || '',
+          es: parsed.es || '',
+          pt: parsed.pt || '',
+        };
+      } catch (e) {
+        // If it's not valid JSON, treat it as a plain string for English
+        return {
+          en: typeof field === 'string' ? field : '',
+          es: '',
+          pt: '',
+        };
+      }
+    },
 
-    // Add button if we have a link and button title
-    if (item.link && (buttonTitle.en || buttonTitle.es || buttonTitle.pt)) {
-      const isExternal = this.isExternalUrl(item.link);
-      slide.button = {
-        text: {
-          en: buttonTitle.en || buttonTitle.es || buttonTitle.pt || '',
-          es: buttonTitle.es || buttonTitle.en || buttonTitle.pt || '',
-          pt: buttonTitle.pt || buttonTitle.en || buttonTitle.es || '',
+    isExternalUrl(url: string): boolean {
+      try {
+        const urlObj = new URL(url, window.location.origin);
+        return urlObj.origin !== window.location.origin;
+      } catch (e) {
+        // If URL parsing fails, assume it's relative (internal)
+        return false;
+      }
+    },
+
+    transformCarouselItem(item: types.CarouselItem): SlideData | null {
+      const title = this.parseJsonField(item.title);
+      const description = this.parseJsonField(item.excerpt);
+      const buttonTitle = this.parseJsonField(item.button_title);
+
+      // Check if we have at least one language with content
+      const hasContent =
+        (title.en || title.es || title.pt) &&
+        (description.en || description.es || description.pt);
+
+      if (!hasContent || !item.image_url) {
+        return null;
+      }
+
+      const slide: SlideData = {
+        image: item.image_url,
+        title: {
+          en: title.en || title.es || title.pt || '',
+          es: title.es || title.en || title.pt || '',
+          pt: title.pt || title.en || title.es || '',
         },
-        href: item.link,
-        target: isExternal ? '_blank' : '_self',
+        description: {
+          en: description.en || description.es || description.pt || '',
+          es: description.es || description.en || description.pt || '',
+          pt: description.pt || description.en || description.es || '',
+        },
       };
-    }
 
-    return slide;
-  }
-}
+      // Add button if we have a link and button title
+      if (item.link && (buttonTitle.en || buttonTitle.es || buttonTitle.pt)) {
+        const isExternal = this.isExternalUrl(item.link);
+        slide.button = {
+          text: {
+            en: buttonTitle.en || buttonTitle.es || buttonTitle.pt || '',
+            es: buttonTitle.es || buttonTitle.en || buttonTitle.pt || '',
+            pt: buttonTitle.pt || buttonTitle.en || buttonTitle.es || '',
+          },
+          href: item.link,
+          target: isExternal ? '_blank' : '_self',
+        };
+      }
+
+      return slide;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
