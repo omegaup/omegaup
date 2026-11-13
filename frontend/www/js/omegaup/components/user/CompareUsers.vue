@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_CompareCard from './CompareCard.vue';
@@ -112,56 +112,95 @@ interface UserCompareData {
   contestsCount: number | null;
 }
 
-@Component({
+export default defineComponent({
+  name: 'CompareUsers',
   components: {
     'omegaup-user-compare-card': user_CompareCard,
     'omegaup-common-typeahead': common_Typeahead,
   },
-})
-export default class CompareUsers extends Vue {
-  @Prop({ default: null }) user1!: UserCompareData | null;
-  @Prop({ default: null }) user2!: UserCompareData | null;
-  @Prop({ default: null }) username1!: string | null;
-  @Prop({ default: null }) username2!: string | null;
-  @Prop({ default: false }) isLoading!: boolean;
-  @Prop({ default: () => [] }) searchResultUsers1!: types.ListItem[];
-  @Prop({ default: () => [] }) searchResultUsers2!: types.ListItem[];
-  @Prop({ default: null }) selectedUser1!: types.ListItem | null;
-  @Prop({ default: null }) selectedUser2!: types.ListItem | null;
+  props: {
+    user1: {
+      type: Object as PropType<UserCompareData | null>,
+      default: null,
+    },
+    user2: {
+      type: Object as PropType<UserCompareData | null>,
+      default: null,
+    },
+    username1: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    username2: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+    searchResultUsers1: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    searchResultUsers2: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    selectedUser1: {
+      type: Object as PropType<types.ListItem | null>,
+      default: null,
+    },
+    selectedUser2: {
+      type: Object as PropType<types.ListItem | null>,
+      default: null,
+    },
+  },
+  emits: [
+    'compare',
+    'update-search-result-users',
+    'update:selectedUser1',
+    'update:selectedUser2',
+  ],
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    canCompare(): boolean {
+      return this.selectedUser1 !== null && this.selectedUser2 !== null;
+    },
+  },
+  methods: {
+    fetchComparison(): void {
+      if (!this.canCompare) return;
+      this.$emit('compare', {
+        username1: this.selectedUser1?.key,
+        username2: this.selectedUser2?.key,
+      });
+    },
 
-  T = T;
+    getComparisonClass(userNumber: number): string {
+      if (!this.user1 || !this.user2) return '';
 
-  get canCompare(): boolean {
-    return this.selectedUser1 !== null && this.selectedUser2 !== null;
-  }
+      const solved1 = this.user1.solvedProblemsCount;
+      const solved2 = this.user2.solvedProblemsCount;
 
-  fetchComparison(): void {
-    if (!this.canCompare) return;
-    this.$emit('compare', {
-      username1: this.selectedUser1?.key,
-      username2: this.selectedUser2?.key,
-    });
-  }
+      // If either count is null (private profile), don't show comparison styling
+      if (solved1 === null || solved2 === null) return '';
 
-  getComparisonClass(userNumber: number): string {
-    if (!this.user1 || !this.user2) return '';
-
-    const solved1 = this.user1.solvedProblemsCount;
-    const solved2 = this.user2.solvedProblemsCount;
-
-    // If either count is null (private profile), don't show comparison styling
-    if (solved1 === null || solved2 === null) return '';
-
-    if (userNumber === 1) {
-      if (solved1 > solved2) return 'compare-winner';
-      if (solved1 < solved2) return 'compare-loser';
-    } else {
-      if (solved2 > solved1) return 'compare-winner';
-      if (solved2 < solved1) return 'compare-loser';
-    }
-    return 'compare-tie';
-  }
-}
+      if (userNumber === 1) {
+        if (solved1 > solved2) return 'compare-winner';
+        if (solved1 < solved2) return 'compare-loser';
+      } else {
+        if (solved2 > solved1) return 'compare-winner';
+        if (solved2 < solved1) return 'compare-loser';
+      }
+      return 'compare-tie';
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
