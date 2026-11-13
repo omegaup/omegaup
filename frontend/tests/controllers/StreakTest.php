@@ -32,7 +32,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             // Day -2, Day -1, Day 0 (today)
             for ($daysAgo = 2; $daysAgo >= 0; $daysAgo--) {
-                \OmegaUp\Time::setTimeForTesting($baseTime - ($daysAgo * 86400));
+                \OmegaUp\Time::setTimeForTesting(
+                    $baseTime - ($daysAgo * 86400)
+                );
                 $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData,
                     $identity
@@ -66,7 +68,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             // Submitted 3 days ago and 2 days ago, but missed yesterday (day -1)
             foreach ([3, 2] as $daysAgo) {
-                \OmegaUp\Time::setTimeForTesting($baseTime - ($daysAgo * 86400));
+                \OmegaUp\Time::setTimeForTesting(
+                    $baseTime - ($daysAgo * 86400)
+                );
                 $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData,
                     $identity
@@ -105,7 +109,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             // Submitted 2 days ago and yesterday (day -1)
             foreach ([2, 1] as $daysAgo) {
-                \OmegaUp\Time::setTimeForTesting($baseTime - ($daysAgo * 86400));
+                \OmegaUp\Time::setTimeForTesting(
+                    $baseTime - ($daysAgo * 86400)
+                );
                 $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData,
                     $identity
@@ -134,7 +140,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             // 31 consecutive days: day -30 up to day 0 in chronological order
             for ($daysAgo = 30; $daysAgo >= 0; $daysAgo--) {
-                \OmegaUp\Time::setTimeForTesting($baseTime - ($daysAgo * 86400));
+                \OmegaUp\Time::setTimeForTesting(
+                    $baseTime - ($daysAgo * 86400)
+                );
                 $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData,
                     $identity
