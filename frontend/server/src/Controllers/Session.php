@@ -42,7 +42,7 @@ class ScopedGitHub {
  * @psalm-type ApiToken=array{last_used: \OmegaUp\Timestamp, name: string, rate_limit: array{limit: int, remaining: int, reset: \OmegaUp\Timestamp}, timestamp: \OmegaUp\Timestamp}
  * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
  * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
- * @psalm-type CurrentSession=array{apiTokenId: int|null, api_tokens: list<ApiToken>, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, mentor_can_choose_coder: bool,  is_under_13_user: bool, user_verification_deadline: \OmegaUp\Timestamp|null, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
+ * @psalm-type CurrentSession=array{apiTokenId: int|null, api_tokens: list<ApiToken>, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, current_streak: int, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, mentor_can_choose_coder: bool,  is_under_13_user: bool, user_verification_deadline: \OmegaUp\Timestamp|null, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -255,6 +255,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 'identity' => null,
                 'loginIdentity' => null,
                 'classname' => 'user-rank-unranked',
+                'current_streak' => 0,
                 'apiTokenId' => null,
                 'auth_token' => null,
                 'cacheKey' => null,
@@ -369,6 +370,11 @@ class Session extends \OmegaUp\Controllers\Controller {
             'identity' => $currentIdentity,
             'loginIdentity' => $loginIdentity,
             'classname' => $identityClassname,
+            'current_streak' => !is_null($currentUser) ?
+                \OmegaUp\DAO\Runs::getCurrentStreak(
+                    $currentUser->user_id
+                ) :
+                0,
             'cacheKey' => $cacheKey,
             'apiTokenId' => $apiTokenId,
             'auth_token' => $authToken,
