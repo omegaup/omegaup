@@ -4,6 +4,10 @@ import T from '../../lang';
 import type { types } from '../../api_types';
 
 import problem_CollectionList from './CollectionList.vue';
+import problem_FilterTags from './FilterTags.vue';
+import problem_FilterDifficulty from './FilterDifficulty.vue';
+import problem_FilterQuality from './FilterQuality.vue';
+import problem_BaseList from './BaseList.vue';
 
 describe('CollectionList.vue', () => {
   it('Should handle details of problem list collection by level', async () => {
@@ -105,6 +109,130 @@ describe('CollectionList.vue', () => {
     expect(radioInput1.checked).toBeTruthy();
     expect(radioInput2.checked).toBeFalsy();
   });
+
+  it.each([
+    { selectedTags: ['problemTagConditionals'], excludedTags: [], index: 0 },
+    { selectedTags: [], excludedTags: ['problemTagConditionals'], index: 1 },
+  ])(
+    'Should keep selected public quality tags visible and restore their state',
+    async ({ selectedTags, excludedTags, index }) => {
+      const tagName = 'problemTagConditionals';
+      const wrapper = mount(problem_CollectionList, {
+        propsData: {
+          data: {
+            level: 'problemLevelBasicIntroductionToProgramming',
+            frequentTags: [],
+            publicTags: [{ name: tagName, problemCount: 2 }],
+          },
+          selectedTags,
+          excludedTags,
+        },
+      });
+
+      const checkboxes = wrapper.findAll(
+        `.tag-filter-row input[type="checkbox"][value="${tagName}"]`,
+      );
+      expect(checkboxes).toHaveLength(2);
+      expect((checkboxes.at(index).element as HTMLInputElement).checked).toBe(
+        true,
+      );
+      expect(
+        (checkboxes.at(1 - index).element as HTMLInputElement).checked,
+      ).toBe(false);
+
+      await wrapper
+        .findComponent(problem_FilterTags)
+        .vm.$emit('filters-changed', {
+          selected: ['problemTagArrays'],
+          excluded: [tagName],
+        });
+      expect(wrapper.emitted('apply-filter')?.[0]).toEqual([
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        ['problemTagArrays'],
+        [tagName],
+      ]);
+    },
+  );
+
+  it.each([
+    {
+      source: problem_FilterDifficulty,
+      event: 'change-difficulty',
+      value: 'hard',
+      expectedFilters: [
+        undefined,
+        undefined,
+        'hard',
+        'onlyQualityProblems',
+        ['problemTagMatrices'],
+        ['problemTagConditionals'],
+      ],
+    },
+    {
+      source: problem_FilterQuality,
+      event: 'change-quality',
+      value: 'all',
+      expectedFilters: [
+        undefined,
+        undefined,
+        'all',
+        'all',
+        ['problemTagMatrices'],
+        ['problemTagConditionals'],
+      ],
+    },
+    {
+      source: problem_BaseList,
+      event: 'apply-filter',
+      value: ['title', 'asc'],
+      expectedFilters: [
+        'title',
+        'asc',
+        'all',
+        'onlyQualityProblems',
+        ['problemTagMatrices'],
+        ['problemTagConditionals'],
+      ],
+    },
+  ])(
+    'Should preserve excluded tags when $event changes',
+    async ({ source, event, value, expectedFilters }) => {
+      const wrapper = mount(problem_CollectionList, {
+        propsData: {
+          data: {
+            level: 'problemLevelBasicIntroductionToProgramming',
+            frequentTags: [],
+            publicTags: [],
+          },
+          difficulty: 'all',
+          quality: 'onlyQualityProblems',
+          selectedTags: ['problemTagMatrices'],
+          excludedTags: ['problemTagConditionals'],
+          problems: [
+            {
+              alias: 'problem',
+              title: 'Problem',
+              difficulty: 1,
+              points: 1,
+              problem_id: 1,
+              quality: 1,
+              ratio: 0,
+              visibility: 2,
+              tags: [],
+            },
+          ],
+        },
+      });
+
+      await wrapper
+        .findComponent(source)
+        .vm.$emit(event, ...(Array.isArray(value) ? value : [value]));
+      expect(wrapper.emitted('apply-filter')?.[0]).toEqual(expectedFilters);
+    },
+  );
 
   it('Should toggle problem tags visibility', async () => {
     const wrapper = mount(problem_CollectionList, {
