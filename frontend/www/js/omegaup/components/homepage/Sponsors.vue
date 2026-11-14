@@ -20,18 +20,29 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-@Component
-export default class Sponsors extends Vue {
-  @Prop() title!: string;
-  @Prop() logos!: {
-    src: string;
-    alt: string;
-    href: string;
-    class: string;
-  }[];
-}
+export default defineComponent({
+  name: 'HomepageSponsors',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    logos: {
+      type: Array as PropType<
+        {
+          src: string;
+          alt: string;
+          href: string;
+          class: string;
+        }[]
+      >,
+      required: true,
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
