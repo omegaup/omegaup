@@ -1866,6 +1866,19 @@ export const Reset = {
   ),
 };
 
+export const Role = {
+  assignments: apiCall<
+    messages.RoleAssignmentsRequest,
+    messages.RoleAssignmentsResponse
+  >('/api/role/assignments/'),
+  details: apiCall<messages.RoleDetailsRequest, messages.RoleDetailsResponse>(
+    '/api/role/details/',
+  ),
+  list: apiCall<messages.RoleListRequest, messages.RoleListResponse>(
+    '/api/role/list/',
+  ),
+};
+
 export const Run = {
   counts: apiCall<messages.RunCountsRequest, messages.RunCountsResponse>(
     '/api/run/counts/',
