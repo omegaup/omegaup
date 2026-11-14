@@ -97,7 +97,7 @@ describe('Scoreboard.vue', () => {
 
     await wrapper
       .find('input[type="checkbox"].toggle-contestants')
-      .trigger('click');
+      .setChecked(false);
 
     expect(wrapper.find('.omegaup-scoreboard table tbody').text()).toContain(
       'test_user_0',

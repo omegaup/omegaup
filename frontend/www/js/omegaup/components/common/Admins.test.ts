@@ -27,7 +27,7 @@ describe('Admins.vue', () => {
       },
     });
     expect(wrapper.find('table tbody').text()).toContain('owner');
-    await wrapper.find('input[name="toggle-site-admins"]').trigger('click');
+    await wrapper.find('input[name="toggle-site-admins"]').setChecked(true);
     expect(wrapper.find('table tbody').text()).toContain('site-admin');
   });
 });
