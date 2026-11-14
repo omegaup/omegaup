@@ -49,8 +49,12 @@ abstract class UserReadmeReportLog {
                 User_Readme_Report_Log (
                     `readme_id`,
                     `reporter_user_id`,
-                    `report_time`
+                    `report_time`,
+                    `reason`,
+                    `detail`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?
@@ -61,6 +65,8 @@ abstract class UserReadmeReportLog {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $User_Readme_Report_Log->report_time
             ),
+            $User_Readme_Report_Log->reason,
+            $User_Readme_Report_Log->detail,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -80,7 +86,9 @@ abstract class UserReadmeReportLog {
             UPDATE
                 `User_Readme_Report_Log`
             SET
-                `report_time` = ?
+                `report_time` = ?,
+                `reason` = ?,
+                `detail` = ?
             WHERE
                 (
                     `readme_id` = ? AND
@@ -90,6 +98,8 @@ abstract class UserReadmeReportLog {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $User_Readme_Report_Log->report_time
             ),
+            $User_Readme_Report_Log->reason,
+            $User_Readme_Report_Log->detail,
             (
                 is_null($User_Readme_Report_Log->readme_id) ?
                 null :
@@ -123,7 +133,9 @@ abstract class UserReadmeReportLog {
             SELECT
                 `User_Readme_Report_Log`.`readme_id`,
                 `User_Readme_Report_Log`.`reporter_user_id`,
-                `User_Readme_Report_Log`.`report_time`
+                `User_Readme_Report_Log`.`report_time`,
+                `User_Readme_Report_Log`.`reason`,
+                `User_Readme_Report_Log`.`detail`
             FROM
                 `User_Readme_Report_Log`
             WHERE
@@ -271,7 +283,9 @@ abstract class UserReadmeReportLog {
             SELECT
                 `User_Readme_Report_Log`.`readme_id`,
                 `User_Readme_Report_Log`.`reporter_user_id`,
-                `User_Readme_Report_Log`.`report_time`
+                `User_Readme_Report_Log`.`report_time`,
+                `User_Readme_Report_Log`.`reason`,
+                `User_Readme_Report_Log`.`detail`
             FROM
                 `User_Readme_Report_Log`
             ORDER BY
@@ -318,8 +332,12 @@ abstract class UserReadmeReportLog {
                 `User_Readme_Report_Log` (
                     `readme_id`,
                     `reporter_user_id`,
-                    `report_time`
+                    `report_time`,
+                    `reason`,
+                    `detail`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?
@@ -338,6 +356,8 @@ abstract class UserReadmeReportLog {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $User_Readme_Report_Log->report_time
             ),
+            $User_Readme_Report_Log->reason,
+            $User_Readme_Report_Log->detail,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

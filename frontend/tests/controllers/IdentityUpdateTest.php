@@ -588,4 +588,190 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\DAO\Identities::findByUsername($newUsername)
         );
     }
+
+    public function testIdentityManagementUsesOriginGroupNotUsernameFormat(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $originGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            alias: 'origin_grp_' . substr(
+                \OmegaUp\Test\Utils::createRandomString(),
+                0,
+                12
+            ),
+            login: $creatorLogin
+        );
+        $secondaryGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            alias: 'sec_grp_' . substr(
+                \OmegaUp\Test\Utils::createRandomString(),
+                0,
+                12
+            ),
+            login: $creatorLogin
+        );
+
+        $username = "{$originGroup['group']->alias}:member1";
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => 'Origin Member',
+            'password' => $password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'group_alias' => $originGroup['group']->alias,
+        ]));
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+
+        // Add identity as a regular member to a second group owned by the same creator.
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $secondaryGroup['group']->alias,
+            'usernameOrEmail' => $username,
+        ]));
+
+        // Non-origin group cannot manage the identity even when the same creator owns it.
+        try {
+            \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $secondaryGroup['group']->alias,
+                'username' => $username,
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Non-origin group should not change password');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\Identity::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $secondaryGroup['group']->alias,
+                'original_username' => $username,
+                'username' => "{$secondaryGroup['group']->alias}:hijacked",
+                'name' => 'Hijacked',
+                'gender' => 'male',
+                'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Non-origin group should not update identity');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        // Decouple username from the origin alias to prove origin tracking relies
+        // on Groups_Identities.is_origin rather than the username prefix.
+        $nonMatchingUsername = "{$secondaryGroup['group']->alias}:custom_alias";
+        $identity->username = $nonMatchingUsername;
+        \OmegaUp\DAO\Identities::update($identity);
+
+        try {
+            \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $secondaryGroup['group']->alias,
+                'username' => $nonMatchingUsername,
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail(
+                'Username prefix match alone must not grant origin control'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        $newPassword = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $originGroup['group']->alias,
+            'username' => $nonMatchingUsername,
+            'password' => $newPassword,
+        ]));
+        $updatedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $nonMatchingUsername
+        );
+        $this->assertTrue(
+            \OmegaUp\SecurityTools::compareHashedStrings(
+                $newPassword,
+                strval($updatedIdentity->password)
+            )
+        );
+
+        $restoredUsername = "{$originGroup['group']->alias}:updated_member";
+        \OmegaUp\Controllers\Identity::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $originGroup['group']->alias,
+            'original_username' => $nonMatchingUsername,
+            'username' => $restoredUsername,
+            'name' => 'Updated Origin Member',
+            'gender' => 'male',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+        ]));
+        $this->assertSame(
+            $identity->identity_id,
+            \OmegaUp\Controllers\Identity::resolveIdentity(
+                $restoredUsername
+            )->identity_id
+        );
+    }
+
+    public function testAssociatedIdentityRetainsOriginButCannotBeManagedByCreator(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            login: $creatorLogin
+        );
+
+        $username = "{$group['group']->alias}:assoc_member";
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => 'Assoc Member',
+            'password' => $password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'female',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+
+        ['identity' => $userIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($userIdentity);
+        \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
+            'auth_token' => $userLogin->auth_token,
+            'username' => $username,
+            'password' => $password,
+        ]));
+
+        // Origin record persists after user association, while creator password
+        // changes remain forbidden because user_id is now populated.
+        $this->assertTrue(
+            \OmegaUp\DAO\GroupsIdentities::isOriginIdentityInGroup(
+                intval($identity->identity_id),
+                intval($group['group']->group_id)
+            )
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+                'username' => $username,
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail(
+                'Creators cannot change passwords of associated identities'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
 }

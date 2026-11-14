@@ -142,6 +142,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 new \OmegaUp\DAO\VO\GroupsIdentities([
                     'group_id' => intval($group->group_id),
                     'identity_id' => $identity->identity_id,
+                    'is_origin' => true,
                 ])
             );
 
@@ -529,16 +530,24 @@ class Identity extends \OmegaUp\Controllers\Controller {
                             $newIdentity = $preexistingIdentity;
                         }
                     }
+                    $selfGeneratedUsernames = [];
+                    $externalUsernames = [];
+                    foreach ($teamIdentity['identityUsernames'] as $user) {
+                        if (isset($user['password'])) {
+                            $selfGeneratedUsernames[] = $user['username'];
+                        } else {
+                            $externalUsernames[] = $user['username'];
+                        }
+                    }
                     \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
                         $team->team_id,
-                        array_map(
-                            /**
-                             * @param array{password?: string, username: string} $user
-                             * @return string
-                             */
-                            fn ($user) => $user['username'],
-                            $teamIdentity['identityUsernames']
-                        )
+                        $selfGeneratedUsernames,
+                        isOrigin: true
+                    );
+                    \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
+                        $team->team_id,
+                        $externalUsernames,
+                        isOrigin: false
                     );
                 }
 
@@ -649,7 +658,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiUpdateIdentityTeam(\OmegaUp\Request $r): array {
-        self::validateUpdateRequest($r);
+        $authorizedGroups = self::validateUpdateRequest(
+            $r,
+            allowGroups: false,
+            allowTeamGroups: true
+        );
         $originalUsername = $r->ensureString('original_username');
         $username = $r->ensureString('username');
         $name = $r->ensureString('name');
@@ -663,8 +676,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $originalIdentity = self::resolveIdentity($originalUsername);
         self::validateTargetIdentityBelongsToGroup(
             $originalIdentity,
-            $groupAlias,
-            isTeam: true
+            $authorizedGroups
         );
 
         $originalSchoolId = null;
@@ -860,12 +872,37 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $identity->identity_id = $preexistingIdentity->identity_id;
             $identity->user_id = $preexistingIdentity->user_id;
         }
-        \OmegaUp\DAO\GroupsIdentities::replace(
-            new \OmegaUp\DAO\VO\GroupsIdentities([
-                'group_id' => intval($group->group_id),
-                'identity_id' => $identity->identity_id,
-            ])
+        if (is_null($group->group_id) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+        $existingGroupIdentity = \OmegaUp\DAO\GroupsIdentities::getByPK(
+            $group->group_id,
+            $identity->identity_id
         );
+        if (is_null($existingGroupIdentity)) {
+            $isOrigin = is_null($identity->user_id)
+                && !\OmegaUp\DAO\GroupsIdentities::hasOriginGroup(
+                    $identity->identity_id
+                );
+            \OmegaUp\DAO\GroupsIdentities::create(
+                new \OmegaUp\DAO\VO\GroupsIdentities([
+                    'group_id' => $group->group_id,
+                    'identity_id' => $identity->identity_id,
+                    'is_origin' => $isOrigin,
+                ])
+            );
+        } elseif (
+            !$existingGroupIdentity->is_origin
+            && is_null($identity->user_id)
+            && !\OmegaUp\DAO\GroupsIdentities::hasOriginGroup(
+                $identity->identity_id
+            )
+        ) {
+            $existingGroupIdentity->is_origin = true;
+            \OmegaUp\DAO\GroupsIdentities::update($existingGroupIdentity);
+        }
     }
 
     /**
@@ -950,7 +987,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
-        self::validateUpdateRequest($r);
+        $authorizedGroups = self::validateUpdateRequest(
+            $r,
+            allowGroups: true,
+            allowTeamGroups: false
+        );
         $originalUsername = $r->ensureString('original_username');
         $username = $r->ensureString('username');
         $name = $r->ensureString('name');
@@ -967,7 +1008,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $originalIdentity = self::resolveIdentity($originalUsername);
         self::validateTargetIdentityBelongsToGroup(
             $originalIdentity,
-            $groupAlias
+            $authorizedGroups
         );
 
         $originalSchoolId = null;
@@ -1048,9 +1089,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['password'],
             'password'
         );
-        $groupAlias = self::validateUpdateRequest($r);
+        $authorizedGroups = self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
-        self::validateTargetIdentityBelongsToGroup($identity, $groupAlias);
+        self::validateTargetIdentityBelongsToGroup(
+            $identity,
+            $authorizedGroups,
+            allowTeamUsers: true
+        );
 
         \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $identity->password = \OmegaUp\SecurityTools::hashString(
@@ -1102,18 +1147,23 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param \OmegaUp\Request $r
+     * Validates that the acting identity creator owns the target group or team
+     * group and that an update payload is present.
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return string The validated group alias.
+     * @return array{group: null|\OmegaUp\DAO\VO\Groups, teamGroup: null|\OmegaUp\DAO\VO\TeamGroups}
      *
      * @omegaup-request-param string $group_alias
      * @omegaup-request-param mixed $identities
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $username
      */
-    private static function validateUpdateRequest(\OmegaUp\Request $r): string {
+    private static function validateUpdateRequest(
+        \OmegaUp\Request $r,
+        bool $allowGroups = true,
+        bool $allowTeamGroups = true
+    ): array {
         $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -1124,10 +1174,30 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'group_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Controllers\Group::validateGroupAndOwner(
-            $groupAlias,
-            $r->identity
-        );
+        $group = $allowGroups
+            ? \OmegaUp\DAO\Groups::findByAlias($groupAlias)
+            : null;
+        $teamGroup = $allowTeamGroups
+            ? \OmegaUp\DAO\TeamGroups::getByAlias($groupAlias)
+            : null;
+        if (is_null($group) && is_null($teamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+        $authorizedGroup = (
+            !is_null($group) &&
+            \OmegaUp\Authorization::isGroupAdmin($r->identity, $group)
+        ) ? $group : null;
+        $authorizedTeamGroup = (
+            !is_null($teamGroup) &&
+            \OmegaUp\Authorization::isTeamGroupAdmin($r->identity, $teamGroup)
+        ) ? $teamGroup : null;
+        if (is_null($authorizedGroup) && is_null($authorizedTeamGroup)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
         if (
             !is_array($r['identities']) &&
             !isset($r['username']) &&
@@ -1139,25 +1209,33 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'identities'
             );
         }
-        return $groupAlias;
+        return [
+            'group' => $authorizedGroup,
+            'teamGroup' => $authorizedTeamGroup,
+        ];
     }
 
     /**
-     * Identity creators can only manage the identities that were created for
-     * their own group, whose usernames are namespaced with the group alias
-     * (`<group_alias>:<name>` for groups, `teams:<group_alias>:<name>` for
-     * teams). Without this check, any identity creator could take over an
-     * unrelated account (including a main account) by changing its password or
-     * renaming it to a username inside their group.
+     * Identity creators can only manage unassociated identities that were
+     * originally created inside their own group or team group.
+     *
+     * @param array{group: null|\OmegaUp\DAO\VO\Groups, teamGroup: null|\OmegaUp\DAO\VO\TeamGroups} $authorizedGroups
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateTargetIdentityBelongsToGroup(
         \OmegaUp\DAO\VO\Identities $identity,
-        string $groupAlias,
-        bool $isTeam = false
+        array $authorizedGroups,
+        bool $allowTeamUsers = false
     ): void {
-        if (!self::isGroupManagedIdentity($identity, $groupAlias, $isTeam)) {
+        if (
+            !self::isGroupManagedIdentity(
+                $identity,
+                $authorizedGroups['group'],
+                $authorizedGroups['teamGroup'],
+                $allowTeamUsers
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -1166,20 +1244,41 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
     private static function isGroupManagedIdentity(
         \OmegaUp\DAO\VO\Identities $identity,
-        string $groupAlias,
-        bool $isTeam
+        ?\OmegaUp\DAO\VO\Groups $group,
+        ?\OmegaUp\DAO\VO\TeamGroups $teamGroup,
+        bool $allowTeamUsers
     ): bool {
-        if (!is_null($identity->user_id)) {
+        if (!is_null($identity->user_id) || is_null($identity->identity_id)) {
             return false;
         }
-        $usernameParts = explode(':', strval($identity->username));
-        if ($isTeam) {
-            return count($usernameParts) === 3
-                && $usernameParts[0] === 'teams'
-                && $usernameParts[1] === $groupAlias;
+        if (
+            !is_null($group)
+            && !is_null($group->group_id)
+            && \OmegaUp\DAO\GroupsIdentities::isOriginIdentityInGroup(
+                $identity->identity_id,
+                $group->group_id
+            )
+        ) {
+            return true;
         }
-        return count($usernameParts) === 2
-            && $usernameParts[0] === $groupAlias;
+        if (is_null($teamGroup) || is_null($teamGroup->team_group_id)) {
+            return false;
+        }
+        if (
+            !is_null(
+                \OmegaUp\DAO\Teams::getByTeamGroupIdAndIdentityId(
+                    $teamGroup->team_group_id,
+                    $identity->identity_id
+                )
+            )
+        ) {
+            return true;
+        }
+        return $allowTeamUsers
+            && \OmegaUp\DAO\TeamUsers::isOriginIdentityInTeamGroup(
+                $identity->identity_id,
+                $teamGroup->team_group_id
+            );
     }
 
     public static function validateIdentity(
