@@ -1,7 +1,7 @@
 <template>
   <multiselect
     :value="selectedOptions"
-    class="omegaup-typeahead omegaup-typeahead--multiple"
+    class="omegaup-typeahead omegaup-typeahead--multiple omegaup-multiselect"
     open-direction="bottom"
     :options="visibleOptions"
     :multiple="true"
@@ -103,13 +103,9 @@ export default class MultiTypeahead extends Vue {
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
+@import './omegaup-multiselect';
 
 .omegaup-typeahead {
-  .multiselect__tag,
-  .multiselect__option--highlight {
-    background: $omegaup-primary--darker;
-  }
-
   &.omegaup-typeahead--multiple .multiselect__input {
     position: relative !important;
     width: 100% !important;

@@ -236,6 +236,7 @@
             >
               <vue-multiselect
                 v-model="selectedLanguages"
+                class="omegaup-multiselect"
                 :disabled="readOnly"
                 :options="Object.keys(allLanguages)"
                 :multiple="true"
@@ -626,10 +627,6 @@ export default class CourseDetails extends Vue {
 @import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
-.multiselect__tag {
-  background: var(--multiselect-tag-background-color);
-}
-
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
   border-color: var(--form-input-error-color);
@@ -651,4 +648,9 @@ export default class CourseDetails extends Vue {
 .invalid-date-feedback {
   display: block;
 }
+</style>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+@import '../common/omegaup-multiselect';
 </style>
