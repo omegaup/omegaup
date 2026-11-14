@@ -69,6 +69,7 @@
               :next-submission-timestamp="currentNextSubmissionTimestamp"
               :next-execution-timestamp="currentNextExecutionTimestamp"
               :problem="problemInfo"
+              :bookmarked-status="isCurrentProblemBookmarked"
               :nomination-status="
                 problemInfo ? problemInfo.nominationStatus : null
               "
@@ -105,6 +106,7 @@
               @new-submission-popup-displayed="
                 $emit('new-submission-popup-displayed')
               "
+              @toggle-bookmark="onToggleBookmark"
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -240,8 +242,10 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as api from '../../api';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
+import * as ui from '../../ui';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
@@ -325,6 +329,15 @@ export default class ArenaCourse extends Vue {
   currentNextExecutionTimestamp = this.nextExecutionTimestamp;
   now = new Date();
   INF = '∞';
+  isLoadingBookmark = false;
+
+  get isCurrentProblemBookmarked(): boolean {
+    return Boolean(
+      this.problemInfo &&
+        (this.problemInfo.is_bookmarked ||
+          (this.problemInfo as any).isBookmarked),
+    );
+  }
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -444,6 +457,36 @@ export default class ArenaCourse extends Vue {
 
   onRunExecuted(): void {
     this.$emit('execute-run', { target: this });
+  }
+
+  onToggleBookmark(problemAlias: string): void {
+    if (this.isLoadingBookmark) {
+      return;
+    }
+    this.isLoadingBookmark = true;
+    api.ProblemBookmark.toggle({
+      problem_alias: problemAlias,
+    })
+      .then((response) => {
+        if (this.problemInfo && this.problemInfo.alias === problemAlias) {
+          this.$set(this.problemInfo, 'is_bookmarked', response.bookmarked);
+        }
+        ui.success(
+          response.bookmarked
+            ? T.problemBookmarkAdded
+            : T.problemBookmarkRemoved,
+        );
+        this.$emit('toggle-bookmark', {
+          problemAlias,
+          isBookmarked: response.bookmarked,
+        });
+      })
+      .catch((error) => {
+        ui.apiError(error);
+      })
+      .finally(() => {
+        this.isLoadingBookmark = false;
+      });
   }
 
   @Watch('problem')
