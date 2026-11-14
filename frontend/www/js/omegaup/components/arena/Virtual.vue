@@ -54,34 +54,58 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
 import DateTimePicker from '../DateTimePicker.vue';
 
-@Component({
+export default defineComponent({
+  name: 'ArenaVirtual',
   components: {
     'omegaup-datetimepicker': DateTimePicker,
   },
-})
-export default class ArenaVirtual extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() startTime!: Date;
-  @Prop() finishTime!: Date;
-  @Prop() scoreboard!: string;
-  @Prop() submissionsGap!: number;
-
-  T = T;
-  ui = ui;
-  time = time;
-  virtualContestStartTime = new Date();
-
-  onSubmit(): void {
-    this.$emit('submit', {
-      virtualContestStartTime: this.virtualContestStartTime,
-    });
-  }
-}
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    startTime: {
+      type: Date as PropType<Date>,
+      required: true,
+    },
+    finishTime: {
+      type: Date as PropType<Date>,
+      required: true,
+    },
+    scoreboard: {
+      type: String,
+      required: true,
+    },
+    submissionsGap: {
+      type: Number,
+      required: true,
+    },
+  },
+  emits: ['submit'],
+  data() {
+    return {
+      T,
+      ui,
+      time,
+      virtualContestStartTime: new Date(),
+    };
+  },
+  methods: {
+    onSubmit(): void {
+      this.$emit('submit', {
+        virtualContestStartTime: this.virtualContestStartTime,
+      });
+    },
+  },
+});
 </script>
