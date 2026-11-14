@@ -7,8 +7,8 @@ namespace OmegaUp;
  * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type MaintenanceMessage=array{message: string, type: string}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, isSupportTeamMember: bool, mentorCanChooseCoder: bool, isUnder13User: bool, userVerificationDeadline: \OmegaUp\Timestamp|null, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null, preferredLanguage: string, maintenanceMessage: MaintenanceMessage|null}
- * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, is_under_13_user: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool, api_tokens: list<ApiToken>, verification_deadline: int|null}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentStreak: int, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, isSupportTeamMember: bool, mentorCanChooseCoder: bool, isUnder13User: bool, userVerificationDeadline: \OmegaUp\Timestamp|null, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null, preferredLanguage: string, maintenanceMessage: MaintenanceMessage|null}
+ * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, current_streak: int, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, is_under_13_user: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool, api_tokens: list<ApiToken>, verification_deadline: int|null}
  * @psalm-type RenderCallbackPayload=array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string}
  */
 class UITools {
@@ -184,6 +184,7 @@ class UITools {
             'api_tokens' => $apiTokens,
             'is_under_13_user' => $isUnder13User,
             'user_verification_deadline' => $userVerificationDeadline,
+            'current_streak' => $currentStreak,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => boolval(OMEGAUP_LOCKDOWN),
@@ -210,6 +211,7 @@ class UITools {
                 ''
             ),
             'currentName' => !is_null($identity) ? $identity->name : null,
+            'currentStreak' => $currentStreak,
             'currentEmail' => $email ?? '',
             'associatedIdentities' => $associatedIdentities,
             'apiTokens' => $apiTokens,

@@ -4750,6 +4750,7 @@ contestant's machine and the server.
 | `auth_token`                 | `string`                         |          |
 | `cacheKey`                   | `string`                         |          |
 | `classname`                  | `string`                         | ✓        |
+| `current_streak`             | `number`                         | ✓        |
 | `email`                      | `string`                         |          |
 | `identity`                   | `dao.Identities`                 |          |
 | `is_admin`                   | `boolean`                        | ✓        |
