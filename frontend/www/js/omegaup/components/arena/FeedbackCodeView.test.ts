@@ -36,4 +36,27 @@ describe('FeedbackCodeView.vue', () => {
     expect(wrapper.text()).toContain('four lines;');
     expect(wrapper.find('button').attributes().disabled).not.toBeDefined();
   });
+
+  it('Should only make the gutter editable when it is not readonly', () => {
+    const readonlyWrapper = mount(arena_FeedbackCodeView, {
+      propsData: {
+        language: 'java',
+        value: 'This \ncode \nhas \nfour lines;',
+      },
+    });
+    expect(
+      readonlyWrapper.find('[data-feedback-code-mirror]').classes(),
+    ).not.toContain('editable');
+
+    const editableWrapper = mount(arena_FeedbackCodeView, {
+      propsData: {
+        language: 'java',
+        value: 'This \ncode \nhas \nfour lines;',
+        readonly: false,
+      },
+    });
+    expect(
+      editableWrapper.find('[data-feedback-code-mirror]').classes(),
+    ).toContain('editable');
+  });
 });
