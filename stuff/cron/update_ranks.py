@@ -506,7 +506,6 @@ def update_school_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
-    update_school_of_the_month: bool,
 ) -> None:
     '''Updates the list of candidates to school of the current month'''
     logging.info('Updating the candidates to school of the month...')
@@ -525,13 +524,11 @@ def update_school_of_the_month_candidates(
         first_day_of_current_month
     )
 
-    if update_school_of_the_month:
-        insert_school_of_the_month_candidates(
-            cur, first_day_of_next_month, schools_sql)
-    else:
-        debug_school_of_the_month_candidates(
-            first_day_of_next_month, schools_sql,
-            use_json_format=True)
+    insert_school_of_the_month_candidates(
+        cur, first_day_of_next_month, schools_sql)
+    debug_school_of_the_month_candidates(
+        first_day_of_next_month, schools_sql,
+        use_json_format=True)
 
 
 def debug_school_of_the_month_candidates(
@@ -929,7 +926,6 @@ def update_schools_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
-    update_school_of_the_month: bool,
 ) -> None:
     '''Updates all the information and ranks related to schools'''
     logging.info('Updating schools stats...')
@@ -947,8 +943,7 @@ def update_schools_stats(
             raise
 
         try:
-            update_school_of_the_month_candidates(cur, cur_readonly, date,
-                                                  update_school_of_the_month)
+            update_school_of_the_month_candidates(cur, cur_readonly, date)
         except Exception:  # pylint: disable=broad-except
             logging.exception(
                 'Failed to update candidates to school of the month')
@@ -979,8 +974,6 @@ def main() -> None:
                         type=int,
                         default=100,
                         help='The number of candidates to save in the DB')
-    parser.add_argument('--update-school-of-the-month', action='store_true',
-                        help='Update the School of the month')
     parser.add_argument('--max-rank-churn',
                         type=float,
                         default=0.5,
@@ -1009,8 +1002,7 @@ def main() -> None:
                     update_users_stats(cur, cur_readonly, dbconn.conn, args)
                 with cron_run.phase('update_schools_stats'):
                     update_schools_stats(cur, cur_readonly, dbconn.conn,
-                                         args.date,
-                                         args.update_school_of_the_month)
+                                         args.date)
         finally:
             dbconn.conn.close()
             logging.info('Done')
