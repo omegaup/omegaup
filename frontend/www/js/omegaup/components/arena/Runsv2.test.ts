@@ -1,4 +1,5 @@
 import { mount, createLocalVue } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Runs from './Runsv2.vue';
@@ -83,7 +84,7 @@ describe('Runsv2.vue', () => {
   ];
 
   it('Should handle empty runs', () => {
-    const wrapper = mount(arena_Runs, {
+    const wrapper = mount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         runs: [] as types.Run[],
         problemAlias: 'test-problem-1',
@@ -98,7 +99,7 @@ describe('Runsv2.vue', () => {
   });
 
   it('Should handle AC runs', () => {
-    const wrapper = mount(arena_Runs, {
+    const wrapper = mount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         runs,
         problemAlias: 'test-problem-1',
@@ -141,7 +142,7 @@ describe('Runsv2.vue', () => {
         time: new Date('1/1/2020, 12:05:00 AM'),
       },
     ];
-    const wrapper = mount(arena_Runs, {
+    const wrapper = mount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         runs,
         problemAlias: 'test-problem-1',
@@ -184,7 +185,7 @@ describe('Runsv2.vue', () => {
         time: new Date('1/1/2020, 12:05:00 AM'),
       },
     ];
-    const wrapper = mount(arena_Runs, {
+    const wrapper = mount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         runs,
         problemAlias: 'test-problem-1',
@@ -202,7 +203,7 @@ describe('Runsv2.vue', () => {
   });
 
   it('Should handle the run details button', async () => {
-    const wrapper = mount(arena_Runs, {
+    const wrapper = mount(arena_Runs as ComponentOptions<Vue>, {
       propsData: {
         runs,
         problemAlias: 'test-problem-1',

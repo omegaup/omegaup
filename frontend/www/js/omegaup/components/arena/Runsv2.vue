@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -87,220 +87,235 @@ interface TableRunItem {
   };
 }
 
-@Component({
+export default defineComponent({
+  name: 'Runs',
   components: {
     BIconChevronRight,
     BIconChevronDown,
     BIconQuestionCircleFill,
   },
-})
-export default class Runs extends Vue {
-  @Prop() currentRunDetails!: types.RunDetails | null;
-  @Prop({ default: null }) problemAlias!: string | null;
-  @Prop() runs!: null | types.Run[];
-
-  T = T;
-  time = time;
-  showDetails = false;
-
-  toggleDetails(row: { toggleDetails: () => void; item: TableRunItem }): void {
-    this.showDetails = !this.showDetails;
-    if (this.showDetails) {
-      this.$emit('show-run-details', { guid: row.item.guid });
-    }
-    row.toggleDetails();
-  }
-
-  get filteredRuns(): TableRunItem[] {
-    return this.sortedRuns.map((run) => {
-      return {
-        time: time.formatDateLocalHHMM(run.time),
-        guid: run.guid,
-        language: run.language,
-        memory: this.memory(run),
-        percentage: this.percentage(run),
-        runtime: this.runtime(run),
-        verdict: run.verdict,
-        status: run.status,
-        type: run.type,
-        _cellVariants: {
-          verdict: this.statusClass(run),
+  props: {
+    currentRunDetails: {
+      type: Object as PropType<types.RunDetails | null>,
+      default: null,
+    },
+    problemAlias: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    runs: {
+      type: Array as PropType<types.Run[] | null>,
+      default: null,
+    },
+  },
+  emits: ['show-run-details'],
+  data() {
+    return {
+      T,
+      time,
+      showDetails: false,
+    };
+  },
+  computed: {
+    filteredRuns(): TableRunItem[] {
+      return this.sortedRuns.map((run) => {
+        return {
+          time: time.formatDateLocalHHMM(run.time),
+          guid: run.guid,
+          language: run.language,
+          memory: this.memory(run),
+          percentage: this.percentage(run),
+          runtime: this.runtime(run),
+          verdict: run.verdict,
+          status: run.status,
+          type: run.type,
+          _cellVariants: {
+            verdict: this.statusClass(run),
+          },
+        };
+      });
+    },
+    tableFields(): (string | TableField)[] {
+      return [
+        {
+          label: '',
+          key: 'index',
+          class: 'align-middle',
         },
-      };
-    });
-  }
-
-  get tableFields(): (string | TableField)[] {
-    return [
-      {
-        label: '',
-        key: 'index',
-        class: 'align-middle',
-      },
-      {
-        label: T.wordsTime,
-        key: 'time',
-        class: 'text-center align-middle',
-      },
-      {
-        label: T.runGUID,
-        key: 'guid',
-        class: 'text-center align-middle',
-      },
-      // TODO: Add the participant, contest and problem...
-      {
-        label: T.wordsStatus,
-        key: 'verdict',
-        class: 'text-center align-middle',
-      },
-      // TODO: Add the points and penalty...
-      {
-        label: T.wordsPercentage,
-        key: 'percentage',
-        class: 'align-middle',
-        thClass: 'text-center',
-        tdClass: 'text-right',
-      },
-      {
-        label: T.wordsLanguage,
-        key: 'language',
-        class: 'text-center align-middle',
-      },
-      {
-        label: T.wordsMemory,
-        key: 'memory',
-        class: 'align-middle',
-        thClass: 'text-center',
-        tdClass: 'text-right',
-      },
-      {
-        label: T.wordsRuntime,
-        key: 'runtime',
-        class: 'align-middle',
-        thClass: 'text-center',
-        tdClass: 'text-right',
-      },
-      {
-        label: T.wordsActions,
-        key: 'actions',
-        class: 'text-center align-middle',
-      },
-    ];
-  }
-
-  get sortedRuns(): types.Run[] {
-    if (!this.runs) {
-      return [];
-    }
-    return this.runs
-      .slice()
-      .sort((a, b) => b.time.getTime() - a.time.getTime());
-  }
-
-  memory(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      let prefix = '';
-      if (run.verdict == 'MLE') {
-        prefix = '>';
+        {
+          label: T.wordsTime,
+          key: 'time',
+          class: 'text-center align-middle',
+        },
+        {
+          label: T.runGUID,
+          key: 'guid',
+          class: 'text-center align-middle',
+        },
+        // TODO: Add the participant, contest and problem...
+        {
+          label: T.wordsStatus,
+          key: 'verdict',
+          class: 'text-center align-middle',
+        },
+        // TODO: Add the points and penalty...
+        {
+          label: T.wordsPercentage,
+          key: 'percentage',
+          class: 'align-middle',
+          thClass: 'text-center',
+          tdClass: 'text-right',
+        },
+        {
+          label: T.wordsLanguage,
+          key: 'language',
+          class: 'text-center align-middle',
+        },
+        {
+          label: T.wordsMemory,
+          key: 'memory',
+          class: 'align-middle',
+          thClass: 'text-center',
+          tdClass: 'text-right',
+        },
+        {
+          label: T.wordsRuntime,
+          key: 'runtime',
+          class: 'align-middle',
+          thClass: 'text-center',
+          tdClass: 'text-right',
+        },
+        {
+          label: T.wordsActions,
+          key: 'actions',
+          class: 'text-center align-middle',
+        },
+      ];
+    },
+    sortedRuns(): types.Run[] {
+      if (!this.runs) {
+        return [];
       }
-      return `${prefix}${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
-    } else {
+      return this.runs
+        .slice()
+        .sort((a, b) => b.time.getTime() - a.time.getTime());
+    },
+  },
+  methods: {
+    toggleDetails(row: {
+      toggleDetails: () => void;
+      item: TableRunItem;
+    }): void {
+      this.showDetails = !this.showDetails;
+      if (this.showDetails) {
+        this.$emit('show-run-details', { guid: row.item.guid });
+      }
+      row.toggleDetails();
+    },
+    memory(run: types.Run): string {
+      if (
+        run.status == 'ready' &&
+        run.verdict != 'JE' &&
+        run.verdict != 'VE' &&
+        run.verdict != 'CE'
+      ) {
+        let prefix = '';
+        if (run.verdict == 'MLE') {
+          prefix = '>';
+        }
+        return `${prefix}${(run.memory / (1024 * 1024)).toFixed(2)} MB`;
+      } else {
+        return '—';
+      }
+    },
+    percentage(run: types.Run): string {
+      if (
+        run.status == 'ready' &&
+        run.verdict != 'JE' &&
+        run.verdict != 'VE' &&
+        run.verdict != 'CE'
+      ) {
+        return `${(run.score * 100).toFixed(2)}%`;
+      }
       return '—';
-    }
-  }
-
-  percentage(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      return `${(run.score * 100).toFixed(2)}%`;
-    }
-    return '—';
-  }
-
-  runtime(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      let prefix = '';
+    },
+    runtime(run: types.Run): string {
+      if (
+        run.status == 'ready' &&
+        run.verdict != 'JE' &&
+        run.verdict != 'VE' &&
+        run.verdict != 'CE'
+      ) {
+        let prefix = '';
+        if (run.verdict == 'TLE') {
+          prefix = '>';
+        }
+        return `${prefix}${(run.runtime / 1000).toFixed(2)} s`;
+      }
+      return '—';
+    },
+    statusClass(run: types.Run): string {
+      if (run.status != 'ready') return '';
+      if (run.type == 'disqualified') return 'danger';
+      if (run.verdict == 'AC') {
+        return 'success';
+      }
+      if (run.verdict == 'PA') {
+        return 'info';
+      }
+      if (run.verdict == 'WA') {
+        return 'danger';
+      }
       if (run.verdict == 'TLE') {
-        prefix = '>';
+        return 'warning';
       }
-      return `${prefix}${(run.runtime / 1000).toFixed(2)} s`;
-    }
-    return '—';
-  }
-
-  statusClass(run: types.Run): string {
-    if (run.status != 'ready') return '';
-    if (run.type == 'disqualified') return 'danger';
-    if (run.verdict == 'AC') {
-      return 'success';
-    }
-    if (run.verdict == 'PA') {
-      return 'info';
-    }
-    if (run.verdict == 'WA') {
-      return 'danger';
-    }
-    if (run.verdict == 'TLE') {
-      return 'warning';
-    }
-    if (run.verdict == 'OLE') {
-      return 'warning';
-    }
-    if (run.verdict == 'MLE') {
-      return 'warning';
-    }
-    if (run.verdict == 'RTE') {
-      return 'warning';
-    }
-    if (run.verdict == 'RFE') {
-      return 'warning';
-    }
-    if (run.verdict == 'CE') {
-      return 'warning';
-    }
-    if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return 'danger';
-    }
-    return '';
-  }
-
-  status(run: types.Run): string {
-    if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
-
-    return run.status == 'ready' ? run.verdict : run.status;
-  }
-
-  statusHelp(run: types.Run): string {
-    if (run.status != 'ready' || run.verdict == 'AC') {
+      if (run.verdict == 'OLE') {
+        return 'warning';
+      }
+      if (run.verdict == 'MLE') {
+        return 'warning';
+      }
+      if (run.verdict == 'RTE') {
+        return 'warning';
+      }
+      if (run.verdict == 'RFE') {
+        return 'warning';
+      }
+      if (run.verdict == 'CE') {
+        return 'warning';
+      }
+      if (run.verdict == 'JE' || run.verdict == 'VE') {
+        return 'danger';
+      }
       return '';
-    }
+    },
+    status(run: types.Run): string {
+      if (run.type == 'disqualified') return T.arenaRunsActionsDisqualified;
 
-    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
-      if (run.verdict == 'RTE' || run.verdict == 'RE') {
-        return T.verdictHelpKarelRTE;
-      } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
-        return T.verdictHelpKarelTLE;
+      return run.status == 'ready' ? run.verdict : run.status;
+    },
+    statusHelp(run: types.Run): string {
+      if (run.status != 'ready' || run.verdict == 'AC') {
+        return '';
       }
-    }
-    if (run.type == 'disqualified') return T.verdictHelpDisqualified;
-    const verdict = T[`verdict${run.verdict}`];
-    const verdictHelp = T[`verdictHelp${run.verdict}`];
 
-    return `${verdict}: ${verdictHelp}`;
-  }
-}
+      if (
+        run.language == 'kj' ||
+        run.language == 'kp' ||
+        run.language == 'rk'
+      ) {
+        if (run.verdict == 'RTE' || run.verdict == 'RE') {
+          return T.verdictHelpKarelRTE;
+        } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
+          return T.verdictHelpKarelTLE;
+        }
+      }
+      if (run.type == 'disqualified') return T.verdictHelpDisqualified;
+      const verdict = T[`verdict${run.verdict}`];
+      const verdictHelp = T[`verdictHelp${run.verdict}`];
+
+      return `${verdict}: ${verdictHelp}`;
+    },
+  },
+});
 </script>

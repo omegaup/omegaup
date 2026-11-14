@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 
 import arena_RunSubmitPopup from './RunSubmitPopup.vue';
 import { sourceTemplates } from '../../grader/GraderTemplates';
@@ -28,14 +29,17 @@ describe('RunSubmitPopup.vue', () => {
   it('Should restore a saved language from storage when it is allowed for the current problem', async () => {
     localStorage.setItem('arena:selectedLanguage', 'py3');
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['py3', 'cpp17-gcc'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'cpp17-gcc',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['py3', 'cpp17-gcc'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'cpp17-gcc',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -48,14 +52,17 @@ describe('RunSubmitPopup.vue', () => {
   it('Should fall back to preferredLanguage when the saved language is not allowed', async () => {
     localStorage.setItem('arena:selectedLanguage', 'java');
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['cpp17-gcc'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'cpp17-gcc',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['cpp17-gcc'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'cpp17-gcc',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -68,14 +75,17 @@ describe('RunSubmitPopup.vue', () => {
   it('Should revalidate the restored language after navigating to another problem', async () => {
     localStorage.setItem('arena:selectedLanguage', 'java');
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['java'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'java',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['java'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'java',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -98,14 +108,17 @@ describe('RunSubmitPopup.vue', () => {
   it('Should emit submit-run with the current valid language after navigation', async () => {
     localStorage.setItem('arena:selectedLanguage', 'java');
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['java'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'java',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['java'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'java',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -131,14 +144,17 @@ describe('RunSubmitPopup.vue', () => {
   });
 
   it('Should load the system boilerplate when the user has no custom template', async () => {
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['py3'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'py3',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['py3'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'py3',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -151,14 +167,17 @@ describe('RunSubmitPopup.vue', () => {
   it('Should load the custom template for the selected language', async () => {
     localStorage.setItem('codeTemplates:py', 'print("mine")');
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['py3'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'py3',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['py3'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'py3',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -179,14 +198,17 @@ describe('RunSubmitPopup.vue', () => {
       'int main() { return 0; }',
     );
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['cpp17-gcc'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'cpp17-gcc',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['cpp17-gcc'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'cpp17-gcc',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -199,14 +221,17 @@ describe('RunSubmitPopup.vue', () => {
   it('Should switch between custom template and boilerplate when changing languages', async () => {
     localStorage.setItem('codeTemplates:py', 'print("mine")');
 
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['py3', 'cpp17-gcc'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'py3',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['py3', 'cpp17-gcc'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'py3',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
@@ -226,14 +251,17 @@ describe('RunSubmitPopup.vue', () => {
   });
 
   it('Should persist the newly selected language to storage when the user changes it', async () => {
-    const wrapper = shallowMount(arena_RunSubmitPopup, {
-      attachTo: '#root',
-      propsData: {
-        languages: ['py3', 'cpp17-gcc'],
-        nextSubmissionTimestamp,
-        preferredLanguage: 'py3',
+    const wrapper = shallowMount(
+      arena_RunSubmitPopup as ComponentOptions<Vue>,
+      {
+        attachTo: '#root',
+        propsData: {
+          languages: ['py3', 'cpp17-gcc'],
+          nextSubmissionTimestamp,
+          preferredLanguage: 'py3',
+        },
       },
-    });
+    );
 
     await wrapper.vm.$nextTick();
 
