@@ -200,8 +200,6 @@
 
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
-  --finder-wizard-modal-container-background-color: #eee;
-  --finder-wizard-modal-container-border-color: #ccc;
   --finder-wizard-slider-process-background-color: #678dd7;
   --finder-wizard-tab-select-el-border-color: #678dd7;
   --finder-wizard-tab-select-el-font-color: #678dd7;
@@ -286,6 +284,11 @@
   --user-rank-international-master-font-color: #cb000a;
   --user-basic-info-form-group-border-color: #e9e9e9;
   --user-basic-info-field-data-font-color: #808080;
+
+  // USER OBJECTIVES QUESTIONS
+  --user-objectives-modal-description-font-color: #7a828a;
+  --user-objectives-modal-progress-track-background-color: #d8dce0;
+  --user-objectives-modal-option-border-color: #cfd4da;
 
   // USER API TOKENS
   --user-api-token-card-border-color: #dee2e6;

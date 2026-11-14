@@ -10,10 +10,20 @@
     <p v-if="description" class="text-muted mb-4">{{ description }}</p>
     <slot name="action">
       <template v-if="buttonText">
-        <a v-if="buttonLink" class="btn btn-primary btn-lg" :href="buttonLink">
+        <a
+          v-if="buttonLink"
+          class="btn btn-primary btn-lg"
+          :href="buttonLink"
+          v-bind="buttonDataAttributes"
+        >
           {{ buttonText }}
         </a>
-        <button v-else class="btn btn-primary btn-lg" @click="$emit('action')">
+        <button
+          v-else
+          class="btn btn-primary btn-lg"
+          v-bind="buttonDataAttributes"
+          @click="$emit('action')"
+        >
           {{ buttonText }}
         </button>
       </template>
@@ -22,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -34,18 +44,50 @@ import {
 
 library.add(faUsers, faGraduationCap, faClipboardList, faTerminal);
 
-@Component({
+export default defineComponent({
+  name: 'EmptyState',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class EmptyState extends Vue {
-  @Prop() icon!: string | string[];
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop({ default: '' }) buttonText!: string;
-  @Prop({ default: '' }) buttonLink!: string;
-}
+  props: {
+    icon: {
+      type: [String, Array] as PropType<string | string[]>,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    description: {
+      type: String,
+      default: '',
+    },
+    buttonText: {
+      type: String,
+      default: '',
+    },
+    buttonLink: {
+      type: String,
+      default: '',
+    },
+    buttonDataAttribute: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['action'],
+  computed: {
+    buttonDataAttributes(): { [key: string]: string } {
+      if (!this.buttonDataAttribute) {
+        return {};
+      }
+      const attr = this.buttonDataAttribute.startsWith('data-')
+        ? this.buttonDataAttribute
+        : `data-${this.buttonDataAttribute}`;
+      return { [attr]: '' };
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

@@ -30,6 +30,15 @@ def _convert(value: Any) -> Any:
         return value
 
 
+def _adapt_value(val: Any) -> Any:
+    '''Convert date/datetime parameter to string format suitable for SQLite.'''
+    if isinstance(val, datetime.datetime):
+        return val.strftime(_TIMESTAMP_FORMAT)
+    if isinstance(val, datetime.date):
+        return val.strftime('%Y-%m-%d')
+    return val
+
+
 def connect(*statements: str) -> sqlite3.Connection:
     '''Open an in-memory database and run the given statements.'''
     conn = sqlite3.connect(':memory:')
@@ -45,10 +54,20 @@ class SqliteCursor:
         self._cur = conn.cursor()
         self.calls: List[Tuple[str, Any]] = []
 
+    @staticmethod
+    def _adapt_params(params: Any) -> Tuple[Any, ...]:
+        adapted_params = []
+        for param in (params or ()):
+            if isinstance(param, (list, set, tuple)):
+                adapted_params.append([_adapt_value(p) for p in param])
+            else:
+                adapted_params.append(_adapt_value(param))
+        return tuple(adapted_params)
+
     def execute(self, sql: str, params: Any = None) -> None:
         '''Record the call and run the translated statement.'''
         self.calls.append((sql, params))
-        self._cur.execute(_translate(sql), tuple(params or ()))
+        self._cur.execute(_translate(sql), self._adapt_params(params))
 
     def executemany(self, sql: str, seq_of_params: Iterable[Any]) -> None:
         '''Forward each parameter row through `execute`.'''

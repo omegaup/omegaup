@@ -1453,6 +1453,8 @@ CREATE TABLE `User_Readme_Report_Log` (
   `readme_id` int NOT NULL COMMENT 'README reportado',
   `reporter_user_id` int NOT NULL COMMENT 'Usuario que hizo el reporte',
   `report_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del reporte',
+  `reason` varchar(255) DEFAULT NULL COMMENT 'Motivo por el cual se reportó el README',
+  `detail` text COMMENT 'Detalles adicionales sobre el reporte proporcionados por el usuario',
   PRIMARY KEY (`readme_id`,`reporter_user_id`),
   KEY `readme_id` (`readme_id`),
   KEY `reporter_user_id` (`reporter_user_id`),

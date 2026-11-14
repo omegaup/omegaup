@@ -23,7 +23,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -31,39 +32,53 @@ import * as time from '../../time';
 
 import user_Username from '../user/Username.vue';
 
-@Component({
+function findGeneralFeedback(
+  feedbackOptions: types.SubmissionFeedback[],
+): null | types.SubmissionFeedback {
+  if (!feedbackOptions.length) return null;
+  const [feedback] = feedbackOptions.filter(
+    (feedback) => feedback.range_bytes_start == null,
+  );
+  return feedback;
+}
+
+export default defineComponent({
+  name: 'SubmissionFeedback',
   components: {
     'omegaup-user-username': user_Username,
   },
-})
-export default class SubmissionFeedback extends Vue {
-  @Prop() guid!: string;
-  @Prop({ default: false }) isAdmin!: boolean;
-  @Prop({ default: () => [] }) feedbackOptions!: types.SubmissionFeedback[];
-
-  T = T;
-  ui = ui;
-  time = time;
-
-  get generalFeedback(): null | types.SubmissionFeedback {
-    if (!this.feedbackOptions.length) return null;
-    const [feedback] = this.feedbackOptions.filter(
-      (feedback) => feedback.range_bytes_start == null,
-    );
-    return feedback;
-  }
-}
+  props: {
+    guid: {
+      type: String,
+      required: true,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    feedbackOptions: {
+      type: Array as PropType<types.SubmissionFeedback[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+      time,
+    };
+  },
+  computed: {
+    generalFeedback(): null | types.SubmissionFeedback {
+      return findGeneralFeedback(this.feedbackOptions);
+    },
+  },
+});
 </script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
 .feedback-section {
   margin-top: 1.5em;
-  .form-group {
-    margin-top: 0.5em;
-    button {
-      margin-top: 1em;
-    }
-  }
 }
 </style>

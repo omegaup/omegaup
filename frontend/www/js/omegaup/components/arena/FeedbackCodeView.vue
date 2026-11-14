@@ -59,7 +59,7 @@
 <script lang="ts">
 // TODO: Only display the gutters in the component if the logged-in user is an
 // admin or teaching assistant.
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import CodeMirror from 'codemirror';
@@ -95,6 +95,7 @@ export default class FeedbackCodeView extends Vue {
   mapChangeTracker = 1;
   showReviewPanel = false;
   reviewSummary = '';
+  reviewAwaitingRefresh = false;
 
   get feedbackList(): ArenaCourseFeedback[] {
     if (!this.mapChangeTracker) {
@@ -123,6 +124,7 @@ export default class FeedbackCodeView extends Vue {
       mode: this.mode,
       readOnly: true,
       gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
+      viewportMargin: Infinity,
     };
   }
 
@@ -301,10 +303,22 @@ export default class FeedbackCodeView extends Vue {
   cancelReview(): void {
     this.reviewSummary = '';
     this.showReviewPanel = false;
+    this.reviewAwaitingRefresh = false;
+  }
+
+  @Watch('feedbackMap')
+  onFeedbackMapRefreshed(): void {
+    // course.ts has no success callback. It refreshes feedbackMap after
+    // setFeedbackList resolves; a failed request leaves this map alone.
+    if (!this.reviewAwaitingRefresh) {
+      return;
+    }
+    this.cancelReview();
   }
 
   saveFeedbackList(): void {
     const generalFeedback = this.reviewSummary.trim();
+    this.reviewAwaitingRefresh = true;
     this.$emit('save-feedback-list', {
       feedbackList: this.pendingFeedbackList.flatMap((feedback) => {
         if (!feedback.text?.trim()) {
@@ -314,7 +328,6 @@ export default class FeedbackCodeView extends Vue {
       }),
       generalFeedback: generalFeedback || null,
     });
-    this.cancelReview();
   }
 }
 </script>

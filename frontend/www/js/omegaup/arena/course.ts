@@ -498,12 +498,14 @@ OmegaUp.on('ready', async () => {
                       feedback: response,
                     };
                   }
-                  component.feedbackMap.forEach((feedback) => {
+                  const refreshedFeedbackMap = new Map(this.feedbackMap);
+                  refreshedFeedbackMap.forEach((feedback) => {
                     feedback.submissionFeedbackId = response.find(
                       (fb) => fb.range_bytes_start == feedback.lineNumber,
                     )?.submission_feedback_id;
                     feedback.status = FeedbackStatus.Saved;
                   });
+                  this.feedbackMap = refreshedFeedbackMap;
                 });
 
                 component.currentPopupDisplayed = PopupDisplayed.None;

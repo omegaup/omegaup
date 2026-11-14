@@ -86,6 +86,23 @@ describe('FeedbackCodeView.vue', () => {
         },
       ],
     ]);
+    expect(wrapper.find('[data-review-summary]').exists()).toBe(true);
+    expect(
+      (wrapper.find('[data-review-summary]').element as HTMLTextAreaElement)
+        .value,
+    ).toBe('Looks close.');
+
+    const refreshedFeedbackMap = new Map(feedbackMap);
+    const pending = refreshedFeedbackMap.get(0);
+    if (!pending) {
+      throw new Error('missing pending feedback');
+    }
+    refreshedFeedbackMap.set(0, {
+      ...pending,
+      status: FeedbackStatus.Saved,
+    });
+    await wrapper.setProps({ feedbackMap: refreshedFeedbackMap });
+
     expect(wrapper.find('[data-review-summary]').exists()).toBe(false);
   });
 
@@ -113,5 +130,14 @@ describe('FeedbackCodeView.vue', () => {
         },
       ],
     ]);
+    expect(wrapper.find('[data-review-summary]').exists()).toBe(true);
+    expect(
+      (wrapper.find('[data-review-summary]').element as HTMLTextAreaElement)
+        .value,
+    ).toBe('Nice work.');
+
+    await wrapper.setProps({ feedbackMap: new Map() });
+
+    expect(wrapper.find('[data-review-summary]').exists()).toBe(false);
   });
 });

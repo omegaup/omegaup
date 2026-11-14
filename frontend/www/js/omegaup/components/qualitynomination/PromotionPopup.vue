@@ -1,15 +1,17 @@
 <template>
   <omegaup-overlay-popup @dismiss="onCloseModal(currentView)">
     <transition name="fade">
-      <form data-promotion-popup class="h-auto w-auto" @submit.prevent="">
+      <form data-promotion-popup class="modal-form" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
             <slot name="popup-content" :onSubmit="onSubmit" :onHide="onHide">
-              <p class="h4 font-weight-bold pb-4 text-center w-100">
+              <p class="modal-form__title text-center">
                 {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAc }}
               </p>
-              <div class="form-group w-100">
-                <label class="w-100">{{ T.qualityFormDifficulty }}</label>
+              <div class="modal-form__field">
+                <label class="modal-form__label">{{
+                  T.qualityFormDifficulty
+                }}</label>
                 <div class="container-fluid">
                   <div
                     v-for="difficultyLevel in difficultyLevels"
@@ -28,8 +30,10 @@
                   </div>
                 </div>
               </div>
-              <div class="w-100 mb-3">
-                <label class="mb-2 w-100">{{ T.qualityFormQuality }}</label>
+              <div class="modal-form__field">
+                <label class="modal-form__label">{{
+                  T.qualityFormQuality
+                }}</label>
                 <div class="container-fluid">
                   <div
                     v-for="qualityLevel in qualityLevels"
@@ -47,10 +51,10 @@
                   </div>
                 </div>
               </div>
-              <div class="text-right w-100">
+              <div class="modal-form__actions">
                 <button
                   data-submit-feedback-button
-                  class="col-md-4 mr-2 mb-1 btn btn-primary"
+                  class="btn btn-primary"
                   type="submit"
                   :disabled="!quality && !difficulty"
                   @click="onSubmit"
@@ -58,7 +62,7 @@
                   {{ T.wordsSend }}
                 </button>
                 <button
-                  class="col-md-4 mb-1 btn btn-secondary"
+                  class="btn btn-secondary"
                   type="button"
                   @click="onHide(true)"
                 >
@@ -79,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 import T from '../../lang';
@@ -94,67 +98,79 @@ interface QualityLevel {
   description: string;
 }
 
-@Component({
+export default defineComponent({
+  name: 'QualityPromotionPopup',
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
-})
-export default class QualityPromotionPopup extends Vue {
-  @Prop({ default: false }) solved!: boolean;
-  @Prop({ default: false }) tried!: boolean;
-  @Prop({
-    default: () => [
-      { id: '0', description: T.qualityFormDifficultyVeryEasy },
-      { id: '1', description: T.qualityFormDifficultyEasy },
-      { id: '2', description: T.qualityFormDifficultyMedium },
-      { id: '3', description: T.qualityFormDifficultyHard },
-      { id: '4', description: T.qualityFormDifficultyVeryHard },
-    ],
-  })
-  difficultyLevels!: DifficultyLevel[];
-  @Prop({
-    default: () => [
-      { id: '0', description: T.qualityFormQualityVeryBad },
-      { id: '1', description: T.qualityFormQualityBad },
-      { id: '2', description: T.qualityFormQualityFair },
-      { id: '3', description: T.qualityFormQualityGood },
-      { id: '4', description: T.qualityFormQualityVeryGood },
-    ],
-  })
-  qualityLevels!: QualityLevel[];
+  props: {
+    solved: {
+      type: Boolean,
+      default: false,
+    },
+    tried: {
+      type: Boolean,
+      default: false,
+    },
+    difficultyLevels: {
+      type: Array as PropType<DifficultyLevel[]>,
+      default: () => [
+        { id: '0', description: T.qualityFormDifficultyVeryEasy },
+        { id: '1', description: T.qualityFormDifficultyEasy },
+        { id: '2', description: T.qualityFormDifficultyMedium },
+        { id: '3', description: T.qualityFormDifficultyHard },
+        { id: '4', description: T.qualityFormDifficultyVeryHard },
+      ],
+    },
+    qualityLevels: {
+      type: Array as PropType<QualityLevel[]>,
+      default: () => [
+        { id: '0', description: T.qualityFormQualityVeryBad },
+        { id: '1', description: T.qualityFormQualityBad },
+        { id: '2', description: T.qualityFormQualityFair },
+        { id: '3', description: T.qualityFormQualityGood },
+        { id: '4', description: T.qualityFormQualityVeryGood },
+      ],
+    },
+  },
+  emits: ['dismiss', 'submit'],
+  data() {
+    return {
+      AvailableViews,
+      T,
+      currentView: AvailableViews.Content as AvailableViews,
+      difficulty: '',
+      quality: '',
+    };
+  },
+  methods: {
+    onCloseModal(currentView: AvailableViews): void {
+      if (currentView !== AvailableViews.Thanks) {
+        this.onDismiss();
+        return;
+      }
+      this.onHide(false);
+    },
 
-  AvailableViews = AvailableViews;
-  T = T;
-  currentView: AvailableViews = AvailableViews.Content;
-  difficulty = '';
-  quality = '';
+    onHide(isDismissed: boolean): void {
+      this.$emit('dismiss', this, isDismissed);
+    },
 
-  onCloseModal(currentView: AvailableViews): void {
-    if (currentView !== AvailableViews.Thanks) {
-      this.onDismiss();
-      return;
-    }
-    this.onHide(false);
-  }
+    onDismiss(): void {
+      this.$emit('dismiss', this, /*isDismissed=*/ true);
+    },
 
-  onHide(isDismissed: boolean): void {
-    this.$emit('dismiss', this, isDismissed);
-  }
+    onSubmit(): void {
+      this.$emit('submit', {
+        solved: this.solved,
+        tried: this.tried,
+        difficulty: this.difficulty,
+        quality: this.quality,
+      });
+      this.currentView = AvailableViews.Thanks;
 
-  onDismiss(): void {
-    this.$emit('dismiss', this, /*isDismissed=*/ true);
-  }
-
-  onSubmit(): void {
-    this.$emit('submit', {
-      solved: this.solved,
-      tried: this.tried,
-      difficulty: this.difficulty,
-      quality: this.quality,
-    });
-    this.currentView = AvailableViews.Thanks;
-
-    setTimeout(() => this.onHide(false), 2000);
-  }
-}
+      setTimeout(() => this.onHide(false), 2000);
+    },
+  },
+});
 </script>

@@ -205,6 +205,23 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame(1, $response['ranking'][0]['problems'][1]['runs']);
 
+        $this->assertArrayHasKey(
+            'first_solved',
+            $response['ranking'][0]['problems'][0]
+        );
+        $this->assertArrayHasKey(
+            'first_solved',
+            $response['ranking'][1]['problems'][0]
+        );
+        $this->assertArrayNotHasKey(
+            'first_solved',
+            $response['ranking'][2]['problems'][0]
+        );
+        $this->assertLessThan(
+            $response['ranking'][1]['problems'][0]['first_solved'],
+            $response['ranking'][0]['problems'][0]['first_solved']
+        );
+
         // Now get the scoreboard as an contest director
         $login = self::login($testData['contestData']['director']);
         $r = new \OmegaUp\Request([
