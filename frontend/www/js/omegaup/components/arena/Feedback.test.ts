@@ -1,3 +1,4 @@
+import { ComponentOptions } from 'vue';
 import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 
@@ -14,7 +15,7 @@ const feedback: ArenaCourseFeedback = {
 
 describe('Feedback.vue', () => {
   it('Should handle feedback component when form is sumbitted', async () => {
-    const wrapper = shallowMount(arena_Feedback, {
+    const wrapper = shallowMount(arena_Feedback as ComponentOptions<Vue>, {
       propsData: {
         feedback,
       },
@@ -50,7 +51,7 @@ describe('Feedback.vue', () => {
   });
 
   it('Should handle feedback component when form is cancelled', async () => {
-    const wrapper = shallowMount(arena_Feedback, {
+    const wrapper = shallowMount(arena_Feedback as ComponentOptions<Vue>, {
       propsData: {
         feedback,
       },

@@ -73,69 +73,85 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
-@Component({
+export default defineComponent({
+  name: 'NewClarificationPopup',
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
-})
-export default class ArenaNewClarificationPopup extends Vue {
-  @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
-  @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problemAlias!: null | string;
-  @Prop({ default: null }) username!: null | string;
-
-  T = T;
-  message: null | string = null;
-  currentProblemAlias = this.problemAlias;
-  currentUsername = this.username;
-
-  get filteredUsers(): { username: string; name: string }[] {
-    return this.users.map((user) => {
-      return {
-        username: user.username,
-        name: !user.is_owner ? user.username : T.wordsPublic,
-      };
-    });
-  }
-
-  get ownerUsername(): null | string {
-    return this.users.find((user) => user.is_owner)?.username ?? null;
-  }
-
-  get canSubmitClarification(): boolean {
-    return (
-      this.message != null &&
-      (this.currentUsername != null || this.users.length == 0) &&
-      this.currentProblemAlias != null
-    );
-  }
-
-  onSubmit(): void {
-    if (this.currentProblemAlias == null || this.message == null) return;
-    const clarificationRequest: types.Clarification = {
-      clarification_id: 0,
-      author: this.currentUsername ?? '',
-      problem_alias: this.currentProblemAlias,
-      message: this.message,
-      public:
-        this.ownerUsername != null &&
-        this.currentUsername != null &&
-        this.ownerUsername == this.currentUsername,
-      time: new Date(),
+  props: {
+    problems: {
+      type: Array as PropType<types.NavbarProblemsetProblem[]>,
+      default: () => [],
+    },
+    users: {
+      type: Array as PropType<types.ContestUser[]>,
+      default: () => [],
+    },
+    problemAlias: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    username: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+  },
+  emits: ['dismiss', 'new-clarification'],
+  data() {
+    return {
+      T,
+      message: null as null | string,
+      currentProblemAlias: this.problemAlias,
+      currentUsername: this.username,
     };
-    this.$emit('new-clarification', {
-      clarification: clarificationRequest,
-      clearForm: () => this.clearForm(),
-    });
-  }
-
-  clearForm(): void {
-    this.$emit('dismiss');
-  }
-}
+  },
+  computed: {
+    filteredUsers(): { username: string; name: string }[] {
+      return this.users.map((user) => {
+        return {
+          username: user.username,
+          name: !user.is_owner ? user.username : T.wordsPublic,
+        };
+      });
+    },
+    ownerUsername(): null | string {
+      return this.users.find((user) => user.is_owner)?.username ?? null;
+    },
+    canSubmitClarification(): boolean {
+      return (
+        this.message != null &&
+        (this.currentUsername != null || this.users.length == 0) &&
+        this.currentProblemAlias != null
+      );
+    },
+  },
+  methods: {
+    onSubmit(): void {
+      if (this.currentProblemAlias == null || this.message == null) return;
+      const clarificationRequest: types.Clarification = {
+        clarification_id: 0,
+        author: this.currentUsername ?? '',
+        problem_alias: this.currentProblemAlias,
+        message: this.message,
+        public:
+          this.ownerUsername != null &&
+          this.currentUsername != null &&
+          this.ownerUsername == this.currentUsername,
+        time: new Date(),
+      };
+      this.$emit('new-clarification', {
+        clarification: clarificationRequest,
+        clearForm: () => this.clearForm(),
+      });
+    },
+    clearForm(): void {
+      this.$emit('dismiss');
+    },
+  },
+});
 </script>
