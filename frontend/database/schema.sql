@@ -557,16 +557,18 @@ CREATE TABLE `Groups_` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Groups_Identities` (
-  `group_id` int NOT NULL,
-  `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
-  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
+  `group_id` int NOT NULL COMMENT 'Id del grupo',
+  `identity_id` int NOT NULL COMMENT 'Id de la identidad miembro del grupo',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta de la identidad miembro sobre si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
-  `accept_teacher` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
-  `is_invited` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad ingresará al curso por invitación o le fue compartido el link del curso abierto con registro',
+  `accept_teacher` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta de la identidad miembro sobre si acepta al organizador como su maestro.',
+  `is_invited` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad ingresó al grupo por invitación o mediante registro abierto',
+  `is_origin` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad fue creada originalmente en este grupo',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),
   KEY `fk_gipc_privacystatement_consent_id` (`privacystatement_consent_id`),
+  KEY `idx_groups_identities_origin` (`identity_id`,`is_origin`),
   CONSTRAINT `fk_gii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_gipc_privacystatement_consent_id` FOREIGN KEY (`privacystatement_consent_id`) REFERENCES `PrivacyStatement_Consent_Log` (`privacystatement_consent_id`),
   CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`)
@@ -1373,9 +1375,11 @@ CREATE TABLE `Team_Groups` (
 CREATE TABLE `Team_Users` (
   `team_id` int NOT NULL,
   `identity_id` int NOT NULL COMMENT 'Id de la identidad que pertenece al equipo',
+  `is_origin` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad fue creada originalmente en este equipo',
   PRIMARY KEY (`team_id`,`identity_id`),
   KEY `team_id` (`team_id`),
   KEY `identity_id` (`identity_id`),
+  KEY `idx_team_users_origin` (`identity_id`,`is_origin`),
   CONSTRAINT `fk_tui_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
