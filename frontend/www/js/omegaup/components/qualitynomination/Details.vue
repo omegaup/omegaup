@@ -125,7 +125,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import confirmation from '../common/Confirmation.vue';
@@ -136,45 +136,80 @@ interface QualityNominationContents {
   reason: string;
 }
 
-@Component({
+export default defineComponent({
+  name: 'QualityNominationDetails',
   components: {
     'omegaup-common-confirmation': confirmation,
   },
-})
-export default class QualityNominationDetails extends Vue {
-  @Prop() author!: omegaup.User;
-  @Prop() contents!: QualityNominationContents;
-  @Prop() initialRationale!: string;
-  @Prop() nomination!: string;
-  @Prop() nominator!: omegaup.User;
-  @Prop() problem!: omegaup.Problem;
-  @Prop() qualitynomination_id!: number;
-  @Prop() reviewer!: boolean;
-  @Prop() votes!: omegaup.NominationVote[];
-
-  T = T;
-  rationale = this.initialRationale;
-  showConfirmation = false;
-  status = 'banned';
-
-  userUrl(alias: string): string {
-    return `/profile/${alias}/`;
-  }
-
-  problemUrl(alias: string): string {
-    return `/arena/problem/${alias}/`;
-  }
-
-  markResolution(all: boolean): void {
-    this.showConfirmation = false;
-    this.$emit('mark-resolution', this, this.status, all);
-  }
-
-  showConfirmationDialog(status: string): void {
-    this.status = status;
-    this.showConfirmation = true;
-  }
-}
+  props: {
+    author: {
+      type: Object as PropType<omegaup.User>,
+      required: true,
+    },
+    contents: {
+      type: Object as PropType<QualityNominationContents>,
+      required: true,
+    },
+    initialRationale: {
+      type: String,
+      default: '',
+    },
+    nomination: {
+      type: String,
+      required: true,
+    },
+    nominator: {
+      type: Object as PropType<omegaup.User>,
+      required: true,
+    },
+    problem: {
+      type: Object as PropType<omegaup.Problem>,
+      required: true,
+    },
+    qualitynominationId: {
+      type: Number,
+      required: true,
+    },
+    reviewer: {
+      type: Boolean,
+      default: false,
+    },
+    votes: {
+      type: Array as PropType<omegaup.NominationVote[]>,
+      default: () => [],
+    },
+  },
+  emits: ['mark-resolution'],
+  data() {
+    return {
+      T,
+      rationale: this.initialRationale ?? '',
+      showConfirmation: false,
+      status: 'banned',
+    };
+  },
+  computed: {
+    qualitynomination_id(): number {
+      return this.qualitynominationId;
+    },
+  },
+  methods: {
+    userUrl(alias: string): string {
+      return `/profile/${alias}/`;
+    },
+    problemUrl(alias: string): string {
+      return `/arena/problem/${alias}/`;
+    },
+    markResolution(all: boolean): void {
+      this.showConfirmation = false;
+      this.$emit('mark-resolution', this, this.status, all);
+    },
+    showConfirmationDialog(status: string): void {
+      this.status = status;
+      this.showConfirmation = true;
+    },
+  },
+});
 </script>
 
 <style>
