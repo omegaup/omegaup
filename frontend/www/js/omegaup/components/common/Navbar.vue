@@ -11,12 +11,13 @@
           :title="logoTooltip"
           @click.prevent="handleLogoClick"
         >
-          <img
-            alt="omegaUp"
-            src="/media/omegaup_curves.png"
-            height="20"
-            class="d-inline-block"
-          />
+          <span class="navbar-logo" aria-label="omegaUp">
+            <span class="navbar-logo-symbol" aria-hidden="true">Ω</span>
+            <span class="navbar-logo-wordmark"
+              ><span class="navbar-logo-omega">omega</span
+              ><span class="navbar-logo-up">Up</span></span
+            >
+          </span>
           <img
             v-show="omegaUpLockDown"
             alt="lockdown"
@@ -599,9 +600,31 @@ export default class Navbar extends Vue {
 
 nav.navbar {
   background-color: var(--header-primary-color);
+  border-bottom: 0.8px solid var(--header-border-color);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  display: block;
+  top: 0;
+  z-index: 50;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  backdrop-filter: blur(12px);
+
+  > .container-xl {
+    max-width: 80rem;
+    height: 56px;
+    margin-right: auto;
+    margin-left: auto;
+    align-items: center;
+  }
 
   .navbar-brand {
-    background-color: var(--header-navbar-brand-background-color);
+    background-color: transparent;
+    display: inline-flex;
+    align-items: center;
   }
 
   .navbar-brand img {
@@ -610,6 +633,42 @@ nav.navbar {
 
   .navbar-brand:hover img {
     transform: scale(1.08);
+  }
+
+  .navbar-logo {
+    display: inline-flex;
+    align-items: center;
+    color: rgb(255, 255, 255);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .navbar-logo-symbol {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+    color: var(--header-primary-color);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .navbar-logo-wordmark {
+    font-size: 20px;
+    letter-spacing: -0.04em;
+  }
+
+  .navbar-logo-omega {
+    color: rgb(0, 0, 0);
+  }
+
+  .navbar-logo-up {
+    color: rgb(255, 255, 255);
   }
 
   .navbar-nav .nav-link {
@@ -642,7 +701,7 @@ nav.navbar {
 
   a,
   span.nav-link {
-    color: var(--header-navbar-primary-link-color);
+    color: rgb(255, 255, 255);
   }
 
   .dropdown-menu {

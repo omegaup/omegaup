@@ -1,31 +1,6 @@
 <template>
-  <div>
-    <ul class="nav nav-tabs mb-3" role="tablist">
-      <li class="nav-item" role="presentation">
-        <a
-          :href="`#${AvailableTabs.Login}`"
-          class="nav-link"
-          :class="{ active: activeTab === AvailableTabs.Login }"
-          role="tab"
-          @click.prevent="setActiveTab(AvailableTabs.Login)"
-        >
-          {{ T.omegaupTitleLogin }}
-        </a>
-      </li>
-      <li class="nav-item" role="presentation">
-        <a
-          :href="`#${AvailableTabs.Signup}`"
-          class="nav-link"
-          :class="{ active: activeTab === AvailableTabs.Signup }"
-          role="tab"
-          @click.prevent="setActiveTab(AvailableTabs.Signup)"
-        >
-          {{ T.loginSignUp }}
-        </a>
-      </li>
-    </ul>
-
-    <div class="tab-content">
+  <div class="signin-page-wrapper">
+    <div class="tab-content w-100">
       <div
         v-show="activeTab === AvailableTabs.Login"
         class="tab-pane"
@@ -38,6 +13,7 @@
           :github-client-id="githubClientId"
           :github-state="githubState"
           :google-client-id="googleClientId"
+          @change-tab="setActiveTab"
           @login="(username, password) => $emit('login', username, password)"
         >
         </omegaup-login>
@@ -54,6 +30,7 @@
           :active-tab="activeTab"
           :validate-recaptcha="validateRecaptcha"
           :use-signup-form-with-birth-date="useSignupFormWithBirthDate"
+          @change-tab="setActiveTab"
           @register-and-login="
             (request) => $emit('register-and-login', request)
           "
@@ -112,52 +89,27 @@ export default class Signin extends Vue {
 <style scoped lang="scss">
 @import '../../../../sass/main.scss';
 
-.nav-tabs {
-  border-bottom: 1px solid var(--signin-nav-tabs-border-color);
+.signin-page-wrapper {
   display: flex;
-  margin-bottom: 0;
-}
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px 16px;
 
-.nav-item {
-  list-style: none;
-}
-
-.nav-link {
-  color: var(--signin-nav-link-color);
-  background-color: var(--signin-nav-link-background-color);
-  border: 1px solid var(--signin-nav-tabs-border-color);
-  border-bottom: none;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
-  text-decoration: none;
-  display: block;
-}
-
-.nav-link:hover {
-  background-color: var(--signin-nav-link-hover-background-color);
-  color: var(--signin-nav-link-hover-color);
-}
-
-.nav-link.active {
-  color: var(--signin-nav-link-active-color);
-  background-color: var(--signin-nav-link-active-background-color);
-  border-color: var(--signin-nav-tabs-border-color)
-    var(--signin-nav-tabs-border-color)
-    var(--signin-nav-link-active-background-color);
-  position: relative;
-  z-index: 1;
-  margin-bottom: -1px;
+  @media (max-width: 768px) {
+    padding: 20px 12px;
+  }
 }
 
 .tab-content {
   margin-top: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .tab-pane {
   display: block;
+  width: 100%;
 }
 </style>
