@@ -20,6 +20,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
+ * @psalm-type FollowUser=array{classname: string, name: null|string, username: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
  * @psalm-type UserRankTableLoggedOutPayload=array{isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
  * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
@@ -106,6 +107,9 @@ class User extends \OmegaUp\Controllers\Controller {
     ];
 
     const README_REPORT_THRESHOLD = 10;
+
+    const FOLLOW_LIST_PAGE_SIZE_DEFAULT = 20;
+    const MAX_FOLLOW_LIST_PAGE_SIZE = 100;
 
     // User types
     const USER_TYPE_STUDENT = 'student';
@@ -3559,6 +3563,165 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
         ];
+    }
+
+    /**
+     * Makes the current user follow the given user.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $username
+     */
+    public static function apiFollow(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        $followedUserId = self::resolveFollowTargetUserId($r);
+        if ($followedUserId === $r->user->user_id) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'cannotFollowYourself'
+            );
+        }
+
+        try {
+            \OmegaUp\DAO\UsersFollowers::create(
+                new \OmegaUp\DAO\VO\UsersFollowers([
+                    'follower_user_id' => $r->user->user_id,
+                    'followed_user_id' => $followedUserId,
+                    'created_at' => new \OmegaUp\Timestamp(
+                        \OmegaUp\Time::get()
+                    ),
+                ])
+            );
+        } catch (\Exception $e) {
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'userAlreadyFollowed',
+                    $e
+                );
+            }
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Makes the current user stop following the given user.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $username
+     */
+    public static function apiUnfollow(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\DAO\UsersFollowers::unfollow(
+            $r->user->user_id,
+            self::resolveFollowTargetUserId($r)
+        );
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Gets the users that follow the given user, most recent first.
+     *
+     * @return array{followers: list<FollowUser>, totalRows: int}
+     *
+     * @omegaup-request-param null|int $page
+     * @omegaup-request-param null|int $rowcount
+     * @omegaup-request-param string $username
+     */
+    public static function apiFollowers(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        return \OmegaUp\DAO\UsersFollowers::getFollowers(
+            self::resolveFollowTargetUserId($r),
+            $r->ensureOptionalInt('page', 1) ?? 1,
+            $r->ensureOptionalInt(
+                'rowcount',
+                1,
+                self::MAX_FOLLOW_LIST_PAGE_SIZE
+            ) ?? self::FOLLOW_LIST_PAGE_SIZE_DEFAULT
+        );
+    }
+
+    /**
+     * Gets the users the given user follows, most recent first.
+     *
+     * @return array{following: list<FollowUser>, totalRows: int}
+     *
+     * @omegaup-request-param null|int $page
+     * @omegaup-request-param null|int $rowcount
+     * @omegaup-request-param string $username
+     */
+    public static function apiFollowing(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        return \OmegaUp\DAO\UsersFollowers::getFollowing(
+            self::resolveFollowTargetUserId($r),
+            $r->ensureOptionalInt('page', 1) ?? 1,
+            $r->ensureOptionalInt(
+                'rowcount',
+                1,
+                self::MAX_FOLLOW_LIST_PAGE_SIZE
+            ) ?? self::FOLLOW_LIST_PAGE_SIZE_DEFAULT
+        );
+    }
+
+    /**
+     * Gets the follow counters for the given user, plus whether the current
+     * user follows them. Intended for rendering a profile's follow button.
+     *
+     * @return array{followersCount: int, followingCount: int, isFollowing: bool}
+     *
+     * @omegaup-request-param string $username
+     */
+    public static function apiFollowStatus(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        $profileUserId = self::resolveFollowTargetUserId($r);
+        $isFollowing = false;
+        if (!is_null($r->user) && !is_null($r->user->user_id)) {
+            $isFollowing = \OmegaUp\DAO\UsersFollowers::isFollowing(
+                $r->user->user_id,
+                $profileUserId
+            );
+        }
+
+        $counts = \OmegaUp\DAO\UsersFollowers::getCounts($profileUserId);
+        return [
+            'followersCount' => $counts['followersCount'],
+            'followingCount' => $counts['followingCount'],
+            'isFollowing' => $isFollowing,
+        ];
+    }
+
+    /**
+     * Resolves the user a follow endpoint acts upon.
+     *
+     * @omegaup-request-param string $username
+     */
+    private static function resolveFollowTargetUserId(
+        \OmegaUp\Request $r
+    ): int {
+        $r->ensureString(
+            'username',
+            fn(string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        return $user->user_id;
     }
 
     /**

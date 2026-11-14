@@ -21,33 +21,48 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
 export enum ToggleSwitchSize {
   Small = 'small',
   Large = 'large',
 }
 
-@Component
-export default class ToggleSwitch extends Vue {
-  @Prop({ default: 'Check' }) textDescription!: string;
-  @Prop({ default: true }) checkedValue!: boolean;
-  @Prop({ default: ToggleSwitchSize.Large }) size!: ToggleSwitchSize;
-  @Prop({ default: false }) disabled!: boolean;
-
-  currentCheckedValue = this.checkedValue;
-
-  @Watch('currentCheckedValue')
-  @Emit('update:value')
-  onUpdateInput(newValue: boolean): boolean {
-    return newValue;
-  }
-
-  @Watch('checkedValue')
-  onCheckedValueChanged(newValue: boolean): void {
-    this.currentCheckedValue = newValue;
-  }
-}
+export default defineComponent({
+  name: 'ToggleSwitch',
+  props: {
+    textDescription: {
+      type: String,
+      default: 'Check',
+    },
+    checkedValue: {
+      type: Boolean,
+      default: true,
+    },
+    size: {
+      type: String as PropType<ToggleSwitchSize>,
+      default: ToggleSwitchSize.Large,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      currentCheckedValue: this.checkedValue,
+    };
+  },
+  watch: {
+    currentCheckedValue(newValue: boolean): void {
+      this.$emit('update:value', newValue);
+    },
+    checkedValue(newValue: boolean): void {
+      this.currentCheckedValue = newValue;
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
