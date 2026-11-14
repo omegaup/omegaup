@@ -1,11 +1,15 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 import T from '../lang';
 
 import omegaup_RadioSwitch from './RadioSwitch.vue';
 
+const RadioSwitch = omegaup_RadioSwitch as ComponentOptions<Vue>;
+
 describe('RadioSwitch.vue', () => {
   it('Should render a simple radio switch with default descriptions', () => {
-    const wrapper = shallowMount(omegaup_RadioSwitch, {
+    const wrapper = shallowMount(RadioSwitch, {
       propsData: {
         selectedValue: true,
       },
@@ -15,7 +19,7 @@ describe('RadioSwitch.vue', () => {
   });
 
   it('Should render a simple radio switch with custom descriptions', () => {
-    const wrapper = shallowMount(omegaup_RadioSwitch, {
+    const wrapper = shallowMount(RadioSwitch, {
       propsData: {
         selectedValue: true,
         textForTrue: 'Red',
@@ -26,5 +30,17 @@ describe('RadioSwitch.vue', () => {
     expect(wrapper.text()).toContain('Yellow');
     expect(wrapper.text()).not.toContain(T.wordsYes);
     expect(wrapper.text()).not.toContain(T.wordsNo);
+  });
+
+  it('Should emit update:value once with the selected value', async () => {
+    const wrapper = shallowMount(RadioSwitch, {
+      propsData: {
+        selectedValue: false,
+      },
+    });
+
+    await wrapper.findAll('input[type="radio"]').at(0).setChecked();
+
+    expect(wrapper.emitted('update:value')).toEqual([[true]]);
   });
 });

@@ -1644,6 +1644,15 @@ export namespace types {
             return x;
           });
         })(x.problemHealthFindings);
+        x.recommendationModelRuns = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+            return x;
+          });
+        })(x.recommendationModelRuns);
         x.runs = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1907,6 +1916,14 @@ export namespace types {
     export function LoginDetailsPayload(
       elementId: string = 'payload',
     ): types.LoginDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function OperationsDashboardPayload(
+      elementId: string = 'payload',
+    ): types.OperationsDashboardPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
@@ -3904,6 +3921,7 @@ export namespace types {
   export interface CronsDetailsPayload {
     jobs: types.CronJob[];
     problemHealthFindings: types.ProblemHealthFinding[];
+    recommendationModelRuns: types.RecommendationModelRun[];
     runs: types.CronRun[];
   }
 
@@ -3970,6 +3988,12 @@ export namespace types {
     progress?: number;
     school_name?: string;
     start_time: Date;
+  }
+
+  export interface FollowUser {
+    classname: string;
+    name?: string;
+    username: string;
   }
 
   export interface FullIDEPayload {
@@ -4298,6 +4322,12 @@ export namespace types {
     status?: string;
     type: string;
     url?: string;
+  }
+
+  export interface OperationsDashboardPayload {
+    accessLevel: string;
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
   }
 
   export interface PageItem {
@@ -4763,6 +4793,17 @@ export namespace types {
   export interface Progress {
     max_score: number;
     score: number;
+  }
+
+  export interface RecommendationModelRun {
+    created_at: Date;
+    dataset_size: number;
+    map_score: number;
+    model_run_id: number;
+    output_path?: string;
+    published: boolean;
+    rng_seed?: number;
+    skip_reason?: string;
   }
 
   export interface Run {
@@ -5509,6 +5550,7 @@ export namespace messages {
   export type AdminGetCronsResponse = {
     jobs: types.CronJob[];
     problemHealthFindings: types.ProblemHealthFinding[];
+    recommendationModelRuns: types.RecommendationModelRun[];
     runs: types.CronRun[];
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
@@ -6438,6 +6480,24 @@ export namespace messages {
     verified: boolean;
     within_last_day: boolean;
   };
+  export type UserFollowRequest = { [key: string]: any };
+  export type UserFollowResponse = {};
+  export type UserFollowStatusRequest = { [key: string]: any };
+  export type UserFollowStatusResponse = {
+    followersCount: number;
+    followingCount: number;
+    isFollowing: boolean;
+  };
+  export type UserFollowersRequest = { [key: string]: any };
+  export type UserFollowersResponse = {
+    followers: types.FollowUser[];
+    totalRows: number;
+  };
+  export type UserFollowingRequest = { [key: string]: any };
+  export type UserFollowingResponse = {
+    following: types.FollowUser[];
+    totalRows: number;
+  };
   export type UserGenerateGitTokenRequest = { [key: string]: any };
   export type UserGenerateGitTokenResponse = { token: string };
   export type UserGenerateOmiUsersRequest = { [key: string]: any };
@@ -6505,6 +6565,8 @@ export namespace messages {
     username: string;
     verified: boolean;
   };
+  export type UserUnfollowRequest = { [key: string]: any };
+  export type UserUnfollowResponse = {};
   export type UserUpdateRequest = { [key: string]: any };
   export type UserUpdateResponse = {};
   export type UserUpdateBasicInfoRequest = { [key: string]: any };
@@ -7339,6 +7401,18 @@ export namespace controllers {
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
+    follow: (
+      params?: messages.UserFollowRequest,
+    ) => Promise<messages.UserFollowResponse>;
+    followStatus: (
+      params?: messages.UserFollowStatusRequest,
+    ) => Promise<messages.UserFollowStatusResponse>;
+    followers: (
+      params?: messages.UserFollowersRequest,
+    ) => Promise<messages.UserFollowersResponse>;
+    following: (
+      params?: messages.UserFollowingRequest,
+    ) => Promise<messages.UserFollowingResponse>;
     generateGitToken: (
       params?: messages.UserGenerateGitTokenRequest,
     ) => Promise<messages.UserGenerateGitTokenResponse>;
@@ -7405,6 +7479,9 @@ export namespace controllers {
     statusVerified: (
       params?: messages.UserStatusVerifiedRequest,
     ) => Promise<messages.UserStatusVerifiedResponse>;
+    unfollow: (
+      params?: messages.UserUnfollowRequest,
+    ) => Promise<messages.UserUnfollowResponse>;
     update: (
       params?: messages.UserUpdateRequest,
     ) => Promise<messages.UserUpdateResponse>;

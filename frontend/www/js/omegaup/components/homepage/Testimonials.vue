@@ -60,15 +60,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import testimonialsConfig from '../../testimonials.config';
 
-@Component
-export default class Testimonials extends Vue {
-  T = T;
-  testimonials = testimonialsConfig;
-}
+export default defineComponent({
+  name: 'HomepageTestimonials',
+  data() {
+    return {
+      T,
+      testimonials: testimonialsConfig,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>

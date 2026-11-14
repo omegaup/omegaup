@@ -239,8 +239,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import type { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -259,252 +260,255 @@ interface ModalRef {
   hide(): void;
 }
 
-@Component({
+function getEmptyItem(): types.CarouselItem {
+  return {
+    carousel_item_id: 0,
+    title: '',
+    excerpt: '',
+    image_url: '',
+    link: '',
+    button_title: '',
+    is_active: true,
+  };
+}
+
+export default defineComponent({
+  name: 'AdminCarousel',
   components: {
     'font-awesome-icon': FontAwesomeIcon,
   },
-})
-export default class Carousel extends Vue {
-  @Prop() carouselItems!: types.CarouselItem[];
-  @Ref('carouselItemModal') readonly carouselItemModal!: ModalRef;
-  @Ref('carouselForm') readonly carouselForm!: HTMLFormElement;
-
-  T = T;
-  time = time;
-  isEditing = false;
-  currentItem: types.CarouselItem = this.getEmptyItem();
-  expirationDateInput = '';
-  currentLanguage = 'en';
-  editingLanguage = 'en';
-  currentStatusFilter = 'active';
-  languages = [
-    { code: 'en', name: T.wordsEnglish },
-    { code: 'es', name: T.wordsSpanish },
-    { code: 'pt', name: T.wordsPortuguese },
-  ];
-  multilingualData: MultilingualData = {
-    title: { en: '', es: '', pt: '' },
-    excerpt: { en: '', es: '', pt: '' },
-    button_title: { en: '', es: '', pt: '' },
-  };
-  itemToArchive: types.CarouselItem | null = null;
-  showArchiveModal = false;
-
-  getEmptyItem(): types.CarouselItem {
+  props: {
+    carouselItems: {
+      type: Array as PropType<types.CarouselItem[]>,
+      default: () => [],
+    },
+  },
+  emits: ['create-item', 'update-item', 'delete-item'],
+  data(): {
+    T: typeof T;
+    time: typeof time;
+    isEditing: boolean;
+    currentItem: types.CarouselItem;
+    expirationDateInput: string;
+    currentLanguage: string;
+    editingLanguage: string;
+    currentStatusFilter: string;
+    languages: { code: string; name: string }[];
+    multilingualData: MultilingualData;
+    itemToArchive: types.CarouselItem | null;
+    showArchiveModal: boolean;
+  } {
     return {
-      carousel_item_id: 0,
-      title: '',
-      excerpt: '',
-      image_url: '',
-      link: '',
-      button_title: '',
-      is_active: true,
+      T,
+      time,
+      isEditing: false,
+      currentItem: getEmptyItem(),
+      expirationDateInput: '',
+      currentLanguage: 'en',
+      editingLanguage: 'en',
+      currentStatusFilter: 'active',
+      languages: [
+        { code: 'en', name: T.wordsEnglish },
+        { code: 'es', name: T.wordsSpanish },
+        { code: 'pt', name: T.wordsPortuguese },
+      ],
+      multilingualData: {
+        title: { en: '', es: '', pt: '' },
+        excerpt: { en: '', es: '', pt: '' },
+        button_title: { en: '', es: '', pt: '' },
+      },
+      itemToArchive: null,
+      showArchiveModal: false,
     };
-  }
-
-  showItemModal(): void {
-    this.carouselItemModal.show();
-  }
-
-  openCreateModal(): void {
-    this.isEditing = false;
-    this.resetModalState();
-    this.showItemModal();
-  }
-
-  isItemArchived(item: types.CarouselItem): boolean {
-    // If is_active is false, it's archived
-    if (!item.is_active) {
-      return true;
-    }
-
-    // If is_active is true, check expiration_date
-    if (item.expiration_date) {
-      const expirationDate = new Date(item.expiration_date);
-      const now = new Date();
-      // If expiration date has passed, it's archived
-      return expirationDate < now;
-    }
-
-    // If is_active is true and no expiration date, it's active
-    return false;
-  }
-
-  get filteredCarouselItems(): types.CarouselItem[] {
-    if (this.currentStatusFilter === 'active') {
-      return this.carouselItems.filter((item) => !this.isItemArchived(item));
-    }
-
-    if (this.currentStatusFilter === 'archived') {
-      return this.carouselItems.filter((item) => this.isItemArchived(item));
-    }
-
-    return this.carouselItems;
-  }
-
-  parseJsonField(field?: string): { [key: string]: string } {
-    if (!field) {
-      return { en: '', es: '', pt: '' };
-    }
-    try {
-      const parsed = typeof field === 'string' ? JSON.parse(field) : field;
-      return {
-        en: parsed.en || '',
-        es: parsed.es || '',
-        pt: parsed.pt || '',
-      };
-    } catch (e) {
-      // If it's not valid JSON, treat it as a plain string for the current language
-      return {
-        en: typeof field === 'string' ? field : '',
-        es: '',
-        pt: '',
-      };
-    }
-  }
-
-  stringifyJsonField(data: { [key: string]: string }): string {
-    return JSON.stringify(data);
-  }
-
-  getMultilingualText(lang: string, field?: string): string {
-    const parsed = this.parseJsonField(field);
-    return parsed[lang] || parsed.en || '';
-  }
-
-  editItem(item: types.CarouselItem): void {
-    this.isEditing = true;
-    this.currentItem = { ...item };
-    this.multilingualData = {
-      title: this.parseJsonField(item.title),
-      excerpt: this.parseJsonField(item.excerpt),
-      button_title: this.parseJsonField(item.button_title),
-    };
-    if (item.expiration_date) {
-      const date = new Date(item.expiration_date);
-      this.expirationDateInput = time.formatDateTimeLocal(date);
-    } else {
-      this.expirationDateInput = '';
-    }
-    this.editingLanguage = 'en';
-    this.showItemModal();
-  }
-
-  confirmDelete(item: types.CarouselItem): void {
-    this.itemToArchive = item;
-    this.showArchiveModal = true;
-  }
-
-  archiveSelectedItem(): void {
-    if (!this.itemToArchive) {
-      return;
-    }
-    this.$emit('delete-item', this.itemToArchive.carousel_item_id);
-  }
-
-  resetArchiveModal(): void {
-    this.itemToArchive = null;
-  }
-
-  saveItem(): void {
-    // Convert multilingual data to JSON strings
-    this.currentItem.title = this.stringifyJsonField(
-      this.multilingualData.title,
-    );
-    this.currentItem.excerpt = this.stringifyJsonField(
-      this.multilingualData.excerpt,
-    );
-    this.currentItem.button_title = this.stringifyJsonField(
-      this.multilingualData.button_title,
-    );
-
-    if (this.expirationDateInput) {
-      this.currentItem.expiration_date = new Date(this.expirationDateInput);
-    } else {
-      delete this.currentItem.expiration_date;
-    }
-
-    if (this.isEditing) {
-      this.$emit('update-item', this.currentItem);
-    } else {
-      this.$emit('create-item', this.currentItem);
-    }
-    this.carouselItemModal.hide();
-  }
-
-  resetModalState(): void {
-    this.currentItem = this.getEmptyItem();
-    this.expirationDateInput = '';
-    this.editingLanguage = 'en';
-    this.multilingualData = {
-      title: { en: '', es: '', pt: '' },
-      excerpt: { en: '', es: '', pt: '' },
-      button_title: { en: '', es: '', pt: '' },
-    };
-  }
-
-  onItemModalOk(evt: Event): void {
-    if (!this.carouselForm.checkValidity()) {
-      evt.preventDefault();
-      this.carouselForm.reportValidity();
-      return;
-    }
-    this.saveItem();
-  }
-
-  onItemModalHidden(): void {
-    this.isEditing = false;
-    this.resetModalState();
-  }
-
-  truncateText(text: string, maxLength: number): string {
-    if (!text || text.length <= maxLength) {
-      return text || '';
-    }
-    return text.substring(0, maxLength) + '...';
-  }
-
-  getStatusText(item: types.CarouselItem): string {
-    if (!item.is_active) {
-      return T.carouselInactive;
-    }
-
-    if (item.expiration_date) {
-      const expirationDate = new Date(item.expiration_date);
-      const now = new Date();
-      if (expirationDate < now) {
-        return T.carouselExpire;
+  },
+  computed: {
+    filteredCarouselItems(): types.CarouselItem[] {
+      if (this.currentStatusFilter === 'active') {
+        return this.carouselItems.filter((item) => !this.isItemArchived(item));
       }
-    }
 
-    return T.carouselActive;
-  }
+      if (this.currentStatusFilter === 'archived') {
+        return this.carouselItems.filter((item) => this.isItemArchived(item));
+      }
 
-  getStatusBadgeClass(item: types.CarouselItem): Record<string, boolean> {
-    if (!item.is_active) {
-      return {
-        badge: true,
-        'badge-secondary': true,
-      };
-    }
+      return this.carouselItems;
+    },
+  },
+  methods: {
+    getEmptyItem(): types.CarouselItem {
+      return getEmptyItem();
+    },
+    showItemModal(): void {
+      ((this.$refs.carouselItemModal as unknown) as ModalRef).show();
+    },
+    openCreateModal(): void {
+      this.isEditing = false;
+      this.resetModalState();
+      this.showItemModal();
+    },
+    isItemArchived(item: types.CarouselItem): boolean {
+      if (!item.is_active) {
+        return true;
+      }
 
-    if (item.expiration_date) {
-      const expirationDate = new Date(item.expiration_date);
-      const now = new Date();
-      if (expirationDate < now) {
+      if (item.expiration_date) {
+        const expirationDate = new Date(item.expiration_date);
+        const now = new Date();
+        return expirationDate < now;
+      }
+
+      return false;
+    },
+    parseJsonField(field?: string): { [key: string]: string } {
+      if (!field) {
+        return { en: '', es: '', pt: '' };
+      }
+      try {
+        const parsed = typeof field === 'string' ? JSON.parse(field) : field;
         return {
-          badge: true,
-          'badge-danger': true,
+          en: parsed.en || '',
+          es: parsed.es || '',
+          pt: parsed.pt || '',
+        };
+      } catch (e) {
+        return {
+          en: typeof field === 'string' ? field : '',
+          es: '',
+          pt: '',
         };
       }
-    }
+    },
+    stringifyJsonField(data: { [key: string]: string }): string {
+      return JSON.stringify(data);
+    },
+    getMultilingualText(lang: string, field?: string): string {
+      const parsed = this.parseJsonField(field);
+      return parsed[lang] || parsed.en || '';
+    },
+    editItem(item: types.CarouselItem): void {
+      this.isEditing = true;
+      this.currentItem = { ...item };
+      this.multilingualData = {
+        title: this.parseJsonField(item.title),
+        excerpt: this.parseJsonField(item.excerpt),
+        button_title: this.parseJsonField(item.button_title),
+      };
+      if (item.expiration_date) {
+        const date = new Date(item.expiration_date);
+        this.expirationDateInput = time.formatDateTimeLocal(date);
+      } else {
+        this.expirationDateInput = '';
+      }
+      this.editingLanguage = 'en';
+      this.showItemModal();
+    },
+    confirmDelete(item: types.CarouselItem): void {
+      this.itemToArchive = item;
+      this.showArchiveModal = true;
+    },
+    archiveSelectedItem(): void {
+      if (!this.itemToArchive) {
+        return;
+      }
+      this.$emit('delete-item', this.itemToArchive.carousel_item_id);
+    },
+    resetArchiveModal(): void {
+      this.itemToArchive = null;
+    },
+    saveItem(): void {
+      this.currentItem.title = this.stringifyJsonField(
+        this.multilingualData.title,
+      );
+      this.currentItem.excerpt = this.stringifyJsonField(
+        this.multilingualData.excerpt,
+      );
+      this.currentItem.button_title = this.stringifyJsonField(
+        this.multilingualData.button_title,
+      );
 
-    return {
-      badge: true,
-      'badge-success': true,
-    };
-  }
-}
+      if (this.expirationDateInput) {
+        this.currentItem.expiration_date = new Date(this.expirationDateInput);
+      } else {
+        delete this.currentItem.expiration_date;
+      }
+
+      if (this.isEditing) {
+        this.$emit('update-item', this.currentItem);
+      } else {
+        this.$emit('create-item', this.currentItem);
+      }
+      ((this.$refs.carouselItemModal as unknown) as ModalRef).hide();
+    },
+    resetModalState(): void {
+      this.currentItem = this.getEmptyItem();
+      this.expirationDateInput = '';
+      this.editingLanguage = 'en';
+      this.multilingualData = {
+        title: { en: '', es: '', pt: '' },
+        excerpt: { en: '', es: '', pt: '' },
+        button_title: { en: '', es: '', pt: '' },
+      };
+    },
+    onItemModalOk(evt: Event): void {
+      const carouselForm = this.$refs.carouselForm as HTMLFormElement;
+      if (!carouselForm.checkValidity()) {
+        evt.preventDefault();
+        carouselForm.reportValidity();
+        return;
+      }
+      this.saveItem();
+    },
+    onItemModalHidden(): void {
+      this.isEditing = false;
+      this.resetModalState();
+    },
+    truncateText(text: string, maxLength: number): string {
+      if (!text || text.length <= maxLength) {
+        return text || '';
+      }
+      return text.substring(0, maxLength) + '...';
+    },
+    getStatusText(item: types.CarouselItem): string {
+      if (!item.is_active) {
+        return T.carouselInactive;
+      }
+
+      if (item.expiration_date) {
+        const expirationDate = new Date(item.expiration_date);
+        const now = new Date();
+        if (expirationDate < now) {
+          return T.carouselExpire;
+        }
+      }
+
+      return T.carouselActive;
+    },
+    getStatusBadgeClass(item: types.CarouselItem): Record<string, boolean> {
+      if (!item.is_active) {
+        return {
+          badge: true,
+          'badge-secondary': true,
+        };
+      }
+
+      if (item.expiration_date) {
+        const expirationDate = new Date(item.expiration_date);
+        const now = new Date();
+        if (expirationDate < now) {
+          return {
+            badge: true,
+            'badge-danger': true,
+          };
+        }
+      }
+
+      return {
+        badge: true,
+        'badge-success': true,
+      };
+    },
+  },
+});
 </script>
 
 <style scoped>

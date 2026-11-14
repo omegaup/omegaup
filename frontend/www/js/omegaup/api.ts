@@ -129,6 +129,15 @@ export const Admin = {
         return x;
       });
     })(x.problemHealthFindings);
+    x.recommendationModelRuns = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      });
+    })(x.recommendationModelRuns);
     x.runs = ((x) => {
       if (!Array.isArray(x)) {
         return x;
@@ -2276,6 +2285,21 @@ export const User = {
       x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
     return x;
   }),
+  follow: apiCall<messages.UserFollowRequest, messages.UserFollowResponse>(
+    '/api/user/follow/',
+  ),
+  followStatus: apiCall<
+    messages.UserFollowStatusRequest,
+    messages.UserFollowStatusResponse
+  >('/api/user/followStatus/'),
+  followers: apiCall<
+    messages.UserFollowersRequest,
+    messages.UserFollowersResponse
+  >('/api/user/followers/'),
+  following: apiCall<
+    messages.UserFollowingRequest,
+    messages.UserFollowingResponse
+  >('/api/user/following/'),
   generateGitToken: apiCall<
     messages.UserGenerateGitTokenRequest,
     messages.UserGenerateGitTokenResponse
@@ -2387,6 +2411,10 @@ export const User = {
     messages.UserStatusVerifiedRequest,
     messages.UserStatusVerifiedResponse
   >('/api/user/statusVerified/'),
+  unfollow: apiCall<
+    messages.UserUnfollowRequest,
+    messages.UserUnfollowResponse
+  >('/api/user/unfollow/'),
   update: apiCall<messages.UserUpdateRequest, messages.UserUpdateResponse>(
     '/api/user/update/',
   ),
