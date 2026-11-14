@@ -76,7 +76,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
@@ -88,39 +89,66 @@ import common_Typeahead from '../common/Typeahead.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { getBlogUrl } from '../../urlHelper';
 
-@Component({
+export default defineComponent({
+  name: 'SchoolRank',
   components: {
     FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-typeahead': common_Typeahead,
   },
-})
-export default class SchoolRank extends Vue {
-  @Prop() page!: number;
-  @Prop() length!: number;
-  @Prop() showHeader!: boolean;
-  @Prop() totalRows!: number;
-  @Prop() rank!: omegaup.SchoolsRank[];
-  @Prop() pagerItems!: types.PageItem[];
-  @Prop({ default: () => [] }) searchResultSchools!: types.SchoolListItem[];
-
-  T = T;
-  ui = ui;
-  searchedSchool: null | types.SchoolListItem = null;
-
-  get SchoolRankingFeatureGuideURL(): string {
-    // Use the key defined in blog-links-config.json
-    return getBlogUrl('SchoolRankingFeatureGuideURL');
-  }
-
-  onSubmit(): void {
-    if (!this.searchedSchool) return;
-    window.location.href = `/schools/profile/${encodeURIComponent(
-      this.searchedSchool.key,
-    )}/`;
-  }
-}
+  props: {
+    page: {
+      type: Number,
+      required: true,
+    },
+    length: {
+      type: Number,
+      required: true,
+    },
+    showHeader: {
+      type: Boolean,
+      required: true,
+    },
+    totalRows: {
+      type: Number,
+      required: true,
+    },
+    rank: {
+      type: Array as PropType<omegaup.SchoolsRank[]>,
+      required: true,
+    },
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+      searchedSchool: null as null | types.SchoolListItem,
+    };
+  },
+  computed: {
+    SchoolRankingFeatureGuideURL(): string {
+      // Use the key defined in blog-links-config.json
+      return getBlogUrl('SchoolRankingFeatureGuideURL');
+    },
+  },
+  methods: {
+    onSubmit(): void {
+      if (!this.searchedSchool) return;
+      window.location.href = `/schools/profile/${encodeURIComponent(
+        this.searchedSchool.key,
+      )}/`;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
