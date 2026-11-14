@@ -1,4 +1,4 @@
-import VoerroTagsInput from '@voerro/vue-tagsinput';
+import Multiselect from 'vue-multiselect';
 import { mount } from '@vue/test-utils';
 import Vue from 'vue';
 import common_MultiTypeahead from './MultiTypeahead.vue';
@@ -11,8 +11,8 @@ describe('MultiTypeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'qu');
+    const tagsInput = wrapper.findComponent(Multiselect);
+    tagsInput.vm.$emit('search-change', 'qu');
     expect(wrapper.emitted()).toEqual({});
   });
 
@@ -23,8 +23,8 @@ describe('MultiTypeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
-    tagsInput.vm.$emit('change', 'query');
+    const tagsInput = wrapper.findComponent(Multiselect);
+    tagsInput.vm.$emit('search-change', 'query');
     expect(wrapper.emitted()).toEqual({
       'update-existing-options': [['query']],
     });
@@ -37,15 +37,11 @@ describe('MultiTypeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
+    const tagsInput = wrapper.findComponent(Multiselect);
     tagsInput.vm.$emit('input', [{ key: 'key', value: 'value' }]);
-    tagsInput.vm.$emit('tag-added');
     await Vue.nextTick();
     expect(wrapper.emitted()).toEqual({
-      'update:value': [
-        [[{ key: 'key', value: 'value' }]],
-        [[{ key: 'key', value: 'value' }]],
-      ],
+      'update:value': [[[{ key: 'key', value: 'value' }]]],
     });
   });
 
@@ -56,9 +52,8 @@ describe('MultiTypeahead.vue', () => {
       },
     });
 
-    const tagsInput = wrapper.findComponent(VoerroTagsInput);
+    const tagsInput = wrapper.findComponent(Multiselect);
     tagsInput.vm.$emit('input', []);
-    tagsInput.vm.$emit('tag-removed');
     await Vue.nextTick();
     expect(wrapper.emitted()).toEqual({
       'update:value': [[[]]],
