@@ -105,6 +105,7 @@ CREATE TABLE `Auth_Tokens` (
   PRIMARY KEY (`token`),
   KEY `identity_id` (`identity_id`),
   KEY `fk_ati_acting_identity_id` (`acting_identity_id`),
+  KEY `idx_identity_create_time` (`identity_id`,`create_time`),
   CONSTRAINT `fk_ati_acting_identity_id` FOREIGN KEY (`acting_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens de autorización para los logins.';
