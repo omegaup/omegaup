@@ -1,9 +1,10 @@
 import { mount, shallowMount } from '@vue/test-utils';
+import Vue, { ComponentOptions } from 'vue';
 import common_EmptyState from './EmptyState.vue';
 
 describe('EmptyState.vue', () => {
   it('Should display title and description', () => {
-    const wrapper = shallowMount(common_EmptyState, {
+    const wrapper = shallowMount(common_EmptyState as ComponentOptions<Vue>, {
       propsData: {
         title: 'No items found',
         description: 'Try adding a new item to get started.',
@@ -15,7 +16,7 @@ describe('EmptyState.vue', () => {
   });
 
   it('Should render an action link when buttonLink is provided', () => {
-    const wrapper = shallowMount(common_EmptyState, {
+    const wrapper = shallowMount(common_EmptyState as ComponentOptions<Vue>, {
       propsData: {
         title: 'Empty List',
         buttonText: 'Create New',
@@ -30,7 +31,7 @@ describe('EmptyState.vue', () => {
   });
 
   it('Should render an action button and emit action event on click when buttonLink is not provided', async () => {
-    const wrapper = shallowMount(common_EmptyState, {
+    const wrapper = shallowMount(common_EmptyState as ComponentOptions<Vue>, {
       propsData: {
         title: 'Empty List',
         buttonText: 'Click Me',
@@ -46,7 +47,7 @@ describe('EmptyState.vue', () => {
   });
 
   it('Should render custom content in the action slot', () => {
-    const wrapper = mount(common_EmptyState, {
+    const wrapper = mount(common_EmptyState as ComponentOptions<Vue>, {
       propsData: {
         title: 'Custom Action',
       },
@@ -60,7 +61,7 @@ describe('EmptyState.vue', () => {
   });
 
   it('Should render action button with custom data attribute', () => {
-    const wrapper = shallowMount(common_EmptyState, {
+    const wrapper = shallowMount(common_EmptyState as ComponentOptions<Vue>, {
       propsData: {
         title: 'Empty List',
         buttonText: 'Click Me',
