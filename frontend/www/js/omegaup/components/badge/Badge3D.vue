@@ -33,7 +33,7 @@ export default defineComponent({
       tiltStrength: 30,
     };
   },
-  beforeUnmount() {
+  beforeDestroy() {
     this.onMouseLeave();
   },
   methods: {

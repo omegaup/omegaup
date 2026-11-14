@@ -53,6 +53,11 @@
             "
           ></omegaup-user-edit-preferences>
         </template>
+        <template v-else-if="currentSelectedTab === 'edit-code-templates'">
+          <omegaup-user-edit-code-templates
+            :profile="profile"
+          ></omegaup-user-edit-code-templates>
+        </template>
         <template v-else-if="currentSelectedTab === 'manage-schools'">
           <omegaup-user-manage-schools
             :profile="profile"
@@ -109,6 +114,7 @@ import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_BasicInformationEdit from './BasicInformationEdit.vue';
+import user_CodeTemplatesEdit from './CodeTemplatesEdit.vue';
 import userDeleteAccount from './DeleteAccount.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
@@ -134,6 +140,7 @@ export interface ProfileStatistics {
     'omegaup-user-view-profile': user_ViewProfile,
     'omegaup-user-edit-preferences': user_PreferencesEdit,
     'omegaup-user-edit-basic-information': user_BasicInformationEdit,
+    'omegaup-user-edit-code-templates': user_CodeTemplatesEdit,
     'omegaup-user-edit-password': user_PasswordEdit,
     'omegaup-user-add-password': user_PasswordAdd,
     'omegaup-user-manage-identities': user_ManageIdentities,

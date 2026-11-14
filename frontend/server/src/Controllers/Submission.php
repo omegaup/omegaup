@@ -570,48 +570,71 @@ class Submission extends \OmegaUp\Controllers\Controller {
         // Optional review summary. Stored on the general feedback row
         // (range_bytes_start IS NULL), which is also where a student's
         // feedback request is saved, so this replaces that placeholder.
+        // Trim before the 1-1000 check so a whitespace-only summary is absent.
         $generalFeedback = $r->ensureOptionalString(
             'feedback',
             required: false,
-            validator: fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
-                $feedback,
-                1,
-                1000
+            validator: fn (string $feedback) => (
+                trim($feedback) === '' ||
+                \OmegaUp\Validators::stringOfLengthInRange(
+                    trim($feedback),
+                    1,
+                    1000
+                )
             )
         );
+        if (!is_null($generalFeedback)) {
+            $generalFeedback = trim($generalFeedback);
+            if ($generalFeedback === '') {
+                $generalFeedback = null;
+            }
+        }
 
         $feedbackString = $r->ensureString('feedback_list');
-        $decodedFeedbackList = json_decode(
-            $feedbackString,
-            associative: true
-        );
+        $decodedFeedbackList = json_decode($feedbackString, associative: true);
         if (!is_array($decodedFeedbackList)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'invalidParameters'
-            );
-        }
-        if ($decodedFeedbackList === [] && is_null($generalFeedback)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'invalidParameters'
+                'invalidParameters',
+                'feedback_list'
             );
         }
 
-        /** @var list<array{feedback: string, lineNumber: int}> $decodedFeedbackList */
-        foreach ($decodedFeedbackList as $lineFeedback) {
-            if (
-                !is_array($lineFeedback) ||
-                !is_string($lineFeedback['feedback'] ?? null) ||
-                !is_int($lineFeedback['lineNumber'] ?? null)
-            ) {
+        /** @var list<array{lineNumber: int, feedback: string}> */
+        $feedbackList = [];
+        foreach ($decodedFeedbackList as $feedbackEntry) {
+            if (!is_array($feedbackEntry)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'invalidParameters'
+                    'invalidParameters',
+                    'feedback_list'
                 );
             }
+            $lineNumber = $feedbackEntry['lineNumber'] ?? null;
+            $feedbackText = $feedbackEntry['feedback'] ?? null;
+            if (!is_int($lineNumber) || !is_string($feedbackText)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidParameters',
+                    'feedback_list'
+                );
+            }
+            $feedbackList[] = [
+                'lineNumber' => $lineNumber,
+                'feedback' => $feedbackText,
+            ];
+        }
+
+        if ($feedbackList === [] && is_null($generalFeedback)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters',
+                'feedback_list'
+            );
+        }
+
+        foreach ($feedbackList as $feedback) {
             self::createOrUpdateFeedback(
                 $r->identity,
                 $submission,
-                $lineFeedback['feedback'],
-                $lineFeedback['lineNumber']
+                $feedback['feedback'],
+                $feedback['lineNumber']
             );
         }
 

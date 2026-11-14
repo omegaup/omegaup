@@ -44,7 +44,6 @@ class ContestsCallbackForTesting:
         '''Function to call the original callback'''
         callback = contest_callback.ContestsCallback(dbconn=self.dbconn)
         callback(channel, method, properties, body)
-        channel.close()
 
 
 def test_client_contest() -> None:
@@ -65,10 +64,23 @@ def test_client_contest() -> None:
             username=test_credentials.OMEGAUP_USERNAME,
             password=test_credentials.OMEGAUP_PASSWORD,
             host=test_credentials.RABBITMQ_HOST,) as channel:
-        rabbitmq_connection.initialize_rabbitmq(queue='contest',
-                                                exchange='certificates',
-                                                routing_key='ContestQueue',
-                                                channel=channel)
+        rabbitmq_connection.initialize_rabbitmq(
+            queue='contest-test',
+            exchange='certificates',
+            routing_key='ContestQueue-test',
+            channel=channel)
+        channel.queue_purge(queue='contest-test')
+        cur.execute('''
+            UPDATE
+                `Contests`
+            SET
+                `certificates_status` = 'uninitiated'
+            WHERE
+                finish_time >= %s
+                AND finish_time <= %s;
+            ''', (test_constants.DATE_LOWER_LIMIT,
+                  test_constants.DATE_UPPER_LIMIT))
+        dbconn.conn.commit()
         client = omegaup.api.Client(
             api_token=test_constants.API_TOKEN,
             url=test_constants.OMEGAUP_API_ENDPOINT,
@@ -78,7 +90,9 @@ def test_client_contest() -> None:
             channel=channel,
             date_lower_limit=test_constants.DATE_LOWER_LIMIT,
             date_upper_limit=test_constants.DATE_UPPER_LIMIT,
-            client=client)
+            client=client,
+            queue='contest-test',
+            routing_key='ContestQueue-test')
         callback = ContestsCallbackForTesting(dbconn=dbconn.conn)
         cur.execute('TRUNCATE TABLE `Certificates`;')
         dbconn.conn.commit()
@@ -88,11 +102,12 @@ def test_client_contest() -> None:
         assert count['count'] == 0
 
         rabbitmq_client.receive_messages(
-            queue='contest',
+            queue='contest-test',
             exchange='certificates',
-            routing_key='ContestQueue',
+            routing_key='ContestQueue-test',
             channel=channel,
-            callback=callback)
+            callback=callback,
+            stop_after_message=True)
         cur.execute('SELECT COUNT(*) AS count FROM `Certificates`;')
         count = cur.fetchone()
         assert count['count'] > 0

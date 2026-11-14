@@ -191,7 +191,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -216,120 +217,136 @@ interface Origin {
   }[];
 }
 
-@Component({
+export default defineComponent({
+  name: 'ActivityFeed',
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-common-paginator': common_Paginator,
   },
-})
-export default class ActivityFeed extends Vue {
-  @Prop() page!: number;
-  @Prop() length!: number;
-  @Prop() type!: string;
-  @Prop() alias!: string;
-  @Prop() report!: types.ActivityEvent[];
-  @Prop() pagerItems!: types.PageItem[];
-
-  T = T;
-  time = time;
-  showTab = 'report';
-
-  onTabChange(tab: string) {
-    if (this.showTab !== tab) {
-      this.showTab = tab;
-      history.pushState(null, '', `#${tab}`);
-      this.syncFromHash();
-    }
-  }
-
-  syncFromHash() {
-    const tab = window.location.hash.replace('#', '') || 'report';
-
-    if (this.showTab !== tab) {
-      this.showTab = tab;
-    }
-  }
-
+  props: {
+    page: {
+      type: Number,
+      required: true,
+    },
+    length: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    alias: {
+      type: String,
+      required: true,
+    },
+    report: {
+      type: Array as PropType<types.ActivityEvent[]>,
+      required: true,
+    },
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      time,
+      showTab: 'report',
+    };
+  },
+  computed: {
+    wordsReportSummary(): string {
+      return this.type == 'contest'
+        ? T.activityReportSummaryContest
+        : T.activityReportSummaryCourse;
+    },
+    typeUrl(): string {
+      if (this.type == 'contest') {
+        return `/arena/${this.alias}/`;
+      }
+      return `/${this.type}/${this.alias}/`;
+    },
+    classByUser(): { [key: string]: string } {
+      let events = this.report;
+      let obj: { [key: string]: string } = {};
+      for (let evt of events) {
+        obj[evt.username] = evt.classname;
+      }
+      return obj;
+    },
+    users(): User[] {
+      let userMapping: Mapping = {};
+      for (let evt of this.report) {
+        this.addMapping(userMapping, evt.username, String(evt.ip));
+      }
+      let users: User[] = [];
+      let sortedUsers = Object.keys(userMapping);
+      sortedUsers.sort();
+      for (let user of sortedUsers) {
+        let ips: string[] = Array.from(new Set(userMapping[user]));
+        if (ips.length == 1) continue;
+        ips.sort();
+        users.push({
+          username: user,
+          classname: this.classByUser[user],
+          ips: ips,
+        });
+      }
+      return users;
+    },
+    origins(): Origin[] {
+      let originMapping: Mapping = {};
+      for (let evt of this.report) {
+        this.addMapping(originMapping, String(evt.ip), evt.username);
+      }
+      let origins: Origin[] = [];
+      let sortedOrigins = Object.keys(originMapping);
+      sortedOrigins.sort();
+      for (let origin of sortedOrigins) {
+        let users: string[] = Array.from(new Set(originMapping[origin]));
+        if (users.length == 1) continue;
+        users.sort();
+        origins.push({
+          origin: origin,
+          usernames: users.map((u) => {
+            return { username: u, classname: this.classByUser[u] };
+          }),
+        });
+      }
+      return origins;
+    },
+  },
   mounted() {
     this.syncFromHash();
     window.addEventListener('popstate', this.syncFromHash);
-  }
-
+  },
   beforeDestroy() {
     window.removeEventListener('popstate', this.syncFromHash);
-  }
+  },
+  methods: {
+    onTabChange(tab: string) {
+      if (this.showTab !== tab) {
+        this.showTab = tab;
+        history.pushState(null, '', `#${tab}`);
+        this.syncFromHash();
+      }
+    },
+    syncFromHash() {
+      const tab = window.location.hash.replace('#', '') || 'report';
 
-  addMapping(mapping: Mapping, key: string, value: string): void {
-    if (key in mapping) {
-      mapping[key].push(value);
-    } else {
-      mapping[key] = [value];
-    }
-  }
-
-  get wordsReportSummary(): string {
-    return this.type == 'contest'
-      ? T.activityReportSummaryContest
-      : T.activityReportSummaryCourse;
-  }
-
-  get typeUrl(): string {
-    if (this.type == 'contest') {
-      return `/arena/${this.alias}/`;
-    }
-    return `/${this.type}/${this.alias}/`;
-  }
-
-  get classByUser(): { [key: string]: string } {
-    let events = this.report;
-    let obj: { [key: string]: string } = {};
-    for (let evt of events) {
-      obj[evt.username] = evt.classname;
-    }
-    return obj;
-  }
-
-  get users(): User[] {
-    let userMapping: Mapping = {};
-    for (let evt of this.report) {
-      this.addMapping(userMapping, evt.username, String(evt.ip));
-    }
-    let users: User[] = [];
-    let sortedUsers = Object.keys(userMapping);
-    sortedUsers.sort();
-    for (let user of sortedUsers) {
-      let ips: string[] = Array.from(new Set(userMapping[user]));
-      if (ips.length == 1) continue;
-      ips.sort();
-      users.push({
-        username: user,
-        classname: this.classByUser[user],
-        ips: ips,
-      });
-    }
-    return users;
-  }
-
-  get origins(): Origin[] {
-    let originMapping: Mapping = {};
-    for (let evt of this.report) {
-      this.addMapping(originMapping, String(evt.ip), evt.username);
-    }
-    let origins: Origin[] = [];
-    let sortedOrigins = Object.keys(originMapping);
-    sortedOrigins.sort();
-    for (let origin of sortedOrigins) {
-      let users: string[] = Array.from(new Set(originMapping[origin]));
-      if (users.length == 1) continue;
-      users.sort();
-      origins.push({
-        origin: origin,
-        usernames: users.map((u) => {
-          return { username: u, classname: this.classByUser[u] };
-        }),
-      });
-    }
-    return origins;
-  }
-}
+      if (this.showTab !== tab) {
+        this.showTab = tab;
+      }
+    },
+    addMapping(mapping: Mapping, key: string, value: string): void {
+      if (key in mapping) {
+        mapping[key].push(value);
+      } else {
+        mapping[key] = [value];
+      }
+    },
+  },
+});
 </script>

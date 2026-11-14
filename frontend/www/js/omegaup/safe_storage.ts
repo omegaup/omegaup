@@ -25,6 +25,16 @@ export class SafeStorage {
     }
   }
 
+  static removeItem(key: string): boolean {
+    try {
+      localStorage.removeItem(key);
+      return true;
+    } catch (e) {
+      console.warn('localStorage remove failed:', e);
+      return false;
+    }
+  }
+
   static clearOldItems(): void {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     try {

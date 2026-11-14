@@ -159,10 +159,7 @@ describe('ProblemLists.vue', () => {
       wrapper.find('input[data-use-latest-version-false]').element,
     ).toBeChecked();
 
-    const radio = wrapper.find('input[name="use-latest-version"]')
-      .element as HTMLOptionElement;
-    radio.selected = true;
-    await radio.click();
+    await wrapper.find('input[data-use-latest-version-true]').setChecked();
 
     expect(
       wrapper.find('input[data-use-latest-version-true]').element,
