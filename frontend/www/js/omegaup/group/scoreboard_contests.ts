@@ -25,7 +25,7 @@ OmegaUp.on('ready', function () {
         },
         on: {
           'add-contest': (
-            source: group_ScoreboardContests,
+            source: InstanceType<typeof group_ScoreboardContests>,
             selectedContest: string,
             onlyAc: boolean,
             weight: number,

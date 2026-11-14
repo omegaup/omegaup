@@ -67,44 +67,61 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 import { generateAlias } from '../../alias';
 
-@Component
-export default class GroupForm extends Vue {
-  @Prop({ default: '' }) groupAlias!: string;
-  @Prop({ default: '' }) groupDescription!: string;
-  @Prop({ default: '' }) groupName!: string;
-  @Prop({ default: false }) isUpdate!: boolean;
-
-  T = T;
-  alias: string = this.groupAlias;
-  description: string = this.groupDescription;
-  name: string = this.groupName;
-
-  onSubmit(): void {
-    if (this.isUpdate) {
-      this.$emit('update-group', this.name, this.description);
-      return;
-    }
-    this.$emit('create-group', this.name, this.alias, this.description);
-  }
-
-  @Watch('alias')
-  onAliasChanged(newValue: string): void {
-    if (this.isUpdate) {
-      return;
-    }
-    this.$emit('validate-unused-alias', newValue);
-  }
-
-  @Watch('name')
-  onNameChanged(newValue: string): void {
-    if (this.isUpdate) {
-      return;
-    }
-    this.alias = generateAlias(newValue);
-  }
-}
+export default defineComponent({
+  name: 'GroupForm',
+  props: {
+    groupAlias: {
+      type: String,
+      default: '',
+    },
+    groupDescription: {
+      type: String,
+      default: '',
+    },
+    groupName: {
+      type: String,
+      default: '',
+    },
+    isUpdate: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['update-group', 'create-group', 'validate-unused-alias'],
+  data() {
+    return {
+      T,
+      alias: this.groupAlias,
+      description: this.groupDescription,
+      name: this.groupName,
+    };
+  },
+  watch: {
+    alias(newValue: string): void {
+      if (this.isUpdate) {
+        return;
+      }
+      this.$emit('validate-unused-alias', newValue);
+    },
+    name(newValue: string): void {
+      if (this.isUpdate) {
+        return;
+      }
+      this.alias = generateAlias(newValue);
+    },
+  },
+  methods: {
+    onSubmit(): void {
+      if (this.isUpdate) {
+        this.$emit('update-group', this.name, this.description);
+        return;
+      }
+      this.$emit('create-group', this.name, this.alias, this.description);
+    },
+  },
+});
 </script>
