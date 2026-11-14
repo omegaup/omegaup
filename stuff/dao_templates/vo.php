@@ -85,26 +85,49 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
      * Auto Incremento
 {%- endif %}
      *
+{%- if table.strict_types %}
+     */
+    public {{ column.php_type }} ${{ column.name -}}
+{%- if column.default -%}
+  {%- if column.default == 'CURRENT_TIMESTAMP' -%}{{ "; // CURRENT_TIMESTAMP" }}
+  {%- elif 'timestamp' in column.type -%}{{ "; // " }}{{ column.default }}
+  {%- elif column.php_primitive_type == 'bool' -%}{{ " = " }}{{ 'true' if column.default == '1' else 'false' }}{{ ";" }}
+  {%- elif column.php_primitive_type == 'int' -%}{{ " = " }}{{ '%d'|format(column.default|int) }}{{ ";" }}
+  {%- elif column.php_primitive_type == 'float' -%}{{ " = " }}{{ '%.2f'|format(column.default|float) }}{{ ";" }}
+  {%- else -%}{{ " = '" }}{{ column.default }}{{ "';" }}
+  {%- endif -%}
+{%- elif column.auto_increment -%}{{ " = 0;" }}
+{%- elif not column.not_null -%}{{ " = null;" }}
+{%- else -%}
+  {%- if column.php_primitive_type == 'bool' -%}{{ " = false;" }}
+  {%- elif column.php_primitive_type == 'int' -%}{{ " = 0;" }}
+  {%- elif column.php_primitive_type == 'float' -%}{{ " = 0.0;" }}
+  {%- elif column.php_primitive_type == 'string' -%}{{ " = '';" }}
+  {%- else -%}{{ ";" }}
+  {%- endif -%}
+{%- endif %}
+{%- else %}
      * @var {{ column.php_primitive_type }}{% if not column.default %}|null{% endif %}
      */
 {%- if column.default %}
-{%- if column.default == 'CURRENT_TIMESTAMP' %}
+  {%- if column.default == 'CURRENT_TIMESTAMP' %}
     public ${{ column.name }};  // CURRENT_TIMESTAMP
-{%- elif 'timestamp' in column.type %}
+  {%- elif 'timestamp' in column.type %}
     public ${{ column.name }};  // {{ column.default }}
-{%- elif column.php_primitive_type == 'bool' %}
+  {%- elif column.php_primitive_type == 'bool' %}
     public ${{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
-{%- elif column.php_primitive_type == 'int' %}
+  {%- elif column.php_primitive_type == 'int' %}
     public ${{ column.name }} = {{ '%d'|format(column.default|int) }};
-{%- elif column.php_primitive_type == 'float' %}
+  {%- elif column.php_primitive_type == 'float' %}
     public ${{ column.name }} = {{ '%.2f'|format(column.default|float) }};
-{%- else %}
+  {%- else %}
     public ${{ column.name }} = '{{ column.default }}';
-{%- endif %}
+  {%- endif %}
 {%- elif column.auto_increment %}
     public ${{ column.name }} = 0;
 {%- else %}
     public ${{ column.name }} = null;
+{%- endif %}
 {%- endif %}
 {%- endfor %}
 }
