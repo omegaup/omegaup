@@ -1,6 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
-import Vue from 'vue';
+import Vue, { ComponentOptions } from 'vue';
 import TagsSolvedChart from './TagsSolvedChart.vue';
+
+const UserTagsSolvedChart = (TagsSolvedChart as unknown) as ComponentOptions<Vue>;
 
 // Mock Highcharts to avoid actual chart rendering in tests
 // Use render function instead of template since Vue runtime-only build
@@ -24,7 +26,7 @@ describe('TagsSolvedChart.vue', () => {
   ];
 
   it('should render the component with chart title', () => {
-    const wrapper = shallowMount(TagsSolvedChart, {
+    const wrapper = shallowMount(UserTagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
@@ -34,7 +36,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should render chart container when tags are provided', () => {
-    const wrapper = shallowMount(TagsSolvedChart, {
+    const wrapper = shallowMount(UserTagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
@@ -45,7 +47,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should show no-data message when tags array is empty', () => {
-    const wrapper = shallowMount(TagsSolvedChart, {
+    const wrapper = shallowMount(UserTagsSolvedChart, {
       propsData: {
         tags: [],
       },
@@ -56,7 +58,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should compute correct chart options', () => {
-    const wrapper = shallowMount(TagsSolvedChart, {
+    const wrapper = shallowMount(UserTagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
@@ -76,7 +78,7 @@ describe('TagsSolvedChart.vue', () => {
       count: 25 - i,
     }));
 
-    const wrapper = shallowMount(TagsSolvedChart, {
+    const wrapper = shallowMount(UserTagsSolvedChart, {
       propsData: {
         tags: manyTags,
       },
@@ -89,7 +91,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should have correct data structure for chart', () => {
-    const wrapper = shallowMount(TagsSolvedChart, {
+    const wrapper = shallowMount(UserTagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },

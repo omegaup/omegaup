@@ -1,8 +1,10 @@
 import { shallowMount, Wrapper } from '@vue/test-utils';
-import Vue from 'vue';
+import Vue, { ComponentOptions } from 'vue';
 import Charts from './Charts.vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+
+const UserCharts = (Charts as unknown) as ComponentOptions<Vue>;
 
 jest.mock('highcharts-vue', () => ({
   Chart: {
@@ -37,7 +39,7 @@ function mountComponent(
   data: omegaup.RunInfo[] = [],
   username = 'testuser',
 ): Wrapper<Vue> {
-  return shallowMount(Charts, {
+  return shallowMount(UserCharts, {
     propsData: { data, username },
   });
 }
