@@ -67,60 +67,81 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
 import { BBreadcrumb, BBreadcrumbItem } from 'bootstrap-vue';
-@Component({
+
+export default defineComponent({
+  name: 'ArenaNavbarProblems',
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
     'b-breadcrumb': BBreadcrumb,
     'b-breadcrumb-item': BBreadcrumbItem,
   },
-})
-export default class ArenaNavbarProblems extends Vue {
-  @Prop() problems!: types.NavbarProblemsetProblem[];
-  @Prop() activeProblem!: string | null;
-  @Prop() courseAlias!: string | null;
-  @Prop() courseName!: string | null;
-  @Prop({ default: false }) inAssignment!: boolean;
-  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-  @Prop({ default: null }) currentAssignment!: omegaup.Assignment | null;
-
-  T = T;
-
-  getProblemTypeTitle(acceptsSubmissions: boolean): string {
-    return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
-  }
-
-  getMaxScoreForProblem(problem: types.NavbarProblemsetProblem): string {
-    const bestScore = problem.myBestScore ?? problem.bestScore;
-    return `(${bestScore.toFixed(
-      this.digitsAfterDecimalPoint,
-    )} / ${problem.maxScore.toFixed(this.digitsAfterDecimalPoint)})`;
-  }
-
-  get urlAssignment(): string {
-    return `/course/${this.courseAlias}/`;
-  }
-
-  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
-    this.$emit('navigate-to-problem', problem);
-  }
-}
+  props: {
+    problems: {
+      type: Array as PropType<types.NavbarProblemsetProblem[]>,
+      default: () => [],
+    },
+    activeProblem: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    courseAlias: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    courseName: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    inAssignment: {
+      type: Boolean,
+      default: false,
+    },
+    digitsAfterDecimalPoint: {
+      type: Number,
+      default: 2,
+    },
+    currentAssignment: {
+      type: Object as PropType<omegaup.Assignment | null>,
+      default: null,
+    },
+  },
+  emits: ['disable-active-problem', 'navigate-to-problem'],
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    urlAssignment(): string {
+      return `/course/${this.courseAlias}/`;
+    },
+  },
+  methods: {
+    getProblemTypeTitle(acceptsSubmissions: boolean): string {
+      return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
+    },
+    getMaxScoreForProblem(problem: types.NavbarProblemsetProblem): string {
+      const bestScore = problem.myBestScore ?? problem.bestScore;
+      return `(${bestScore.toFixed(
+        this.digitsAfterDecimalPoint,
+      )} / ${problem.maxScore.toFixed(this.digitsAfterDecimalPoint)})`;
+    },
+    onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
+      this.$emit('navigate-to-problem', problem);
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

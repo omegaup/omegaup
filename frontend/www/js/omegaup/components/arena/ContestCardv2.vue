@@ -134,7 +134,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
@@ -154,40 +154,46 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
-@Component({
+export default defineComponent({
+  name: 'ContestCardv2',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class ContestCardv2 extends Vue {
-  @Prop({ required: true }) contest!: types.ContestListItem;
-
-  T = T;
-  ui = ui;
-
-  get contestDuration(): string {
-    return time.formatContestDurationHumanReadable(
-      this.contest.start_time,
-      this.contest.finish_time,
-    );
-  }
-
-  getContestURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/`;
-  }
-
-  getContestScoreboardURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/#ranking`;
-  }
-
-  getVirtualContestURL(alias: string): string {
-    return `/contest/${encodeURIComponent(alias)}/virtual/`;
-  }
-
-  getPracticeContestURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/practice/`;
-  }
-}
+  props: {
+    contest: {
+      type: Object as PropType<types.ContestListItem>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+    };
+  },
+  computed: {
+    contestDuration(): string {
+      return time.formatContestDurationHumanReadable(
+        this.contest.start_time,
+        this.contest.finish_time,
+      );
+    },
+  },
+  methods: {
+    getContestURL(alias: string): string {
+      return `/arena/${encodeURIComponent(alias)}/`;
+    },
+    getContestScoreboardURL(alias: string): string {
+      return `/arena/${encodeURIComponent(alias)}/#ranking`;
+    },
+    getVirtualContestURL(alias: string): string {
+      return `/contest/${encodeURIComponent(alias)}/virtual/`;
+    },
+    getPracticeContestURL(alias: string): string {
+      return `/arena/${encodeURIComponent(alias)}/practice/`;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
