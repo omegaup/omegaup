@@ -8,7 +8,7 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
      * Test streak is 0 for a user with no submissions.
      */
     public function testZeroStreak(): void {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
             intval($identity->identity_id)
@@ -32,7 +32,7 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
      * Test a consecutive 3-day streak ending today.
      */
     public function testThreeDayStreak(): void {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $baseTime = strtotime('2026-05-15 12:00:00');
@@ -76,7 +76,7 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
      * Test non-AC submissions (e.g. WA) do not count towards the streak.
      */
     public function testNonAcceptedSubmissionsDoNotCount(): void {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $baseTime = strtotime('2026-05-15 12:00:00');
@@ -105,7 +105,7 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
      * Test a gap in submissions resets the streak.
      */
     public function testGapResetsStreak(): void {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $baseTime = strtotime('2026-05-15 12:00:00');
@@ -150,7 +150,7 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
      * Test submitted yesterday but not yet today keeps streak alive.
      */
     public function testSubmittedYesterdayButNotToday(): void {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $baseTime = strtotime('2026-05-15 12:00:00');
@@ -183,7 +183,7 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
      * Test 30+ boundary (30 and 31 consecutive days).
      */
     public function testThirtyPlusBoundary(): void {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $baseTime = strtotime('2026-05-15 12:00:00');
