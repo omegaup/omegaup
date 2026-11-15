@@ -2,9 +2,10 @@
   <span
     class="streak-indicator d-inline-flex align-items-center px-2 py-1"
     :title="tooltip"
+    :aria-label="tooltip"
     data-streak-indicator
   >
-    <span class="streak-emoji mr-1">{{ emoji }}</span>
+    <span class="streak-emoji mr-1" aria-hidden="true">{{ emoji }}</span>
     <span class="streak-count">{{ streak }}</span>
   </span>
 </template>
@@ -39,7 +40,11 @@ export default class StreakIndicator extends Vue {
   }
 
   get tooltip(): string {
-    return ui.formatString(T.streakIndicatorTooltip, {
+    const template =
+      this.streak === 1
+        ? T.streakIndicatorTooltipOne
+        : T.streakIndicatorTooltip;
+    return ui.formatString(template, {
       count: this.streak,
     });
   }

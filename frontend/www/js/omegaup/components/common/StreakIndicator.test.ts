@@ -38,13 +38,22 @@ describe('StreakIndicator.vue', () => {
         propsData: { streak },
       });
 
-      expect(wrapper.find('[data-streak-indicator]').exists()).toBe(true);
-      expect(wrapper.find('.streak-emoji').text()).toBe(expectedEmoji);
+      const indicator = wrapper.find('[data-streak-indicator]');
+      expect(indicator.exists()).toBe(true);
+
+      const emojiSpan = wrapper.find('.streak-emoji');
+      expect(emojiSpan.text()).toBe(expectedEmoji);
+      expect(emojiSpan.attributes('aria-hidden')).toBe('true');
+
       expect(wrapper.find('.streak-count').text()).toBe(String(streak));
       expect(wrapper.text()).toContain(`${expectedEmoji} ${streak}`);
-      expect(wrapper.attributes('title')).toBe(
-        ui.formatString(T.streakIndicatorTooltip, { count: streak }),
-      );
+
+      const expectedTooltip =
+        streak === 1
+          ? ui.formatString(T.streakIndicatorTooltipOne, { count: streak })
+          : ui.formatString(T.streakIndicatorTooltip, { count: streak });
+      expect(indicator.attributes('title')).toBe(expectedTooltip);
+      expect(indicator.attributes('aria-label')).toBe(expectedTooltip);
     });
   });
 });

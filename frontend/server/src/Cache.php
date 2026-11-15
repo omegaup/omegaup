@@ -677,6 +677,7 @@ class Cache {
     const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
     const PROBLEM_IDENTITY_TYPE = 'problems-identity-type-';
     const SYSTEM_SETTINGS = 'system-settings-';
+    const USER_CURRENT_STREAK = 'user-current-streak-';
 
     /** @var \Monolog\Logger */
     private $log;

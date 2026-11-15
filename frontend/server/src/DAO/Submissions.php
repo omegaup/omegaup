@@ -463,4 +463,73 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         }
         return $submissions;
     }
+
+    /**
+     * Calculates the current consecutive day streak of accepted submissions for an identity.
+     * Day boundary is server time (00:00-23:59).
+     */
+    final public static function getCurrentStreak(int $identityId): int {
+        $today = date('Y-m-d', \OmegaUp\Time::get());
+        $yesterday = date('Y-m-d', \OmegaUp\Time::get() - 86400);
+
+        $sql = '
+            WITH DailySubmissions AS (
+                SELECT DISTINCT
+                    DATE(s.time) AS submission_date
+                FROM
+                    Submissions AS s
+                WHERE
+                    s.identity_id = ?
+                    AND s.status = "ready"
+                    AND s.`type` = "normal"
+                    AND s.verdict = "AC"
+                    AND s.time <= FROM_UNIXTIME(?)
+            ),
+            ConsecutiveStreaks AS (
+                SELECT
+                    submission_date,
+                    DENSE_RANK() OVER (ORDER BY submission_date) AS d_rank
+                FROM
+                    DailySubmissions
+            ),
+            GroupedStreaks AS (
+                SELECT
+                    submission_date,
+                    submission_date - INTERVAL d_rank DAY AS streak_group
+                FROM
+                    ConsecutiveStreaks
+            ),
+            Streaks AS (
+                SELECT
+                    streak_group,
+                    MAX(submission_date) AS last_date,
+                    COUNT(*) AS streak_length
+                FROM
+                    GroupedStreaks
+                GROUP BY
+                    streak_group
+            )
+            SELECT
+                streak_length,
+                last_date
+            FROM
+                Streaks
+            ORDER BY
+                last_date DESC
+            LIMIT 1;
+        ';
+
+        /** @var array{last_date: string, streak_length: int}|null $row */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identityId, \OmegaUp\Time::get()]
+        );
+        if (empty($row) || !isset($row['last_date'])) {
+            return 0;
+        }
+        if ($row['last_date'] === $today || $row['last_date'] === $yesterday) {
+            return (int)$row['streak_length'];
+        }
+        return 0;
+    }
 }

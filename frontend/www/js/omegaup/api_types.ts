@@ -3933,7 +3933,6 @@ export namespace types {
     auth_token?: string;
     cacheKey?: string;
     classname: string;
-    current_streak: number;
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;

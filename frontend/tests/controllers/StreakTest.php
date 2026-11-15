@@ -10,14 +10,14 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
     public function testZeroStreak(): void {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+        $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+            intval($identity->identity_id)
+        );
         $this->assertSame(0, $streak);
 
-        $login = self::login($identity);
-        $response = \OmegaUp\Controllers\Session::apiCurrentSession(
-            new \OmegaUp\Request(['auth_token' => $login->auth_token])
-        );
-        $this->assertSame(0, $response['session']['current_streak']);
+        self::login($identity);
+        $commonPayload = \OmegaUp\UITools::getCommonPayload(false);
+        $this->assertSame(0, $commonPayload['currentStreak']);
     }
 
     /**
@@ -41,14 +41,43 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
             }
 
             \OmegaUp\Time::setTimeForTesting($baseTime);
-            $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
             $this->assertSame(3, $streak);
 
-            $login = self::login($identity);
-            $response = \OmegaUp\Controllers\Session::apiCurrentSession(
-                new \OmegaUp\Request(['auth_token' => $login->auth_token])
+            self::login($identity);
+            $commonPayload = \OmegaUp\UITools::getCommonPayload(false);
+            $this->assertSame(3, $commonPayload['currentStreak']);
+        } finally {
+            \OmegaUp\Time::setTimeForTesting($originalTime);
+        }
+    }
+
+    /**
+     * Test non-AC submissions (e.g. WA) do not count towards the streak.
+     */
+    public function testNonAcceptedSubmissionsDoNotCount(): void {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $baseTime = strtotime('2026-05-15 12:00:00');
+        $originalTime = \OmegaUp\Time::get();
+        try {
+            // Day -1 (yesterday) with WA verdict
+            \OmegaUp\Time::setTimeForTesting($baseTime - 86400);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $identity
             );
-            $this->assertSame(3, $response['session']['current_streak']);
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 0, 'WA');
+
+            // Today at baseTime
+            \OmegaUp\Time::setTimeForTesting($baseTime);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
+            $this->assertSame(0, $streak);
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
@@ -76,7 +105,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
 
             // At baseTime (today), without submitting today: gap yesterday resets streak to 0
             \OmegaUp\Time::setTimeForTesting($baseTime);
-            $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
             $this->assertSame(0, $streak);
 
             // Now submit today: streak resets to 1 (new streak started today)
@@ -86,7 +117,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
             );
             \OmegaUp\Test\Factories\Run::gradeRun($run);
 
-            $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
             $this->assertSame(1, $streak);
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
@@ -115,7 +148,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Today is baseTime, no submission today yet
             \OmegaUp\Time::setTimeForTesting($baseTime);
-            $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
             $this->assertSame(2, $streak);
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
@@ -144,12 +179,16 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
 
             // At yesterday (day -1), streak is 30
             \OmegaUp\Time::setTimeForTesting($baseTime - 86400);
-            $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
             $this->assertSame(30, $streak);
 
             // At today (day 0), streak is 31
             \OmegaUp\Time::setTimeForTesting($baseTime);
-            $streak = \OmegaUp\DAO\Runs::getCurrentStreak($user->user_id);
+            $streak = \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            );
             $this->assertSame(31, $streak);
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);

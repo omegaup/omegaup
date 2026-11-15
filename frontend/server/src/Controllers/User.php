@@ -1565,6 +1565,19 @@ class User extends \OmegaUp\Controllers\Controller {
         return (array_sum($fields) / count($fields)) * 100;
     }
 
+    public static function getCurrentStreak(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): int {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::USER_CURRENT_STREAK,
+            strval($identity->identity_id),
+            fn () => \OmegaUp\DAO\Submissions::getCurrentStreak(
+                intval($identity->identity_id)
+            ),
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
+    }
+
     /**
      * Get general user info
      *

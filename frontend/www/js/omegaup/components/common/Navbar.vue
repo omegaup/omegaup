@@ -32,10 +32,6 @@
             v-if="isLoggedIn"
             class="navbar-nav navbar-right align-items-end d-lg-none"
           >
-            <omegaup-streak-indicator
-              :streak="currentStreak"
-              class="d-flex align-items-center mr-2"
-            ></omegaup-streak-indicator>
             <omegaup-notifications-clarifications
               v-if="inContest"
               :clarifications="clarifications"
@@ -45,6 +41,11 @@
               :notifications="notifications"
               @read="readNotifications"
             ></omegaup-notification-list>
+            <omegaup-streak-indicator
+              v-if="isMainUserIdentity"
+              :streak="currentStreak"
+              class="d-flex align-items-center ml-2"
+            ></omegaup-streak-indicator>
           </div>
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex mr-2">
             <li class="nav-item d-flex align-items-center">
@@ -108,7 +109,10 @@
                   @read="readNotifications"
                 ></omegaup-notification-list>
               </li>
-              <li class="nav-item d-none d-lg-flex align-items-center">
+              <li
+                v-if="isMainUserIdentity"
+                class="nav-item d-none d-lg-flex align-items-center"
+              >
                 <omegaup-streak-indicator
                   :streak="currentStreak"
                 ></omegaup-streak-indicator>
