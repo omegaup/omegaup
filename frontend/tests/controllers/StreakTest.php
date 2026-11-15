@@ -56,7 +56,9 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertSame(3, $streak);
 
-            $userStreak = \OmegaUp\Controllers\User::getCurrentStreak($identity);
+            $userStreak = \OmegaUp\Controllers\User::getCurrentStreak(
+                $identity
+            );
             $this->assertSame(3, $userStreak);
 
             $login = self::login($identity);
