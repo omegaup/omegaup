@@ -528,7 +528,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             return 0;
         }
         if ($row['last_date'] === $today || $row['last_date'] === $yesterday) {
-            return (int)$row['streak_length'];
+            return $row['streak_length'];
         }
         return 0;
     }
