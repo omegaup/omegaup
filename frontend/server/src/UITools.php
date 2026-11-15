@@ -169,7 +169,7 @@ class UITools {
     /**
      * @return CommonPayload
      */
-    private static function getCommonPayload(
+    public static function getCommonPayload(
         bool $inContest = false,
         string $navbarSection = ''
     ) {
