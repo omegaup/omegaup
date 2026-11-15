@@ -570,17 +570,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
         // Optional review summary. Stored on the general feedback row
         // (range_bytes_start IS NULL), which is also where a student's
         // feedback request is saved, so this replaces that placeholder.
-        // Trim before the 1-1000 check so a whitespace-only summary is absent.
+        // Trim before the length check; a whitespace-only summary is
+        // treated as absent below.
         $generalFeedback = $r->ensureOptionalString(
             'feedback',
             required: false,
-            validator: fn (string $feedback) => (
-                trim($feedback) === '' ||
-                \OmegaUp\Validators::stringOfLengthInRange(
-                    trim($feedback),
-                    1,
-                    1000
-                )
+            validator: fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
+                trim($feedback),
+                0,
+                1000
             )
         );
         if (!is_null($generalFeedback)) {
