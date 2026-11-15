@@ -171,7 +171,8 @@ class UITools {
      */
     public static function getCommonPayload(
         bool $inContest = false,
-        string $navbarSection = ''
+        string $navbarSection = '',
+        ?\OmegaUp\Request $r = null
     ) {
         [
             'email' => $email,
@@ -184,7 +185,7 @@ class UITools {
             'api_tokens' => $apiTokens,
             'is_under_13_user' => $isUnder13User,
             'user_verification_deadline' => $userVerificationDeadline,
-        ] = \OmegaUp\Controllers\Session::getCurrentSession();
+        ] = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $currentStreak = 0;
         if (!is_null($user) && !is_null($identity)) {
             $currentStreak = \OmegaUp\Controllers\User::getCurrentStreak(

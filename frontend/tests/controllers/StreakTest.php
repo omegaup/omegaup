@@ -20,14 +20,12 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         \OmegaUp\Controllers\Session::invalidateCache();
-        $_REQUEST['auth_token'] = $login->auth_token;
-        try {
-            $commonPayload = \OmegaUp\UITools::getCommonPayload(false);
-            $this->assertSame(0, $commonPayload['currentStreak']);
-        } finally {
-            unset($_REQUEST['auth_token']);
-            \OmegaUp\Controllers\Session::invalidateCache();
-        }
+        $commonPayload = \OmegaUp\UITools::getCommonPayload(
+            false,
+            '',
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+        $this->assertSame(0, $commonPayload['currentStreak']);
     }
 
     /**
@@ -63,14 +61,12 @@ class StreakTest extends \OmegaUp\Test\ControllerTestCase {
 
             $login = self::login($identity);
             \OmegaUp\Controllers\Session::invalidateCache();
-            $_REQUEST['auth_token'] = $login->auth_token;
-            try {
-                $commonPayload = \OmegaUp\UITools::getCommonPayload(false);
-                $this->assertSame(3, $commonPayload['currentStreak']);
-            } finally {
-                unset($_REQUEST['auth_token']);
-                \OmegaUp\Controllers\Session::invalidateCache();
-            }
+            $commonPayload = \OmegaUp\UITools::getCommonPayload(
+                false,
+                '',
+                new \OmegaUp\Request(['auth_token' => $login->auth_token])
+            );
+            $this->assertSame(3, $commonPayload['currentStreak']);
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
