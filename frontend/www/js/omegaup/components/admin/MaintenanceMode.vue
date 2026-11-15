@@ -52,34 +52,34 @@
 
         <div class="mb-3">
           <label class="d-block">{{ T.maintenanceModeTypeLabel }}</label>
-          <button
-            v-for="type in maintenanceTypes"
-            :key="type.value"
-            type="button"
-            :class="[
-              'btn',
-              'mr-2',
-              'mb-2',
-              typeButtonClass(type.value),
-              { active: currentMaintenanceType === type.value },
-            ]"
-            :aria-pressed="
-              currentMaintenanceType === type.value ? 'true' : 'false'
-            "
-            @click="currentMaintenanceType = type.value"
-          >
-            {{ type.label }}
-          </button>
+          <div class="d-flex flex-column flex-md-row">
+            <button
+              v-for="type in maintenanceTypes"
+              :key="type.value"
+              type="button"
+              :class="[
+                'btn',
+                'mb-2',
+                'mr-md-2',
+                typeButtonClass(type.value),
+                { active: currentMaintenanceType === type.value },
+              ]"
+              :aria-pressed="
+                currentMaintenanceType === type.value ? 'true' : 'false'
+              "
+              @click="currentMaintenanceType = type.value"
+            >
+              {{ type.label }}
+            </button>
+          </div>
         </div>
 
         <label>{{ T.maintenanceModeMessage }}</label>
-        <div class="row mb-2">
-          <div class="col-auto d-flex align-items-center">
-            <span class="badge badge-secondary w-100">{{
-              T.wordsSpanish
-            }}</span>
+        <div class="row mb-2 language-row">
+          <div class="col-12 col-md-auto language-label mb-1 mb-md-0">
+            <span class="badge badge-secondary">{{ T.wordsSpanish }}</span>
           </div>
-          <div class="col">
+          <div class="col-12 col-md language-field">
             <textarea
               v-model="currentMaintenanceMessageEs"
               :class="['form-control', badgeClass(currentMaintenanceType)]"
@@ -88,13 +88,11 @@
             ></textarea>
           </div>
         </div>
-        <div class="row mb-2">
-          <div class="col-auto d-flex align-items-center">
-            <span class="badge badge-secondary w-100">{{
-              T.wordsEnglish
-            }}</span>
+        <div class="row mb-2 language-row">
+          <div class="col-12 col-md-auto language-label mb-1 mb-md-0">
+            <span class="badge badge-secondary">{{ T.wordsEnglish }}</span>
           </div>
-          <div class="col">
+          <div class="col-12 col-md language-field">
             <textarea
               v-model="currentMaintenanceMessageEn"
               :class="['form-control', badgeClass(currentMaintenanceType)]"
@@ -103,13 +101,11 @@
             ></textarea>
           </div>
         </div>
-        <div class="row mb-2">
-          <div class="col-auto d-flex align-items-center">
-            <span class="badge badge-secondary w-100">{{
-              T.wordsPortuguese
-            }}</span>
+        <div class="row mb-2 language-row">
+          <div class="col-12 col-md-auto language-label mb-1 mb-md-0">
+            <span class="badge badge-secondary">{{ T.wordsPortuguese }}</span>
           </div>
-          <div class="col">
+          <div class="col-12 col-md language-field">
             <textarea
               v-model="currentMaintenanceMessagePt"
               :class="['form-control', badgeClass(currentMaintenanceType)]"
@@ -117,21 +113,6 @@
               @input="autoResize($event)"
             ></textarea>
           </div>
-        </div>
-
-        <div v-if="previewLines.length > 0" class="mt-3">
-          <label class="mb-1">{{ T.wordsPreview }}</label>
-          <div
-            :class="['alert', 'mb-1', badgeClass(currentMaintenanceType)]"
-            data-maintenance-preview
-          >
-            <div v-for="(line, index) in previewLines" :key="index">
-              {{ line }}
-            </div>
-          </div>
-          <small class="form-text text-muted">
-            {{ T.maintenanceModePreviewHelp }}
-          </small>
         </div>
 
         <small class="form-text text-muted mt-3">
@@ -146,6 +127,15 @@
             @click="onCancel"
           >
             {{ T.wordsCancel }}
+          </button>
+          <button
+            class="btn btn-outline-primary mt-2 mt-md-0 mr-md-2"
+            type="button"
+            data-maintenance-preview
+            :disabled="previewMessage === ''"
+            @click="onPreview"
+          >
+            {{ T.wordsPreview }}
           </button>
           <button
             class="btn btn-primary"
@@ -164,6 +154,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 import { types } from '../../api_types';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
@@ -209,6 +200,12 @@ export default class AdminMaintenanceMode extends Vue {
   currentMaintenanceMessagePt = this.maintenanceMessagePt;
   currentMaintenanceType = this.maintenanceType || 'info';
 
+  savedMaintenanceEnabled = this.maintenanceEnabled;
+  savedMaintenanceMessageEs = this.maintenanceMessageEs;
+  savedMaintenanceMessageEn = this.maintenanceMessageEn;
+  savedMaintenanceMessagePt = this.maintenanceMessagePt;
+  savedMaintenanceType = this.maintenanceType || 'info';
+
   T = T;
   MaintenanceType = MaintenanceType;
 
@@ -221,22 +218,30 @@ export default class AdminMaintenanceMode extends Vue {
     { value: MaintenanceType.Error, label: this.T.maintenanceModeTypeError },
   ];
 
-  get previewLines(): string[] {
+  get previewMessage(): string {
     const messages: { [language: string]: string } = {
       es: this.currentMaintenanceMessageEs,
       en: this.currentMaintenanceMessageEn,
       pt: this.currentMaintenanceMessagePt,
     };
-    const message =
+    return (
       messages[this.preferredLanguage] ||
       this.currentMaintenanceMessageEs ||
       this.currentMaintenanceMessageEn ||
       this.currentMaintenanceMessagePt ||
-      '';
-    return message
-      .split(/<br\s*\/?>/i)
-      .map((line) => line.trim())
-      .filter((line) => line !== '');
+      ''
+    );
+  }
+
+  get previewType(): ui.MessageType {
+    switch (this.currentMaintenanceType) {
+      case 'warning':
+        return ui.MessageType.Warning;
+      case 'danger':
+        return ui.MessageType.Danger;
+      default:
+        return ui.MessageType.Info;
+    }
   }
 
   badgeClass(type: string) {
@@ -270,26 +275,31 @@ export default class AdminMaintenanceMode extends Vue {
   @Watch('maintenanceEnabled')
   onMaintenanceEnabledChange(newValue: boolean) {
     this.currentMaintenanceEnabled = newValue;
+    this.savedMaintenanceEnabled = newValue;
   }
 
   @Watch('maintenanceMessageEs')
   onMaintenanceMessageEsChange(newValue: string) {
     this.currentMaintenanceMessageEs = newValue;
+    this.savedMaintenanceMessageEs = newValue;
   }
 
   @Watch('maintenanceMessageEn')
   onMaintenanceMessageEnChange(newValue: string) {
     this.currentMaintenanceMessageEn = newValue;
+    this.savedMaintenanceMessageEn = newValue;
   }
 
   @Watch('maintenanceMessagePt')
   onMaintenanceMessagePtChange(newValue: string) {
     this.currentMaintenanceMessagePt = newValue;
+    this.savedMaintenanceMessagePt = newValue;
   }
 
   @Watch('maintenanceType')
   onMaintenanceTypeChange(newValue: string) {
     this.currentMaintenanceType = newValue;
+    this.savedMaintenanceType = newValue || 'info';
   }
 
   @Emit('toggle-maintenance')
@@ -300,6 +310,11 @@ export default class AdminMaintenanceMode extends Vue {
       this.currentMaintenanceMessageEn = '';
       this.currentMaintenanceMessagePt = '';
       this.currentMaintenanceType = 'info';
+      this.savedMaintenanceEnabled = false;
+      this.savedMaintenanceMessageEs = '';
+      this.savedMaintenanceMessageEn = '';
+      this.savedMaintenanceMessagePt = '';
+      this.savedMaintenanceType = 'info';
     }
     return newValue;
   }
@@ -316,12 +331,20 @@ export default class AdminMaintenanceMode extends Vue {
   }
 
   onCancel(): void {
-    this.currentMaintenanceEnabled = this.maintenanceEnabled;
-    this.currentMaintenanceMessageEs = this.maintenanceMessageEs;
-    this.currentMaintenanceMessageEn = this.maintenanceMessageEn;
-    this.currentMaintenanceMessagePt = this.maintenanceMessagePt;
-    this.currentMaintenanceType = this.maintenanceType || 'info';
+    this.currentMaintenanceEnabled = this.savedMaintenanceEnabled;
+    this.currentMaintenanceMessageEs = this.savedMaintenanceMessageEs;
+    this.currentMaintenanceMessageEn = this.savedMaintenanceMessageEn;
+    this.currentMaintenanceMessagePt = this.savedMaintenanceMessagePt;
+    this.currentMaintenanceType = this.savedMaintenanceType;
     this.selectedTemplateId = '';
+  }
+
+  onPreview(): void {
+    ui.displayStatus({
+      message: this.previewMessage,
+      type: this.previewType,
+      autoHide: false,
+    });
   }
 
   onSelectTemplate() {
@@ -415,21 +438,22 @@ export default class AdminMaintenanceMode extends Vue {
   padding: 0.75rem 1rem;
 }
 
-.row.mb-2 {
-  .col-auto {
+.language-row {
+  .language-label {
     display: flex;
     align-items: stretch;
     .badge {
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
       height: 100%;
       min-width: 100px;
       font-size: 1rem;
       border-radius: 0.25rem;
     }
   }
-  .col {
+  .language-field {
     display: flex;
     align-items: stretch;
     textarea {
@@ -440,6 +464,12 @@ export default class AdminMaintenanceMode extends Vue {
       padding-bottom: 8px;
       border-radius: 0.25rem;
     }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .language-row .language-label .badge {
+    padding: 0.375rem 0.75rem;
   }
 }
 </style>

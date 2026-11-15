@@ -1,7 +1,13 @@
 import { mount } from '@vue/test-utils';
-
 import T from '../../lang';
 import admin_MaintenanceMode from './MaintenanceMode.vue';
+
+import * as ui from '../../ui';
+
+jest.mock('../../ui', () => ({
+  ...jest.requireActual('../../ui'),
+  displayStatus: jest.fn(),
+}));
 
 const predefinedTemplates = [
   {
@@ -45,6 +51,10 @@ const firstEventPayload = (
 };
 
 describe('MaintenanceMode.vue', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('Should only show the status when maintenance is disabled', () => {
     const wrapper = mountMaintenance();
 
@@ -142,35 +152,53 @@ describe('MaintenanceMode.vue', () => {
     });
   });
 
-  it('Should preview the message in the preferred language', () => {
+  it('Should preview the message of the user language with ui.displayStatus', async () => {
     const wrapper = mountMaintenance({
       maintenanceEnabled: true,
-      maintenanceMessageEs: 'Titulo<br>Detalle',
-      maintenanceMessageEn: 'Title<br>Detail',
+      maintenanceMessageEs: 'Hola<br>Mundo',
+      maintenanceMessageEn: 'Hello<br>World',
+      maintenanceMessagePt: 'Olá<br>Mundo',
+      maintenanceType: 'warning',
       preferredLanguage: 'en',
     });
 
-    const lines = wrapper
-      .findAll('[data-maintenance-preview] > div')
-      .wrappers.map((line) => line.text());
-    expect(lines).toEqual(['Title', 'Detail']);
-  });
+    await wrapper.find('[data-maintenance-preview]').trigger('click');
 
-  it('Should not render HTML in the preview', () => {
-    const wrapper = mountMaintenance({
-      maintenanceEnabled: true,
-      maintenanceMessageEs: '<b>Hola</b>',
+    expect(ui.displayStatus).toHaveBeenCalledWith({
+      message: 'Hello<br>World',
+      type: ui.MessageType.Warning,
+      autoHide: false,
     });
-
-    const preview = wrapper.find('[data-maintenance-preview]');
-    expect(preview.text()).toBe('<b>Hola</b>');
-    expect(preview.find('b').exists()).toBe(false);
+    expect(wrapper.emitted('save-maintenance')).toBeUndefined();
   });
 
-  it('Should hide the preview when there is no message', () => {
+  it('Should disable the preview button when there is no message', () => {
     const wrapper = mountMaintenance({ maintenanceEnabled: true });
 
-    expect(wrapper.find('[data-maintenance-preview]').exists()).toBe(false);
+    expect(
+      wrapper.find('[data-maintenance-preview]').attributes('disabled'),
+    ).toBe('disabled');
+  });
+
+  it('Should not bring back a message that was already disabled when cancelling', async () => {
+    const wrapper = mountMaintenance({
+      maintenanceEnabled: true,
+      maintenanceMessageEs: 'Hola',
+      maintenanceMessageEn: 'Hello',
+      maintenanceMessagePt: 'Olá',
+      maintenanceType: 'danger',
+    });
+
+    // Disabling is saved right away by the parent.
+    await wrapper.find('input[type="checkbox"]').setChecked(false);
+    expect(wrapper.emitted('toggle-maintenance')?.[0][0]).toBe(false);
+
+    // Turning it on again is not saved until the user presses "Save".
+    await wrapper.find('input[type="checkbox"]').setChecked(true);
+    await wrapper.find('[data-maintenance-cancel]').trigger('click');
+
+    expect(wrapper.find('textarea').exists()).toBe(false);
+    expect(wrapper.text()).toContain(T.maintenanceModeInactive);
   });
 
   it('Should restore the saved values when cancelling', async () => {

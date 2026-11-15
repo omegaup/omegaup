@@ -1023,7 +1023,6 @@
 	"maintenanceModeMessage": "Message to display",
 	"maintenanceModeMessagePlaceholder": "Enter the message that users will see during maintenance...",
 	"maintenanceModeNotice": "The message will be shown on every omegaUp page to all users.",
-	"maintenanceModePreviewHelp": "This is how users will see the message.",
 	"maintenanceModeSaveHelp": "Turning the message off is applied immediately. Changes to the message are applied when you save.",
 	"maintenanceModeTemplateCustomOption": "Other",
 	"maintenanceModeTemplateSelectPlaceholder": "Choose one option",
