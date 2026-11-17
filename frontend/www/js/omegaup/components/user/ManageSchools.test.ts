@@ -1,4 +1,6 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import { types } from '../../api_types';
 import userManageSchools from './ManageSchools.vue';
 import omegaupRadioSwitch from '../RadioSwitch.vue';
@@ -26,7 +28,7 @@ const profile: types.UserProfileInfo = {
 
 describe('ManageSchools.vue', () => {
   it('Should enable graduation date', async () => {
-    const wrapper = mount(userManageSchools, {
+    const wrapper = mount(userManageSchools as ComponentOptions<Vue>, {
       propsData: {
         profile,
         searchResultSchools: [{ key: 'teams-group', value: 'teams group' }],
@@ -42,7 +44,7 @@ describe('ManageSchools.vue', () => {
   });
 
   it('Should emit user update schools', async () => {
-    const wrapper = mount(userManageSchools, {
+    const wrapper = mount(userManageSchools as ComponentOptions<Vue>, {
       propsData: {
         profile,
         searchResultSchools: [{ key: 1, value: 'escuela' }],
@@ -68,6 +70,31 @@ describe('ManageSchools.vue', () => {
           school_id: 1,
           school_name: 'escuela',
           scholar_degree: 'bachelors',
+        },
+      ],
+    ]);
+  });
+
+  it('Should emit null scholar_degree when omitted from profile', async () => {
+    const profileWithoutDegree: types.UserProfileInfo = {
+      ...profile,
+      scholar_degree: undefined,
+    };
+    const wrapper = mount(userManageSchools as ComponentOptions<Vue>, {
+      propsData: {
+        profile: profileWithoutDegree,
+        searchResultSchools: [{ key: 1, value: 'escuela' }],
+      },
+    });
+
+    await wrapper.find('button[type="submit"]').trigger('submit');
+    expect(wrapper.emitted('update-user-schools')).toEqual([
+      [
+        {
+          graduation_date: null,
+          school_id: 1,
+          school_name: 'escuela',
+          scholar_degree: null,
         },
       ],
     ]);
