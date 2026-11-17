@@ -94,7 +94,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue, { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -110,7 +111,8 @@ import homepage_Cookie from './CookieConsent.vue';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expires: -1 });
 
-@Component({
+export default defineComponent({
+  name: 'Homepage',
   components: {
     'omegaup-carousel': homepage_Carousel,
     'omegaup-coder-of-the-month': homepage_CoderOfTheMonth,
@@ -122,30 +124,59 @@ Vue.use(VueCookies, { expires: -1 });
     'omegaup-sponsors': homepage_Sponsors,
     'omegaup-cookie-accept-decline': homepage_Cookie,
   },
-})
-export default class Homepage extends Vue {
-  @Prop() coderOfTheMonth!: types.UserProfile;
-  @Prop() coderOfTheMonthFemale!: types.UserProfile;
-  @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
-  @Prop() currentUserInfo!: omegaup.User;
-  @Prop() rankTable!: omegaup.UserRankTable;
-  @Prop() schoolsRank!: omegaup.SchoolRankTable;
-  @Prop() isUnder13User!: boolean;
-  @Prop({ default: () => [] }) carouselItems!: types.CarouselItem[];
+  props: {
+    coderOfTheMonth: {
+      type: Object as PropType<types.UserProfile | null>,
+      default: null,
+    },
+    coderOfTheMonthFemale: {
+      type: Object as PropType<types.UserProfile | null>,
+      default: null,
+    },
+    schoolOfTheMonth: {
+      type: Object as PropType<omegaup.SchoolOfTheMonth | null>,
+      default: null,
+    },
+    currentUserInfo: {
+      type: Object as PropType<omegaup.User>,
+      required: true,
+    },
+    rankTable: {
+      type: Object as PropType<omegaup.UserRankTable>,
+      required: true,
+    },
+    schoolsRank: {
+      type: Object as PropType<omegaup.SchoolRankTable>,
+      required: true,
+    },
+    isUnder13User: {
+      type: Boolean,
+      required: true,
+    },
+    carouselItems: {
+      type: Array as PropType<types.CarouselItem[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  methods: {
+    cookieClickedAccept() {
+      // TODO: make an API to send the response to the server
+      this.$cookies.set('accept-cookies', true, -1);
+    },
 
-  T = T;
-  cookieClickedAccept() {
-    // TODO: make an API to send the response to the server
-    this.$cookies.set('accept-cookies', true, -1);
-  }
+    cookieClickedDecline() {
+      // TODO: make an API to send the response to the server
+      this.$cookies.set('accept-cookies', false, -1);
+    },
 
-  cookieClickedDecline() {
-    // TODO: make an API to send the response to the server
-    this.$cookies.set('accept-cookies', false, -1);
-  }
-
-  cookieClickedPostpone() {
-    // TODO: make an API to send the response to the server
-  }
-}
+    cookieClickedPostpone() {
+      // TODO: make an API to send the response to the server
+    },
+  },
+});
 </script>
