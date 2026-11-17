@@ -3207,7 +3207,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Problems is optional
         if (!is_null($problems)) {
-            /** @var mixed */
             $requestProblems = json_decode($problems, associative: true);
             if (!is_array($requestProblems)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -3224,7 +3223,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     || !isset($requestProblem['problem'])
                     || !is_string($requestProblem['problem'])
                     || !isset($requestProblem['points'])
-                    || !is_numeric($requestProblem['points'])
+                    || (
+                        !is_int($requestProblem['points'])
+                        && !is_float($requestProblem['points'])
+                    )
                 ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'invalidParameters',
