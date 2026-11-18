@@ -110,6 +110,24 @@ def test_infrastructure_failure_is_requeued(
     channel.basic_ack.assert_not_called()
 
 
+def test_access_denied_failure_is_not_requeued(
+        mocker: pytest_mock.MockerFixture
+) -> None:
+    '''A wrapped access-denied error is rejected without requeueing.'''
+    error = errors.InterfaceError(  # type: ignore[attr-defined]
+        'Can not reconnect to MySQL after 3 attempt(s)')
+    error.__cause__ = errors.ProgrammingError(  # type: ignore[attr-defined]
+        'Access denied', errno=1045)
+    dbconn = mocker.MagicMock()
+    dbconn.ping.side_effect = error
+    callback = contest_callback.ContestsCallback(dbconn=dbconn)
+
+    channel = _deliver(mocker, callback, body=_valid_body())
+
+    channel.basic_nack.assert_called_once_with(delivery_tag=7, requeue=False)
+    channel.basic_ack.assert_not_called()
+
+
 @pytest.mark.parametrize(
     'body',
     [

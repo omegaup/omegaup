@@ -31,9 +31,32 @@ _TRANSIENT_MYSQL_ERRNOS = frozenset({
     errorcode.CR_SERVER_LOST,  # type: ignore[attr-defined]
 })
 
+_PERMANENT_MYSQL_ERRNOS = frozenset({
+    errorcode.ER_ACCESS_DENIED_ERROR,  # type: ignore[attr-defined]
+})
+
+
+def _has_mysql_errno(err: BaseException, errnos: frozenset[int]) -> bool:
+    '''Returns whether an exception in the cause chain has a MySQL errno.'''
+    current: Optional[BaseException] = err
+    for _ in range(10):
+        if current is None:
+            break
+        if getattr(current, 'errno', None) in errnos:
+            return True
+        current = current.__cause__
+    return False
+
+
+def _is_permanent_mysql_error(err: BaseException) -> bool:
+    '''Returns whether the MySQL error cannot be resolved by retrying.'''
+    return _has_mysql_errno(err, _PERMANENT_MYSQL_ERRNOS)
+
 
 def _is_transient(err: Exception) -> bool:
     '''Tells infrastructure failures apart from permanent errors.'''
+    if _is_permanent_mysql_error(err):
+        return False
     if isinstance(err, _TRANSIENT_ERRORS):
         return True
     return getattr(err, 'errno', None) in _TRANSIENT_MYSQL_ERRNOS
@@ -98,6 +121,14 @@ class ContestsCallback:
             self._handle_processing_error(contest_id, 'fatal_error')
             raise
         except Exception as err:  # pylint: disable=broad-except
+            if _is_permanent_mysql_error(err):
+                logging.error(
+                    'Contest %s failed permanently (%s, cause: %s)',
+                    contest_id, type(err).__name__, _root_cause(err))
+                self._handle_processing_error(contest_id, 'fatal_error')
+                raise rabbitmq_client.UnrecoverableMessageError(
+                    'Permanent MySQL error while processing the message'
+                ) from err
             if _is_transient(err):
                 logging.warning(
                     'Contest %s failed temporarily (%s, cause: %s), it will '
