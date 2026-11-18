@@ -15,9 +15,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-22.04
+    outputs:
+      php: ${{ steps.filter.outputs.php }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      python: ${{ steps.filter.outputs.python }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - id: filter
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "php=true" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+            echo "python=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD \
+            | bash ./stuff/ci-paths.sh >> "$GITHUB_OUTPUT"
+
   verify-action-hashes:
     name: Verify Action Hashes
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.php == 'true'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
@@ -38,7 +62,8 @@ jobs:
 
   php:
     runs-on: ubuntu-22.04
-    needs: verify-action-hashes
+    needs: [verify-action-hashes, changes]
+    if: needs.changes.outputs.php == 'true'
 
     services:
       mysql:
@@ -214,6 +239,8 @@ jobs:
   javascript:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -371,6 +398,8 @@ jobs:
     name: cypress (${{ matrix.name }})
     runs-on: ubuntu-22.04
     timeout-minutes: 25
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -463,6 +492,8 @@ jobs:
 
   python:
     runs-on: ubuntu-22.04
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
