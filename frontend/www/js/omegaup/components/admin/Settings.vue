@@ -36,9 +36,9 @@ import T from '../../lang';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
+import { faLaptopCode } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-library.add(fas);
+library.add(faLaptopCode);
 
 @Component({
   components: {
