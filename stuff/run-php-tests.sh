@@ -26,9 +26,17 @@ fi
 
 mkdir -p "${OMEGAUP_ROOT}/frontend/tests/runfiles"
 
+JUNIT_PATH="${OMEGAUP_JUNIT:-${OMEGAUP_ROOT}/frontend/tests/runfiles/phpunit-junit.xml}"
+CLOVER_PATH="${OMEGAUP_CLOVER:-${OMEGAUP_ROOT}/coverage.xml}"
+if [[ "${CLOVER_PATH}" == *.php ]]; then
+	COVERAGE_ARG="--coverage-php=${CLOVER_PATH}"
+else
+	COVERAGE_ARG="--coverage-clover=${CLOVER_PATH}"
+fi
+
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
 	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
-	--coverage-clover="${OMEGAUP_ROOT}/coverage.xml" \
-	--log-junit="${OMEGAUP_ROOT}/frontend/tests/runfiles/phpunit-junit.xml" \
+	"${COVERAGE_ARG}" \
+	--log-junit="${JUNIT_PATH}" \
 	"${ARGS[@]}"
