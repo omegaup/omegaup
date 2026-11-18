@@ -109,7 +109,7 @@ describe('Requests.vue', () => {
     expect(wrapper.find('table tbody').text()).toContain('test_user_1');
     expect(wrapper.find('table tbody').text()).not.toContain('test_user_2');
 
-    await wrapper.find('div[data-requests] input').trigger('click');
+    await wrapper.find('div[data-requests] input').setChecked(true);
     expect(wrapper.find('table tbody').text()).toContain('test_user_2');
   });
 });
