@@ -1179,8 +1179,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
         string $groupAlias
     ): void {
         if (
-            !self::isGroupManagedIdentity($identity, $groupAlias, false)
-            && !self::isGroupManagedIdentity($identity, $groupAlias, true)
+            !self::isGroupManagedIdentity($identity, $groupAlias, isTeam: false)
+            && !self::isGroupManagedIdentity(
+                $identity,
+                $groupAlias,
+                isTeam: true
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
