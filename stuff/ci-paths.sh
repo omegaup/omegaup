@@ -6,7 +6,7 @@
 set -eu
 
 classify() {
-	local php=false frontend=false python=false f
+	local php=false frontend=false python=false teaching=false f
 	while IFS= read -r f || [[ -n "${f:-}" ]]; do
 		[[ -z "${f}" ]] && continue
 		case "${f}" in
@@ -15,6 +15,7 @@ classify() {
 				php=true
 				frontend=true
 				python=true
+				teaching=true
 				;;
 			composer.json|composer.lock|frontend/server/*|frontend/tests/*|frontend/database/*|stuff/*)
 				php=true
@@ -33,8 +34,13 @@ classify() {
 				python=true
 				;;
 		esac
+		case "${f}" in
+			stuff/teaching_assistant/*)
+				teaching=true
+				;;
+		esac
 	done
-	printf 'php=%s\nfrontend=%s\npython=%s\n' "${php}" "${frontend}" "${python}"
+	printf 'php=%s\nfrontend=%s\npython=%s\nteaching=%s\n' "${php}" "${frontend}" "${python}" "${teaching}"
 }
 
 if [[ "${1:-}" == "--self-check" ]]; then
@@ -50,15 +56,16 @@ if [[ "${1:-}" == "--self-check" ]]; then
 			exit 1
 		fi
 	}
-	check docs $'README.md' $'php=false\nfrontend=false\npython=false'
-	check wiki $'frontend/www/docs/Home.md' $'php=false\nfrontend=false\npython=false'
-	check php $'frontend/server/src/Controllers/User.php' $'php=true\nfrontend=false\npython=false'
-	check js $'frontend/www/js/omegaup/api.ts' $'php=false\nfrontend=true\npython=false'
-	check py $'stuff/cron/foo.py' $'php=true\nfrontend=false\npython=true'
-	check sh $'stuff/mysql_types.sh' $'php=true\nfrontend=false\npython=false'
-	check workflow $'.github/workflows/ci.yml' $'php=true\nfrontend=true\npython=true'
-	check compose $'docker-compose.yml' $'php=true\nfrontend=true\npython=true'
-	check docs_py $'stuff/docs/tool.py' $'php=false\nfrontend=false\npython=false'
+	check docs $'README.md' $'php=false\nfrontend=false\npython=false\nteaching=false'
+	check wiki $'frontend/www/docs/Home.md' $'php=false\nfrontend=false\npython=false\nteaching=false'
+	check php $'frontend/server/src/Controllers/User.php' $'php=true\nfrontend=false\npython=false\nteaching=false'
+	check js $'frontend/www/js/omegaup/api.ts' $'php=false\nfrontend=true\npython=false\nteaching=false'
+	check py $'stuff/cron/foo.py' $'php=true\nfrontend=false\npython=true\nteaching=false'
+	check sh $'stuff/mysql_types.sh' $'php=true\nfrontend=false\npython=false\nteaching=false'
+	check workflow $'.github/workflows/ci.yml' $'php=true\nfrontend=true\npython=true\nteaching=true'
+	check compose $'docker-compose.yml' $'php=true\nfrontend=true\npython=true\nteaching=true'
+	check docs_py $'stuff/docs/tool.py' $'php=false\nfrontend=false\npython=false\nteaching=false'
+	check ta $'stuff/teaching_assistant/foo.py' $'php=true\nfrontend=false\npython=true\nteaching=true'
 	echo "ci-paths ok"
 	exit 0
 fi

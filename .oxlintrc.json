@@ -21,6 +21,7 @@
     "**/third_party/**",
     "frontend/www/karel.js/**",
     "frontend/www/rekarel/**",
+    "frontend/www/preguntas/**",
     "frontend/www/js/omegaup/lang.*",
     "frontend/www/**/*.d.ts",
     "frontend/www/js/omegaup/api_types.ts"

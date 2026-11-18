@@ -21,6 +21,7 @@ jobs:
       php: ${{ steps.filter.outputs.php }}
       frontend: ${{ steps.filter.outputs.frontend }}
       python: ${{ steps.filter.outputs.python }}
+      teaching: ${{ steps.filter.outputs.teaching }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
@@ -32,6 +33,7 @@ jobs:
             echo "php=true" >> "$GITHUB_OUTPUT"
             echo "frontend=true" >> "$GITHUB_OUTPUT"
             echo "python=true" >> "$GITHUB_OUTPUT"
+            echo "teaching=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD \
@@ -121,8 +123,12 @@ jobs:
           sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.1 100
           # Enable APCu for tests
           echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.1/cli/conf.d/20-apcu.ini >/dev/null
-          # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
+          # ponytail: coverage instruments every test. Keep it on main, skip it on pull requests.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo 'xdebug.mode=off' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
+          else
+            echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
+          fi
 
       - name: Create default configuration files
         run: |
@@ -196,6 +202,7 @@ jobs:
       - name: Run tests
         env:
           MYSQL_TCP_PORT: 13306
+          OMEGAUP_COVERAGE: ${{ github.event_name != 'pull_request' && '1' || '0' }}
         timeout-minutes: 20
         run: ./stuff/mysql_types.sh
 
@@ -214,6 +221,7 @@ jobs:
             --show-info=false
 
       - name: Upload code coverage
+        if: github.event_name != 'pull_request'
         run: |
           curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
           echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
@@ -562,6 +570,8 @@ jobs:
 
   teaching-assistant:
     runs-on: ubuntu-22.04
+    needs: changes
+    if: needs.changes.outputs.teaching == 'true'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5

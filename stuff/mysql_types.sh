@@ -124,10 +124,12 @@ else
 	if (( status != 0 )); then
 		exit "${status}"
 	fi
-	php "${OMEGAUP_ROOT}/stuff/merge-coverage.php" \
-		"${OMEGAUP_ROOT}/vendor/autoload.php" \
-		"${OMEGAUP_ROOT}/frontend/tests/runfiles" \
-		"${OMEGAUP_ROOT}/coverage.xml"
+	if [[ "${OMEGAUP_COVERAGE:-1}" != "0" ]]; then
+		php "${OMEGAUP_ROOT}/stuff/merge-coverage.php" \
+			"${OMEGAUP_ROOT}/vendor/autoload.php" \
+			"${OMEGAUP_ROOT}/frontend/tests/runfiles" \
+			"${OMEGAUP_ROOT}/coverage.xml"
+	fi
 fi
 
 # Disable General Query Log
