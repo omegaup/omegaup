@@ -47,6 +47,7 @@ OmegaUp.on('ready', () => {
           associatedIdentities: payload.associatedIdentities,
           currentEmail: payload.currentEmail,
           currentName: payload.currentName,
+          currentStreak: payload.currentStreak,
           currentUsername: mainStore.state.username,
           isAdmin: payload.isAdmin,
           isSupportTeamMember: payload.isSupportTeamMember,

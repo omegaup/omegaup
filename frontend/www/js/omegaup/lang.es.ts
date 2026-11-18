@@ -2020,6 +2020,8 @@ const translations: { [key: string]: string; } = {
   statementLanguageEs: "Espa\u00f1ol",
   statementLanguagePt: "Portugu\u00e9s",
   statementNotFound: "Redacci\u00f3n no encontrada",
+  streakIndicatorTooltip: "Racha actual: %(count) d\u00edas",
+  streakIndicatorTooltipOne: "Racha actual: %(count) d\u00eda",
   studentCourseInformationDescription: "Aqu\u00ed encontrar\u00e1s la lista de los cursos en los que te has inscrito.",
   studentProgressDescriptionTotalPoints: "(%(points) puntos + %(extraPoints) extra)",
   studentProgressExtraProblem: "(extra)",
