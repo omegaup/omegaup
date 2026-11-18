@@ -59,15 +59,10 @@ fi
 if [[ -n "${OMEGAUP_TEST_WORKERS:-}" ]]; then
 	workers="${OMEGAUP_TEST_WORKERS}"
 elif command -v nproc >/dev/null 2>&1; then
+	# ponytail: one PHPUnit process per core. MySQL shares the runner; set OMEGAUP_TEST_WORKERS if that stalls.
 	workers="$(nproc)"
-	if (( workers > 1 )); then
-		workers=$((workers - 1))
-	fi
 else
 	workers="$(sysctl -n hw.ncpu)"
-	if (( workers > 1 )); then
-		workers=$((workers - 1))
-	fi
 fi
 
 tests=()
