@@ -1,9 +1,7 @@
 <template>
   <div class="post">
     <div class="copy">
-      <h1>
-        <a :href="typeUrl">{{ alias }}</a> — {{ T.activityReport }}
-      </h1>
+      <h1><a :href="typeUrl">{{ alias }}</a> — {{ T.activityReport }}</h1>
       <p>{{ wordsReportSummary }}</p>
       <!-- Nav tabs -->
       <ul class="nav nav-tabs" role="tablist">
@@ -119,9 +117,7 @@
           </p>
           <table v-else class="table">
             <caption>
-              {{
-                T.activityReportDuplicatesForUsersDescription
-              }}
+              {{ T.activityReportDuplicatesForUsersDescription }}
             </caption>
             <thead>
               <tr>
@@ -159,9 +155,7 @@
           </p>
           <table v-else class="table">
             <caption>
-              {{
-                T.activityReportDuplicatesForOriginsDescription
-              }}
+              {{ T.activityReportDuplicatesForOriginsDescription }}
             </caption>
             <thead>
               <tr>

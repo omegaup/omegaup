@@ -339,7 +339,7 @@ export default defineComponent({
       return getEmptyItem();
     },
     showItemModal(): void {
-      ((this.$refs.carouselItemModal as unknown) as ModalRef).show();
+      (this.$refs.carouselItemModal as unknown as ModalRef).show();
     },
     openCreateModal(): void {
       this.isEditing = false;
@@ -437,7 +437,7 @@ export default defineComponent({
       } else {
         this.$emit('create-item', this.currentItem);
       }
-      ((this.$refs.carouselItemModal as unknown) as ModalRef).hide();
+      (this.$refs.carouselItemModal as unknown as ModalRef).hide();
     },
     resetModalState(): void {
       this.currentItem = this.getEmptyItem();

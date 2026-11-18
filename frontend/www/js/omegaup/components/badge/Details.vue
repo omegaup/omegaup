@@ -135,7 +135,7 @@ export default defineComponent({
   &-text {
     font-size: 1.1em;
 
-    >>> &-icon {
+    >  >  > &-icon {
       font-size: 30px;
     }
   }

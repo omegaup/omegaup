@@ -37,11 +37,11 @@
   --btn-intro-js-background-color: #f4f4f4;
   --btn-intro-js-font-color: #212529;
   --btn-intro-js-border-color: #bdbdbd;
-  --btn-github-background-color: #ffffff;
+  --btn-github-background-color: #fff;
   --btn-github-background-color--hover: #f9fafb;
   --btn-github-border-color: #d1d5db;
   --btn-github-border-color--hover: #9ca3af;
-  --btn-github-font-color: #000000;
+  --btn-github-font-color: #000;
   --btn-contest-preset-outline-color: #c0c4c7;
 
   // PASSWORD TOGGLE
@@ -50,7 +50,7 @@
 
   // REQUIRED FIELD INDICATORS
   --field-required-incomplete-color: #dc3545; // Red - needs attention
-  --field-required-complete-color: #000000; // Black - completed
+  --field-required-complete-color: #000; // Black - completed
 
   // MARKDOWN
   --markdown-pre-background-color: #eee;
@@ -126,9 +126,9 @@
   --arena-runs-table-status-ac-font-color: #333;
   --arena-runs-table-status-ce-background-color: #f90;
   --arena-runs-table-status-ce-font-color: #fff;
-  --arena-runs-table-status-pa-background-color: #ffdd00;
+  --arena-runs-table-status-pa-background-color: #fd0;
   --arena-runs-table-status-ole-background-color: #739de3;
-  --arena-runs-table-status-rte-background-color: #ff8888;
+  --arena-runs-table-status-rte-background-color: #f88;
   --arena-runs-table-status-rfe-background-color: #c09853;
   --arena-runs-table-row-selected-background-color: #e0ffe0;
   --arena-runs-table-row-selected-border-color: #468847;
@@ -176,27 +176,27 @@
   --arena-reset-text-color: #6c757d;
 
   // USER HEATMAP
-  --user-heatmap-empty-cell-color: #dddddd;
+  --user-heatmap-empty-cell-color: #ddd;
   --user-heatmap-low-activity-color: #739de3;
-  --user-heatmap-medium-activity-color: #5588dd;
+  --user-heatmap-medium-activity-color: #58d;
   --user-heatmap-high-activity-color: #4670b5;
   --user-heatmap-background-color: transparent;
-  --user-heatmap-wrapper-background-color: #ffffff;
-  --user-chart-section-background-color: #ffffff;
-  --user-chart-section-heatmap-background-color: #ffffff;
-  --user-chart-title-color: #333333;
+  --user-heatmap-wrapper-background-color: #fff;
+  --user-chart-section-background-color: #fff;
+  --user-chart-section-heatmap-background-color: #fff;
+  --user-chart-title-color: #333;
 
   // PROBLEM SOLVING PROGRESS
-  --problem-progress-background-color: #ffffff;
-  --problem-progress-text-primary-color: #333333;
-  --problem-progress-text-secondary-color: #666666;
-  --problem-progress-text-muted-color: #999999;
+  --problem-progress-background-color: #fff;
+  --problem-progress-text-primary-color: #333;
+  --problem-progress-text-secondary-color: #666;
+  --problem-progress-text-muted-color: #999;
   --problem-progress-bg-light-color: #f7f7f7;
   --problem-progress-border-light-color: #e8e8e8;
   --problem-progress-easy-color: #00b8a3;
   --problem-progress-medium-color: #ffc01e;
   --problem-progress-hard-color: #ef4743;
-  --problem-progress-unlabelled-color: #999999;
+  --problem-progress-unlabelled-color: #999;
 
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
@@ -379,8 +379,8 @@
   //MONACO EDITOR
   --monaco-editor-toolbar-background-color: #f4f4f4;
   --monaco-editor-toolbar-label-background-color: #e1e1e1;
-  --monaco-editor-toolbar-label-color: #777777;
-  --monaco-editor-toolbar-label-border-color: #cccccc;
+  --monaco-editor-toolbar-label-color: #777;
+  --monaco-editor-toolbar-label-border-color: #ccc;
   --monaco-editor-toolbar-border-bottom-color: #ccc;
 
   // CONTEST CARD

@@ -193,7 +193,9 @@ export default class ContestCardv2 extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 .contest-card-vertical {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   border: 1px solid var(--contest-card-border-color);
   height: 100% !important;
 

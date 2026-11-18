@@ -307,7 +307,10 @@ export default class CollectionList extends Vue {
 .filters-sidebar {
   width: 250px;
   min-width: 250px;
-  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.2s ease;
+  transition:
+    width 0.3s ease,
+    min-width 0.3s ease,
+    opacity 0.2s ease;
   overflow: hidden;
   padding-right: 1rem;
 }
@@ -355,7 +358,9 @@ export default class CollectionList extends Vue {
     border-right: 1px solid
       var(--problem-collection-list-mobile-sidebar-border-color);
     box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, opacity 0.2s ease;
+    transition:
+      transform 0.3s ease,
+      opacity 0.2s ease;
   }
 
   .filters-sidebar.filters-hidden {

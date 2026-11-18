@@ -173,7 +173,7 @@ h2 {
   font-size: 1.2em;
 }
 
-.problem-change-log-message>>p {
+.problem-change-log-message >  > p {
   margin-bottom: 0;
 }
 

@@ -164,15 +164,9 @@
           <p class="mb-1">
             <strong>{{ T.wordsName }}:</strong> {{ identity.name }}
           </p>
-          <p>
-            <strong>{{ T.profileCountry }}:</strong> {{ identity.country }}
-          </p>
-          <p>
-            <strong>{{ T.profileState }}:</strong> {{ identity.state }}
-          </p>
-          <p>
-            <strong>{{ T.profileSchool }}:</strong> {{ identity.school }}
-          </p>
+          <p><strong>{{ T.profileCountry }}:</strong> {{ identity.country }}</p>
+          <p><strong>{{ T.profileState }}:</strong> {{ identity.state }}</p>
+          <p><strong>{{ T.profileSchool }}:</strong> {{ identity.school }}</p>
 
           <div class="d-flex justify-content-between mt-3">
             <button

@@ -404,7 +404,8 @@ export default class MonacoEditor extends Vue {
 @import '../../../sass/main.scss';
 
 .monaco-root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   position: relative;
   border: 1px solid var(--monaco-editor-toolbar-border-bottom-color, #d1d5db);
 

@@ -44,15 +44,15 @@ export default defineComponent({
       default: false,
     },
     selectedValue: {
-      type: (null as unknown) as PropType<any>,
+      type: null as unknown as PropType<any>,
       default: undefined,
     },
     valueForTrue: {
-      type: (null as unknown) as PropType<any>,
+      type: null as unknown as PropType<any>,
       default: true,
     },
     valueForFalse: {
-      type: (null as unknown) as PropType<any>,
+      type: null as unknown as PropType<any>,
       default: false,
     },
     textForTrue: {

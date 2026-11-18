@@ -191,13 +191,8 @@ export function describeSchedule(schedule?: string | null): string | null {
   if (fields.length !== CRON_FIELD_COUNT) {
     return null;
   }
-  const [
-    minuteField,
-    hourField,
-    dayOfMonthField,
-    monthField,
-    dayOfWeekField,
-  ] = fields;
+  const [minuteField, hourField, dayOfMonthField, monthField, dayOfWeekField] =
+    fields;
   if (monthField !== '*') {
     return null;
   }

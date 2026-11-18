@@ -7,7 +7,8 @@
     "oxc",
     "import",
     "node",
-    "jest"
+    "jest",
+    "vue"
   ],
   "categories": {
     "correctness": "error",
@@ -131,6 +132,8 @@
     "unicorn/prefer-string-starts-ends-with": "off",
     "unicorn/prefer-type-error": "off",
     "unicorn/require-post-message-target-origin": "off",
+    "vue/no-deprecated-destroyed-lifecycle": "off",
+    "vue/no-deprecated-delete-set": "off",
     "no-console": [
       "error",
       {

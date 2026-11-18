@@ -464,22 +464,34 @@ export default class Sidebar extends Vue {
 
   @Watch('groups')
   onGroupsChanged() {
-    this.editGroupModal = this.groups.reduce((acc, group) => {
-      acc[group.groupID] = false;
-      return acc;
-    }, {} as { [key: string]: boolean });
-    this.editGroupName = this.groups.reduce((acc, group) => {
-      acc[group.groupID] = group.name;
-      return acc;
-    }, {} as { [key: string]: string });
-    this.editGroupPoints = this.groups.reduce((acc, group) => {
-      acc[group.groupID] = group.points;
-      return acc;
-    }, {} as { [key: string]: number });
-    this.editGroupAutoPoints = this.groups.reduce((acc, group) => {
-      acc[group.groupID] = group.autoPoints;
-      return acc;
-    }, {} as { [key: string]: boolean });
+    this.editGroupModal = this.groups.reduce(
+      (acc, group) => {
+        acc[group.groupID] = false;
+        return acc;
+      },
+      {} as { [key: string]: boolean },
+    );
+    this.editGroupName = this.groups.reduce(
+      (acc, group) => {
+        acc[group.groupID] = group.name;
+        return acc;
+      },
+      {} as { [key: string]: string },
+    );
+    this.editGroupPoints = this.groups.reduce(
+      (acc, group) => {
+        acc[group.groupID] = group.points;
+        return acc;
+      },
+      {} as { [key: string]: number },
+    );
+    this.editGroupAutoPoints = this.groups.reduce(
+      (acc, group) => {
+        acc[group.groupID] = group.autoPoints;
+        return acc;
+      },
+      {} as { [key: string]: boolean },
+    );
   }
 
   toggleGroupAutoPoints(groupID: GroupID) {

@@ -652,7 +652,9 @@ nav.navbar {
   }
 
   a[data-logout-button] {
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
     border-radius: 4px;
   }
 

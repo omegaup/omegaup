@@ -113,7 +113,9 @@ export default defineComponent({
 .card-header {
   color: var(--coder-of-the-month-card-header-font-color);
   background-color: var(--coder-of-the-month-card-header-background-color);
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
   cursor: pointer;
 
   &:hover {
@@ -128,7 +130,9 @@ export default defineComponent({
     background-color: var(
       --coder-of-the-month-card-header-female-background-color
     );
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition:
+      background-color 0.3s ease,
+      transform 0.2s ease;
     cursor: pointer;
 
     &:hover {

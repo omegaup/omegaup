@@ -78,8 +78,8 @@ button.list-group-item {
 
 textarea {
   flex: 1;
-  font-family: 'Droid Sans Mono', 'Courier New', monospace,
-    'Droid Sans Fallback';
+  font-family:
+    'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback';
   border: 0px;
   resize: none;
 }
