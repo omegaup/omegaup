@@ -10,7 +10,7 @@ import certificate_Mine from './Mine.vue';
 
 // defineComponent() is typed for Vue 2.7/3 interop; @vue/test-utils@1 expects
 // ComponentOptions<Vue>. Runtime is correct — assertion removed with test-utils@2.
-const Mine = (certificate_Mine as unknown) as ComponentOptions<Vue> & {
+const Mine = certificate_Mine as unknown as ComponentOptions<Vue> & {
   methods: {
     getVerificationLink: (verificationCode: string) => string;
     getDownloadLink: (verificationCode: string) => string;

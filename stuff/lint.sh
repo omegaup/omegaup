@@ -20,6 +20,18 @@ else
 	ARGS="fix ${MERGE_BASE}"
 fi
 
+cd "${OMEGAUP_ROOT}"
+ox_start=$(date +%s)
+pnpm exec oxlint --deny-warnings frontend/www cypress
+ox_mid=$(date +%s)
+if [[ " ${ARGS} " == *" validate "* ]]; then
+	pnpm exec oxfmt --check 'frontend/www/**/*.ts' 'cypress/**/*.ts'
+else
+	pnpm exec oxfmt 'frontend/www/**/*.ts' 'cypress/**/*.ts'
+fi
+ox_end=$(date +%s)
+echo "oxlint_seconds=$((ox_mid - ox_start)) oxfmt_seconds=$((ox_end - ox_mid))"
+
 if [[ -t 0 ]]; then
 	# This is being run in an environment where stdin is connected to a TTY.
 	TTY_ARGS="--interactive --tty"

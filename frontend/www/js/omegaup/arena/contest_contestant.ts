@@ -210,8 +210,8 @@ OmegaUp.on('ready', async () => {
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
-          shouldShowFirstAssociatedIdentityRunWarning: this
-            .shouldShowFirstAssociatedIdentityRunWarning,
+          shouldShowFirstAssociatedIdentityRunWarning:
+            this.shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
           isBlocked: this.isBlocked,
           blockedMessage: this.blockedMessage,
@@ -538,7 +538,8 @@ OmegaUp.on('ready', async () => {
         );
         rankingStore.commit('updateRanking', normalizedRanking);
 
-        const selectedProblem = contestContestant.problem as types.NavbarProblemsetProblem | null;
+        const selectedProblem =
+          contestContestant.problem as types.NavbarProblemsetProblem | null;
         if (!selectedProblem) {
           return;
         }
@@ -659,12 +660,15 @@ OmegaUp.on('ready', async () => {
     window.addEventListener('popstate', syncFromHash);
   });
 
-  setInterval(() => {
-    refreshContestClarifications({
-      type: ContestClarificationType.AllProblems,
-      contestAlias: payload.contest.alias,
-      offset: 0,
-      rowcount: 100,
-    });
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      refreshContestClarifications({
+        type: ContestClarificationType.AllProblems,
+        contestAlias: payload.contest.alias,
+        offset: 0,
+        rowcount: 100,
+      });
+    },
+    5 * 60 * 1000,
+  );
 });

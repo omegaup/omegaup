@@ -42,8 +42,8 @@ OmegaUp.on('ready', async () => {
 
   const courseAdmin = Boolean(
     payload.courseDetails.is_admin ||
-      payload.courseDetails.is_curator ||
-      payload.courseDetails.is_teaching_assistant,
+    payload.courseDetails.is_curator ||
+    payload.courseDetails.is_teaching_assistant,
   );
   const activeTab = getSelectedValidTab(
     locationHash,
@@ -142,8 +142,8 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
           socketStatus: socketStore.state.socketStatus,
-          shouldShowFirstAssociatedIdentityRunWarning: this
-            .shouldShowFirstAssociatedIdentityRunWarning,
+          shouldShowFirstAssociatedIdentityRunWarning:
+            this.shouldShowFirstAssociatedIdentityRunWarning,
           feedbackMap: this.feedbackMap,
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
@@ -581,9 +581,7 @@ OmegaUp.on('ready', async () => {
       .catch(ui.apiError);
   }
 
-  function getFeedbackMap(
-    runDetailsFeedback: types.SubmissionFeedback[],
-  ): {
+  function getFeedbackMap(runDetailsFeedback: types.SubmissionFeedback[]): {
     feedbackMap: Map<number, ArenaCourseFeedback>;
     feedbackThreadMap: Map<number, ArenaCourseFeedback>;
   } {
@@ -662,12 +660,15 @@ OmegaUp.on('ready', async () => {
   });
   socket.connect();
 
-  setInterval(() => {
-    refreshCourseClarifications({
-      type: CourseClarificationType.AllProblems,
-      courseAlias: payload.courseDetails.alias,
-    });
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      refreshCourseClarifications({
+        type: CourseClarificationType.AllProblems,
+        courseAlias: payload.courseDetails.alias,
+      });
+    },
+    5 * 60 * 1000,
+  );
 
   const component = arenaCourse.$refs.component as arena_Course;
 

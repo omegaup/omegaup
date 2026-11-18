@@ -168,8 +168,8 @@ export function apiError(
     response.error instanceof Error
       ? T.apiUnexpectedError
       : response.error && response.payload
-      ? formatString(response.error, response.payload)
-      : (response.error || 'error').toString(),
+        ? formatString(response.error, response.payload)
+        : (response.error || 'error').toString(),
     options,
   );
 }
@@ -191,7 +191,8 @@ export function prettyPrintJSON(json: JSONType): string {
 }
 
 export function syntaxHighlight(json: JSONType): string {
-  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
+  const jsonRE =
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
   return json
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

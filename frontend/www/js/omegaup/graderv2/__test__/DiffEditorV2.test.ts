@@ -13,9 +13,11 @@ jest.mock('monaco-editor', () => ({
   },
 }));
 
-((global as unknown) as {
-  ResizeObserver: unknown;
-}).ResizeObserver = class ResizeObserver {
+(
+  global as unknown as {
+    ResizeObserver: unknown;
+  }
+).ResizeObserver = class ResizeObserver {
   observe(): void {}
   unobserve(): void {}
   disconnect(): void {}

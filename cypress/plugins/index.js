@@ -8,6 +8,7 @@
 module.exports = (on, config) => {
     on('task', {
         log(message) {
+            // oxlint-disable-next-line no-console -- Cypress task prints the test message
             console.log(message);
 
             return null;

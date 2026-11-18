@@ -570,14 +570,17 @@ OmegaUp.on('ready', async () => {
     }
   }
   if (payload.user.admin) {
-    setInterval(() => {
-      refreshRuns();
-      refreshProblemClarifications({
-        problemAlias: payload.problem.alias,
-        rowcount: 20,
-        offset: 0,
-      });
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        refreshRuns();
+        refreshProblemClarifications({
+          problemAlias: payload.problem.alias,
+          rowcount: 20,
+          offset: 0,
+        });
+      },
+      5 * 60 * 1000,
+    );
   }
   if (locationHash.includes('new-run')) {
     problemDetailsView.popupDisplayed = PopupDisplayed.RunSubmit;

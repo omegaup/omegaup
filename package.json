@@ -101,6 +101,8 @@
     "monaco-editor": "0.21",
     "monaco-editor-webpack-plugin": "^2.1",
     "node-gyp": "^9.4.0",
+    "oxfmt": "^0.79.0",
+    "oxlint": "^1.94.0",
     "pako": "^1.0.7",
     "popper.js": "^1.16.1",
     "prettier": "2.2.1",
@@ -167,6 +169,8 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js",
     "test:e2e": "cypress run --browser chrome",
+    "lint:oxlint": "oxlint --deny-warnings frontend/www cypress",
+    "fmt:oxfmt": "oxfmt --check \"frontend/www/**/*.ts\" \"cypress/**/*.ts\"",
     "storybook": "storybook dev -p 6006",
     "prepare": "husky"
   }

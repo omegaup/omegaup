@@ -53,9 +53,7 @@
 		},
 		"eslint": {
 			"allowlist": [
-				"frontend/www/.*\\.ts$",
-				"frontend/www/.*\\.vue$",
-				"cypress/.*\\.ts$"
+				"frontend/www/.*\\.vue$"
 			],
 			"denylist": [
 				".*js/omegaup/lang\\..*",
@@ -78,19 +76,6 @@
 				"frontend/www/libinteractive/.*",
 				"frontend/www/preguntas/.*",
 				"frontend/www/third_party/.*"
-			]
-		},
-		"typescript": {
-			"extra_js_linters": [
-				"node stuff/refactor.js"
-			],
-			"allowlist": [
-				"frontend/www/.*\\.ts$",
-				"cypress/.*\\.ts$"
-			],
-			"denylist": [
-				".*third_party.*",
-				".*js/omegaup/lang\\..*"
 			]
 		},
 		"vue": {

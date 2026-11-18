@@ -6,14 +6,14 @@ import type { types } from '../../api_types';
 import AdminRoles from './Roles.vue';
 
 describe('Roles.vue', () => {
-  const roles = ([
+  const roles = [
     { name: 'Admin', value: false },
     { name: 'Reviewer', value: true },
-  ] as unknown) as types.UserRole[];
-  const groups = ([
+  ] as unknown as types.UserRole[];
+  const groups = [
     { alias: 'mentors', name: 'Mentors', value: false },
     { alias: 'devs', name: 'Developers', value: true },
-  ] as unknown) as types.Group[];
+  ] as unknown as types.Group[];
 
   it('Should render roles and groups correctly', () => {
     const wrapper = shallowMount(AdminRoles as ComponentOptions<Vue>, {

@@ -20,11 +20,11 @@ describe('downloadHandlers', () => {
 
   it('downloadInputFile triggers a download of the input file', () => {
     const click = jest.fn();
-    const anchor = ({
+    const anchor = {
       href: '',
       download: '',
       click,
-    } as unknown) as HTMLAnchorElement;
+    } as unknown as HTMLAnchorElement;
     const createElement = jest
       .spyOn(document, 'createElement')
       .mockReturnValue(anchor);
@@ -49,11 +49,11 @@ describe('downloadHandlers', () => {
 
   it('downloadZipFile generates and downloads the zip file', async () => {
     const click = jest.fn();
-    const anchor = ({
+    const anchor = {
       href: '',
       download: '',
       click,
-    } as unknown) as HTMLAnchorElement;
+    } as unknown as HTMLAnchorElement;
     const createElement = jest
       .spyOn(document, 'createElement')
       .mockReturnValue(anchor);
@@ -71,7 +71,7 @@ describe('downloadHandlers', () => {
     };
     downloadZipFile({
       fileName: 'problem',
-      zipContent: (zipContent as unknown) as JSZip,
+      zipContent: zipContent as unknown as JSZip,
     });
     await Promise.resolve();
     await Promise.resolve();
