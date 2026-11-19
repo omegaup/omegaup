@@ -9,6 +9,5 @@ if [[ "${CI}" == "true" ]]; then
 fi
 
 cd /opt/omegaup
-corepack enable
 pnpm install --config.confirmModulesPurge=false
 exec pnpm run dev-all:watch
