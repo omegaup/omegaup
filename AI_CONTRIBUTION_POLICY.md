@@ -48,7 +48,7 @@ Whether or not you use AI, you are fully responsible for the code, documentation
 
 These expectations apply to all contributions, regardless of whether AI was used:
 
-- For UI changes, include a screenshot or a short video when useful.
+- For UI changes, screenshots or short videos are generally expected, though exceptions are fine when such evidence is not applicable.
 - For backend or behavior changes, provide reproducible steps, tests, benchmarks, logs, or other relevant evidence.
 - Add or update tests for new or modified functionality when required by the project's [coding guidelines](frontend/www/docs/Coding-guidelines.md).
 
@@ -58,9 +58,9 @@ For more details, see the [pull request template](PULL_REQUEST_TEMPLATE.MD).
 
 ## Transparency and Disclosure
 
-- If AI made a significant contribution to your submission — for example, generating a substantial part of a function, proposing an architectural approach, or drafting significant documentation — mention it in your pull request description or a relevant commit message.
+- If AI made a significant contribution to your submission — for example, generating a substantial part of a function, proposing an architectural approach, or drafting significant documentation — please disclose it in your pull request description. Mentioning it in a relevant commit message is an optional additional location.
 - You do not need to disclose trivial uses such as fixing spelling or punctuation, correcting minor typos, small wording improvements, or simple translation and proofreading assistance.
-- There is no mandatory format. A short note is enough, for example:
+- There is no mandatory format. A short note in the PR description is enough, for example:
 
   > Parts of this change were prepared with help from [tool name].
 
