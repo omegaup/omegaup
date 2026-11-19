@@ -78,7 +78,7 @@ echo "php test workers=${workers}"
 if (( workers > 1 && ${#tests[@]} > 1 )); then
 	schema="$(mktemp)"
 	trap 'rm -f "${schema}"' EXIT
-	mysqldump "${MYSQL_ARGS[@]}" --no-data --routines --triggers \
+	mysqldump "${MYSQL_ARGS[@]}" --routines --triggers \
 		--single-transaction --skip-comments omegaup-test > "${schema}"
 	for token in $(seq 1 "${workers}"); do
 		mysql "${MYSQL_ARGS[@]}" -e "DROP DATABASE IF EXISTS \`omegaup-test-${token}\`; CREATE DATABASE \`omegaup-test-${token}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
