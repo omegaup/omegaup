@@ -66,7 +66,7 @@ try_define(
 try_define('OMEGAUP_EXPERIMENT_SECRET', 'omegaup');
 try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
-try_define('OMEGAUP_GITSERVER_PORT', 33863 + $_testShard);
+try_define('OMEGAUP_GITSERVER_PORT', 23163 + $_testShard);
 try_define(
     'OMEGAUP_GITSERVER_URL',
     'http://localhost:' . strval(OMEGAUP_GITSERVER_PORT)
