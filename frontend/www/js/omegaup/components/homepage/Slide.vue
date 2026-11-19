@@ -30,26 +30,44 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class Slide extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() imageSrc!: string;
-  @Prop() button!: {
-    text: {
-      en: string;
-      es: string;
-      pt: string;
+export default defineComponent({
+  name: 'HomepageSlide',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    imageSrc: {
+      type: String,
+      required: true,
+    },
+    button: {
+      type: Object as PropType<{
+        text: {
+          en: string;
+          es: string;
+          pt: string;
+        };
+        href: string;
+        target: string;
+      }>,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      T,
     };
-    href: string;
-    target: string;
-  };
-
-  T = T;
-}
+  },
+});
 </script>
 
 <style lang="scss" scoped>
