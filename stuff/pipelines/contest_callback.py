@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
@@ -14,6 +14,7 @@ from mysql.connector import errorcode
 import pika
 
 import database.contest
+import rabbitmq_client
 import verification_code
 
 
@@ -54,9 +55,15 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        response = json.loads(body)
+        response = self._parse_body(body)
+        self._validate_structure(response)
 
         try:
+            self.dbconn.ping(  # type: ignore[attr-defined]
+                reconnect=True,
+                attempts=3,
+                delay=5,
+            )
             ranking = []
             for user_ranking in response['ranking']:
                 ranking.append(database.contest.Ranking(**user_ranking))
@@ -193,16 +200,67 @@ class ContestsCallback:
                 channel.connection.close()
 
         except:  # noqa: bare-except
-            with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
-                cur.execute('''
-                    UPDATE
-                        `Contests`
-                    SET
-                        `certificates_status` = 'retryable_error'
-                    WHERE
-                        `contest_id` = %s;
-                    ''', (response['contest_id'],))
-                self.dbconn.commit()
+            self._handle_processing_error(response)
+            raise
+
+    def _handle_processing_error(self, response: Any) -> None:
+        '''Marks the contest as retryable when it can be identified.'''
+        contest_id = (
+            response.get('contest_id')
+            if isinstance(response, dict) else None
+        )
+        if contest_id is not None:
+            self._mark_retryable_error(contest_id)
+
+    _REQUIRED_FIELDS = (
+        'certificate_cutoff',
+        'alias',
+        'scoreboard_url',
+        'contest_id',
+        'ranking',
+    )
+
+    @staticmethod
+    def _parse_body(body: bytes) -> Any:
+        '''Parses the message body, discarding it if it is not valid JSON.'''
+        try:
+            return json.loads(body)
+        except json.JSONDecodeError as err:
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message body is not valid JSON'
+            ) from err
+
+    @classmethod
+    def _validate_structure(cls, response: Any) -> None:
+        '''Validates the minimum structure of a contest message.'''
+        if not isinstance(response, dict):
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message body is not a JSON object'
+            )
+        missing = [
+            field for field in cls._REQUIRED_FIELDS if field not in response
+        ]
+        if missing:
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message is missing required fields: ' + ', '.join(missing)
+            )
+        if not isinstance(response['ranking'], list):
+            raise rabbitmq_client.UnrecoverableMessageError(
+                "Message field 'ranking' is not a list"
+            )
+
+    def _mark_retryable_error(self, contest_id: int) -> None:
+        '''Marks the given contest's certificates as a retryable error.'''
+        with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            cur.execute('''
+                UPDATE
+                    `Contests`
+                SET
+                    `certificates_status` = 'retryable_error'
+                WHERE
+                    `contest_id` = %s;
+                ''', (contest_id,))
+            self.dbconn.commit()
 
 
 def generate_contest_code() -> str:

@@ -481,4 +481,162 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame($e->getMessage(), 'userNotAllowed');
         }
     }
+
+    /**
+     * Owning a group does not give an identity creator access to accounts
+     * outside that group. Changing the password of a main identity would be an
+     * account takeover, so it has to be rejected.
+     */
+    public function testChangePasswordOfMainIdentityIsRejected() {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        [
+            'identity' => $victimIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'password' => 'OriginalPass123!',
+            ])
+        );
+
+        $newPassword = 'AttackerPass123!';
+        try {
+            \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => $victimIdentity->username,
+                'password' => $newPassword,
+                'group_alias' => $group['group']->alias,
+            ]));
+            $this->fail(
+                'Identity creators should not change passwords of main identities'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+
+        // The victim's password must remain untouched.
+        $victim = \OmegaUp\DAO\Identities::findByUsername(
+            $victimIdentity->username
+        );
+        $this->assertNotNull($victim);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Identity::testPassword(
+                $victim,
+                'OriginalPass123!'
+            )
+        );
+        $this->assertFalse(
+            \OmegaUp\Controllers\Identity::testPassword(
+                $victim,
+                $newPassword
+            )
+        );
+    }
+
+    /**
+     * Renaming a main identity into the creator's group would let them manage
+     * (and take over) that account afterwards, so it has to be rejected too.
+     */
+    public function testUpdateMainIdentityIsRejected() {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        ['identity' => $victimIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $newUsername = "{$group['group']->alias}:stolen";
+
+        try {
+            \OmegaUp\Controllers\Identity::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+                'original_username' => $victimIdentity->username,
+                'username' => $newUsername,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'gender' => 'male',
+                'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail(
+                'Identity creators should not rename identities outside their group'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+
+        // The victim keeps their username and the attacker's username was not
+        // created.
+        $this->assertNotNull(
+            \OmegaUp\DAO\Identities::findByUsername($victimIdentity->username)
+        );
+        $this->assertNull(
+            \OmegaUp\DAO\Identities::findByUsername($newUsername)
+        );
+    }
+
+    /**
+     * Identity creators change team passwords through the same endpoint as
+     * regular group passwords, so the group check has to accept the
+     * `teams:<alias>:<name>` namespace as well as `<alias>:<name>`.
+     */
+    public function testChangePasswordOfTeamIdentity() {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                    forTeams: true,
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv'
+        );
+        $teamUsername = "teams:{$teamGroup->alias}:{$teamUsernames[0]}";
+        $newPassword = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\Controllers\Identity::apiChangePassword(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => $teamUsername,
+                'password' => $newPassword,
+                'group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        $identity = \OmegaUp\DAO\Identities::findByUsername($teamUsername);
+        $this->assertNotNull($identity);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Identity::testPassword($identity, $newPassword)
+        );
+    }
 }

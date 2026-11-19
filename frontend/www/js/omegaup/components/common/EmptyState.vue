@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -44,29 +44,50 @@ import {
 
 library.add(faUsers, faGraduationCap, faClipboardList, faTerminal);
 
-@Component({
+export default defineComponent({
+  name: 'EmptyState',
   components: {
     FontAwesomeIcon,
   },
-})
-export default class EmptyState extends Vue {
-  @Prop() icon!: string | string[];
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop({ default: '' }) buttonText!: string;
-  @Prop({ default: '' }) buttonLink!: string;
-  @Prop({ default: '' }) buttonDataAttribute!: string;
-
-  get buttonDataAttributes(): { [key: string]: string } {
-    if (!this.buttonDataAttribute) {
-      return {};
-    }
-    const attr = this.buttonDataAttribute.startsWith('data-')
-      ? this.buttonDataAttribute
-      : `data-${this.buttonDataAttribute}`;
-    return { [attr]: '' };
-  }
-}
+  props: {
+    icon: {
+      type: [String, Array] as PropType<string | string[]>,
+      default: '',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    description: {
+      type: String,
+      default: '',
+    },
+    buttonText: {
+      type: String,
+      default: '',
+    },
+    buttonLink: {
+      type: String,
+      default: '',
+    },
+    buttonDataAttribute: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['action'],
+  computed: {
+    buttonDataAttributes(): { [key: string]: string } {
+      if (!this.buttonDataAttribute) {
+        return {};
+      }
+      const attr = this.buttonDataAttribute.startsWith('data-')
+        ? this.buttonDataAttribute
+        : `data-${this.buttonDataAttribute}`;
+      return { [attr]: '' };
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

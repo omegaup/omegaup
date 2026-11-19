@@ -5,8 +5,8 @@
         {{ T.omegaupTitleAdminGlobalSettings }}
       </div>
     </div>
-    <div class="card-body">
-      <div class="row mb-3">
+    <div class="card-body p-4">
+      <div class="row">
         <div class="col-md-12">
           <h4>{{ T.wordsEphemeralGrader }}</h4>
           <div class="form-check">
