@@ -8,7 +8,7 @@ being processed.
 import unittest
 from typing import Any, List, Tuple, cast
 
-import aggregate_feedback
+from cron import aggregate_feedback
 
 
 class _FakeCursor:

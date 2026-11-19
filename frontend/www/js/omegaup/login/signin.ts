@@ -69,6 +69,8 @@ OmegaUp.on('ready', () => {
     ui.success(payload.verifyEmailSuccessfully);
   }
 
+  ui.showPersistedSuccessMessage();
+
   const locationHash = window.location.hash.substring(1);
   let initialActiveTab: AvailableTabs = AvailableTabs.Login;
   if (locationHash === AvailableTabs.Signup) {

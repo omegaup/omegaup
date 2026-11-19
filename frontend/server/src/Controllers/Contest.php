@@ -45,7 +45,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
- * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, first_solved?: float, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ContestScoreboardPayload=array{contest: ContestDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, scoreboardToken:null|string}
@@ -2959,6 +2959,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentityIsOver13();
 
+        \OmegaUp\RateLimiter::assertWithinLimit($r->identity);
+
         // Validate request
         self::validateCreate($r, $r->identity);
 
@@ -3205,7 +3207,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Problems is optional
         if (!is_null($problems)) {
-            /** @var list<array{problem: string, points: int}>|null */
             $requestProblems = json_decode($problems, associative: true);
             if (!is_array($requestProblems)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -3217,6 +3218,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $problems = [];
 
             foreach ($requestProblems as $requestProblem) {
+                if (
+                    !is_array($requestProblem)
+                    || !isset($requestProblem['problem'])
+                    || !is_string($requestProblem['problem'])
+                    || !isset($requestProblem['points'])
+                    || (
+                        !is_int($requestProblem['points'])
+                        && !is_float($requestProblem['points'])
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'invalidParameters',
+                        'problems'
+                    );
+                }
+
                 $problem = \OmegaUp\DAO\Problems::getByAlias(
                     $requestProblem['problem']
                 );
@@ -5570,7 +5587,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{runs: list<Run>, totalRuns: int}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int|null $rowcount

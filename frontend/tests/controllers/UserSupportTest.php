@@ -155,14 +155,63 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($supportIdentity);
 
-        $newEmail = 'new_mail@omegaup.com';
-        \OmegaUp\Controllers\User::apiUpdateMainEmail(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'email' => $newEmail,
-                'originalEmail' => $originalEmail,
-            ])
+        $emailSender = new \OmegaUp\Test\FakeEmailSender();
+        $scopedSender = new \OmegaUp\Test\ScopedEmailSender($emailSender);
+        $originalSendEmailOnVerify = (
+            \OmegaUp\Controllers\User::$sendEmailOnVerify
         );
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
+
+        try {
+            $newEmail = 'new_mail@omegaup.com';
+            \OmegaUp\Controllers\User::apiUpdateMainEmail(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'email' => $newEmail,
+                    'originalEmail' => $originalEmail,
+                ])
+            );
+
+            // Check email and verification status in db for target user
+            $userInDb = \OmegaUp\DAO\Users::findByEmail($newEmail);
+            $this->assertNotNull($userInDb);
+            $this->assertFalse($userInDb->verified);
+            $this->assertNotNull($userInDb->verification_id);
+            $this->assertSame(50, strlen($userInDb->verification_id));
+
+            // Verify the email sent to the new address
+            $this->assertCount(1, $emailSender->listEmails);
+            $this->assertSame(
+                [$newEmail],
+                $emailSender->listEmails[0]['email']
+            );
+            $this->assertStringContainsString(
+                'https://omegaup.com/user/verifyemail/'
+                    . "{$userInDb->verification_id}/",
+                $emailSender->listEmails[0]['body']
+            );
+            $this->assertStringNotContainsString(
+                'https://omegaup.com/user/verifyemail//',
+                $emailSender->listEmails[0]['body']
+            );
+
+            // Verify email via apiVerifyEmail
+            \OmegaUp\Controllers\User::apiVerifyEmail(
+                new \OmegaUp\Request([
+                    'id' => $userInDb->verification_id,
+                ])
+            );
+
+            $userInDb = \OmegaUp\DAO\Users::findByEmail($newEmail);
+            $this->assertNotNull($userInDb);
+            $this->assertTrue($userInDb->verified);
+            $this->assertNull($userInDb->verification_id);
+        } finally {
+            \OmegaUp\Controllers\User::$sendEmailOnVerify = (
+                $originalSendEmailOnVerify
+            );
+            unset($scopedSender);
+        }
 
         $loginResponse = \OmegaUp\Controllers\User::apiLogin(
             new \OmegaUp\Request([
@@ -183,6 +232,93 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
             $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
+        }
+    }
+
+    public function testUpdateMainEmailForUnverifiedUserAsASupportTeamMember() {
+        // Creates a user with role of support team member
+        [
+            'identity' => $supportIdentity,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
+
+        $originalEmail = 'original_unverified@omegaup.com';
+        // Creates an unverified user
+        \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                [
+                    'email' => $originalEmail,
+                    'verify' => false,
+                ]
+            )
+        );
+
+        $userInDb = \OmegaUp\DAO\Users::findByEmail($originalEmail);
+        $this->assertNotNull($userInDb);
+        $this->assertFalse($userInDb->verified);
+        $this->assertNotNull($userInDb->verification_id);
+        $initialVerificationId = $userInDb->verification_id;
+
+        $login = self::login($supportIdentity);
+
+        $emailSender = new \OmegaUp\Test\FakeEmailSender();
+        $scopedSender = new \OmegaUp\Test\ScopedEmailSender($emailSender);
+        $originalSendEmailOnVerify = (
+            \OmegaUp\Controllers\User::$sendEmailOnVerify
+        );
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
+
+        try {
+            $newEmail = 'new_unverified@omegaup.com';
+            \OmegaUp\Controllers\User::apiUpdateMainEmail(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'email' => $newEmail,
+                    'originalEmail' => $originalEmail,
+                ])
+            );
+
+            // Check email and verification status in db for target user
+            $userInDb = \OmegaUp\DAO\Users::findByEmail($newEmail);
+            $this->assertNotNull($userInDb);
+            $this->assertFalse($userInDb->verified);
+            $this->assertNotNull($userInDb->verification_id);
+            $this->assertNotSame(
+                $initialVerificationId,
+                $userInDb->verification_id
+            );
+
+            // Verify the email sent to the new address
+            $this->assertCount(1, $emailSender->listEmails);
+            $this->assertSame(
+                [$newEmail],
+                $emailSender->listEmails[0]['email']
+            );
+            $this->assertStringContainsString(
+                'https://omegaup.com/user/verifyemail/'
+                    . "{$userInDb->verification_id}/",
+                $emailSender->listEmails[0]['body']
+            );
+            $this->assertStringNotContainsString(
+                'https://omegaup.com/user/verifyemail//',
+                $emailSender->listEmails[0]['body']
+            );
+
+            // Verify email via apiVerifyEmail
+            \OmegaUp\Controllers\User::apiVerifyEmail(
+                new \OmegaUp\Request([
+                    'id' => $userInDb->verification_id,
+                ])
+            );
+
+            $userInDb = \OmegaUp\DAO\Users::findByEmail($newEmail);
+            $this->assertNotNull($userInDb);
+            $this->assertTrue($userInDb->verified);
+            $this->assertNull($userInDb->verification_id);
+        } finally {
+            \OmegaUp\Controllers\User::$sendEmailOnVerify = (
+                $originalSendEmailOnVerify
+            );
+            unset($scopedSender);
         }
     }
 

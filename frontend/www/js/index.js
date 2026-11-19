@@ -14,7 +14,7 @@
     var ttNode = document.createElement('tt');
     ttNode.appendChild(
       document.createTextNode(
-        'cd /opt/omegaup && yarn install && yarn run dev-all',
+        'cd /opt/omegaup && pnpm install && pnpm run dev-all',
       ),
     );
     statusMessageElement.appendChild(ttNode);
