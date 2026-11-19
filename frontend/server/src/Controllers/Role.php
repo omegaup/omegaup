@@ -4,7 +4,7 @@ namespace OmegaUp\Controllers;
 
 /**
  * @psalm-type RoleSummary=array{role_id: int, name: string, description: string, users_count: int, groups_count: int, permissions_count: int}
- * @psalm-type RolePermission=array{permission_id: int, name: string, description: string}
+ * @psalm-type RolePermission=array{permission_id: int, name: string, resource_type: string, description: string}
  * @psalm-type RoleDetails=array{role: RoleSummary, permissions: list<RolePermission>}
  * @psalm-type RoleAssignment=array{name: string, acl_id: int, resource_type: string, resource_alias: null|string}
  * @psalm-type RoleAssignmentsResponse=array{assignments: list<RoleAssignment>, total_rows: int}

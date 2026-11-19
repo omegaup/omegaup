@@ -4821,6 +4821,7 @@ export namespace types {
     description: string;
     name: string;
     permission_id: number;
+    resource_type: string;
   }
 
   export interface RoleSummary {

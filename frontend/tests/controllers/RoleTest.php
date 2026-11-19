@@ -77,6 +77,27 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertIsArray($response['permissions']);
     }
 
+    public function testDetailsReturnsTheResourceTypeOfEachPermission(): void {
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+
+        $response = \OmegaUp\Controllers\Role::apiDetails(
+            self::request($support, ['role' => self::adminRoleName()])
+        );
+
+        $this->assertNotEmpty($response['permissions']);
+        $resourceTypes = [];
+        foreach ($response['permissions'] as $permission) {
+            $this->assertContains(
+                $permission['resource_type'],
+                ['entrypoint', 'endpoint', 'capability']
+            );
+            $resourceTypes[$permission['resource_type']] = true;
+        }
+        $this->assertArrayHasKey('entrypoint', $resourceTypes);
+        $this->assertArrayHasKey('endpoint', $resourceTypes);
+        $this->assertArrayHasKey('capability', $resourceTypes);
+    }
+
     public function testDetailsWithUnknownRoleFails(): void {
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 

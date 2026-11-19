@@ -68,13 +68,14 @@ class Roles extends \OmegaUp\DAO\Base\Roles {
     }
 
     /**
-     * @return list<array{permission_id: int, name: string, description: string}>
+     * @return list<array{permission_id: int, name: string, resource_type: string, description: string}>
      */
     public static function getPermissions(int $roleId): array {
         $sql = '
             SELECT
                 p.permission_id,
                 p.name,
+                p.resource_type,
                 p.description
             FROM
                 Roles_Permissions rp
@@ -85,7 +86,7 @@ class Roles extends \OmegaUp\DAO\Base\Roles {
             ORDER BY
                 p.permission_id;';
 
-        /** @var list<array{description: string, name: string, permission_id: int}> */
+        /** @var list<array{description: string, name: string, permission_id: int, resource_type: string}> */
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$roleId]
@@ -95,6 +96,7 @@ class Roles extends \OmegaUp\DAO\Base\Roles {
             fn (array $row): array => [
                 'permission_id' => $row['permission_id'],
                 'name' => $row['name'],
+                'resource_type' => $row['resource_type'],
                 'description' => $row['description'],
             ],
             $rows
