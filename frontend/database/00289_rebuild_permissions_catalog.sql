@@ -63,7 +63,7 @@ INSERT INTO `Permissions` (`permission_id`, `name`, `resource_type`, `descriptio
 (45, 'user.request_deletion', 'capability', 'Solicitar el borrado de la cuenta de otro usuario.'),
 (46, 'user.confirm_deletion', 'capability', 'Confirmar el borrado de la cuenta de otro usuario.'),
 (47, 'user.view_hidden_data', 'capability', 'Ver datos ocultos de otro usuario: perfil, estadísticas y certificados.'),
-(48, 'reset.skip_wait', 'capability', 'Solicitar un restablecimiento de contraseña sin esperar el tiempo mínimo.'),
+(48, 'user.password_reset.skip_wait', 'capability', 'Solicitar un restablecimiento de contraseña sin esperar el tiempo mínimo.'),
 (49, 'run.skip_wait', 'capability', 'Enviar soluciones sin esperar el tiempo mínimo entre envíos.'),
 (50, 'ai_editorial.skip_quota', 'capability', 'Generar editoriales sin límite de cuota.');
 
