@@ -158,7 +158,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
 import * as Highcharts from 'highcharts/highstock';
 import { Chart } from 'highcharts-vue';
@@ -170,195 +170,224 @@ import * as time from '../../time';
 import omegaup_Countdown from '../Countdown.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
-@Component({
+export default defineComponent({
+  name: 'ArenaScoreboard',
   components: {
     highcharts: Chart,
     'omegaup-countdown': omegaup_Countdown,
   },
-})
-export default class ArenaScoreboard extends Vue {
-  @Prop({ default: 10 }) numberOfPositions!: number;
-  @Prop() problems!: omegaup.Problem[];
-  @Prop() ranking!: types.ScoreboardRankingEntry[];
-  @Prop({ default: null }) rankingChartOptions!: Highcharts.Options | null;
-  @Prop() lastUpdated!: Date;
-  @Prop({ default: true }) showInvitedUsersFilter!: boolean;
-  @Prop({ default: true }) showPenalty!: boolean;
-  @Prop({ default: false }) showAllContestants!: boolean;
-  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-  @Prop() title!: string;
-  @Prop({ default: null }) finishTime!: null | Date;
-  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-
-  T = T;
-  ui = ui;
-  INF = '∞';
-  onlyShowExplicitlyInvited =
-    !this.showAllContestants && this.showInvitedUsersFilter;
-  nameDisplayOptions: ui.NameDisplayOptions =
-    ui.NameDisplayOptions.NameAndUsername;
-
-  get lastUpdatedString(): null | string {
-    if (!this.lastUpdated) return null;
-    return ui.formatString(T.scoreboardLastUpdated, {
-      datetime: time.formatDateTime(this.lastUpdated),
-    });
-  }
-
-  get socketClass(): string {
-    if (this.socketStatus === SocketStatus.Connected) {
-      return 'socket-status socket-status-ok';
-    }
-    if (this.socketStatus === SocketStatus.Failed) {
-      return 'socket-status socket-status-error';
-    }
-    return 'socket-status';
-  }
-
-  get socketStatusTitle(): string {
-    if (this.socketStatus === SocketStatus.Connected) {
-      return T.socketStatusConnected;
-    }
-    if (this.socketStatus === SocketStatus.Failed) {
-      return T.socketStatusFailed;
-    }
-    return T.socketStatusWaiting;
-  }
-
-  get visibleRanking(): types.ScoreboardRankingEntry[] {
-    return (this.ranking ?? []).filter((user) =>
-      this.showUser(user.is_invited),
-    );
-  }
-
-  get solveStats(): {
-    [alias: string]: {
-      solved: number;
-      percentage: number;
-      firstSolver: { username: string; time: string } | null;
+  props: {
+    numberOfPositions: {
+      type: Number,
+      default: 10,
+    },
+    problems: {
+      type: Array as PropType<omegaup.Problem[]>,
+      default: () => [],
+    },
+    ranking: {
+      type: Array as PropType<types.ScoreboardRankingEntry[]>,
+      default: () => [],
+    },
+    rankingChartOptions: {
+      type: Object as PropType<Highcharts.Options | null>,
+      default: null,
+    },
+    lastUpdated: {
+      type: (Date as unknown) as PropType<null | Date>,
+      default: null,
+    },
+    showInvitedUsersFilter: {
+      type: Boolean,
+      default: true,
+    },
+    showPenalty: {
+      type: Boolean,
+      default: true,
+    },
+    showAllContestants: {
+      type: Boolean,
+      default: false,
+    },
+    digitsAfterDecimalPoint: {
+      type: Number,
+      default: 2,
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    finishTime: {
+      type: (Date as unknown) as PropType<null | Date>,
+      default: null,
+    },
+    socketStatus: {
+      type: String as PropType<SocketStatus>,
+      default: SocketStatus.Waiting,
+    },
+  },
+  data() {
+    return {
+      T,
+      ui,
+      INF: '∞',
+      onlyShowExplicitlyInvited:
+        !this.showAllContestants && this.showInvitedUsersFilter,
+      nameDisplayOptions: ui.NameDisplayOptions.NameAndUsername,
     };
-  } {
-    const stats: {
+  },
+  computed: {
+    lastUpdatedString(): null | string {
+      if (!this.lastUpdated) return null;
+      return ui.formatString(T.scoreboardLastUpdated, {
+        datetime: time.formatDateTime(this.lastUpdated),
+      });
+    },
+    socketClass(): string {
+      if (this.socketStatus === SocketStatus.Connected) {
+        return 'socket-status socket-status-ok';
+      }
+      if (this.socketStatus === SocketStatus.Failed) {
+        return 'socket-status socket-status-error';
+      }
+      return 'socket-status';
+    },
+    socketStatusTitle(): string {
+      if (this.socketStatus === SocketStatus.Connected) {
+        return T.socketStatusConnected;
+      }
+      if (this.socketStatus === SocketStatus.Failed) {
+        return T.socketStatusFailed;
+      }
+      return T.socketStatusWaiting;
+    },
+    visibleRanking(): types.ScoreboardRankingEntry[] {
+      return (this.ranking ?? []).filter((user) =>
+        this.showUser(user.is_invited),
+      );
+    },
+    solveStats(): {
       [alias: string]: {
         solved: number;
         percentage: number;
         firstSolver: { username: string; time: string } | null;
       };
-    } = {};
-    const participants = this.visibleRanking.length;
-    for (const problem of this.problems) {
-      let solved = 0;
-      let firstSolver: { username: string; minutes: number } | null = null;
-      for (const user of this.visibleRanking) {
-        const userProblem = this.getUserProblem(user, problem.alias);
-        if (!userProblem) continue;
-        if (userProblem.percent === 100) {
-          solved++;
+    } {
+      const stats: {
+        [alias: string]: {
+          solved: number;
+          percentage: number;
+          firstSolver: { username: string; time: string } | null;
+        };
+      } = {};
+      const participants = this.visibleRanking.length;
+      for (const problem of this.problems) {
+        let solved = 0;
+        let firstSolver: { username: string; minutes: number } | null = null;
+        for (const user of this.visibleRanking) {
+          const userProblem = this.getUserProblem(user, problem.alias);
+          if (!userProblem) continue;
+          if (userProblem.percent === 100) {
+            solved++;
+          }
+          if (
+            typeof userProblem.first_solved === 'number' &&
+            (firstSolver === null ||
+              userProblem.first_solved < firstSolver.minutes)
+          ) {
+            firstSolver = {
+              username: user.username,
+              minutes: userProblem.first_solved,
+            };
+          }
         }
-        if (
-          typeof userProblem.first_solved === 'number' &&
-          (firstSolver === null ||
-            userProblem.first_solved < firstSolver.minutes)
-        ) {
-          firstSolver = {
-            username: user.username,
-            minutes: userProblem.first_solved,
-          };
-        }
+        stats[problem.alias] = {
+          solved,
+          percentage: participants
+            ? Math.round((solved / participants) * 100)
+            : 0,
+          firstSolver: firstSolver
+            ? {
+                username: firstSolver.username,
+                time: this.formatContestTime(firstSolver.minutes),
+              }
+            : null,
+        };
       }
-      stats[problem.alias] = {
-        solved,
-        percentage: participants
-          ? Math.round((solved / participants) * 100)
-          : 0,
-        firstSolver: firstSolver
-          ? {
-              username: firstSolver.username,
-              time: this.formatContestTime(firstSolver.minutes),
-            }
-          : null,
-      };
-    }
-    return stats;
-  }
-
-  formatContestTime(minutes: number): string {
-    const totalMinutes = Math.max(0, Math.floor(minutes));
-    const hours = Math.floor(totalMinutes / 60);
-    const remainingMinutes = totalMinutes % 60;
-    return `${String(hours).padStart(2, '0')}:${String(
-      remainingMinutes,
-    ).padStart(2, '0')}`;
-  }
-
-  firstSolverTitle(alias: string): string {
-    const firstSolver = this.solveStats[alias]?.firstSolver;
-    if (!firstSolver) return '';
-    return ui.formatString(T.scoreboardFirstSolvedTooltip, {
-      username: firstSolver.username,
-      time: firstSolver.time,
-    });
-  }
-
-  legendClass(idx: number): string {
-    return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
-  }
-
-  renderPoints(p: types.ScoreboardRankingProblem): string {
-    return (
-      (p.points > 0 ? '+' : '') + p.points.toFixed(this.digitsAfterDecimalPoint)
-    );
-  }
-
-  totalRuns(u: types.ScoreboardRankingEntry): number {
-    return u.problems.reduce(
-      (acc: number, val: types.ScoreboardRankingProblem) => acc + val.runs,
-      0,
-    );
-  }
-
-  problemClass(p: types.ScoreboardRankingProblem, alias: string): string {
-    if (p.percent === 100) {
-      return `${alias} accepted`;
-    } else if (p.pending) {
-      return `${alias} pending`;
-    } else if (p.percent === 0 && p.runs > 0) {
-      return `${alias} wrong`;
-    } else {
-      return alias;
-    }
-  }
-
-  problemAlias(
-    problemIndex: number,
-    problem: types.ScoreboardRankingProblem,
-  ): string {
-    return this.problems[problemIndex]?.alias || problem.alias || '';
-  }
-
-  getUserProblem(
-    user: types.ScoreboardRankingEntry,
-    alias: string,
-  ): types.ScoreboardRankingProblem | null {
-    return user.problems.find((p) => p.alias === alias) ?? null;
-  }
-
-  problemClassByAlias(
-    user: types.ScoreboardRankingEntry,
-    alias: string,
-  ): string {
-    const p = this.getUserProblem(user, alias);
-    if (!p) return alias;
-    return this.problemClass(p, alias);
-  }
-
-  showUser(userIsInvited: boolean): boolean {
-    // Invited users filter is only available in contests, in a course all users
-    // are visible in scoreboard.
-    if (!this.showInvitedUsersFilter) return true;
-    return userIsInvited || !this.onlyShowExplicitlyInvited;
-  }
-}
+      return stats;
+    },
+  },
+  methods: {
+    formatContestTime(minutes: number): string {
+      const totalMinutes = Math.max(0, Math.floor(minutes));
+      const hours = Math.floor(totalMinutes / 60);
+      const remainingMinutes = totalMinutes % 60;
+      return `${String(hours).padStart(2, '0')}:${String(
+        remainingMinutes,
+      ).padStart(2, '0')}`;
+    },
+    firstSolverTitle(alias: string): string {
+      const firstSolver = this.solveStats[alias]?.firstSolver;
+      if (!firstSolver) return '';
+      return ui.formatString(T.scoreboardFirstSolvedTooltip, {
+        username: firstSolver.username,
+        time: firstSolver.time,
+      });
+    },
+    legendClass(idx: number): string {
+      return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
+    },
+    renderPoints(p: types.ScoreboardRankingProblem): string {
+      return (
+        (p.points > 0 ? '+' : '') +
+        p.points.toFixed(this.digitsAfterDecimalPoint)
+      );
+    },
+    totalRuns(u: types.ScoreboardRankingEntry): number {
+      return u.problems.reduce(
+        (acc: number, val: types.ScoreboardRankingProblem) => acc + val.runs,
+        0,
+      );
+    },
+    problemClass(p: types.ScoreboardRankingProblem, alias: string): string {
+      if (p.percent === 100) {
+        return `${alias} accepted`;
+      } else if (p.pending) {
+        return `${alias} pending`;
+      } else if (p.percent === 0 && p.runs > 0) {
+        return `${alias} wrong`;
+      } else {
+        return alias;
+      }
+    },
+    problemAlias(
+      problemIndex: number,
+      problem: types.ScoreboardRankingProblem,
+    ): string {
+      return this.problems[problemIndex]?.alias || problem.alias || '';
+    },
+    getUserProblem(
+      user: types.ScoreboardRankingEntry,
+      alias: string,
+    ): types.ScoreboardRankingProblem | null {
+      return user.problems.find((p) => p.alias === alias) ?? null;
+    },
+    problemClassByAlias(
+      user: types.ScoreboardRankingEntry,
+      alias: string,
+    ): string {
+      const p = this.getUserProblem(user, alias);
+      if (!p) return alias;
+      return this.problemClass(p, alias);
+    },
+    showUser(userIsInvited: boolean): boolean {
+      // Invited users filter is only available in contests, in a course all users
+      // are visible in scoreboard.
+      if (!this.showInvitedUsersFilter) return true;
+      return userIsInvited || !this.onlyShowExplicitlyInvited;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
