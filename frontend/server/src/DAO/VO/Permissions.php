@@ -18,6 +18,7 @@ class Permissions extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'permission_id' => true,
         'name' => true,
+        'resource_type' => true,
         'description' => true,
     ];
 
@@ -41,6 +42,11 @@ class Permissions extends \OmegaUp\DAO\VO\VO {
                 $data['name']
             ) ? strval($data['name']) : '';
         }
+        if (isset($data['resource_type'])) {
+            $this->resource_type = is_scalar(
+                $data['resource_type']
+            ) ? strval($data['resource_type']) : '';
+        }
         if (isset($data['description'])) {
             $this->description = is_scalar(
                 $data['description']
@@ -63,6 +69,13 @@ class Permissions extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $name = null;
+
+    /**
+     * Tipo de recurso que protege el permiso: página, API o capacidad.
+     *
+     * @var string|null
+     */
+    public $resource_type = null;
 
     /**
      * La descripción humana del permiso.
