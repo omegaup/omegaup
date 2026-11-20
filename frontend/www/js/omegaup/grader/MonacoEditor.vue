@@ -155,6 +155,9 @@ export default class MonacoEditor extends Vue {
       formatOnType: true,
       language: Util.supportedLanguages[this.language].modelMapping,
       readOnly: this.readOnly,
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+      },
       theme: this.theme,
       value: this.contents,
       fontSize: this.selectedFontSize,
