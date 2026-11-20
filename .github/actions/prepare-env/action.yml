@@ -9,6 +9,10 @@ inputs:
     description: Path to additional requirements file to install on host
     required: false
     default: ''
+  skip_test_db:
+    description: Skip migrating omegaup-test when the job only uses omegaup
+    required: false
+    default: false
 
 runs:
   using: composite
@@ -141,4 +145,8 @@ runs:
           python3 -m venv /opt/omegaup/stuff/venv && \
           PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install wheel && \
           PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-        docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+        BOOTSTRAP_EXTRA_ARGS=()
+        if [ "${{ inputs.skip_test_db }}" = "true" ]; then
+          BOOTSTRAP_EXTRA_ARGS+=(--skip-test-db)
+        fi
+        docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose "${BOOTSTRAP_EXTRA_ARGS[@]}"

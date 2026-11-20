@@ -37,9 +37,15 @@ if [[ "${OMEGAUP_COVERAGE:-1}" != "0" ]]; then
 	fi
 fi
 
+FAIL_FAST_ARGS=()
+if [[ "${OMEGAUP_FAIL_FAST:-0}" == "1" ]]; then
+	FAIL_FAST_ARGS+=("--stop-on-failure" "--stop-on-error")
+fi
+
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
 	--configuration="${OMEGAUP_ROOT}/frontend/tests/phpunit.xml" \
 	"${COVERAGE_ARGS[@]}" \
+	"${FAIL_FAST_ARGS[@]}" \
 	--log-junit="${JUNIT_PATH}" \
 	"${ARGS[@]}"

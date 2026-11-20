@@ -53,21 +53,23 @@
 		},
 		"api": {
 			"allowlist": [
-				"frontend/server/src/Controllers/.*\\.php$",
-				"frontend/www/js/omegaup/api.ts$",
-				"frontend/www/js/omegaup/api_types.ts$"
+				"frontend/server/cmd/APITool\\.php$",
+				"frontend/server/src/Controllers/.*\\.(php|md)$",
+				"frontend/www/docs/Controllers\\.md$",
+				"frontend/www/js/omegaup/api\\.ts$",
+				"frontend/www/js/omegaup/api_types\\.ts$"
 			]
 		},
 		"i18n": {
 			"allowlist": [
+				"frontend/badges/.*/localizations\\.json$",
 				"frontend/templates/.*\\.lang$",
-				"frontend/www/js/omegaup/lang\\..*\\.json$",
-				"frontend/www/js/omegaup/lang\\..*\\.js$"
+				"frontend/www/js/omegaup/lang\\..*\\.(json|js|ts)$"
 			]
 		},
 		"dao": {
 			"allowlist": [
-				"frontend/database/schema.sql",
+				"frontend/database/(dao_)?schema\\.sql$",
 				"frontend/server/src/DAO/Base/.*\\.php$",
 				"frontend/server/src/DAO/VO/.*\\.php$"
 			]

@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
       - id: filter
         run: |
@@ -36,12 +36,18 @@ jobs:
             echo "teaching=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD \
+          if git rev-parse --verify -q HEAD^2 >/dev/null; then
+            DIFF_BASE="HEAD^1"
+          else
+            git fetch --no-tags --depth=200 origin "${{ github.event.pull_request.base.sha }}"
+            DIFF_BASE="$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD 2>/dev/null || (git fetch --no-tags --unshallow origin && git merge-base "${{ github.event.pull_request.base.sha }}" HEAD))"
+          fi
+          git diff --name-only "${DIFF_BASE}" HEAD \
             | bash ./stuff/ci-paths.sh >> "$GITHUB_OUTPUT"
 
   verify-action-hashes:
     name: Verify Action Hashes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: changes
     if: needs.changes.outputs.php == 'true'
     steps:
@@ -56,7 +62,7 @@ jobs:
 
       - name: Install jq
         run: |
-          sudo apt-get update && sudo apt-get install -y jq
+          command -v jq >/dev/null || (sudo apt-get update && sudo apt-get install -y jq)
 
       - name: Run verification
         run: |
@@ -64,7 +70,7 @@ jobs:
 
   php:
     runs-on: ubuntu-22.04
-    needs: [verify-action-hashes, changes]
+    needs: changes
     if: needs.changes.outputs.php == 'true'
 
     services:
@@ -96,9 +102,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-        with:
-          submodules: recursive
-          fetch-depth: 0
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -169,6 +172,21 @@ jobs:
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Run Psalm
+        run: |
+          # ponytail: run static types before 5m of DB migrations + PHPUnit so broken types fail in ~60s.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
+          ./vendor/bin/psalm \
+            --threads="$(nproc)" \
+            --output-format=github \
+            --long-progress \
+            --show-info=false
+          rm -f frontend/server/config.php
+
       - name: Create database users
         run: |
           mysql \
@@ -203,22 +221,10 @@ jobs:
         env:
           MYSQL_TCP_PORT: 13306
           OMEGAUP_COVERAGE: ${{ github.event_name != 'pull_request' && '1' || '0' }}
+          OMEGAUP_EXPLAIN_LOG: ${{ github.event_name != 'pull_request' && '1' || '0' }}
+          OMEGAUP_FAIL_FAST: ${{ github.event_name == 'pull_request' && '1' || '0' }}
         timeout-minutes: 20
         run: ./stuff/mysql_types.sh
-
-      - name: Run Psalm
-        run: |
-          # Create optional directories to simplify psalm config.
-          mkdir -p frontend/www/{phpminiadmin,preguntas}
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_LOG_FILE', 'php://stderr');
-          EOF
-          ./vendor/bin/psalm \
-            --threads="$(nproc)" \
-            --output-format=github \
-            --long-progress \
-            --show-info=false
 
       - name: Upload code coverage
         if: github.event_name != 'pull_request'
@@ -310,6 +316,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
+          fetch-depth: 2
 
       - name: Use PHP 8.1
         run: |
@@ -361,42 +368,32 @@ jobs:
       - name: Install Python dependencies
         run: python3 -m pip install --user yapf==0.30.0
 
-      - name: Get docker container
-        run: ./stuff/lint.sh ensure-container
-
-      - name: Run linters
+      - name: Run fast host checks
         run: |
-          # Create optional directories to simplify psalm config.
-          mkdir -p frontend/www/{phpminiadmin,preguntas}
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_LOG_FILE', 'php://stderr');
-          EOF
-          touch 'frontend/tests/test_config.php'
-
-          docker run --rm \
-            --user "$(id -u)":"$(id -g)" \
-            --volume "${PWD}:/src" \
-            --volume "${PWD}:${PWD}" \
-            --volume "${PWD}:/opt/omegaup" \
-            --mount 'type=tmpfs,destination=/home/.cache,tmpfs-mode=1777' \
-            --mount 'type=tmpfs,destination=/home/.local,tmpfs-mode=1777' \
-            --env 'HOME=/home' \
-            --env 'MYPYPATH=/opt/omegaup/stuff' \
-            --env 'VIRTUAL_ENV=/opt/omegaup/stuff/venv' \
-            --entrypoint='' \
-            "$(grep CONTAINER_VERSION= stuff/lint.sh | cut -f2 -d=)" \
-            bash -c "\
-            python3 -m venv /opt/omegaup/stuff/venv && \
-            . /opt/omegaup/stuff/venv/bin/activate && \
-            PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install wheel && \
-            PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          set -o pipefail
-          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null 2>&1 | tee lint-output.log
+          # ponytail: fail in <60s on JS/CSS/Psalm/i18n/API errors before pulling hook_tools container.
+          pnpm run lint:oxlint
+          pnpm run fmt:oxfmt
+          pnpm exec stylelint 'frontend/www/**/*.css' 'frontend/www/**/*.scss'
+          refactor_failed=0
+          while IFS= read -r js_file; do
+            js_tmp="$(mktemp)"
+            cp "${js_file}" "${js_tmp}"
+            node stuff/refactor.js "${js_tmp}" "${js_file}"
+            if ! cmp -s "${js_tmp}" "${js_file}"; then
+              echo "refactor.js would change ${js_file}" >&2
+              refactor_failed=1
+            fi
+            rm -f "${js_tmp}"
+          done < <(git ls-files 'frontend/www/js/**/*.js' | grep -v third_party | grep -v 'omegaup/lang.')
+          [ "${refactor_failed}" -eq 0 ]
+          ./stuff/unused_translation_strings.py
+          php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
 
       - name: Run Psalm
         run: |
           set -o pipefail
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/tests/test_config.php'
           find frontend/ \
             -name *.php \
             -and -not -wholename 'frontend/server/libs/third_party/*' \
@@ -410,11 +407,48 @@ jobs:
             --long-progress \
             --show-info=false 2>&1 | tee psalm-output.log
 
-      - name: Find unused translation strings
-        run: ./stuff/unused_translation_strings.py
+      - name: Get docker container
+        run: ./stuff/lint.sh ensure-container
 
-      - name: Validate generated Python API syntax
-        run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
+      - name: Run linters
+        run: |
+          # ponytail: lint only PR diff on pull_request (~10s vs ~4m40s); main still runs --all.
+          NEED_VENV=1
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if git rev-parse --verify -q HEAD^2 >/dev/null; then
+              DIFF_BASE="HEAD^1"
+            else
+              git fetch --no-tags --depth=200 origin "${{ github.event.pull_request.base.sha }}"
+              DIFF_BASE="$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD 2>/dev/null || (git fetch --no-tags --unshallow origin && git merge-base "${{ github.event.pull_request.base.sha }}" HEAD))"
+            fi
+            LINT_ARGS=("${DIFF_BASE}" HEAD)
+            if ! git diff --name-only "${DIFF_BASE}" HEAD | grep -Eq '(\.py$|^frontend/database/(dao_)?schema\.sql$|^frontend/server/src/DAO/)'; then
+              NEED_VENV=0
+            fi
+          else
+            LINT_ARGS=(--all)
+          fi
+          if [ "${NEED_VENV}" = "1" ]; then
+            docker run --rm \
+              --user "$(id -u)":"$(id -g)" \
+              --volume "${PWD}:/src" \
+              --volume "${PWD}:${PWD}" \
+              --volume "${PWD}:/opt/omegaup" \
+              --mount 'type=tmpfs,destination=/home/.cache,tmpfs-mode=1777' \
+              --mount 'type=tmpfs,destination=/home/.local,tmpfs-mode=1777' \
+              --env 'HOME=/home' \
+              --env 'MYPYPATH=/opt/omegaup/stuff' \
+              --env 'VIRTUAL_ENV=/opt/omegaup/stuff/venv' \
+              --entrypoint='' \
+              "$(grep CONTAINER_VERSION= stuff/lint.sh | cut -f2 -d=)" \
+              bash -c "\
+              python3 -m venv /opt/omegaup/stuff/venv && \
+              . /opt/omegaup/stuff/venv/bin/activate && \
+              PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install wheel && \
+              PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
+          fi
+          set -o pipefail
+          OMEGAUP_SKIP_HOST_LINT=1 ./stuff/lint.sh --diagnostics-output=github validate "${LINT_ARGS[@]}" < /dev/null 2>&1 | tee lint-output.log
 
       - name: Upload lint artifacts
         if: ${{ failure() }}
@@ -434,21 +468,21 @@ jobs:
     needs: changes
     if: needs.changes.outputs.frontend == 'true'
     strategy:
-      fail-fast: false
+      fail-fast: ${{ github.event_name == 'pull_request' }}
       matrix:
         include:
           - shard: 1
             name: contest-group
-            specs: 'cypress/e2e/contest.cy.ts,cypress/e2e/problem_collection.cy.ts,cypress/e2e/group.cy.ts'
+            specs: 'cypress/e2e/contest.cy.ts,cypress/e2e/group.cy.ts'
           - shard: 2
             name: courses
             specs: 'cypress/e2e/course_2Part.cy.ts,cypress/e2e/course.cy.ts,cypress/e2e/certificate.cy.ts,cypress/e2e/navigation.cy.ts'
           - shard: 3
             name: ide-basics
-            specs: 'cypress/e2e/ide.cy.ts,cypress/e2e/basic_commands.cy.ts'
+            specs: 'cypress/e2e/ide.cy.ts,cypress/e2e/basic_commands.cy.ts,cypress/e2e/problem_collection.cy.ts'
           - shard: 4
             name: problem-creator
-            specs: 'cypress/e2e/problem_creator.cy.ts'
+            specs: 'cypress/e2e/contest_2Part.cy.ts,cypress/e2e/problem_creator.cy.ts'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -478,14 +512,14 @@ jobs:
         run: |
           rm -f /tmp/frontend-build.exit /tmp/frontend-build.log
           setsid nohup bash -c '
-            pnpm install --frozen-lockfile && pnpm build
+            pnpm install --frozen-lockfile && WEBPACK_DEVTOOL=false pnpm build-development
             echo $? > /tmp/frontend-build.exit
           ' > /tmp/frontend-build.log 2>&1 < /dev/null &
 
       - name: Prepare Environment
         uses: ./.github/actions/prepare-env
         with:
-          install_host_python_deps: true
+          skip_test_db: true
 
       - name: Wait for frontend build
         run: |
@@ -504,6 +538,8 @@ jobs:
           wait-for-it -t 30 grader:21680
 
       - name: Run Cypress tests
+        env:
+          CYPRESS_FAIL_FAST: ${{ github.event_name == 'pull_request' && '1' || '0' }}
         run: |
           ./node_modules/.bin/cypress run --browser chrome --spec '${{ matrix.specs }}'
 
@@ -583,6 +619,7 @@ jobs:
         with:
           install_host_python_deps: true
           extra_python_requirements: stuff/teaching_assistant/requirements.txt
+          skip_test_db: true
 
       - name: Run pre setup for course mode
         run: |

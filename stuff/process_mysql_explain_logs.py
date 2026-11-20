@@ -417,6 +417,7 @@ def explain_queries(
     results: List[InefficientQueryResult] = []
     cursor = connection.cursor()
     query_id_map: Dict[str, int] = {}
+    seen_normalized: Set[str] = set()
 
     queries_list = list(queries)
     progress_bar = tqdm(
@@ -429,6 +430,11 @@ def explain_queries(
         for query in queries_list:
             query_text = query[0]
             normalized_query = normalize_query(query_text)
+            # ponytail: dedupe normalized SQL before EXPLAIN (410k -> ~1k).
+            if normalized_query in seen_normalized:
+                progress_bar.update(1)
+                continue
+            seen_normalized.add(normalized_query)
             if query_text not in query_id_map:
                 query_id_map[query_text] = len(query_id_map) + 1
 

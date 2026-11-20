@@ -7,16 +7,60 @@ set -e
 
 OMEGAUP_ROOT=$(/usr/bin/git rev-parse --show-toplevel)
 
-# ponytail: round-robin by filename. Weight shards by junit time if one runs >1.5x the others.
+# ponytail: greedy LPT bin-packing with static seconds for the >=10s suites; beats dynamic timing caches with zero state.
 assign_shards() {
 	local workers="$1"
 	shift
-	local i=0
-	local f
-	for f in "$@"; do
-		echo "$((i % workers)) ${f}"
-		i=$((i + 1))
-	done
+	printf '%s\n' "$@" | awk -v w="${workers}" '
+	function weight(path, base) {
+		base = path
+		sub(/^.*\//, "", base)
+		if (base == "CoderOfTheMonthTest.php") return 141
+		if (base == "ProblemListTest.php") return 48
+		if (base == "UserRankTest.php") return 45
+		if (base == "SchoolOfTheMonthRulesTest.php") return 38
+		if (base == "Badge_100solvedProblemsTest.php") return 33
+		if (base == "CacheTest.php") return 28
+		if (base == "QualityNominationTest.php") return 23
+		if (base == "BadgesTest.php") return 17
+		if (base == "CollectionListTest.php") return 16
+		if (base == "SchoolOfTheMonthTest.php") return 12
+		if (base == "ProblemUpdateTest.php") return 11
+		if (base == "RunDetailsTest.php") return 10
+		if (base == "CertificatesTest.php") return 10
+		return 2
+	}
+	NF {
+		n++
+		files[n] = $0
+		weights[n] = weight($0)
+		order[n] = n
+	}
+	END {
+		for (i = 2; i <= n; i++) {
+			idx = order[i]
+			wt = weights[idx]
+			j = i - 1
+			while (j >= 1 && weights[order[j]] < wt) {
+				order[j + 1] = order[j]
+				j--
+			}
+			order[j + 1] = idx
+		}
+		for (k = 0; k < w; k++) load[k] = 0
+		for (i = 1; i <= n; i++) {
+			idx = order[i]
+			best = 0
+			for (k = 1; k < w; k++) {
+				if (load[k] < load[best]) best = k
+			}
+			shard[idx] = best
+			load[best] += weights[idx]
+		}
+		for (i = 1; i <= n; i++) {
+			print shard[i] " " files[i]
+		}
+	}'
 }
 
 if [[ "${1:-}" == "--self-check" ]]; then
@@ -25,6 +69,13 @@ if [[ "${1:-}" == "--self-check" ]]; then
 	if [[ "${got}" != "${want}" ]]; then
 		echo "shard split failed" >&2
 		echo "${got}" >&2
+		exit 1
+	fi
+	heavy=$(assign_shards 2 CoderOfTheMonthTest.php ProblemListTest.php UserRankTest.php CacheTest.php)
+	heavy_want=$'0 CoderOfTheMonthTest.php\n1 ProblemListTest.php\n1 UserRankTest.php\n1 CacheTest.php'
+	if [[ "${heavy}" != "${heavy_want}" ]]; then
+		echo "weighted shard split failed" >&2
+		echo "${heavy}" >&2
 		exit 1
 	fi
 	echo "shard split ok"
@@ -88,11 +139,13 @@ if (( workers > 1 && ${#tests[@]} > 1 )); then
 	trap - EXIT
 fi
 
-# Enable General Query Log
-mysql "${MYSQL_ARGS[@]}" -e "TRUNCATE TABLE mysql.general_log;"
-mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL general_log = 'ON';"
-trap disable_general_log EXIT
-mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL log_output = 'TABLE';"
+# ponytail: non-blocking explain report stays on main; skip global general_log lock contention on PRs.
+if [[ "${OMEGAUP_EXPLAIN_LOG:-1}" != "0" ]]; then
+	mysql "${MYSQL_ARGS[@]}" -e "TRUNCATE TABLE mysql.general_log;"
+	mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL general_log = 'ON';"
+	trap disable_general_log EXIT
+	mysql "${MYSQL_ARGS[@]}" -e "SET GLOBAL log_output = 'TABLE';"
+fi
 
 if (( workers <= 1 || ${#tests[@]} <= 1 )); then
 	"${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
@@ -117,9 +170,24 @@ else
 		pids+=("$!")
 	done
 	status=0
-	for pid in "${pids[@]}"; do
-		wait "${pid}" || status=1
-	done
+	if (( BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 3) )); then
+		remaining=${#pids[@]}
+		while (( remaining > 0 )); do
+			if ! wait -n; then
+				status=1
+				if [[ "${OMEGAUP_FAIL_FAST:-0}" == "1" ]]; then
+					kill "${pids[@]}" 2>/dev/null || true
+					wait 2>/dev/null || true
+					break
+				fi
+			fi
+			remaining=$((remaining - 1))
+		done
+	else
+		for pid in "${pids[@]}"; do
+			wait "${pid}" || status=1
+		done
+	fi
 	rm -rf "${shard_root}"
 	if (( status != 0 )); then
 		exit "${status}"
@@ -132,9 +200,10 @@ else
 	fi
 fi
 
-# Disable General Query Log
-disable_general_log
-trap - EXIT
+if [[ "${OMEGAUP_EXPLAIN_LOG:-1}" != "0" ]]; then
+	disable_general_log
+	trap - EXIT
+fi
 
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \
@@ -145,4 +214,6 @@ find "${OMEGAUP_ROOT}/frontend/tests/runfiles/" -mindepth 2 -name mysql_types.lo
 python3 "${OMEGAUP_ROOT}/stuff/process_mysql_return_types.py" \
 	"${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log"
 
-python3 "${OMEGAUP_ROOT}/stuff/process_mysql_explain_logs.py"
+if [[ "${OMEGAUP_EXPLAIN_LOG:-1}" != "0" ]]; then
+	python3 "${OMEGAUP_ROOT}/stuff/process_mysql_explain_logs.py"
+fi

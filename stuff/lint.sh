@@ -22,45 +22,47 @@ fi
 
 cd "${OMEGAUP_ROOT}"
 # ponytail: eslint-plugin-vue template rules are not in oxlint. They are dropped.
-OX_GLOBS=(
-	'frontend/www/**/*.ts'
-	'frontend/www/**/*.vue'
-	'frontend/www/js/**/*.js'
-	'frontend/www/**/*.css'
-	'frontend/www/**/*.scss'
-	'cypress/**/*.ts'
-	'cypress/**/*.js'
-)
-ox_start=$(date +%s)
-pnpm exec oxlint --deny-warnings frontend/www cypress
-ox_mid=$(date +%s)
-if [[ " ${ARGS} " == *" validate "* ]]; then
-	pnpm exec oxfmt --check "${OX_GLOBS[@]}"
-	pnpm exec stylelint 'frontend/www/**/*.css' 'frontend/www/**/*.scss'
-else
-	pnpm exec oxfmt "${OX_GLOBS[@]}"
-	pnpm exec stylelint --fix 'frontend/www/**/*.css' 'frontend/www/**/*.scss'
-fi
-ox_end=$(date +%s)
-echo "oxlint_seconds=$((ox_mid - ox_start)) oxfmt_seconds=$((ox_end - ox_mid))"
-
-refactor_failed=0
-while IFS= read -r js_file; do
-	js_tmp="$(mktemp)"
-	cp "${js_file}" "${js_tmp}"
-	node stuff/refactor.js "${js_tmp}" "${js_file}"
-	if ! cmp -s "${js_tmp}" "${js_file}"; then
-		if [[ " ${ARGS} " == *" validate "* ]]; then
-			echo "refactor.js would change ${js_file}" >&2
-			refactor_failed=1
-		else
-			cp "${js_tmp}" "${js_file}"
-		fi
+if [[ " ${ARGS} " != *" ensure-container "* && "${OMEGAUP_SKIP_HOST_LINT:-0}" != "1" ]]; then
+	OX_GLOBS=(
+		'frontend/www/**/*.ts'
+		'frontend/www/**/*.vue'
+		'frontend/www/js/**/*.js'
+		'frontend/www/**/*.css'
+		'frontend/www/**/*.scss'
+		'cypress/**/*.ts'
+		'cypress/**/*.js'
+	)
+	ox_start=$(date +%s)
+	pnpm exec oxlint --deny-warnings frontend/www cypress
+	ox_mid=$(date +%s)
+	if [[ " ${ARGS} " == *" validate "* ]]; then
+		pnpm exec oxfmt --check "${OX_GLOBS[@]}"
+		pnpm exec stylelint 'frontend/www/**/*.css' 'frontend/www/**/*.scss'
+	else
+		pnpm exec oxfmt "${OX_GLOBS[@]}"
+		pnpm exec stylelint --fix 'frontend/www/**/*.css' 'frontend/www/**/*.scss'
 	fi
-	rm -f "${js_tmp}"
-done < <(git ls-files 'frontend/www/js/**/*.js' | grep -v third_party | grep -v 'omegaup/lang.')
-if (( refactor_failed != 0 )); then
-	exit 1
+	ox_end=$(date +%s)
+	echo "oxlint_seconds=$((ox_mid - ox_start)) oxfmt_seconds=$((ox_end - ox_mid))"
+
+	refactor_failed=0
+	while IFS= read -r js_file; do
+		js_tmp="$(mktemp)"
+		cp "${js_file}" "${js_tmp}"
+		node stuff/refactor.js "${js_tmp}" "${js_file}"
+		if ! cmp -s "${js_tmp}" "${js_file}"; then
+			if [[ " ${ARGS} " == *" validate "* ]]; then
+				echo "refactor.js would change ${js_file}" >&2
+				refactor_failed=1
+			else
+				cp "${js_tmp}" "${js_file}"
+			fi
+		fi
+		rm -f "${js_tmp}"
+	done < <(git ls-files 'frontend/www/js/**/*.js' | grep -v third_party | grep -v 'omegaup/lang.')
+	if (( refactor_failed != 0 )); then
+		exit 1
+	fi
 fi
 
 if [[ -t 0 ]]; then
@@ -82,6 +84,17 @@ if [[ $? != 0 || -z "${DOCKER_PATH}" ]]; then
 	exit 1
 fi
 
+# ponytail: hook_tools:v1.0.9 ships Node 14, which crashes on Oxfmt ESM in ApiLinter; drop once v1.0.10 lands.
+NODE_MOUNT=()
+NODE_PATH_PREFIX=""
+if [[ "$(uname -s)" == "Linux" ]] && command -v node >/dev/null 2>&1; then
+	HOST_NODE_BIN="$(readlink -f "$(command -v node)")"
+	if [[ "${HOST_NODE_BIN}" != /usr/* ]]; then
+		NODE_MOUNT=(--volume "${HOST_NODE_BIN}:/tmp/host-node/node:ro")
+		NODE_PATH_PREFIX="/tmp/host-node:"
+	fi
+fi
+
 "${DOCKER_PATH}" run $TTY_ARGS --rm \
 	--user "$(id -u):$(id -g)" \
 	--env "GIT_AUTHOR_NAME=$(git config user.name)" \
@@ -91,10 +104,11 @@ fi
 	--volume "${OMEGAUP_ROOT}:/src" \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--volume "${OMEGAUP_ROOT}:/opt/omegaup" \
+	"${NODE_MOUNT[@]}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
 	--env "VIRTUAL_ENV=${OMEGAUP_ROOT}/stuff/venv" \
 	--entrypoint='' \
-	"${CONTAINER_VERSION}" bash -c "PATH=\"${OMEGAUP_ROOT}/stuff/venv/bin:\$PATH\" exec python3 -m omegaup_hook_tools --command-name=\"./stuff/lint.sh\" ${ARGS}"
+	"${CONTAINER_VERSION}" bash -c "PATH=\"${NODE_PATH_PREFIX}${OMEGAUP_ROOT}/stuff/venv/bin:\$PATH\" exec python3 -m omegaup_hook_tools --command-name=\"./stuff/lint.sh\" ${ARGS}"
 
 echo OK

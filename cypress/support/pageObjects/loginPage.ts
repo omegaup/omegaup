@@ -11,8 +11,19 @@ export class LoginPage {
         password: 'P@55w0rd',
       };
 
-      cy.register(userLoginOptions);
-      cy.logout();
+      // ponytail: POST /api/user/create/ directly; skips login + reload + UI modal logout per user.
+      cy.request({
+        method: 'POST',
+        url: '/api/user/create/',
+        form: true,
+        body: {
+          username: userLoginOptions.username,
+          password: userLoginOptions.password,
+          email: `${userLoginOptions.username}@omegaup.com`,
+        },
+      })
+        .its('status')
+        .should('eq', 200);
       users.push(userLoginOptions);
     }
 

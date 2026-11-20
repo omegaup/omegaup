@@ -13,8 +13,8 @@ export default defineConfig({
     },
     baseUrl: 'http://127.0.0.1:8001',
     retries: {
-      // Retry flaky tests in headless CI runs before failing the job.
-      runMode: 2,
+      // ponytail: fail-fast on PRs (0 retries); keep 2 retries on main where flakes block merges.
+      runMode: process.env.CYPRESS_FAIL_FAST === '1' ? 0 : 2,
       // Keep interactive `cypress open` runs at zero retries so flakes
       // stay visible while developing tests locally.
       openMode: 0,
