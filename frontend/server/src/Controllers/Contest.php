@@ -3207,7 +3207,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Problems is optional
         if (!is_null($problems)) {
-            /** @var list<array{problem: string, points: int}>|null */
             $requestProblems = json_decode($problems, associative: true);
             if (!is_array($requestProblems)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -3219,6 +3218,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $problems = [];
 
             foreach ($requestProblems as $requestProblem) {
+                if (
+                    !is_array($requestProblem)
+                    || !isset($requestProblem['problem'])
+                    || !is_string($requestProblem['problem'])
+                    || !isset($requestProblem['points'])
+                    || (
+                        !is_int($requestProblem['points'])
+                        && !is_float($requestProblem['points'])
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'invalidParameters',
+                        'problems'
+                    );
+                }
+
                 $problem = \OmegaUp\DAO\Problems::getByAlias(
                     $requestProblem['problem']
                 );
