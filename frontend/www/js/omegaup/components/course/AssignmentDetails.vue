@@ -404,6 +404,73 @@ export default class CourseAssignmentDetails extends Vue {
     this.unlimitedDuration = !this.assignment.finish_time;
   }
 
+  get hasUnsavedChanges(): boolean {
+    if (this.assignmentFormMode === omegaup.AssignmentFormMode.Default) {
+      return false;
+    }
+
+    const isNew = this.assignmentFormMode === omegaup.AssignmentFormMode.New;
+
+    const formFieldsChanged =
+      this.name !== (this.assignment.name || '') ||
+      this.description !== (this.assignment.description || '') ||
+      this.alias !== (this.assignment.alias || '') ||
+      this.assignmentType !== (this.assignment.assignment_type || 'homework') ||
+      this.unlimitedDuration !== !this.assignment.finish_time ||
+      Boolean(
+        this.startTime &&
+          this.assignment.start_time &&
+          this.startTime.getTime() !== this.assignment.start_time.getTime(),
+      ) ||
+      Boolean(
+        this.finishTime &&
+          this.assignment.finish_time &&
+          this.finishTime.getTime() !== this.assignment.finish_time.getTime(),
+      );
+
+    const hasScheduledProblems =
+      (this.scheduledProblemList?.problems?.length ?? 0) > 0;
+    const hasAssignmentProblems = (this.assignmentProblems?.length ?? 0) > 0;
+
+    if (isNew) {
+      return (
+        formFieldsChanged ||
+        hasScheduledProblems ||
+        hasAssignmentProblems ||
+        Boolean(this.name || this.description || this.alias)
+      );
+    }
+
+    return formFieldsChanged;
+  }
+
+  @Watch('hasUnsavedChanges')
+  onHasUnsavedChangesChanged(newValue: boolean): void {
+    if (newValue) {
+      window.addEventListener('beforeunload', this.onBeforeUnload);
+    } else {
+      window.removeEventListener('beforeunload', this.onBeforeUnload);
+    }
+  }
+
+  mounted(): void {
+    if (this.hasUnsavedChanges) {
+      window.addEventListener('beforeunload', this.onBeforeUnload);
+    }
+  }
+
+  beforeDestroy(): void {
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
+  }
+
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.hasUnsavedChanges) {
+      return;
+    }
+    event.preventDefault();
+    event.returnValue = '';
+  }
+
   @Watch('show')
   onShowChanged(): void {
     this.reset();

@@ -1,10 +1,10 @@
 <template>
   <transition name="modal">
-    <div class="modal-mask">
-      <div class="modal-container">
-        <div class="d-flex justify-content-end">
-          <button class="btn" @click="$emit('close')">❌</button>
-        </div>
+    <div class="modal-mask" @click.self="$emit('close')">
+      <omegaup-overlay-popup
+        class="problem-finder-wizard-popup"
+        @dismiss="$emit('close')"
+      >
         <form-wizard
           color="#678DD7"
           :back-button-text="T.wordsBack"
@@ -66,7 +66,7 @@
               /></label>
             </div> </tab-content
         ></form-wizard>
-      </div>
+      </omegaup-overlay-popup>
     </div>
   </transition>
 </template>
@@ -86,6 +86,7 @@ import '@voerro/vue-tagsinput/dist/style.css';
 // https://nightcatsama.github.io/vue-slider-component/
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
+import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
 interface Priority {
   type: string;
@@ -104,10 +105,12 @@ interface TagObject {
     ToggleButton,
     'tags-input': VoerroTagsInput,
     VueSlider,
+    'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
 })
 export default class ProblemFinderWizard extends Vue {
   @Prop() possibleTags!: { name: string }[];
+  @Prop({ default: false }) show!: boolean;
 
   T = T;
   karel = false;
@@ -166,6 +169,33 @@ export default class ProblemFinderWizard extends Vue {
     }
     this.$emit('search-problems', queryParameters);
   }
+
+  mounted(): void {
+    document.addEventListener('keydown', this.onEsc);
+  }
+
+  beforeDestroy(): void {
+    document.removeEventListener('keydown', this.onEsc);
+  }
+
+  onEsc(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || !this.show) {
+      return;
+    }
+    // Let form elements handle ESC themselves (e.g. dismissing the tags-input
+    // typeahead) instead of closing the whole wizard.
+    const target = event.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable)
+    ) {
+      return;
+    }
+    this.$emit('close');
+  }
 }
 </script>
 
@@ -182,21 +212,8 @@ export default class ProblemFinderWizard extends Vue {
   transition: opacity 0.3s ease;
 }
 
-.modal-container {
-  background: var(--finder-wizard-modal-container-background-color);
-  min-width: 340px;
+.problem-finder-wizard-popup {
   max-width: 800px;
-  margin: 2.5em auto 0;
-  border: 2px solid var(--finder-wizard-modal-container-border-color);
-  padding: 1em;
-  position: relative;
-  overflow: auto;
-}
-
-.close {
-  float: none;
-  text-align: right;
-  width: 100%;
 }
 
 .wizard-tab-content {

@@ -979,6 +979,57 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             $response[0]['participating']
         );
     }
+
+    public function testContestListOrderByContestants() {
+        $now = \OmegaUp\Time::get();
+        $contests = [];
+        foreach (['two', 'one', 'zero'] as $suffix) {
+            $contests[$suffix] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'public',
+                    'alias' => "contestants-{$suffix}",
+                    'startTime' => $now + 60 * 60,
+                    'finishTime' => $now + 2 * 60 * 60,
+                ])
+            );
+        }
+
+        ['identity' => $firstIdentity] =
+            \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $secondIdentity] =
+            \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contests['two'],
+            $firstIdentity
+        );
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contests['two'],
+            $secondIdentity
+        );
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contests['one'],
+            $firstIdentity
+        );
+
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request([
+                'sort_order' => 'contestants',
+                'page_size' => 3,
+                'tab_name' => 'future',
+            ])
+        );
+
+        $this->assertSame(
+            ['contestants-two', 'contestants-one', 'contestants-zero'],
+            array_column($response['results'], 'alias')
+        );
+        $this->assertSame(
+            [2, 1, 0],
+            array_column($response['results'], 'contestants')
+        );
+    }
+
     public function testListAllTabsReturnsCurrentPastFuture() {
         \OmegaUp\Test\Factories\Contest::createContest();
         $response = \OmegaUp\Controllers\Contest::apiListAllTabs(

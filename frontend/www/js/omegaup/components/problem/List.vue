@@ -29,6 +29,7 @@
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
       v-show="showFinderWizard"
+      :show="showFinderWizard"
       :possible-tags="wizardTags"
       @close="showFinderWizard = false"
       @search-problems="wizardSearch"

@@ -16,25 +16,37 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class LogoutConfirmation extends Vue {
-  @Prop({ default: false }) value!: boolean;
-
-  T = T;
-
-  get showModal(): boolean {
-    return this.value;
-  }
-
-  set showModal(value: boolean) {
-    this.$emit('input', value);
-  }
-
-  confirmLogout(): void {
-    window.location.href = '/logout/';
-  }
-}
+export default defineComponent({
+  name: 'LogoutConfirmation',
+  props: {
+    value: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['input'],
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    showModal: {
+      get(): boolean {
+        return this.value;
+      },
+      set(value: boolean): void {
+        this.$emit('input', value);
+      },
+    },
+  },
+  methods: {
+    confirmLogout(): void {
+      window.location.href = '/logout/';
+    },
+  },
+});
 </script>

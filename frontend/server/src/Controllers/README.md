@@ -1,9 +1,15 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
+  - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/rerunCron/`](#apiadminreruncron)
+  - [`/api/admin/setCronJobEnabled/`](#apiadminsetcronjobenabled)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
+  - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -21,7 +27,6 @@
   - [`/api/carouselItems/create/`](#apicarouselitemscreate)
   - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
   - [`/api/carouselItems/list/`](#apicarouselitemslist)
-  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
   - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
@@ -266,6 +271,10 @@
   - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
   - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
+  - [`/api/user/follow/`](#apiuserfollow)
+  - [`/api/user/followStatus/`](#apiuserfollowstatus)
+  - [`/api/user/followers/`](#apiuserfollowers)
+  - [`/api/user/following/`](#apiuserfollowing)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
@@ -288,6 +297,7 @@
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
+  - [`/api/user/unfollow/`](#apiuserunfollow)
   - [`/api/user/update/`](#apiuserupdate)
   - [`/api/user/updateBasicInfo/`](#apiuserupdatebasicinfo)
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
@@ -312,6 +322,55 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 Admin Controller
 
+## `/api/admin/getCronRun/`
+
+### Description
+
+Returns the detail of a single cron run.
+
+### Parameters
+
+| Name     | Type  | Description | Required |
+| -------- | ----- | ----------- | -------- |
+| `run_id` | `int` |             | ✓        |
+
+### Returns
+
+| Name  | Type            |
+| ----- | --------------- |
+| `run` | `types.CronRun` |
+
+**`types.CronRun` fields:**
+
+| Name               | Type                       | Required |
+| ------------------ | -------------------------- | -------- |
+| `duration_seconds` | `number`                   |          |
+| `error_text`       | `string`                   |          |
+| `finished_at`      | `Date`                     |          |
+| `hostname`         | `string`                   |          |
+| `name`             | `string`                   | ✓        |
+| `phases`           | `List[types.CronRunPhase]` | ✓        |
+| `rows_affected`    | `number`                   |          |
+| `run_id`           | `number`                   | ✓        |
+| `started_at`       | `Date`                     |          |
+| `status`           | `string`                   | ✓        |
+
+## `/api/admin/getCrons/`
+
+### Description
+
+Lists the registered cron jobs, their most recent runs, the open problem
+health findings and the quality of the recommendation models.
+
+### Returns
+
+| Name                      | Type                                 |
+| ------------------------- | ------------------------------------ |
+| `jobs`                    | `List[types.CronJob]`                |
+| `problemHealthFindings`   | `List[types.ProblemHealthFinding]`   |
+| `recommendationModelRuns` | `List[types.RecommendationModelRun]` |
+| `runs`                    | `List[types.CronRun]`                |
+
 ## `/api/admin/getMaintenanceMode/`
 
 ### Description
@@ -323,6 +382,18 @@ Get maintenance mode status
 ```typescript
 types.MaintenanceModeStatus;
 ```
+
+## `/api/admin/getSystemSettings/`
+
+### Description
+
+Gets the current system settings. Only available to system admins.
+
+### Returns
+
+| Name       | Type                                   |
+| ---------- | -------------------------------------- |
+| `settings` | `{ ephemeralGraderEnabled: boolean; }` |
 
 ## `/api/admin/platformReportStats/`
 
@@ -343,6 +414,43 @@ Get stats for an overall platform report.
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
 
+## `/api/admin/rerunCron/`
+
+### Description
+
+Queues a manual rerun of a registered cron job for a worker to pick up.
+`queued` is false when the job already had a rerun waiting or running.
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `name` | `string` |             | ✓        |
+
+### Returns
+
+| Name     | Type      |
+| -------- | --------- |
+| `queued` | `boolean` |
+
+## `/api/admin/setCronJobEnabled/`
+
+### Description
+
+Enables or disables a cron job. A disabled job skips its scheduled runs
+and new rerun requests for it are refused.
+
+### Parameters
+
+| Name      | Type     | Description | Required |
+| --------- | -------- | ----------- | -------- |
+| `enabled` | `bool`   |             | ✓        |
+| `name`    | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
 ## `/api/admin/setMaintenanceMode/`
 
 ### Description
@@ -358,6 +466,22 @@ Set maintenance mode
 | `message_es` | `null\|string` |             |          |
 | `message_pt` | `null\|string` |             |          |
 | `type`       | `null\|string` |             |          |
+
+### Returns
+
+_Nothing_
+
+## `/api/admin/updateSystemSettings/`
+
+### Description
+
+Updates system settings. Temporarily available to the support team.
+
+### Parameters
+
+| Name                       | Type         | Description | Required |
+| -------------------------- | ------------ | ----------- | -------- |
+| `ephemeral_grader_enabled` | `null\|bool` |             |          |
 
 ### Returns
 
@@ -588,9 +712,10 @@ Create a new Carousel Item
 
 | Name              | Type           | Description | Required |
 | ----------------- | -------------- | ----------- | -------- |
-| `buttonTitle`     | `string`       |             | ✓        |
+| `button_title`    | `string`       |             | ✓        |
 | `excerpt`         | `string`       |             | ✓        |
 | `image_url`       | `string`       |             | ✓        |
+| `is_active`       | `bool`         |             | ✓        |
 | `link`            | `string`       |             | ✓        |
 | `status`          | `bool`         |             | ✓        |
 | `title`           | `string`       |             | ✓        |
@@ -620,19 +745,13 @@ _Nothing_
 
 ### Description
 
-List all Carousel Items (admin only)
+List Carousel Items (admin/support only)
 
-### Returns
+### Parameters
 
-```typescript
-types.CarouselItemListPayload;
-```
-
-## `/api/carouselItems/listActive/`
-
-### Description
-
-List all active Carousel Items (homepage)
+| Name          | Type   | Description | Required |
+| ------------- | ------ | ----------- | -------- |
+| `active_only` | `bool` |             | ✓        |
 
 ### Returns
 
@@ -650,14 +769,15 @@ Update a Carousel Item
 
 | Name               | Type           | Description | Required |
 | ------------------ | -------------- | ----------- | -------- |
-| `buttonTitle`      | `string`       |             | ✓        |
+| `button_title`     | `string`       |             | ✓        |
 | `carousel_item_id` | `int`          |             | ✓        |
 | `excerpt`          | `string`       |             | ✓        |
 | `image_url`        | `string`       |             | ✓        |
+| `is_active`        | `bool`         |             | ✓        |
 | `link`             | `string`       |             | ✓        |
-| `status`           | `bool`         |             | ✓        |
 | `title`            | `string`       |             | ✓        |
 | `expiration_date`  | `null\|string` |             |          |
+| `status`           | `bool\|null`   |             |          |
 
 ### Returns
 
@@ -1573,16 +1693,16 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `contest_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`        | `int\|null`                                                                                                                                                                                                         |             |          |
-| `rowcount`      | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`      | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `contest_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`        | `int\|null`                                                                                                                                                                                                               |             |          |
+| `rowcount`      | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`      | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -2564,19 +2684,19 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type                                                                                                                                                                                                                | Description | Required |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `assignment_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `course_alias`     | `string`                                                                                                                                                                                                            |             | ✓        |
-| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`           |             |          |
-| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `offset`           | `int\|null`                                                                                                                                                                                                         |             |          |
-| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                               |             |          |
-| `problem_alias`    | `null\|string`                                                                                                                                                                                                      |             |          |
-| `rowcount`         | `int\|null`                                                                                                                                                                                                         |             |          |
-| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `username`         | `null\|string`                                                                                                                                                                                                      |             |          |
-| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name               | Type                                                                                                                                                                                                                      | Description | Required |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `assignment_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `course_alias`     | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `execution`        | `'EXECUTION_COMPILATION_ERROR'\|'EXECUTION_FINISHED'\|'EXECUTION_INTERRUPTED'\|'EXECUTION_JUDGE_ERROR'\|'EXECUTION_RUNTIME_ERROR'\|'EXECUTION_RUNTIME_FUNCTION_ERROR'\|'EXECUTION_VALIDATOR_ERROR'\|null`                 |             |          |
+| `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `offset`           | `int\|null`                                                                                                                                                                                                               |             |          |
+| `output`           | `'OUTPUT_CORRECT'\|'OUTPUT_EXCEEDED'\|'OUTPUT_INCORRECT'\|'OUTPUT_INTERRUPTED'\|null`                                                                                                                                     |             |          |
+| `problem_alias`    | `null\|string`                                                                                                                                                                                                            |             |          |
+| `rowcount`         | `int\|null`                                                                                                                                                                                                               |             |          |
+| `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `username`         | `null\|string`                                                                                                                                                                                                            |             |          |
+| `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -3465,6 +3585,7 @@ List of public and user's private problems
 | `query`                 | `null\|string`                                                                                                                     |             |          |
 | `require_all_tags`      | `bool\|null`                                                                                                                       |             |          |
 | `rowcount`              | `int\|null`                                                                                                                        |             |          |
+| `solved_status`         | `'all'\|'attempted'\|'solved'\|'unsolved'\|null`                                                                                   |             |          |
 | `some_tags`             | `bool\|null`                                                                                                                       |             |          |
 | `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |          |
 
@@ -4442,15 +4563,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `offset`        | `int`                                                                                                                                                                                                               |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `rowcount`      | `int`                                                                                                                                                                                                               |             | ✓        |
-| `username`      | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                                     |             | ✓        |
+| `username`      | `string`                                                                                                                                                                                                                  |             | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
 
 ### Returns
 
@@ -5344,6 +5465,85 @@ Gets extra information of the identity:
 | `verified`        | `boolean`      |
 | `within_last_day` | `boolean`      |
 
+## `/api/user/follow/`
+
+### Description
+
+Makes the current user follow the given user.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/followStatus/`
+
+### Description
+
+Gets the follow counters for the given user, plus whether the current
+user follows them. Intended for rendering a profile's follow button.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+| Name             | Type      |
+| ---------------- | --------- |
+| `followersCount` | `number`  |
+| `followingCount` | `number`  |
+| `isFollowing`    | `boolean` |
+
+## `/api/user/followers/`
+
+### Description
+
+Gets the users that follow the given user, most recent first.
+
+### Parameters
+
+| Name       | Type        | Description | Required |
+| ---------- | ----------- | ----------- | -------- |
+| `username` | `string`    |             | ✓        |
+| `page`     | `null\|int` |             |          |
+| `rowcount` | `null\|int` |             |          |
+
+### Returns
+
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `followers` | `List[types.FollowUser]` |
+| `totalRows` | `number`                 |
+
+## `/api/user/following/`
+
+### Description
+
+Gets the users the given user follows, most recent first.
+
+### Parameters
+
+| Name       | Type        | Description | Required |
+| ---------- | ----------- | ----------- | -------- |
+| `username` | `string`    |             | ✓        |
+| `page`     | `null\|int` |             |          |
+| `rowcount` | `null\|int` |             |          |
+
+### Returns
+
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `following` | `List[types.FollowUser]` |
+| `totalRows` | `number`                 |
+
 ## `/api/user/generateGitToken/`
 
 ### Description
@@ -5558,6 +5758,12 @@ types.UserProfileInfo;
 
 Get profile statistics including solved problems by difficulty and tags distribution.
 
+`tags` is the capped distribution: at most 10 entries, with every
+remaining tag aggregated into a single 'Others' entry. `tagsFull` is
+the complete distribution with no cap and no aggregation, so `tags` is
+not simply a subset of `tagsFull`: the tail entries are merged into
+the 'Others' entry instead of appearing on their own.
+
 ### Parameters
 
 | Name       | Type           | Description | Required |
@@ -5571,7 +5777,8 @@ Get profile statistics including solved problems by difficulty and tags distribu
 | `attempting` | `number`                                                              |
 | `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
 | `solved`     | `number`                                                              |
-| `tags`       | `List[{ count: number; name: string; }]`                              |
+| `tags`       | `List[types.TagDistribution]`                                         |
+| `tagsFull`   | `List[types.TagDistribution]`                                         |
 
 ## `/api/user/removeExperiment/`
 
@@ -5727,6 +5934,22 @@ Gets verify status of a user
 | `username` | `string`  |
 | `verified` | `boolean` |
 
+## `/api/user/unfollow/`
+
+### Description
+
+Makes the current user stop following the given user.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
 ## `/api/user/update/`
 
 ### Description
@@ -5742,7 +5965,6 @@ Update user profile
 | `graduation_date`           | `string`                                     |             | ✓        |
 | `locale`                    | `string`                                     |             | ✓        |
 | `state_id`                  | `string`                                     |             | ✓        |
-| `auth_token`                | `mixed`                                      |             |          |
 | `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |          |
 | `has_competitive_objective` | `bool\|null`                                 |             |          |
 | `has_learning_objective`    | `bool\|null`                                 |             |          |

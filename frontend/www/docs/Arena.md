@@ -98,7 +98,7 @@ If the user has an `auth_token`, creates a new contest without associated proble
     "scoreboard": int (0,100) // Percentage of the contest time during which the scoreboard is visible
     "penalty_type": enum (none, problem_open, contest_start, runtime) // How the penalty is calculated for each submission
     "show_scoreboard_after": bool // Whether to display the full scoreboard after the contest ends
-    "languages": set (kp, kj, c11-gcc, c11-clang, ...) // Languages allowed in the contest, multiple can be set separated by commas
+    "languages": set (kp, kj, rk, c11-gcc, c11-clang, ...) // Languages allowed in the contest, multiple can be set separated by commas
     "basic_information": bool // Whether users must have registered basic information (Country, State, School) to join
     "requests_user_information": enum (no, optional, required) // Whether the organizer will request permission to view contestant information
     
@@ -314,7 +314,7 @@ If the user has a valid `auth_token`, creates a new problem which can later be a
     "source": string // Author or original contest
     $_FILES["problem_contents"]
     "validator": enum("remote","literal","token","token-caseless","token-numeric") // optional (default "token")
-    "languages": enum("c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb", "kj,kp", "cat", "") // optional
+    "languages": enum("c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb", "kj,kp", "rk", "cat", "") // optional
     "validator_time_limit": int // optional (default 1000)
     "time_limit": int (ms) // optional (default 1000)
     "overall_wall_time_limit": int (ms) // optional (default 60000)

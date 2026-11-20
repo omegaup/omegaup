@@ -1,6 +1,6 @@
 <template>
   <div>
-    <omegaup-carousel></omegaup-carousel>
+    <omegaup-carousel :carousel-items="carouselItems"></omegaup-carousel>
     <div
       v-if="
         coderOfTheMonthFemale ||
@@ -69,61 +69,10 @@
       </div>
     </div>
     <omegaup-testimonials></omegaup-testimonials>
+    <omegaup-getting-started
+      :is-under13-user="isUnder13User"
+    ></omegaup-getting-started>
     <div class="container-lg py-5">
-      <omegaup-section
-        :title="T.homepageCompeteSectionTitle"
-        :description="T.homepageCompeteSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonGoToContests,
-            href: '/arena/',
-          },
-        ]"
-        :image-src="'/media/homepage/contests_section.svg'"
-      ></omegaup-section>
-      <omegaup-section
-        :title="T.homepageTrainSectionTitle"
-        :description="T.homepageTrainSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonGoToProblems,
-            href: '/problem/',
-          },
-        ]"
-        :image-src="'/media/homepage/problems_section.svg'"
-        :image-to-right="true"
-      ></omegaup-section>
-      <omegaup-section
-        :title="T.homepageCreateSectionTitle"
-        :description="T.homepageCreateSectionDescription"
-        :buttons="
-          !isUnder13User
-            ? [
-                {
-                  text: T.buttonCreateProblem,
-                  href: '/problem/new/',
-                },
-                {
-                  text: T.buttonCreateContest,
-                  href: '/contest/new/',
-                },
-              ]
-            : []
-        "
-        :image-src="'/media/homepage/create_section.svg'"
-      ></omegaup-section>
-      <omegaup-section
-        :title="T.homepageTeachSectionTitle"
-        :description="T.homepageTeachSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonGoToCourses,
-            href: '/course/',
-          },
-        ]"
-        :image-src="'/media/homepage/courses_section.svg'"
-        :image-to-right="true"
-      ></omegaup-section>
       <omegaup-sponsors
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
@@ -145,7 +94,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import Vue, { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -153,7 +103,7 @@ import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import homepage_Testimonials from './Testimonials.vue';
-import homepage_Section from './Section.vue';
+import homepage_GettingStarted from './GettingStarted.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
@@ -161,7 +111,8 @@ import homepage_Cookie from './CookieConsent.vue';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expires: -1 });
 
-@Component({
+export default defineComponent({
+  name: 'Homepage',
   components: {
     'omegaup-carousel': homepage_Carousel,
     'omegaup-coder-of-the-month': homepage_CoderOfTheMonth,
@@ -169,33 +120,63 @@ Vue.use(VueCookies, { expires: -1 });
     'omegaup-school-rank': school_Rank,
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
-    'omegaup-section': homepage_Section,
+    'omegaup-getting-started': homepage_GettingStarted,
     'omegaup-sponsors': homepage_Sponsors,
     'omegaup-cookie-accept-decline': homepage_Cookie,
   },
-})
-export default class Homepage extends Vue {
-  @Prop() coderOfTheMonth!: types.UserProfile;
-  @Prop() coderOfTheMonthFemale!: types.UserProfile;
-  @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
-  @Prop() currentUserInfo!: omegaup.User;
-  @Prop() rankTable!: omegaup.UserRankTable;
-  @Prop() schoolsRank!: omegaup.SchoolRankTable;
-  @Prop() isUnder13User!: boolean;
+  props: {
+    coderOfTheMonth: {
+      type: Object as PropType<types.UserProfile | null>,
+      default: null,
+    },
+    coderOfTheMonthFemale: {
+      type: Object as PropType<types.UserProfile | null>,
+      default: null,
+    },
+    schoolOfTheMonth: {
+      type: Object as PropType<omegaup.SchoolOfTheMonth | null>,
+      default: null,
+    },
+    currentUserInfo: {
+      type: Object as PropType<omegaup.User>,
+      required: true,
+    },
+    rankTable: {
+      type: Object as PropType<omegaup.UserRankTable>,
+      required: true,
+    },
+    schoolsRank: {
+      type: Object as PropType<omegaup.SchoolRankTable>,
+      required: true,
+    },
+    isUnder13User: {
+      type: Boolean,
+      required: true,
+    },
+    carouselItems: {
+      type: Array as PropType<types.CarouselItem[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  methods: {
+    cookieClickedAccept() {
+      // TODO: make an API to send the response to the server
+      this.$cookies.set('accept-cookies', true, -1);
+    },
 
-  T = T;
-  cookieClickedAccept() {
-    // TODO: make an API to send the response to the server
-    this.$cookies.set('accept-cookies', true, -1);
-  }
+    cookieClickedDecline() {
+      // TODO: make an API to send the response to the server
+      this.$cookies.set('accept-cookies', false, -1);
+    },
 
-  cookieClickedDecline() {
-    // TODO: make an API to send the response to the server
-    this.$cookies.set('accept-cookies', false, -1);
-  }
-
-  cookieClickedPostpone() {
-    // TODO: make an API to send the response to the server
-  }
-}
+    cookieClickedPostpone() {
+      // TODO: make an API to send the response to the server
+    },
+  },
+});
 </script>

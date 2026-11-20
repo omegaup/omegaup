@@ -397,23 +397,28 @@ const storeOptions: StoreOptions<GraderStore> = {
       );
 
       if (itemString) {
-        state.sessionStorageSources = JSON.parse(itemString);
+        const parsed = JSON.parse(itemString);
+        if (parsed.sources && parsed.sources[parsed.language]) {
+          state.sessionStorageSources = parsed;
+        }
       }
       if (!state.sessionStorageSources) {
+        const tmpl = state.request.input.interactive
+          ? interactiveTemplates
+          : sourceTemplates;
+        const sources: Record<string, string> = {};
+        for (const lang of state.languages) {
+          sources[lang] = tmpl[languageExtensionMapping[lang]] || '';
+        }
         state.sessionStorageSources = {
           language: initialLanguage,
-          sources: state.request.input.interactive
-            ? { ...interactiveTemplates }
-            : { ...sourceTemplates },
+          sources,
         };
       }
-      // do not persist storage sources
       state.request.language = state.sessionStorageSources.language;
       state.request.source =
         initialSource ||
-        state.sessionStorageSources.sources[
-          languageExtensionMapping[state.request.language]
-        ];
+        state.sessionStorageSources.sources[state.request.language];
     },
     showSubmitButton(state: GraderStore, value: boolean) {
       state.showSubmitButton = value;
@@ -442,10 +447,11 @@ const storeOptions: StoreOptions<GraderStore> = {
         return;
       }
 
-      if (state.sessionStorageSources) {
-        if (state.sessionStorageSources.sources[extension]) {
-          state.request.source = state.sessionStorageSources.sources[extension];
-        }
+      if (
+        state.sessionStorageSources &&
+        state.sessionStorageSources.sources[language]
+      ) {
+        state.request.source = state.sessionStorageSources.sources[language];
       } else if (state.request.input.interactive) {
         if (interactiveTemplates[extension]) {
           state.request.source = interactiveTemplates[extension];
@@ -473,9 +479,7 @@ const storeOptions: StoreOptions<GraderStore> = {
         return;
       }
 
-      state.sessionStorageSources.sources[
-        languageExtensionMapping[state.sessionStorageSources.language]
-      ] = value;
+      state.sessionStorageSources.sources[state.request.language] = value;
       persistToSessionStorage(state.alias)({
         alias: state.alias,
         contents: state.sessionStorageSources,
@@ -819,6 +823,15 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     theme({ commit }: { commit: Commit }, value: string) {
       commit('theme', value);
+    },
+    resetSource({ commit, state }: { commit: Commit; state: GraderStore }) {
+      const extension = languageExtensionMapping[state.request.language];
+      const templateSource = state.request.input.interactive
+        ? interactiveTemplates[extension]
+        : sourceTemplates[extension];
+      if (templateSource) {
+        commit('request.source', templateSource);
+      }
     },
     reset({ commit }: { commit: Commit }) {
       commit(

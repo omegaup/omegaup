@@ -200,8 +200,6 @@
 
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
-  --finder-wizard-modal-container-background-color: #eee;
-  --finder-wizard-modal-container-border-color: #ccc;
   --finder-wizard-slider-process-background-color: #678dd7;
   --finder-wizard-tab-select-el-border-color: #678dd7;
   --finder-wizard-tab-select-el-font-color: #678dd7;
@@ -287,6 +285,11 @@
   --user-basic-info-form-group-border-color: #e9e9e9;
   --user-basic-info-field-data-font-color: #808080;
 
+  // USER OBJECTIVES QUESTIONS
+  --user-objectives-modal-description-font-color: #7a828a;
+  --user-objectives-modal-progress-track-background-color: #d8dce0;
+  --user-objectives-modal-option-border-color: #cfd4da;
+
   // USER API TOKENS
   --user-api-token-card-border-color: #dee2e6;
   --user-api-token-card-background-color: #fff;
@@ -305,6 +308,9 @@
   // HOMEPAGE
   --homepage-carousel-font-color: #fff;
   --homepage-carousel-background-color: #466aaf;
+  --homepage-getting-started-card-border-color: #e8e8e8;
+  --homepage-getting-started-title-color: #1a1a2e;
+  --homepage-getting-started-description-color: #6b7280;
 
   // GRADER
   --grader-status-submissions-link-background-color: #fff;
@@ -328,6 +334,11 @@
   --vs-dark-btn-secondary-background-color: #444;
   --vs-dark-btn-secondary-background-color--hover: #555;
   --vs-dark-selected-form-border-color: #007bff;
+
+  // LANGUAGE DETECTION
+  --language-detected-bg: rgba(0, 0, 0, 0.04);
+  --language-detected-border: rgba(0, 0, 0, 0.08);
+
   // GRADER ZIP BUTTONS
   --zip-button-color--hover: #fff;
 
@@ -352,6 +363,9 @@
   // MULTI USER ADD AREA
   --multi-user-add-area-edit-button-color: #8bb0d3;
   --multi-user-add-area-edit-button-color--hover: #666;
+
+  // TEAMS GROUP
+  --teams-group-archive-btn-color: #8bb0d3;
 
   // CERTIFICATES
   --certificates-selected-certificate-border-color: #007bff;
@@ -390,4 +404,22 @@
   --diff-editor-divider-background-color: #e5e7eb;
   --diff-editor-readonly-badge-color: #6b7280;
   --diff-editor-readonly-badge-background-color: #e5e7eb;
+
+  // PROBLEM CREATOR MODAL
+  --problem-creator-modal-overlay-background-color: rgba(0, 0, 0, 0.5);
+  --problem-creator-modal-content-background-color: #fff;
+  --problem-creator-modal-box-shadow-color: rgba(0, 0, 0, 0.1);
+  --problem-creator-modal-footer-border-color: #dee2e6;
+
+  // OPERATIONS DASHBOARD
+  --admin-dashboard-sidebar-background-color: #f8f9fa;
+  --admin-dashboard-sidebar-border-color: #dee2e6;
+  --admin-dashboard-sidebar-item-color: #495057;
+  --admin-dashboard-sidebar-item-hover-background-color: #e9ecef;
+  --admin-dashboard-sidebar-item-hover-color: #0d6efd;
+  --admin-dashboard-notice-background-color: #e6f0fd;
+  --admin-dashboard-notice-border-color: #b7d3f8;
+  --admin-dashboard-notice-font-color: #0b4a9e;
+  --admin-dashboard-setting-icon-color: #6c757d;
+  --admin-dashboard-section-gap: 1.5rem;
 }

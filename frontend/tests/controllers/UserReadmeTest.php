@@ -275,7 +275,7 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
                 'Should have thrown DuplicatedEntryInDatabaseException'
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertSame('readmeAlreadyReported', $e->getMessage());
+            $this->assertSame('aboutSectionAlreadyReported', $e->getMessage());
         }
     }
 

@@ -1,15 +1,22 @@
 import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 
 import activity_Feed from './Feed.vue';
 
+const Feed = activity_Feed as ComponentOptions<Vue>;
+
 describe('Feed.vue', () => {
   it('Should handle contest activity report', async () => {
-    const wrapper = shallowMount(activity_Feed, {
+    const wrapper = shallowMount(Feed, {
       propsData: {
+        page: 1,
+        length: 100,
         alias: 'test_contest',
         type: 'contest',
+        pagerItems: [],
         report: [
           {
             classname: 'user-rank-unranked',
@@ -34,10 +41,13 @@ describe('Feed.vue', () => {
   });
 
   it('Should handle course activity report', async () => {
-    const wrapper = shallowMount(activity_Feed, {
+    const wrapper = shallowMount(Feed, {
       propsData: {
+        page: 1,
+        length: 100,
         alias: 'test_course',
         type: 'course',
+        pagerItems: [],
         report: [
           {
             classname: 'user-rank-unranked',
