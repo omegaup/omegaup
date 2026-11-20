@@ -6,7 +6,7 @@ import dataclasses
 import json
 import logging
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import mysql.connector
 import mysql.connector.cursor
 from mysql.connector import errors
@@ -14,7 +14,62 @@ from mysql.connector import errorcode
 import pika
 
 import database.contest
+import rabbitmq_client
 import verification_code
+
+
+_TRANSIENT_ERRORS = (
+    errors.OperationalError,  # type: ignore[attr-defined]
+    errors.InterfaceError,  # type: ignore[attr-defined]
+    OSError,
+)
+
+_TRANSIENT_MYSQL_ERRNOS = frozenset({
+    errorcode.ER_LOCK_DEADLOCK,  # type: ignore[attr-defined]
+    errorcode.ER_LOCK_WAIT_TIMEOUT,  # type: ignore[attr-defined]
+    errorcode.CR_SERVER_GONE_ERROR,  # type: ignore[attr-defined]
+    errorcode.CR_SERVER_LOST,  # type: ignore[attr-defined]
+})
+
+_PERMANENT_MYSQL_ERRNOS = frozenset({
+    errorcode.ER_ACCESS_DENIED_ERROR,  # type: ignore[attr-defined]
+})
+
+
+def _has_mysql_errno(err: BaseException, errnos: frozenset[int]) -> bool:
+    '''Returns whether an exception in the cause chain has a MySQL errno.'''
+    current: Optional[BaseException] = err
+    for _ in range(10):
+        if current is None:
+            break
+        if getattr(current, 'errno', None) in errnos:
+            return True
+        current = current.__cause__
+    return False
+
+
+def _is_permanent_mysql_error(err: BaseException) -> bool:
+    '''Returns whether the MySQL error cannot be resolved by retrying.'''
+    return _has_mysql_errno(err, _PERMANENT_MYSQL_ERRNOS)
+
+
+def _is_transient(err: Exception) -> bool:
+    '''Tells infrastructure failures apart from permanent errors.'''
+    if _is_permanent_mysql_error(err):
+        return False
+    if isinstance(err, _TRANSIENT_ERRORS):
+        return True
+    return getattr(err, 'errno', None) in _TRANSIENT_MYSQL_ERRNOS
+
+
+def _root_cause(err: BaseException) -> str:
+    '''Describes the original error hidden behind wrapped exceptions.'''
+    root = err
+    for _ in range(10):
+        if root.__cause__ is None:
+            break
+        root = root.__cause__
+    return f'{type(root).__name__} (errno={getattr(root, "errno", None)})'
 
 
 @dataclasses.dataclass
@@ -54,155 +109,262 @@ class ContestsCallback:
                  _properties: Optional[pika.spec.BasicProperties],
                  body: bytes) -> None:
         '''Function to store the certificates by a given contest'''
-        response = json.loads(body)
+        response = self._parse_body(body)
+        self._validate_structure(response)
+
+        contest_id = response['contest_id']
 
         try:
-            ranking = []
-            for user_ranking in response['ranking']:
-                ranking.append(database.contest.Ranking(**user_ranking))
-            response['ranking'] = ranking
-            data = ContestCertificate(**response)
+            self._process(channel, response)
+        except rabbitmq_client.UnrecoverableMessageError as err:
+            logging.error('Contest %s failed permanently: %s', contest_id, err)
+            self._handle_processing_error(contest_id, 'fatal_error')
+            raise
+        except Exception as err:  # pylint: disable=broad-except
+            if _is_permanent_mysql_error(err):
+                logging.error(
+                    'Contest %s failed permanently (%s, cause: %s)',
+                    contest_id, type(err).__name__, _root_cause(err))
+                self._handle_processing_error(contest_id, 'fatal_error')
+                raise rabbitmq_client.UnrecoverableMessageError(
+                    'Permanent MySQL error while processing the message'
+                ) from err
+            if _is_transient(err):
+                logging.warning(
+                    'Contest %s failed temporarily (%s, cause: %s), it will '
+                    'be retried', contest_id, type(err).__name__,
+                    _root_cause(err))
+                self._handle_processing_error(contest_id, 'retryable_error')
+                raise rabbitmq_client.TransientMessageError(
+                    'Transient error while processing the message'
+                ) from err
+            logging.exception(
+                'Contest %s failed with an unexpected error', contest_id)
+            self._handle_processing_error(contest_id, 'fatal_error')
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Unexpected error while processing the message'
+            ) from err
 
-            certificates: List[Certificate] = []
-            usernames: List[str] = []
+    def _process(
+            self,
+            channel: pika.adapters.blocking_connection.BlockingChannel,
+            response: Any) -> None:
+        '''Builds and stores the certificates for a validated message.'''
+        self.dbconn.ping(  # type: ignore[attr-defined]
+            reconnect=True,
+            attempts=3,
+            delay=5,
+        )
+        ranking = []
+        for user_ranking in response['ranking']:
+            ranking.append(database.contest.Ranking(**user_ranking))
+        response['ranking'] = ranking
+        data = ContestCertificate(**response)
 
-            for user_ranking in data.ranking:
-                contest_place: Optional[int] = None
-                place = int(user_ranking.place)
-                cutoff = data.certificate_cutoff
-                if (cutoff and place and place <= cutoff):
-                    contest_place = user_ranking.place
-                certificates.append(Certificate(
-                    certificate_type='contest',
-                    contest_id=data.contest_id,
-                    verification_code=generate_contest_code(),
-                    contest_place=contest_place,
-                    username=user_ranking.username
-                ))
-                usernames.append(user_ranking.username)
+        certificates: List[Certificate] = []
+        usernames: List[str] = []
 
-            notifications = []
-            with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+        for user_ranking in data.ranking:
+            contest_place: Optional[int] = None
+            place = int(user_ranking.place)
+            cutoff = data.certificate_cutoff
+            if (cutoff and place and place <= cutoff):
+                contest_place = user_ranking.place
+            certificates.append(Certificate(
+                certificate_type='contest',
+                contest_id=data.contest_id,
+                verification_code=generate_contest_code(),
+                contest_place=contest_place,
+                username=user_ranking.username
+            ))
+            usernames.append(user_ranking.username)
+
+        notifications: List[Any] = []
+        with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            try:
                 users_ids = database.contest.get_users_ids(
                     cur,
                     usernames
                 )
-                contest_title = database.contest.get_contest_title(
-                    cur,
-                    data.contest_id
-                )
-                for index, user_id in enumerate(users_ids):
-                    notifications.append(
-                        (user_id, json.dumps({
-                            'type': 'certificate-awarded',
-                            'body': {
-                                'localizationString':
-                                    'notificationNewContestCertificate',
-                                'localizationParams': {
-                                    'contest_title': contest_title,
-                                },
-                                'url': '/certificates/mine/#' +
-                                    certificates[index].verification_code,
-                                'iconUrl': '/media/info.png',
+            except KeyError as err:
+                raise rabbitmq_client.UnrecoverableMessageError(
+                    'A username in the ranking does not exist'
+                ) from err
+            contest_title = database.contest.get_contest_title(
+                cur,
+                data.contest_id
+            )
+            for index, user_id in enumerate(users_ids):
+                notifications.append(
+                    (user_id, json.dumps({
+                        'type': 'certificate-awarded',
+                        'body': {
+                            'localizationString':
+                                'notificationNewContestCertificate',
+                            'localizationParams': {
+                                'contest_title': contest_title,
                             },
-                        })))
+                            'url': '/certificates/mine/#' +
+                                certificates[index].verification_code,
+                            'iconUrl': '/media/info.png',
+                        },
+                    })))
 
-                while True:
-                    try:
-                        cur.executemany('''
-                            INSERT INTO
-                                `Certificates` (
-                                    `identity_id`,
-                                    `certificate_type`,
-                                    `contest_id`,
-                                    `verification_code`,
-                                    `contest_place`)
-                            SELECT
-                                `identity_id`,
-                                %s,
-                                %s,
-                                %s,
-                                %s
-                            FROM
-                                `Identities`
-                            WHERE
-                                `username` = %s;
-                            ''',
-                                        [
-                                            dataclasses.astuple(
-                                                certificate
-                                            ) for certificate in certificates])
-                        cur.executemany(
-                            '''
-                            INSERT INTO
-                                Notifications (user_id, contents)
-                            VALUES (%s, %s)''', notifications)
-                        self.dbconn.commit()
-                        break
-                    except errors.IntegrityError as err:
-                        self.dbconn.rollback()
-                        if err.errno != errorcode.ER_DUP_ENTRY:
-                            raise
-                        if err.msg.find(
-                            'Certificates.contest_identity_key'
-                        ) > 0:
-                            logging.exception(
-                                'At least one certificate for this contest is '
-                                'duplicated'
-                            )
-                            break
-                        for index, cert in enumerate(certificates):
-                            cert.verification_code = generate_contest_code()
-                            user_id = notifications[index][0]
-                            notifications[index] = (user_id, json.dumps({
-                                'type': 'certificate-awarded',
-                                'body': {
-                                    'localizationString':
-                                        'notificationNewContestCertificate',
-                                    'localizationParams': {
-                                        'contest_title': contest_title,
-                                    },
-                                    'url': '/certificates/mine/#' +
-                                        cert.verification_code,
-                                    'iconUrl': '/media/info.png',
-                                },
-                            }))
-                        logging.exception(
-                            'At least one of the verification codes had a '
-                            'conflict'
-                        )
-                try:
-                    cur.execute('''
-                        UPDATE
-                            `Contests`
-                        SET
-                            `certificates_status` = 'generated'
-                        WHERE
-                            `contest_id` = %s;
-                        ''', (data.contest_id,))
-                    self.dbconn.commit()
-                except:  # noqa: bare-except
-                    logging.exception(
-                        'Failed to update the certificate status'
-                    )
+            self._insert_certificates(
+                cur, certificates, notifications, contest_title)
 
-            if self.for_testing:
-                logging.info(
-                    'Closing the connection for testing purposes'
-                )
-                channel.connection.close()
-
-        except:  # noqa: bare-except
-            with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            try:
                 cur.execute('''
                     UPDATE
                         `Contests`
                     SET
-                        `certificates_status` = 'retryable_error'
+                        `certificates_status` = 'generated'
                     WHERE
                         `contest_id` = %s;
-                    ''', (response['contest_id'],))
+                    ''', (data.contest_id,))
                 self.dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update the certificate status'
+                )
+
+        if self.for_testing:
+            logging.info(
+                'Closing the connection for testing purposes'
+            )
+            channel.connection.close()
+
+    def _insert_certificates(
+            self,
+            cur: mysql.connector.cursor.MySQLCursorDict,
+            certificates: List[Certificate],
+            notifications: List[Any],
+            contest_title: str) -> None:
+        '''Inserts the certificates, regenerating codes on collision.'''
+        while True:
+            try:
+                cur.executemany('''
+                    INSERT INTO
+                        `Certificates` (
+                            `identity_id`,
+                            `certificate_type`,
+                            `contest_id`,
+                            `verification_code`,
+                            `contest_place`)
+                    SELECT
+                        `identity_id`,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    FROM
+                        `Identities`
+                    WHERE
+                        `username` = %s;
+                    ''',
+                                [
+                                    dataclasses.astuple(
+                                        certificate
+                                    ) for certificate in certificates])
+                cur.executemany(
+                    '''
+                    INSERT INTO
+                        Notifications (user_id, contents)
+                    VALUES (%s, %s)''', notifications)
+                self.dbconn.commit()
+                return
+            except errors.IntegrityError as err:
+                self.dbconn.rollback()
+                if err.errno != errorcode.ER_DUP_ENTRY:
+                    raise
+                if err.msg.find('Certificates.contest_identity_key') > 0:
+                    logging.exception(
+                        'At least one certificate for this contest is '
+                        'duplicated'
+                    )
+                    return
+                for index, cert in enumerate(certificates):
+                    cert.verification_code = generate_contest_code()
+                    user_id = notifications[index][0]
+                    notifications[index] = (user_id, json.dumps({
+                        'type': 'certificate-awarded',
+                        'body': {
+                            'localizationString':
+                                'notificationNewContestCertificate',
+                            'localizationParams': {
+                                'contest_title': contest_title,
+                            },
+                            'url': '/certificates/mine/#' +
+                                cert.verification_code,
+                            'iconUrl': '/media/info.png',
+                        },
+                    }))
+                logging.exception(
+                    'At least one of the verification codes had a '
+                    'conflict'
+                )
+
+    def _handle_processing_error(
+            self, contest_id: Optional[int], status: str) -> None:
+        '''Sets the certificates status when the contest can be identified.'''
+        if contest_id is not None:
+            try:
+                self._mark_status(contest_id, status)
+            except Exception:  # noqa: bare-except pylint: disable=broad-except
+                logging.exception(
+                    'Failed to mark contest %s as %s', contest_id, status
+                )
+
+    _REQUIRED_FIELDS = (
+        'certificate_cutoff',
+        'alias',
+        'scoreboard_url',
+        'contest_id',
+        'ranking',
+    )
+
+    @staticmethod
+    def _parse_body(body: bytes) -> Any:
+        '''Parses the message body, discarding it if it is not valid JSON.'''
+        try:
+            return json.loads(body)
+        except json.JSONDecodeError as err:
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message body is not valid JSON'
+            ) from err
+
+    @classmethod
+    def _validate_structure(cls, response: Any) -> None:
+        '''Validates the minimum structure of a contest message.'''
+        if not isinstance(response, dict):
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message body is not a JSON object'
+            )
+        missing = [
+            field for field in cls._REQUIRED_FIELDS if field not in response
+        ]
+        if missing:
+            raise rabbitmq_client.UnrecoverableMessageError(
+                'Message is missing required fields: ' + ', '.join(missing)
+            )
+        if not isinstance(response['ranking'], list):
+            raise rabbitmq_client.UnrecoverableMessageError(
+                "Message field 'ranking' is not a list"
+            )
+
+    def _mark_status(self, contest_id: int, status: str) -> None:
+        '''Sets the certificates status of the given contest.'''
+        self.dbconn.rollback()
+        with self.dbconn.cursor(buffered=True, dictionary=True) as cur:
+            cur.execute('''
+                UPDATE
+                    `Contests`
+                SET
+                    `certificates_status` = %s
+                WHERE
+                    `contest_id` = %s;
+                ''', (status, contest_id))
+            self.dbconn.commit()
 
 
 def generate_contest_code() -> str:

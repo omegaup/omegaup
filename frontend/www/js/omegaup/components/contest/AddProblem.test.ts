@@ -207,7 +207,7 @@ describe('AddProblem.vue', () => {
 
     await wrapper
       .find('input[name="use-latest-version"][value="false"]')
-      .trigger('click');
+      .setChecked();
 
     expect(wrapper.find('[data-versions]').text()).toContain(
       commit.substring(0, 8),
@@ -255,7 +255,7 @@ describe('AddProblem.vue', () => {
 
     await wrapper
       .find('input[name="use-latest-version"][value="true"]')
-      .trigger('click');
+      .setChecked();
 
     await wrapper.find('button.add-problem').trigger('submit');
     expect(wrapper.emitted('add-problem')).toEqual([
@@ -292,7 +292,7 @@ describe('AddProblem.vue', () => {
 
     await wrapper
       .find('input[name="use-latest-version"][value="false"]')
-      .trigger('click');
+      .setChecked();
 
     expect(wrapper.find('[data-versions]').text()).toContain(
       commit.substring(0, 8),
