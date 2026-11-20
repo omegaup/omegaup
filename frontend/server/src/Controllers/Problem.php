@@ -7106,7 +7106,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'utf-8'
                 );
                 $result = json_decode($jsonContent, associative: true);
-                /** @var array|null $result */
+               
             }
             if (!is_array($result)) {
                 return null;
