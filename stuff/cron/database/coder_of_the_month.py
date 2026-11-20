@@ -186,8 +186,11 @@ def get_cotm_eligible_users(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category
     )
+    # ponytail: explicit ORDER BY MIN(s.submission_id) so score ties don't
+    # depend on whether MySQL scans Identities or Submissions first; GROUP BY
+    # i.identity_id already deduplicates rows so DISTINCT is redundant.
     sql = f'''
-            SELECT DISTINCT
+            SELECT
                 IFNULL(i.user_id, 0) AS user_id,
                 i.identity_id,
                 i.username,
@@ -243,7 +246,9 @@ def get_cotm_eligible_users(
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
-                i.identity_id;
+                i.identity_id
+            ORDER BY
+                MIN(s.submission_id) ASC;
             '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
