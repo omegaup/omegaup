@@ -896,6 +896,9 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             login: $creatorLogin,
         );
 
+        // Commit the test fixtures so they survive the outer transaction rollback.
+        \OmegaUp\Test\Utils::commit();
+
         $reflection = new \ReflectionClass(\OmegaUp\MySQLConnection::class);
         $countProp = $reflection->getProperty('_transactionCount');
         $countProp->setAccessible(true);
@@ -904,6 +907,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $conn = \OmegaUp\MySQLConnection::getInstance();
         $initialTxCount = $countProp->getValue($conn);
+        $this->assertSame(1, $initialTxCount);
         $this->assertTrue($okProp->getValue($conn));
 
         $validUsername = "{$group['group']->alias}:validuser1";
@@ -957,6 +961,12 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $okProp->getValue($conn),
             'Transaction should be marked as failed by transRollback()'
         );
+
+        // Complete the outer test transaction so MySQL actually executes ROLLBACK
+        // based on the failed transaction status.
+        $conn->CompleteTrans();
+        // Restart a transaction so ControllerTestCase::tearDown() has a transaction to close.
+        $conn->StartTrans();
 
         // Verify that the first identity was not persisted after rollback
         $this->assertNull(
