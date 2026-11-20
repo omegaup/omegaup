@@ -7,7 +7,11 @@ from unittest import mock
 import mysql.connector.cursor
 
 from cron import update_ranks
-from cron.database.coder_of_the_month import Problem, get_user_problems
+from cron.database.coder_of_the_month import (
+    Problem,
+    get_cotm_eligible_users,
+    get_user_problems,
+)
 from cron.database.school_of_the_month import School
 from cron.tests.fixtures import sqlite_cursor
 from cron.tests.fixtures.mock_cursor import MockCursor
@@ -702,6 +706,60 @@ class UpdateUserRankClassnameTest(unittest.TestCase):
         '''With no cutoffs stored every user is unranked.'''
         self.assertEqual(self._classnames([2000.0], []),
                          ['user-rank-unranked'])
+
+
+class GetCotmEligibleUsersBoundaryTest(unittest.TestCase):
+    '''Boundary tests for get_cotm_eligible_users.'''
+
+    _SCHEMA = (
+        'CREATE TABLE Identities (identity_id INTEGER, user_id INTEGER, '
+        'username TEXT, country_id TEXT, gender TEXT, '
+        'current_identity_school_id INTEGER);',
+        'CREATE TABLE Submissions (identity_id INTEGER, problem_id INTEGER, '
+        'verdict TEXT, type TEXT, time TEXT);',
+        'CREATE TABLE Problems (problem_id INTEGER, visibility INTEGER, '
+        'quality_seal INTEGER, acl_id INTEGER);',
+        'CREATE TABLE Identities_Schools (identity_school_id INTEGER, '
+        'school_id INTEGER);',
+        'CREATE TABLE User_Rank_Cutoffs (score REAL, percentile REAL, '
+        'classname TEXT);',
+        'CREATE TABLE User_Rank (user_id INTEGER, score REAL);',
+        'CREATE TABLE User_Roles (user_id INTEGER, acl_id INTEGER, '
+        'role_id INTEGER);',
+    )
+
+    def test_excludes_submission_at_exact_start_of_next_month(self) -> None:
+        '''A submission at first_day_of_next_month is not eligible.
+
+        In MySQL a DATE is coerced to midnight, so s.time <=
+        first_day_of_next_month includes a submission stamped at the exact
+        first instant of the next month. The date-only string here reproduces
+        the same inclusive boundary under SQLite.
+        '''
+        conn = sqlite_cursor.connect(*self._SCHEMA)
+        conn.execute(
+            "INSERT INTO Identities "
+            "VALUES (1, 1, 'user1', 'MX', NULL, NULL);"
+        )
+        conn.execute(
+            "INSERT INTO Submissions "
+            "VALUES (1, 10, 'AC', 'normal', '2026-07-01');"
+        )
+        conn.execute('INSERT INTO Problems VALUES (10, 1, 1, 99);')
+
+        cur = cast(mysql.connector.cursor.MySQLCursorDict,
+                   sqlite_cursor.SqliteCursor(conn))
+        june = datetime.date(2026, 6, 1)
+        july = datetime.date(2026, 7, 1)
+
+        result = get_cotm_eligible_users(cur, june, july, 'all', [])
+
+        self.assertEqual(
+            result,
+            [],
+            'A user whose only submission is at first_day_of_next_month '
+            'should not be eligible for the current month.',
+        )
 
 
 if __name__ == '__main__':
