@@ -72,10 +72,12 @@ export class ProfilePage {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#change-password"]').click();
+    cy.intercept('POST', '/api/user/changePassword/').as('changePassword');
     cy.get('[data-old-password]').type(oldPassword);
     cy.get('[data-new-password]').type(newPassword);
     cy.get('[data-new-password2]').type(newPassword);
     cy.get('[data-save-changed-password]').click();
+    cy.wait('@changePassword').its('response.statusCode').should('eq', 200);
   }
 
   updateProfileInformation(userBasicInformation: UserInformation): void {
