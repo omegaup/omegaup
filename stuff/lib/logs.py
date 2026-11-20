@@ -12,10 +12,10 @@ import logging
 
 from typing import Any, Dict
 
-from pythonjsonlogger import jsonlogger  # type: ignore
+from pythonjsonlogger import json  # type: ignore
 
 
-class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
+class _CustomJsonFormatter(json.JsonFormatter):  # type: ignore
     """A JSON formatter that adds the level."""
 
     def add_fields(
