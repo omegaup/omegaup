@@ -957,5 +957,21 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $okProp->getValue($conn),
             'Transaction should be marked as failed by transRollback()'
         );
+
+        // Verify that the first identity was not persisted after rollback
+        $this->assertNull(
+            \OmegaUp\DAO\Identities::findByUsername($validUsername),
+            'First identity should not be persisted after rollback'
+        );
+        $this->assertNull(
+            \OmegaUp\DAO\Identities::findByUsername($invalidUsername),
+            'Second identity should not be persisted'
+        );
+
+        // Verify that no member identities remain associated with the group
+        $this->assertEmpty(
+            \OmegaUp\DAO\GroupsIdentities::getMemberIdentities($group['group']),
+            'Group should have no member identities persisted after rollback'
+        );
     }
 }
