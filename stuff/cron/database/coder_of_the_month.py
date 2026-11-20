@@ -229,7 +229,7 @@ def get_cotm_eligible_users(
                 isc.identity_school_id = i.current_identity_school_id
             WHERE
                 s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-                s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
+                s.time < %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
                 i.user_id IS NOT NULL
                 -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
                 -- role_id = 1 is ADMIN_ROLE)
