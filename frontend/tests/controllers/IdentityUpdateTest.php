@@ -588,4 +588,55 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\DAO\Identities::findByUsername($newUsername)
         );
     }
+
+    /**
+     * Identity creators change team passwords through the same endpoint as
+     * regular group passwords, so the group check has to accept the
+     * `teams:<alias>:<name>` namespace as well as `<alias>:<name>`.
+     */
+    public function testChangePasswordOfTeamIdentity() {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            login: $creatorLogin,
+        );
+
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                    forTeams: true,
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv'
+        );
+        $teamUsername = "teams:{$teamGroup->alias}:{$teamUsernames[0]}";
+        $newPassword = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\Controllers\Identity::apiChangePassword(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => $teamUsername,
+                'password' => $newPassword,
+                'group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        $identity = \OmegaUp\DAO\Identities::findByUsername($teamUsername);
+        $this->assertNotNull($identity);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Identity::testPassword($identity, $newPassword)
+        );
+    }
 }

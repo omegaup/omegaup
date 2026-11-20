@@ -1,0 +1,100 @@
+name: Publish development PHP image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # The Dockerfile and context rules, followed by its COPY sources.
+      - 'stuff/docker/Dockerfile.dev-php'
+      - 'stuff/docker/.dockerignore'
+      - 'stuff/docker/Dockerfile.dev-php.dockerignore'
+      - 'stuff/docker/etc/omegaup/frontend/**'
+      - 'stuff/docker/etc/supervisor/**'
+      - 'stuff/docker/etc/php/8.1/fpm/**'
+      - 'stuff/docker/etc/php/8.1/mods-available/**'
+      - 'stuff/docker/etc/nginx/**'
+      - 'stuff/docker/etc/sudoers.d/**'
+      - 'stuff/docker/usr/bin/**'
+      - 'stuff/docker/my.cnf'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to Docker Hub (only from omegaup/omegaup main)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-dev-php-${{ github.sha }}-${{ github.event_name == 'push' || inputs.publish }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      IMAGE_REPOSITORY: omegaup/dev-php
+      IMAGE_TAG: sha-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+
+      - name: Build the development image
+        run: |
+          docker buildx build --platform linux/amd64 --load \
+            --file stuff/docker/Dockerfile.dev-php \
+            --tag "$IMAGE_REPOSITORY:$IMAGE_TAG" stuff/docker/
+
+      - name: Check Node.js, Corepack and pnpm as ubuntu
+        run: |
+          # Use the pnpm version selected by the project's packageManager field.
+          docker run --rm --pull=never --user ubuntu --workdir /opt/omegaup \
+            --mount "type=bind,source=$PWD/package.json,target=/opt/omegaup/package.json,readonly" \
+            "$IMAGE_REPOSITORY:$IMAGE_TAG" bash -euc '
+              test "$(id -un)" = ubuntu
+              test "$(id -u)" -ne 0
+              node --version
+              corepack --version
+              pnpm --version
+            '
+
+      - name: Publish the validated image to Docker Hub
+        if: >-
+          github.repository == 'omegaup/omegaup' &&
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || inputs.publish)
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          # The repository is public. Only a definitive 404 allows a push.
+          token=$(curl --fail --silent --show-error --max-time 30 \
+            "https://auth.docker.io/token?service=registry.docker.io&scope=repository:$IMAGE_REPOSITORY:pull" \
+            | jq --exit-status --raw-output '.token | select(length > 0)')
+          accept='application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.docker.distribution.manifest.v2+json'
+          status=$(curl --silent --show-error --max-time 30 --head --output /dev/null \
+            --write-out '%{http_code}' --header "Authorization: Bearer $token" \
+            --header "Accept: $accept" \
+            "https://registry-1.docker.io/v2/$IMAGE_REPOSITORY/manifests/$IMAGE_TAG")
+          case "$status" in
+            200)
+              echo "$IMAGE_REPOSITORY:$IMAGE_TAG is already published."
+              exit 0
+              ;;
+            404) ;;
+            *)
+              echo "Could not check the Docker Hub tag (HTTP $status)." >&2
+              exit 1
+              ;;
+          esac
+
+          printf '%s' "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+          docker push "$IMAGE_REPOSITORY:$IMAGE_TAG"
