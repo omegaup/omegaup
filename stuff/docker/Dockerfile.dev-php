@@ -12,10 +12,21 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
+# Minimum Node.js version required at build time.
+ARG NODE_MIN_SECURE_VERSION=24.22.1
+
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
-    corepack enable && \
     corepack enable
+
+RUN set -eu; \
+    min="${NODE_MIN_SECURE_VERSION}"; \
+    ver="$(node -v)"; \
+    ver="${ver#v}"; \
+    if ! dpkg --compare-versions "$ver" ge "$min"; then \
+        echo "FATAL: node $ver is older than $min"; exit 1; \
+    fi; \
+    echo "OK: node $ver >= $min"
 
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
@@ -85,7 +96,6 @@ CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mys
      "/bin/bash", "-c", \
      "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; \
       cd /opt/omegaup && \
-      corepack enable && \
       pnpm install --frozen-lockfile && \
       pnpm run dev-all & \
       exec /usr/bin/supervisord"]

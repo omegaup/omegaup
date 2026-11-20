@@ -29,6 +29,8 @@ class RabbitmqProducer:
     def send_message(self, message: str) -> None:
         '''Send message to any queue'''
         body = message.encode()
-        self.channel.basic_publish(exchange=self.exchange,
-                                   routing_key=self.routing_key,
-                                   body=body)
+        self.channel.basic_publish(
+            exchange=self.exchange,
+            routing_key=self.routing_key,
+            body=body,
+            properties=pika.BasicProperties(delivery_mode=2))
