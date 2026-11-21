@@ -512,6 +512,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
+     * @omegaup-request-param null|string $feedback
      * @omegaup-request-param string $feedback_list
      * @omegaup-request-param string $guid
      *
@@ -566,6 +567,27 @@ class Submission extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        // Optional review summary. Stored on the general feedback row
+        // (range_bytes_start IS NULL), which is also where a student's
+        // feedback request is saved, so this replaces that placeholder.
+        // Trim before the length check; a whitespace-only summary is
+        // treated as absent below.
+        $generalFeedback = $r->ensureOptionalString(
+            'feedback',
+            required: false,
+            validator: fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
+                trim($feedback),
+                0,
+                1000
+            )
+        );
+        if (!is_null($generalFeedback)) {
+            $generalFeedback = trim($generalFeedback);
+            if ($generalFeedback === '') {
+                $generalFeedback = null;
+            }
+        }
+
         $feedbackString = $r->ensureString('feedback_list');
         $decodedFeedbackList = json_decode($feedbackString, associative: true);
         if (!is_array($decodedFeedbackList)) {
@@ -598,12 +620,27 @@ class Submission extends \OmegaUp\Controllers\Controller {
             ];
         }
 
+        if ($feedbackList === [] && is_null($generalFeedback)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters',
+                'feedback_list'
+            );
+        }
+
         foreach ($feedbackList as $feedback) {
             self::createOrUpdateFeedback(
                 $r->identity,
                 $submission,
                 $feedback['feedback'],
                 $feedback['lineNumber']
+            );
+        }
+
+        if (!is_null($generalFeedback)) {
+            self::createOrUpdateFeedback(
+                $r->identity,
+                $submission,
+                $generalFeedback
             );
         }
 

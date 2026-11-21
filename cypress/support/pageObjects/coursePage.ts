@@ -232,6 +232,7 @@ export class CoursePage {
   }
 
   leaveFeedbackOnSolution(feedbacks: { line: number; text: string }[]): void {
+    const reviewSummary = 'Please review the comments below.';
     cy.get('[data-course-submisson-button]').click();
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
@@ -266,10 +267,14 @@ export class CoursePage {
           );
         });
 
-        cy.get('[data-button-send-feedback]').click();
+        cy.get('[data-button-finish-review]').click();
+        cy.get('[data-review-summary]').type(reviewSummary);
+        cy.get('[data-button-submit-review]').click();
 
         cy.get('[data-runs-actions-button]').click();
         cy.get('[data-runs-show-details-button]').click();
+
+        cy.get('[data-run-feedback]').should('contain', reviewSummary);
 
         feedbacks.forEach(({ text }) => {
           cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(

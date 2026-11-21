@@ -472,9 +472,11 @@ OmegaUp.on('ready', async () => {
           },
           'save-feedback-list': ({
             feedbackList,
+            generalFeedback,
             guid,
           }: {
             feedbackList: { lineNumber: number; feedback: string }[];
+            generalFeedback: string | null;
             guid: string;
           }) => {
             api.Submission.setFeedbackList({
@@ -482,6 +484,7 @@ OmegaUp.on('ready', async () => {
               course_alias: payload.courseDetails.alias,
               assignment_alias: payload.currentAssignment.alias,
               feedback_list: JSON.stringify(feedbackList),
+              feedback: generalFeedback ?? undefined,
             })
               .then(() => {
                 ui.success(T.feedbackSuccessfullyAdded);
@@ -489,12 +492,20 @@ OmegaUp.on('ready', async () => {
                 api.Run.getSubmissionFeedback({
                   run_alias: guid,
                 }).then((response) => {
-                  component.feedbackMap.forEach((feedback) => {
+                  if (this.runDetailsData?.guid === guid) {
+                    this.runDetailsData = {
+                      ...this.runDetailsData,
+                      feedback: response,
+                    };
+                  }
+                  const refreshedFeedbackMap = new Map(this.feedbackMap);
+                  refreshedFeedbackMap.forEach((feedback) => {
                     feedback.submissionFeedbackId = response.find(
                       (fb) => fb.range_bytes_start == feedback.lineNumber,
                     )?.submission_feedback_id;
                     feedback.status = FeedbackStatus.Saved;
                   });
+                  this.feedbackMap = refreshedFeedbackMap;
                 });
 
                 component.currentPopupDisplayed = PopupDisplayed.None;

@@ -15,21 +15,9 @@
       ></omegaup-user-username>
     </div>
     <div v-if="isAdmin" class="feedback-section">
-      <a
-        data-run-leave-feedback-button
-        role="button"
-        class="btn btn-sm btn-primary"
-        @click="showFeedbackForm = !showFeedbackForm"
-        >{{ T.submissionFeedbackSendButton }}</a
-      >
-      <div v-show="showFeedbackForm" class="form-group">
-        <p>{{ T.submissionFeedbackAnimationButton }}</p>
-        <img
-          v-show="showFeedbackForm"
-          src="/media/submission_feedback_demo.gif"
-          :alt="T.submissionFeedbackDemoAlt"
-        />
-      </div>
+      <p data-submission-feedback-review-hint>
+        {{ T.submissionFeedbackReviewHint }}
+      </p>
     </div>
   </div>
 </template>
@@ -78,10 +66,6 @@ export default defineComponent({
       T,
       ui,
       time,
-      showFeedbackForm: false,
-      // Computed properties are not available yet inside data(), so the
-      // initial value is derived from the prop directly.
-      feedback: findGeneralFeedback(this.feedbackOptions)?.feedback ?? null,
     };
   },
   computed: {
@@ -96,11 +80,5 @@ export default defineComponent({
 @import '../../../../sass/main.scss';
 .feedback-section {
   margin-top: 1.5em;
-  .form-group {
-    margin-top: 0.5em;
-    button {
-      margin-top: 1em;
-    }
-  }
 }
 </style>
