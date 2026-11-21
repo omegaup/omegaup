@@ -106,14 +106,23 @@ export function generatePassword(): string {
   const len = 8;
   // Browser supports window.crypto
   if (typeof window.crypto == 'object') {
-    const arr = new Uint8Array(2 * len);
-    window.crypto.getRandomValues(arr);
-    return Array.from(
-      arr.filter((value) => value <= 255 - (255 % validChars.length)),
-      (value) => validChars[value % validChars.length],
-    )
-      .join('')
-      .substr(0, len);
+    // Only accept bytes below the largest multiple of validChars.length that
+    // fits in a byte, so that every character is equally likely (rejection
+    // sampling). Keep sampling until `len` characters have been generated,
+    // since rejected bytes could otherwise leave the password short.
+    const maxValidByte = 256 - (256 % validChars.length);
+    const password: string[] = [];
+    while (password.length < len) {
+      const arr = new Uint8Array(2 * len);
+      window.crypto.getRandomValues(arr);
+      for (const value of arr) {
+        if (value >= maxValidByte || password.length === len) {
+          continue;
+        }
+        password.push(validChars[value % validChars.length]);
+      }
+    }
+    return password.join('');
   }
 
   // Browser does not support window.crypto

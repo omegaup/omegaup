@@ -74,6 +74,54 @@ describe('groups_utils', () => {
       const password = generatePassword();
       expect(password.length).toBe(simplePasswordLength);
     });
+
+    describe('with window.crypto', () => {
+      const originalCrypto = window.crypto;
+
+      afterEach(() => {
+        if (typeof originalCrypto === 'undefined') {
+          delete (window as any).crypto;
+        } else {
+          (window as any).crypto = originalCrypto;
+        }
+      });
+
+      it('Should reject bytes that would cause modulo bias and resample', () => {
+        // 256 % 40 == 16, so bytes >= 240 must be rejected for all 40
+        // characters to be equally likely. Byte 240 would map to 'a' if it
+        // were accepted.
+        let callCount = 0;
+        (window as any).crypto = {
+          getRandomValues: (arr: Uint8Array) => {
+            arr.fill(callCount++ === 0 ? 240 : 1);
+            return arr;
+          },
+        };
+
+        const password = generatePassword();
+
+        expect(password).toBe('cccccccc');
+        expect(callCount).toBe(2);
+      });
+
+      it('Should always generate 8 characters even when bytes are rejected', () => {
+        // The old implementation truncated the sampled bytes, so when many
+        // bytes were rejected at once it could return a password shorter
+        // than 8 characters.
+        let callCount = 0;
+        (window as any).crypto = {
+          getRandomValues: (arr: Uint8Array) => {
+            arr.fill(callCount++ < 2 ? 255 : 0);
+            return arr;
+          },
+        };
+
+        const password = generatePassword();
+
+        expect(password.length).toBe(simplePasswordLength);
+        expect(callCount).toBe(3);
+      });
+    });
   });
 
   describe('getCSVRecords', () => {
