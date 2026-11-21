@@ -257,7 +257,10 @@
             <tr
               v-for="run in paginatedRuns"
               :key="run.guid"
-              :class="{ selected: createdGuid === run.guid }"
+              :class="{
+                selected: createdGuid === run.guid && run.status === 'ready',
+                'run-loading': run.status !== 'ready',
+              }"
             >
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td v-show="showGUID">
@@ -350,7 +353,15 @@
               >
                 {{ percentage(run) }}
               </td>
-              <td class="numeric">{{ execution(run) }}</td>
+              <td class="numeric">
+                <font-awesome-icon
+                  v-if="run.status !== 'ready'"
+                  :icon="['fas', 'spinner']"
+                  spin
+                  class="mr-1"
+                />
+                {{ execution(run) }}
+              </td>
               <td class="numeric">
                 {{ output(run) }}
                 <br
@@ -532,6 +543,7 @@ import {
   faCalendarAlt,
   faCheckCircle,
   faTimesCircle,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faQuestionCircle);
@@ -545,6 +557,7 @@ library.add(faClock);
 library.add(faCalendarAlt);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
+library.add(faSpinner);
 
 Vue.use(PaginationPlugin);
 
@@ -879,7 +892,7 @@ export default class RunsForCourses extends Vue {
     }
 
     if (run.status !== 'ready') {
-      return '—';
+      return this.status(run);
     }
 
     switch (run.execution) {
@@ -1263,5 +1276,27 @@ export default class RunsForCourses extends Vue {
 .status-rfe {
   background: var(--arena-runs-table-status-rfe-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
+}
+
+tr.run-loading td {
+  animation: run-loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes run-loading-pulse {
+  0% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>
