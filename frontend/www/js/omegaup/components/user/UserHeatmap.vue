@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import * as Highcharts from 'highcharts/highstock';
 import HighchartsHeatmap from 'highcharts/modules/heatmap';
 import T from '../../lang';
@@ -67,26 +67,96 @@ export const COLORS = {
   wrapper: 'var(--user-heatmap-wrapper-background-color)',
 };
 
-@Component({})
-export default class UserHeatmap extends Vue {
-  @Prop() username!: string;
-  @Prop({ default: () => [] }) availableYears!: number[];
-  @Prop({ default: false }) isLoading!: boolean;
-  @Prop({ default: () => [] }) data!: any[];
+export default defineComponent({
+  name: 'UserHeatmap',
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
+    availableYears: {
+      type: Array as PropType<number[]>,
+      default: () => [],
+    },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+    data: {
+      type: Array as PropType<any[]>,
+      default: () => [],
+    },
+  },
+  emits: ['year-changed'],
+  data() {
+    return {
+      chart: null as Highcharts.Chart | null,
+      selectedYear: new Date().getFullYear(),
+      totalSubmissions: 0,
+      activeDays: 0,
+      maxStreak: 0,
+      currentStreak: 0,
+      hasRendered: false,
+      T,
+      ui,
+      COLORS,
+    };
+  },
+  computed: {
+    isCurrentYearSelected(): boolean {
+      return this.selectedYear === new Date().getFullYear();
+    },
+    heatmapContainer(): HTMLElement {
+      return this.$refs.heatmapContainer as HTMLElement;
+    },
+  },
+  watch: {
+    availableYears: {
+      immediate: true,
+      deep: true,
+      handler(newValue: number[]): void {
+        if (!newValue?.length) return;
 
-  chart: Highcharts.Chart | null = null;
-  selectedYear: number = new Date().getFullYear();
-  totalSubmissions = 0;
-  activeDays = 0;
-  maxStreak = 0;
-  currentStreak = 0;
-  hasRendered: boolean = false;
-  T = T;
-  ui = ui;
-  COLORS = COLORS;
+        this.selectedYear = newValue[0];
+        this.hasRendered = false;
 
-  @Ref('heatmapContainer') readonly heatmapContainer!: HTMLElement;
+        this.$nextTick(() => {
+          if (this.data && this.data.length > 0) {
+            this.renderHeatmap();
+          }
+        });
+      },
+    },
+    data: {
+      immediate: true,
+      deep: true,
+      handler(): void {
+        if (!this.data?.length) return;
 
+        this.hasRendered = false;
+
+        this.$nextTick(() => {
+          this.renderHeatmap();
+        });
+      },
+    },
+    isLoading(newValue: boolean): void {
+      if (!newValue && this.data?.length) {
+        this.hasRendered = false;
+        this.$nextTick(() => {
+          this.renderHeatmap();
+        });
+      }
+    },
+    selectedYear(): void {
+      this.hasRendered = false;
+      this.$nextTick(() => {
+        if (this.data?.length) {
+          this.renderHeatmap();
+        }
+      });
+    },
+  },
   mounted(): void {
     this.$nextTick(() => {
       if (this.availableYears?.length) {
@@ -97,220 +167,175 @@ export default class UserHeatmap extends Vue {
         this.renderHeatmap();
       }
     });
-  }
-
-  @Watch('availableYears', { immediate: true, deep: true })
-  onAvailableYearsChange(newValue: number[]): void {
-    if (!newValue?.length) return;
-
-    this.selectedYear = newValue[0];
-    this.hasRendered = false;
-
-    this.$nextTick(() => {
-      if (this.data && this.data.length > 0) {
-        this.renderHeatmap();
-      }
-    });
-  }
-
-  @Watch('data', { immediate: true, deep: true })
-  onDataChange(): void {
-    if (!this.data?.length) return;
-
-    this.hasRendered = false;
-
-    this.$nextTick(() => {
-      this.renderHeatmap();
-    });
-  }
-
-  @Watch('isLoading')
-  onLoadingChange(newValue: boolean): void {
-    if (!newValue && this.data?.length) {
-      this.hasRendered = false;
-      this.$nextTick(() => {
-        this.renderHeatmap();
-      });
-    }
-  }
-
-  @Watch('selectedYear')
-  onSelectedYearChange(): void {
-    this.hasRendered = false;
-    this.$nextTick(() => {
-      if (this.data?.length) {
-        this.renderHeatmap();
-      }
-    });
-  }
-
-  onYearChange(): void {
-    this.$emit('year-changed', this.selectedYear);
-  }
-
-  renderHeatmap(): void {
-    if (this.hasRendered) return;
-
-    if (!this.heatmapContainer) {
-      return;
-    }
-
-    // Use the same stats data that the bar chart uses
-    const stats = this.data;
-
-    const startDate = new Date(this.selectedYear, 0, 1);
-    const firstDayOffset = startDate.getDay();
-
-    // Create a map for faster lookups, using the same format as bar chart.
-    // The map keeps every year so the current streak can cross year
-    // boundaries; per-year stats and cells only look up selected-year dates.
-    const dateMap = new Map<string, number>();
-
-    if (stats?.length) {
-      for (const run of stats) {
-        if (!run.date) continue;
-
-        // Only count accepted submissions as activity
-        if (run.verdict !== 'AC') continue;
-
-        // Sum runs by date
-        const currentCount = dateMap.get(run.date) || 0;
-        dateMap.set(run.date, currentCount + run.runs);
-      }
-    }
-
-    const formattedData: Array<[number, number, number]> = [];
-    const now = new Date();
-
-    const lastDay = new Date(this.selectedYear, 11, 31);
-    const firstDay = new Date(this.selectedYear, 0, 1);
-    const totalDays =
-      Math.round(
-        (lastDay.getTime() - firstDay.getTime()) / (24 * 60 * 60 * 1000),
-      ) + 1;
-    const totalWeeks = Math.ceil(totalDays / 7);
-
-    for (let i = 0; i < totalDays; i++) {
-      const currentDate = new Date(this.selectedYear, 0, i + 1);
-
-      // Format date for map lookup (YYYY-MM-DD)
-      const dateStr = this.formatDateToString(currentDate);
-
-      const weekNumber = Math.floor((i + firstDayOffset) / 7);
-      const dayOfWeek = currentDate.getDay();
-
-      if (currentDate > now) {
-        formattedData.push([weekNumber, dayOfWeek, 0]);
-      } else {
-        const count = dateMap.get(dateStr) || 0;
-        formattedData.push([weekNumber, dayOfWeek, count]);
-      }
-    }
-
-    const boxWidth = 11;
-    const boxHeight = 16;
-    const boxPadding = 2;
-    const cellWidth = boxWidth + boxPadding;
-    const cellHeight = boxHeight + boxPadding;
-
-    const chartWidth = (totalWeeks + 1) * cellWidth;
-    const chartHeight = 7 * cellHeight + 15;
-
-    const options = getHeatmapChartOptions({
-      heatmapContainer: this.heatmapContainer,
-      formattedData,
-      startDate,
-      firstDayOffset,
-      totalWeeks,
-      boxWidth,
-      boxHeight,
-      boxPadding,
-      chartWidth,
-      chartHeight,
-      colors: this.COLORS,
-    });
-
-    this.setActivityStats(dateMap, firstDay, now);
-
-    if (this.chart) {
-      this.chart.destroy();
-    }
-
-    this.chart = new Highcharts.Chart(options);
-    this.hasRendered = true;
-  }
-
-  formatDateToString(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  setActivityStats(dateMap: Map<string, number>, start: Date, now: Date): void {
-    const lastDay =
-      this.selectedYear === now.getFullYear()
-        ? new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        : new Date(this.selectedYear, 11, 31);
-    let totalSubmissionsCount = 0;
-    let activeDays = 0;
-    let currentStreak = 0;
-    let bestStreak = 0;
-
-    for (
-      let currentDate = new Date(start.getTime());
-      currentDate <= lastDay;
-      currentDate.setDate(currentDate.getDate() + 1)
-    ) {
-      const dateStr = this.formatDateToString(currentDate);
-      const runs = dateMap.get(dateStr) || 0;
-
-      totalSubmissionsCount += runs;
-
-      if (runs > 0) {
-        activeDays += 1;
-        currentStreak += 1;
-        bestStreak = Math.max(bestStreak, currentStreak);
-      } else {
-        currentStreak = 0;
-      }
-    }
-
-    this.totalSubmissions = totalSubmissionsCount;
-    this.activeDays = activeDays;
-    this.maxStreak = bestStreak;
-    this.currentStreak = this.computeCurrentStreak(dateMap, lastDay);
-  }
-
-  get isCurrentYearSelected(): boolean {
-    return this.selectedYear === new Date().getFullYear();
-  }
-
-  computeCurrentStreak(dateMap: Map<string, number>, lastDay: Date): number {
-    const cursor = new Date(lastDay.getTime());
-
-    // A missing submission today should not break the streak yet: fall back
-    // to the streak ending yesterday.
-    if (!(dateMap.get(this.formatDateToString(cursor)) || 0)) {
-      cursor.setDate(cursor.getDate() - 1);
-    }
-
-    // Walk backwards without a lower bound so the streak survives year
-    // boundaries (e.g. Dec 31 -> Jan 1).
-    let streak = 0;
-    while ((dateMap.get(this.formatDateToString(cursor)) || 0) > 0) {
-      streak += 1;
-      cursor.setDate(cursor.getDate() - 1);
-    }
-    return streak;
-  }
-
+  },
   beforeDestroy(): void {
     if (this.chart) {
       this.chart.destroy();
     }
-  }
-}
+  },
+  methods: {
+    onYearChange(): void {
+      this.$emit('year-changed', this.selectedYear);
+    },
+
+    renderHeatmap(): void {
+      if (this.hasRendered) return;
+
+      if (!this.heatmapContainer) {
+        return;
+      }
+
+      // Use the same stats data that the bar chart uses
+      const stats = this.data;
+
+      const startDate = new Date(this.selectedYear, 0, 1);
+      const firstDayOffset = startDate.getDay();
+
+      // Create a map for faster lookups, using the same format as bar chart.
+      // The map keeps every year so the current streak can cross year
+      // boundaries; per-year stats and cells only look up selected-year dates.
+      const dateMap = new Map<string, number>();
+
+      if (stats?.length) {
+        for (const run of stats) {
+          if (!run.date) continue;
+
+          // Only count accepted submissions as activity
+          if (run.verdict !== 'AC') continue;
+
+          // Sum runs by date
+          const currentCount = dateMap.get(run.date) || 0;
+          dateMap.set(run.date, currentCount + run.runs);
+        }
+      }
+
+      const formattedData: Array<[number, number, number]> = [];
+      const now = new Date();
+
+      const lastDay = new Date(this.selectedYear, 11, 31);
+      const firstDay = new Date(this.selectedYear, 0, 1);
+      const totalDays =
+        Math.round(
+          (lastDay.getTime() - firstDay.getTime()) / (24 * 60 * 60 * 1000),
+        ) + 1;
+      const totalWeeks = Math.ceil(totalDays / 7);
+
+      for (let i = 0; i < totalDays; i++) {
+        const currentDate = new Date(this.selectedYear, 0, i + 1);
+
+        // Format date for map lookup (YYYY-MM-DD)
+        const dateStr = this.formatDateToString(currentDate);
+
+        const weekNumber = Math.floor((i + firstDayOffset) / 7);
+        const dayOfWeek = currentDate.getDay();
+
+        if (currentDate > now) {
+          formattedData.push([weekNumber, dayOfWeek, 0]);
+        } else {
+          const count = dateMap.get(dateStr) || 0;
+          formattedData.push([weekNumber, dayOfWeek, count]);
+        }
+      }
+
+      const boxWidth = 11;
+      const boxHeight = 16;
+      const boxPadding = 2;
+      const cellWidth = boxWidth + boxPadding;
+      const cellHeight = boxHeight + boxPadding;
+
+      const chartWidth = (totalWeeks + 1) * cellWidth;
+      const chartHeight = 7 * cellHeight + 15;
+
+      const options = getHeatmapChartOptions({
+        heatmapContainer: this.heatmapContainer,
+        formattedData,
+        startDate,
+        firstDayOffset,
+        totalWeeks,
+        boxWidth,
+        boxHeight,
+        boxPadding,
+        chartWidth,
+        chartHeight,
+        colors: this.COLORS,
+      });
+
+      this.setActivityStats(dateMap, firstDay, now);
+
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      this.chart = new Highcharts.Chart(options);
+      this.hasRendered = true;
+    },
+
+    formatDateToString(date: Date): string {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
+
+    setActivityStats(
+      dateMap: Map<string, number>,
+      start: Date,
+      now: Date,
+    ): void {
+      const lastDay =
+        this.selectedYear === now.getFullYear()
+          ? new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          : new Date(this.selectedYear, 11, 31);
+      let totalSubmissionsCount = 0;
+      let activeDays = 0;
+      let currentStreak = 0;
+      let bestStreak = 0;
+
+      for (
+        let currentDate = new Date(start.getTime());
+        currentDate <= lastDay;
+        currentDate.setDate(currentDate.getDate() + 1)
+      ) {
+        const dateStr = this.formatDateToString(currentDate);
+        const runs = dateMap.get(dateStr) || 0;
+
+        totalSubmissionsCount += runs;
+
+        if (runs > 0) {
+          activeDays += 1;
+          currentStreak += 1;
+          bestStreak = Math.max(bestStreak, currentStreak);
+        } else {
+          currentStreak = 0;
+        }
+      }
+
+      this.totalSubmissions = totalSubmissionsCount;
+      this.activeDays = activeDays;
+      this.maxStreak = bestStreak;
+      this.currentStreak = this.computeCurrentStreak(dateMap, lastDay);
+    },
+
+    computeCurrentStreak(dateMap: Map<string, number>, lastDay: Date): number {
+      const cursor = new Date(lastDay.getTime());
+
+      // A missing submission today should not break the streak yet: fall back
+      // to the streak ending yesterday.
+      if (!(dateMap.get(this.formatDateToString(cursor)) || 0)) {
+        cursor.setDate(cursor.getDate() - 1);
+      }
+
+      // Walk backwards without a lower bound so the streak survives year
+      // boundaries (e.g. Dec 31 -> Jan 1).
+      let streak = 0;
+      while ((dateMap.get(this.formatDateToString(cursor)) || 0) > 0) {
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return streak;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
