@@ -149,12 +149,23 @@ export default defineComponent({
       ];
     },
     schoolUsers(): SchoolUser[] {
-      this.sortBy;
-      return [...this.users].sort((userA, userB) => {
-        if (userA.getDisplayValue() < userB.getDisplayValue()) return 1;
-        if (userA.getDisplayValue() > userB.getDisplayValue()) return -1;
-        return 0;
-      });
+      const sortField = this.sortBy as
+        | 'solved_problems'
+        | 'created_problems'
+        | 'organized_contests';
+      return [...this.users]
+        .map((user) => {
+          const userCopy = new SchoolUser(user);
+          userCopy.displayField = sortField;
+          return userCopy;
+        })
+        .sort((userA, userB) => {
+          const valueA = userA[sortField] ?? 0;
+          const valueB = userB[sortField] ?? 0;
+          if (valueA < valueB) return 1;
+          if (valueA > valueB) return -1;
+          return 0;
+        });
     },
     sortByTableTitle(): string {
       switch (this.sortBy) {
@@ -171,7 +182,6 @@ export default defineComponent({
   },
   methods: {
     updateUsers(newSortBy: string): void {
-      this.users.forEach((user) => (user.displayField = newSortBy));
       this.sortBy = newSortBy;
     },
   },

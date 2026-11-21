@@ -128,12 +128,10 @@ describe('SchoolRank.vue', () => {
     });
 
     const typeahead = wrapper.findComponent({ name: 'Typeahead' });
-    if (typeahead.exists()) {
-      typeahead.vm.$emit('update-existing-options', 'query');
-      expect(wrapper.emitted('update-search-result-schools')).toBeTruthy();
-      expect(wrapper.emitted('update-search-result-schools')?.[0]).toEqual([
-        'query',
-      ]);
-    }
+    expect(typeahead.exists()).toBe(true);
+    typeahead.vm.$emit('update-existing-options', 'query');
+    expect(wrapper.emitted('update-search-result-schools')).toEqual([
+      ['query'],
+    ]);
   });
 });

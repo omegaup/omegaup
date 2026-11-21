@@ -120,8 +120,12 @@ describe('Profile.vue', () => {
 
     expect(vm.sortBy).toBe('created_problems');
     expect(vm.sortByTableTitle).toBe(T.profileCreatedProblems);
-    expect(user1.displayField).toBe('created_problems');
-    expect(user2.displayField).toBe('created_problems');
+    // Original users prop should not be mutated
+    expect(user1.displayField).toBe('solved_problems');
+    expect(user2.displayField).toBe('solved_problems');
+    // Mapped schoolUsers have updated displayField and are sorted accordingly
+    expect(vm.schoolUsers[0].displayField).toBe('created_problems');
+    expect(vm.schoolUsers[1].displayField).toBe('created_problems');
     // Now user1 (10) > user2 (2)
     expect(vm.schoolUsers[0].username).toBe('user1');
     expect(vm.schoolUsers[1].username).toBe('user2');
@@ -130,5 +134,9 @@ describe('Profile.vue', () => {
     vm.updateUsers('organized_contests');
     await wrapper.vm.$nextTick();
     expect(vm.sortByTableTitle).toBe(T.profileOrganizedContests);
+    // user1 (5) > user2 (1)
+    expect(vm.schoolUsers[0].username).toBe('user1');
+    expect(vm.schoolUsers[1].username).toBe('user2');
+    expect(vm.schoolUsers[0].displayField).toBe('organized_contests');
   });
 });
