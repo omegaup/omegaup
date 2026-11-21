@@ -152,7 +152,7 @@ export default defineComponent({
     },
     isDisabled: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
