@@ -574,11 +574,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $pageSize = 1000,
         int $active = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         ?string $query = null,
-        int $orderBy = 0
+        int $orderBy = 0,
+        bool $showArchived = false
     ) {
         $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             $active
         );
+        $archivedCondition = $showArchived ? '1 = 1' : 'archived = 0';
         $recommendedCondition = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ALL
         );
@@ -655,7 +657,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $recommendedCondition AND
                 $activeCondition AND
                 $queryCondition AND
-                archived = 0
+                {$archivedCondition}
             GROUP BY Contests.contest_id, pic.contestants
         ";
         $params = [
@@ -714,7 +716,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $recommendedCondition AND
                 $activeCondition AND
                 $queryCondition AND
-                archived = 0
+                {$archivedCondition}
         ";
 
         /** @var int */

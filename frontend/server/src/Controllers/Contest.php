@@ -664,7 +664,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                $query
+                $query,
+                0,
+                $showArchived
             )
         );
     }

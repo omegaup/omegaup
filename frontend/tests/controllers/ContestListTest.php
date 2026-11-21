@@ -634,6 +634,56 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testParticipatingListHonorsShowArchived() {
+        // Create two private contests the user participates in.
+        $contestData = [];
+        for ($i = 0; $i < 2; $i++) {
+            $contestData[] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'private',
+                ])
+            );
+        }
+
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        foreach ($contestData as $contest) {
+            \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
+        }
+
+        // Archive the first contest.
+        $archivedContest = \OmegaUp\DAO\Contests::getByAlias(
+            strval($contestData[0]['request']['alias'])
+        );
+        $archivedContest->archived = true;
+        \OmegaUp\DAO\Contests::update($archivedContest);
+
+        $login = self::login($identity);
+
+        // By default archived contests are excluded.
+        $response = \OmegaUp\Controllers\Contest::apiListParticipating(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount(1, $response['contests']);
+        $this->assertSame(
+            strval($contestData[1]['request']['alias']),
+            $response['contests'][0]['alias']
+        );
+
+        // With show_archived the archived contest is included too.
+        $response = \OmegaUp\Controllers\Contest::apiListParticipating(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'show_archived' => true,
+            ])
+        );
+        $this->assertCount(2, $response['contests']);
+    }
+
     public function testPrivateContestListForInvitedGroup() {
         // Create three new private contests, and one public contest
         $contestData = [];
