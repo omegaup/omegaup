@@ -902,4 +902,75 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('parameterEmpty', $e->getMessage());
         }
     }
+
+    public function testGetMemberIdentitiesPrivacyUsesIsOriginFlag(): void {
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $originGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            login: $creatorLogin
+        );
+        $secondaryGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            login: $creatorLogin
+        );
+
+        $identityUsername = "{$originGroup['group']->alias}:member_privacy";
+        $schoolName = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $identityUsername,
+            'name' => 'Origin Privacy Member',
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'female',
+            'school_name' => $schoolName,
+            'group_alias' => $originGroup['group']->alias,
+        ]));
+
+        ['identity' => $regularUser] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $originGroup['group']->alias,
+            'usernameOrEmail' => $regularUser->username,
+        ]));
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $secondaryGroup['group']->alias,
+            'usernameOrEmail' => $identityUsername,
+        ]));
+
+        $originMembers = \OmegaUp\Controllers\Group::apiMembers(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $originGroup['group']->alias,
+        ]))['identities'];
+        $originByUsername = array_column($originMembers, null, 'username');
+        $this->assertSame(
+            'female',
+            $originByUsername[$identityUsername]['gender']
+        );
+        $this->assertSame(
+            $schoolName,
+            $originByUsername[$identityUsername]['school']
+        );
+        $this->assertNull($originByUsername[$regularUser->username]['gender']);
+        $this->assertNull($originByUsername[$regularUser->username]['school']);
+
+        $secondaryMembers = \OmegaUp\Controllers\Group::apiMembers(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $secondaryGroup['group']->alias,
+        ]))['identities'];
+        $secondaryByUsername = array_column(
+            $secondaryMembers,
+            null,
+            'username'
+        );
+        $this->assertNull($secondaryByUsername[$identityUsername]['gender']);
+        $this->assertNull($secondaryByUsername[$identityUsername]['school']);
+        $this->assertNull($secondaryByUsername[$identityUsername]['country']);
+        $this->assertNull($secondaryByUsername[$identityUsername]['state']);
+    }
 }
