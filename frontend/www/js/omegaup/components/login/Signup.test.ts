@@ -12,10 +12,13 @@ jest.mock('intro.js', () => {
 
 import { mount, shallowMount, Wrapper } from '@vue/test-utils';
 import Vue from 'vue';
+import type { ComponentOptions } from 'vue';
 
 import T from '../../lang';
 
 import login_Signup from './Signup.vue';
+
+const Signup = login_Signup as ComponentOptions<Vue>;
 
 describe('Signup.vue', () => {
   // Helper to get intro.js mocks
@@ -39,7 +42,7 @@ describe('Signup.vue', () => {
   function createWrapper(
     propsData: Record<string, unknown> = {},
   ): Wrapper<Vue> {
-    return shallowMount(login_Signup, {
+    return shallowMount(Signup, {
       propsData: {
         validateRecaptcha: false,
         hasVisitedSection: true, // suppress intro by default
@@ -435,7 +438,7 @@ describe('Signup.vue', () => {
     ): Wrapper<Vue> {
       const container = document.createElement('div');
       document.body.appendChild(container);
-      introWrapper = mount(login_Signup, {
+      introWrapper = mount(Signup, {
         propsData: {
           validateRecaptcha: false,
           hasVisitedSection: true,
