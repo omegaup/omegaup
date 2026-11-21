@@ -3,6 +3,7 @@ import type { types } from '../../api_types';
 
 import T from '../../lang';
 
+import MarkdownEditor from '../common/MarkdownEditor.vue';
 import course_Form from './Form.vue';
 
 const baseCourseFormProps = {
@@ -58,5 +59,26 @@ describe('Form.vue', () => {
     });
 
     expect(wrapper.find(selector).text()).toBe(T.courseNewFormScheduleCourse);
+  });
+
+  it('Should render a Markdown editor for objective and description', () => {
+    const wrapper = shallowMount(course_Form, {
+      propsData: baseCourseFormProps,
+    });
+
+    const editors = wrapper.findAllComponents(MarkdownEditor);
+    expect(editors).toHaveLength(2);
+    expect(editors.at(0).props('idPostfix')).toBe('-objective');
+    expect(editors.at(1).props('idPostfix')).toBe('-description');
+  });
+
+  it('Should make the Markdown editors read only', () => {
+    const wrapper = shallowMount(course_Form, {
+      propsData: Object.assign({}, baseCourseFormProps, { readOnly: true }),
+    });
+
+    const editors = wrapper.findAllComponents(MarkdownEditor);
+    expect(editors.at(0).props('readOnly')).toBe(true);
+    expect(editors.at(1).props('readOnly')).toBe(true);
   });
 });
