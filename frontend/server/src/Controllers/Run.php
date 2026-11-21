@@ -148,10 +148,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      *
-     * @omegaup-request-param null|string $contest_alias
-     * @omegaup-request-param string $language
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param int|null $problemset_id
+     * @omegaup-request-param null|string $contest_alias Alias of the contest
+     * @omegaup-request-param string $language Programming language used for the solution
+     * @omegaup-request-param string $problem_alias Alias of the problem
+     * @omegaup-request-param int|null $problemset_id ID of the problemset associated with the submission
      */
     private static function validateCreateRequest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -406,11 +406,12 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      *
-     * @omegaup-request-param null|string $contest_alias
-     * @omegaup-request-param string $language
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param int|null $problemset_id
-     * @omegaup-request-param string $source
+     * @omegaup-request-param null|string $contest_alias Alias of the contest
+     * @omegaup-request-param string $language Programming language used for the solution
+     * @omegaup-request-param string $problem_alias Alias of the problem
+     * @omegaup-request-param int|null $problemset_id ID of the problemset associated with the submission
+     * @omegaup-request-param string $source Source code of the solution
+
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -1122,7 +1123,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return RunDetails
      *
-     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param string $run_alias Alias (GUID) of the run
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -1375,7 +1376,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      *
-     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param string $run_alias Alias (GUID) of the run
      */
     public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -1926,13 +1927,13 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{runs: list<Run>, totalRuns: int}
      *
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
-     * @omegaup-request-param int $offset
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param int $rowcount
-     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
-     * @omegaup-request-param string $username
-     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'rk'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language Filter runs by programming language
+     * @omegaup-request-param int $offset Number of runs to skip before returning results (used for pagination)
+     * @omegaup-request-param string $problem_alias Alias of the problem
+     * @omegaup-request-param int $rowcount Maximum number of runs to return
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status Filter runs by grading status
+     * @omegaup-request-param string $username Filter runs by the user who submitted them
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict Filter runs by the judge's verdict
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
