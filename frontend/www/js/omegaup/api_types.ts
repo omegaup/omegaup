@@ -3239,6 +3239,7 @@ export namespace types {
     associatedIdentities: types.AssociatedIdentity[];
     currentEmail: string;
     currentName?: string;
+    currentStreak: number;
     currentUsername: string;
     ephemeralGraderEnabled: boolean;
     gravatarURL128: string;
