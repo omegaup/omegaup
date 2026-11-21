@@ -1,7 +1,6 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import CasesForm from './CasesForm.vue';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
 import T from '../../../../lang';
@@ -12,8 +11,6 @@ import {
 import * as ui from '@/js/omegaup/ui';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('CasesForm.vue', () => {
   beforeEach(() => {

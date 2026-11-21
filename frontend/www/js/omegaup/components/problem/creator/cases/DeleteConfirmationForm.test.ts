@@ -1,13 +1,10 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
-import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import Vue from 'vue';
 import DeleteConfirmationForm from './DeleteConfirmationForm.vue';
 import T from '../../../../lang';
 import * as ui from '@/js/omegaup/ui';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('DeleteConfirmationForm.vue', () => {
   it('Should set commitMessage when visible changes', async () => {
