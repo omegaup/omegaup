@@ -29,20 +29,32 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
-@Component({
+
+export default defineComponent({
+  name: 'ArenaNavbarMiniranking',
   components: {
     'omegaup-user-username': user_Username,
   },
-})
-export default class ArenaNavbarMiniranking extends Vue {
-  @Prop() showRanking!: boolean;
-  @Prop() users!: omegaup.UserRank[];
-  T = T;
-}
+  props: {
+    showRanking: {
+      type: Boolean,
+      default: false,
+    },
+    users: {
+      type: Array as PropType<omegaup.UserRank[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>
