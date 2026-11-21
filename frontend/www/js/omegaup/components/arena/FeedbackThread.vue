@@ -70,60 +70,72 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import user_Username from '../user/Username.vue';
 import * as time from '../../time';
 import { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
 
-@Component({
+export default defineComponent({
+  name: 'FeedbackThread',
   components: {
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-user-username': user_Username,
   },
-})
-export default class FeedbackThread extends Vue {
-  @Prop() feedbackThread!: ArenaCourseFeedback;
-  @Prop({ default: false }) saved!: boolean;
-  @Ref('feedback-thread-form') feedbackThreadForm!: HTMLTextAreaElement;
-
-  FeedbackStatus = FeedbackStatus;
-  T = T;
-  time = time;
-  currentSaved = this.saved;
-  currentFeedbackThread = this.feedbackThread;
-  isSelectedNewFeedback = false;
-
-  get currentFeedbackThreadTimestamp(): string {
-    return time.formatDateTimeLocal(
-      this.currentFeedbackThread.timestamp ?? new Date(),
-    );
-  }
-
-  onHandleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      this.onDeleteFeedbackThread();
-    }
-  }
-
-  onSubmitFeedback() {
-    this.currentSaved = true;
-    this.$emit('submit-feedback-thread', this.currentFeedbackThread);
-  }
-
-  onDeleteFeedbackThread() {
-    this.currentFeedbackThread.text = '';
-    this.isSelectedNewFeedback = false;
-  }
-
-  @Watch('isSelectedNewFeedback')
-  onIsSelectedNewFeedbackChanged(newValue: boolean): void {
-    if (newValue) {
-      this.$nextTick(() => this.feedbackThreadForm.focus());
-    }
-  }
-}
+  props: {
+    feedbackThread: {
+      type: Object as PropType<ArenaCourseFeedback>,
+      required: true,
+    },
+    saved: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['submit-feedback-thread'],
+  data() {
+    return {
+      FeedbackStatus,
+      T,
+      time,
+      currentSaved: this.saved,
+      currentFeedbackThread: this.feedbackThread,
+      isSelectedNewFeedback: false,
+    };
+  },
+  computed: {
+    currentFeedbackThreadTimestamp(): string {
+      return time.formatDateTimeLocal(
+        this.currentFeedbackThread.timestamp ?? new Date(),
+      );
+    },
+  },
+  watch: {
+    isSelectedNewFeedback(newValue: boolean): void {
+      if (newValue) {
+        this.$nextTick(() => {
+          (this.$refs['feedback-thread-form'] as HTMLTextAreaElement)?.focus();
+        });
+      }
+    },
+  },
+  methods: {
+    onHandleKeyDown(event: KeyboardEvent): void {
+      if (event.key === 'Escape') {
+        this.onDeleteFeedbackThread();
+      }
+    },
+    onSubmitFeedback(): void {
+      this.currentSaved = true;
+      this.$emit('submit-feedback-thread', this.currentFeedbackThread);
+    },
+    onDeleteFeedbackThread(): void {
+      this.currentFeedbackThread.text = '';
+      this.isSelectedNewFeedback = false;
+    },
+  },
+});
 </script>
 
 <style>
