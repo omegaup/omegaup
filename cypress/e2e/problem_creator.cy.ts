@@ -123,7 +123,7 @@ describe('Problem creator Test', () => {
           cy.get('[data-problem-creator-code-language]')
             .should('have.value', 'rs')
             .find('option:selected')
-            .should('contain', 'Rust (1.56.1)');
+            .should('contain', 'Rust (1.98.1)');
         });
       });
 
