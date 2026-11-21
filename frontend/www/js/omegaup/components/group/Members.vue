@@ -33,19 +33,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identities" :key="identity.username">
+        <tr v-for="member in identities" :key="member.username">
           <td>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </td>
           <td>
             <button
               class="btn btn-link"
               :title="T.groupEditMembersRemove"
-              @click="$emit('remove', identity.username)"
+              @click="$emit('remove', member.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>
@@ -68,24 +68,24 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identitiesCsv" :key="identity.username">
+        <tr v-for="member in identitiesCsv" :key="member.username">
           <td data-members-username>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </td>
-          <td>{{ identity.name }}</td>
-          <td>{{ identity.country }}</td>
-          <td>{{ identity.state }}</td>
-          <td>{{ identity.school }}</td>
+          <td>{{ member.name }}</td>
+          <td>{{ member.country }}</td>
+          <td>{{ member.state }}</td>
+          <td>{{ member.school }}</td>
           <td class="actions-cell">
             <div class="actions-wrapper">
               <button
                 class="btn btn-link"
                 :title="T.groupEditMembersEdit"
-                @click="onEdit(identity)"
+                @click="onEdit(member)"
               >
                 <font-awesome-icon :icon="['fas', 'edit']" />
               </button>
@@ -94,7 +94,7 @@
                 data-identity-change-password
                 class="btn btn-link"
                 :title="T.groupEditMembersChangePassword"
-                @click="onChangePass(identity.username)"
+                @click="onChangePass(member.username)"
               >
                 <font-awesome-icon :icon="['fas', 'lock']" />
               </button>
@@ -102,7 +102,7 @@
               <button
                 class="btn btn-link"
                 :title="T.groupEditMembersRemove"
-                @click="$emit('remove', identity.username)"
+                @click="$emit('remove', member.username)"
               >
                 <font-awesome-icon :icon="['fas', 'trash-alt']" />
               </button>
@@ -115,8 +115,8 @@
     <div class="d-md-none">
       <!-- Members added from search -->
       <div
-        v-for="identity in identities"
-        :key="identity.username"
+        v-for="member in identities"
+        :key="member.username"
         class="card mb-3 shadow-sm"
       >
         <div
@@ -129,16 +129,16 @@
 
             <omegaup-user-username
               class="h6 mb-0"
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </div>
 
           <button
             class="btn btn-link text-primary"
             :title="T.groupEditMembersRemove"
-            @click="$emit('remove', identity.username)"
+            @click="$emit('remove', member.username)"
           >
             <font-awesome-icon :icon="['fas', 'trash-alt']" />
           </button>
@@ -147,38 +147,38 @@
 
       <!-- CSV identities -->
       <div
-        v-for="identity in identitiesCsv"
-        :key="'csv-' + identity.username"
+        v-for="member in identitiesCsv"
+        :key="'csv-' + member.username"
         class="card mb-3"
       >
         <div class="card-body">
           <p>
             <strong>{{ T.groupEditMembersCoder }}: </strong>
             <omegaup-user-username
-              :classname="identity.classname"
+              :classname="member.classname"
               :linkify="true"
-              :username="identity.username"
+              :username="member.username"
             ></omegaup-user-username>
           </p>
 
           <p class="mb-1">
-            <strong>{{ T.wordsName }}:</strong> {{ identity.name }}
+            <strong>{{ T.wordsName }}:</strong> {{ member.name }}
           </p>
           <p>
-            <strong>{{ T.profileCountry }}:</strong> {{ identity.country }}
+            <strong>{{ T.profileCountry }}:</strong> {{ member.country }}
           </p>
           <p>
-            <strong>{{ T.profileState }}:</strong> {{ identity.state }}
+            <strong>{{ T.profileState }}:</strong> {{ member.state }}
           </p>
           <p>
-            <strong>{{ T.profileSchool }}:</strong> {{ identity.school }}
+            <strong>{{ T.profileSchool }}:</strong> {{ member.school }}
           </p>
 
           <div class="d-flex justify-content-between mt-3">
             <button
               class="btn btn-link"
               :title="T.groupEditMembersEdit"
-              @click="onEdit(identity)"
+              @click="onEdit(member)"
             >
               <font-awesome-icon :icon="['fas', 'edit']" />
             </button>
@@ -186,7 +186,7 @@
             <button
               class="btn btn-link"
               :title="T.groupEditMembersChangePassword"
-              @click="onChangePass(identity.username)"
+              @click="onChangePass(member.username)"
             >
               <font-awesome-icon :icon="['fas', 'lock']" />
             </button>
@@ -194,7 +194,7 @@
             <button
               class="btn btn-link text-primary"
               :title="T.groupEditMembersRemove"
-              @click="$emit('remove', identity.username)"
+              @click="$emit('remove', member.username)"
             >
               <font-awesome-icon :icon="['fas', 'trash-alt']" />
             </button>
@@ -225,7 +225,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
@@ -238,7 +239,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEdit, faLock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faLock, faTrashAlt);
 
-@Component({
+export default defineComponent({
+  name: 'Members',
   components: {
     FontAwesomeIcon,
     'omegaup-common-typeahead': common_Typeahead,
@@ -246,63 +248,96 @@ library.add(faEdit, faLock, faTrashAlt);
     'omegaup-identity-edit': identity_Edit,
     'omegaup-identity-change-password': identity_ChangePassword,
   },
-})
-export default class Members extends Vue {
-  @Prop() identities!: types.Identity[];
-  @Prop({ default: () => [] }) identitiesCsv!: types.Identity[];
-  @Prop() groupAlias!: string;
-  @Prop() countries!: Array<dao.Countries>;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() searchResultSchools!: types.SchoolListItem[];
+  props: {
+    identities: {
+      type: Array as PropType<types.Identity[]>,
+      required: true,
+    },
+    identitiesCsv: {
+      type: Array as PropType<types.Identity[]>,
+      default: () => [],
+    },
+    groupAlias: {
+      type: String,
+      required: true,
+    },
+    countries: {
+      type: Array as PropType<dao.Countries[]>,
+      required: true,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      required: true,
+    },
+    searchResultSchools: {
+      type: Array as PropType<types.SchoolListItem[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'add-member',
+    'cancel',
+    'change-password-identity',
+    'change-password-identity-member',
+    'edit-identity',
+    'edit-identity-member',
+    'remove',
+    'update-search-result-schools',
+    'update-search-result-users',
+  ],
+  data() {
+    return {
+      T,
+      identity: {},
+      username: '',
+      showEditForm: false,
+      showChangePasswordForm: false,
+      searchedUsername: null as null | types.ListItem,
+    };
+  },
+  methods: {
+    onAddMember(): void {
+      this.$emit('add-member', this, this.searchedUsername?.key);
+      this.reset();
+    },
 
-  T = T;
-  identity = {};
-  username = '';
-  showEditForm = false;
-  showChangePasswordForm = false;
-  searchedUsername: null | types.ListItem = null;
+    onEdit(identity: types.Identity): void {
+      this.$emit('edit-identity', this, identity);
+    },
 
-  onAddMember(): void {
-    this.$emit('add-member', this, this.searchedUsername?.key);
-    this.reset();
-  }
+    onChangePass(username: string): void {
+      this.$emit('change-password-identity', this, username);
+    },
 
-  onEdit(identity: types.Identity): void {
-    this.$emit('edit-identity', this, identity);
-  }
+    onChildChangePasswordMember(
+      newPassword: string,
+      newPasswordRepeat: string,
+    ): void {
+      this.$emit(
+        'change-password-identity-member',
+        this,
+        this.username,
+        newPassword,
+        newPasswordRepeat,
+      );
+    },
 
-  onChangePass(username: string): void {
-    this.$emit('change-password-identity', this, username);
-  }
+    onChildEditIdentityMember(
+      originalUsername: string,
+      identity: types.Identity,
+    ): void {
+      this.$emit('edit-identity-member', this, originalUsername, identity);
+    },
 
-  onChildChangePasswordMember(
-    newPassword: string,
-    newPasswordRepeat: string,
-  ): void {
-    this.$emit(
-      'change-password-identity-member',
-      this,
-      this.username,
-      newPassword,
-      newPasswordRepeat,
-    );
-  }
+    onChildCancel(): void {
+      this.$emit('cancel', this);
+    },
 
-  onChildEditIdentityMember(
-    originalUsername: string,
-    identity: types.Identity,
-  ): void {
-    this.$emit('edit-identity-member', this, originalUsername, identity);
-  }
-
-  onChildCancel(): void {
-    this.$emit('cancel', this);
-  }
-
-  reset(): void {
-    this.searchedUsername = null;
-  }
-}
+    reset(): void {
+      this.searchedUsername = null;
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
