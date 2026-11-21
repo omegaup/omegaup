@@ -371,4 +371,74 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
 
         return $result;
     }
+
+    /**
+     * @return array{assignments: list<array{name: string, acl_id: int, resource_type: string, resource_alias: null|string}>, total_rows: int}
+     */
+    public static function getAssignmentsByRole(
+        int $roleId,
+        ?int $aclId,
+        string $query,
+        int $page,
+        int $pageSize
+    ): array {
+        $where = 'ur.role_id = ?';
+        $params = [$roleId];
+        if (!is_null($aclId)) {
+            $where .= ' AND ur.acl_id = ?';
+            $params[] = $aclId;
+        }
+        if ($query !== '') {
+            $where .= ' AND i.username LIKE ?';
+            $params[] = addcslashes($query, '%_\\') . '%';
+        }
+
+        /** @var int|null */
+        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            "SELECT COUNT(*)
+             FROM User_Roles ur
+             INNER JOIN Identities i ON i.user_id = ur.user_id
+             WHERE {$where};",
+            $params
+        );
+
+        $sql = "
+            SELECT
+                page.name,
+                page.acl_id,
+                CASE
+                    WHEN page.acl_id = ? THEN 'system'
+                    WHEN c.contest_id IS NOT NULL THEN 'contest'
+                    WHEN co.course_id IS NOT NULL THEN 'course'
+                    WHEN p.problem_id IS NOT NULL THEN 'problem'
+                    WHEN g.group_id IS NOT NULL THEN 'group'
+                    ELSE 'other'
+                END AS resource_type,
+                COALESCE(c.alias, co.alias, p.alias, g.alias) AS resource_alias
+            FROM (
+                SELECT i.username AS name, ur.acl_id
+                FROM User_Roles ur
+                INNER JOIN Identities i ON i.user_id = ur.user_id
+                WHERE {$where}
+                ORDER BY i.username, ur.acl_id
+                LIMIT ?, ?
+            ) page
+            LEFT JOIN Contests c ON c.acl_id = page.acl_id
+            LEFT JOIN Courses co ON co.acl_id = page.acl_id
+            LEFT JOIN Problems p ON p.acl_id = page.acl_id
+            LEFT JOIN Groups_ g ON g.acl_id = page.acl_id
+            ORDER BY page.name, page.acl_id;";
+
+        /** @var list<array{acl_id: int, name: string, resource_alias: null|string, resource_type: string}> */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            array_merge(
+                [\OmegaUp\Authorization::SYSTEM_ACL],
+                $params,
+                [($page - 1) * $pageSize, $pageSize]
+            )
+        );
+
+        return ['assignments' => $rows, 'total_rows' => intval($total)];
+    }
 }
