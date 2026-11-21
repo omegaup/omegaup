@@ -1,6 +1,11 @@
 # GitHub Actions reversemap for omegaup project
 # Maps action references to their immutable commit hashes
 
+actions/cache:
+  tag: v4.2.3
+  sha: 5a3ec84eff668545956fd18022155c47e93e2684
+  sha-url: https://github.com/actions/cache/commit/5a3ec84eff668545956fd18022155c47e93e2684
+  tag-url: https://github.com/actions/cache/tree/v4.2.3
 actions/checkout:
   tag: v4
   sha: 34e114876b0b11c390a56381ad16ebd13914f8d5

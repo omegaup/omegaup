@@ -168,6 +168,17 @@ def test_skips_when_lock_is_held() -> None:
     assert not _matching(conn.calls, 'insert into `cron_runs`')
 
 
+def test_lock_name_includes_database() -> None:
+    '''Shards on one server must not share a lock.'''
+    conn = _FakeConnection(lock_acquired=True)
+    args = _args()
+    args.database = 'omegaup-test-2'
+    with _run('update_ranks.py', args, conn):
+        pass
+    assert _matching(conn.calls, 'get_lock')[0][0] == (
+        'cron:update_ranks.py:omegaup-test-2')
+
+
 def test_no_track_bypasses_all_database_access() -> None:
     '''With --no-track the runner touches neither the lock nor the table.'''
     conn = _FakeConnection(lock_acquired=True)

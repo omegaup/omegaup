@@ -24,8 +24,13 @@ for (const entryname of Object.keys(frontendConfig.entry)) {
 const config = [frontendConfig, require('./webpack.config-style.js')];
 
 module.exports = (env, argv) => {
+  // ponytail: WEBPACK_DEVTOOL=false skips source maps in CI e2e builds (~195s -> ~45s).
   const devtool =
-    argv && argv.mode !== 'development' ? 'source-map' : 'cheap-source-map';
+    process.env.WEBPACK_DEVTOOL === 'false'
+      ? false
+      : argv && argv.mode !== 'development'
+        ? 'source-map'
+        : 'cheap-source-map';
 
   for (const entry of config) {
     Object.assign(entry, {

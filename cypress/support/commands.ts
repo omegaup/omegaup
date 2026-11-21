@@ -272,7 +272,9 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('enterContest', ({ contestAlias }) => {
   cy.visit(`arena/${contestAlias}`);
+  cy.intercept('POST', '/api/contest/open/').as('openContest');
   cy.get('button[data-start-contest]').click();
+  cy.wait('@openContest').its('response.statusCode').should('eq', 200);
 });
 
 Cypress.Commands.add(

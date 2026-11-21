@@ -1181,7 +1181,9 @@ export default class RunsForCourses extends Vue {
   background-color: var(--arena-runs-table-row-selected-background-color);
   border: 2px solid var(--arena-runs-table-row-selected-border-color);
   border-radius: 8px;
-  transition: background-color 10s ease, border-color 10s ease;
+  transition:
+    background-color 10s ease,
+    border-color 10s ease;
 }
 
 .text-break-all {

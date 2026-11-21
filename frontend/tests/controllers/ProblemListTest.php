@@ -1345,13 +1345,25 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Test List API with query param
      */
     public function testListWithAliasQuery() {
+        // ponytail: strip InnoDB ngram 2-char hex stopwords (be/de) so random
+        // title substrings don't flake MATCH ... AGAINST IN BOOLEAN MODE.
         $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
+                'title' => str_replace(
+                    ['be', 'de'],
+                    ['bx', 'dx'],
+                    \OmegaUp\Test\Utils::createRandomString()
+                ),
                 'visibility' => 'promoted',
             ])
         );
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
+                'title' => str_replace(
+                    ['be', 'de'],
+                    ['bx', 'dx'],
+                    \OmegaUp\Test\Utils::createRandomString()
+                ),
                 'visibility' => 'private',
             ])
         );

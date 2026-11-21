@@ -226,9 +226,12 @@ OmegaUp.on('ready', async () => {
   }
 
   refreshRuns();
-  setInterval(() => {
-    vueInstance.$data.currentOffset = 0;
-    vueInstance.$data.endOfResults = false;
-    refreshRuns();
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      vueInstance.$data.currentOffset = 0;
+      vueInstance.$data.endOfResults = false;
+      refreshRuns();
+    },
+    5 * 60 * 1000,
+  );
 });

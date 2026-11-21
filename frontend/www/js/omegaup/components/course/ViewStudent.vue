@@ -114,8 +114,7 @@
                     selectedRun.feedback
                       ? selectedRun.feedback.feedback
                       : T.feedbackNotSentYet
-                  }}</pre
-                >
+                  }}</pre>
                 <div v-if="selectedRun.feedback && selectedRun.feedback.author">
                   {{
                     ui.formatString(T.feedbackLeftBy, {

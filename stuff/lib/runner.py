@@ -67,7 +67,9 @@ class CronRun:  # pylint: disable=too-many-instance-attributes
 
     @property
     def _lock_name(self) -> str:
-        return f'cron:{self._program}'[:64]
+        database = getattr(self._args, 'database', None)
+        suffix = f':{database}' if database else ''
+        return f'cron:{self._program}{suffix}'[:64]
 
     def __enter__(self) -> 'CronRun':
         if not self._enabled:

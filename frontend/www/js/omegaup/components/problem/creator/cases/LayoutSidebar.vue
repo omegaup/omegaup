@@ -42,9 +42,8 @@
             <b-dropdown-item
               data-layout-dropdown-rename-layout
               @click="
-                showRenameModal[layout.layoutID] = !showRenameModal[
-                  layout.layoutID
-                ]
+                showRenameModal[layout.layoutID] =
+                  !showRenameModal[layout.layoutID]
               "
             >
               <div class="d-flex">
@@ -268,18 +267,27 @@ export default class Sidebar extends Vue {
 
   @Watch('getAllLayouts')
   onGroupsChanged() {
-    this.showLayout = this.getAllLayouts.reduce((acc, layout) => {
-      acc[layout.layoutID] = false;
-      return acc;
-    }, {} as { [key: string]: boolean });
-    this.showRenameModal = this.getAllLayouts.reduce((acc, layout) => {
-      acc[layout.layoutID] = false;
-      return acc;
-    }, {} as { [key: string]: boolean });
-    this.editLayoutModalName = this.getAllLayouts.reduce((acc, layout) => {
-      acc[layout.layoutID] = layout.name;
-      return acc;
-    }, {} as { [key: string]: string });
+    this.showLayout = this.getAllLayouts.reduce(
+      (acc, layout) => {
+        acc[layout.layoutID] = false;
+        return acc;
+      },
+      {} as { [key: string]: boolean },
+    );
+    this.showRenameModal = this.getAllLayouts.reduce(
+      (acc, layout) => {
+        acc[layout.layoutID] = false;
+        return acc;
+      },
+      {} as { [key: string]: boolean },
+    );
+    this.editLayoutModalName = this.getAllLayouts.reduce(
+      (acc, layout) => {
+        acc[layout.layoutID] = layout.name;
+        return acc;
+      },
+      {} as { [key: string]: string },
+    );
   }
 
   EditIconDisplayOption = Object.freeze({

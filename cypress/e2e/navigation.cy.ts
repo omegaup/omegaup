@@ -22,8 +22,7 @@ describe('Navigation Test', () => {
     profilePage.changePassword(loginOptions[0].password, newPassword);
     cy.logout();
 
-    loginOptions[0].password = newPassword;
-    cy.login(loginOptions[0]);
+    cy.login({ username: loginOptions[0].username, password: newPassword });
     cy.logout();
   });
 

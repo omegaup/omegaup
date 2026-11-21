@@ -105,8 +105,8 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
-          shouldShowFirstAssociatedIdentityRunWarning: this
-            .shouldShowFirstAssociatedIdentityRunWarning,
+          shouldShowFirstAssociatedIdentityRunWarning:
+            this.shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
@@ -251,12 +251,15 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  setInterval(() => {
-    refreshContestClarifications({
-      type: ContestClarificationType.AllProblems,
-      contestAlias: payload.contest.alias,
-      rowcount: 20,
-      offset: 0,
-    });
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      refreshContestClarifications({
+        type: ContestClarificationType.AllProblems,
+        contestAlias: payload.contest.alias,
+        rowcount: 20,
+        offset: 0,
+      });
+    },
+    5 * 60 * 1000,
+  );
 });

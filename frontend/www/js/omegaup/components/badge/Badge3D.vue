@@ -92,7 +92,7 @@ export default defineComponent({
   transform-style: preserve-3d;
   pointer-events: none;
 
-  >>> * {
+  >  >  > * {
     width: 100%;
     height: 100%;
     object-fit: contain;

@@ -40,10 +40,7 @@ def _generate_typescript(filename: str) -> str:
         print(result, file=sys.stderr)
         result.check_returncode()
     command = [
-        _which('prettier'),
-        '--single-quote',
-        '--trailing-comma=all',
-        '--no-config',
+        _which('oxfmt'),
         '--stdin-filepath',
         filename,
     ]

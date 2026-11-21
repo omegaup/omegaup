@@ -102,7 +102,7 @@ describe('Carousel.vue', () => {
       },
     });
 
-    const vm = (wrapper.vm as unknown) as {
+    const vm = wrapper.vm as unknown as {
       confirmDelete: (item: types.CarouselItem) => void;
       archiveSelectedItem: () => void;
     };
@@ -122,7 +122,7 @@ describe('Carousel.vue', () => {
       },
     });
 
-    const vm = (wrapper.vm as unknown) as {
+    const vm = wrapper.vm as unknown as {
       editItem: (item: types.CarouselItem) => void;
       showItemModal: () => void;
       isEditing: boolean;

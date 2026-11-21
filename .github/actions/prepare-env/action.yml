@@ -9,6 +9,10 @@ inputs:
     description: Path to additional requirements file to install on host
     required: false
     default: ''
+  skip_test_db:
+    description: Skip migrating omegaup-test when the job only uses omegaup
+    required: false
+    default: false
 
 runs:
   using: composite
@@ -98,14 +102,29 @@ runs:
         password=omegaup
         EOF
 
+    - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+      with:
+        path: ~/.cache/composer/files
+        key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
     - name: Install composer dependencies
       shell: bash
       run: composer install --prefer-dist --no-progress
+
+    - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+      with:
+        path: .cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('stuff/requirements.txt', 'stuff/teaching_assistant/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install Host Python dependencies
       if: inputs.install_host_python_deps == 'true'
       shell: bash
       run: |
+        export PIP_CACHE_DIR="${GITHUB_WORKSPACE}/.cache/pip"
         python3 -m pip install --user setuptools wheel
         python3 -m pip install --user -r stuff/requirements.txt
         if [ -n "${{ inputs.extra_python_requirements }}" ]; then
@@ -124,6 +143,10 @@ runs:
 
         docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
           python3 -m venv /opt/omegaup/stuff/venv && \
-          python3 -m pip install wheel && \
-          python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-        docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+          PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install wheel && \
+          PIP_CACHE_DIR=/opt/omegaup/.cache/pip python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
+        BOOTSTRAP_EXTRA_ARGS=()
+        if [ "${{ inputs.skip_test_db }}" = "true" ]; then
+          BOOTSTRAP_EXTRA_ARGS+=(--skip-test-db)
+        fi
+        docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose "${BOOTSTRAP_EXTRA_ARGS[@]}"

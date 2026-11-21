@@ -128,9 +128,8 @@ OmegaUp.on('ready', async () => {
   }
 
   // Cache scoreboard data for virtual contest
-  let virtualContestRefreshInterval: ReturnType<
-    typeof setInterval
-  > | null = null;
+  let virtualContestRefreshInterval: ReturnType<typeof setInterval> | null =
+    null;
   if (
     payload.scoreboard &&
     payload.scoreboardEvents &&
@@ -389,12 +388,15 @@ OmegaUp.on('ready', async () => {
   });
   socket.connect();
 
-  setInterval(() => {
-    refreshContestClarifications({
-      type: ContestClarificationType.AllProblems,
-      contestAlias: payload.contest.alias,
-      offset: 0,
-      rowcount: 100,
-    });
-  }, 5 * 60 * 1000);
+  setInterval(
+    () => {
+      refreshContestClarifications({
+        type: ContestClarificationType.AllProblems,
+        contestAlias: payload.contest.alias,
+        offset: 0,
+        rowcount: 100,
+      });
+    },
+    5 * 60 * 1000,
+  );
 });

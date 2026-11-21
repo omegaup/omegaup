@@ -9,7 +9,7 @@ import certificate_Details from './Details.vue';
 
 // defineComponent() is typed for Vue 2.7/3 interop; @vue/test-utils@1 expects
 // ComponentOptions<Vue>. Runtime is correct — assertion removed with test-utils@2.
-const Details = (certificate_Details as unknown) as ComponentOptions<Vue>;
+const Details = certificate_Details as unknown as ComponentOptions<Vue>;
 
 describe('Details.vue', () => {
   it('Should render the certificate details title and markdown body', () => {

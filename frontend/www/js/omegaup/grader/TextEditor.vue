@@ -54,8 +54,8 @@ export default class TextEditor extends Vue {
 @import '../../../sass/main.scss';
 
 textarea {
-  font-family: 'Droid Sans Mono', 'Courier New', monospace,
-    'Droid Sans Fallback';
+  font-family:
+    'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback';
   border: 0px;
   resize: none;
 

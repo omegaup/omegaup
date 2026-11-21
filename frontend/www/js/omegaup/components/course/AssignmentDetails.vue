@@ -419,13 +419,13 @@ export default class CourseAssignmentDetails extends Vue {
       this.unlimitedDuration !== !this.assignment.finish_time ||
       Boolean(
         this.startTime &&
-          this.assignment.start_time &&
-          this.startTime.getTime() !== this.assignment.start_time.getTime(),
+        this.assignment.start_time &&
+        this.startTime.getTime() !== this.assignment.start_time.getTime(),
       ) ||
       Boolean(
         this.finishTime &&
-          this.assignment.finish_time &&
-          this.finishTime.getTime() !== this.assignment.finish_time.getTime(),
+        this.assignment.finish_time &&
+        this.finishTime.getTime() !== this.assignment.finish_time.getTime(),
       );
 
     const hasScheduledProblems =

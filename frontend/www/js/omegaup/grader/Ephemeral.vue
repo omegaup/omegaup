@@ -251,10 +251,10 @@ export default class Ephemeral extends Vue {
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   readonly themeToRef: { [key: string]: string } = {
-    [Util.MonacoThemes
-      .VSLight]: `/third_party/css/golden-layout/goldenlayout-light-theme.css`,
-    [Util.MonacoThemes
-      .VSDark]: `/third_party/css/golden-layout/goldenlayout-dark-theme.css`,
+    [Util.MonacoThemes.VSLight]:
+      `/third_party/css/golden-layout/goldenlayout-light-theme.css`,
+    [Util.MonacoThemes.VSDark]:
+      `/third_party/css/golden-layout/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -405,9 +405,8 @@ export default class Ephemeral extends Vue {
         store.commit('updatingSettings', false);
         this.$nextTick(() => {
           if (!this.isEmbedded || !this.goldenLayout?.isInitialised) return;
-          let mainColumn = this.goldenLayout.root.getItemsById(
-            'main-column',
-          )[0];
+          let mainColumn =
+            this.goldenLayout.root.getItemsById('main-column')[0];
           mainColumn.parent.setActiveContentItem(mainColumn);
         });
       })

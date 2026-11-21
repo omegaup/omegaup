@@ -49,8 +49,10 @@ describe('CodeTemplatesEdit.vue', () => {
     const vm = wrapper.vm as any;
     expect(vm.selectedLanguage).toBe('py2');
     expect(
-      (wrapper.find('textarea[data-code-templates-source]')
-        .element as HTMLTextAreaElement).value,
+      (
+        wrapper.find('textarea[data-code-templates-source]')
+          .element as HTMLTextAreaElement
+      ).value,
     ).toBe(sourceTemplates.py);
   });
 
@@ -83,8 +85,10 @@ describe('CodeTemplatesEdit.vue', () => {
     );
 
     expect(
-      (wrapper.find('textarea[data-code-templates-source]')
-        .element as HTMLTextAreaElement).value,
+      (
+        wrapper.find('textarea[data-code-templates-source]')
+          .element as HTMLTextAreaElement
+      ).value,
     ).toBe('print("mine")');
   });
 
@@ -104,8 +108,10 @@ describe('CodeTemplatesEdit.vue', () => {
       .setSelected();
 
     expect(
-      (wrapper.find('textarea[data-code-templates-source]')
-        .element as HTMLTextAreaElement).value,
+      (
+        wrapper.find('textarea[data-code-templates-source]')
+          .element as HTMLTextAreaElement
+      ).value,
     ).toBe('puts "mine"');
   });
 
@@ -123,8 +129,10 @@ describe('CodeTemplatesEdit.vue', () => {
 
     expect(localStorage.getItem('codeTemplates:omegaup:py')).toBeNull();
     expect(
-      (wrapper.find('textarea[data-code-templates-source]')
-        .element as HTMLTextAreaElement).value,
+      (
+        wrapper.find('textarea[data-code-templates-source]')
+          .element as HTMLTextAreaElement
+      ).value,
     ).toBe(sourceTemplates.py);
   });
 

@@ -14,3 +14,13 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     return false;
   }
 });
+
+// ponytail: abort remaining specs in shard on first failure during PR runs without adding cypress-fail-fast plugin.
+afterEach(function () {
+  if (
+    this.currentTest?.state === 'failed' &&
+    String(Cypress.env('FAIL_FAST')) === '1'
+  ) {
+    Cypress.runner.stop();
+  }
+});

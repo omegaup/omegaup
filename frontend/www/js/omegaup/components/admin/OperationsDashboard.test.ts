@@ -124,15 +124,15 @@ describe('OperationsDashboard.vue', () => {
     });
 
     // The user turns maintenance off, but the request fails.
-    const before = (wrapper.findComponent(admin_MaintenanceMode)
-      .vm as unknown) as MaintenanceVm;
+    const before = wrapper.findComponent(admin_MaintenanceMode)
+      .vm as unknown as MaintenanceVm;
     before.onToggleMaintenance(false);
     expect(before.currentMaintenanceEnabled).toBe(false);
 
     await wrapper.setProps({ maintenanceVersion: 1 });
 
-    const after = (wrapper.findComponent(admin_MaintenanceMode)
-      .vm as unknown) as MaintenanceVm;
+    const after = wrapper.findComponent(admin_MaintenanceMode)
+      .vm as unknown as MaintenanceVm;
     expect(after.currentMaintenanceEnabled).toBe(true);
     expect(after.currentMaintenanceMessageEs).toBe('Hola');
   });

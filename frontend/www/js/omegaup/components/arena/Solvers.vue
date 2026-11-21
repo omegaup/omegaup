@@ -1,9 +1,7 @@
 <template>
   <table>
     <caption>
-      {{
-        T.wordsBestSolvers
-      }}
+      {{ T.wordsBestSolvers }}
     </caption>
     <thead>
       <tr>

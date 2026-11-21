@@ -4,7 +4,8 @@ import type { ComponentOptions } from 'vue';
 import qualitynomination_PromotionPopup from './PromotionPopup.vue';
 import { AvailableViews } from './DemotionPopup.vue';
 
-const PromotionPopup = qualitynomination_PromotionPopup as ComponentOptions<Vue>;
+const PromotionPopup =
+  qualitynomination_PromotionPopup as ComponentOptions<Vue>;
 
 type PromotionPopupVm = Vue & {
   currentView: AvailableViews;

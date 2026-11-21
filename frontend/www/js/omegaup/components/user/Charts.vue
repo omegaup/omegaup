@@ -355,7 +355,7 @@ export default class UserCharts extends Vue {
             data: x.data,
             name: x.name,
             type: 'column',
-          } as Highcharts.SeriesColumnOptions),
+          }) as Highcharts.SeriesColumnOptions,
       ),
     };
   }

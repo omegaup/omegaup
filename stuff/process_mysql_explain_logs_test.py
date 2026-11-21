@@ -3,7 +3,7 @@
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, List, Tuple
 
 import pytest
 
@@ -16,6 +16,7 @@ from process_mysql_explain_logs import (
     build_query_family,
     compare_results_with_allowlist,
     deduplicate_results,
+    explain_queries,
     get_comparison_exit_code,
     load_allowlist,
     log_allowlist_comparison,
@@ -806,3 +807,47 @@ def test_main_exits_nonzero_when_allowlist_fails_to_load(
     exit_exception: SystemExit = excinfo.value
     assert exit_exception.code == 1
     assert 'Failed to load allowlist' in caplog.text
+
+
+def test_explain_queries_deduplicates_normalized_sql_before_explain() -> None:
+    '''Identical normalized queries must only execute EXPLAIN once.'''
+    # pylint: disable=missing-function-docstring
+    executed: List[str] = []
+
+    class _RecordingCursor:
+        description = [
+            ('id',),
+            ('select_type',),
+            ('table',),
+            ('type',),
+            ('possible_keys',),
+            ('key',),
+            ('Extra',),
+        ]
+
+        def execute(self, sql: str) -> None:
+            executed.append(sql)
+
+        def fetchall(self) -> List[Tuple[Any, ...]]:
+            return [(1, 'SIMPLE', 'Users', 'ALL', None, None, 'Using where')]
+
+        def close(self) -> None:
+            pass
+
+    class _RecordingConn:
+        def cursor(self) -> _RecordingCursor:
+            return _RecordingCursor()
+
+    rows = explain_queries(
+        _RecordingConn(),  # type: ignore[arg-type]
+        [
+            ('SELECT * FROM Users WHERE username = "alice"',),
+            ('SELECT * FROM Users WHERE username = "bob"',),
+            ('SELECT * FROM Users WHERE username = "charlie"',),
+        ],
+    )
+    assert executed == [
+        'EXPLAIN SELECT * FROM Users WHERE username = "alice"',
+    ]
+    assert len(rows) == 1
+    assert rows[0]['Table'] == 'Users'

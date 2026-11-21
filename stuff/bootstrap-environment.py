@@ -266,6 +266,9 @@ def _main() -> None:
     parser.add_argument('--purge',
                         action='store_true',
                         help='Also purges and re-creates the database')
+    parser.add_argument('--skip-test-db',
+                        action='store_true',
+                        help='Skip purging and migrating omegaup-test')
     parser.add_argument('--mysql-config-file',
                         default=None,
                         help='.my.cnf file that stores credentials')
@@ -317,10 +320,15 @@ def _main() -> None:
         if args.verbose:
             db_migrate_args.append('--verbose')
         logging.info('Purging database...')
-        subprocess.check_call(db_migrate_args + ['purge'])
+        purge_args = ['purge']
+        migrate_args = ['migrate', '--development-environment']
+        if args.skip_test_db:
+            # ponytail: e2e jobs only use omegaup; skip 288 test-db migrations.
+            purge_args.append('--databases=omegaup,_omegaup_metadata')
+            migrate_args.append('--databases=omegaup')
+        subprocess.check_call(db_migrate_args + purge_args)
         logging.info('Migrating database...')
-        subprocess.check_call(db_migrate_args +
-                              ['migrate', '--development-environment'])
+        subprocess.check_call(db_migrate_args + migrate_args)
 
     if args.seed_mode == "synthetic":
         seed_synthetic(

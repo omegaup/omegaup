@@ -1,0 +1,20 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "semi": true,
+  "printWidth": 80,
+  "tabWidth": 2,
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/third_party/**",
+    "frontend/www/karel.js/**",
+    "frontend/www/rekarel/**",
+    "frontend/www/js/omegaup/lang.*",
+    "frontend/www/css/dist/**",
+    "frontend/www/css/markdown-editor-widgets.css",
+    "frontend/www/docs/**",
+    "frontend/www/grader/**",
+    "frontend/www/libinteractive/**",
+    "frontend/www/preguntas/**"
+  ]
+}

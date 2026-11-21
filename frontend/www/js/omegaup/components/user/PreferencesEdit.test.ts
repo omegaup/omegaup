@@ -394,12 +394,16 @@ describe('PreferencesEdit.vue', () => {
     );
 
     expect(
-      (wrapper.find('select[data-learning-teaching-objective]')
-        .element as HTMLSelectElement).value,
+      (
+        wrapper.find('select[data-learning-teaching-objective]')
+          .element as HTMLSelectElement
+      ).value,
     ).toBe('learning');
     expect(
-      (wrapper.find('select[data-scholar-competitive-objective]')
-        .element as HTMLSelectElement).value,
+      (
+        wrapper.find('select[data-scholar-competitive-objective]')
+          .element as HTMLSelectElement
+      ).value,
     ).toBe('scholar');
 
     await wrapper

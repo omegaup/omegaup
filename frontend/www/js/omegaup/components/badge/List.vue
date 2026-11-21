@@ -42,11 +42,11 @@ export default defineComponent({
   },
   props: {
     allBadges: {
-      type: (Set as unknown) as PropType<Set<string>>,
+      type: Set as unknown as PropType<Set<string>>,
       required: true,
     },
     visitorBadges: {
-      type: (Set as unknown) as PropType<Set<string>>,
+      type: Set as unknown as PropType<Set<string>>,
       required: true,
     },
     showAllBadgesLink: {
