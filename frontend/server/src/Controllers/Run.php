@@ -568,6 +568,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Submissions::update($submission);
         });
 
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_CURRENT_STREAK,
+            strval($r->identity->identity_id)
+        );
+
         // Call Grader
         try {
             \OmegaUp\Grader::getInstance()->grade($run, trim($source));
