@@ -3,6 +3,7 @@ import type { types } from '../../api_types';
 
 import T from '../../lang';
 
+import MarkdownEditor from '../common/MarkdownEditor.vue';
 import course_Form from './Form.vue';
 
 const baseCourseFormProps = {
@@ -60,28 +61,24 @@ describe('Form.vue', () => {
     expect(wrapper.find(selector).text()).toBe(T.courseNewFormScheduleCourse);
   });
 
-  it('Should add Markdown controls to the objective and description', () => {
+  it('Should render a Markdown editor for objective and description', () => {
     const wrapper = shallowMount(course_Form, {
       propsData: baseCourseFormProps,
     });
 
-    const buttonBars = wrapper.findAll('.wmd-button-bar');
-    expect(buttonBars).toHaveLength(2);
-    expect(buttonBars.at(0).element.children.length).toBeGreaterThan(0);
-    expect(buttonBars.at(1).element.children.length).toBeGreaterThan(0);
-    expect(wrapper.find('textarea[data-course-objective]').exists()).toBe(
-      true,
-    );
-    expect(
-      wrapper.find('textarea[data-course-new-description]').exists(),
-    ).toBe(true);
+    const editors = wrapper.findAllComponents(MarkdownEditor);
+    expect(editors).toHaveLength(2);
+    expect(editors.at(0).props('idPostfix')).toBe('-objective');
+    expect(editors.at(1).props('idPostfix')).toBe('-description');
   });
 
-  it('Should hide the Markdown controls when the form is read only', () => {
+  it('Should make the Markdown editors read only', () => {
     const wrapper = shallowMount(course_Form, {
       propsData: Object.assign({}, baseCourseFormProps, { readOnly: true }),
     });
 
-    expect(wrapper.find('.wmd-button-bar').isVisible()).toBe(false);
+    const editors = wrapper.findAllComponents(MarkdownEditor);
+    expect(editors.at(0).props('readOnly')).toBe(true);
+    expect(editors.at(1).props('readOnly')).toBe(true);
   });
 });
