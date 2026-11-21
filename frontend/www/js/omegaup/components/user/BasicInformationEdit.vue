@@ -34,11 +34,15 @@
       <select v-model="countryId" data-countries class="custom-select">
         <option value=""></option>
         <option
-          v-for="country in countries"
+          v-for="country in localizedCountries"
           :key="country.country_id"
           :value="country.country_id"
         >
-          {{ country.country_id === 'xx' ? T.countryNotSet : country.name }}
+          {{
+            country.country_id === 'xx'
+              ? T.countryNotSet
+              : T['country' + country.country_id] || country.name
+          }}
         </option>
       </select>
     </div>
@@ -109,6 +113,19 @@ export default class UserBasicInformationEdit extends Vue {
   birthDate = this.profile.birth_date
     ? time.convertLocalDateToGMTDate(this.profile.birth_date)
     : new Date('');
+
+  get localizedCountries(): dao.Countries[] {
+    const collator = new Intl.Collator(undefined, { sensitivity: 'base' });
+    return this.countries.slice().sort((a, b) => {
+      if (a.country_id === 'xx') return -1;
+      if (b.country_id === 'xx') return 1;
+      const nameA =
+        T['country' + a.country_id] || a.name;
+      const nameB =
+        T['country' + b.country_id] || b.name;
+      return collator.compare(nameA, nameB);
+    });
+  }
 
   get isCountrySelected(): boolean {
     return Boolean(this.countryId);
