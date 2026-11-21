@@ -18,6 +18,11 @@ To set up the development environment, run the project locally, and troubleshoot
 
 This guide contains detailed instructions for Docker setup, running tests, authentication, and troubleshooting.
 
+If you plan to use AI tools to assist with your contributions, please review:
+
+📘 **AI Contribution Policy**  
+- [`AI_CONTRIBUTION_POLICY.md`](AI_CONTRIBUTION_POLICY.md)
+
 ---
 
 ## Issue Assignment Workflow
@@ -66,12 +71,27 @@ Follow conventional commit-style prefixes where possible.
 
 - Open Pull Requests against the `main` branch
 - Link the related issue in the PR description (e.g. `Fixes #162`)
+- Follow the [AI Contribution Policy](AI_CONTRIBUTION_POLICY.md) if your changes involved AI assistance
 - Use Draft PRs for work in progress
 - Ensure CI checks pass before requesting review
 - Keep PRs focused and avoid unrelated refactors
 
 For more information on Pull Requests, see:
 - https://docs.github.com/en/pull-requests
+
+---
+
+## AI Contribution Policy
+
+Contributors are welcome to use AI tools responsibly to assist with their contributions:
+
+- AI should be treated as an assistance tool, not as a replacement for your own judgment or responsibility
+- Contributors remain fully responsible for the code, documentation, and communication they submit
+- Disclose significant AI assistance in your pull request description
+- Human review, testing, and evidence expectations apply equally to all contributions
+
+📘 For full details, see:  
+- [`AI_CONTRIBUTION_POLICY.md`](AI_CONTRIBUTION_POLICY.md)
 
 ---
 
