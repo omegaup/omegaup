@@ -1,6 +1,7 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { shallowMount, mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Course from './Coursev2.vue';
@@ -132,7 +133,7 @@ describe('Coursev2.vue', () => {
   ];
 
   it('Should show the assignment navigation buttons', () => {
-    let wrapper = shallowMount(arena_Course, {
+    let wrapper = shallowMount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         allRuns: runs,
         course,
@@ -145,7 +146,7 @@ describe('Coursev2.vue', () => {
     });
     expect(wrapper.text()).toContain(course.assignments[1].name);
 
-    wrapper = shallowMount(arena_Course, {
+    wrapper = shallowMount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         allRuns: runs,
         course,
@@ -160,7 +161,7 @@ describe('Coursev2.vue', () => {
   });
 
   it('Should show the course summary', () => {
-    const wrapper = shallowMount(arena_Course, {
+    const wrapper = shallowMount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         allRuns: runs,
         course,
@@ -180,7 +181,7 @@ describe('Coursev2.vue', () => {
   });
 
   it('Should show the course scoreboard', () => {
-    const wrapper = mount(arena_Course, {
+    const wrapper = mount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         allRuns: runs,
         course,
@@ -198,7 +199,7 @@ describe('Coursev2.vue', () => {
   });
 
   it('Should hide the course scoreboard tab when scoreboard is null', () => {
-    const wrapper = mount(arena_Course, {
+    const wrapper = mount(arena_Course as ComponentOptions<Vue>, {
       propsData: {
         allRuns: runs,
         course,

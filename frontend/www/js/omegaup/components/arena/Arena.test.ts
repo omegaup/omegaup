@@ -1,11 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import { types } from '../../api_types';
 
 import arena_Arena from './Arena.vue';
 
 describe('Arena.vue', () => {
   it('Should handle details for a contest', () => {
-    const wrapper = shallowMount(arena_Arena, {
+    const wrapper = shallowMount(arena_Arena as ComponentOptions<Vue>, {
       propsData: {
         title: 'Hello omegaUp',
         activeTab: 'problems',
@@ -20,7 +21,7 @@ describe('Arena.vue', () => {
   });
 
   it('Should mark as read clarifications tab', async () => {
-    const wrapper = shallowMount(arena_Arena, {
+    const wrapper = shallowMount(arena_Arena as ComponentOptions<Vue>, {
       propsData: {
         title: 'Hello omegaUp',
         activeTab: 'problems',
