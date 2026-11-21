@@ -1,29 +1,35 @@
 <template>
   <div class="card">
-    <div class="card-header bg-warning text-dark">
-      <h5 class="mb-0">
-        <font-awesome-icon icon="wrench" />
-        {{ T.maintenanceModeTitle }}
-      </h5>
-    </div>
     <div class="card-body">
-      <div class="form-group">
-        <omegaup-toggle-switch
-          :checked-value="currentMaintenanceEnabled"
-          @update:value="onToggleMaintenance"
-        >
-          <template #switch-text>
-            <span class="switch-text">
-              <strong>{{
-                currentMaintenanceEnabled
-                  ? T.maintenanceModeActive
-                  : T.maintenanceModeInactive
-              }}</strong>
-            </span>
-          </template>
-        </omegaup-toggle-switch>
+      <div class="setting-card">
+        <font-awesome-icon icon="bullhorn" class="setting-icon" />
+        <h5 class="setting-title">{{ T.maintenanceModeTitle }}</h5>
+        <p class="setting-description text-muted mb-0">
+          {{ T.maintenanceModeDescription }}
+        </p>
+        <div class="setting-control">
+          <strong class="mr-3">{{
+            currentMaintenanceEnabled
+              ? T.maintenanceModeActive
+              : T.maintenanceModeInactive
+          }}</strong>
+          <omegaup-toggle-switch
+            :checked-value="currentMaintenanceEnabled"
+            @update:value="onToggleMaintenance"
+          >
+            <template #switch-text>
+              <span class="sr-only">{{ T.maintenanceModeTitle }}</span>
+            </template>
+          </omegaup-toggle-switch>
+        </div>
       </div>
-      <div v-if="currentMaintenanceEnabled" class="form-group">
+
+      <div v-if="currentMaintenanceEnabled" class="mt-4">
+        <div class="notice d-flex align-items-center mb-3" role="note">
+          <font-awesome-icon icon="info-circle" class="mr-2" />
+          {{ T.maintenanceModeNotice }}
+        </div>
+
         <select
           v-model="selectedTemplateId"
           class="form-control mb-3"
@@ -44,32 +50,36 @@
           </option>
         </select>
 
-        <div class="mb-2">
-          <span
-            v-for="type in maintenanceTypes"
-            :key="type.value"
-            :class="[
-              'badge',
-              'mr-3',
-              'p-2',
-              badgeClass(type.value),
-              {
-                'badge-selected': currentMaintenanceType === type.value,
-              },
-            ]"
-            @click="currentMaintenanceType = type.value"
-          >
-            {{ type.label }}
-          </span>
-        </div>
-        <label>{{ T.maintenanceModeMessage }}</label>
-        <div class="row mb-2">
-          <div class="col-auto d-flex align-items-center">
-            <span class="badge badge-secondary w-100">{{
-              T.wordsSpanish
-            }}</span>
+        <div class="mb-3">
+          <label class="d-block">{{ T.maintenanceModeTypeLabel }}</label>
+          <div class="d-flex flex-column flex-md-row">
+            <button
+              v-for="type in maintenanceTypes"
+              :key="type.value"
+              type="button"
+              :class="[
+                'btn',
+                'mb-2',
+                'mr-md-2',
+                typeButtonClass(type.value),
+                { active: currentMaintenanceType === type.value },
+              ]"
+              :aria-pressed="
+                currentMaintenanceType === type.value ? 'true' : 'false'
+              "
+              @click="currentMaintenanceType = type.value"
+            >
+              {{ type.label }}
+            </button>
           </div>
-          <div class="col">
+        </div>
+
+        <label>{{ T.maintenanceModeMessage }}</label>
+        <div class="row mb-2 language-row">
+          <div class="col-12 col-md-auto language-label mb-1 mb-md-0">
+            <span class="badge badge-secondary">{{ T.wordsSpanish }}</span>
+          </div>
+          <div class="col-12 col-md language-field">
             <textarea
               v-model="currentMaintenanceMessageEs"
               :class="['form-control', badgeClass(currentMaintenanceType)]"
@@ -78,13 +88,11 @@
             ></textarea>
           </div>
         </div>
-        <div class="row mb-2">
-          <div class="col-auto d-flex align-items-center">
-            <span class="badge badge-secondary w-100">{{
-              T.wordsEnglish
-            }}</span>
+        <div class="row mb-2 language-row">
+          <div class="col-12 col-md-auto language-label mb-1 mb-md-0">
+            <span class="badge badge-secondary">{{ T.wordsEnglish }}</span>
           </div>
-          <div class="col">
+          <div class="col-12 col-md language-field">
             <textarea
               v-model="currentMaintenanceMessageEn"
               :class="['form-control', badgeClass(currentMaintenanceType)]"
@@ -93,13 +101,11 @@
             ></textarea>
           </div>
         </div>
-        <div class="row mb-2">
-          <div class="col-auto d-flex align-items-center">
-            <span class="badge badge-secondary w-100">{{
-              T.wordsPortuguese
-            }}</span>
+        <div class="row mb-2 language-row">
+          <div class="col-12 col-md-auto language-label mb-1 mb-md-0">
+            <span class="badge badge-secondary">{{ T.wordsPortuguese }}</span>
           </div>
-          <div class="col">
+          <div class="col-12 col-md language-field">
             <textarea
               v-model="currentMaintenanceMessagePt"
               :class="['form-control', badgeClass(currentMaintenanceType)]"
@@ -108,15 +114,39 @@
             ></textarea>
           </div>
         </div>
+
+        <small class="form-text text-muted mt-3">
+          {{ T.maintenanceModeSaveHelp }}
+        </small>
+
+        <div class="mt-3 d-flex flex-column-reverse flex-md-row">
+          <button
+            class="btn btn-secondary mt-2 mt-md-0 mr-md-2"
+            type="button"
+            data-maintenance-cancel
+            @click="onCancel"
+          >
+            {{ T.wordsCancel }}
+          </button>
+          <button
+            class="btn btn-outline-primary mt-2 mt-md-0 mr-md-2"
+            type="button"
+            data-maintenance-preview
+            :disabled="previewMessage === ''"
+            @click="onPreview"
+          >
+            {{ T.wordsPreview }}
+          </button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            data-maintenance-save
+            @click="onSaveMaintenance"
+          >
+            {{ T.wordsSaveChanges }}
+          </button>
+        </div>
       </div>
-      <button
-        v-if="currentMaintenanceEnabled"
-        class="btn btn-primary"
-        type="button"
-        @click="onSaveMaintenance"
-      >
-        {{ T.wordsSaveChanges }}
-      </button>
     </div>
   </div>
 </template>
@@ -124,6 +154,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 import { types } from '../../api_types';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
@@ -169,6 +200,12 @@ export default class AdminMaintenanceMode extends Vue {
   currentMaintenanceMessagePt = this.maintenanceMessagePt;
   currentMaintenanceType = this.maintenanceType || 'info';
 
+  savedMaintenanceEnabled = this.maintenanceEnabled;
+  savedMaintenanceMessageEs = this.maintenanceMessageEs;
+  savedMaintenanceMessageEn = this.maintenanceMessageEn;
+  savedMaintenanceMessagePt = this.maintenanceMessagePt;
+  savedMaintenanceType = this.maintenanceType || 'info';
+
   T = T;
   MaintenanceType = MaintenanceType;
 
@@ -181,6 +218,32 @@ export default class AdminMaintenanceMode extends Vue {
     { value: MaintenanceType.Error, label: this.T.maintenanceModeTypeError },
   ];
 
+  get previewMessage(): string {
+    const messages: { [language: string]: string } = {
+      es: this.currentMaintenanceMessageEs,
+      en: this.currentMaintenanceMessageEn,
+      pt: this.currentMaintenanceMessagePt,
+    };
+    return (
+      messages[this.preferredLanguage] ||
+      this.currentMaintenanceMessageEs ||
+      this.currentMaintenanceMessageEn ||
+      this.currentMaintenanceMessagePt ||
+      ''
+    );
+  }
+
+  get previewType(): ui.MessageType {
+    switch (this.currentMaintenanceType) {
+      case 'warning':
+        return ui.MessageType.Warning;
+      case 'danger':
+        return ui.MessageType.Danger;
+      default:
+        return ui.MessageType.Info;
+    }
+  }
+
   badgeClass(type: string) {
     switch (type) {
       case 'warning':
@@ -189,6 +252,17 @@ export default class AdminMaintenanceMode extends Vue {
         return 'alert-danger';
       default:
         return 'alert-info';
+    }
+  }
+
+  typeButtonClass(type: string): string {
+    switch (type) {
+      case 'warning':
+        return 'btn-outline-warning';
+      case 'danger':
+        return 'btn-outline-danger';
+      default:
+        return 'btn-outline-info';
     }
   }
 
@@ -201,26 +275,31 @@ export default class AdminMaintenanceMode extends Vue {
   @Watch('maintenanceEnabled')
   onMaintenanceEnabledChange(newValue: boolean) {
     this.currentMaintenanceEnabled = newValue;
+    this.savedMaintenanceEnabled = newValue;
   }
 
   @Watch('maintenanceMessageEs')
   onMaintenanceMessageEsChange(newValue: string) {
     this.currentMaintenanceMessageEs = newValue;
+    this.savedMaintenanceMessageEs = newValue;
   }
 
   @Watch('maintenanceMessageEn')
   onMaintenanceMessageEnChange(newValue: string) {
     this.currentMaintenanceMessageEn = newValue;
+    this.savedMaintenanceMessageEn = newValue;
   }
 
   @Watch('maintenanceMessagePt')
   onMaintenanceMessagePtChange(newValue: string) {
     this.currentMaintenanceMessagePt = newValue;
+    this.savedMaintenanceMessagePt = newValue;
   }
 
   @Watch('maintenanceType')
   onMaintenanceTypeChange(newValue: string) {
     this.currentMaintenanceType = newValue;
+    this.savedMaintenanceType = newValue || 'info';
   }
 
   @Emit('toggle-maintenance')
@@ -231,6 +310,11 @@ export default class AdminMaintenanceMode extends Vue {
       this.currentMaintenanceMessageEn = '';
       this.currentMaintenanceMessagePt = '';
       this.currentMaintenanceType = 'info';
+      this.savedMaintenanceEnabled = false;
+      this.savedMaintenanceMessageEs = '';
+      this.savedMaintenanceMessageEn = '';
+      this.savedMaintenanceMessagePt = '';
+      this.savedMaintenanceType = 'info';
     }
     return newValue;
   }
@@ -244,6 +328,23 @@ export default class AdminMaintenanceMode extends Vue {
       message_pt: this.currentMaintenanceMessagePt,
       type: this.currentMaintenanceType,
     };
+  }
+
+  onCancel(): void {
+    this.currentMaintenanceEnabled = this.savedMaintenanceEnabled;
+    this.currentMaintenanceMessageEs = this.savedMaintenanceMessageEs;
+    this.currentMaintenanceMessageEn = this.savedMaintenanceMessageEn;
+    this.currentMaintenanceMessagePt = this.savedMaintenanceMessagePt;
+    this.currentMaintenanceType = this.savedMaintenanceType;
+    this.selectedTemplateId = '';
+  }
+
+  onPreview(): void {
+    ui.displayStatus({
+      message: this.previewMessage,
+      type: this.previewType,
+      autoHide: false,
+    });
   }
 
   onSelectTemplate() {
@@ -266,25 +367,93 @@ export default class AdminMaintenanceMode extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.badge {
-  cursor: pointer;
+.setting-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'icon title control'
+    'icon description control';
+  column-gap: 1rem;
+  align-items: center;
 }
 
-.row.mb-2 {
-  .col-auto {
+.setting-icon {
+  grid-area: icon;
+  font-size: 1.5rem;
+  color: var(--admin-dashboard-setting-icon-color);
+}
+
+.setting-title {
+  grid-area: title;
+  align-self: end;
+  margin-bottom: 0.25rem;
+}
+
+.setting-description {
+  grid-area: description;
+  align-self: start;
+}
+
+.setting-control {
+  grid-area: control;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  .switch-container {
+    width: auto;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .setting-card {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'icon title'
+      'description description'
+      'control control';
+    row-gap: 0.75rem;
+  }
+
+  .setting-title {
+    align-self: center;
+    margin-bottom: 0;
+  }
+
+  .setting-control {
+    justify-content: space-between;
+    border-top: 1px solid var(--admin-dashboard-sidebar-border-color);
+    padding-top: 0.75rem;
+  }
+}
+
+.notice {
+  background: var(--admin-dashboard-notice-background-color);
+  border: 1px solid var(--admin-dashboard-notice-border-color);
+  border-radius: 0.375rem;
+  color: var(--admin-dashboard-notice-font-color);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+}
+
+.language-row {
+  .language-label {
     display: flex;
     align-items: stretch;
     .badge {
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
       height: 100%;
       min-width: 100px;
       font-size: 1rem;
       border-radius: 0.25rem;
     }
   }
-  .col {
+  .language-field {
     display: flex;
     align-items: stretch;
     textarea {
@@ -295,6 +464,12 @@ export default class AdminMaintenanceMode extends Vue {
       padding-bottom: 8px;
       border-radius: 0.25rem;
     }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .language-row .language-label .badge {
+    padding: 0.375rem 0.75rem;
   }
 }
 </style>
