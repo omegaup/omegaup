@@ -722,6 +722,7 @@
 	"courseNewFormUserInformationRequiredDesc": "Habilita esta opci\u00f3n para solicitar acceso a la informaci\u00f3n de los participantes que pertenecen al curso con el fin de ser contactados posteriormente. Ten en cuenta que el participante podr\u00e1 elegir si desea dar acceso a su informaci\u00f3n o no.",
 	"courseNotFound": "Curso no encontrado",
 	"coursePrivacyConsent": "Consentimiento de privacidad de curso",
+	"courseProblemListEmptyDescription": "Agrega tu primer problema para comenzar.",
 	"courseProgressGlobalScore": "Puntaje global",
 	"courseRegistrationPreAcceptedDescription": "Esta cuenta ha sido invitada expl\u00edcitamente al curso",
 	"courseRequestFeedback": "\u00bfTienes dudas? solicita una retroalimentacion sobre tu c\u00f3digo!",
