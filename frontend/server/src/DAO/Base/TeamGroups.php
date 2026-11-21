@@ -44,11 +44,7 @@ abstract class TeamGroups {
                     `team_group_id` = ?
                 );';
         $params = [
-            (
-                is_null($Team_Groups->acl_id) ?
-                null :
-                intval($Team_Groups->acl_id)
-            ),
+            intval($Team_Groups->acl_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Team_Groups->create_time
             ),
@@ -295,11 +291,7 @@ abstract class TeamGroups {
                     ?
                 );';
         $params = [
-            (
-                is_null($Team_Groups->acl_id) ?
-                null :
-                intval($Team_Groups->acl_id)
-            ),
+            intval($Team_Groups->acl_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Team_Groups->create_time
             ),
