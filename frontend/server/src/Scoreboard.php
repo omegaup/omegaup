@@ -525,7 +525,7 @@ class Scoreboard {
     }
 
     /**
-     * @param list<array{contest_score: float, guid?: string, identity_id: int, penalty: float|int, problem_id: int, score: float, submit_delay?: int, submission_count?: int, time?: \OmegaUp\Timestamp, type: string}> $contestRuns
+     * @param list<array{contest_score: float, guid?: string, identity_id: int, penalty: float|int|null, problem_id: int, score: float, submit_delay?: int, submission_count?: int, time?: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool, classname: string}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
@@ -650,7 +650,7 @@ class Scoreboard {
                 }
             }
 
-            $totalPenalty = $run['penalty'] + $problem['runs'] * $contestPenalty;
+            $totalPenalty = ($run['penalty'] ?? 0) + $problem['runs'] * $contestPenalty;
             $roundedScore = round(floatval($contestScore), 2);
             if (
                 $problem['points'] < $roundedScore ||
@@ -805,7 +805,7 @@ class Scoreboard {
 
     /**
      * @param \OmegaUp\ScoreboardParams $params
-     * @param list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> $contestRuns
+     * @param list<array{contest_score: float, guid: string, identity_id: int, penalty: int|null, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string, maxScore: int}> $problemMapping
      * @return list<ScoreboardEvent>

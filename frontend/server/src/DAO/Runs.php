@@ -745,7 +745,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
+     * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int|null, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
      */
     final public static function getProblemsetRuns(
         int $problemsetId,
@@ -763,7 +763,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         0,
                         r.score
                 ) AS score,
-                IFNULL(r.penalty, 0) AS penalty,
+                r.penalty,
                 IFNULL(
                     IF(
                         c.score_mode = 'all_or_nothing' AND r.score <> 1,
@@ -808,7 +808,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ORDER BY
                 s.submission_id;";
 
-        /** @var list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> */
+        /** @var list<array{contest_score: float, guid: string, identity_id: int, penalty: int|null, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
