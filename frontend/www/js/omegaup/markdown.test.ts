@@ -606,5 +606,41 @@ Tags &lt;b&gt;hello&lt;/b&gt;
         '<p><pre><code class="language-in">&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre></p>',
       );
     });
+
+    it('Should clear source mapping after rendering', () => {
+      const customConverter = new markdown.Converter();
+      expect(
+        customConverter.makeHtmlWithImages(
+          '{{foo.py}}',
+          {},
+          { 'foo.py': 'print(1)' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span></code></pre></p>',
+      );
+      const result = customConverter.makeHtml('{{foo.py}}');
+      expect(result).toContain('Unrecognized source filename: foo.py');
+      expect(result).not.toContain('print');
+    });
+
+    it('Should clear source mapping even if an error is thrown during conversion', () => {
+      const customConverter = new markdown.Converter();
+      jest
+        .spyOn(customConverter.converter, 'makeHtml')
+        .mockImplementationOnce(() => {
+          throw new Error('Conversion error');
+        });
+      expect(() =>
+        customConverter.makeHtmlWithImages(
+          '{{foo.py}}',
+          {},
+          { 'foo.py': 'print(1)' },
+        ),
+      ).toThrow('Conversion error');
+
+      const result = customConverter.makeHtml('{{foo.py}}');
+      expect(result).toContain('Unrecognized source filename: foo.py');
+      expect(result).not.toContain('print');
+    });
   });
 });
