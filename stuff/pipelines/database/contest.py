@@ -93,7 +93,7 @@ def get_contests(
         WHERE
             finish_time >= %s
             AND finish_time <= %s
-            AND certificates_status <> 'generated';
+            AND certificates_status NOT IN ('generated', 'fatal_error');
         ''', (date_lower_limit,
               date_upper_limit.replace(hour=23, minute=59, second=59))
     )
