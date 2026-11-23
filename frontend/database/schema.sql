@@ -721,6 +721,7 @@ CREATE TABLE `Notifications` (
 CREATE TABLE `Permissions` (
   `permission_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
+  `resource_type` enum('entrypoint','endpoint','capability') NOT NULL COMMENT 'Tipo de recurso que protege el permiso: página, API o capacidad.',
   `description` varchar(100) NOT NULL COMMENT 'La descripción humana del permiso.',
   PRIMARY KEY (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los permisos que se pueden dar a los roles.';
