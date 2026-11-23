@@ -2,57 +2,76 @@
   <aside
     data-practice-timer
     class="practice-timer"
+    :class="{ 'practice-timer--minimized': isMinimized }"
     role="group"
+    tabindex="0"
     :aria-label="T.arenaPracticeTimerTitle"
+    :aria-description="T.arenaPracticeTimerDrag"
+    aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
     :style="positionStyle"
+    @pointerdown="startDragging"
+    @click.capture="preventClickAfterDrag"
+    @keydown.self="moveWithKeyboard"
   >
+    <template v-if="!isMinimized">
+      <span class="practice-timer__title">
+        {{ T.arenaPracticeTimerTitle }}
+      </span>
+
+      <span class="practice-timer__display" role="timer" aria-live="off">
+        {{ formattedElapsed }}
+      </span>
+
+      <div class="practice-timer__controls">
+        <button
+          class="practice-timer__toggle"
+          type="button"
+          :aria-label="
+            isPaused ? T.arenaPracticeTimerResume : T.arenaPracticeTimerPause
+          "
+          :title="
+            isPaused ? T.arenaPracticeTimerResume : T.arenaPracticeTimerPause
+          "
+          @click.stop="togglePause"
+        >
+          <font-awesome-icon
+            :icon="isPaused ? 'play' : 'pause'"
+            aria-hidden="true"
+          />
+        </button>
+
+        <button
+          class="practice-timer__reset"
+          type="button"
+          :aria-label="T.arenaPracticeTimerReset"
+          :title="T.arenaPracticeTimerReset"
+          @click.stop="resetTimer"
+        >
+          <font-awesome-icon icon="redo-alt" aria-hidden="true" />
+        </button>
+
+        <button
+          class="practice-timer__minimize"
+          type="button"
+          :aria-label="T.arenaPracticeTimerMinimize"
+          :title="T.arenaPracticeTimerMinimize"
+          @click.stop="toggleMinimized"
+        >
+          <font-awesome-icon icon="chevron-right" aria-hidden="true" />
+        </button>
+      </div>
+    </template>
+
     <button
-      class="practice-timer__drag-handle"
+      v-else
+      class="practice-timer__restore"
       type="button"
-      :aria-label="T.arenaPracticeTimerDrag"
-      :title="T.arenaPracticeTimerDrag"
-      @pointerdown.prevent="startDragging"
-      @keydown="moveWithKeyboard"
+      :aria-label="T.arenaPracticeTimerRestore"
+      :title="T.arenaPracticeTimerRestore"
+      @click.stop="toggleMinimized"
     >
-      <span aria-hidden="true">⠿</span>
+      <font-awesome-icon icon="stopwatch" aria-hidden="true" />
     </button>
-
-    <span class="practice-timer__title">
-      {{ T.arenaPracticeTimerTitle }}
-    </span>
-
-    <span class="practice-timer__display" role="timer" aria-live="off">
-      {{ formattedElapsed }}
-    </span>
-
-    <div class="practice-timer__controls">
-      <button
-        class="practice-timer__toggle"
-        type="button"
-        :aria-label="
-          isPaused ? T.arenaPracticeTimerResume : T.arenaPracticeTimerPause
-        "
-        :title="
-          isPaused ? T.arenaPracticeTimerResume : T.arenaPracticeTimerPause
-        "
-        @click="togglePause"
-      >
-        <font-awesome-icon
-          :icon="isPaused ? 'play' : 'pause'"
-          aria-hidden="true"
-        />
-      </button>
-
-      <button
-        class="practice-timer__reset"
-        type="button"
-        :aria-label="T.arenaPracticeTimerReset"
-        :title="T.arenaPracticeTimerReset"
-        @click="resetTimer"
-      >
-        <font-awesome-icon icon="redo-alt" aria-hidden="true" />
-      </button>
-    </div>
   </aside>
 </template>
 
@@ -93,10 +112,19 @@ export default class ArenaPracticeTimer extends Vue {
   intervalId: number | null = null;
 
   position: TimerPosition | null = null;
+  expandedPosition: TimerPosition | null = null;
 
-  private dragOffsetX = 0;
-  private dragOffsetY = 0;
+  isMinimized = false;
+
+  private pointerStartX = 0;
+  private pointerStartY = 0;
+  private dragStartLeft = 0;
+  private dragStartTop = 0;
+
+  private isPointerDown = false;
   private isDragging = false;
+  private suppressClick = false;
+  private clickSuppressionTimeout: number | null = null;
 
   private get timerStorageKey(): string {
     return `arena:practice-timer:${encodeURIComponent(
@@ -106,6 +134,18 @@ export default class ArenaPracticeTimer extends Vue {
 
   private get positionStorageKey(): string {
     return `arena:practice-timer-position:${encodeURIComponent(
+      this.contestAlias,
+    )}`;
+  }
+
+  private get minimizedStorageKey(): string {
+    return `arena:practice-timer-minimized:${encodeURIComponent(
+      this.contestAlias,
+    )}`;
+  }
+
+  private get expandedPositionStorageKey(): string {
+    return `arena:practice-timer-expanded-position:${encodeURIComponent(
       this.contestAlias,
     )}`;
   }
@@ -138,6 +178,8 @@ export default class ArenaPracticeTimer extends Vue {
   mounted(): void {
     this.loadTimerState();
     this.loadPosition();
+    this.loadMinimizedState();
+    this.loadExpandedPosition();
 
     if (!this.isPaused && this.isActive) {
       this.startedAt = Date.now();
@@ -172,6 +214,11 @@ export default class ArenaPracticeTimer extends Vue {
 
     this.startedAt = null;
     this.stopDragging();
+
+    if (this.clickSuppressionTimeout !== null) {
+      window.clearTimeout(this.clickSuppressionTimeout);
+      this.clickSuppressionTimeout = null;
+    }
 
     window.removeEventListener('resize', this.clampPosition);
   }
@@ -241,6 +288,72 @@ export default class ArenaPracticeTimer extends Vue {
     }
   }
 
+  private loadMinimizedState(): void {
+    try {
+      this.isMinimized =
+        window.localStorage.getItem(this.minimizedStorageKey) === 'true';
+    } catch {
+      // Minimized state persistence is optional.
+    }
+  }
+
+  private persistMinimizedState(): void {
+    try {
+      window.localStorage.setItem(
+        this.minimizedStorageKey,
+        String(this.isMinimized),
+      );
+    } catch {
+      // Minimized state persistence is optional.
+    }
+  }
+
+  private loadExpandedPosition(): void {
+    try {
+      const saved = window.localStorage.getItem(
+        this.expandedPositionStorageKey,
+      );
+
+      if (saved !== null) {
+        const position = JSON.parse(saved) as Partial<TimerPosition>;
+
+        if (
+          typeof position.left === 'number' &&
+          Number.isFinite(position.left) &&
+          typeof position.top === 'number' &&
+          Number.isFinite(position.top)
+        ) {
+          this.expandedPosition = {
+            left: position.left,
+            top: position.top,
+          };
+          return;
+        }
+      }
+    } catch {
+      // Expanded position persistence is optional.
+    }
+
+    if (!this.isMinimized && this.position !== null) {
+      this.expandedPosition = { ...this.position };
+    }
+  }
+
+  private persistExpandedPosition(): void {
+    if (this.expandedPosition === null) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        this.expandedPositionStorageKey,
+        JSON.stringify(this.expandedPosition),
+      );
+    } catch {
+      // Expanded position persistence is optional.
+    }
+  }
+
   private persistPosition(): void {
     if (this.position === null) {
       return;
@@ -253,6 +366,11 @@ export default class ArenaPracticeTimer extends Vue {
       );
     } catch {
       // Storage is optional; keep the timer functional when unavailable.
+    }
+
+    if (!this.isMinimized) {
+      this.expandedPosition = { ...this.position };
+      this.persistExpandedPosition();
     }
   }
 
@@ -293,20 +411,61 @@ export default class ArenaPracticeTimer extends Vue {
     this.persistTimerState();
   }
 
-  startDragging(event: PointerEvent): void {
-    const rect = this.$el.getBoundingClientRect();
+  toggleMinimized(): void {
+    if (!this.isMinimized) {
+      const rect = this.$el.getBoundingClientRect();
 
-    if (this.position === null) {
-      this.position = {
-        left: rect.left,
-        top: rect.top,
-      };
+      this.expandedPosition = this.position
+        ? { ...this.position }
+        : {
+            left: rect.left,
+            top: rect.top,
+          };
+
+      this.persistExpandedPosition();
+      this.isMinimized = true;
+    } else {
+      this.isMinimized = false;
+
+      if (this.expandedPosition !== null) {
+        this.position = { ...this.expandedPosition };
+      }
     }
 
-    this.dragOffsetX = event.clientX - rect.left;
-    this.dragOffsetY = event.clientY - rect.top;
+    this.persistMinimizedState();
 
-    this.isDragging = true;
+    this.$nextTick(() => {
+      if (this.isMinimized) {
+        const rect = this.$el.getBoundingClientRect();
+
+        const top = this.position?.top ?? rect.top;
+
+        this.position = {
+          left: Math.max(0, window.innerWidth - rect.width),
+          top: this.clamp(top, 0, window.innerHeight - rect.height),
+        };
+
+        this.persistPosition();
+      } else {
+        this.clampPosition();
+      }
+    });
+  }
+
+  startDragging(event: PointerEvent): void {
+    if (event.button !== 0 || this.isPointerDown) {
+      return;
+    }
+
+    const rect = this.$el.getBoundingClientRect();
+
+    this.pointerStartX = event.clientX;
+    this.pointerStartY = event.clientY;
+    this.dragStartLeft = rect.left;
+    this.dragStartTop = rect.top;
+
+    this.isPointerDown = true;
+    this.isDragging = false;
 
     window.addEventListener('pointermove', this.onPointerMove);
     window.addEventListener('pointerup', this.stopDragging);
@@ -314,20 +473,29 @@ export default class ArenaPracticeTimer extends Vue {
   }
 
   private onPointerMove(event: PointerEvent): void {
-    if (!this.isDragging) {
+    if (!this.isPointerDown) {
       return;
     }
+
+    const deltaX = event.clientX - this.pointerStartX;
+    const deltaY = event.clientY - this.pointerStartY;
+
+    if (!this.isDragging && Math.hypot(deltaX, deltaY) < 4) {
+      return;
+    }
+
+    this.isDragging = true;
 
     const rect = this.$el.getBoundingClientRect();
 
     this.position = {
       left: this.clamp(
-        event.clientX - this.dragOffsetX,
+        this.dragStartLeft + deltaX,
         0,
         window.innerWidth - rect.width,
       ),
       top: this.clamp(
-        event.clientY - this.dragOffsetY,
+        this.dragStartTop + deltaY,
         0,
         window.innerHeight - rect.height,
       ),
@@ -335,17 +503,45 @@ export default class ArenaPracticeTimer extends Vue {
   }
 
   stopDragging(): void {
-    if (!this.isDragging) {
+    if (!this.isPointerDown) {
       return;
     }
 
-    this.isDragging = false;
+    this.isPointerDown = false;
 
     window.removeEventListener('pointermove', this.onPointerMove);
     window.removeEventListener('pointerup', this.stopDragging);
     window.removeEventListener('pointercancel', this.stopDragging);
 
+    if (!this.isDragging) {
+      return;
+    }
+
+    this.isDragging = false;
     this.persistPosition();
+
+    this.suppressClick = true;
+
+    this.clickSuppressionTimeout = window.setTimeout(() => {
+      this.suppressClick = false;
+      this.clickSuppressionTimeout = null;
+    }, 0);
+  }
+
+  preventClickAfterDrag(event: MouseEvent): void {
+    if (!this.suppressClick) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.suppressClick = false;
+
+    if (this.clickSuppressionTimeout !== null) {
+      window.clearTimeout(this.clickSuppressionTimeout);
+      this.clickSuppressionTimeout = null;
+    }
   }
 
   moveWithKeyboard(event: KeyboardEvent): void {
@@ -522,5 +718,60 @@ export default class ArenaPracticeTimer extends Vue {
     min-width: 4.5rem;
     font-size: 1rem;
   }
+}
+
+.practice-timer {
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.practice-timer button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.practice-timer__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.practice-timer__minimize {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.25rem;
+}
+
+.practice-timer__minimize:hover {
+  opacity: 0.7;
+}
+
+.practice-timer--minimized {
+  box-sizing: border-box;
+  width: 3rem;
+  max-width: 3rem;
+  min-height: 3rem;
+  height: 3rem;
+  padding: 0.35rem;
+  justify-content: center;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.practice-timer__restore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.25rem;
+  font-size: 1.35rem;
+}
+
+.practice-timer__restore:hover {
+  opacity: 0.7;
 }
 </style>

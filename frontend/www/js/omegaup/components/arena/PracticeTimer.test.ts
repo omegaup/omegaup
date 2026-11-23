@@ -154,6 +154,49 @@ describe('PracticeTimer.vue', () => {
     wrapper.destroy();
   });
 
+  it('Should minimize and restore the timer', async () => {
+    const wrapper = mountTimer();
+
+    await wrapper.find('.practice-timer__minimize').trigger('click');
+
+    expect(wrapper.classes()).toContain('practice-timer--minimized');
+    expect(wrapper.find('.practice-timer__restore').exists()).toBe(true);
+    expect(wrapper.find('.practice-timer__display').exists()).toBe(false);
+
+    await wrapper.find('.practice-timer__restore').trigger('click');
+
+    expect(wrapper.classes()).not.toContain('practice-timer--minimized');
+    expect(wrapper.find('.practice-timer__display').exists()).toBe(true);
+    expect(wrapper.find('.practice-timer__toggle').exists()).toBe(true);
+    expect(wrapper.find('.practice-timer__reset').exists()).toBe(true);
+
+    wrapper.destroy();
+  });
+
+  it('Should restore the previous expanded position', async () => {
+    localStorage.setItem(
+      'arena:practice-timer-position:contestA',
+      JSON.stringify({ left: 120, top: 80 }),
+    );
+
+    const wrapper = mountTimer();
+
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('.practice-timer__minimize').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('.practice-timer__restore').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.element as HTMLElement).toHaveStyle({
+      left: '120px',
+      top: '80px',
+    });
+
+    wrapper.destroy();
+  });
+
   it('Should save the timer position after dragging', () => {
     const wrapper = mountTimer();
 
@@ -171,7 +214,53 @@ describe('PracticeTimer.vue', () => {
 
     jest.spyOn(wrapper.element, 'getBoundingClientRect').mockReturnValue(rect);
 
-    wrapper.find('.practice-timer__drag-handle').element.dispatchEvent(
+    wrapper.find('.practice-timer__display').element.dispatchEvent(
+      new MouseEvent('pointerdown', {
+        bubbles: true,
+        clientX: 110,
+        clientY: 110,
+      }),
+    );
+
+    window.dispatchEvent(
+      new MouseEvent('pointermove', {
+        clientX: 160,
+        clientY: 160,
+      }),
+    );
+
+    window.dispatchEvent(new MouseEvent('pointerup'));
+
+    const savedPosition = JSON.parse(
+      localStorage.getItem('arena:practice-timer-position:contestA') || '{}',
+    );
+
+    expect(savedPosition.left).toBe(150);
+    expect(savedPosition.top).toBe(150);
+
+    wrapper.destroy();
+  });
+
+  it('Should allow dragging the minimized timer', async () => {
+    const wrapper = mountTimer();
+
+    await wrapper.find('.practice-timer__minimize').trigger('click');
+
+    const rect = {
+      x: 100,
+      y: 100,
+      left: 100,
+      top: 100,
+      right: 148,
+      bottom: 148,
+      width: 48,
+      height: 48,
+      toJSON: () => ({}),
+    } as DOMRect;
+
+    jest.spyOn(wrapper.element, 'getBoundingClientRect').mockReturnValue(rect);
+
+    wrapper.find('.practice-timer__restore').element.dispatchEvent(
       new MouseEvent('pointerdown', {
         bubbles: true,
         clientX: 110,
