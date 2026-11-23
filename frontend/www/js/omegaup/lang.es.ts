@@ -1008,7 +1008,7 @@ const translations: { [key: string]: string; } = {
   loginGoogleInvalidCSRFToken: "Token CSRF inv\u00e1lido",
   loginHeader: "Inicia sesi\u00f3n en omegaUp",
   loginLogIn: "Iniciar sesi\u00f3n",
-  loginMotivationalHeadline: "Codea un futuro mejor. Para todos.",
+  loginMotivationalHeadline: "Programando un mejor futuro. Para todos.",
   loginNative: "Cuenta omegaUp",
   loginOrDivider: "O",
   loginParentEmail: "Correo electr\u00f3nico de figura parental",
