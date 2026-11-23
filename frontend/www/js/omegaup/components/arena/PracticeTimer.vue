@@ -612,6 +612,7 @@ export default class ArenaPracticeTimer extends Vue {
 @import '../../../../sass/main.scss';
 
 .practice-timer {
+  box-sizing: border-box;
   position: fixed;
   z-index: 1030;
   top: 5rem;
@@ -621,6 +622,11 @@ export default class ArenaPracticeTimer extends Vue {
   align-items: center;
   gap: 0.6rem;
 
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  flex-wrap: nowrap;
+  white-space: nowrap;
+
   padding: 0.65rem 0.85rem;
 
   background-color: var(--arena-background-color);
@@ -628,6 +634,10 @@ export default class ArenaPracticeTimer extends Vue {
   border: 1px solid var(--arena-contest-navleft-main-border-color);
   border-radius: 0.35rem;
   box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.15);
+
+  cursor: move;
+  user-select: none;
+  touch-action: none;
 }
 
 .practice-timer button {
@@ -635,6 +645,8 @@ export default class ArenaPracticeTimer extends Vue {
   background: transparent;
   color: inherit;
   padding: 0.2rem 0.35rem;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 
 .practice-timer__controls {
@@ -684,15 +696,6 @@ export default class ArenaPracticeTimer extends Vue {
   outline-offset: 2px;
 }
 
-.practice-timer {
-  box-sizing: border-box;
-  width: max-content;
-  max-width: calc(100vw - 2rem);
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-
-.practice-timer__drag-handle,
 .practice-timer__title,
 .practice-timer__display,
 .practice-timer__controls {
@@ -718,23 +721,6 @@ export default class ArenaPracticeTimer extends Vue {
     min-width: 4.5rem;
     font-size: 1rem;
   }
-}
-
-.practice-timer {
-  cursor: move;
-  user-select: none;
-  touch-action: none;
-}
-
-.practice-timer button {
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.practice-timer__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
 }
 
 .practice-timer__minimize {
