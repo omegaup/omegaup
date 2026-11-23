@@ -1,10 +1,10 @@
 <template>
   <omegaup-arena
-    :active-tab="activeTab"
+    :active-tab="currentActiveTab"
     :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
-    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
+    @update:activeTab="onActiveTabSelected"
   >
     <template #arena-problems>
       <div data-contest-practice>
@@ -31,6 +31,12 @@
             :show-ranking="false"
           ></omegaup-arena-summary>
           <div v-else class="problem main">
+            <omegaup-arena-practice-timer
+              :key="activeProblemAlias"
+              :contest-alias="contest.alias"
+              :problem-alias="activeProblemAlias"
+              :is-active="currentActiveTab === 'problems'"
+            ></omegaup-arena-practice-timer>
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="currentNextSubmissionTimestamp"
@@ -127,6 +133,7 @@ import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_PracticeTimer from './PracticeTimer.vue';
 import arena_Summary from './Summary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
@@ -139,6 +146,7 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-arena': arena_Arena,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-arena-practice-timer': arena_PracticeTimer,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-details': problem_Details,
   },
@@ -169,6 +177,7 @@ export default class ArenaContestPractice extends Vue {
   currentClarifications = this.clarifications;
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
+  currentActiveTab: string = this.activeTab || 'problems';
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
   currentNextExecutionTimestamp = this.nextExecutionTimestamp;
   currentRunDetailsData = this.runDetailsData;
@@ -210,6 +219,16 @@ export default class ArenaContestPractice extends Vue {
         contestAlias: this.contest.alias,
       },
     });
+  }
+
+  onActiveTabSelected(selectedTab: string): void {
+    this.currentActiveTab = selectedTab;
+    this.$emit('update:activeTab', selectedTab);
+  }
+
+  @Watch('activeTab')
+  onActiveTabPropChanged(newTab: string): void {
+    this.currentActiveTab = newTab || 'problems';
   }
 
   onRunExecuted(): void {
