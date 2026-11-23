@@ -47,6 +47,11 @@ const basicInformationEditProps: {
     programmingLanguages: { py2: 'Python 2', py3: 'Python 3' },
     profile: profile,
     identities: [],
+    followStatus: {
+      followersCount: 0,
+      followingCount: 0,
+      isFollowing: false,
+    },
   },
   countries: [
     {

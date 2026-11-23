@@ -20,7 +20,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
- * @psalm-type FollowUser=array{classname: string, name: null|string, username: string}
+ * @psalm-type FollowUser=array{classname: string, gravatar_32: string, name: null|string, username: string}
+ * @psalm-type FollowStatus=array{followersCount: int, followingCount: int, isFollowing: bool}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
  * @psalm-type UserRankTableLoggedOutPayload=array{isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
  * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
@@ -41,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type BookmarkProblem=array{alias: string, attempted: bool, solved: bool, title: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
  * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
- * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null}
+ * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null, followStatus: FollowStatus}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, first_solved?: float, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
@@ -3679,27 +3680,49 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets the follow counters for the given user, plus whether the current
      * user follows them. Intended for rendering a profile's follow button.
      *
-     * @return array{followersCount: int, followingCount: int, isFollowing: bool}
+     * @return FollowStatus
      *
      * @omegaup-request-param string $username
      */
     public static function apiFollowStatus(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        $profileUserId = self::resolveFollowTargetUserId($r);
-        $isFollowing = false;
-        if (!is_null($r->user) && !is_null($r->user->user_id)) {
-            $isFollowing = \OmegaUp\DAO\UsersFollowers::isFollowing(
-                $r->user->user_id,
-                $profileUserId
-            );
+        return self::getFollowStatus(
+            $r->user,
+            self::resolveFollowTargetUserId($r)
+        );
+    }
+
+    /**
+     * Gets the follow counters of a profile, plus whether the viewer follows
+     * it. Identities with no user cannot take part in a follow.
+     *
+     * @return FollowStatus
+     */
+    private static function getFollowStatus(
+        ?\OmegaUp\DAO\VO\Users $viewer,
+        ?int $profileUserId
+    ): array {
+        if (is_null($profileUserId)) {
+            return [
+                'followersCount' => 0,
+                'followingCount' => 0,
+                'isFollowing' => false,
+            ];
         }
 
         $counts = \OmegaUp\DAO\UsersFollowers::getCounts($profileUserId);
         return [
             'followersCount' => $counts['followersCount'],
             'followingCount' => $counts['followingCount'],
-            'isFollowing' => $isFollowing,
+            'isFollowing' => (
+                !is_null($viewer) &&
+                !is_null($viewer->user_id) &&
+                \OmegaUp\DAO\UsersFollowers::isFollowing(
+                    $viewer->user_id,
+                    $profileUserId
+                )
+            ),
         ];
     }
 
@@ -4699,6 +4722,10 @@ class User extends \OmegaUp\Controllers\Controller {
                     'programmingLanguages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
                     'extraProfileDetails' => null,
                     'identities' => [],
+                    'followStatus' => self::getFollowStatus(
+                        $r->user,
+                        $targetIdentity->user_id
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProfile'

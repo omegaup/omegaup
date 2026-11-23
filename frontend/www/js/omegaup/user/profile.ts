@@ -10,7 +10,10 @@ import * as ui from '../ui';
 import user_Profile, {
   ProfileStatistics,
 } from '../components/user/Profile.vue';
+import { FollowListState } from '../components/user/FollowList.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
+
+const FOLLOW_LIST_PAGE_SIZE = 20;
 
 // Heatmap utility interfaces and functions
 export interface HeatmapColors {
@@ -197,6 +200,9 @@ declare module 'vue/types/vue' {
   interface Vue {
     loadInitialData(username: string): void;
     loadHeatmapDataForYear(username: string, year: number): void;
+    refreshVisibleFollowList(): void;
+    loadFollowers(username: string, page: number): void;
+    loadFollowing(username: string, page: number): void;
   }
 }
 
@@ -236,6 +242,7 @@ OmegaUp.on('ready', () => {
       if (hash === viewProfileTab) {
         userProfile.viewProfileSelectedTab = viewProfileTab;
         userProfile.selectedTab = 'view-profile';
+        userProfile.refreshVisibleFollowList();
         return;
       }
     }
@@ -262,11 +269,16 @@ OmegaUp.on('ready', () => {
         availableYears: [currentYear] as number[],
         isLoading: true,
         profileStatistics: null as ProfileStatistics | null,
+        followStatus: payload.followStatus,
+        followers: { users: [], totalRows: 0, page: 1 } as FollowListState,
+        following: { users: [], totalRows: 0, page: 1 } as FollowListState,
       };
     },
     mounted: function () {
       if (this.profile.username) {
         this.loadInitialData(this.profile.username);
+        // A link straight to #followers or #following opens on that list.
+        this.refreshVisibleFollowList();
       }
     },
     methods: {
@@ -320,6 +332,55 @@ OmegaUp.on('ready', () => {
       },
 
       /**
+       * Reloads whichever follow list is on screen, from its first page:
+       * that is where a follow or unfollow that just happened shows up.
+       */
+      refreshVisibleFollowList: function (): void {
+        const username = this.profile.username;
+        if (!username) {
+          return;
+        }
+        if (this.viewProfileSelectedTab === ViewProfileTabs.Followers) {
+          this.loadFollowers(username, 1);
+        }
+        if (this.viewProfileSelectedTab === ViewProfileTabs.Following) {
+          this.loadFollowing(username, 1);
+        }
+      },
+
+      loadFollowers: function (username: string, page: number): void {
+        api.User.followers({
+          username,
+          page,
+          rowcount: FOLLOW_LIST_PAGE_SIZE,
+        })
+          .then((response) => {
+            this.followers = {
+              users: response.followers,
+              totalRows: response.totalRows,
+              page,
+            };
+          })
+          .catch(ui.apiError);
+      },
+
+      loadFollowing: function (username: string, page: number): void {
+        api.User.following({
+          username,
+          page,
+          rowcount: FOLLOW_LIST_PAGE_SIZE,
+        })
+          .then((response) => {
+            this.following = {
+              users: response.following,
+              totalRows: response.totalRows,
+              page,
+            };
+          })
+          .catch(ui.apiError);
+      },
+
+      /**
        * Loads data for a specific year for both charts
        */
       loadHeatmapDataForYear: function (username: string, year: number): void {
@@ -365,6 +426,11 @@ OmegaUp.on('ready', () => {
           availableYears: this.availableYears,
           isLoading: this.isLoading,
           profileStatistics: this.profileStatistics,
+          isLoggedIn: commonPayload.isLoggedIn,
+          followStatus: this.followStatus,
+          followers: this.followers,
+          following: this.following,
+          followListPageSize: FOLLOW_LIST_PAGE_SIZE,
         },
         on: {
           'update-user-basic-information': (
@@ -554,6 +620,59 @@ OmegaUp.on('ready', () => {
             api.User.reportReadme({ username })
               .then(onSuccess)
               .catch(ui.apiError);
+          },
+          follow: ({
+            username,
+            onSuccess,
+          }: {
+            username: string;
+            onSuccess: () => void;
+          }) => {
+            api.User.follow({ username })
+              .then(() => {
+                onSuccess();
+                this.refreshVisibleFollowList();
+              })
+              .catch(ui.apiError);
+          },
+          unfollow: ({
+            username,
+            onSuccess,
+          }: {
+            username: string;
+            onSuccess: () => void;
+          }) => {
+            api.User.unfollow({ username })
+              .then(() => {
+                onSuccess();
+                this.refreshVisibleFollowList();
+              })
+              .catch(ui.apiError);
+          },
+          // Clicking a count in the sidebar, or a tab inside the list view,
+          // swaps the main card over to that list. It is fetched every time
+          // it is opened so it never shows a stale answer; nothing is loaded
+          // until someone asks.
+          'show-list': (listType: ViewProfileTabs) => {
+            this.selectedTab = 'view-profile';
+            this.viewProfileSelectedTab = listType;
+            history.replaceState({}, 'updateTab', `#${listType}`);
+            this.refreshVisibleFollowList();
+          },
+          'update:viewProfileSelectedTab': (tab: string | null) => {
+            this.viewProfileSelectedTab = tab;
+          },
+          'followers-page-changed': (page: number) => {
+            if (!this.profile.username) {
+              return;
+            }
+            this.loadFollowers(this.profile.username, page);
+          },
+          'following-page-changed': (page: number) => {
+            if (!this.profile.username) {
+              return;
+            }
+            this.loadFollowing(this.profile.username, page);
           },
         },
       });

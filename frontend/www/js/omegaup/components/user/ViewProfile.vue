@@ -68,7 +68,12 @@
       <div class="col-md-12">
         <div class="card">
           <div class="card-header" data-profile-tabs>
-            <nav class="nav nav-tabs" role="tablist" data-profile-navtabs>
+            <nav
+              v-if="!isFollowListView"
+              class="nav nav-tabs"
+              role="tablist"
+              data-profile-navtabs
+            >
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
                 :href="`#${ViewProfileTabs.Badges}`"
@@ -317,6 +322,62 @@
                   ></omegaup-user-heatmap>
                 </div>
               </div>
+              <div
+                v-if="isFollowListView"
+                class="tab-pane fade show active"
+                role="tab"
+                data-follow-list-pane
+              >
+                <a
+                  :href="`#${ViewProfileTabs.Badges}`"
+                  class="btn btn-sm btn-light mb-3"
+                  :title="T.wordsBack"
+                  :aria-label="T.wordsBack"
+                  data-follow-list-back
+                  @click="currentSelectedTab = ViewProfileTabs.Badges"
+                  >&lsaquo;</a
+                >
+                <div class="mb-3" data-follow-list-tabs>
+                  <a
+                    href="#"
+                    class="btn btn-sm mr-2"
+                    :class="getFollowListTabClass(ViewProfileTabs.Following)"
+                    data-follow-list-tab-following
+                    @click.prevent="$emit('show-list', 'following')"
+                    >{{ T.profileFollowing }}</a
+                  >
+                  <a
+                    href="#"
+                    class="btn btn-sm"
+                    :class="getFollowListTabClass(ViewProfileTabs.Followers)"
+                    data-follow-list-tab-followers
+                    @click.prevent="$emit('show-list', 'followers')"
+                    >{{ T.profileFollowers }}</a
+                  >
+                </div>
+                <omegaup-user-follow-list
+                  v-if="currentSelectedTab == ViewProfileTabs.Followers"
+                  :users="followers.users"
+                  :total-rows="followers.totalRows"
+                  :page="followers.page"
+                  :page-size="followListPageSize"
+                  :empty-message="T.profileFollowersEmpty"
+                  @page-changed="
+                    (page) => $emit('followers-page-changed', page)
+                  "
+                ></omegaup-user-follow-list>
+                <omegaup-user-follow-list
+                  v-else
+                  :users="following.users"
+                  :total-rows="following.totalRows"
+                  :page="following.page"
+                  :page-size="followListPageSize"
+                  :empty-message="T.profileFollowingEmpty"
+                  @page-changed="
+                    (page) => $emit('following-page-changed', page)
+                  "
+                ></omegaup-user-follow-list>
+              </div>
             </div>
           </div>
         </div>
@@ -346,6 +407,7 @@ import country_Flag from '../CountryFlag.vue';
 import common_Markdown from '../Markdown.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Charts from './Charts.vue';
+import user_FollowList, { FollowListState } from './FollowList.vue';
 import user_MainInfo from './MainInfo.vue';
 import problem_SolvingProgress from './ProblemSolvingProgress.vue';
 import tags_SolvedChart from './TagsSolvedChart.vue';
@@ -359,6 +421,9 @@ export enum ViewProfileTabs {
   CreatedContent = 'created-content',
   Data = 'data',
   Charts = 'charts',
+  // Reached by clicking the counts in the sidebar rather than by a nav tab.
+  Followers = 'followers',
+  Following = 'following',
 }
 
 function getInitialSelectedTab(
@@ -378,6 +443,7 @@ function getInitialSelectedTab(
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-user-heatmap': user_Heatmap,
+    'omegaup-user-follow-list': user_FollowList,
     'omegaup-user-maininfo': user_MainInfo,
     'omegaup-problem-solving-progress': problem_SolvingProgress,
     'omegaup-tags-solved-chart': tags_SolvedChart,
@@ -390,6 +456,11 @@ function getInitialSelectedTab(
 export default class ViewProfile extends Vue {
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
+  @Prop({ default: () => ({ users: [], totalRows: 0, page: 1 }) })
+  followers!: FollowListState;
+  @Prop({ default: () => ({ users: [], totalRows: 0, page: 1 }) })
+  following!: FollowListState;
+  @Prop({ default: 20 }) followListPageSize!: number;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
@@ -428,6 +499,19 @@ export default class ViewProfile extends Vue {
   readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
   isReadmeEnabled = Experiments.loadGlobal().isEnabled('user_readme');
+
+  // The follow lists take over the whole card, so the profile nav tabs are
+  // hidden while one of them is showing.
+  getFollowListTabClass(tab: ViewProfileTabs): string {
+    return this.currentSelectedTab === tab ? 'btn-secondary' : 'btn-light';
+  }
+
+  get isFollowListView(): boolean {
+    return (
+      this.currentSelectedTab === ViewProfileTabs.Followers ||
+      this.currentSelectedTab === ViewProfileTabs.Following
+    );
+  }
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
