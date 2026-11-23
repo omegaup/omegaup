@@ -126,7 +126,8 @@ class S3SubmissionDownloader:
     """A SubmissionDownloader that can download files from an S3 bucket."""
 
     def __init__(self, bucket_name: str = 'omegaup-submissions') -> None:
-        self._bucket = boto3.client('s3').Bucket(bucket_name)
+        # Bucket objects come from the resource API; a client has no Bucket().
+        self._bucket = boto3.resource('s3').Bucket(bucket_name)
 
     def __call__(self, guid: str, destination: str) -> None:
         self._bucket.download_file(guid, os.path.join(destination))

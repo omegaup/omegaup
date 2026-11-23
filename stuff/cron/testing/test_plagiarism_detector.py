@@ -603,3 +603,18 @@ def test_filter_and_format_result_empty_results() -> None:
         cron.plagiarism_detector.INSERT_INTO_PLAGIARISMS, []
     )
     mock_dbconn.conn.commit.assert_called_once()
+
+
+def test_s3_submission_downloader() -> None:
+    '''The S3 downloader gets the bucket from the resource API.'''
+    with mock.patch.object(cron.plagiarism_detector.boto3,
+                           'resource') as resource:
+        download = cron.plagiarism_detector.S3SubmissionDownloader(
+            'test-bucket')
+        download('0123456789abcdef', '/tmp/submission.cpp')
+
+    resource.assert_called_once_with('s3')
+    bucket = resource.return_value.Bucket
+    bucket.assert_called_once_with('test-bucket')
+    bucket.return_value.download_file.assert_called_once_with(
+        '0123456789abcdef', '/tmp/submission.cpp')
