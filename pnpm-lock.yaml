@@ -306,9 +306,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^4.3.0
         version: 4.3.0(eslint@7.24.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@4.4.4)
-      '@voerro/vue-tagsinput':
-        specifier: ^2.7.1
-        version: 2.7.1
       '@vue/test-utils':
         specifier: ^1.0.3
         version: 1.0.3(vue-template-compiler@2.7.16)(vue@2.7.16)
@@ -2680,9 +2677,6 @@ packages:
   '@typescript-eslint/visitor-keys@4.3.0':
     resolution: {integrity: sha512-xZxkuR7XLM6RhvLkgv9yYlTcBHnTULzfnw4i6+z2TGBLy9yljAypQaZl9c3zFvy7PNI7fYWyvKYtohyF8au3cw==}
     engines: {node: ^8.10.0 || ^10.13.0 || >=11.10.1}
-
-  '@voerro/vue-tagsinput@2.7.1':
-    resolution: {integrity: sha512-G7ClILHgtc/D1vEw9qp6dlsAstlhwLDkPvEp6w1iY/dmSzu4hhxaMk8jyahjxQRDgiLlrAikESOsfkVhy18YwQ==}
 
   '@vue/compiler-core@3.5.27':
     resolution: {integrity: sha512-gnSBQjZA+//qDZen+6a2EdHqJ68Z7uybrMf3SPjEGgG4dicklwDVmMC1AeIHxtLVPT7sn6sH1KOO+tS6gwOUeQ==}
@@ -5138,8 +5132,8 @@ packages:
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
 
-  immutable@4.3.8:
-    resolution: {integrity: sha512-d/Ld9aLbKpNwyl0KiM2CT1WYvkitQ1TSvmRtkcV8FKStiDoA7Slzgjmb/1G2yhKM1p0XeNOieaTbFZmU1d3Xuw==}
+  immutable@4.3.9:
+    resolution: {integrity: sha512-ObHy4YN7ycwZOUCLI1/6svfyAFu7vL8RhAvVu/bh/RZW9EPlOyDaQ9jDQWCtdqzaXUjgXZCW1migtHE7YI7UGQ==}
 
   import-fresh@3.2.2:
     resolution: {integrity: sha512-cTPNrlvJT6twpYy+YmKUKrTSjWFs3bjYjAhCwm+z4EOCubZxAuO+hHpRN64TqjEaYSHs7tJAE0w1CKMGmsG/lw==}
@@ -11571,8 +11565,6 @@ snapshots:
       '@typescript-eslint/types': 4.3.0
       eslint-visitor-keys: 2.0.0
 
-  '@voerro/vue-tagsinput@2.7.1': {}
-
   '@vue/compiler-core@3.5.27':
     dependencies:
       '@babel/parser': 7.29.7
@@ -14359,7 +14351,7 @@ snapshots:
 
   immediate@3.0.6: {}
 
-  immutable@4.3.8: {}
+  immutable@4.3.9: {}
 
   import-fresh@3.2.2:
     dependencies:
@@ -14471,7 +14463,7 @@ snapshots:
 
   is-core-module@2.16.1:
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   is-data-descriptor@0.1.4:
     dependencies:
@@ -16898,7 +16890,7 @@ snapshots:
   sass@1.44.0:
     dependencies:
       chokidar: 3.5.3
-      immutable: 4.3.8
+      immutable: 4.3.9
 
   saxes@5.0.1:
     dependencies:

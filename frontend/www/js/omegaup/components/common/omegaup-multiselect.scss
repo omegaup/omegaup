@@ -1,0 +1,7 @@
+.omegaup-multiselect {
+  .multiselect__tag,
+  .multiselect__option--highlight,
+  .multiselect__option--highlight::after {
+    background: $omegaup-primary--darker;
+  }
+}
