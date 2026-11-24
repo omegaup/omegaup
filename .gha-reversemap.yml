@@ -52,7 +52,7 @@ actions/first-interaction:
   tag: v3.1.0
   tag-url: https://github.com/actions/first-interaction/tree/v3.1.0
 codecov/codecov-action:
-  sha: b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
-  sha-url: https://github.com/codecov/codecov-action/commit/b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
-  tag: v4
-  tag-url: https://github.com/codecov/codecov-action/tree/v4
+  sha: 303a32d7a59b442fa8d48b6a1cc6825c09c847a5
+  sha-url: https://github.com/codecov/codecov-action/commit/303a32d7a59b442fa8d48b6a1cc6825c09c847a5
+  tag: v7.1.1
+  tag-url: https://github.com/codecov/codecov-action/tree/v7.1.1

@@ -178,15 +178,13 @@ jobs:
             --long-progress \
             --show-info=false
 
-      # continue-on-error: CI passes when CODECOV_TOKEN is missing or upload fails; remove once secret is added and stable
       - name: Upload code coverage
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
-        continue-on-error: true
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: php
-          fail_ci_if_error: false
-          handle_no_reports_found: true
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Upload artifacts
         if: ${{ always() }}
@@ -243,15 +241,13 @@ jobs:
           set -o pipefail
           pnpm test:coverage 2>&1 | tee jest-output.log
 
-      # continue-on-error: CI passes when CODECOV_TOKEN is missing or upload fails; remove once secret is added and stable
       - name: Upload code coverage
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
-        continue-on-error: true
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: javascript
-          fail_ci_if_error: false
-          handle_no_reports_found: true
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Upload JavaScript test artifacts
         if: ${{ failure() }}
