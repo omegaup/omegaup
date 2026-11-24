@@ -278,4 +278,105 @@ describe('Profilev2.vue', () => {
       }
     }
   });
+
+  it('Should display practice badge and link for bookmarked contest problem', async () => {
+    const badgeAlias = 'contestManager';
+    const bookmarkedProblems: types.BookmarkProblem[] = [
+      {
+        alias: 'contest-problem',
+        attempted: false,
+        contest_alias: 'test-contest',
+        contest_title: 'Test Contest Title',
+        is_private: false,
+        practice_url: '/arena/test-contest/practice/#problems/contest-problem',
+        solved: false,
+        title: 'Contest Problem',
+      },
+    ];
+    const wrapper = mount(user_ViewProfile, {
+      propsData: {
+        profile,
+        data: { ...data, bookmarkedProblems },
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
+      },
+    });
+    await wrapper.find('a[href="#problems"]').trigger('click');
+
+    const problemLink = wrapper.find(
+      'a[href="/arena/problem/contest-problem/"]',
+    );
+    expect(problemLink.exists()).toBe(true);
+
+    const practiceLink = wrapper.find(
+      'a[href="/arena/test-contest/practice/#problems/contest-problem"]',
+    );
+    expect(practiceLink.exists()).toBe(true);
+    expect(practiceLink.text()).toBe(T.contestPracticeMode);
+    expect(practiceLink.attributes('title')).toBe('Test Contest Title');
+  });
+
+  it('Should route problem link to practice arena for private problems with practice access', async () => {
+    const badgeAlias = 'contestManager';
+    const bookmarkedProblems: types.BookmarkProblem[] = [
+      {
+        alias: 'private-contest-problem',
+        attempted: false,
+        contest_alias: 'private-contest',
+        contest_title: 'Private Contest Title',
+        is_private: true,
+        practice_url:
+          '/arena/private-contest/practice/#problems/private-contest-problem',
+        solved: false,
+        title: 'Private Contest Problem',
+      },
+    ];
+    const wrapper = mount(user_ViewProfile, {
+      propsData: {
+        profile,
+        data: { ...data, bookmarkedProblems },
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
+      },
+    });
+    await wrapper.find('a[href="#problems"]').trigger('click');
+
+    // Title link should directly link to practice arena to prevent 403 on standalone page
+    const problemLink = wrapper.find(
+      'a[href="/arena/private-contest/practice/#problems/private-contest-problem"]',
+    );
+    expect(problemLink.exists()).toBe(true);
+
+    // Standalone URL should not exist for private problem
+    expect(
+      wrapper
+        .find('a[href="/arena/problem/private-contest-problem/"]')
+        .exists(),
+    ).toBe(false);
+  });
+
+  it('Should not display bookmarked problems when viewing another user profile', async () => {
+    const badgeAlias = 'contestManager';
+    const bookmarkedProblems: types.BookmarkProblem[] = [
+      {
+        alias: 'some-problem',
+        attempted: false,
+        solved: false,
+        title: 'Some Problem',
+      },
+    ];
+    const wrapper = mount(user_ViewProfile, {
+      propsData: {
+        profile: { ...profile, is_own_profile: false },
+        data: { ...data, bookmarkedProblems },
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
+      },
+    });
+    await wrapper.find('a[href="#problems"]').trigger('click');
+
+    expect(
+      wrapper.find('a[href="/arena/problem/some-problem/"]').exists(),
+    ).toBe(false);
+  });
 });

@@ -3034,6 +3034,10 @@ export namespace types {
   export interface BookmarkProblem {
     alias: string;
     attempted: boolean;
+    contest_alias?: string;
+    contest_title?: string;
+    is_private?: boolean;
+    practice_url?: string;
     solved: boolean;
     title: string;
   }
