@@ -336,6 +336,7 @@
                     }"
                   >
                     <multiselect
+                      class="omegaup-multiselect"
                       :value="languages"
                       :options="Object.keys(allLanguages)"
                       :multiple="true"
@@ -1627,10 +1628,6 @@ export default class Form extends Vue {
   font-size: 0.9rem;
 }
 
-.multiselect__tag {
-  background: var(--multiselect-tag-background-color);
-}
-
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
@@ -1699,4 +1696,9 @@ export default class Form extends Vue {
 .btn-group .btn:hover {
   z-index: 0;
 }
+</style>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+@import '../common/omegaup-multiselect';
 </style>
