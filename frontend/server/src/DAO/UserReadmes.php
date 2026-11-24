@@ -5,18 +5,17 @@ namespace OmegaUp\DAO;
 /**
  * UserReadmes Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita
- * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\UserReadmes}.
+ * This class contains all the database manipulation needed to permanently
+ * store and retrieve instances of {@link \OmegaUp\DAO\VO\UserReadmes}.
  *
  * @access public
  */
 class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
     /**
-     * Obtener el README de un usuario por su user_id.
+     * Get the README for a user by their user_id.
      *
-     * @param int $userId El ID del usuario
-     * @return ?\OmegaUp\DAO\VO\UserReadmes El README del usuario o null si no existe
+     * @param int $userId The user's ID
+     * @return ?\OmegaUp\DAO\VO\UserReadmes The user's README or null if it does not exist
      */
     final public static function getByUserId(int $userId): ?\OmegaUp\DAO\VO\UserReadmes {
         $sql = '
@@ -46,10 +45,10 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
     }
 
     /**
-     * Incrementar el contador de reportes para un README.
-     * Esta operación es atómica y segura para actualizaciones concurrentes.
+     * Increment the report counter for a README.
+     * This operation is atomic and safe for concurrent updates.
      *
-     * @param int $readmeId El ID del README
+     * @param int $readmeId The README's ID
      * @return void
      */
     final public static function incrementReportCount(int $readmeId): void {
@@ -66,12 +65,12 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
     }
 
     /**
-     * Establecer el estado de deshabilitación de un README.
-     * Permite habilitar o deshabilitar un README, típicamente usado
-     * por moderadores cuando un README recibe demasiados reportes.
+     * Set the disabled state of a README.
+     * Allows enabling or disabling a README, typically used
+     * by moderators when a README receives too many reports.
      *
-     * @param int $readmeId El ID del README
-     * @param bool $isDisabled True para deshabilitar, false para habilitar
+     * @param int $readmeId The README's ID
+     * @param bool $isDisabled True to disable, false to enable
      * @return void
      */
     final public static function setDisabled(

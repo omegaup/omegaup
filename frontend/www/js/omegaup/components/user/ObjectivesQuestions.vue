@@ -1,21 +1,43 @@
 <template>
-  <b-modal v-model="showModal" hide-footer>
+  <b-modal
+    v-model="showModal"
+    hide-footer
+    dialog-class="mx-auto"
+    header-class="border-bottom-0"
+  >
     <template #modal-title>
       <h5 class="modal-title font-weight-bold">
         {{ T.userObjectivesModalTitle }}
       </h5>
     </template>
-    <p class="text-right text-primary">
-      {{
-        ui.formatString(T.userObjectivesModalPageCounter, {
-          current: currentModalPage,
-          last: lastModalPage,
-        })
-      }}
+    <p class="modal-description">
+      {{ T.userObjectivesModalIntro }}
     </p>
+    <div class="modal-progress">
+      <div
+        class="modal-progress-track"
+        role="progressbar"
+        :aria-valuenow="currentModalPage"
+        :aria-valuemin="1"
+        :aria-valuemax="lastModalPage"
+      >
+        <div
+          class="modal-progress-value"
+          :class="currentModalPage === 1 ? 'w-50' : 'w-100'"
+        ></div>
+      </div>
+      <span class="modal-progress-counter">
+        {{
+          ui.formatString(T.userObjectivesModalPageCounter, {
+            current: currentModalPage,
+            last: lastModalPage,
+          })
+        }}
+      </span>
+    </div>
     <p class="font-weight-bold">{{ description }}</p>
     <div v-if="currentModalPage === 1" class="mb-3">
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -23,7 +45,7 @@
           :value="ObjectivesAnswers.Learning"
         />{{ T.userObjectivesModalAnswerLearning }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -31,7 +53,7 @@
           :value="ObjectivesAnswers.Teaching"
         />{{ T.userObjectivesModalAnswerTeaching }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -39,7 +61,7 @@
           :value="ObjectivesAnswers.LearningAndTeaching"
         />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -49,7 +71,7 @@
       >
     </div>
     <div v-else class="mb-3">
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -57,7 +79,7 @@
           :value="ObjectivesAnswers.Scholar"
         />{{ T.userObjectivesModalAnswerScholar }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -65,7 +87,7 @@
           :value="ObjectivesAnswers.Competitive"
         />{{ T.userObjectivesModalAnswerCompetitive }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -73,7 +95,7 @@
           :value="ObjectivesAnswers.ScholarAndCompetitive"
         />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
       >
-      <label class="d-block"
+      <label class="objective-option"
         ><input
           v-model="objective"
           class="mr-3"
@@ -82,15 +104,29 @@
         />{{ T.userObjectivesModalAnswerOther }}</label
       >
     </div>
-    <button
-      v-if="currentModalPage === 1 && objective !== ObjectivesAnswers.None"
-      type="button"
-      class="btn btn-next-previous float-right pr-0"
-      @click="onNextModalPage"
-    >
-      {{ T.userObjectivesModalButtonNext }}
-      <font-awesome-icon class="ml-1" icon="greater-than" />
-    </button>
+    <div v-if="currentModalPage === 1" class="modal-actions">
+      <button type="button" class="btn btn-skip pl-0" @click="skip">
+        {{ T.userObjectivesModalSkip }}
+      </button>
+      <button
+        v-if="objective !== ObjectivesAnswers.None"
+        type="button"
+        class="btn btn-primary"
+        @click="onNextModalPage"
+      >
+        {{ T.userObjectivesModalButtonNext }}
+        <font-awesome-icon class="ml-1" icon="greater-than" />
+      </button>
+      <button
+        v-else-if="objective === ObjectivesAnswers.None"
+        type="button"
+        class="btn btn-primary"
+        data-dismiss="modal"
+        @click="onSubmit"
+      >
+        {{ T.userObjectivesModalButtonSend }}
+      </button>
+    </div>
     <div v-else>
       <button
         v-if="objective !== ObjectivesAnswers.None"
@@ -215,6 +251,10 @@ export default class UserObjectivesQuestions extends Vue {
     this.currentModalPage--;
   }
 
+  skip(): void {
+    this.showModal = false;
+  }
+
   onSubmit(): void {
     if (this.currentModalPage !== 1) {
       switch (this.objective) {
@@ -253,14 +293,61 @@ export default class UserObjectivesQuestions extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
->>> .modal-dialog {
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep .modal-dialog {
   max-width: 330px;
 }
 
->>> .modal-header {
-  border-bottom: 0;
+.modal-description {
+  color: var(--user-objectives-modal-description-font-color);
 }
 
+.modal-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.modal-progress-track {
+  flex: 1;
+  height: 4px;
+  background-color: var(
+    --user-objectives-modal-progress-track-background-color
+  );
+}
+
+.modal-progress-value {
+  height: 100%;
+  background-color: var(--btn-ok-background-color);
+}
+
+.modal-progress-counter {
+  color: var(--btn-ok-background-color);
+  white-space: nowrap;
+}
+
+.objective-option {
+  display: flex;
+  align-items: center;
+  min-height: 43px;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--user-objectives-modal-option-border-color);
+  cursor: pointer;
+}
+
+.objective-option input {
+  margin-right: 0.75rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-skip,
 .btn-next-previous {
   color: var(--btn-next-previous-font-color);
 }

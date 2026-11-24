@@ -1,11 +1,13 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import user_Password_Add from './PasswordAdd.vue';
 import T from '../../lang';
 
 describe('PasswordAdd.vue', () => {
   it('Should emit password add', async () => {
     const username = 'username';
-    const wrapper = mount(user_Password_Add, {
+    const wrapper = mount(user_Password_Add as ComponentOptions<Vue>, {
       propsData: { username },
     });
     const newPassword = 'newPassword';
@@ -26,7 +28,7 @@ describe('PasswordAdd.vue', () => {
   });
 
   it('Should not emit password add when there is new password mismatch', async () => {
-    const wrapper = mount(user_Password_Add, {
+    const wrapper = mount(user_Password_Add as ComponentOptions<Vue>, {
       propsData: { username: 'username' },
     });
 
@@ -42,7 +44,7 @@ describe('PasswordAdd.vue', () => {
   });
 
   it('Should enable submit button when there is no new password mismatch nor empty passwords', async () => {
-    const wrapper = mount(user_Password_Add, {
+    const wrapper = mount(user_Password_Add as ComponentOptions<Vue>, {
       propsData: { username: 'username' },
     });
 
@@ -56,7 +58,7 @@ describe('PasswordAdd.vue', () => {
 
   it('Should disable submit button when there is new password mismatch or empty inputs', async () => {
     let username = 'username';
-    const wrapper = mount(user_Password_Add, {
+    const wrapper = mount(user_Password_Add as ComponentOptions<Vue>, {
       propsData: { username },
     });
 

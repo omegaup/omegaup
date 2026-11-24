@@ -42,7 +42,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0.34
+        image: mysql:8.4.10@sha256:8dbcf531a03aade657e181b9cf2f1d1803ce621a1d55610cb44cb531ab7d7db6
         ports:
           - 13306:13306
         env:
@@ -195,6 +195,17 @@ jobs:
           name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
 
+      - name: Upload PHPUnit results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phpunit-results-${{ github.run_attempt }}
+          path: |
+            frontend/tests/runfiles/phpunit-junit.xml
+            coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload inefficient queries
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -212,17 +223,25 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '20'
-          cache: 'yarn'
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run JavaScript tests
-        run: yarn test:coverage
+        run: |
+          set -o pipefail
+          pnpm test:coverage 2>&1 | tee jest-output.log
 
       # continue-on-error: CI passes when CODECOV_TOKEN is missing or upload fails; remove once secret is added and stable
       - name: Upload code coverage
@@ -233,6 +252,17 @@ jobs:
           flags: javascript
           fail_ci_if_error: false
           handle_no_reports_found: true
+
+      - name: Upload JavaScript test artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: javascript-test-results-${{ github.run_attempt }}
+          path: |
+            jest-output.log
+            coverage/
+          if-no-files-found: ignore
+          retention-days: 7
 
   lint:
     runs-on: ubuntu-22.04
@@ -257,8 +287,20 @@ jobs:
           define('OMEGAUP_LOG_FILE', 'php://stderr');
           EOF
 
-      - name: Install yarn dependencies
-        run: yarn install
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -296,10 +338,12 @@ jobs:
             . /opt/omegaup/stuff/venv/bin/activate && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
+          set -o pipefail
+          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null 2>&1 | tee lint-output.log
 
       - name: Run Psalm
         run: |
+          set -o pipefail
           find frontend/ \
             -name *.php \
             -and -not -wholename 'frontend/server/libs/third_party/*' \
@@ -310,7 +354,7 @@ jobs:
           | xargs ./vendor/bin/psalm \
             --output-format=github \
             --long-progress \
-            --show-info=false
+            --show-info=false 2>&1 | tee psalm-output.log
 
       - name: Find unused translation strings
         run: ./stuff/unused_translation_strings.py
@@ -318,25 +362,79 @@ jobs:
       - name: Validate generated Python API syntax
         run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
 
+      - name: Upload lint artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lint-logs-${{ github.run_attempt }}
+          path: |
+            lint-output.log
+            psalm-output.log
+          if-no-files-found: ignore
+          retention-days: 7
+
   cypress:
+    name: cypress (${{ matrix.name }})
     runs-on: ubuntu-22.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            name: contest-group
+            specs: 'cypress/e2e/contest.cy.ts,cypress/e2e/problem_collection.cy.ts,cypress/e2e/group.cy.ts'
+          - shard: 2
+            name: courses
+            specs: 'cypress/e2e/course_2Part.cy.ts,cypress/e2e/course.cy.ts,cypress/e2e/certificate.cy.ts,cypress/e2e/navigation.cy.ts'
+          - shard: 3
+            name: ide-basics
+            specs: 'cypress/e2e/ide.cy.ts,cypress/e2e/basic_commands.cy.ts'
+          - shard: 4
+            name: problem-creator
+            specs: 'cypress/e2e/problem_creator.cy.ts'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
 
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Activate pinned pnpm
+        run: corepack prepare --activate
+
+      - name: Start frontend build in background
+        run: |
+          rm -f /tmp/frontend-build.exit /tmp/frontend-build.log
+          setsid nohup bash -c '
+            pnpm install --frozen-lockfile && pnpm build
+            echo $? > /tmp/frontend-build.exit
+          ' > /tmp/frontend-build.log 2>&1 < /dev/null &
+
       - name: Prepare Environment
         uses: ./.github/actions/prepare-env
         with:
           install_host_python_deps: true
 
-      - name: Install yarn dependencies
-        run: yarn install
-
-      - name: Build webpack resources
-        run: yarn build
+      - name: Wait for frontend build
+        run: |
+          for i in $(seq 1 600); do
+            [ -f /tmp/frontend-build.exit ] && break
+            sleep 1
+          done
+          echo "::group::frontend build log"
+          cat /tmp/frontend-build.log
+          echo "::endgroup::"
+          [ "$(cat /tmp/frontend-build.exit 2>/dev/null)" = "0" ] \
+            || { echo "::error::frontend build failed or timed out"; exit 1; }
 
       - name: Wait for dependencies
         run: |
@@ -344,7 +442,7 @@ jobs:
 
       - name: Run Cypress tests
         run: |
-          ./node_modules/.bin/cypress run --browser chrome
+          ./node_modules/.bin/cypress run --browser chrome --spec '${{ matrix.specs }}'
 
       - name: Collect container logs
         if: ${{ always() }}
@@ -359,14 +457,14 @@ jobs:
         if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: cypress-screenshots-${{ github.run_attempt }}
+          name: cypress-screenshots-shard-${{ matrix.shard }}-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
         if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: cypress-videos-${{ github.run_attempt }}
+          name: cypress-videos-shard-${{ matrix.shard }}-${{ github.run_attempt }}
           path: cypress/videos
 
   python:
@@ -424,9 +522,12 @@ jobs:
           pytest stuff/teaching_assistant/test_ta_course_mode_pre.py -s
 
       - name: Run the teaching assistant for course mode
+        env:
+          OMEGAUP_PASSWORD: teacher123
+          OMEGAUP_LLM_KEY: omegaup
         run: |
           cd stuff/teaching_assistant
-          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup --key omegaup
+          python teaching_assistant.py --test_mode --skip-confirm --username teacher --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup
 
       - name: Run post check for course mode
         run: |

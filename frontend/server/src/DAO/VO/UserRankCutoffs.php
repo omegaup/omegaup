@@ -64,6 +64,7 @@ class UserRankCutoffs extends \OmegaUp\DAO\VO\VO {
 
     /**
      * [Campo no documentado]
+     * Llave Primaria
      *
      * @var string|null
      */

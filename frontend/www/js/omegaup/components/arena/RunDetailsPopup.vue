@@ -1,7 +1,10 @@
 <template>
-  <omegaup-overlay-popup @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup
+    class="overlay-popup--wide"
+    @dismiss="$emit('dismiss')"
+  >
     <div v-if="data">
-      <form data-run-details-view>
+      <form data-run-details-view class="modal-form">
         <slot
           name="feedback"
           :feedback="data.feedback"
@@ -148,22 +151,22 @@
                 >{{ T.wordsDownloadCode }}</a
               >
             </li>
-            <li>
-              <a
-                v-if="data.admin"
-                class="output"
-                :href="`/api/run/download/run_alias/${data.guid}/`"
-                >{{ T.wordsDownloadOutput }}</a
-              >
-            </li>
-            <li>
-              <a
-                v-if="data.admin"
-                class="details"
-                :href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
-                >{{ T.wordsDownloadDetails }}</a
-              >
-            </li>
+            <template v-if="data.admin">
+              <li>
+                <a
+                  class="output"
+                  :href="`/api/run/download/run_alias/${data.guid}/`"
+                  >{{ T.wordsDownloadOutput }}</a
+                >
+              </li>
+              <li>
+                <a
+                  class="details"
+                  :href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
+                  >{{ T.wordsDownloadDetails }}</a
+                >
+              </li>
+            </template>
           </ul>
         </div>
         <div v-if="data.judged_by" class="judged_by">

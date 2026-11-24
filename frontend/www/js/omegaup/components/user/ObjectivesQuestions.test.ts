@@ -7,10 +7,9 @@ import user_ObjectivesQuestions from './ObjectivesQuestions.vue';
 describe('ObjectivesQuestions.vue', () => {
   it('Should only display next modal page button', async () => {
     const wrapper = shallowMount(user_ObjectivesQuestions);
-    const buttonNext = wrapper.find('button.btn-next-previous');
+    const buttonNext = wrapper.find('button.btn-primary');
     expect(buttonNext.exists()).toBe(true);
     expect(buttonNext.text()).toBe(T.userObjectivesModalButtonNext);
-    expect(wrapper.find('button.btn-primary').exists()).toBe(false);
   });
 
   it('Should only display submit button', async () => {
@@ -24,7 +23,7 @@ describe('ObjectivesQuestions.vue', () => {
     const wrapper = shallowMount(user_ObjectivesQuestions);
     await wrapper.find('input[type="radio"][value="learning"]').setChecked();
 
-    const buttonNext = wrapper.find('button.btn-next-previous');
+    const buttonNext = wrapper.find('button.btn-primary');
     expect(buttonNext.exists()).toBe(true);
     await buttonNext.trigger('click');
 
@@ -76,7 +75,7 @@ describe('ObjectivesQuestions.vue', () => {
       await wrapper
         .find(`input[type="radio"][value="${objective}"]`)
         .setChecked();
-      await wrapper.find('button.btn-next-previous').trigger('click');
+      await wrapper.find('button.btn-primary').trigger('click');
       expect(wrapper.text()).toContain(description);
     },
   );
@@ -194,7 +193,7 @@ describe('ObjectivesQuestions.vue', () => {
       await wrapper
         .find(`input[type="radio"][value="${objectiveA}"]`)
         .setChecked();
-      await wrapper.find('button.btn-next-previous').trigger('click');
+      await wrapper.find('button.btn-primary').trigger('click');
       await wrapper
         .find(`input[type="radio"][value="${objectiveB}"]`)
         .setChecked();

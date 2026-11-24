@@ -99,6 +99,7 @@ OmegaUp.on('ready', async () => {
           activeTab: this.activeTab,
           allRuns: runsStore.state.runs,
           problem: payload.problem,
+          ephemeralGraderEnabled: commonPayload.ephemeralGraderEnabled,
           runs: myRunsStore.state.runs,
           solvers: payload.solvers,
           user: payload.user,
@@ -230,7 +231,9 @@ OmegaUp.on('ready', async () => {
               contents: JSON.stringify(contents),
             }).catch(ui.apiError);
           },
-          'submit-demotion': (source: qualitynomination_Demotion) => {
+          'submit-demotion': (
+            source: InstanceType<typeof qualitynomination_Demotion>,
+          ) => {
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,
               nomination: 'demotion',
@@ -279,7 +282,7 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'dismiss-promotion': (
-            source: qualitynomination_Promotion,
+            source: InstanceType<typeof qualitynomination_Promotion>,
             isDismissed: boolean,
           ) => {
             const contents: { before_ac?: boolean } = {};

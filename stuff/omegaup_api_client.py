@@ -358,7 +358,7 @@ class OmegaUpAPIClient:
             logging.warning("Solution update failed: %s", response)
             return False
 
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.error("Error updating solution: %s", e)
             return False
 
@@ -387,7 +387,7 @@ class OmegaUpAPIClient:
             solution_data = response.get('solution', {}) or {}
             return solution_data.get('markdown', '')  # type: ignore
 
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.debug("No existing solution found: %s", e)
             return None
 
@@ -404,7 +404,7 @@ class OmegaUpAPIClient:
         try:
             self.get_problem_details(problem_alias)
             return True
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.warning("Problem access verification failed: %s", e)
             return False
 
@@ -421,7 +421,7 @@ class OmegaUpAPIClient:
         try:
             problem_data = self.get_problem_details(problem_alias)
             return problem_data.get('languages', [])
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.warning("Could not get supported languages: %s", e)
             return ['py3', 'cpp17-gcc', 'java']  # Fallback defaults
 
@@ -447,7 +447,7 @@ class OmegaUpAPIClient:
                 return (run_guid, submission_token)
             return None
 
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.error("Error submitting solution: %s", e)
             return None
 
@@ -474,7 +474,7 @@ class OmegaUpAPIClient:
             # If we can get admin list, we have admin access
             return response.get('status') == 'ok' or 'admins' in response
 
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.debug("Admin access check failed: %s", e)
             return False
 
@@ -509,7 +509,7 @@ class OmegaUpAPIClient:
 
             return (verdict, score, memory)
 
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.error("Error getting detailed run status: %s", e)
             return ('JE', 0.0, '0')
 
@@ -616,7 +616,7 @@ class OmegaUpAPIClient:
                               (2 * random.random() - 1))
                     delay_seconds = max(0.5, exponential_delay + jitter)
 
-            except (ConnectionError, TypeError, ValueError) as e:
+            except (requests.RequestException, TypeError, ValueError) as e:
                 logging.warning(
                     "Error polling run %s (attempt %d): %s",
                     run_guid, attempt, e)
@@ -699,7 +699,7 @@ class OmegaUpAPIClient:
             logging.warning("Job status update failed: %s", response)
             return False
 
-        except (ConnectionError, TypeError, ValueError) as e:
+        except (requests.RequestException, TypeError, ValueError) as e:
             logging.error("Error updating job status for %s: %s", job_id, e)
             return False
 

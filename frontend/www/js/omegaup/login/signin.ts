@@ -34,7 +34,14 @@ OmegaUp.on('ready', () => {
       return;
     }
 
-    if (pathname && pathname.indexOf('/') === 0) {
+    const isLogoutPath = pathname === '/logout' || pathname === '/logout/';
+
+    if (
+      pathname &&
+      pathname.startsWith('/') &&
+      !pathname.startsWith('//') &&
+      !isLogoutPath
+    ) {
       window.location.href = pathname + '?fromLogin';
       return;
     }
@@ -61,6 +68,8 @@ OmegaUp.on('ready', () => {
   } else if (payload.verifyEmailSuccessfully) {
     ui.success(payload.verifyEmailSuccessfully);
   }
+
+  ui.showPersistedSuccessMessage();
 
   const locationHash = window.location.hash.substring(1);
   let initialActiveTab: AvailableTabs = AvailableTabs.Login;

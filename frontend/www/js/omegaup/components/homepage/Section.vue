@@ -5,7 +5,13 @@
       class="p-3 col-md-6 mt-2 mt-md-0"
       :class="{ 'order-md-2': imageToRight }"
     >
-      <img class="img-fluid" :src="imageSrc" :alt="title" />
+      <img
+        class="img-fluid"
+        :src="imageSrc"
+        :alt="title"
+        width="260"
+        height="260"
+      />
     </div>
     <div class="col-md-6 mt-2 mt-md-0" :class="{ 'order-md-1': imageToRight }">
       <p class="section-description">{{ description }}</p>
@@ -25,19 +31,34 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-@Component
-export default class Homepage extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() buttons!: {
-    text: string;
-    href: string;
-  }[];
-  @Prop() imageSrc!: string;
-  @Prop({ default: false }) imageToRight!: boolean;
-}
+export default defineComponent({
+  name: 'HomepageSection',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    buttons: {
+      type: Array as PropType<{ text: string; href: string }[]>,
+      required: true,
+    },
+    imageSrc: {
+      type: String,
+      required: true,
+    },
+    imageToRight: {
+      type: Boolean,
+      default: false,
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

@@ -5,7 +5,12 @@
       data-enable-hover-dropdown
     >
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
+        <a
+          class="navbar-brand p-3 mr-0 mr-sm-3"
+          href="/"
+          :title="logoTooltip"
+          @click.prevent="handleLogoClick"
+        >
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -82,7 +87,6 @@
             :navbar-section="navbarSection"
           >
           </omegaup-navbar-items>
-          <!-- in lockdown or contest mode there is no left navbar -->
 
           <div class="d-flex px-3 justify-content-between">
             <ul
@@ -217,41 +221,30 @@
                       href="/dependents"
                       >{{ T.navDependents }}</a
                     >
-                    <form v-if="!isUnder13User" class="collapse-submenu">
-                      <div class="btn-group">
-                        <a
-                          class="dropdown-item"
-                          href="/profile/#created-content"
-                          >{{ T.navMyContent }}</a
-                        >
-                        <button
-                          type="button"
-                          class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
-                          data-toggle="collapse"
-                          data-target=".collapse-links"
-                          aria-expanded="false"
-                          aria-controls="collapse-links"
-                        ></button>
-                      </div>
-                      <div class="collapse collapse-links pl-3">
-                        <a class="dropdown-item" href="/problem/mine">{{
-                          T.navMyProblems
-                        }}</a>
-                        <a
-                          class="dropdown-item"
-                          href="/course/mine"
-                          data-nav-courses-mine
-                          >{{ T.navMyCourses }}</a
-                        >
-                        <a
-                          class="dropdown-item"
-                          href="/contest/mine"
-                          data-nav-user-contests
-                          >{{ T.navMyContests }}</a
-                        >
-                      </div>
-                    </form>
-
+                    <template v-if="!isUnder13User">
+                      <div class="dropdown-divider"></div>
+                      <a
+                        class="dropdown-item"
+                        href="/profile/#created-content"
+                        >{{ T.navMyContent }}</a
+                      >
+                      <a class="dropdown-item" href="/problem/mine">{{
+                        T.navMyProblems
+                      }}</a>
+                      <a
+                        class="dropdown-item"
+                        href="/course/mine"
+                        data-nav-courses-mine
+                        >{{ T.navMyCourses }}</a
+                      >
+                      <a
+                        class="dropdown-item"
+                        href="/contest/mine"
+                        data-nav-user-contests
+                        >{{ T.navMyContests }}</a
+                      >
+                      <div class="dropdown-divider"></div>
+                    </template>
                     <a
                       class="dropdown-item"
                       href="/group/"
@@ -269,7 +262,6 @@
                     }}</a>
                   </template>
                   <div class="dropdown-divider"></div>
-                  <!-- Logout button for desktop - navbar menu -->
                   <a
                     class="dropdown-item"
                     href="#"
@@ -287,9 +279,41 @@
                   ></omegaup-common-grader-status>
                 </div>
               </li>
+              <li
+                v-if="isAdmin || isSupportTeamMember"
+                class="nav-item dropdown d-none d-lg-flex align-items-center"
+                data-nav-operations-dashboard
+              >
+                <a
+                  class="nav-link px-2 dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  :title="T.omegaupTitleAdminOperations"
+                >
+                  <font-awesome-icon :icon="['fas', 'cog']" />
+                </a>
+                <div
+                  :class="[
+                    'dropdown-menu',
+                    'dropdown-menu-right',
+                    'fullwidth-mobile-fit-lg',
+                    'navbar-item-dropdown',
+                  ]"
+                >
+                  <omegaup-navbar-item
+                    :title="T.omegaupTitleAdminOperations"
+                    :description="T.omegaupOperationsDashboardDescription"
+                    :icon="['fas', 'cog']"
+                    href="/admin/operations/"
+                    data-nav-operations-dashboard-link
+                  />
+                </div>
+              </li>
             </ul>
 
-            <!-- Logout button for mobile -->
             <a
               v-if="isLoggedIn"
               class="navbar justify-content-end d-lg-none align-items-start pt-4 d-flex align-items-center"
@@ -372,9 +396,10 @@ import { AvailableTabs } from '../login/Signin.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUser, faCog } from '@fortawesome/free-solid-svg-icons';
 import LogoutConfirmation from './LogoutConfirmation.vue';
-library.add(faSignOutAlt, faUser);
+import NavbarItem from './NavbarItem.vue';
+library.add(faSignOutAlt, faUser, faCog);
 
 export const EventBus = new Vue();
 
@@ -388,6 +413,7 @@ export const EventBus = new Vue();
     'omegaup-user-objectives-questions': user_objectives_questions,
     'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
+    'omegaup-navbar-item': NavbarItem,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-logout-confirmation': LogoutConfirmation,
   },
@@ -404,6 +430,7 @@ export default class Navbar extends Vue {
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
   @Prop() isAdmin!: boolean;
+  @Prop() isSupportTeamMember!: boolean;
   @Prop() isMainUserIdentity!: boolean;
   @Prop() lockDownImage!: string;
   @Prop() navbarSection!: string;
@@ -424,6 +451,7 @@ export default class Navbar extends Vue {
   ui = ui;
   AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
+  scrollY: number = 0;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
@@ -490,6 +518,56 @@ export default class Navbar extends Vue {
           : this.formattedSignupURL;
     }
   }
+
+  get logoTooltip(): string {
+    if (this.scrollY > 0) {
+      return this.T.navbarScrollToTop;
+    }
+    return this.T.navbarGoToHomepage;
+  }
+
+  updateScroll(): void {
+    this.scrollY = window.scrollY;
+  }
+
+  handleLogoClick(): void {
+    const isAtTop = window.scrollY <= 0;
+    const isHome = window.location.pathname === '/';
+
+    if (!isAtTop) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (!isHome) {
+      window.location.href = '/';
+    }
+  }
+
+  mounted() {
+    document.addEventListener('click', this.handleDocumentClick);
+    window.addEventListener('scroll', this.updateScroll);
+
+    this.updateScroll();
+  }
+
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleDocumentClick);
+    window.removeEventListener('scroll', this.updateScroll);
+  }
+
+  private handleDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const navbar = this.$el as HTMLElement;
+
+    if (!navbar.contains(target)) {
+      const navbarCollapse = navbar.querySelector('.navbar-collapse.show');
+
+      if (!navbarCollapse) return;
+
+      ($(navbarCollapse) as any).collapse('hide');
+    }
+  }
 }
 </script>
 
@@ -513,6 +591,10 @@ export default class Navbar extends Vue {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+[data-nav-operations-dashboard] > a {
+  font-size: 1.4rem;
 }
 
 nav.navbar {
@@ -561,10 +643,6 @@ nav.navbar {
   a,
   span.nav-link {
     color: var(--header-navbar-primary-link-color);
-  }
-
-  .collapse-submenu .btn:focus {
-    box-shadow: 0 0 0 0;
   }
 
   .dropdown-menu {
@@ -622,22 +700,6 @@ nav.navbar {
     .dropdown:not(.show):hover
     > .dropdown-menu {
     display: none !important;
-  }
-
-  .nav-problems .collapse-links {
-    display: none;
-  }
-
-  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
-    display: block;
-  }
-
-  .nav-user .collapse-links {
-    display: none;
-  }
-
-  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
-    display: block;
   }
 }
 

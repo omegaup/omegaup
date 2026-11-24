@@ -115,9 +115,17 @@
                 :disabled="readOnly"
                 name="end-date"
                 :enabled="!unlimitedDuration"
-                :is-invalid="invalidParameterName === 'finish_time'"
+                :is-invalid="
+                  invalidParameterName === 'finish_time' || invalidDate
+                "
               ></omegaup-datepicker
             ></label>
+            <div
+              v-if="invalidDate"
+              class="invalid-feedback invalid-date-feedback"
+            >
+              {{ T.courseAssignmentEndDateBeforeCourseStartDate }}
+            </div>
           </div>
         </div>
         <div class="row">
@@ -128,15 +136,21 @@
                 :class="{ 'is-complete': isSchoolComplete }"
                 >{{ T.profileSchool }}</span
               >
-              <omegaup-common-typeahead
-                :existing-options="searchResultSchools"
-                :options="searchResultSchools"
-                :readonly="readOnly"
-                :value.sync="school"
-                @update-existing-options="
-                  (query) => $emit('update-search-result-schools', query)
-                "
-              ></omegaup-common-typeahead>
+              <div
+                :class="{
+                  'is-invalid-school': invalidParameterName === 'school',
+                }"
+              >
+                <omegaup-common-typeahead
+                  :existing-options="searchResultSchools"
+                  :options="searchResultSchools"
+                  :readonly="readOnly"
+                  :value.sync="school"
+                  @update-existing-options="
+                    (query) => $emit('update-search-result-schools', query)
+                  "
+                ></omegaup-common-typeahead>
+              </div>
             </label>
           </div>
           <div class="form-group col-md-4 introjs-basic-information">
@@ -222,6 +236,7 @@
             >
               <vue-multiselect
                 v-model="selectedLanguages"
+                class="omegaup-multiselect"
                 :disabled="readOnly"
                 :options="Object.keys(allLanguages)"
                 :multiple="true"
@@ -235,8 +250,12 @@
         </div>
         <div class="row">
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-objective"
-              >{{ T.courseNewFormObjective }}
+            <label class="font-weight-bold w-100 introjs-objective">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isObjectiveComplete }"
+                >{{ T.courseNewFormObjective }}</span
+              >
               <font-awesome-icon
                 :title="T.courseNewFormObjectiveDesc"
                 icon="info-circle"
@@ -251,6 +270,7 @@
                 }"
                 cols="30"
                 rows="5"
+                required="required"
                 :maxlength="MAX_LENGTH.objective"
               ></textarea>
             </label>
@@ -320,7 +340,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 import {
   FontAwesomeIcon,
@@ -411,6 +431,10 @@ export default class CourseDetails extends Vue {
 
   get isDescriptionComplete(): boolean {
     return this.description !== null && this.description.trim().length > 0;
+  }
+
+  get isObjectiveComplete(): boolean {
+    return (this.objective ?? '').trim().length > 0;
   }
 
   // Computed properties for character limit danger thresholds
@@ -549,7 +573,17 @@ export default class CourseDetails extends Vue {
     this.unlimitedDuration = this.course.finish_time === null;
   }
 
+  get invalidDate(): boolean {
+    if (this.unlimitedDuration) return false;
+    if (!this.startTime || !this.finishTime) return false;
+    if (this.finishTime <= this.startTime) return true;
+    return false;
+  }
+
   onSubmit(): void {
+    if (this.invalidDate) {
+      return;
+    }
     if (!this.selectedLanguages || this.selectedLanguages.length === 0) {
       this.$emit('invalid-languages');
       return;
@@ -593,12 +627,13 @@ export default class CourseDetails extends Vue {
 @import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
-.multiselect__tag {
-  background: var(--multiselect-tag-background-color);
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: var(--form-input-error-color);
 }
 
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.is-invalid-wrapper ::v-deep .multiselect__tags {
+.is-invalid-school ::v-deep .omegaup-typeahead .multiselect__tags {
   border-color: var(--form-input-error-color);
 }
 
@@ -609,4 +644,13 @@ export default class CourseDetails extends Vue {
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
+
+.invalid-date-feedback {
+  display: block;
+}
+</style>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+@import '../common/omegaup-multiselect';
 </style>

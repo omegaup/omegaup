@@ -120,6 +120,72 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Tests solved and attempted status in the bookmark list
+     */
+    public function testListBookmarkedProblemsSolveStatus() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $solvedProblem = \OmegaUp\Test\Factories\Problem::createProblem();
+        $attemptedProblem = \OmegaUp\Test\Factories\Problem::createProblem();
+        $pendingProblem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $login = self::login($identity);
+        foreach (
+            [
+                $solvedProblem,
+                $attemptedProblem,
+                $pendingProblem,
+            ] as $problemData
+        ) {
+            \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'problem_alias' => $problemData['problem']->alias,
+                ])
+            );
+        }
+
+        $acceptedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $solvedProblem,
+            $identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($acceptedRun);
+
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+        $rejectedRun = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $attemptedProblem,
+            $identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($rejectedRun, 0, 'WA');
+
+        $response = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertSame(3, $response['total']);
+
+        $problemsByAlias = [];
+        foreach ($response['problems'] as $problem) {
+            $problemsByAlias[$problem['alias']] = $problem;
+        }
+
+        $solvedAlias = strval($solvedProblem['problem']->alias);
+        $this->assertTrue($problemsByAlias[$solvedAlias]['solved']);
+        $this->assertTrue($problemsByAlias[$solvedAlias]['attempted']);
+
+        $attemptedAlias = strval($attemptedProblem['problem']->alias);
+        $this->assertFalse($problemsByAlias[$attemptedAlias]['solved']);
+        $this->assertTrue($problemsByAlias[$attemptedAlias]['attempted']);
+
+        $pendingAlias = strval($pendingProblem['problem']->alias);
+        $this->assertFalse($problemsByAlias[$pendingAlias]['solved']);
+        $this->assertFalse($problemsByAlias[$pendingAlias]['attempted']);
+    }
+
+    /**
      * Tests that bookmarks are user-specific
      */
     public function testBookmarkIsUserSpecific() {

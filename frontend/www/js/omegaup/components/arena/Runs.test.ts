@@ -1,4 +1,5 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
+jest.mock('vue-infinite-scroll', () => ({}));
 
 import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
@@ -6,6 +7,8 @@ import { types } from '../../api_types';
 import T from '../../lang';
 
 import arena_Runs, { DisqualificationType } from './Runs.vue';
+import common_EmptyState from '../common/EmptyState.vue';
+import user_Username from '../user/Username.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
@@ -16,8 +19,8 @@ describe('Runs.vue', () => {
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
-    expect(wrapper.find('table tbody').text()).toBe('');
+    expect(wrapper.find('.card-header').text()).toBe(T.latestSubmissionsTitle);
+    expect(wrapper.findComponent(common_EmptyState).exists()).toBe(true);
   });
 
   it('Should handle runs', async () => {
@@ -135,6 +138,18 @@ describe('Runs.vue', () => {
     expect(
       wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
     ).toEqual(['122000', '121500', '121000', '120500', '120000']);
+  });
+
+  it('Should pass the country of the run to the username', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs: [{ ...baseRunData, country: 'MX' }],
+        showUser: true,
+        username: null,
+      },
+    });
+    expect(wrapper.findComponent(user_Username).props('country')).toBe('MX');
   });
 
   const filtersMapping: { filter: string; value: string }[] = [
@@ -413,5 +428,67 @@ describe('Runs.vue', () => {
       expect(wrapper.findAll('table tbody tr').length).toBe(runs.length);
       expect(wrapper.vm.filterUsername).toBeFalsy();
     });
+  });
+
+  it('Should show loading skeleton when loading prop is true', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        loading: true,
+        endOfResults: false,
+      },
+    });
+
+    expect(wrapper.findAll('.loading-line').length).toBe(3);
+  });
+
+  it('Should not show loading skeleton when loading prop is false', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        loading: false,
+        endOfResults: false,
+      },
+    });
+
+    expect(wrapper.findAll('.loading-line').length).toBe(0);
+  });
+
+  it('Should not show pager when showPager is false', () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs,
+        showPager: false,
+      },
+    });
+
+    expect(wrapper.find('.pager-controls').exists()).toBeFalsy();
+  });
+
+  it('Should apply run-loading class and spinner icon when run status is not ready', () => {
+    const runsWithLoading: types.Run[] = [
+      {
+        ...runs[0],
+        guid: 'loading_run',
+        status: 'new',
+      },
+      ...runs,
+    ];
+    const wrapper = mount(arena_Runs, {
+      propsData: {
+        contestAlias: 'admin',
+        runs: runsWithLoading,
+      },
+    });
+
+    const loadingRows = wrapper.findAll('tbody tr.run-loading');
+    expect(loadingRows.length).toBe(1);
+
+    const statusCell = loadingRows.at(0).find('[data-run-status]');
+    expect(statusCell.find('span').text()).toBe('new');
+    expect(statusCell.find('svg.fa-spinner').exists()).toBe(true);
   });
 });

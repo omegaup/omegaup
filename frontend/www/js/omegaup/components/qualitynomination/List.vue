@@ -75,89 +75,102 @@
           </label>
         </div>
       </div>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr class="text-nowrap">
-              <th>
-                {{ T.wordsAlias }}
-                <omegaup-common-sort-controls
-                  ref="sortControlByTitle"
-                  column="title"
-                  :sort-order="sortOrder"
-                  :column-name="columnName"
-                  @apply-filter="onApplyFilter"
-                ></omegaup-common-sort-controls>
-              </th>
-              <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
-              <th>{{ T.qualityNominationCreatedBy }}</th>
-              <th>
-                {{ T.wordsSubmissionDate }}
-                <omegaup-common-sort-controls
-                  ref="sortControlByTime"
-                  column="time"
-                  :sort-order="sortOrder"
-                  :column-name="columnName"
-                  @apply-filter="onApplyFilter"
-                ></omegaup-common-sort-controls>
-              </th>
-              <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
-              <th class="text-center">{{ T.wordsStatus }}</th>
-              <th><!-- view button --></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="nomination in orderedNominations"
-              :key="`nomination-${nomination.qualitynomination_id}`"
-            >
-              <td class="align-middle">
-                <a :href="problemUrl(nomination.problem.alias)">{{
-                  nomination.problem.title
-                }}</a>
-              </td>
-              <td v-if="!myView" class="align-middle">
-                <a :href="userUrl(nomination.nominator.username)">{{
-                  nomination.nominator.username
-                }}</a>
-              </td>
-              <td class="align-middle">
-                <a :href="userUrl(nomination.author.username)">{{
-                  nomination.author.username
-                }}</a>
-              </td>
-              <td class="align-middle">
-                {{ nomination.time.toLocaleDateString(T.locale) }}
-              </td>
-              <td v-if="!myView" class="align-middle">
-                {{ nomination.contents.reason }}
-              </td>
-              <td class="text-center align-middle">{{ nomination.status }}</td>
-              <td class="align-middle">
-                <a
-                  :href="nominationDetailsUrl(nomination.qualitynomination_id)"
-                  :class="nomination.problem.title"
-                  >{{ T.wordsDetails }}</a
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-if="nominations.length === 0" class="card-body">
+        <omegaup-common-empty-state
+          icon="clipboard-list"
+          :title="T.qualityNominationListEmptyTitle"
+          :description="T.qualityNominationListEmptyDescription"
+        ></omegaup-common-empty-state>
       </div>
-      <omegaup-common-paginator
-        :pager-items="pagerItems"
-        class="mb-3"
-        @page-changed="
-          (page) =>
-            $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
-        "
-      ></omegaup-common-paginator>
+      <template v-else>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr class="text-nowrap">
+                <th>
+                  {{ T.wordsAlias }}
+                  <omegaup-common-sort-controls
+                    ref="sortControlByTitle"
+                    column="title"
+                    :sort-order="sortOrder"
+                    :column-name="columnName"
+                    @apply-filter="onApplyFilter"
+                  ></omegaup-common-sort-controls>
+                </th>
+                <th v-if="!myView">{{ T.qualityNominationNominatedBy }}</th>
+                <th>{{ T.qualityNominationCreatedBy }}</th>
+                <th>
+                  {{ T.wordsSubmissionDate }}
+                  <omegaup-common-sort-controls
+                    ref="sortControlByTime"
+                    column="time"
+                    :sort-order="sortOrder"
+                    :column-name="columnName"
+                    @apply-filter="onApplyFilter"
+                  ></omegaup-common-sort-controls>
+                </th>
+                <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
+                <th class="text-center">{{ T.wordsStatus }}</th>
+                <th><!-- view button --></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="nomination in orderedNominations"
+                :key="`nomination-${nomination.qualitynomination_id}`"
+              >
+                <td class="align-middle">
+                  <a :href="problemUrl(nomination.problem.alias)">{{
+                    nomination.problem.title
+                  }}</a>
+                </td>
+                <td v-if="!myView" class="align-middle">
+                  <a :href="userUrl(nomination.nominator.username)">{{
+                    nomination.nominator.username
+                  }}</a>
+                </td>
+                <td class="align-middle">
+                  <a :href="userUrl(nomination.author.username)">{{
+                    nomination.author.username
+                  }}</a>
+                </td>
+                <td class="align-middle">
+                  {{ nomination.time.toLocaleDateString(T.locale) }}
+                </td>
+                <td v-if="!myView" class="align-middle">
+                  {{ nomination.contents.reason }}
+                </td>
+                <td class="text-center align-middle">
+                  {{ nomination.status }}
+                </td>
+                <td class="align-middle">
+                  <a
+                    :href="
+                      nominationDetailsUrl(nomination.qualitynomination_id)
+                    "
+                    :class="nomination.problem.title"
+                    >{{ T.wordsDetails }}</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <omegaup-common-paginator
+          :pager-items="pagerItems"
+          class="mb-3"
+          @page-changed="
+            (page) =>
+              $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
+          "
+        ></omegaup-common-paginator>
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -165,100 +178,135 @@ import common_Paginator from '../common/Paginator.vue';
 import { types } from '../../api_types';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_SortControls from '../common/SortControls.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
-@Component({
+export default defineComponent({
+  name: 'QualityNominationList',
   components: {
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-sort-controls': common_SortControls,
+    'omegaup-common-empty-state': common_EmptyState,
   },
-})
-export default class QualityNominationList extends Vue {
-  @Prop() pages!: number;
-  @Prop() length!: number;
-  @Prop() myView!: boolean;
-  @Prop() nominations!: types.NominationListItem[];
-  @Prop() pagerItems!: types.PageItem[];
-  @Prop() isAdmin!: boolean;
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() searchResultProblems!: types.ListItem[];
+  props: {
+    pages: {
+      type: Number,
+      required: true,
+    },
+    length: {
+      type: Number,
+      required: true,
+    },
+    myView: {
+      type: Boolean,
+      default: false,
+    },
+    nominations: {
+      type: Array as PropType<types.NominationListItem[]>,
+      default: () => [],
+    },
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      default: () => [],
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    searchResultProblems: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+  },
+  emits: [
+    'update-search-result-problems',
+    'update-search-result-users',
+    'go-to-page',
+  ],
+  data() {
+    return {
+      showAll: true,
+      T,
+      ui,
+      sortOrder: omegaup.SortOrder.Ascending as omegaup.SortOrder,
+      columnName: 'title',
+      queryProblem: null as null | types.ListItem,
+      queryUsername: null as null | types.ListItem,
+      selectColumn: '',
+      columns: {
+        problem_alias: T.wordsProblem,
+        nominator_username: T.qualityNominationNominatedBy,
+        author_username: T.qualityNominationCreatedBy,
+      },
+    };
+  },
+  computed: {
+    orderedNominations(): types.NominationListItem[] {
+      const order = this.sortOrder === omegaup.SortOrder.Ascending ? 1 : -1;
 
-  showAll = true;
-  T = T;
-  ui = ui;
+      switch (this.columnName) {
+        case 'time':
+          return [...this.nominations].sort(
+            (a, b) => order * (a.time.getTime() - b.time.getTime()),
+          );
+        case 'title':
+        default:
+          return [...this.nominations].sort(
+            (a, b) => order * a.problem.title.localeCompare(b.problem.title),
+          );
+      }
+    },
+  },
+  watch: {
+    selectColumn() {
+      this.queryProblem = null;
+      this.queryUsername = null;
+    },
+  },
+  methods: {
+    getQuery(): null | string {
+      if (
+        this.selectColumn == 'nominator_username' ||
+        this.selectColumn == 'author_username'
+      ) {
+        return this.queryUsername?.key ?? null;
+      } else {
+        return this.queryProblem?.key ?? null;
+      }
+    },
 
-  sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
-  columnName = 'title';
+    getStatus(): string {
+      if (this.showAll) {
+        return 'all';
+      } else {
+        return 'open';
+      }
+    },
 
-  queryProblem: null | types.ListItem = null;
-  queryUsername: null | types.ListItem = null;
-  selectColumn = '';
-  columns = {
-    problem_alias: T.wordsProblem,
-    nominator_username: T.qualityNominationNominatedBy,
-    author_username: T.qualityNominationCreatedBy,
-  };
+    problemUrl(problemAlias: string): string {
+      return `/arena/problem/${problemAlias}/`;
+    },
 
-  get orderedNominations(): types.NominationListItem[] {
-    const order = this.sortOrder === omegaup.SortOrder.Ascending ? 1 : -1;
+    userUrl(username: string): string {
+      return `/profile/${username}/`;
+    },
 
-    switch (this.columnName) {
-      case 'time':
-        return this.nominations.sort(
-          (a, b) => order * (a.time.getTime() - b.time.getTime()),
-        );
-      case 'title':
-      default:
-        return this.nominations.sort(
-          (a, b) => order * a.problem.title.localeCompare(b.problem.title),
-        );
-    }
-  }
+    nominationDetailsUrl(nominationId: number): string {
+      return `/nomination/${nominationId}/`;
+    },
 
-  @Watch('selectColumn')
-  onPropertyChanged() {
-    this.queryProblem = null;
-    this.queryUsername = null;
-  }
+    onApplyFilter(columnName: string, sortOrder: string): void {
+      this.columnName = columnName;
 
-  getQuery(): null | string {
-    if (
-      this.selectColumn == 'nominator_username' ||
-      this.selectColumn == 'author_username'
-    ) {
-      return this.queryUsername?.key ?? null;
-    } else {
-      return this.queryProblem?.key ?? null;
-    }
-  }
-
-  getStatus(): string {
-    if (this.showAll) {
-      return 'all';
-    } else {
-      return 'open';
-    }
-  }
-
-  problemUrl(problemAlias: string): string {
-    return `/arena/problem/${problemAlias}/`;
-  }
-
-  userUrl(username: string): string {
-    return `/profile/${username}/`;
-  }
-
-  nominationDetailsUrl(nominationId: number): string {
-    return `/nomination/${nominationId}/`;
-  }
-
-  onApplyFilter(columnName: string, sortOrder: string): void {
-    this.columnName = columnName;
-
-    this.sortOrder =
-      sortOrder === omegaup.SortOrder.Ascending
-        ? omegaup.SortOrder.Ascending
-        : omegaup.SortOrder.Descending;
-  }
-}
+      this.sortOrder =
+        sortOrder === omegaup.SortOrder.Ascending
+          ? omegaup.SortOrder.Ascending
+          : omegaup.SortOrder.Descending;
+    },
+  },
+});
 </script>

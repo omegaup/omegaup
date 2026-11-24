@@ -28,6 +28,8 @@
             @heatmap-year-changed="
               (year) => $emit('heatmap-year-changed', year)
             "
+            @save-readme="(payload) => $emit('save-readme', payload)"
+            @report-readme="(payload) => $emit('report-readme', payload)"
           ></omegaup-user-view-profile>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-basic-information'">
@@ -50,6 +52,11 @@
               (request) => $emit('update-user-preferences', request)
             "
           ></omegaup-user-edit-preferences>
+        </template>
+        <template v-else-if="currentSelectedTab === 'edit-code-templates'">
+          <omegaup-user-edit-code-templates
+            :profile="profile"
+          ></omegaup-user-edit-code-templates>
         </template>
         <template v-else-if="currentSelectedTab === 'manage-schools'">
           <omegaup-user-manage-schools
@@ -107,6 +114,7 @@ import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_BasicInformationEdit from './BasicInformationEdit.vue';
+import user_CodeTemplatesEdit from './CodeTemplatesEdit.vue';
 import userDeleteAccount from './DeleteAccount.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
@@ -132,6 +140,7 @@ export interface ProfileStatistics {
     'omegaup-user-view-profile': user_ViewProfile,
     'omegaup-user-edit-preferences': user_PreferencesEdit,
     'omegaup-user-edit-basic-information': user_BasicInformationEdit,
+    'omegaup-user-edit-code-templates': user_CodeTemplatesEdit,
     'omegaup-user-edit-password': user_PasswordEdit,
     'omegaup-user-add-password': user_PasswordAdd,
     'omegaup-user-manage-identities': user_ManageIdentities,
@@ -164,6 +173,11 @@ export default class Profile extends Vue {
   ui = ui;
   currentSelectedTab = this.selectedTab;
   currentViewProfileSelectedTab = this.viewProfileSelectedTab;
+
+  @Watch('viewProfileSelectedTab')
+  onViewProfileSelectedTabChanged(newValue: string | null) {
+    this.currentViewProfileSelectedTab = newValue;
+  }
 
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {

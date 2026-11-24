@@ -102,7 +102,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($token)) {
             return null;
         }
-        if (strpos($token, ',') === false) {
+        if (!str_contains($token, ',')) {
             return [
                 'token' => $token,
                 'username' => null,
@@ -523,12 +523,12 @@ class Session extends \OmegaUp\Controllers\Controller {
         for (;;) {
             // Maybe we can bring all records from db
             // with prefix $username, because this:
-            $userexists = \OmegaUp\DAO\Users::FindByUsername(
+            $identityExists = \OmegaUp\DAO\Identities::findByUsername(
                 "{$username}{$suffix}"
             );
             // will query db every single time probably.
 
-            if (empty($userexists)) {
+            if (empty($identityExists)) {
                 break;
             }
 

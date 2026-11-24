@@ -51,7 +51,8 @@ module.exports = {
     '.*\\.[jt]sx?$': ['babel-jest', babelConfig],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(vue-.*|@voerro/vue-tagsinput|monaco-editor|monaco-editor-core)/)',
+    'node_modules/.pnpm/[^/]+/node_modules/(?!(vue-.*|monaco-editor|monaco-editor-core)/)',
+    'node_modules/(?!(\\.pnpm|vue-.*|monaco-editor|monaco-editor-core)/)',
   ],
   testURL: 'http://localhost:8001/',
 };

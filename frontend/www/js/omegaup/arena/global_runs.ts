@@ -9,12 +9,15 @@ import * as time from '../time';
 import { runsStore } from './runsStore';
 import {
   onRefreshRuns,
+  onAppendRuns,
   showSubmission,
   SubmissionRequest,
   updateRunFallback,
 } from './submissions';
 import { types } from '../api_types';
 import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
+
+const rowCount = 100;
 
 OmegaUp.on('ready', async () => {
   const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
@@ -27,7 +30,7 @@ OmegaUp.on('ready', async () => {
   } catch (e: any) {
     ui.apiError(e);
   }
-  new Vue({
+  const vueInstance = new Vue({
     el: '#main-container',
     components: {
       'omegaup-arena-runs': arena_Runs,
@@ -38,6 +41,9 @@ OmegaUp.on('ready', async () => {
       popupDisplayed,
       guid,
       runDetailsData: runDetails,
+      loading: true,
+      endOfResults: false,
+      currentOffset: 0,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-runs', {
@@ -49,7 +55,8 @@ OmegaUp.on('ready', async () => {
           showProblem: true,
           showDetails: true,
           showDisqualify: true,
-          showPager: true,
+          showPager: false,
+          showFilters: true,
           showRejudge: true,
           showUser: true,
           guid: this.guid,
@@ -57,6 +64,8 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           runDetailsData: this.runDetailsData,
           totalRuns: runsStore.state.totalRuns,
+          loading: this.loading,
+          endOfResults: this.endOfResults,
         },
         on: {
           details: (request: SubmissionRequest) => {
@@ -92,7 +101,42 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
           'filter-changed': () => {
+            this.currentOffset = 0;
+            this.endOfResults = false;
             refreshRuns();
+          },
+          'fetch-more-data': () => {
+            if (this.loading || this.endOfResults) return;
+            this.loading = true;
+            const nextOffset = this.currentOffset + 1;
+            api.Run.list({
+              show_all: true,
+              offset: runsStore.state.filters?.offset ?? nextOffset,
+              rowcount: runsStore.state.filters?.rowcount ?? rowCount,
+              verdict: runsStore.state.filters?.verdict,
+              language: runsStore.state.filters?.language,
+              username: runsStore.state.filters?.username,
+              status: runsStore.state.filters?.status,
+            })
+              .then(time.remoteTimeAdapter)
+              .then((response) => {
+                if (response.runs === null || response.runs.length === 0) {
+                  this.endOfResults = true;
+                } else {
+                  this.currentOffset = nextOffset;
+                  onAppendRuns({
+                    runs: response.runs,
+                    totalRuns: response.totalRuns,
+                  });
+                }
+              })
+              .catch((error) => {
+                this.endOfResults = true;
+                ui.apiError(error);
+              })
+              .finally(() => {
+                this.loading = false;
+              });
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
@@ -165,7 +209,7 @@ OmegaUp.on('ready', async () => {
     api.Run.list({
       show_all: true,
       offset: runsStore.state.filters?.offset,
-      rowcount: runsStore.state.filters?.rowcount,
+      rowcount: runsStore.state.filters?.rowcount ?? rowCount,
       verdict: runsStore.state.filters?.verdict,
       language: runsStore.state.filters?.language,
       username: runsStore.state.filters?.username,
@@ -175,11 +219,16 @@ OmegaUp.on('ready', async () => {
       .then((response) => {
         onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
       })
-      .catch(ui.apiError);
+      .catch(ui.apiError)
+      .finally(() => {
+        vueInstance.$data.loading = false;
+      });
   }
 
   refreshRuns();
   setInterval(() => {
+    vueInstance.$data.currentOffset = 0;
+    vueInstance.$data.endOfResults = false;
     refreshRuns();
   }, 5 * 60 * 1000);
 });

@@ -198,16 +198,24 @@ describe('time', () => {
   });
 
   describe('convertLocalDateToGMTDate', () => {
-    it('Should convert local dates to GMT (UTC) dates correctly', () => {
+    it('Should preserve UTC year/month/day as local date components', () => {
       const dateNow = new Date();
       const result = time.convertLocalDateToGMTDate(dateNow);
 
       expect(result.getFullYear()).toEqual(dateNow.getUTCFullYear());
       expect(result.getMonth()).toEqual(dateNow.getUTCMonth());
       expect(result.getDate()).toEqual(dateNow.getUTCDate());
-      expect(result.getHours()).toEqual(dateNow.getUTCHours());
-      expect(result.getMinutes()).toEqual(dateNow.getUTCMinutes());
-      expect(result.getSeconds()).toEqual(dateNow.getUTCSeconds());
+    });
+
+    it('Should handle midnight UTC dates that shift day in negative timezones', () => {
+      // Simulate a birth_date timestamp from the server: 2000-01-15 midnight UTC
+      const serverTimestamp = Date.UTC(2000, 0, 15);
+      const dateFromServer = new Date(serverTimestamp);
+      const result = time.convertLocalDateToGMTDate(dateFromServer);
+
+      expect(result.getFullYear()).toEqual(2000);
+      expect(result.getMonth()).toEqual(0);
+      expect(result.getDate()).toEqual(15);
     });
   });
 
@@ -292,5 +300,33 @@ describe('time', () => {
         );
       }
     });
+  });
+
+  describe('formatContestDurationHumanReadable', () => {
+    const minuteMs = 60 * 1000;
+    const hourMs = 60 * 60 * 1000;
+    const dayMs = 24 * 60 * 60 * 1000;
+    const start = new Date('2021-01-01 00:00:00+00:00');
+
+    it.each([
+      [minuteMs * 45, '45 minutos'],
+      [hourMs * 10, '10 horas'],
+      [hourMs * 10 + minuteMs * 10 + 10 * 1000, '~ 10 horas'],
+      [dayMs, '1 día'],
+      [dayMs * 15, '15 días'],
+      [dayMs * 15 + hourMs * 8, '~ 15 días'],
+      [dayMs * 30, '1 mes'],
+      [dayMs * 89, '~ 3 meses'],
+    ])(
+      'Should format %p ms with human-readable units',
+      (durationMs, expected) => {
+        expect(
+          time.formatContestDurationHumanReadable(
+            start,
+            new Date(start.getTime() + durationMs),
+          ),
+        ).toEqual(expected);
+      },
+    );
   });
 });
