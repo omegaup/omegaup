@@ -113,7 +113,7 @@ export default class List extends Vue {
   max-width: 14rem;
 }
 
-.searchbar-width .tags-input-wrapper-default {
+.searchbar-width .omegaup-typeahead .multiselect__tags {
   min-width: 20rem;
 }
 
