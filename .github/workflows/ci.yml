@@ -179,11 +179,11 @@ jobs:
             --show-info=false
 
       - name: Upload code coverage
-        run: |
-          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
-          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
-          chmod +x codecov
-          ./codecov
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: php
+          fail_ci_if_error: true
 
       - name: Upload artifacts
         if: ${{ always() }}
@@ -191,6 +191,17 @@ jobs:
         with:
           name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
+
+      - name: Upload PHPUnit results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phpunit-results-${{ github.run_attempt }}
+          path: |
+            frontend/tests/runfiles/phpunit-junit.xml
+            coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload inefficient queries
         if: ${{ always() }}
@@ -230,11 +241,11 @@ jobs:
           pnpm test:coverage 2>&1 | tee jest-output.log
 
       - name: Upload code coverage
-        run: |
-          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
-          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
-          chmod +x codecov
-          ./codecov
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: javascript
+          fail_ci_if_error: true
 
       - name: Upload JavaScript test artifacts
         if: ${{ failure() }}
