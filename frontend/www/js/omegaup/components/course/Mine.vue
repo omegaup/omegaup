@@ -1,18 +1,31 @@
 <template>
   <div class="card">
-    <h3 class="card-header mb-0">{{ T.courseListAdminCourses }}</h3>
-    <div class="card-body pb-0">
-      <div v-if="isMainUserIdentity" class="float-right">
-        <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
-      </div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">{{ T.courseListAdminCourses }}</h3>
+      <a
+        v-if="isMainUserIdentity && hasCourses"
+        class="btn btn-primary"
+        href="/course/new/"
+      >
+        {{ T.courseNew }}
+      </a>
     </div>
-    <template v-if="courses.admin.activeTab !== ''">
+    <div class="card-body pb-0"></div>
+    <template v-if="hasCourses">
       <omegaup-course-filtered-list
         :courses="courses.admin"
         :active-tab="courses.admin.activeTab"
         :show-percentage="false"
-      ></omegaup-course-filtered-list>
+      />
     </template>
+    <omegaup-common-empty-state
+      v-else
+      icon="graduation-cap"
+      :title="T.courseListEmptyTitle"
+      :description="T.courseListEmptyDescription"
+      :button-text="isMainUserIdentity ? T.courseNew : ''"
+      button-link="/course/new/"
+    ></omegaup-common-empty-state>
   </div>
 </template>
 
@@ -22,10 +35,12 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import course_FilteredList from './FilteredList.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 @Component({
   components: {
     'omegaup-course-filtered-list': course_FilteredList,
+    'omegaup-common-empty-state': common_EmptyState,
   },
 })
 export default class Mine extends Vue {
@@ -34,5 +49,15 @@ export default class Mine extends Vue {
 
   T = T;
   ui = ui;
+
+  get hasCourses(): boolean {
+    const filtered = this.courses.admin.filteredCourses;
+
+    if (!filtered) return false;
+
+    return Object.values(filtered).some(
+      (group: types.CoursesByTimeType) => group.courses?.length > 0,
+    );
+  }
 }
 </script>

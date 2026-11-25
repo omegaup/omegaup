@@ -29,6 +29,7 @@
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
       v-show="showFinderWizard"
+      :show="showFinderWizard"
       :possible-tags="wizardTags"
       @close="showFinderWizard = false"
       @search-problems="wizardSearch"
@@ -50,6 +51,8 @@
       :sort-order="sortOrder"
       :column-name="columnName"
       :path="'/problem/'"
+      :solved-problem-aliases="solvedProblemAliases"
+      :attempted-problem-aliases="attemptedProblemAliases"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
@@ -92,6 +95,8 @@ export default class List extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   omegaup = omegaup;
@@ -108,7 +113,7 @@ export default class List extends Vue {
   max-width: 14rem;
 }
 
-.searchbar-width .tags-input-wrapper-default {
+.searchbar-width .omegaup-typeahead .multiselect__tags {
   min-width: 20rem;
 }
 

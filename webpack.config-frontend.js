@@ -19,11 +19,16 @@ module.exports = {
       './frontend/www/js/omegaup/omegaup-legacy.js',
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
+    admin_carousel: './frontend/www/js/omegaup/admin/carousel.ts',
+    admin_crons: './frontend/www/js/omegaup/admin/crons.ts',
+    admin_operations_dashboard: './frontend/www/js/omegaup/admin/operations.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.ts',
+    admin_global_settings: './frontend/www/js/omegaup/admin/settings.ts',
     admin_support: './frontend/www/js/omegaup/admin/support.ts',
     admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
+    arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
     arena_contest_listv2: './frontend/www/js/omegaup/arena/contest_listv2.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
@@ -39,7 +44,6 @@ module.exports = {
     certificate_validation:
       './frontend/www/js/omegaup/certificate/validation.ts',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
-    common_scroll_to_top: './frontend/www/js/omegaup/common/scroll_to_top.ts',
     common_docs: './frontend/www/js/omegaup/common/docs.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.ts',
     common_index: './frontend/www/js/omegaup/common/index.ts',
@@ -47,6 +51,8 @@ module.exports = {
     common_global_notifications:
       './frontend/www/js/omegaup/common/global_notifications.ts',
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
+    common_view_unavailable:
+      './frontend/www/js/omegaup/common/view_unavailable.ts',
     contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
     contest_intro: './frontend/www/js/omegaup/contest/intro.ts',
     contest_mine: './frontend/www/js/omegaup/contest/mine.ts',

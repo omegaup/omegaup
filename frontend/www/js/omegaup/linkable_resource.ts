@@ -23,6 +23,36 @@ export interface LinkableResource {
   getLogo(): Logo | null;
 }
 
+export class BookmarkedProblem implements LinkableResource {
+  alias: string = '';
+  title: string = '';
+  solved: boolean = false;
+  attempted: boolean = false;
+
+  constructor(problem: types.BookmarkProblem) {
+    this.alias = problem.alias;
+    this.title = problem.title;
+    this.solved = problem.solved;
+    this.attempted = problem.attempted;
+  }
+
+  toString(): string {
+    return this.title;
+  }
+
+  getUrl(): string {
+    return `/arena/problem/${this.alias}/`;
+  }
+
+  getLogo(): null {
+    return null;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.empty();
+  }
+}
+
 export class ContestResult implements LinkableResource {
   alias: string = '';
   title: string = '';

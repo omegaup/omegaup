@@ -1,9 +1,9 @@
 <template>
   <div class="container-lg p-4">
     <div
-      class="slide d-flex align-items-center justify-content-around flex-wrap flex-lg-nowrap"
+      class="slide d-flex align-items-center justify-content-center flex-column flex-lg-row"
     >
-      <div class="titles-width">
+      <div class="titles-width text-center text-lg-left mb-4 mb-lg-0">
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
@@ -13,15 +13,16 @@
           :target="button.target"
           role="button"
         >
-          {{ button.text[T.locale] }}
+          {{ button.text[T.locale] || button.text['es'] }}
         </a>
       </div>
-      <div>
+      <div class="image-container d-flex justify-content-center">
         <img
-          class="d-block image-width"
-          height="320"
+          class="d-block img-fluid image-width"
           :src="imageSrc"
           :alt="title"
+          width="480"
+          height="480"
         />
       </div>
     </div>
@@ -29,34 +30,52 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 
-@Component
-export default class Slide extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() imageSrc!: string;
-  @Prop() button!: {
-    text: {
-      en: string;
-      es: string;
-      pt: string;
+export default defineComponent({
+  name: 'HomepageSlide',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    imageSrc: {
+      type: String,
+      required: true,
+    },
+    button: {
+      type: Object as PropType<{
+        text: {
+          en: string;
+          es: string;
+          pt: string;
+        };
+        href: string;
+        target: string;
+      }>,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      T,
     };
-    href: string;
-    target: string;
-  };
-
-  T = T;
-}
+  },
+});
 </script>
 
 <style lang="scss" scoped>
 .slide {
-  height: 43.5rem;
+  min-height: 43.5rem;
 
-  @media only screen and (min-width: 767px) {
-    height: 31rem;
+  @media only screen and (min-width: 992px) {
+    min-height: 31rem;
   }
 
   h2 {
@@ -67,6 +86,7 @@ export default class Slide extends Vue {
   p {
     font-size: 1.16rem;
     margin-bottom: 1.1em;
+    white-space: pre-line;
   }
 }
 a.slide-button {
@@ -75,10 +95,17 @@ a.slide-button {
   letter-spacing: 0.03rem;
   font-size: 1.08rem;
 }
-.image-width {
+.image-container {
+  width: 100%;
   max-width: 480px;
 }
+.image-width {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
 .titles-width {
+  width: 100%;
   max-width: 640px;
 }
 </style>

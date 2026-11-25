@@ -34,19 +34,14 @@ def send_contest_message_to_client(
         date_lower_limit: datetime.datetime = datetime.datetime(2005, 1, 1),
         date_upper_limit: datetime.datetime = datetime.datetime.now(),
         client: omegaup.api.Client,
+        queue: str = 'contest',
+        routing_key: str = 'ContestQueue',
 ) -> None:
-    '''Send messages to contest queue.
-     date-lower-limit: initial time from which to be taken the finish contests.
-     By default. the 2005/01/01 date will be taken.
-     date-upper-limit: finish time from which to be taken the finish contests.
-     By default, the current date will be taken.
-
-     When API token and URL are given, it is possible to send the messages.
-    '''
+    '''Send messages to the given contest queue.'''
     contest_producer = rabbitmq_producer.RabbitmqProducer(
-        queue='client_contest',
+        queue=queue,
         exchange='certificates',
-        routing_key='ContestQueue',
+        routing_key=routing_key,
         channel=channel
     )
 
@@ -57,9 +52,20 @@ def send_contest_message_to_client(
         client=client
     )
 
+    failed_contests: List[int] = []
+
     for data in contestants:
         message = json.dumps(data._asdict())
-        contest_producer.send_message(message)
+        try:
+            contest_producer.send_message(message)
+        except rabbitmq_producer.MessageNotConfirmedError:
+            logging.exception(
+                'Contest %s was not confirmed by the broker',
+                data.contest_id)
+            failed_contests.append(data.contest_id)
+
+    if failed_contests:
+        raise rabbitmq_producer.UnconfirmedPublicationsError(failed_contests)
 
 
 def get_contests_from_db(
@@ -122,9 +128,9 @@ def main() -> None:
                 date_lower_limit=args.date_lower_limit,
                 date_upper_limit=args.date_upper_limit,
                 client=client)
+        logging.info('Done')
     finally:
         dbconn.conn.close()
-        logging.info('Done')
 
 
 if __name__ == '__main__':

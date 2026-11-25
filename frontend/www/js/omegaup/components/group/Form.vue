@@ -69,7 +69,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import latinize from 'latinize';
+import { generateAlias } from '../../alias';
 
 @Component
 export default class GroupForm extends Vue {
@@ -91,21 +91,6 @@ export default class GroupForm extends Vue {
     this.$emit('create-group', this.name, this.alias, this.description);
   }
 
-  generateAlias(name: string): string {
-    // Remove accents
-    let generatedAlias = latinize(name);
-
-    // Replace whitespace
-    generatedAlias = generatedAlias.replace(/\s+/g, '-');
-
-    // Remove invalid characters
-    generatedAlias = generatedAlias.replace(/[^a-zA-Z0-9_-]/g, '');
-
-    generatedAlias = generatedAlias.substring(0, 32);
-
-    return generatedAlias;
-  }
-
   @Watch('alias')
   onAliasChanged(newValue: string): void {
     if (this.isUpdate) {
@@ -119,7 +104,7 @@ export default class GroupForm extends Vue {
     if (this.isUpdate) {
       return;
     }
-    this.alias = this.generateAlias(newValue);
+    this.alias = generateAlias(newValue);
   }
 }
 </script>

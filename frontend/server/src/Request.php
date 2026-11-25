@@ -264,6 +264,54 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures that the value associated with the key is a JSON-encoded list
+     * of strings.
+     *
+     * @param null|callable(string):bool $validator Applied to every element.
+     * @return list<string>
+     */
+    public function ensureJsonStringList(
+        string $key,
+        ?callable $validator = null
+    ): array {
+        $rawValue = $this->ensureString($key);
+        /** @var mixed */
+        $decoded = json_decode($rawValue, associative: true);
+        if (!is_array($decoded) || !array_is_list($decoded)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $key
+            );
+        }
+
+        $result = [];
+        /** @var mixed $item */
+        foreach ($decoded as $item) {
+            if (!is_string($item)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    $key
+                );
+            }
+            if (!is_null($validator)) {
+                try {
+                    if (!$validator($item)) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterInvalid',
+                            $key
+                        );
+                    }
+                } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                    $e->parameter = $key;
+                    throw $e;
+                }
+            }
+            $result[] = $item;
+        }
+        return $result;
+    }
+
+    /**
      * Ensures that the value associated with the key is a timestamp.
      */
     public function ensureTimestamp(
@@ -471,6 +519,29 @@ class Request extends \ArrayObject {
             is_null($this->user)
             || $this->user->main_identity_id != $this->identity->identity_id
         ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+    }
+
+    /**
+     * Ensures that the current identity has administrative access, either
+     * because it is a system admin, or because it is a member of the
+     * support team.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->user_id
+     * @psalm-assert !null $this->identity->username
+     * @psalm-assert !null $this->user
+     * @psalm-assert !null $this->user->main_identity_id
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->username
+     */
+    public function ensureUserHasAdministrativeAccess(): void {
+        $this->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSupportTeamMember($this->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }

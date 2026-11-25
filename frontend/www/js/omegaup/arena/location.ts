@@ -58,7 +58,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
       } else if (match.groups.alias?.startsWith('clarification-')) {
         clarificationsStore.commit(
           'selectClarificationId',
-          parseInt(match.groups.alias.split('-')[1]),
+          parseInt(match.groups.alias.split('-')[1], 10),
         );
       }
       break;

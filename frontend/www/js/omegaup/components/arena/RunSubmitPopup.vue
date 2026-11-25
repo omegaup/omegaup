@@ -1,8 +1,11 @@
 <template>
-  <omegaup-overlay-popup @dismiss="$emit('dismiss')">
+  <omegaup-overlay-popup
+    class="run-submit-popup overlay-popup--wide"
+    @dismiss="$emit('dismiss')"
+  >
     <form
       data-run-submit
-      class="d-flex flex-column h-100"
+      class="modal-form d-flex flex-column h-100"
       @submit.prevent="onSubmit"
     >
       <div class="form-group row">
@@ -12,7 +15,7 @@
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
-            class="form-control"
+            class="form-control modal-form__control"
             name="language"
           >
             <option
@@ -36,7 +39,7 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="h-100">
+      <div class="h-100 run-submit-code-view">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
@@ -49,7 +52,12 @@
           {{ T.arenaRunSubmitUpload }}
         </label>
         <div class="col-sm-7">
-          <input ref="inputFile" class="w-100" type="file" name="file" />
+          <input
+            ref="inputFile"
+            class="w-100 modal-form__control"
+            type="file"
+            name="file"
+          />
         </div>
       </div>
       <div class="form-group row">
@@ -81,6 +89,7 @@ import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
+import { SafeStorage } from '../../safe_storage';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
@@ -90,6 +99,7 @@ import {
   supportedLanguages,
 } from '../../grader/util';
 import { sourceTemplates } from '../../grader/GraderTemplates';
+import { getCodeTemplate } from '../../code_templates';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -109,6 +119,13 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage: null | string = this.preferredLanguage;
   code = '';
   now: number = Date.now();
+
+  mounted(): void {
+    const savedLanguage = SafeStorage.getItem('arena:selectedLanguage');
+    if (savedLanguage && savedLanguage in this.allowedLanguages) {
+      this.selectedLanguage = savedLanguage;
+    }
+  }
 
   getLanguageExtension(language: string): string {
     if (!language || language === 'cat') {
@@ -137,12 +154,16 @@ export default class ArenaRunSubmitPopup extends Vue {
       return;
     }
     const extension = this.getLanguageExtension(language);
-    if (extension && sourceTemplates[extension]) {
-      this.code = sourceTemplates[extension];
-    } else {
-      // If no template found, keep current code or set empty
+    if (!extension) {
       this.code = '';
+      return;
     }
+    const customTemplate = getCodeTemplate(extension);
+    if (customTemplate !== null) {
+      this.code = customTemplate;
+      return;
+    }
+    this.code = sourceTemplates[extension] ?? '';
   }
 
   handleChangeLanguage(language: string): void {
@@ -156,6 +177,9 @@ export default class ArenaRunSubmitPopup extends Vue {
   ): void {
     if (!newLanguage || newLanguage === oldLanguage) return;
     this.loadBoilerplateForLanguage(newLanguage);
+    if (oldLanguage !== undefined) {
+      SafeStorage.setItem('arena:selectedLanguage', newLanguage);
+    }
   }
 
   get canSubmit(): boolean {
@@ -205,15 +229,35 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 
   @Watch('preferredLanguage')
-  onPreferredLanguageChanged(newValue: null | string): void {
-    if (newValue) {
-      this.selectedLanguage = newValue;
+  onPreferredLanguageChanged(): void {
+    this.revalidateLanguage();
+  }
+
+  @Watch('languages')
+  onLanguagesChanged(): void {
+    this.revalidateLanguage();
+  }
+
+  revalidateLanguage(): void {
+    if (
+      this.selectedLanguage &&
+      this.selectedLanguage in this.allowedLanguages
+    ) {
+      return;
     }
+    if (
+      this.preferredLanguage &&
+      this.preferredLanguage in this.allowedLanguages
+    ) {
+      this.selectedLanguage = this.preferredLanguage;
+      return;
+    }
+    this.selectedLanguage = Object.keys(this.allowedLanguages)[0] || null;
   }
 
   onSubmit(): void {
     if (!this.canSubmit) {
-      alert(
+      ui.warning(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(
             (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
@@ -224,7 +268,7 @@ export default class ArenaRunSubmitPopup extends Vue {
     }
 
     if (!this.selectedLanguage) {
-      alert(T.arenaRunSubmitMissingLanguage);
+      ui.error(T.arenaRunSubmitMissingLanguage);
       return;
     }
     const file = this.inputFile.files?.[0];
@@ -245,7 +289,7 @@ export default class ArenaRunSubmitPopup extends Vue {
         validExtensions.includes(this.extension)
       ) {
         if (this.inputLimit && file.size >= this.inputLimit) {
-          alert(
+          ui.error(
             ui.formatString(T.arenaRunSubmitFilesize, {
               limit: `${this.inputLimit / 1024} KiB`,
             }),
@@ -257,7 +301,9 @@ export default class ArenaRunSubmitPopup extends Vue {
       }
       // 512kiB _must_ be enough for anybody.
       if (file.size >= 512 * 1024) {
-        alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }));
+        ui.error(
+          ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }),
+        );
         return;
       }
       reader.readAsDataURL(file);
@@ -266,7 +312,7 @@ export default class ArenaRunSubmitPopup extends Vue {
     }
 
     if (!this.code) {
-      alert(T.arenaRunSubmitEmptyCode);
+      ui.error(T.arenaRunSubmitEmptyCode);
       return;
     }
 
@@ -280,3 +326,29 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@media (max-height: 706px), (max-width: 475px) {
+  .run-submit-popup form[data-run-submit] {
+    height: calc(90vh - 54px) !important;
+    max-height: none;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .run-submit-popup form[data-run-submit] > * {
+    flex-shrink: 0;
+  }
+
+  .run-submit-popup form[data-run-submit] > .run-submit-code-view {
+    height: auto !important;
+    flex: 1 1 0;
+    min-height: 100px;
+    flex-shrink: 1;
+  }
+
+  .run-submit-popup .run-submit-code-view .CodeMirror-scroll {
+    height: 100% !important;
+  }
+}
+</style>

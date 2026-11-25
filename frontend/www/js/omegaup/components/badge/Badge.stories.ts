@@ -28,8 +28,7 @@ const meta: Meta<typeof Badge> = {
   component: Badge,
   title: 'Components/Badge',
   argTypes: {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore FIXME: vue-property-decorator is deprecated, so we can't get prop types from the component
+    // Story controls flatten nested badge fields for the controls panel.
     badge_alias: {
       control: 'select',
       options: AvailableBadges,

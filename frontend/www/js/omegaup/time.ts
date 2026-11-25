@@ -1,6 +1,7 @@
 import formatDuration from 'date-fns/formatDuration';
 import intervalToDuration from 'date-fns/intervalToDuration';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import format from 'date-fns/format';
 import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
@@ -319,11 +320,192 @@ export function formatContestDuration(
 }
 
 /**
- * Converts a date to a GMT (UTC) date.
+ * Formats contest duration for ArenaV2 cards.
  *
- * @param date - The local date to be converted.
- * @returns The same date, but in GMT.
+ * Heuristic:
+ * - < 1 hour: show minutes
+ * - < 24 hours: round to nearest hour (~X hours)
+ * - < 30 days: round to nearest day (~X days)
+ * - >= 30 days: convert to months (~X months)
+ *
+ * This intentionally differs from `formatContestDuration` which uses a
+ * mix of `formatDelta` (HH:MM:SS-style) and `date-fns/intervalToDuration`.
+ */
+export function formatContestDurationHumanReadable(
+  startDate: Date,
+  finishDate: Date,
+): string {
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
+  }
+
+  const diffMs = Math.max(0, finishDate.getTime() - startDate.getTime());
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const APPROXIMATE_PREFIX = '~ ';
+
+  const totalMinutes = Math.round(diffMs / (60 * 1000));
+  if (diffMs < ONE_HOUR_MS) {
+    return totalMinutes === 1
+      ? T.contestDurationMinute
+      : interpolate(T.contestDurationMinutes, { N: totalMinutes });
+  }
+
+  if (diffMs < TWENTY_FOUR_HOURS_MS) {
+    const totalHours = Math.max(1, Math.round(diffMs / ONE_HOUR_MS));
+    const duration =
+      totalHours === 1
+        ? T.contestDurationHour
+        : interpolate(T.contestDurationHours, { N: totalHours });
+    if (diffMs % ONE_HOUR_MS === 0) {
+      return duration;
+    }
+    return `${APPROXIMATE_PREFIX}${duration}`;
+  }
+
+  if (diffMs < THIRTY_DAYS_MS) {
+    const totalDays = Math.max(1, Math.round(diffMs / (24 * 60 * 60 * 1000)));
+    const duration =
+      totalDays === 1
+        ? T.contestDurationDay
+        : interpolate(T.contestDurationDays, { N: totalDays });
+    if (diffMs % TWENTY_FOUR_HOURS_MS === 0) {
+      return duration;
+    }
+    return `${APPROXIMATE_PREFIX}${duration}`;
+  }
+
+  const totalMonths = Math.max(1, Math.round(diffMs / THIRTY_DAYS_MS));
+  const duration = formatDuration(
+    { months: totalMonths },
+    { locale: currentLocale },
+  );
+  if (diffMs % THIRTY_DAYS_MS === 0) {
+    return duration;
+  }
+  return `${APPROXIMATE_PREFIX}${duration}`;
+}
+
+export function formatDateForContest(date: Date): string {
+  let currentLocale;
+  let dateFormat: string;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      dateFormat = 'd MMMM yyyy';
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      dateFormat = 'MMMM d, yyyy';
+      break;
+    default:
+      currentLocale = esLocale;
+      dateFormat = 'd MMMM yyyy';
+      break;
+  }
+  return format(date, dateFormat, { locale: currentLocale });
+}
+
+function interpolate(
+  template: string,
+  values: Record<string, string | number>,
+): string {
+  return template.replace(/%\(([^)]+)\)/g, (_, key) =>
+    String(values[key] ?? ''),
+  );
+}
+
+const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
+const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+
+function buildDurationString(diffMs: number): string {
+  if (diffMs < FORTY_EIGHT_HOURS_MS) {
+    const totalHours = Math.floor(diffMs / (60 * 60 * 1000));
+    if (totalHours >= 1) {
+      return totalHours === 1
+        ? T.contestDurationHour
+        : interpolate(T.contestDurationHours, { N: totalHours });
+    }
+    const totalMinutes = Math.floor(diffMs / (60 * 1000));
+    return totalMinutes === 1
+      ? T.contestDurationMinute
+      : interpolate(T.contestDurationMinutes, { N: totalMinutes });
+  }
+  const totalDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+  return totalDays === 1
+    ? T.contestDurationDay
+    : interpolate(T.contestDurationDays, { N: totalDays });
+}
+
+/**
+ * Returns the display string for a past contest's finish time.
+ * E.g. "Ended 5 minutes ago" or "Ended: February 1, 2026"
+ */
+export function getDisplayForPastContest(finishDate: Date): string {
+  const diffMs = Date.now() - finishDate.getTime();
+  if (diffMs < FIFTEEN_DAYS_MS) {
+    return interpolate(T.contestEndedAgo, {
+      duration: buildDurationString(diffMs),
+    });
+  }
+  return interpolate(T.contestEndedOn, {
+    endDate: formatDateForContest(finishDate),
+  });
+}
+
+/**
+ * Returns the display string for a currently-running contest's finish time.
+ * E.g. "Ends in 3 days" or "Ends: March 27, 2026"
+ */
+export function getDisplayForCurrentContest(finishDate: Date): string {
+  const diffMs = finishDate.getTime() - Date.now();
+  if (diffMs > 0 && diffMs < FIFTEEN_DAYS_MS) {
+    return interpolate(T.contestEndsIn, {
+      duration: buildDurationString(diffMs),
+    });
+  }
+  return interpolate(T.contestEndTime, {
+    endDate: formatDateForContest(finishDate),
+  });
+}
+
+/**
+ * Returns the display string for a future contest's start time.
+ * E.g. "Starts in 2 hours" or "Starts: May 26, 2026"
+ */
+export function getDisplayForFutureContest(startDate: Date): string {
+  const diffMs = startDate.getTime() - Date.now();
+  if (diffMs > 0 && diffMs < FIFTEEN_DAYS_MS) {
+    return interpolate(T.contestStartsIn, {
+      duration: buildDurationString(diffMs),
+    });
+  }
+  return interpolate(T.contestStartsOn, {
+    startDate: formatDateForContest(startDate),
+  });
+}
+
+/**
+ * Converts a UTC date to a local date with the same year/month/day.
+ *
+ * When the server sends a date-only value (like birth_date) as a POSIX
+ * timestamp at midnight UTC, creating a JS Date from it can show the previous
+ * day in timezones west of UTC. This function extracts the UTC components and
+ * constructs a local Date with the same year, month, and day values.
+ *
+ * @param date - The date whose UTC components should be preserved.
+ * @returns A local Date with the same year/month/day as the UTC representation.
  */
 export function convertLocalDateToGMTDate(date: Date): Date {
-  return new Date(date.toUTCString().replace('GMT', ''));
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }

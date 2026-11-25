@@ -52,7 +52,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         );
         $identities = [];
         foreach ($rs as $row) {
-            if (strpos($row['username'], ':') === false) {
+            if (!str_contains($row['username'], ':')) {
                 $identities[] = [
                     'username' => $row['username'],
                     'name' => $row['name'],

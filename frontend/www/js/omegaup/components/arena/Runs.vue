@@ -1,8 +1,14 @@
 <template>
-  <div class="mt-2" data-runs>
+  <div
+    v-infinite-scroll="() => $emit('fetch-more-data')"
+    class="mt-2"
+    data-runs
+    infinite-scroll-disabled="isScrollDisabled"
+    infinite-scroll-distance="10"
+  >
     <slot name="title">
       <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+        <h1 class="text-center">{{ T.latestSubmissionsTitle }}</h1>
       </div>
     </slot>
     <div
@@ -14,27 +20,27 @@
     >
       <div>
         <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
-        <div v-if="showPager">
-          <div class="pager-controls">
-            <button
-              data-button-page-previous
-              :disabled="filterOffset <= 0"
-              @click="filterOffset--"
-            >
-              &lt;
-            </button>
-            {{ currentPage }}
-            <button
-              data-button-page-next
-              :disabled="
-                totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
-              "
-              @click="filterOffset++"
-            >
-              &gt;
-            </button>
-          </div>
+        <div v-if="showPager" class="pager-controls">
+          <button
+            data-button-page-previous
+            :disabled="filterOffset <= 0"
+            @click="filterOffset--"
+          >
+            &lt;
+          </button>
+          {{ currentPage }}
+          <button
+            data-button-page-next
+            :disabled="
+              totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
+            "
+            @click="filterOffset++"
+          >
+            &gt;
+          </button>
+        </div>
 
+        <div v-if="shouldShowFilters">
           <div class="filters row">
             <label class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
@@ -105,6 +111,7 @@
                 <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
+                <option value="rk">ReKarel</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
@@ -121,14 +128,6 @@
                   "
                 ></omegaup-common-typeahead>
               </label>
-              <button
-                type="button"
-                class="close"
-                style="float: none"
-                @click="filterProblem = null"
-              >
-                &times;
-              </button>
             </template>
 
             <template v-if="showUser">
@@ -221,7 +220,22 @@
             </tr>
           </tfoot>
           <tbody>
-            <tr v-for="run in filteredRuns" :key="run.guid">
+            <tr v-if="filteredRuns.length === 0">
+              <td colspan="12">
+                <omegaup-common-empty-state
+                  icon="clipboard-list"
+                  :title="T.runsListEmptyTitle"
+                  :description="T.runsListEmptyDescription"
+                ></omegaup-common-empty-state>
+              </td>
+            </tr>
+            <tr
+              v-for="run in filteredRuns"
+              :key="run.guid"
+              :class="{
+                'run-loading': run.status !== 'ready',
+              }"
+            >
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td>
                 <acronym :title="run.guid" data-run-guid>
@@ -236,7 +250,7 @@
                 <omegaup-user-username
                   :classname="run.classname"
                   :username="run.username"
-                  :country="run.country_id"
+                  :country="run.country"
                   :linkify="true"
                   :href="'#runs'"
                   :emit-click-event="true"
@@ -285,6 +299,12 @@
                 data-run-status
                 class="text-center opacity-4 font-weight-bold"
               >
+                <font-awesome-icon
+                  v-if="run.status !== 'ready'"
+                  :icon="['fas', 'spinner']"
+                  spin
+                  class="mr-1"
+                />
                 <span class="mr-1">{{ status(run) }}</span>
                 <button
                   v-if="!!statusHelp(run)"
@@ -414,6 +434,13 @@
               </td>
               <td v-else></td>
             </tr>
+            <template v-if="loading">
+              <tr v-for="index in 3" :key="`loading-${index}`">
+                <td colspan="16">
+                  <div class="loading-line"></div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -437,6 +464,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import infiniteScroll from 'vue-infinite-scroll';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -444,6 +472,7 @@ import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import common_EmptyState from '../common/EmptyState.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -454,6 +483,7 @@ import {
   faSearchPlus,
   faExternalLinkAlt,
   faTimes,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faQuestionCircle);
 library.add(faRedoAlt);
@@ -461,6 +491,7 @@ library.add(faBan);
 library.add(faSearchPlus);
 library.add(faExternalLinkAlt);
 library.add(faTimes);
+library.add(faSpinner);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -495,6 +526,10 @@ export enum PopupDisplayed {
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
+    'omegaup-common-empty-state': common_EmptyState,
+  },
+  directives: {
+    infiniteScroll,
   },
 })
 export default class Runs extends Vue {
@@ -504,6 +539,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showDetails!: boolean;
   @Prop({ default: false }) showDisqualify!: boolean;
   @Prop({ default: false }) showPager!: boolean;
+  @Prop({ default: null }) showFilters!: boolean | null;
   @Prop({ default: false }) showPoints!: boolean;
   @Prop({ default: false }) showProblem!: boolean;
   @Prop({ default: false }) showRejudge!: boolean;
@@ -524,6 +560,8 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) inContest!: boolean;
+  @Prop({ default: false }) loading!: boolean;
+  @Prop({ default: false }) endOfResults!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -543,6 +581,14 @@ export default class Runs extends Vue {
 
   get currentPage(): number {
     return this.filterOffset + 1;
+  }
+
+  get isScrollDisabled(): boolean {
+    return this.loading || this.endOfResults;
+  }
+
+  get shouldShowFilters(): boolean {
+    return this.showFilters !== null ? this.showFilters : this.showPager;
   }
 
   get filteredRuns(): types.Run[] {
@@ -721,7 +767,7 @@ export default class Runs extends Vue {
       return '';
     }
 
-    if (run.language == 'kj' || run.language == 'kp') {
+    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
       if (run.verdict == 'RTE' || run.verdict == 'RE') {
         return T.verdictHelpKarelRTE;
       } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
@@ -973,5 +1019,53 @@ export default class Runs extends Vue {
 .status-rfe {
   background: var(--arena-runs-table-status-rfe-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.loading-line {
+  height: 49px;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+}
+tr.run-loading td {
+  animation: run-loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes run-loading-pulse {
+  0% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>

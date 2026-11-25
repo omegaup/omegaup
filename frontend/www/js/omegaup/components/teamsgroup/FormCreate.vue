@@ -21,7 +21,7 @@
 import teamsgroup_FormBase from './FormBase.vue';
 import { Vue, Component, Watch, Emit, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import latinize from 'latinize';
+import { generateAlias } from '../../alias';
 
 @Component({
   components: {
@@ -37,18 +37,6 @@ export default class TeamsGroupFormCreate extends Vue {
   name: null | string = null;
   numberOfContestants: number = 3;
 
-  generateAlias(name: string): string {
-    // Remove accents
-    return (
-      latinize(name)
-        // Replace whitespace
-        .replace(/\s+/g, '-')
-        // Remove invalid characters
-        .replace(/[^a-zA-Z0-9_-]/g, '')
-        .substring(0, 32)
-    );
-  }
-
   @Watch('alias')
   @Emit('validate-unused-alias')
   onAliasChanged(newValue: string): string {
@@ -57,7 +45,7 @@ export default class TeamsGroupFormCreate extends Vue {
 
   @Watch('name')
   onNameChanged(newValue: string): void {
-    this.alias = this.generateAlias(newValue);
+    this.alias = generateAlias(newValue);
   }
 }
 </script>

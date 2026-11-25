@@ -22,48 +22,53 @@
         </label>
       </div>
     </div>
-    <table
-      v-if="items.length > 0"
-      class="table table-striped mb-0 table-responsive col-12 table-typo p-0"
-    >
-      <thead class="d-table col-12">
-        <tr>
-          <template v-for="column in columnNames"
-            ><th :class="column.style">{{ column.name }}</th></template
-          >
-        </tr>
-      </thead>
-      <tbody class="d-table col-12">
-        <tr v-for="(group, index) in paginatedItems" :key="index">
-          <th v-if="showPageOffset" scope="row" class="text-left align-middle">
-            {{ currentPageNumber * rowsPerPage + (index + 1) }}
-          </th>
-          <td
-            v-for="(item, itemIndex) in group"
-            :key="itemIndex"
-            class="align-middle"
-          >
-            <slot name="item-data" :item="item">
-              <a :href="item.getUrl()">
-                <img
-                  v-if="item.getLogo()"
-                  :src="item.getLogo().url"
-                  :title="item.getLogo().title"
-                  :alt="item.getLogo().title"
-                />
-                {{ item.toString() }}
-              </a>
-            </slot>
-          </td>
-          <td
-            v-if="!group[0].getBadge().isEmpty()"
-            class="text-right align-middle"
-          >
-            <strong>{{ group[0].getBadge().get() }}</strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="items.length > 0" class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <template v-for="column in columnNames">
+              <th :key="column.name" :class="column.style">
+                {{ column.name }}
+              </th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(group, index) in paginatedItems" :key="index">
+            <th
+              v-if="showPageOffset"
+              scope="row"
+              class="text-left align-middle"
+            >
+              {{ currentPageNumber * rowsPerPage + (index + 1) }}
+            </th>
+            <td
+              v-for="(item, itemIndex) in group"
+              :key="itemIndex"
+              class="align-middle"
+            >
+              <slot name="item-data" :item="item">
+                <a :href="item.getUrl()">
+                  <img
+                    v-if="item.getLogo()"
+                    :src="item.getLogo().url"
+                    :title="item.getLogo().title"
+                    :alt="item.getLogo().title"
+                  />
+                  {{ item.toString() }}
+                </a>
+              </slot>
+            </td>
+            <td
+              v-if="!group[0].getBadge().isEmpty()"
+              class="text-right align-middle"
+            >
+              <strong>{{ group[0].getBadge().get() }}</strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div v-if="items.length > 0" class="card-footer text-center">
       <div class="btn-group" role="group">
         <button
@@ -120,19 +125,27 @@ export default class TablePaginator extends Vue {
     this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
 
   private nextPage(): void {
-    this.currentPageNumber++;
+    if (this.currentPageNumber < this.totalPagesCount - 1) {
+      this.currentPageNumber++;
+    }
   }
 
   private previousPage(): void {
-    this.currentPageNumber--;
+    if (this.currentPageNumber > 0) {
+      this.currentPageNumber--;
+    }
   }
 
   private get totalPagesCount(): number {
-    return Math.ceil(this.items.length / this.rowsPerPage);
+    if (this.rowsPerPage <= 0) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.items.length / this.rowsPerPage));
   }
 
   private get rowsPerPage(): number {
-    return Math.floor(this.itemsPerPage);
+    const rows = Math.floor(this.itemsPerPage);
+    return rows > 0 ? rows : 1;
   }
 
   private get itemsRows(): LinkableResource[][] {
@@ -144,28 +157,41 @@ export default class TablePaginator extends Vue {
   }
 
   private get paginatedItems(): LinkableResource[][] {
-    const start = this.currentPageNumber * this.rowsPerPage;
+    const page = Math.max(
+      0,
+      Math.min(this.currentPageNumber, this.totalPagesCount - 1),
+    );
+    const start = page * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     return this.itemsRows.slice(start, end);
   }
 
+  @Watch('items')
+  onItemsChange(): void {
+    this.currentPageNumber = 0;
+  }
+
+  @Watch('itemsPerPage')
+  onItemsPerPageChange(): void {
+    this.currentPageNumber = 0;
+  }
+
+  @Watch('totalPagesCount')
+  onTotalPagesCountChange(newTotalPagesCount: number): void {
+    if (this.currentPageNumber >= newTotalPagesCount) {
+      this.currentPageNumber = Math.max(0, newTotalPagesCount - 1);
+    }
+  }
+
   @Watch('currentSortOption')
-  onCurrentSortOptionChange(newSelector: string) {
+  onCurrentSortOptionChange(newSelector: string): void {
+    this.currentPageNumber = 0;
     this.$emit('sort-option-change', newSelector);
   }
 }
 </script>
 
-<style>
-@media (max-width: 550px) {
-  .table-typo td,
-  .table-typo th {
-    display: block;
-    background-color: var(--table-paginator-background-color);
-    border: 1px solid var(--table-paginator-border-color);
-  }
-}
-
+<style scoped>
 [data-table-paginator] .table td {
   padding: 0.75rem 1.25rem;
 }

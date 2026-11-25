@@ -62,22 +62,30 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 import * as ui from '../../ui';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component({
+export default defineComponent({
+  name: 'IdentityChangePassword',
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
   },
-})
-export default class IdentityChangePassword extends Vue {
-  @Prop() username!: string;
-
-  T = T;
-  ui = ui;
-  newPassword = '';
-  newPasswordRepeat = '';
-}
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['emit-change-password', 'emit-cancel'],
+  data() {
+    return {
+      T,
+      ui,
+      newPassword: '',
+      newPasswordRepeat: '',
+    };
+  },
+});
 </script>

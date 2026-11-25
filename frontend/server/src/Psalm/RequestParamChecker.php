@@ -34,6 +34,7 @@ class RequestParamChecker implements
         'OmegaUp\\Request::ensureoptionalfloat' => 'float|null',
         'OmegaUp\\Request::ensurestring' => 'string',
         'OmegaUp\\Request::ensureoptionalstring' => 'string|null',
+        'OmegaUp\\Request::ensurejsonstringlist' => 'string',
         'OmegaUp\\Request::ensuretimestamp' => '\\OmegaUp\\Timestamp',
         'OmegaUp\\Request::ensureoptionaltimestamp' => '\\OmegaUp\\Timestamp|null',
     ];
@@ -239,7 +240,7 @@ class RequestParamChecker implements
         if (!($stringValue instanceof \PhpParser\Node\Scalar\String_)) {
             if (
                 // Methods within \OmegaUp\Request are exempt
-                strpos($functionId, 'omegaup\\request::') !== 0 &&
+                !str_starts_with($functionId, 'omegaup\\request::') &&
                 \Psalm\IssueBuffer::accepts(
                     new RequestAccessNotALiteralString(
                         "{$methodId}() argument not a literal string",
@@ -445,7 +446,7 @@ class RequestParamChecker implements
             if (!$stringValue instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request are exempt
-                    strpos($functionId, 'omegaup\\request::') !== 0 &&
+                    !str_starts_with($functionId, 'omegaup\\request::') &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
                             "{$event->getMethodId()}() argument not a literal string",
@@ -481,8 +482,8 @@ class RequestParamChecker implements
             if (!$stringValue instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
-                    strpos($functionId, 'omegaup\\request::') !== 0 &&
-                    strpos($functionId, 'omegaup\\validators::') !== 0 &&
+                    !str_starts_with($functionId, 'omegaup\\request::') &&
+                    !str_starts_with($functionId, 'omegaup\\validators::') &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
                             "{$event->getMethodId()}() second argument not a literal string",
@@ -510,8 +511,8 @@ class RequestParamChecker implements
             if (!$value->dim instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
-                    strpos($functionId, 'omegaup\\request::') !== 0 &&
-                    strpos($functionId, 'omegaup\\validators::') !== 0 &&
+                    !str_starts_with($functionId, 'omegaup\\request::') &&
+                    !str_starts_with($functionId, 'omegaup\\validators::') &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
                             "{$event->getMethodId()}() second argument not a literal string",

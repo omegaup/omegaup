@@ -2,7 +2,7 @@
   <div class="mt-2" data-runs>
     <slot name="title">
       <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+        <h1 class="text-center">{{ T.latestSubmissionsTitle }}</h1>
       </div>
     </slot>
     <div
@@ -116,6 +116,7 @@
                 <option value="js">JavaScript (Node.js 16)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
+                <option value="rk">ReKarel</option>
                 <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
@@ -132,14 +133,6 @@
                   "
                 ></omegaup-common-typeahead>
               </label>
-              <button
-                type="button"
-                class="close"
-                style="float: none"
-                @click="filterProblem = null"
-              >
-                &times;
-              </button>
             </template>
 
             <template v-if="showUser">
@@ -264,7 +257,10 @@
             <tr
               v-for="run in paginatedRuns"
               :key="run.guid"
-              :class="{ selected: createdGuid === run.guid }"
+              :class="{
+                selected: createdGuid === run.guid && run.status === 'ready',
+                'run-loading': run.status !== 'ready',
+              }"
             >
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td v-show="showGUID">
@@ -357,7 +353,15 @@
               >
                 {{ percentage(run) }}
               </td>
-              <td class="numeric">{{ execution(run) }}</td>
+              <td class="numeric">
+                <font-awesome-icon
+                  v-if="run.status !== 'ready'"
+                  :icon="['fas', 'spinner']"
+                  spin
+                  class="mr-1"
+                />
+                {{ execution(run) }}
+              </td>
               <td class="numeric">
                 {{ output(run) }}
                 <br
@@ -539,6 +543,7 @@ import {
   faCalendarAlt,
   faCheckCircle,
   faTimesCircle,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faQuestionCircle);
@@ -552,6 +557,7 @@ library.add(faClock);
 library.add(faCalendarAlt);
 library.add(faCheckCircle);
 library.add(faTimesCircle);
+library.add(faSpinner);
 
 Vue.use(PaginationPlugin);
 
@@ -866,7 +872,7 @@ export default class RunsForCourses extends Vue {
       return '';
     }
 
-    if (run.language == 'kj' || run.language == 'kp') {
+    if (run.language == 'kj' || run.language == 'kp' || run.language == 'rk') {
       if (run.verdict == 'RTE' || run.verdict == 'RE') {
         return T.verdictHelpKarelRTE;
       } else if (run.verdict == 'TLE' || run.verdict == 'TO') {
@@ -886,7 +892,7 @@ export default class RunsForCourses extends Vue {
     }
 
     if (run.status !== 'ready') {
-      return '—';
+      return this.status(run);
     }
 
     switch (run.execution) {
@@ -1106,7 +1112,7 @@ export default class RunsForCourses extends Vue {
 
   onSubmit(): void {
     if (!this.canSubmit && this.nextSubmissionTimestamp) {
-      alert(
+      ui.warning(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(
             (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
@@ -1270,5 +1276,27 @@ export default class RunsForCourses extends Vue {
 .status-rfe {
   background: var(--arena-runs-table-status-rfe-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
+}
+
+tr.run-loading td {
+  animation: run-loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes run-loading-pulse {
+  0% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background-color: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>

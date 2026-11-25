@@ -140,7 +140,10 @@ describe('Header.vue', () => {
     await downloadButton.trigger('click');
     await Vue.nextTick();
 
-    expect(Object.keys(wrapper.vm.zip.files)).toStrictEqual(fileFolderList);
+    const emitted = wrapper.emitted('download-zip-file');
+    expect(emitted).toBeTruthy();
+    const { zipContent } = emitted?.slice(-1)[0][0];
+    expect(Object.keys(zipContent.files)).toStrictEqual(fileFolderList);
 
     jest.restoreAllMocks();
   });

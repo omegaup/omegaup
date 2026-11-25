@@ -98,18 +98,88 @@ export const ACL = {
 };
 
 export const Admin = {
+  getCronRun: apiCall<
+    messages.AdminGetCronRunRequest,
+    messages._AdminGetCronRunServerResponse,
+    messages.AdminGetCronRunResponse
+  >('/api/admin/getCronRun/', (x) => {
+    if (typeof x.run !== 'undefined' && x.run !== null)
+      x.run = ((x) => {
+        if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+          x.finished_at = ((x: number) => new Date(x * 1000))(x.finished_at);
+        if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+          x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+        return x;
+      })(x.run);
+    return x;
+  }),
+  getCrons: apiCall<
+    messages.AdminGetCronsRequest,
+    messages._AdminGetCronsServerResponse,
+    messages.AdminGetCronsResponse
+  >('/api/admin/getCrons/', (x) => {
+    x.problemHealthFindings = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.first_detected_at = ((x: number) => new Date(x * 1000))(
+          x.first_detected_at,
+        );
+        return x;
+      });
+    })(x.problemHealthFindings);
+    x.recommendationModelRuns = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      });
+    })(x.recommendationModelRuns);
+    x.runs = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (typeof x.finished_at !== 'undefined' && x.finished_at !== null)
+          x.finished_at = ((x: number) => new Date(x * 1000))(x.finished_at);
+        if (typeof x.started_at !== 'undefined' && x.started_at !== null)
+          x.started_at = ((x: number) => new Date(x * 1000))(x.started_at);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   getMaintenanceMode: apiCall<
     messages.AdminGetMaintenanceModeRequest,
     messages.AdminGetMaintenanceModeResponse
   >('/api/admin/getMaintenanceMode/'),
+  getSystemSettings: apiCall<
+    messages.AdminGetSystemSettingsRequest,
+    messages.AdminGetSystemSettingsResponse
+  >('/api/admin/getSystemSettings/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  rerunCron: apiCall<
+    messages.AdminRerunCronRequest,
+    messages.AdminRerunCronResponse
+  >('/api/admin/rerunCron/'),
+  setCronJobEnabled: apiCall<
+    messages.AdminSetCronJobEnabledRequest,
+    messages.AdminSetCronJobEnabledResponse
+  >('/api/admin/setCronJobEnabled/'),
   setMaintenanceMode: apiCall<
     messages.AdminSetMaintenanceModeRequest,
     messages.AdminSetMaintenanceModeResponse
   >('/api/admin/setMaintenanceMode/'),
+  updateSystemSettings: apiCall<
+    messages.AdminUpdateSystemSettingsRequest,
+    messages.AdminUpdateSystemSettingsResponse
+  >('/api/admin/updateSystemSettings/'),
 };
 
 export const AiEditorial = {
@@ -259,28 +329,6 @@ export const CarouselItems = {
     messages._CarouselItemsListServerResponse,
     messages.CarouselItemsListResponse
   >('/api/carouselItems/list/', (x) => {
-    x.carouselItems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.expiration_date !== 'undefined' &&
-          x.expiration_date !== null
-        )
-          x.expiration_date = ((x: number) => new Date(x * 1000))(
-            x.expiration_date,
-          );
-        return x;
-      });
-    })(x.carouselItems);
-    return x;
-  }),
-  listActive: apiCall<
-    messages.CarouselItemsListActiveRequest,
-    messages._CarouselItemsListActiveServerResponse,
-    messages.CarouselItemsListActiveResponse
-  >('/api/carouselItems/listActive/', (x) => {
     x.carouselItems = ((x) => {
       if (!Array.isArray(x)) {
         return x;
@@ -520,6 +568,64 @@ export const Contest = {
     })(x.results);
     return x;
   }),
+  listAllTabs: apiCall<
+    messages.ContestListAllTabsRequest,
+    messages._ContestListAllTabsServerResponse,
+    messages.ContestListAllTabsResponse
+  >('/api/contest/listAllTabs/', (x) => {
+    x.current = ((x) => {
+      x.results = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.results);
+      return x;
+    })(x.current);
+    x.future = ((x) => {
+      x.results = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.results);
+      return x;
+    })(x.future);
+    x.past = ((x) => {
+      x.results = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.results);
+      return x;
+    })(x.past);
+    return x;
+  }),
   listParticipating: apiCall<
     messages.ContestListParticipatingRequest,
     messages._ContestListParticipatingServerResponse,
@@ -573,6 +679,22 @@ export const Contest = {
   open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
     '/api/contest/open/',
   ),
+  problemChangeLogs: apiCall<
+    messages.ContestProblemChangeLogsRequest,
+    messages._ContestProblemChangeLogsServerResponse,
+    messages.ContestProblemChangeLogsResponse
+  >('/api/contest/problemChangeLogs/', (x) => {
+    x.logs = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.logs);
+    return x;
+  }),
   problemClarifications: apiCall<
     messages.ContestProblemClarificationsRequest,
     messages._ContestProblemClarificationsServerResponse,
@@ -1983,8 +2105,15 @@ export const TeamsGroup = {
   >('/api/teamsGroup/create/'),
   details: apiCall<
     messages.TeamsGroupDetailsRequest,
+    messages._TeamsGroupDetailsServerResponse,
     messages.TeamsGroupDetailsResponse
-  >('/api/teamsGroup/details/'),
+  >('/api/teamsGroup/details/', (x) => {
+    x.team_group = ((x) => {
+      x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+      return x;
+    })(x.team_group);
+    return x;
+  }),
   list: apiCall<
     messages.TeamsGroupListRequest,
     messages.TeamsGroupListResponse
@@ -2160,6 +2289,21 @@ export const User = {
       x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
     return x;
   }),
+  follow: apiCall<messages.UserFollowRequest, messages.UserFollowResponse>(
+    '/api/user/follow/',
+  ),
+  followStatus: apiCall<
+    messages.UserFollowStatusRequest,
+    messages.UserFollowStatusResponse
+  >('/api/user/followStatus/'),
+  followers: apiCall<
+    messages.UserFollowersRequest,
+    messages.UserFollowersResponse
+  >('/api/user/followers/'),
+  following: apiCall<
+    messages.UserFollowingRequest,
+    messages.UserFollowingResponse
+  >('/api/user/following/'),
   generateGitToken: apiCall<
     messages.UserGenerateGitTokenRequest,
     messages.UserGenerateGitTokenResponse
@@ -2248,10 +2392,18 @@ export const User = {
     messages.UserRemoveRoleRequest,
     messages.UserRemoveRoleResponse
   >('/api/user/removeRole/'),
+  reportReadme: apiCall<
+    messages.UserReportReadmeRequest,
+    messages.UserReportReadmeResponse
+  >('/api/user/reportReadme/'),
   revokeAPIToken: apiCall<
     messages.UserRevokeAPITokenRequest,
     messages.UserRevokeAPITokenResponse
   >('/api/user/revokeAPIToken/'),
+  saveReadme: apiCall<
+    messages.UserSaveReadmeRequest,
+    messages.UserSaveReadmeResponse
+  >('/api/user/saveReadme/'),
   selectCoderOfTheMonth: apiCall<
     messages.UserSelectCoderOfTheMonthRequest,
     messages.UserSelectCoderOfTheMonthResponse
@@ -2263,6 +2415,10 @@ export const User = {
     messages.UserStatusVerifiedRequest,
     messages.UserStatusVerifiedResponse
   >('/api/user/statusVerified/'),
+  unfollow: apiCall<
+    messages.UserUnfollowRequest,
+    messages.UserUnfollowResponse
+  >('/api/user/unfollow/'),
   update: apiCall<messages.UserUpdateRequest, messages.UserUpdateResponse>(
     '/api/user/update/',
   ),

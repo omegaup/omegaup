@@ -1,0 +1,67 @@
+name: Mejora de documentación (Spanish)
+description: Ayúdanos a mejorar solicitando cambios, aclaraciones o mejoras en la documentación con este formato
+title: "[DOCS] Descripción breve de la mejora propuesta"
+labels:
+  - documentation
+body:
+  - type: checkboxes
+    id: lista-verificacion
+    attributes:
+      label: Lista de verificación
+      options:
+        - label: He buscado en los issues existentes y confirmado que esto no es un duplicado
+          required: true
+        - label: He discutido esto en [GitHub Discussions](https://github.com/omegaup/omegaup/discussions) o en [Discord](https://discord.gg/K3JFd9d3wk) y recibí retroalimentación positiva
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Contenido
+
+        _Explica qué parte de la documentación debe mejorarse, actualizarse o está generando confusión y/o dificultad de uso._
+
+        _Ejemplo: La descripción en [ubicación] puede confundir a nuevos contribuidores._
+  - type: textarea
+    id: contenido
+    attributes:
+      label: Contenido
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Impacto del problema (opcional)
+
+        _Detalla cómo afecta a usuarios, desarrolladores o nuevos contribuidores._
+  - type: textarea
+    id: impacto
+    attributes:
+      label: Impacto del problema (opcional)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        ## Propuesta de cambio (opcional)
+
+        _Describe el cambio sugerido o la mejora esperada._
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: Propuesta de cambio (opcional)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        ## Contexto (opcional)
+
+        _Proveer contexto nos ayuda a encontrar la solución adecuada_
+
+        _Ejemplo: Enlaces, capturas, referencias externas que ayuden a entender la mejora._
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto (opcional)
+    validations:
+      required: false

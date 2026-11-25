@@ -4,11 +4,11 @@
       class="d-flex justify-content-between card-header"
       :class="`card-header-${category}`"
     >
-      <h5 class="m-0">
+      <h3 class="m-0">
         {{
           category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth
         }}
-      </h5>
+      </h3>
       <a class="card-header-help" :href="CoderOfTheMonthPolicyURL">
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
@@ -23,17 +23,18 @@
         <img
           :src="coderOfTheMonth.gravatar_92"
           height="80"
+          width="80"
           :alt="coderOfTheMonth.username"
         />
       </a>
-      <h5 class="card-title">
+      <h4 class="card-title">
         <omegaup-user-username
           :classname="coderOfTheMonth.classname"
           :linkify="true"
           :username="coderOfTheMonth.username"
           :country="coderOfTheMonth.country_id"
         ></omegaup-user-username>
-      </h5>
+      </h4>
       <template v-if="!coderOfTheMonth.is_private">
         <div class="card-text">
           {{ coderOfTheMonth.name }}
@@ -65,7 +66,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
@@ -76,21 +78,33 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 
-@Component({
+export default defineComponent({
+  name: 'HomepageCoderOfTheMonth',
   components: {
     FontAwesomeIcon,
     'omegaup-user-username': user_Username,
   },
-})
-export default class CoderOfTheMonth extends Vue {
-  @Prop({ default: 'all' }) category!: string;
-  @Prop() coderOfTheMonth!: types.UserProfile;
-
-  T = T;
-  get CoderOfTheMonthPolicyURL(): string {
-    return getBlogUrl('CoderOfTheMonthPolicyURL');
-  }
-}
+  props: {
+    category: {
+      type: String,
+      default: 'all',
+    },
+    coderOfTheMonth: {
+      type: Object as PropType<types.UserProfile>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      T,
+    };
+  },
+  computed: {
+    CoderOfTheMonthPolicyURL(): string {
+      return getBlogUrl('CoderOfTheMonthPolicyURL');
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

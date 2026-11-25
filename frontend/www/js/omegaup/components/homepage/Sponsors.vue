@@ -7,25 +7,42 @@
       class="p-3 mt-2 mt-md-0 sponsor-logo-container"
     >
       <a :href="logo.href" target="_blank">
-        <img :class="logo.class" :src="logo.src" :alt="logo.alt" />
+        <img
+          :class="logo.class"
+          :src="logo.src"
+          :alt="logo.alt"
+          width="280"
+          height="120"
+        />
       </a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-@Component
-export default class Sponsors extends Vue {
-  @Prop() title!: string;
-  @Prop() logos!: {
-    src: string;
-    alt: string;
-    href: string;
-    class: string;
-  }[];
-}
+export default defineComponent({
+  name: 'HomepageSponsors',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    logos: {
+      type: Array as PropType<
+        {
+          src: string;
+          alt: string;
+          href: string;
+          class: string;
+        }[]
+      >,
+      required: true,
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

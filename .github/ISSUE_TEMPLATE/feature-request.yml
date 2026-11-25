@@ -1,0 +1,35 @@
+name: Feature request (English)
+description: Help us improve the platform by describing your ideas using this format.
+title: "[FEATURE] "
+labels:
+  - feature-request
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and confirmed this is not a duplicate
+          required: true
+        - label: I have discussed this on [GitHub Discussions](https://github.com/omegaup/omegaup/discussions) or [Discord](https://discord.gg/K3JFd9d3wk) and received positive feedback
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        _Provide a title for this suggestion in the following format:_
+
+        _As a [type of user], I want [desired functionality or improvement] for [expected benefit]_
+
+        _Example: As a [**user**], I want [**a start button**] so that [**I can return to the homepage with a single click**]_
+
+        ## Context
+
+        _How has this issue affected you? What is the goal to achieve?_
+
+        _Providing context helps us find the right solution._
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+    validations:
+      required: true

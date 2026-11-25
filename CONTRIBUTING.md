@@ -22,12 +22,13 @@ This guide contains detailed instructions for Docker setup, running tests, authe
 
 ## Issue Assignment Workflow
 
-omegaUp uses an automated issue assignment workflow to keep contributions fair and active.
+omegaUp uses a custom automated issue assignment workflow (`.github/workflows/assign-issues.yml`) to keep contributions fair and active.
 
 - Use `/assign` to self-assign an issue
-- You may have up to **3 active assignments** at a time
-- A Pull Request (**Draft PR is acceptable**) must be opened within **7 days** of assignment
-- Issues without PR activity may be automatically unassigned
+- You may have up to **2 active assignments** at a time
+- `/assign` is available only when the issue creator has repository association `OWNER`, `MEMBER`, or `COLLABORATOR`
+- First-time contributors (`FIRST_TIMER`, `FIRST_TIME_CONTRIBUTOR`, `NONE`) can use `/assign` only after they have at least one merged PR in this repository
+- Use `/unassign` to remove yourself from an issue
 
 📘 For full details, see:  
 - [`frontend/www/docs/Issue-Assignment-Workflow.md`](frontend/www/docs/Issue-Assignment-Workflow.md)
