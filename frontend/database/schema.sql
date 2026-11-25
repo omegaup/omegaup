@@ -445,9 +445,13 @@ CREATE TABLE `Emails` (
   `email_id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `user_id` int DEFAULT NULL,
+  `verified` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el usuario comprobó que tiene acceso a este correo',
+  `verification_id` varchar(50) DEFAULT NULL COMMENT 'Token pendiente de verificación de este correo',
+  `verification_expires_at` timestamp NULL DEFAULT NULL COMMENT 'Fecha límite para usar el token de verificación',
   PRIMARY KEY (`email_id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `user_id` (`user_id`),
+  KEY `verification_id` (`verification_id`),
   CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Esta tabla permite tener varios emails por persona';
 /*!40101 SET character_set_client = @saved_cs_client */;
