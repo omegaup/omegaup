@@ -5,23 +5,24 @@
     :selected-module="currentModule"
   >
     <template v-if="currentModule === AvailableModules.Settings">
-      <omegaup-admin-settings
-        :ephemeral-grader-enabled="ephemeralGraderEnabled"
-        @update-ephemeral-grader="onUpdateEphemeralGrader"
-      ></omegaup-admin-settings>
-      <omegaup-admin-maintenance-mode
-        :key="maintenanceVersion"
-        class="mt-4"
-        :maintenance-enabled="maintenanceMode.enabled"
-        :maintenance-message-es="maintenanceMode.message_es || ''"
-        :maintenance-message-en="maintenanceMode.message_en || ''"
-        :maintenance-message-pt="maintenanceMode.message_pt || ''"
-        :maintenance-type="maintenanceMode.type"
-        :maintenance-predefined-templates="maintenancePredefinedTemplates"
-        :preferred-language="preferredLanguage"
-        @toggle-maintenance="onToggleMaintenance"
-        @save-maintenance="onSaveMaintenance"
-      ></omegaup-admin-maintenance-mode>
+      <div class="settings-sections">
+        <omegaup-admin-settings
+          :ephemeral-grader-enabled="ephemeralGraderEnabled"
+          @update-ephemeral-grader="onUpdateEphemeralGrader"
+        ></omegaup-admin-settings>
+        <omegaup-admin-maintenance-mode
+          :key="maintenanceVersion"
+          :maintenance-enabled="maintenanceMode.enabled"
+          :maintenance-message-es="maintenanceMode.message_es || ''"
+          :maintenance-message-en="maintenanceMode.message_en || ''"
+          :maintenance-message-pt="maintenanceMode.message_pt || ''"
+          :maintenance-type="maintenanceMode.type"
+          :maintenance-predefined-templates="maintenancePredefinedTemplates"
+          :preferred-language="preferredLanguage"
+          @toggle-maintenance="onToggleMaintenance"
+          @save-maintenance="onSaveMaintenance"
+        ></omegaup-admin-maintenance-mode>
+      </div>
     </template>
     <div v-else class="card">
       <div class="text-white bg-primary card-header">
@@ -106,3 +107,9 @@ export default class OperationsDashboard extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.settings-sections > * + * {
+  margin-top: var(--admin-dashboard-section-gap);
+}
+</style>
