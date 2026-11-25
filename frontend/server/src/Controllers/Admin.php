@@ -16,6 +16,11 @@
   * @psalm-type RecommendationModelRun=array{model_run_id: int, map_score: float, dataset_size: int, rng_seed: int|null, output_path: null|string, published: bool, skip_reason: null|string, created_at: \OmegaUp\Timestamp}
   * @psalm-type CronsDetailsPayload=array{jobs: list<CronJob>, runs: list<CronRun>, problemHealthFindings: list<ProblemHealthFinding>, recommendationModelRuns: list<RecommendationModelRun>}
   * @psalm-type OperationsDashboardPayload=array{accessLevel: string, maintenanceMode: MaintenanceModeStatus, maintenancePredefinedTemplates: list<PredefinedTemplate>}
+  * @psalm-type RoleSummary=array{role_id: int, name: string, description: string, users_count: int, groups_count: int, permissions_count: int}
+  * @psalm-type RolePermission=array{permission_id: int, name: string, resource_type: string, description: string}
+  * @psalm-type RoleDetails=array{role: RoleSummary, permissions: list<RolePermission>}
+  * @psalm-type RoleAssignment=array{name: string, acl_id: int, resource_type: string, resource_alias: null|string}
+  * @psalm-type RoleAssignmentsResponse=array{assignments: list<RoleAssignment>, total_rows: int}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
     const MAINTENANCE_MESSAGE_ES_KEY = 'maintenance_message_es';
@@ -37,6 +42,8 @@ class Admin extends \OmegaUp\Controllers\Controller {
     const CRON_RUNS_LIMIT = 50;
     const PROBLEM_HEALTH_FINDINGS_LIMIT = 50;
     const RECOMMENDATION_MODEL_RUNS_LIMIT = 20;
+    const ROLE_ASSIGNMENTS_PAGE_SIZE = 20;
+    const ROLE_ASSIGNMENTS_MAX_PAGE_SIZE = 100;
 
     /**
      * Get stats for an overall platform report.
@@ -685,5 +692,95 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 'payload' => self::cronsPayload(),
             ],
         ];
+    }
+
+    private static function ensureCanConsultRoles(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
+        if (
+            \OmegaUp\Authorization::isSystemAdmin($identity) ||
+            \OmegaUp\Authorization::isSupportTeamMember($identity)
+        ) {
+            return;
+        }
+        throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+    }
+
+    /**
+     * @return array{roles: list<RoleSummary>}
+     */
+    public static function apiGetRoles(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        self::ensureCanConsultRoles($r->identity);
+
+        return ['roles' => \OmegaUp\DAO\Roles::getAllWithCounts()];
+    }
+
+    /**
+     * @return RoleDetails
+     *
+     * @omegaup-request-param string $role
+     */
+    public static function apiGetRoleDetails(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        self::ensureCanConsultRoles($r->identity);
+
+        $details = \OmegaUp\DAO\Roles::getDetailsByName(
+            $r->ensureString('role')
+        );
+        if (is_null($details)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'role'
+            );
+        }
+
+        return $details;
+    }
+
+    /**
+     * @return RoleAssignmentsResponse
+     *
+     * @omegaup-request-param string $assignment_type
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param string $role
+     */
+    public static function apiGetRoleAssignments(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        self::ensureCanConsultRoles($r->identity);
+
+        $roleVO = \OmegaUp\DAO\Roles::getByName($r->ensureString('role'));
+        $roleId = intval($roleVO->role_id);
+        $type = $r->ensureString('assignment_type');
+        if (!in_array($type, ['user', 'group'], true)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignment_type'
+            );
+        }
+        $query = substr($r->ensureOptionalString('query') ?? '', 0, 256);
+        $page = max(1, $r->ensureOptionalInt('page') ?? 1);
+        $pageSize = min(
+            self::ROLE_ASSIGNMENTS_MAX_PAGE_SIZE,
+            max(
+                1,
+                $r->ensureOptionalInt(
+                    'page_size'
+                ) ?? self::ROLE_ASSIGNMENTS_PAGE_SIZE
+            )
+        );
+
+        $dao = $type === 'user'
+            ? \OmegaUp\DAO\UserRoles::class
+            : \OmegaUp\DAO\GroupRoles::class;
+
+        return $dao::getAssignmentsByRole(
+            $roleId,
+            $query,
+            $page,
+            $pageSize
+        );
     }
 }

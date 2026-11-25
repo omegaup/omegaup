@@ -216,20 +216,15 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
      */
     public static function getAssignmentsByRole(
         int $roleId,
-        ?int $aclId,
         string $query,
         int $page,
         int $pageSize
     ): array {
         $where = 'gr.role_id = ?';
         $params = [$roleId];
-        if (!is_null($aclId)) {
-            $where .= ' AND gr.acl_id = ?';
-            $params[] = $aclId;
-        }
         if ($query !== '') {
-            $where .= ' AND gm.alias LIKE ?';
-            $params[] = addcslashes($query, '%_\\') . '%';
+            $where .= " AND gm.alias LIKE CONCAT(?, '%')";
+            $params[] = addcslashes($query, '%_\\');
         }
 
         /** @var int|null */

@@ -1,6 +1,6 @@
 <?php
 
-class RoleTest extends \OmegaUp\Test\ControllerTestCase {
+class AdminRoleTest extends \OmegaUp\Test\ControllerTestCase {
     private static function request(
         \OmegaUp\DAO\VO\Identities $identity,
         array $params = []
@@ -21,7 +21,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         try {
-            \OmegaUp\Controllers\Role::apiList(self::request($identity));
+            \OmegaUp\Controllers\Admin::apiGetRoles(self::request($identity));
             $this->fail('Regular users should not list roles');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('userNotAllowed', $e->getMessage());
@@ -33,7 +33,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         foreach ([$support, $admin] as $identity) {
-            $response = \OmegaUp\Controllers\Role::apiList(
+            $response = \OmegaUp\Controllers\Admin::apiGetRoles(
                 self::request($identity)
             );
             $this->assertNotEmpty($response['roles']);
@@ -49,7 +49,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
     public function testListCountsDirectUsersOfTheAdminRole(): void {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
-        $response = \OmegaUp\Controllers\Role::apiList(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoles(
             self::request($admin)
         );
 
@@ -66,7 +66,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
     public function testDetailsReturnsTheRoleAndItsPermissions(): void {
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 
-        $response = \OmegaUp\Controllers\Role::apiDetails(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleDetails(
             self::request($support, ['role' => self::adminRoleName()])
         );
 
@@ -80,7 +80,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
     public function testDetailsReturnsTheResourceTypeOfEachPermission(): void {
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 
-        $response = \OmegaUp\Controllers\Role::apiDetails(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleDetails(
             self::request($support, ['role' => self::adminRoleName()])
         );
 
@@ -102,7 +102,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         try {
-            \OmegaUp\Controllers\Role::apiDetails(
+            \OmegaUp\Controllers\Admin::apiGetRoleDetails(
                 self::request($support, ['role' => 'no-such-role'])
             );
             $this->fail('An unknown role should fail');
@@ -117,7 +117,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         $this->expectException(
             \OmegaUp\Exceptions\ForbiddenAccessException::class
         );
-        \OmegaUp\Controllers\Role::apiAssignments(
+        \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
             self::request($identity, [
                 'role' => self::adminRoleName(),
                 'assignment_type' => 'user',
@@ -129,7 +129,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         try {
-            \OmegaUp\Controllers\Role::apiAssignments(
+            \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
                 self::request($support, [
                     'role' => self::adminRoleName(),
                     'assignment_type' => 'team',
@@ -145,7 +145,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 
-        $response = \OmegaUp\Controllers\Role::apiAssignments(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
             self::request($support, [
                 'role' => self::adminRoleName(),
                 'assignment_type' => 'user',
@@ -170,7 +170,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\User::createAdminUser();
         \OmegaUp\Test\Factories\User::createAdminUser();
 
-        $response = \OmegaUp\Controllers\Role::apiAssignments(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
             self::request($support, [
                 'role' => self::adminRoleName(),
                 'assignment_type' => 'user',
@@ -186,7 +186,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGroupAssignmentsReturnTheExpectedShape(): void {
         ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
 
-        $response = \OmegaUp\Controllers\Role::apiAssignments(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
             self::request($support, [
                 'role' => self::adminRoleName(),
                 'assignment_type' => 'group',
@@ -204,7 +204,7 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $user);
 
-        $response = \OmegaUp\Controllers\Role::apiAssignments(
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
             self::request($support, [
                 'role' => self::adminRoleName(),
                 'assignment_type' => 'user',
@@ -224,5 +224,125 @@ class RoleTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias'],
             $match['resource_alias']
         );
+    }
+
+    /**
+     * @return array{role_id: int, name: string, description: string, users_count: int, groups_count: int, permissions_count: int}
+     */
+    private static function adminRoleSummary(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        $response = \OmegaUp\Controllers\Admin::apiGetRoles(
+            self::request($identity)
+        );
+        foreach ($response['roles'] as $role) {
+            if ($role['role_id'] === \OmegaUp\Authorization::ADMIN_ROLE) {
+                return $role;
+            }
+        }
+        throw new \RuntimeException('The admin role was not found');
+    }
+
+    private static function userAssignmentsTotal(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): int {
+        return \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
+            self::request($identity, [
+                'role' => self::adminRoleName(),
+                'assignment_type' => 'user',
+            ])
+        )['total_rows'];
+    }
+
+    public function testDetailsMatchTheSummaryOfTheList(): void {
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+
+        $details = \OmegaUp\Controllers\Admin::apiGetRoleDetails(
+            self::request($support, ['role' => self::adminRoleName()])
+        );
+
+        $this->assertSame(self::adminRoleSummary($support), $details['role']);
+        $this->assertCount(
+            $details['role']['permissions_count'],
+            $details['permissions']
+        );
+    }
+
+    public function testDetailsOfARoleWithoutPermissions(): void {
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+        $roleName = \OmegaUp\DAO\Roles::getByPK(
+            \OmegaUp\Authorization::CONTESTANT_ROLE
+        )->name;
+
+        $details = \OmegaUp\Controllers\Admin::apiGetRoleDetails(
+            self::request($support, ['role' => $roleName])
+        );
+
+        $this->assertSame(0, $details['role']['permissions_count']);
+        $this->assertSame([], $details['permissions']);
+    }
+
+    public function testUserAssignmentsIgnoreSecondaryIdentities(): void {
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['identity' => $user] = \OmegaUp\Test\Factories\User::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $user);
+        // A second identity of the same user, with the same username prefix.
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'INSERT INTO Identities (username, user_id, name) VALUES (?, ?, ?);',
+            [$user->username . '-second', $user->user_id, 'Secondary identity']
+        );
+
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
+            self::request($support, [
+                'role' => self::adminRoleName(),
+                'assignment_type' => 'user',
+                'query' => $user->username,
+            ])
+        );
+
+        $this->assertSame(1, $response['total_rows']);
+        $this->assertCount(1, $response['assignments']);
+        $this->assertSame(
+            $user->username,
+            $response['assignments'][0]['name']
+        );
+    }
+
+    public function testCountsDistinguishUsersFromAssignments(): void {
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['identity' => $user] = \OmegaUp\Test\Factories\User::createUser();
+        $usersBefore = self::adminRoleSummary($support)['users_count'];
+        $assignmentsBefore = self::userAssignmentsTotal($support);
+
+        // The same user is an admin of two different contests.
+        foreach ([1, 2] as $_) {
+            $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+            \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $user);
+        }
+
+        $this->assertSame(
+            $usersBefore + 1,
+            self::adminRoleSummary($support)['users_count']
+        );
+        $this->assertSame(
+            $assignmentsBefore + 2,
+            self::userAssignmentsTotal($support)
+        );
+    }
+
+    public function testAssignmentsQueryEscapesWildcards(): void {
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+
+        $response = \OmegaUp\Controllers\Admin::apiGetRoleAssignments(
+            self::request($support, [
+                'role' => self::adminRoleName(),
+                'assignment_type' => 'user',
+                'query' => '%',
+            ])
+        );
+
+        $this->assertSame(0, $response['total_rows']);
+        $this->assertSame([], $response['assignments']);
     }
 }

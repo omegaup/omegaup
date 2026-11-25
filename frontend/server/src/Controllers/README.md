@@ -4,6 +4,9 @@
   - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
   - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getRoleAssignments/`](#apiadmingetroleassignments)
+  - [`/api/admin/getRoleDetails/`](#apiadmingetroledetails)
+  - [`/api/admin/getRoles/`](#apiadmingetroles)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/rerunCron/`](#apiadminreruncron)
@@ -215,10 +218,6 @@
   - [`/api/reset/create/`](#apiresetcreate)
   - [`/api/reset/generateToken/`](#apiresetgeneratetoken)
   - [`/api/reset/update/`](#apiresetupdate)
-- [Role](#role)
-  - [`/api/role/assignments/`](#apiroleassignments)
-  - [`/api/role/details/`](#apiroledetails)
-  - [`/api/role/list/`](#apirolelist)
 - [Run](#run)
   - [`/api/run/counts/`](#apiruncounts)
   - [`/api/run/create/`](#apiruncreate)
@@ -386,6 +385,52 @@ Get maintenance mode status
 ```typescript
 types.MaintenanceModeStatus;
 ```
+
+## `/api/admin/getRoleAssignments/`
+
+### Description
+
+### Parameters
+
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `assignment_type` | `string`       |             | ✓        |
+| `page`            | `int`          |             | ✓        |
+| `page_size`       | `int`          |             | ✓        |
+| `role`            | `string`       |             | ✓        |
+| `query`           | `null\|string` |             |          |
+
+### Returns
+
+```typescript
+types.RoleAssignmentsResponse;
+```
+
+## `/api/admin/getRoleDetails/`
+
+### Description
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `role` | `string` |             | ✓        |
+
+### Returns
+
+```typescript
+types.RoleDetails;
+```
+
+## `/api/admin/getRoles/`
+
+### Description
+
+### Returns
+
+| Name    | Type                      |
+| ------- | ------------------------- |
+| `roles` | `List[types.RoleSummary]` |
 
 ## `/api/admin/getSystemSettings/`
 
@@ -4420,55 +4465,6 @@ the correct parameters are supplied.
 | Name      | Type     |
 | --------- | -------- |
 | `message` | `string` |
-
-# Role
-
-## `/api/role/assignments/`
-
-### Description
-
-### Parameters
-
-| Name              | Type           | Description | Required |
-| ----------------- | -------------- | ----------- | -------- |
-| `assignment_type` | `string`       |             | ✓        |
-| `page`            | `int`          |             | ✓        |
-| `page_size`       | `int`          |             | ✓        |
-| `role`            | `string`       |             | ✓        |
-| `acl_id`          | `null\|int`    |             |          |
-| `query`           | `null\|string` |             |          |
-
-### Returns
-
-```typescript
-types.RoleAssignmentsResponse;
-```
-
-## `/api/role/details/`
-
-### Description
-
-### Parameters
-
-| Name   | Type     | Description | Required |
-| ------ | -------- | ----------- | -------- |
-| `role` | `string` |             | ✓        |
-
-### Returns
-
-```typescript
-types.RoleDetails;
-```
-
-## `/api/role/list/`
-
-### Description
-
-### Returns
-
-| Name    | Type                      |
-| ------- | ------------------------- |
-| `roles` | `List[types.RoleSummary]` |
 
 # Run
 

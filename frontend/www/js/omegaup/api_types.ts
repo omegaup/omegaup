@@ -5588,6 +5588,12 @@ export namespace messages {
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
+  export type AdminGetRoleAssignmentsRequest = { [key: string]: any };
+  export type AdminGetRoleAssignmentsResponse = types.RoleAssignmentsResponse;
+  export type AdminGetRoleDetailsRequest = { [key: string]: any };
+  export type AdminGetRoleDetailsResponse = types.RoleDetails;
+  export type AdminGetRolesRequest = { [key: string]: any };
+  export type AdminGetRolesResponse = { roles: types.RoleSummary[] };
   export type AdminGetSystemSettingsRequest = { [key: string]: any };
   export type AdminGetSystemSettingsResponse = {
     settings: { ephemeralGraderEnabled: boolean };
@@ -6332,14 +6338,6 @@ export namespace messages {
   export type ResetUpdateRequest = { [key: string]: any };
   export type ResetUpdateResponse = { message: string };
 
-  // Role
-  export type RoleAssignmentsRequest = { [key: string]: any };
-  export type RoleAssignmentsResponse = types.RoleAssignmentsResponse;
-  export type RoleDetailsRequest = { [key: string]: any };
-  export type RoleDetailsResponse = types.RoleDetails;
-  export type RoleListRequest = { [key: string]: any };
-  export type RoleListResponse = { roles: types.RoleSummary[] };
-
   // Run
   export type RunCountsRequest = { [key: string]: any };
   export type RunCountsResponse = {
@@ -6646,6 +6644,15 @@ export namespace controllers {
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
+    getRoleAssignments: (
+      params?: messages.AdminGetRoleAssignmentsRequest,
+    ) => Promise<messages.AdminGetRoleAssignmentsResponse>;
+    getRoleDetails: (
+      params?: messages.AdminGetRoleDetailsRequest,
+    ) => Promise<messages.AdminGetRoleDetailsResponse>;
+    getRoles: (
+      params?: messages.AdminGetRolesRequest,
+    ) => Promise<messages.AdminGetRolesResponse>;
     getSystemSettings: (
       params?: messages.AdminGetSystemSettingsRequest,
     ) => Promise<messages.AdminGetSystemSettingsResponse>;
@@ -7279,18 +7286,6 @@ export namespace controllers {
     update: (
       params?: messages.ResetUpdateRequest,
     ) => Promise<messages.ResetUpdateResponse>;
-  }
-
-  export interface Role {
-    assignments: (
-      params?: messages.RoleAssignmentsRequest,
-    ) => Promise<messages.RoleAssignmentsResponse>;
-    details: (
-      params?: messages.RoleDetailsRequest,
-    ) => Promise<messages.RoleDetailsResponse>;
-    list: (
-      params?: messages.RoleListRequest,
-    ) => Promise<messages.RoleListResponse>;
   }
 
   export interface Run {

@@ -156,6 +156,18 @@ export const Admin = {
     messages.AdminGetMaintenanceModeRequest,
     messages.AdminGetMaintenanceModeResponse
   >('/api/admin/getMaintenanceMode/'),
+  getRoleAssignments: apiCall<
+    messages.AdminGetRoleAssignmentsRequest,
+    messages.AdminGetRoleAssignmentsResponse
+  >('/api/admin/getRoleAssignments/'),
+  getRoleDetails: apiCall<
+    messages.AdminGetRoleDetailsRequest,
+    messages.AdminGetRoleDetailsResponse
+  >('/api/admin/getRoleDetails/'),
+  getRoles: apiCall<
+    messages.AdminGetRolesRequest,
+    messages.AdminGetRolesResponse
+  >('/api/admin/getRoles/'),
   getSystemSettings: apiCall<
     messages.AdminGetSystemSettingsRequest,
     messages.AdminGetSystemSettingsResponse
@@ -1867,19 +1879,6 @@ export const Reset = {
   >('/api/reset/generateToken/'),
   update: apiCall<messages.ResetUpdateRequest, messages.ResetUpdateResponse>(
     '/api/reset/update/',
-  ),
-};
-
-export const Role = {
-  assignments: apiCall<
-    messages.RoleAssignmentsRequest,
-    messages.RoleAssignmentsResponse
-  >('/api/role/assignments/'),
-  details: apiCall<messages.RoleDetailsRequest, messages.RoleDetailsResponse>(
-    '/api/role/details/',
-  ),
-  list: apiCall<messages.RoleListRequest, messages.RoleListResponse>(
-    '/api/role/list/',
   ),
 };
 

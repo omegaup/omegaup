@@ -377,28 +377,26 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
      */
     public static function getAssignmentsByRole(
         int $roleId,
-        ?int $aclId,
         string $query,
         int $page,
         int $pageSize
     ): array {
+        // Only the main identity of each user is used, so a user with several
+        // identities does not duplicate its assignments.
+        $from = '
+            User_Roles ur
+            INNER JOIN Users u ON u.user_id = ur.user_id
+            INNER JOIN Identities i ON i.identity_id = u.main_identity_id';
         $where = 'ur.role_id = ?';
         $params = [$roleId];
-        if (!is_null($aclId)) {
-            $where .= ' AND ur.acl_id = ?';
-            $params[] = $aclId;
-        }
         if ($query !== '') {
-            $where .= ' AND i.username LIKE ?';
-            $params[] = addcslashes($query, '%_\\') . '%';
+            $where .= " AND i.username LIKE CONCAT(?, '%')";
+            $params[] = addcslashes($query, '%_\\');
         }
 
         /** @var int|null */
         $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "SELECT COUNT(*)
-             FROM User_Roles ur
-             INNER JOIN Identities i ON i.user_id = ur.user_id
-             WHERE {$where};",
+            "SELECT COUNT(*) FROM {$from} WHERE {$where};",
             $params
         );
 
@@ -417,8 +415,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
                 COALESCE(c.alias, co.alias, p.alias, g.alias) AS resource_alias
             FROM (
                 SELECT i.username AS name, ur.acl_id
-                FROM User_Roles ur
-                INNER JOIN Identities i ON i.user_id = ur.user_id
+                FROM {$from}
                 WHERE {$where}
                 ORDER BY i.username, ur.acl_id
                 LIMIT ?, ?
