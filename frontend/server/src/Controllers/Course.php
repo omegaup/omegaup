@@ -2586,7 +2586,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            \OmegaUp\DAO\GroupsIdentities::replace($groupIdentity);
+            \OmegaUp\DAO\GroupsIdentities::upsertPreservingOrigin(
+                $groupIdentity
+            );
 
             if (
                 $course->admission_mode === self::ADMISSION_MODE_REGISTRATION

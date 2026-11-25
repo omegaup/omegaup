@@ -52,8 +52,10 @@ abstract class GroupsIdentities {
                     `share_user_information`,
                     `privacystatement_consent_id`,
                     `accept_teacher`,
-                    `is_invited`
+                    `is_invited`,
+                    `is_origin`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -80,6 +82,7 @@ abstract class GroupsIdentities {
                 null
             ),
             intval($Groups_Identities->is_invited),
+            intval($Groups_Identities->is_origin),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -102,7 +105,8 @@ abstract class GroupsIdentities {
                 `share_user_information` = ?,
                 `privacystatement_consent_id` = ?,
                 `accept_teacher` = ?,
-                `is_invited` = ?
+                `is_invited` = ?,
+                `is_origin` = ?
             WHERE
                 (
                     `group_id` = ? AND
@@ -125,6 +129,7 @@ abstract class GroupsIdentities {
                 intval($Groups_Identities->accept_teacher)
             ),
             intval($Groups_Identities->is_invited),
+            intval($Groups_Identities->is_origin),
             (
                 is_null($Groups_Identities->group_id) ?
                 null :
@@ -161,7 +166,8 @@ abstract class GroupsIdentities {
                 `Groups_Identities`.`share_user_information`,
                 `Groups_Identities`.`privacystatement_consent_id`,
                 `Groups_Identities`.`accept_teacher`,
-                `Groups_Identities`.`is_invited`
+                `Groups_Identities`.`is_invited`,
+                `Groups_Identities`.`is_origin`
             FROM
                 `Groups_Identities`
             WHERE
@@ -312,7 +318,8 @@ abstract class GroupsIdentities {
                 `Groups_Identities`.`share_user_information`,
                 `Groups_Identities`.`privacystatement_consent_id`,
                 `Groups_Identities`.`accept_teacher`,
-                `Groups_Identities`.`is_invited`
+                `Groups_Identities`.`is_invited`,
+                `Groups_Identities`.`is_origin`
             FROM
                 `Groups_Identities`
             ORDER BY
@@ -362,8 +369,10 @@ abstract class GroupsIdentities {
                     `share_user_information`,
                     `privacystatement_consent_id`,
                     `accept_teacher`,
-                    `is_invited`
+                    `is_invited`,
+                    `is_origin`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -398,6 +407,7 @@ abstract class GroupsIdentities {
                 intval($Groups_Identities->accept_teacher)
             ),
             intval($Groups_Identities->is_invited),
+            intval($Groups_Identities->is_origin),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
