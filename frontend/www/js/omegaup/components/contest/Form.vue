@@ -336,6 +336,7 @@
                     }"
                   >
                     <multiselect
+                      class="omegaup-multiselect"
                       :value="languages"
                       :options="Object.keys(allLanguages)"
                       :multiple="true"
@@ -1709,4 +1710,9 @@ export default class Form extends Vue {
 .btn-group .btn:hover {
   z-index: 0;
 }
+</style>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+@import '../common/omegaup-multiselect';
 </style>
