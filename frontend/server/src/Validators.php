@@ -475,9 +475,36 @@ class Validators {
             return;
         }
 
-        // Validate that we are working with a date
-        // @TODO This strtotime() allows nice strings like "next Thursday".
-        if (!is_string($parameter) || strtotime($parameter) === false) {
+        // Enforce strict YYYY-MM-DD format to reject loose strings
+        // like "next Thursday" that strtotime() would accept.
+        if (
+            !is_string($parameter) ||
+            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
+        }
+
+        // Parse the date strictly in UTC. The '!' resets all fields to
+        // the Unix epoch so only the matched parts are used.
+        $date = \DateTimeImmutable::createFromFormat(
+            '!Y-m-d',
+            $parameter,
+            new \DateTimeZone('UTC')
+        );
+        $errors = \DateTimeImmutable::getLastErrors();
+        // Reject if parsing failed, produced warnings/errors, or if the
+        // roundtrip format differs (catches impossible dates like Feb 30).
+        if (
+            $date === false ||
+            ($errors !== false && (
+                $errors['warning_count'] > 0 ||
+                $errors['error_count'] > 0
+            )) ||
+            $date->format('Y-m-d') !== $parameter
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 $parameterName
@@ -568,6 +595,16 @@ class Validators {
             $parameter = intval($parameter);
         } elseif ($parameter instanceof \OmegaUp\Timestamp) {
             $parameter = $parameter->time;
+        } elseif (is_string($parameter)) {
+             // Only accept strict YYYY-MM-DD format
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)) {
+        throw new \OmegaUp\Exceptions\InvalidParameterException(
+            'parameterInvalid',
+            $parameterName
+        );
+    }
+
+    $parameter = strtotime($parameter);
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotADate',
