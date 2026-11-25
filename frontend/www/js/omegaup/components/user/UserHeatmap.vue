@@ -99,7 +99,7 @@ export default class UserHeatmap extends Vue {
     });
   }
 
-  @Watch('availableYears', { immediate: true, deep: true })
+  @Watch('availableYears')
   onAvailableYearsChange(newValue: number[]): void {
     if (!newValue?.length) return;
 
@@ -113,7 +113,7 @@ export default class UserHeatmap extends Vue {
     });
   }
 
-  @Watch('data', { immediate: true, deep: true })
+  @Watch('data')
   onDataChange(): void {
     if (!this.data?.length) return;
 
