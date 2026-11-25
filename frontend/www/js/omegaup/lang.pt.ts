@@ -446,6 +446,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormAdmissionModeDescription: "Selecione o modo do concurso. Existem tr\u00eas modalidades diferentes:<br /><ul><li>Privado: O concurso s\u00f3 \u00e9 vis\u00edvel para coders que foram explicitamente convidados.</li><li>Registo/aberto: Qualquer pessoa pode registar-se, apenas as pessoas admitidas pelos administradores t\u00eam acesso.</li><li>P\u00fablico: Qualquer pessoa pode participar.</li></ul>",
   contestNewFormAliasInvalid: "o alias pode conter apenas letras, n\u00fameros e h\u00edfens",
   contestNewFormBasicInfo: "Informa\u00e7\u00f5es B\u00e1sicas",
+  contestNewFormBasicInformationNotForTeams: "Concursos por equipes n\u00e3o podem exigir informa\u00e7\u00f5es b\u00e1sicas: as identidades de equipe n\u00e3o podem editar o perfil, ent\u00e3o seus integrantes nunca conseguiriam entrar no concurso.",
   contestNewFormBasicInformationRequired: "\u00c9 necess\u00e1ria informa\u00e7\u00e3o b\u00e1sica",
   contestNewFormBasicInformationRequiredDesc: "Se ativado, todos os concorrentes devem ter registrado suas informa\u00e7\u00f5es b\u00e1sicas para participar do concurso (pa\u00eds, estado, escola)",
   contestNewFormByContests: "Em caso de empate, ser\u00e1 quebrado pelo tempo. O tempo ser\u00e1 medido entre o momento em que o concurso come\u00e7ou e o momento em que cada problema foi resolvido.",

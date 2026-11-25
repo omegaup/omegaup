@@ -445,6 +445,7 @@
 	"contestNewFormAdmissionModeDescription": "Selecciona el modo de acceso del concurso. Existen tres modalidades distintas:<br /><ul><li>Privado: El concurso s\u00f3lo es visible para coders que hayan sido invitados expl\u00edcitamente.</li><li>Registro/abierto: Cualquier persona se puede registrar, s\u00f3lo tienen acceso las personas admitidas por admins.</li><li>P\u00fablico: Cualquier persona puede participar.</li></ul>",
 	"contestNewFormAliasInvalid": "el alias solo puede contener letras, n\u00fameros y guiones",
 	"contestNewFormBasicInfo": "Informaci\u00f3n B\u00e1sica",
+	"contestNewFormBasicInformationNotForTeams": "Los concursos por equipos no pueden solicitar informaci\u00f3n b\u00e1sica: las identidades de equipo no pueden editar su perfil, as\u00ed que sus integrantes nunca podr\u00edan entrar al concurso.",
 	"contestNewFormBasicInformationRequired": "La informaci\u00f3n b\u00e1sica es requerida",
 	"contestNewFormBasicInformationRequiredDesc": "Si est\u00e1 activado, todos los concursantes deben haber registrado su informaci\u00f3n b\u00e1sica para unirse al concurso (pa\u00eds, estado y escuela)",
 	"contestNewFormByContests": "En caso de empate, se desempatar\u00e1 por tiempo. El tiempo contar\u00e1 desde que se inicie el concurso hasta que cada problema sea resuelto.",

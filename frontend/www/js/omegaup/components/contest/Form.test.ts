@@ -157,4 +157,71 @@ describe('Form.vue', () => {
     await wrapper.find('[data-contest-conacup]').trigger('click');
     expect(wrapper.vm.currentScoreMode).toBe('partial');
   });
+
+  it('Should not allow basic information in contests for teams', async () => {
+    const startTime = new Date();
+    const finishTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+    const wrapper = shallowMount(contest_Form, {
+      propsData: {
+        update: false,
+        allLanguages: [{ py3: 'Python 3' }],
+        initialLanguages: ['py3'],
+        initialFinishTime: finishTime,
+        initialStartTime: startTime,
+        initialSubmissionsGap: 1,
+        initialNeedsBasicInformation: true,
+      },
+    });
+
+    const basicInformation = wrapper.find('[data-basic-information-required]');
+    expect(basicInformation.attributes('disabled')).toBeUndefined();
+
+    await wrapper.find('[data-contest-for-teams]').setChecked(true);
+    expect(wrapper.vm.needsBasicInformation).toBe(false);
+    expect(basicInformation.attributes('disabled')).toBe('disabled');
+    expect(wrapper.find('[data-basic-information-teams-warning]').text()).toBe(
+      T.contestNewFormBasicInformationNotForTeams,
+    );
+
+    await wrapper.find('[data-contest-for-teams]').setChecked(false);
+    expect(basicInformation.attributes('disabled')).toBeUndefined();
+    expect(
+      wrapper.find('[data-basic-information-teams-warning]').exists(),
+    ).toBe(false);
+    wrapper.destroy();
+  });
+
+  it('Should reject an existing contest for teams that requires basic information', async () => {
+    const startTime = new Date();
+    const finishTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+    const wrapper = shallowMount(contest_Form, {
+      propsData: {
+        update: true,
+        allLanguages: [{ py3: 'Python 3' }],
+        initialLanguages: ['py3'],
+        initialFinishTime: finishTime,
+        initialStartTime: startTime,
+        initialSubmissionsGap: 1,
+        initialAlias: 'contestAlias',
+        initialTitle: 'Contest Title',
+        initialDescription: 'Contest description.',
+        contestForTeams: true,
+        teamsGroupAlias: { key: 'teams', value: 'Teams' },
+        initialNeedsBasicInformation: true,
+        problems,
+      },
+    });
+
+    // The editor must still be able to uncheck it to fix the contest.
+    const basicInformation = wrapper.find('[data-basic-information-required]');
+    expect(basicInformation.attributes('disabled')).toBeUndefined();
+    expect(wrapper.vm.validateForm()).toBe(false);
+    expect(wrapper.vm.localErrors.needs_basic_information).toBe(
+      T.contestNewFormBasicInformationNotForTeams,
+    );
+
+    await basicInformation.setChecked(false);
+    expect(wrapper.vm.validateForm()).toBe(true);
+    wrapper.destroy();
+  });
 });

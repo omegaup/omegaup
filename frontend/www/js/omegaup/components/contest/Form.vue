@@ -844,13 +844,29 @@
                       v-model="needsBasicInformation"
                       data-basic-information-required
                       class="form-check-input"
+                      :class="{
+                        'is-invalid': localErrors[FieldName.BasicInformation],
+                      }"
                       type="checkbox"
-                      :disabled="isSubmitting"
+                      :disabled="
+                        isSubmitting ||
+                        (currentContestForTeams && !needsBasicInformation)
+                      "
                     />
                     <label class="form-check-label">
                       {{ T.wordsEnable }}
                     </label>
                   </div>
+                  <small
+                    v-if="currentContestForTeams"
+                    class="form-text"
+                    :class="
+                      needsBasicInformation ? 'text-danger' : 'text-muted'
+                    "
+                    data-basic-information-teams-warning
+                  >
+                    {{ T.contestNewFormBasicInformationNotForTeams }}
+                  </small>
                 </div>
                 <div class="form-group col-md-6">
                   <label>
@@ -973,6 +989,7 @@ export enum FieldName {
   WindowLength = 'window_length',
   FinishTime = 'finish_time',
   TeamsGroup = 'teams_group_alias',
+  BasicInformation = 'needs_basic_information',
 }
 
 export enum SectionName {
@@ -1255,6 +1272,23 @@ export default class Form extends Vue {
     }
   }
 
+  @Watch('currentContestForTeams')
+  onContestForTeamsChange(newValue: boolean): void {
+    // Team identities can't edit their profile, so they could never fill in
+    // the basic information and would be locked out of the contest.
+    if (newValue) {
+      this.needsBasicInformation = false;
+      this.clearFieldError(FieldName.BasicInformation);
+    }
+  }
+
+  @Watch('needsBasicInformation')
+  onNeedsBasicInformationChange(newValue: boolean): void {
+    if (!newValue) {
+      this.clearFieldError(FieldName.BasicInformation);
+    }
+  }
+
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
     if (!newValue) {
@@ -1429,6 +1463,11 @@ export default class Form extends Vue {
     if (this.currentContestForTeams && !this.currentTeamsGroupAlias) {
       this.localErrors[FieldName.TeamsGroup] =
         T.contestNewFormTeamsGroupRequired;
+    }
+
+    if (this.currentContestForTeams && this.needsBasicInformation) {
+      this.localErrors[FieldName.BasicInformation] =
+        T.contestNewFormBasicInformationNotForTeams;
     }
 
     return Object.keys(this.localErrors).length === 0;
