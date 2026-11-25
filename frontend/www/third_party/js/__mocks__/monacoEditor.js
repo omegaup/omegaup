@@ -6,6 +6,7 @@ module.exports = {
         onDidChangeContent: jest.fn(),
         getValue: jest.fn(),
         setValue: jest.fn(),
+        updateOptions: jest.fn(),
       })),
       layout: jest.fn(),
       updateOptions: jest.fn(),
