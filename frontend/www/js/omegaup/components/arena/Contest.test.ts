@@ -1,6 +1,7 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import type { types } from '../../api_types';
 import { SocketStatus } from '../../arena/events_socket';
 import T from '../../lang';
@@ -124,7 +125,7 @@ describe('Contest.vue', () => {
   ];
 
   it('Should handle a finished contest', async () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       propsData: {
         contest: Object.assign({}, contest, { finish_time: currentDate }),
         problems,
@@ -138,7 +139,7 @@ describe('Contest.vue', () => {
   });
 
   it('Should handle details for a problem in a contest', async () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       propsData: {
         contest,
         problems,
@@ -161,7 +162,7 @@ describe('Contest.vue', () => {
   });
 
   it('Should handle a submission', async () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       attachTo: '#root',
       propsData: {
         contest,
@@ -217,7 +218,7 @@ describe('Contest.vue', () => {
     verdict: 'AC',
   };
   it('Should handle details for a run in a contest', async () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       propsData: {
         contest,
         problems,
@@ -243,7 +244,7 @@ describe('Contest.vue', () => {
   });
 
   it('Should handle details for a run in a contest as admin', async () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'runs',
         contestAdmin: true,
@@ -272,7 +273,7 @@ describe('Contest.vue', () => {
   });
 
   it('Should display the edit button when current user is admin', () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'runs',
         contestAdmin: true,
@@ -286,7 +287,7 @@ describe('Contest.vue', () => {
   });
 
   it('Should hide the edit button when current user is not an admin', () => {
-    const wrapper = mount(arena_Contest, {
+    const wrapper = mount(arena_Contest as ComponentOptions<Vue>, {
       propsData: {
         activeTab: 'runs',
         contestAdmin: false,

@@ -232,7 +232,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
@@ -243,7 +243,6 @@ import * as ui from '../../ui';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import { AdmissionMode } from '../common/Publish.vue';
 import omegaup_Countdown from '../Countdown.vue';
-import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import arena_Arena from './Arena.vue';
@@ -255,7 +254,8 @@ import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
 library.add(fas);
 
-@Component({
+export default defineComponent({
+  name: 'ArenaContest',
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena': arena_Arena,
@@ -266,210 +266,311 @@ library.add(fas);
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-countdown': omegaup_Countdown,
-    'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-details': problem_Details,
     'font-awesome-icon': FontAwesomeIcon,
   },
-})
-export default class ArenaContest extends Vue {
-  @Prop() contest!: types.ContestPublicDetails;
-  @Prop({ default: false }) contestAdmin!: boolean;
-  @Prop() problems!: types.NavbarProblemsetProblem[];
-  @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
-  @Prop() problemInfo!: types.ProblemInfo;
-  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
-  @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
-  @Prop({ default: true }) showNavigation!: boolean;
-  @Prop({ default: false }) showRanking!: boolean;
-  @Prop({ default: true }) showClarifications!: boolean;
-  @Prop({ default: true }) showDeadlines!: boolean;
-  @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
-  @Prop() activeTab!: string;
-  @Prop() totalRuns!: number;
-  @Prop({ default: null }) guid!: null | string;
-  @Prop() miniRankingUsers!: omegaup.UserRank[];
-  @Prop() ranking!: types.ScoreboardRankingEntry[];
-  @Prop() rankingChartOptions!: Highcharts.Options;
-  @Prop() lastUpdated!: Date;
-  @Prop() submissionDeadline!: Date;
-  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-  @Prop({ default: true }) showPenalty!: boolean;
-  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-  @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: null }) allRuns!: null | types.Run[];
-  @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
-  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
-  @Prop({ default: null }) nextExecutionTimestamp!: Date | null;
-  @Prop({ default: false }) lockdown!: boolean;
-  @Prop({ default: false })
-  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
-  @Prop({ default: false }) isBlocked!: boolean;
-  @Prop({ default: null }) blockedMessage!: string | null;
-  @Prop({ default: () => [] }) logs!: types.ContestProblemChangeLog[];
-
-  T = T;
-  ui = ui;
-  omegaup = omegaup;
-  AdmissionMode = AdmissionMode;
-  PopupDisplayed = PopupDisplayed;
-  ContestClarificationType = ContestClarificationType;
-  currentClarifications = this.clarifications;
-  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
-  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
-  currentRunDetailsData = this.runDetailsData;
-  now = new Date();
-  currentPopupDisplayed = this.popupDisplayed;
-
-  get socketClass(): string {
-    if (this.socketStatus === SocketStatus.Connected) {
-      return 'socket-status socket-status-ok';
-    }
-    if (this.socketStatus === SocketStatus.Failed) {
-      return 'socket-status socket-status-error';
-    }
-    return 'socket-status';
-  }
-
-  get socketStatusTitle(): string {
-    if (this.socketStatus === SocketStatus.Connected) {
-      return T.socketStatusConnected;
-    }
-    if (this.socketStatus === SocketStatus.Failed) {
-      return T.socketStatusFailed;
-    }
-    return T.socketStatusWaiting;
-  }
-
-  get activeProblemAlias(): null | string {
-    return this.activeProblem?.alias ?? null;
-  }
-
-  get deadline(): Date {
-    return this.submissionDeadline || this.contest.finish_time;
-  }
-
-  get isContestFinished(): boolean {
-    return this.deadline < this.now;
-  }
-
-  get isContestStarted(): boolean {
-    return this.contest.start_time < this.now;
-  }
-
-  get urlPractice(): string {
-    return `/arena/${this.contest.alias}/practice/`;
-  }
-
-  get searchResultProblems(): types.ListItem[] {
-    if (!this.problems.length) {
-      return [];
-    }
-    return this.problems.map((problem) => ({
-      key: problem.alias,
-      value: problem.text,
-    }));
-  }
-
-  created() {
+  props: {
+    contest: {
+      type: Object as PropType<types.ContestPublicDetails>,
+      required: true,
+    },
+    contestAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    problems: {
+      type: Array as PropType<types.NavbarProblemsetProblem[]>,
+      required: true,
+    },
+    users: {
+      type: Array as PropType<types.ContestUser[]>,
+      default: () => [],
+    },
+    problem: {
+      type: (Object as unknown) as PropType<types.NavbarProblemsetProblem | null>,
+      default: null,
+    },
+    problemInfo: {
+      type: Object as PropType<types.ProblemInfo>,
+      default: undefined,
+    },
+    clarifications: {
+      type: Array as PropType<types.Clarification[]>,
+      default: () => [],
+    },
+    isEphemeralExperimentEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    showNavigation: {
+      type: Boolean,
+      default: true,
+    },
+    showRanking: {
+      type: Boolean,
+      default: false,
+    },
+    showClarifications: {
+      type: Boolean,
+      default: true,
+    },
+    showDeadlines: {
+      type: Boolean,
+      default: true,
+    },
+    showNewClarificationPopup: {
+      type: Boolean,
+      default: false,
+    },
+    popupDisplayed: {
+      type: (Number as unknown) as PropType<PopupDisplayed>,
+      default: PopupDisplayed.None,
+    },
+    activeTab: {
+      type: String,
+      default: 'problems',
+    },
+    totalRuns: {
+      type: Number,
+      default: 0,
+    },
+    guid: {
+      type: (String as unknown) as PropType<null | string>,
+      default: null,
+    },
+    miniRankingUsers: {
+      type: Array as PropType<omegaup.UserRank[]>,
+      default: () => [],
+    },
+    ranking: {
+      type: Array as PropType<types.ScoreboardRankingEntry[]>,
+      default: () => [],
+    },
+    rankingChartOptions: {
+      type: Object as PropType<Highcharts.Options>,
+      default: () => ({}),
+    },
+    lastUpdated: {
+      type: (Date as unknown) as PropType<Date | null>,
+      default: null,
+    },
+    submissionDeadline: {
+      type: (Date as unknown) as PropType<Date | null>,
+      default: null,
+    },
+    digitsAfterDecimalPoint: {
+      type: Number,
+      default: 2,
+    },
+    showPenalty: {
+      type: Boolean,
+      default: true,
+    },
+    socketStatus: {
+      type: String as PropType<SocketStatus>,
+      default: SocketStatus.Waiting,
+    },
+    runs: {
+      type: Array as PropType<types.Run[]>,
+      default: () => [],
+    },
+    allRuns: {
+      type: (Array as unknown) as PropType<null | types.Run[]>,
+      default: null,
+    },
+    searchResultUsers: {
+      type: Array as PropType<types.ListItem[]>,
+      default: () => [],
+    },
+    runDetailsData: {
+      type: (Object as unknown) as PropType<null | types.RunDetails>,
+      default: null,
+    },
+    nextSubmissionTimestamp: {
+      type: (Date as unknown) as PropType<Date | null>,
+      default: null,
+    },
+    nextExecutionTimestamp: {
+      type: (Date as unknown) as PropType<Date | null>,
+      default: null,
+    },
+    lockdown: {
+      type: Boolean,
+      default: false,
+    },
+    shouldShowFirstAssociatedIdentityRunWarning: {
+      type: Boolean,
+      default: false,
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    blockedMessage: {
+      type: (String as unknown) as PropType<string | null>,
+      default: null,
+    },
+    logs: {
+      type: Array as PropType<types.ContestProblemChangeLog[]>,
+      default: () => [],
+    },
+  },
+  emits: [
+    'update:activeTab',
+    'navigate-to-problem',
+    'submit-run',
+    'execute-run',
+    'show-run',
+    'reset-hash',
+    'new-submission-popup-displayed',
+    'new-clarification',
+    'clarification-response',
+  ],
+  data() {
+    return {
+      T,
+      ui,
+      omegaup,
+      AdmissionMode,
+      PopupDisplayed,
+      ContestClarificationType,
+      currentClarifications: this.clarifications,
+      activeProblem: this.problem as types.NavbarProblemsetProblem | null,
+      currentNextSubmissionTimestamp: this
+        .nextSubmissionTimestamp as Date | null,
+      currentNextExecutionTimestamp: this.nextExecutionTimestamp as Date | null,
+      currentRunDetailsData: this.runDetailsData as types.RunDetails | null,
+      now: new Date(),
+      currentPopupDisplayed: this.popupDisplayed as PopupDisplayed,
+    };
+  },
+  computed: {
+    socketClass(): string {
+      if (this.socketStatus === SocketStatus.Connected) {
+        return 'socket-status socket-status-ok';
+      }
+      if (this.socketStatus === SocketStatus.Failed) {
+        return 'socket-status socket-status-error';
+      }
+      return 'socket-status';
+    },
+    socketStatusTitle(): string {
+      if (this.socketStatus === SocketStatus.Connected) {
+        return T.socketStatusConnected;
+      }
+      if (this.socketStatus === SocketStatus.Failed) {
+        return T.socketStatusFailed;
+      }
+      return T.socketStatusWaiting;
+    },
+    activeProblemAlias(): null | string {
+      return this.activeProblem?.alias ?? null;
+    },
+    deadline(): Date {
+      return (
+        (this.submissionDeadline as Date | null) || this.contest.finish_time
+      );
+    },
+    isContestFinished(): boolean {
+      return this.deadline < this.now;
+    },
+    isContestStarted(): boolean {
+      return this.contest.start_time < this.now;
+    },
+    urlPractice(): string {
+      return `/arena/${this.contest.alias}/practice/`;
+    },
+    searchResultProblems(): types.ListItem[] {
+      if (!this.problems.length) {
+        return [];
+      }
+      return this.problems.map((problem) => ({
+        key: problem.alias,
+        value: problem.text,
+      }));
+    },
+  },
+  watch: {
+    problem(newValue: types.NavbarProblemsetProblem | null): void {
+      if (!newValue) {
+        this.activeProblem = null;
+        return;
+      }
+      this.onNavigateToProblem(newValue);
+    },
+    problemInfo(newValue: types.ProblemInfo | null): void {
+      if (!newValue) {
+        return;
+      }
+      this.currentNextSubmissionTimestamp =
+        newValue.nextSubmissionTimestamp ?? null;
+      this.currentNextExecutionTimestamp =
+        newValue.nextExecutionTimestamp ?? null;
+    },
+    clarifications(newValue: types.Clarification[]): void {
+      this.currentClarifications = newValue;
+    },
+    runDetailsData(newValue: types.RunDetails): void {
+      this.currentRunDetailsData = newValue;
+    },
+  },
+  created(): void {
     if (this.lockdown) {
       window.addEventListener('beforeunload', this.beforeWindowUnload);
     }
-  }
-
-  beforeDestroy() {
+  },
+  beforeDestroy(): void {
     if (this.lockdown) {
       window.removeEventListener('beforeunload', this.beforeWindowUnload);
     }
-  }
-
-  confirmLeave() {
-    return window.confirm(T.lockdownMessageWarning);
-  }
-
-  beforeWindowUnload(e: BeforeUnloadEvent) {
-    if (!this.confirmLeave()) {
-      // Cancel the event
-      e.preventDefault();
-      // Chrome requires returnValue to be set
-      e.returnValue = true;
-    }
-  }
-
-  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
-    this.activeProblem = problem;
-    this.$emit('navigate-to-problem', { problem });
-  }
-
-  onRunSubmitted(request: { code: string; language: string }): void {
-    this.$emit('submit-run', {
-      ...request,
-      problem: this.activeProblem,
-      target: this,
-    });
-  }
-
-  onRunExecuted(): void {
-    this.$emit('execute-run', { target: this });
-  }
-
-  onRunAdminDetails(guid: string): void {
-    this.$emit('show-run', {
-      guid,
-      hash: `#runs/all/show-run:${guid}`,
-      isAdmin: this.contestAdmin,
-    });
-    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
-  }
-
-  onRunDetails(request: SubmissionRequest): void {
-    this.$emit('show-run', {
-      ...request,
-      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
-      isAdmin: this.contestAdmin,
-    });
-  }
-
-  onPopupDismissed(): void {
-    this.currentPopupDisplayed = PopupDisplayed.None;
-    this.currentRunDetailsData = null;
-    this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
-  }
-
-  @Watch('problem')
-  onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
-    if (!newValue) {
-      this.activeProblem = null;
-      return;
-    }
-    this.onNavigateToProblem(newValue);
-  }
-
-  @Watch('problemInfo')
-  onProblemInfoChanged(newValue: types.ProblemInfo | null): void {
-    if (!newValue) {
-      return;
-    }
-    this.currentNextSubmissionTimestamp =
-      newValue.nextSubmissionTimestamp ?? null;
-    this.currentNextExecutionTimestamp =
-      newValue.nextExecutionTimestamp ?? null;
-  }
-
-  @Watch('clarifications')
-  onClarificationsChanged(newValue: types.Clarification[]): void {
-    this.currentClarifications = newValue;
-  }
-
-  @Watch('runDetailsData')
-  onRunDetailsChanged(newValue: types.RunDetails): void {
-    this.currentRunDetailsData = newValue;
-  }
-}
+  },
+  methods: {
+    confirmLeave(): boolean {
+      return window.confirm(T.lockdownMessageWarning);
+    },
+    beforeWindowUnload(e: BeforeUnloadEvent): void {
+      if (!this.confirmLeave()) {
+        e.preventDefault();
+        e.returnValue = true;
+      }
+    },
+    onNavigateToProblem(problem: types.NavbarProblemsetProblem): void {
+      this.activeProblem = problem;
+      this.$emit('navigate-to-problem', { problem });
+    },
+    onRunSubmitted(request: { code: string; language: string }): void {
+      this.$emit('submit-run', {
+        ...request,
+        problem: this.activeProblem,
+        target: this,
+      });
+    },
+    onRunExecuted(): void {
+      this.$emit('execute-run', { target: this });
+    },
+    onRunAdminDetails(guid: string): void {
+      this.$emit('show-run', {
+        guid,
+        hash: `#runs/all/show-run:${guid}`,
+        isAdmin: this.contestAdmin,
+      });
+      this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    },
+    onRunDetails(request: SubmissionRequest): void {
+      this.$emit('show-run', {
+        ...request,
+        hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
+        isAdmin: this.contestAdmin,
+      });
+    },
+    onPopupDismissed(): void {
+      this.currentPopupDisplayed = PopupDisplayed.None;
+      this.currentRunDetailsData = null;
+      this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

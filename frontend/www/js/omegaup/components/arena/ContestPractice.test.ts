@@ -1,6 +1,7 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
 import type { types } from '../../api_types';
 import * as time from '../../time';
 
@@ -106,7 +107,7 @@ describe('ContestPractice.vue', () => {
   ];
 
   it('Should handle details for a problem in a contest, practice mode', async () => {
-    const wrapper = mount(arena_ContestPractice, {
+    const wrapper = mount(arena_ContestPractice as ComponentOptions<Vue>, {
       propsData: {
         contest,
         problems,
@@ -153,7 +154,7 @@ describe('ContestPractice.vue', () => {
       verdict: 'AC',
     };
 
-    const wrapper = mount(arena_ContestPractice, {
+    const wrapper = mount(arena_ContestPractice as ComponentOptions<Vue>, {
       propsData: {
         contest,
         problems,

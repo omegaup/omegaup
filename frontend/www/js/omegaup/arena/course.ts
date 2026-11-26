@@ -669,7 +669,9 @@ OmegaUp.on('ready', async () => {
     });
   }, 5 * 60 * 1000);
 
-  const component = arenaCourse.$refs.component as arena_Course;
+  const component = (arenaCourse.$refs.component as unknown) as InstanceType<
+    typeof arena_Course
+  >;
 
   window.addEventListener('hashchange', async () => {
     const { problem, guid } = getOptionsFromLocation(window.location.hash);

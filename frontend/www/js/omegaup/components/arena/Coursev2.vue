@@ -118,7 +118,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Vue, { defineComponent, PropType } from 'vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -141,7 +141,8 @@ export enum Tabs {
   Ranking = 'ranking',
 }
 
-@Component({
+export default defineComponent({
+  name: 'ArenaCourse',
   components: {
     BIconChevronLeft,
     BIconArrowLeftCircleFill,
@@ -150,49 +151,86 @@ export enum Tabs {
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-problem-details': problem_Details,
   },
-})
-export default class ArenaCourse extends Vue {
-  @Prop() allRuns!: types.Run[];
-  @Prop() assignment!: types.ArenaCourseAssignment;
-  @Prop() course!: types.ArenaCourseDetails;
-  @Prop() currentProblem!: types.ProblemDetails;
-  @Prop() currentRunDetails!: types.RunDetails | null;
-  @Prop() problems!: types.ArenaCourseProblem[];
-  @Prop() scoreboard!: types.Scoreboard;
-  @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
-  @Prop() user!: types.UserInfoForProblem;
-  @Prop() userRuns!: types.Run[];
-
-  T = T;
-  ui = ui;
-  Tabs = Tabs;
-  currentSelectedTab: string | null = this.selectedTab;
-
-  private get currentAssignmentIndex(): number {
-    return this.course.assignments.findIndex(
-      (assignment) => assignment.alias === this.assignment.alias,
-    );
-  }
-
-  get previousAssignment(): types.CourseAssignment | null {
-    if (this.currentAssignmentIndex === 0) {
-      return null;
-    }
-    return this.course.assignments[this.currentAssignmentIndex - 1];
-  }
-
-  get nextAssignment(): types.CourseAssignment | null {
-    if (this.currentAssignmentIndex === this.course.assignments.length - 1) {
-      return null;
-    }
-    return this.course.assignments[this.currentAssignmentIndex + 1];
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabChanged(newValue: string | null) {
-    this.currentSelectedTab = newValue;
-  }
-}
+  props: {
+    allRuns: {
+      type: Array as PropType<types.Run[]>,
+      required: true,
+    },
+    assignment: {
+      type: Object as PropType<types.ArenaCourseAssignment>,
+      required: true,
+    },
+    course: {
+      type: Object as PropType<types.ArenaCourseDetails>,
+      required: true,
+    },
+    currentProblem: {
+      type: (Object as unknown) as PropType<types.ProblemDetails | null>,
+      default: null,
+    },
+    currentRunDetails: {
+      type: (Object as unknown) as PropType<types.RunDetails | null>,
+      default: null,
+    },
+    problems: {
+      type: Array as PropType<types.ArenaCourseProblem[]>,
+      required: true,
+    },
+    scoreboard: {
+      type: (Object as unknown) as PropType<types.Scoreboard | null>,
+      default: null,
+    },
+    selectedTab: {
+      type: (String as unknown) as PropType<string | null>,
+      default: Tabs.Summary,
+    },
+    user: {
+      type: Object as PropType<types.UserInfoForProblem>,
+      default: undefined,
+    },
+    userRuns: {
+      type: Array as PropType<types.Run[]>,
+      required: true,
+    },
+  },
+  emits: ['show-run-details', 'submit-run'],
+  data() {
+    return {
+      T,
+      ui,
+      Tabs,
+      currentSelectedTab: ((this.selectedTab as string | null) ??
+        Tabs.Summary) as string | null,
+    };
+  },
+  computed: {
+    currentAssignmentIndex(): number {
+      return this.course.assignments.findIndex(
+        (assignment) => assignment.alias === this.assignment.alias,
+      );
+    },
+    previousAssignment(): types.CourseAssignment | null {
+      if (this.currentAssignmentIndex <= 0) {
+        return null;
+      }
+      return this.course.assignments[this.currentAssignmentIndex - 1];
+    },
+    nextAssignment(): types.CourseAssignment | null {
+      if (
+        this.currentAssignmentIndex === -1 ||
+        this.currentAssignmentIndex === this.course.assignments.length - 1
+      ) {
+        return null;
+      }
+      return this.course.assignments[this.currentAssignmentIndex + 1];
+    },
+  },
+  watch: {
+    selectedTab(newValue: string | null) {
+      this.currentSelectedTab = newValue;
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
