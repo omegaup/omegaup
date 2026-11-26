@@ -65,9 +65,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
-import VueRecaptcha from 'vue-recaptcha';
 import omegaup_Login from './Login.vue';
 import omegaup_Signup from './Signup.vue';
 
@@ -76,37 +76,65 @@ export enum AvailableTabs {
   Signup = 'signup',
 }
 
-@Component({
+export default defineComponent({
+  name: 'Signin',
   components: {
     'omegaup-login': omegaup_Login,
     'omegaup-signup': omegaup_Signup,
-    'vue-recaptcha': VueRecaptcha,
   },
-})
-export default class Signin extends Vue {
-  @Prop() validateRecaptcha!: boolean;
-  @Prop() facebookUrl!: string;
-  @Prop({ default: '' }) githubClientId!: string;
-  @Prop({ default: null }) githubState!: string | null;
-  @Prop() googleClientId!: string;
-  @Prop() hasVisitedSection!: boolean;
-  @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
-  @Prop({ default: AvailableTabs.Login }) initialActiveTab!: AvailableTabs;
-
-  T = T;
-  AvailableTabs = AvailableTabs;
-  activeTab: AvailableTabs = this.initialActiveTab;
-
-  @Watch('initialActiveTab')
-  onInitialActiveTabChanged(newValue: AvailableTabs): void {
-    this.activeTab = newValue;
-  }
-
-  setActiveTab(tab: AvailableTabs): void {
-    this.activeTab = tab;
-    window.location.hash = `#${tab}`;
-  }
-}
+  props: {
+    validateRecaptcha: {
+      type: Boolean,
+      required: true,
+    },
+    facebookUrl: {
+      type: String,
+      default: undefined,
+    },
+    githubClientId: {
+      type: String,
+      default: '',
+    },
+    githubState: {
+      type: String as PropType<string | null>,
+      default: null,
+    },
+    googleClientId: {
+      type: String,
+      default: undefined,
+    },
+    hasVisitedSection: {
+      type: Boolean,
+      default: false,
+    },
+    useSignupFormWithBirthDate: {
+      type: Boolean,
+      default: false,
+    },
+    initialActiveTab: {
+      type: String as PropType<AvailableTabs>,
+      default: AvailableTabs.Login,
+    },
+  },
+  data() {
+    return {
+      T,
+      AvailableTabs,
+      activeTab: this.initialActiveTab as AvailableTabs,
+    };
+  },
+  watch: {
+    initialActiveTab(newValue: AvailableTabs): void {
+      this.activeTab = newValue;
+    },
+  },
+  methods: {
+    setActiveTab(tab: AvailableTabs): void {
+      this.activeTab = tab;
+      window.location.hash = `#${tab}`;
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
