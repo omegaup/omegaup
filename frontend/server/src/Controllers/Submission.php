@@ -627,21 +627,28 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        foreach ($feedbackList as $feedback) {
-            self::createOrUpdateFeedback(
-                $r->identity,
-                $submission,
-                $feedback['feedback'],
-                $feedback['lineNumber']
-            );
-        }
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            foreach ($feedbackList as $feedback) {
+                self::createOrUpdateFeedback(
+                    $r->identity,
+                    $submission,
+                    $feedback['feedback'],
+                    $feedback['lineNumber']
+                );
+            }
 
-        if (!is_null($generalFeedback)) {
-            self::createOrUpdateFeedback(
-                $r->identity,
-                $submission,
-                $generalFeedback
-            );
+            if (!is_null($generalFeedback)) {
+                self::createOrUpdateFeedback(
+                    $r->identity,
+                    $submission,
+                    $generalFeedback
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         if (!is_null($courseSubmissionInfo['author_id'])) {
