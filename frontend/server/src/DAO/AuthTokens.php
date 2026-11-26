@@ -114,10 +114,14 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     }
 
     public static function expireAuthTokens(int $identityId): int {
+        // Delete only old tokens (> 7 days) to reduce lock contention during
+        // massive logins
         $sql = 'DELETE FROM
                     `Auth_Tokens`
                 WHERE
-                    identity_id = ?;';
+                    identity_id = ?
+                    AND create_time < DATE_SUB(NOW(), INTERVAL 7 DAY)
+                LIMIT 100;';
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$identityId]);
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
