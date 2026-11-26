@@ -745,7 +745,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
+     * @return list<array{contest_score: float, guid: string, identity_id: int, penalty: int|null, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}>
      */
     final public static function getProblemsetRuns(
         int $problemsetId,
@@ -778,9 +778,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.`time`,
                 s.submit_delay,
                 s.guid,
-                JSON_OBJECTAGG(
-                    IFNULL(rg.group_name, ''),
-                    rg.score
+                IFNULL(
+                    (
+                        SELECT JSON_OBJECTAGG(
+                            IFNULL(rg.group_name, ''),
+                            rg.score
+                        )
+                        FROM Runs_Groups rg
+                        WHERE rg.run_id = r.run_id
+                    ),
+                    JSON_OBJECT('', NULL)
                 ) AS score_by_group
             FROM
                 Problemset_Problems pp
@@ -793,28 +800,15 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r ON s.current_run_id = r.run_id
             LEFT JOIN
                 Contests c ON c.problemset_id = pp.problemset_id
-            LEFT JOIN
-                Runs_Groups rg ON r.run_id = rg.run_id
             WHERE
                 pp.problemset_id = ? AND
                 s.status = 'ready' AND
                 s.`type` = 'normal' AND
                 $verdictCondition
-            GROUP BY
-                score_mode,
-                r.score,
-                r.penalty,
-                r.contest_score,
-                s.problemset_id,
-                s.problem_id,
-                s.identity_id,
-                s.time,
-                s.submit_delay,
-                s.guid
             ORDER BY
                 s.submission_id;";
 
-        /** @var list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> */
+        /** @var list<array{contest_score: float, guid: string, identity_id: int, penalty: int|null, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
