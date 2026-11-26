@@ -247,7 +247,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         $name = $r->ensureString('name');
         $description = $r->ensureString('description');
         $numberOfContestants = $r->ensureOptionalInt(
-            'numberOfContestants'
+            'numberOfContestants',
+            lowerBound: 1,
+            upperBound: self::MAX_NUMBER_OF_CONTESTANTS,
         ) ?? self::NUMBER_OF_CONTESTANTS;
 
         self::createTeamGroup(

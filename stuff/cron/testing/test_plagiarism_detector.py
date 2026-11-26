@@ -411,6 +411,57 @@ def test_get_range_green_highlight() -> None:
     assert cron.plagiarism_detector.get_range(code) == ((0, 1), )
 
 
+def test_get_range_unclosed_tag_at_eof_is_discarded() -> None:
+    '''Test that an unclosed opening tag at EOF is discarded.'''
+    code = [
+        f'{cron.plagiarism_detector.START_RED}int x = 0;',
+        'int y = 1;',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ()
+
+
+def test_get_range_orphan_closing_tag_is_ignored() -> None:
+    '''Test that an orphan closing tag without start is safely ignored.'''
+    code = [
+        f'int x = 0;{cron.plagiarism_detector.END}',
+        f'{cron.plagiarism_detector.START_RED}int y = 1;'
+        f'{cron.plagiarism_detector.END}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((1, 1), )
+
+
+def test_get_range_unclosed_tag_followed_by_new_span() -> None:
+    '''Test that unclosed span is discarded when a new start tag begins.'''
+    code = [
+        f'{cron.plagiarism_detector.START_RED}int x = 0;',
+        f'{cron.plagiarism_detector.START_GREEN}int y = 1;',
+        f'return y;{cron.plagiarism_detector.END}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((1, 2), )
+
+
+def test_get_range_multiple_spans_on_same_line() -> None:
+    '''Test that multiple spans on the same line are parsed in order.'''
+    code = [
+        f'{cron.plagiarism_detector.START_RED}int a = 1;'
+        f'{cron.plagiarism_detector.END} '
+        f'{cron.plagiarism_detector.START_RED}int b = 2;'
+        f'{cron.plagiarism_detector.END}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((0, 0), (0, 0))
+
+
+def test_get_range_multiline_spans_sharing_line() -> None:
+    '''Test that spans sharing a boundary line are both captured.'''
+    code = [
+        f'{cron.plagiarism_detector.START_RED}line 0',
+        f'line 1{cron.plagiarism_detector.END} '
+        f'{cron.plagiarism_detector.START_RED}line 1 start',
+        f'line 2{cron.plagiarism_detector.END}',
+    ]
+    assert cron.plagiarism_detector.get_range(code) == ((0, 1), (1, 2))
+
+
 def test_filter_and_format_result_basic() -> None:
     '''Test filter_and_format_result formats and inserts results accurately.'''
     mock_dbconn = mock.MagicMock()
