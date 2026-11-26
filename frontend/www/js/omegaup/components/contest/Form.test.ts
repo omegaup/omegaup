@@ -219,8 +219,14 @@ describe('Form.vue', () => {
     expect(wrapper.vm.localErrors.needs_basic_information).toBe(
       T.contestNewFormBasicInformationNotForTeams,
     );
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('[data-basic-information-error]').text()).toBe(
+      T.contestNewFormBasicInformationNotForTeams,
+    );
+    expect(basicInformation.classes()).toContain('is-invalid');
 
     await basicInformation.setChecked(false);
+    expect(wrapper.find('[data-basic-information-error]').exists()).toBe(false);
     expect(wrapper.vm.validateForm()).toBe(true);
     wrapper.destroy();
   });

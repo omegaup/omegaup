@@ -825,6 +825,11 @@
                   aria-expanded="false"
                 >
                   {{ T.contestNewFormPrivacy }}
+                  <font-awesome-icon
+                    v-if="hasErrorsInSection(SectionName.Privacy)"
+                    icon="exclamation-circle"
+                    class="text-danger ml-2"
+                  />
                 </button>
               </h2>
             </div>
@@ -857,12 +862,16 @@
                       {{ T.wordsEnable }}
                     </label>
                   </div>
+                  <div
+                    v-if="localErrors[FieldName.BasicInformation]"
+                    class="invalid-feedback"
+                    data-basic-information-error
+                  >
+                    {{ localErrors[FieldName.BasicInformation] }}
+                  </div>
                   <small
-                    v-if="currentContestForTeams"
-                    class="form-text"
-                    :class="
-                      needsBasicInformation ? 'text-danger' : 'text-muted'
-                    "
+                    v-else-if="currentContestForTeams"
+                    class="form-text text-muted"
                     data-basic-information-teams-warning
                   >
                     {{ T.contestNewFormBasicInformationNotForTeams }}
@@ -996,6 +1005,7 @@ export enum SectionName {
   Basic = 'basic',
   Logistics = 'logistics',
   Scoring = 'scoring',
+  Privacy = 'privacy',
 }
 
 interface LocalErrors {
@@ -1024,6 +1034,7 @@ const SECTION_FIELDS: Record<SectionName, string[]> = {
     FieldName.Penalty,
     FieldName.PointsDecayFactor,
   ],
+  [SectionName.Privacy]: [FieldName.BasicInformation],
 };
 
 /**
