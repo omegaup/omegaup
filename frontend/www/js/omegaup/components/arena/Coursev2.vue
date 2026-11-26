@@ -99,6 +99,7 @@
           :in-contest-or-course="true"
           :languages="course.languages"
           :problem="currentProblem"
+          :bookmarked-status="isCurrentProblemBookmarked"
           :user="user"
           :user-runs="userRuns"
           @show-run-details="
@@ -111,6 +112,7 @@
               $emit('submit-run', run);
             }
           "
+          @toggle-bookmark="onToggleBookmark"
         ></omegaup-problem-details>
       </b-col>
     </b-row>
@@ -120,6 +122,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as api from '../../api';
 import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_Markdown from '../Markdown.vue';
@@ -167,6 +170,45 @@ export default class ArenaCourse extends Vue {
   ui = ui;
   Tabs = Tabs;
   currentSelectedTab: string | null = this.selectedTab;
+  isLoadingBookmark = false;
+
+  get isCurrentProblemBookmarked(): boolean {
+    return Boolean(
+      this.currentProblem &&
+        (this.currentProblem.is_bookmarked ||
+          (this.currentProblem as any).isBookmarked),
+    );
+  }
+
+  onToggleBookmark(problemAlias: string): void {
+    if (this.isLoadingBookmark) {
+      return;
+    }
+    this.isLoadingBookmark = true;
+    api.ProblemBookmark.toggle({
+      problem_alias: problemAlias,
+    })
+      .then((response) => {
+        if (this.currentProblem && this.currentProblem.alias === problemAlias) {
+          this.$set(this.currentProblem, 'is_bookmarked', response.bookmarked);
+        }
+        ui.success(
+          response.bookmarked
+            ? T.problemBookmarkAdded
+            : T.problemBookmarkRemoved,
+        );
+        this.$emit('toggle-bookmark', {
+          problemAlias,
+          isBookmarked: response.bookmarked,
+        });
+      })
+      .catch((error) => {
+        ui.apiError(error);
+      })
+      .finally(() => {
+        this.isLoadingBookmark = false;
+      });
+  }
 
   private get currentAssignmentIndex(): number {
     return this.course.assignments.findIndex(

@@ -90,6 +90,7 @@
                 :next-execution-timestamp="currentNextExecutionTimestamp"
                 :languages="contest.languages.split(',')"
                 :problem="problemInfo"
+                :bookmarked-status="isCurrentProblemBookmarked"
                 :active-tab="'problems'"
                 :runs="runs"
                 :popup-displayed="popupDisplayed"
@@ -112,6 +113,7 @@
                 @new-submission-popup-displayed="
                   $emit('new-submission-popup-displayed')
                 "
+                @toggle-bookmark="onToggleBookmark"
               >
                 <template #quality-nomination-buttons><div></div></template>
                 <template #best-solvers-list><div></div></template>
@@ -238,6 +240,7 @@ import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
 import { SubmissionRequest } from '../../arena/submissions';
 import T from '../../lang';
+import * as api from '../../api';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
@@ -324,6 +327,15 @@ export default class ArenaContest extends Vue {
   currentRunDetailsData = this.runDetailsData;
   now = new Date();
   currentPopupDisplayed = this.popupDisplayed;
+  isLoadingBookmark = false;
+
+  get isCurrentProblemBookmarked(): boolean {
+    return Boolean(
+      this.problemInfo &&
+        (this.problemInfo.is_bookmarked ||
+          (this.problemInfo as any).isBookmarked),
+    );
+  }
 
   get socketClass(): string {
     if (this.socketStatus === SocketStatus.Connected) {
@@ -438,6 +450,37 @@ export default class ArenaContest extends Vue {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.currentRunDetailsData = null;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
+  }
+
+  onToggleBookmark(problemAlias: string): void {
+    if (this.isLoadingBookmark) {
+      return;
+    }
+    this.isLoadingBookmark = true;
+    api.ProblemBookmark.toggle({
+      problem_alias: problemAlias,
+      contest_alias: this.contest.alias,
+    })
+      .then((response) => {
+        if (this.problemInfo && this.problemInfo.alias === problemAlias) {
+          this.$set(this.problemInfo, 'is_bookmarked', response.bookmarked);
+        }
+        ui.success(
+          response.bookmarked
+            ? T.problemBookmarkAdded
+            : T.problemBookmarkRemoved,
+        );
+        this.$emit('toggle-bookmark', {
+          problemAlias,
+          isBookmarked: response.bookmarked,
+        });
+      })
+      .catch((error) => {
+        ui.apiError(error);
+      })
+      .finally(() => {
+        this.isLoadingBookmark = false;
+      });
   }
 
   @Watch('problem')

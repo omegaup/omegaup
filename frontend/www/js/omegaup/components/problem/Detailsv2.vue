@@ -5,6 +5,12 @@
         <omegaup-problem-settings-summary
           :problem="problem"
           :show-edit-link="user.admin"
+          :user-logged-in="user.loggedIn"
+          :is-bookmarked="bookmarkedStatus"
+          :in-contest-or-course="inContestOrCourse"
+          @toggle-bookmark="
+            (problemAlias) => $emit('toggle-bookmark', problemAlias)
+          "
         ></omegaup-problem-settings-summary>
         <div v-if="problem.karel_problem" class="karel-js-link my-3">
           <a class="p-3" :href="karelIdeUrl" target="_blank">
@@ -177,6 +183,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: true }) ephemeralGraderEnabled!: boolean;
   @Prop() user!: types.UserInfoForProblem;
   @Prop() userRuns!: types.Run[];
+  @Prop({ default: false }) bookmarkedStatus!: boolean;
+  @Prop({ default: false }) inContestOrCourse!: boolean;
 
   @Ref('statement-markdown')
   readonly statementMarkdown!: omegaup_problemMarkdown;

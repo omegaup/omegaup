@@ -3,6 +3,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 import { mount } from '@vue/test-utils';
 
 import arena_Course from './Course.vue';
+import * as api from '../../api';
 import { types } from '../../api_types';
 
 describe('Course.vue', () => {
@@ -339,5 +340,44 @@ describe('Course.vue', () => {
         },
       ],
     ]);
+  });
+
+  it('Should render the bookmark button and handle toggling within a course', async () => {
+    const toggleSpy = jest
+      .spyOn(api.ProblemBookmark, 'toggle')
+      .mockResolvedValue({ bookmarked: true });
+
+    const wrapper = mount(arena_Course, {
+      propsData: {
+        activeTab: 'problems',
+        clarifications: [],
+        course,
+        currentAssignment,
+        problem,
+        problemAlias: problem.alias,
+        problemInfo: {
+          ...problemInfo,
+          is_bookmarked: false,
+        },
+        problems: [problem],
+        allRuns: [],
+        showNewClarificationPopup: false,
+        users: [] as types.ContestUser[],
+        scoreboard,
+        showAllRuns: true,
+      },
+      stubs: breadcrumbStubs,
+    });
+
+    const bookmarkButton = wrapper.find('button[data-bookmark-button]');
+    expect(bookmarkButton.exists()).toBeTruthy();
+
+    await bookmarkButton.trigger('click');
+
+    expect(toggleSpy).toHaveBeenCalledWith({
+      problem_alias: problem.alias,
+    });
+    expect(wrapper.emitted('toggle-bookmark')).toBeTruthy();
+    toggleSpy.mockRestore();
   });
 });
