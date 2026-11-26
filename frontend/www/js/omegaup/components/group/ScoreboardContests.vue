@@ -94,7 +94,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
@@ -105,37 +106,52 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 library.add(faTrash);
 
-@Component({
+export default defineComponent({
+  name: 'GroupScoreboardContests',
   components: {
     FontAwesomeIcon,
     'omegaup-radio-switch': omegaup_RadioSwitch,
   },
-})
-export default class GroupScoreboardContests extends Vue {
-  @Prop() scoreboard!: string;
-  @Prop() availableContests!: types.ContestListItem[];
-  @Prop() contests!: types.ScoreboardContest[];
+  props: {
+    scoreboard: {
+      type: String,
+      required: true,
+    },
+    availableContests: {
+      type: Array as PropType<types.ContestListItem[]>,
+      required: true,
+    },
+    contests: {
+      type: Array as PropType<types.ScoreboardContest[]>,
+      required: true,
+    },
+  },
+  emits: ['add-contest', 'remove-contest'],
+  data() {
+    return {
+      T,
+      ui,
+      selectedContest: null as null | string,
+      onlyAc: false,
+      weight: 1.0,
+    };
+  },
+  methods: {
+    onAddContest(): void {
+      this.$emit(
+        'add-contest',
+        this,
+        this.selectedContest,
+        this.onlyAc,
+        this.weight,
+      );
+    },
 
-  T = T;
-  ui = ui;
-  selectedContest: null | string = null;
-  onlyAc = false;
-  weight = 1.0;
-
-  onAddContest(): void {
-    this.$emit(
-      'add-contest',
-      this,
-      this.selectedContest,
-      this.onlyAc,
-      this.weight,
-    );
-  }
-
-  reset(): void {
-    this.selectedContest = null;
-    this.onlyAc = false;
-    this.weight = 1.0;
-  }
-}
+    reset(): void {
+      this.selectedContest = null;
+      this.onlyAc = false;
+      this.weight = 1.0;
+    },
+  },
+});
 </script>
