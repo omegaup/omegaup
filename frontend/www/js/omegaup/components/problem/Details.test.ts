@@ -498,4 +498,32 @@ int main() {
     );
     expect(wrapper.find('.karel-js-link a').text()).toContain(T.openInKarelJs);
   });
+
+  it('Should update selected tab when activeTab prop changes', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        problem,
+        user: { loggedIn: true, admin: true, reviewer: false },
+        nominationStatus,
+        activeTab: 'problems',
+        runs: [],
+        allRuns: [],
+        clarifications: [] as types.Clarification[],
+        histogram,
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.find('a[aria-controls="problems"]').classes()).toContain(
+      'active',
+    );
+
+    await wrapper.setProps({ activeTab: 'runs' });
+    expect(wrapper.find('a[aria-controls="runs"]').classes()).toContain(
+      'active',
+    );
+    expect(wrapper.find('a[aria-controls="problems"]').classes()).not.toContain(
+      'active',
+    );
+  });
 });
