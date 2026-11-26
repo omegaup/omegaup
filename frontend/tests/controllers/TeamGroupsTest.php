@@ -303,8 +303,82 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         return [
             [-1, 'parameterNumberTooSmall'],
             [0, 'parameterNumberTooSmall'],
+            [11, 'parameterNumberTooLarge'],
             [12, 'parameterNumberTooLarge'],
         ];
+    }
+
+    /**
+     * A PHPUnit data provider for valid number of contestants.
+     *
+     * @return list<array{0: int}>
+     */
+    public function validNumberOfContestantsProvider(): array {
+        return [
+            [1],
+            [10],
+        ];
+    }
+
+    /**
+     * Create teams group with valid number of contestants test
+     *
+     * @dataProvider validNumberOfContestantsProvider
+     */
+    public function testCreateTeamsGroupWithValidNumberOfContestants(
+        int $numberOfContestants
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $alias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'numberOfContestants' => $numberOfContestants,
+            ])
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        $this->assertNotNull($teamsGroup);
+        $this->assertSame(
+            $numberOfContestants,
+            $teamsGroup->number_of_contestants
+        );
+    }
+
+    /**
+     * Create number of contestants in teams group test
+     *
+     * @dataProvider numberOfContestantsProvider
+     */
+    public function testCreateNumberOfContestantsInTeamsGroup(
+        int $numberOfContestants,
+        string $displayedException
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        try {
+            \OmegaUp\Controllers\TeamsGroup::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $alias,
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'numberOfContestants' => $numberOfContestants,
+                ])
+            );
+            $this->fail('Should have thrown an InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame($displayedException, $e->getMessage());
+        }
     }
 
     /**
@@ -339,6 +413,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'numberOfContestants' => $numberOfContestants,
                 ])
             );
+            $this->fail('Should have thrown an InvalidParameterException');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame($displayedException, $e->getMessage());
         }
