@@ -1,5 +1,5 @@
 <template>
-  <span :class="classname" :title="username">
+  <span :class="['username', classname]" :title="username">
     <omegaup-countryflag
       v-if="country != null"
       :country="country"
@@ -85,14 +85,14 @@ export default defineComponent({
 <style lang="scss" scope>
 @import '../../../../sass/main.scss';
 
-span {
+span.username {
   display: inline-block;
   max-width: 100%;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-span a {
+span.username a {
   display: inline-block;
   max-width: 100%;
   white-space: normal;
