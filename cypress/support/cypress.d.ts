@@ -18,6 +18,7 @@ declare global {
 
     interface Chainable {
       login(loginOptions: LoginOptions): void;
+      chooseTypeaheadOption(rootSelector: string, query: string): void;
       logout(): void;
       logoutUsingApi(): void;
       loginAdmin(): void;

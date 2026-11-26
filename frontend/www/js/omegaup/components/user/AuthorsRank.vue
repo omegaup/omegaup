@@ -114,7 +114,7 @@ export default class AuthorsRank extends Vue {
   margin: 0 auto;
 }
 
-[data-authors-rank] .tags-input-wrapper-default {
+[data-authors-rank] .omegaup-typeahead .multiselect__tags {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 
