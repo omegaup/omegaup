@@ -988,7 +988,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Creates a course submission reviewed by a teaching assistant.
      *
-     * @return array{assignmentAlias: string, courseAlias: string, guid: string, student: array{identity: \OmegaUp\DAO\VO\Identities, user: \OmegaUp\DAO\VO\Users}, teachingAssistant: \OmegaUp\DAO\VO\Identities, teachingAssistantLogin: \OmegaUp\Test\ScopedLoginToken}
+     * @return array{assignmentAlias: string, courseAlias: string, guid: string, student: array{identity: \OmegaUp\DAO\VO\Identities, user: \OmegaUp\DAO\VO\Users}, teachingAssistant: \OmegaUp\DAO\VO\Identities, teachingAssistantLogin: \OmegaUp\Test\ScopedLoginToken, admin: \OmegaUp\DAO\VO\Identities}
      */
     private function createCourseSubmissionWithTeachingAssistant(): array {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -1043,6 +1043,32 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             'teachingAssistant' => $teachingAssistant,
             'teachingAssistantLogin' => $teachingAssistantLogin,
+            'admin' => $admin,
+        ];
+    }
+
+    /**
+     * Adds another teaching assistant to a course and returns their identity
+     * and login token.
+     *
+     * @return array{identity: \OmegaUp\DAO\VO\Identities, login: \OmegaUp\Test\ScopedLoginToken}
+     */
+    private function addTeachingAssistantToCourse(
+        \OmegaUp\DAO\VO\Identities $admin,
+        string $courseAlias
+    ): array {
+        ['identity' => $teachingAssistant] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $teachingAssistant->username,
+                'course_alias' => $courseAlias,
+            ])
+        );
+        return [
+            'identity' => $teachingAssistant,
+            'login' => self::login($teachingAssistant),
         ];
     }
 
@@ -1236,6 +1262,93 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('invalidParameters', $e->getMessage());
             $this->assertSame('feedback_list', $e->parameter);
         }
+    }
+
+    public function testSetFeedbackListTwoConsecutiveReviews() {
+        [
+            'assignmentAlias' => $assignmentAlias,
+            'courseAlias' => $courseAlias,
+            'guid' => $guid,
+            'teachingAssistant' => $teachingAssistant,
+            'teachingAssistantLogin' => $teachingAssistantLogin,
+            'admin' => $admin,
+        ] = $this->createCourseSubmissionWithTeachingAssistant();
+
+        \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $teachingAssistantLogin->auth_token,
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback_list' => json_encode([
+                    ['lineNumber' => 1, 'feedback' => 'TA1 line 1'],
+                    ['lineNumber' => 2, 'feedback' => 'TA1 line 2'],
+                ]),
+                'feedback' => 'TA1 summary',
+            ])
+        );
+
+        [
+            'identity' => $secondTeachingAssistant,
+            'login' => $secondTeachingAssistantLogin,
+        ] = $this->addTeachingAssistantToCourse($admin, $courseAlias);
+
+        \OmegaUp\Controllers\Submission::apiSetFeedbackList(
+            new \OmegaUp\Request([
+                'auth_token' => $secondTeachingAssistantLogin->auth_token,
+                'guid' => $guid,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'feedback_list' => json_encode([
+                    ['lineNumber' => 2, 'feedback' => 'TA2 line 2'],
+                    ['lineNumber' => 3, 'feedback' => 'TA2 line 3'],
+                ]),
+                'feedback' => 'TA2 summary',
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $secondTeachingAssistantLogin->auth_token,
+                'run_alias' => $guid,
+            ])
+        );
+
+        $this->assertCount(4, $feedbackList);
+
+        // The general summary is last-writer-wins.
+        $generalFeedback = $this->generalFeedbackRows($feedbackList);
+        $this->assertCount(1, $generalFeedback);
+        $this->assertSame('TA2 summary', $generalFeedback[0]['feedback']);
+        $this->assertSame(
+            $secondTeachingAssistant->username,
+            $generalFeedback[0]['author']
+        );
+
+        $lineFeedback = [];
+        foreach ($feedbackList as $entry) {
+            if (is_null($entry['range_bytes_start'])) {
+                continue;
+            }
+            $lineFeedback[$entry['range_bytes_start']] = $entry;
+        }
+        $this->assertCount(3, $lineFeedback);
+        $this->assertSame('TA1 line 1', $lineFeedback[1]['feedback']);
+        $this->assertSame(
+            $teachingAssistant->username,
+            $lineFeedback[1]['author']
+        );
+        // A second review does not overwrite an existing line comment.
+        $this->assertSame('TA1 line 2', $lineFeedback[2]['feedback']);
+        $this->assertSame(
+            $teachingAssistant->username,
+            $lineFeedback[2]['author']
+        );
+        $this->assertSame('TA2 line 3', $lineFeedback[3]['feedback']);
+        $this->assertSame(
+            $secondTeachingAssistant->username,
+            $lineFeedback[3]['author']
+        );
     }
 
     public function testSetFeedbackListWhitespaceOnlySummaryWithEmptyListFails() {

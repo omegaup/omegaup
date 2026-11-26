@@ -158,7 +158,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Identities::update($identity);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
+        } catch (\Throwable $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -191,10 +191,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'identities'
         );
 
-        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}>|null $identities */
         $identities = json_decode($r['identities'], true);
 
-        if (!is_array($identities)) {
+        if (!is_array($identities) || empty($identities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'identities'
@@ -204,6 +203,17 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $seenUsernames = [];
         $duplicatedUsernames = [];
         foreach ($identities as $identity) {
+            if (
+                !is_array($identity)
+                || !isset($identity['username'])
+                || !is_string($identity['username'])
+                || empty(trim($identity['username']))
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'identities'
+                );
+            }
             if (isset($seenUsernames[$identity['username']])) {
                 $duplicatedUsernames[] = $identity['username'];
             }
@@ -225,6 +235,24 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             foreach ($identities as $identity) {
+                if (
+                    isset($identity['country_id'])
+                    && !is_string($identity['country_id'])
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'country_id'
+                    );
+                }
+                if (
+                    isset($identity['state_id'])
+                    && !is_string($identity['state_id'])
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'state_id'
+                    );
+                }
                 // Prepare DAOs
                 $countryId = empty(
                     $identity['country_id']
@@ -236,16 +264,35 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 ) ? null : strval(
                     $identity['state_id']
                 );
-                if (!array_key_exists('gender', $identity)) {
+                if (
+                    !array_key_exists('gender', $identity)
+                    || !is_string($identity['gender'])
+                ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterEmpty',
                         'gender'
                     );
                 }
                 $gender = $identity['gender'];
+                if (
+                    !array_key_exists('password', $identity)
+                    || !is_string($identity['password'])
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'password'
+                    );
+                }
+                $name = $identity['name'] ?? null;
+                if (!is_null($name) && !is_string($name)) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'name'
+                    );
+                }
                 $newIdentity = self::createIdentity(
                     $identity['username'],
-                    $identity['name'],
+                    $name,
                     $identity['password'],
                     $countryId,
                     $stateId,
@@ -256,6 +303,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 $school = null;
                 $schoolId = null;
                 if (isset($identity['school_name'])) {
+                    if (!is_string($identity['school_name'])) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterInvalid',
+                            'school_name'
+                        );
+                    }
                     $school = trim($identity['school_name']);
                 }
                 if (!empty($school)) {
@@ -300,7 +353,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
+        } catch (\Throwable $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -1050,7 +1103,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         $groupAlias = self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
-        self::validateTargetIdentityBelongsToGroup($identity, $groupAlias);
+        self::validateTargetIdentityBelongsToGroupOrTeam(
+            $identity,
+            $groupAlias
+        );
 
         \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $identity->password = \OmegaUp\SecurityTools::hashString(
@@ -1158,6 +1214,31 @@ class Identity extends \OmegaUp\Controllers\Controller {
         bool $isTeam = false
     ): void {
         if (!self::isGroupManagedIdentity($identity, $groupAlias, $isTeam)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+    }
+
+    /**
+     * Identity creators change team passwords through the same endpoint as
+     * regular group passwords, so the target identity may use either the
+     * `<group_alias>:<name>` or the `teams:<group_alias>:<name>` namespace.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    private static function validateTargetIdentityBelongsToGroupOrTeam(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $groupAlias
+    ): void {
+        if (
+            !self::isGroupManagedIdentity($identity, $groupAlias, isTeam: false)
+            && !self::isGroupManagedIdentity(
+                $identity,
+                $groupAlias,
+                isTeam: true
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );

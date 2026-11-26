@@ -33,6 +33,7 @@ abstract class Permissions {
                 `Permissions`
             SET
                 `name` = ?,
+                `resource_type` = ?,
                 `description` = ?
             WHERE
                 (
@@ -40,6 +41,7 @@ abstract class Permissions {
                 );';
         $params = [
             $Permissions->name,
+            $Permissions->resource_type,
             $Permissions->description,
             intval($Permissions->permission_id),
         ];
@@ -64,6 +66,7 @@ abstract class Permissions {
             SELECT
                 `Permissions`.`permission_id`,
                 `Permissions`.`name`,
+                `Permissions`.`resource_type`,
                 `Permissions`.`description`
             FROM
                 `Permissions`
@@ -207,6 +210,7 @@ abstract class Permissions {
             SELECT
                 `Permissions`.`permission_id`,
                 `Permissions`.`name`,
+                `Permissions`.`resource_type`,
                 `Permissions`.`description`
             FROM
                 `Permissions`
@@ -253,13 +257,16 @@ abstract class Permissions {
             INSERT INTO
                 `Permissions` (
                     `name`,
+                    `resource_type`,
                     `description`
                 ) VALUES (
+                    ?,
                     ?,
                     ?
                 );';
         $params = [
             $Permissions->name,
+            $Permissions->resource_type,
             $Permissions->description,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
