@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div class="container-fluid" data-feedback-code-mirror>
+    <div
+      class="container-fluid"
+      :class="{ editable: !readonly }"
+      data-feedback-code-mirror
+    >
       <textarea
         v-show="false"
         ref="cm-editor"
@@ -278,7 +282,6 @@ export default class FeedbackCodeView extends Vue {
 
     .CodeMirror-linenumber {
       width: 4em !important;
-      cursor: pointer;
     }
 
     .CodeMirror-linenumber::after {
@@ -292,16 +295,22 @@ export default class FeedbackCodeView extends Vue {
       font-size: x-large;
     }
 
-    .CodeMirror-linenumber:hover::after {
-      content: '\f0fe';
-    }
-
     .CodeMirror {
       height: auto;
 
       .CodeMirror-scroll {
         height: auto;
       }
+    }
+  }
+
+  &.editable .cm-s-default {
+    .CodeMirror-linenumber {
+      cursor: pointer;
+    }
+
+    .CodeMirror-linenumber:hover::after {
+      content: '\f0fe';
     }
   }
 }
