@@ -250,7 +250,7 @@
         </div>
         <div class="row">
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-objective">
+            <div class="font-weight-bold w-100 introjs-objective">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isObjectiveComplete }"
@@ -260,20 +260,16 @@
                 :title="T.courseNewFormObjectiveDesc"
                 icon="info-circle"
               />
-              <textarea
+              <omegaup-markdown-editor
                 v-model="objective"
-                :disabled="readOnly"
-                data-course-objective
-                class="form-control"
-                :class="{
-                  'is-invalid': invalidParameterName === 'objective',
-                }"
-                cols="30"
-                rows="5"
-                required="required"
+                id-postfix="-objective"
+                :read-only="readOnly"
+                :invalid="invalidParameterName === 'objective'"
+                required
                 :maxlength="MAX_LENGTH.objective"
-              ></textarea>
-            </label>
+                data-course-objective
+              />
+            </div>
             <small
               class="character-counter"
               :class="{ 'text-danger': isExceedingObjective }"
@@ -281,26 +277,22 @@
             >
           </div>
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-description">
+            <div class="font-weight-bold w-100 introjs-description">
               <span
                 class="field-required"
                 :class="{ 'is-complete': isDescriptionComplete }"
                 >{{ T.courseNewFormDescription }}</span
               >
-              <textarea
+              <omegaup-markdown-editor
                 v-model="description"
-                :disabled="readOnly"
-                data-course-new-description
-                class="form-control"
-                :class="{
-                  'is-invalid': invalidParameterName === 'description',
-                }"
-                cols="30"
-                rows="5"
-                required="required"
+                id-postfix="-description"
+                :read-only="readOnly"
+                :invalid="invalidParameterName === 'description'"
+                required
                 :maxlength="MAX_LENGTH.description"
-              ></textarea>
-            </label>
+                data-course-new-description
+              />
+            </div>
             <small
               class="character-counter"
               :class="{ 'text-danger': isExceedingDescription }"
@@ -333,6 +325,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types, messages } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
+import omegaup_MarkdownEditor from '../common/MarkdownEditor.vue';
 import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import Multiselect from 'vue-multiselect';
@@ -378,6 +371,7 @@ const DANGER_THRESHOLD_PERCENTAGE = 0.9;
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-markdown-editor': omegaup_MarkdownEditor,
     'omegaup-datepicker': DatePicker,
     'omegaup-radio-switch': omegaup_RadioSwitch,
     'font-awesome-icon': FontAwesomeIcon,
