@@ -2,7 +2,6 @@ import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
 import JSZip from 'jszip';
 
 import Header from './Header.vue';
-import BootstrapVue, { IconsPlugin, BButton, BFormInput } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import T from '../../../lang';
 import Vue from 'vue';
@@ -12,14 +11,12 @@ import {
 } from '@/js/omegaup/problem/creator/modules/cases';
 
 const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(IconsPlugin);
 
 describe('Header.vue', () => {
   it('Should contain the header buttons and problem name input', async () => {
     const wrapper = shallowMount(Header, { localVue, store });
 
-    const buttons = wrapper.findAllComponents(BButton);
+    const buttons = wrapper.findAll('button');
     const expectedText = [
       T.problemCreatorLoadProblem,
       T.problemCreatorGenerateProblem,
@@ -28,10 +25,10 @@ describe('Header.vue', () => {
 
     expect(expectedText.length).toBe(buttons.length);
     for (let i = 0; i < expectedText.length; i++) {
-      expect(buttons.at(i).text()).toBe(expectedText[i]);
+      expect(buttons.at(i).text()).toContain(expectedText[i]);
     }
 
-    expect(wrapper.findComponent(BFormInput).exists()).toBe(true);
+    expect(wrapper.find('input.form-control').exists()).toBe(true);
   });
 
   it('Should reset the store on clicking the reset button', async () => {
