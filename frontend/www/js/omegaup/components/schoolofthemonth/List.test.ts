@@ -38,8 +38,8 @@ describe('List.vue', () => {
       propsData: {},
     });
 
-    expect(wrapper.find('.system-in-maintainance').exists()).toBe(true);
-    expect(wrapper.find('table').exists()).toBe(false);
+    expect(wrapper.find('.system-in-maintainance').exists()).toBe(false);
+    expect(wrapper.find('table').exists()).toBe(true);
   });
 
   it('Should handle empty lists', () => {
@@ -65,6 +65,8 @@ describe('List.vue', () => {
         .find('a.nav-link[aria-controls="candidatesToSchoolOfTheMonth"]')
         .text(),
     ).toContain(T.schoolsOfTheMonthCandidates);
+    expect(wrapper.find('div.system-in-maintainance').exists()).toBe(false);
+    expect(wrapper.find('table.table').exists()).toBe(true);
   });
 
   it('Should render tabs without legacy data-toggle attributes', () => {
@@ -294,3 +296,4 @@ describe('List.vue', () => {
     expect(wrapper.find('button.btn-primary').exists()).toBe(false);
   });
 });
+
