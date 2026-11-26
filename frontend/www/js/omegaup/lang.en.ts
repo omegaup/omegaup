@@ -2025,6 +2025,8 @@ const translations: { [key: string]: string; } = {
   statementLanguageEs: "Spanish",
   statementLanguagePt: "Portuguese",
   statementNotFound: "Problem statement not found.",
+  streakIndicatorTooltip: "Current streak: %(count) days",
+  streakIndicatorTooltipOne: "Current streak: %(count) day",
   studentCourseInformationDescription: "Here you will find the list of courses that you are enrolled in.",
   studentProgressDescriptionTotalPoints: "(%(points) points + %(extraPoints) extra)",
   studentProgressExtraProblem: "(extra)",
