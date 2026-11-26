@@ -28,12 +28,20 @@ export class BookmarkedProblem implements LinkableResource {
   title: string = '';
   solved: boolean = false;
   attempted: boolean = false;
+  contestAlias?: null | string = null;
+  contestTitle?: null | string = null;
+  practiceUrl?: null | string = null;
+  isPrivate: boolean = false;
 
   constructor(problem: types.BookmarkProblem) {
     this.alias = problem.alias;
     this.title = problem.title;
     this.solved = problem.solved;
     this.attempted = problem.attempted;
+    this.contestAlias = problem.contest_alias ?? null;
+    this.contestTitle = problem.contest_title ?? null;
+    this.practiceUrl = problem.practice_url ?? null;
+    this.isPrivate = problem.is_private ?? false;
   }
 
   toString(): string {
@@ -41,6 +49,9 @@ export class BookmarkedProblem implements LinkableResource {
   }
 
   getUrl(): string {
+    if (this.isPrivate && this.practiceUrl) {
+      return this.practiceUrl;
+    }
     return `/arena/problem/${this.alias}/`;
   }
 

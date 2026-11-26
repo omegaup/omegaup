@@ -400,4 +400,282 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
             $extraProfileDetails3['bookmarkedProblems']
         );
     }
+
+    /**
+     * Tests that a bookmarked contest problem exposes practice mode URL once
+     * the contest ends.
+     */
+    public function testBookmarkedContestProblemShowsPracticeLinkWhenContestEnds() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $startTime = \OmegaUp\Time::get() - 3600;
+        $finishTime = \OmegaUp\Time::get() + 3600;
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'public',
+                'startTime' => new \OmegaUp\Timestamp($startTime),
+                'finishTime' => new \OmegaUp\Timestamp($finishTime),
+            ])
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+
+        // While contest is still running, practice URL should not be available
+        $ongoingList = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount(1, $ongoingList['problems']);
+        $this->assertNull($ongoingList['problems'][0]['practice_url']);
+
+        // Advance time past contest finish_time
+        $currentTime = \OmegaUp\Time::get();
+        try {
+            \OmegaUp\Time::setTimeForTesting($finishTime + 60);
+            $endedList = \OmegaUp\Controllers\ProblemBookmark::apiList(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+            $this->assertCount(1, $endedList['problems']);
+            $expectedPracticeUrl = (
+                '/arena/' .
+                strval($contestData['contest']->alias) .
+                '/practice/#problems/' .
+                strval($problemData['problem']->alias)
+            );
+            $this->assertSame(
+                $expectedPracticeUrl,
+                $endedList['problems'][0]['practice_url']
+            );
+            $this->assertSame(
+                $contestData['contest']->alias,
+                $endedList['problems'][0]['contest_alias']
+            );
+            $this->assertSame(
+                $contestData['contest']->title,
+                $endedList['problems'][0]['contest_title']
+            );
+        } finally {
+            \OmegaUp\Time::setTimeForTesting($currentTime);
+        }
+    }
+
+    /**
+     * Tests that a private contest practice mode is not exposed to
+     * unauthorized users.
+     */
+    public function testPrivateContestPracticeNotExposedToUnauthorizedUsers() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $startTime = \OmegaUp\Time::get() - 7200;
+        $finishTime = \OmegaUp\Time::get() - 3600;
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+                'startTime' => new \OmegaUp\Timestamp($startTime),
+                'finishTime' => new \OmegaUp\Timestamp($finishTime),
+            ])
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+
+        // Contest is private and ended, but user is not registered/enrolled
+        $unauthorizedList = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount(1, $unauthorizedList['problems']);
+        $this->assertNull($unauthorizedList['problems'][0]['practice_url']);
+
+        // Enroll user in contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $authorizedList = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount(1, $authorizedList['problems']);
+        $expectedPracticeUrl = (
+            '/arena/' .
+            strval($contestData['contest']->alias) .
+            '/practice/#problems/' .
+            strval($problemData['problem']->alias)
+        );
+        $this->assertSame(
+            $expectedPracticeUrl,
+            $authorizedList['problems'][0]['practice_url']
+        );
+    }
+
+    /**
+     * Tests that private problems are completely hidden unless user has
+     * practice access.
+     */
+    public function testPrivateProblemAccessRouting() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            ])
+        );
+
+        $startTime = \OmegaUp\Time::get() - 3600;
+        $finishTime = \OmegaUp\Time::get() + 3600;
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+                'startTime' => new \OmegaUp\Timestamp($startTime),
+                'finishTime' => new \OmegaUp\Timestamp($finishTime),
+            ])
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        // Bookmark problem directly via DAO (simulating contest bookmark)
+        \OmegaUp\DAO\ProblemBookmarks::create(
+            new \OmegaUp\DAO\VO\ProblemBookmarks([
+                'identity_id' => $identity->identity_id,
+                'problem_id' => $problemData['problem']->problem_id,
+            ])
+        );
+
+        $login = self::login($identity);
+
+        // While contest is ongoing, private problem is not visible in bookmarks
+        $ongoingList = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertCount(0, $ongoingList['problems']);
+
+        // Advance time past finish_time: practice mode becomes accessible
+        $currentTime = \OmegaUp\Time::get();
+        try {
+            \OmegaUp\Time::setTimeForTesting($finishTime + 60);
+            $endedList = \OmegaUp\Controllers\ProblemBookmark::apiList(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+            $this->assertCount(1, $endedList['problems']);
+            $this->assertTrue($endedList['problems'][0]['is_private']);
+            $expectedPracticeUrl = (
+                '/arena/' .
+                strval($contestData['contest']->alias) .
+                '/practice/#problems/' .
+                strval($problemData['problem']->alias)
+            );
+            $this->assertSame(
+                $expectedPracticeUrl,
+                $endedList['problems'][0]['practice_url']
+            );
+        } finally {
+            \OmegaUp\Time::setTimeForTesting($currentTime);
+        }
+    }
+
+    /**
+     * Tests tie-breaking when a problem belongs to multiple ended contests,
+     * prioritizing user participation.
+     */
+    public function testMultipleContestsPrioritizesUserContestAndEndedPractice() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Contest 1 ended 1 hour ago (more recent)
+        $contest1 = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'public',
+                'startTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 7200
+                ),
+                'finishTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 3600
+                ),
+            ])
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contest1
+        );
+
+        // Contest 2 ended 3 hours ago (older), but user participated / enrolled
+        $contest2 = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'public',
+                'startTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 14400
+                ),
+                'finishTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 10800
+                ),
+            ])
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contest2
+        );
+        \OmegaUp\Test\Factories\Contest::addUser($contest2, $identity);
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ])
+        );
+
+        $list = \OmegaUp\Controllers\ProblemBookmark::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertCount(1, $list['problems']);
+        // Contest 2 should be chosen because user participated in it
+        $this->assertSame(
+            $contest2['contest']->alias,
+            $list['problems'][0]['contest_alias']
+        );
+        $expectedPracticeUrl = (
+            '/arena/' .
+            strval($contest2['contest']->alias) .
+            '/practice/#problems/' .
+            strval($problemData['problem']->alias)
+        );
+        $this->assertSame(
+            $expectedPracticeUrl,
+            $list['problems'][0]['practice_url']
+        );
+    }
 }

@@ -178,6 +178,7 @@
                   class="mb-3"
                 ></omegaup-grid-paginator>
                 <omegaup-grid-paginator
+                  v-if="profile.is_own_profile"
                   :columns="3"
                   :items="bookmarkedProblems"
                   :items-per-page="30"
@@ -197,6 +198,13 @@
                       v-else-if="slotProps.item.attempted"
                       class="badge badge-warning ml-1"
                       >{{ T.problemStatusAttempted }}</span
+                    >
+                    <a
+                      v-if="slotProps.item.practiceUrl"
+                      :href="slotProps.item.practiceUrl"
+                      class="badge badge-info ml-1"
+                      :title="slotProps.item.contestTitle"
+                      >{{ T.contestPracticeMode }}</a
                     >
                   </template>
                 </omegaup-grid-paginator>

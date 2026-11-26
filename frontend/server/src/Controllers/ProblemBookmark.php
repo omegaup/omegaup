@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * ProblemBookmarkController
  *
- * @psalm-type BookmarkProblem=array{alias: string, attempted: bool, solved: bool, title: string}
+ * @psalm-type BookmarkProblem=array{alias: string, attempted: bool, contest_alias?: null|string, contest_title?: null|string, is_private?: bool, practice_url?: null|string, solved: bool, title: string}
  */
 class ProblemBookmark extends \OmegaUp\Controllers\Controller {
     /**
@@ -103,7 +103,8 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
         // Get all bookmarked problems
         $currentIdentityId = $r->identity->identity_id;
         $bookmarkedProblems = \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
-            $currentIdentityId
+            $currentIdentityId,
+            $r->identity
         );
 
         return [
