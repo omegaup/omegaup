@@ -126,7 +126,11 @@ describe('ContestPractice.vue', () => {
     expect(wrapper.text()).toContain(time.formatDateLocal(date));
 
     await wrapper.find('a[data-problem=problemOmegaUp]').trigger('click');
+
     expect(wrapper.emitted('navigate-to-problem')).toBeDefined();
+    expect(wrapper.find('[data-practice-timer]').exists()).toBe(true);
+
+    wrapper.destroy();
   });
 
   it('Should handle details for a run in a contest, practice mode', async () => {
@@ -176,5 +180,7 @@ describe('ContestPractice.vue', () => {
         },
       ],
     ]);
+
+    wrapper.destroy();
   });
 });
