@@ -49,6 +49,22 @@ describe('FilterTags.vue', () => {
     );
   });
 
+  it('Should show include and exclude icons in the filter header', () => {
+    const wrapper = mount(problem_FilterTags, {
+      propsData: {
+        tags: [tag] as types.TagWithProblemCount[],
+        publicQualityTags: [],
+      },
+    });
+
+    expect(
+      wrapper.find('.tag-filter-header svg[data-icon="plus-circle"]').exists(),
+    ).toBe(true);
+    expect(
+      wrapper.find('.tag-filter-header svg[data-icon="minus-circle"]').exists(),
+    ).toBe(true);
+  });
+
   it.each<TagSelectionCase>([
     {
       description: 'include a tag and clear its exclusion',

@@ -234,6 +234,37 @@ describe('CollectionList.vue', () => {
     },
   );
 
+  it('Should keep excluded tags when navigating through a problem tag', () => {
+    const wrapper = mount(problem_CollectionList, {
+      propsData: {
+        data: {
+          level: 'problemLevelBasicIntroductionToProgramming',
+          frequentTags: [],
+          publicTags: [],
+        },
+        selectedTags: ['problemTagMatrices'],
+        excludedTags: ['problemTagLoops'],
+        problems: [
+          {
+            alias: 'problem',
+            title: 'Problem',
+            difficulty: 1,
+            points: 1,
+            problem_id: 1,
+            quality: 1,
+            ratio: 0,
+            visibility: 2,
+            tags: [{ name: 'problemTagArrays', source: 'owner' }],
+          },
+        ],
+      },
+    });
+
+    expect(wrapper.find('tbody a.badge').attributes('href')).toBe(
+      '/problem/collection/problemLevelBasicIntroductionToProgramming/?tag[]=problemTagMatrices&tag[]=problemTagArrays&excluded_tag[]=problemTagLoops',
+    );
+  });
+
   it('Should toggle problem tags visibility', async () => {
     const wrapper = mount(problem_CollectionList, {
       propsData: {

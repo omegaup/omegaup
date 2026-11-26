@@ -117,6 +117,7 @@
           :problems="problemsToShow"
           :logged-in="loggedIn"
           :selected-tags="selectedTags"
+          :excluded-tags="excludedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"

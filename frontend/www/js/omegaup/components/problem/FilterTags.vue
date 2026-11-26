@@ -14,8 +14,8 @@
       <div class="tag-filter-grid">
         <div class="tag-filter-header">
           <span></span>
-          <span>+</span>
-          <span>−</span>
+          <span><font-awesome-icon :icon="['fas', 'plus-circle']" /></span>
+          <span><font-awesome-icon :icon="['fas', 'minus-circle']" /></span>
         </div>
         <div v-for="tag in tags" :key="tag.name" class="tag-filter-row">
           <span>{{ `${T[tag.name]} (${tag.problemCount})` }}</span>
@@ -55,9 +55,16 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faPlusCircle, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faPlusCircle, faMinusCircle);
+
 @Component({
   components: {
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
+    FontAwesomeIcon,
   },
   directives: {
     tooltip: VTooltip,
@@ -140,7 +147,6 @@ export default class FilterTags extends Vue {
 
 .tag-filter-header {
   text-align: center;
-  font-size: 1.25rem;
   border-bottom: 1px solid
     var(--problem-collection-list-tag-filter-border-color);
   padding-bottom: 0.25rem;
