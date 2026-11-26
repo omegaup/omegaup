@@ -56,9 +56,7 @@ describe('MarkdownEditor.vue', () => {
     });
     expect(wrapper.find('textarea').attributes('readonly')).toBeDefined();
     expect(wrapper.find('[id^="wmd-bold-button"]').exists()).toBe(false);
-    expect(wrapper.find('[data-markdown-editor-preview]').exists()).toBe(
-      false,
-    );
+    expect(wrapper.find('[data-markdown-editor-preview]').exists()).toBe(false);
   });
 
   it('blocks the Ctrl+G image shortcut', () => {
@@ -83,9 +81,7 @@ describe('MarkdownEditor.vue', () => {
       attrs: { 'data-course-objective': '' },
       attachTo: document.body,
     });
-    expect(wrapper.find('textarea[data-course-objective]').exists()).toBe(
-      true,
-    );
+    expect(wrapper.find('textarea[data-course-objective]').exists()).toBe(true);
     wrapper.destroy();
   });
 });
