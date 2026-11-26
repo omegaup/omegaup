@@ -21,7 +21,7 @@ describe('MarkdownEditor.vue', () => {
     const textarea = wrapper.find('textarea');
     (textarea.element as HTMLTextAreaElement).value = '**hi**';
     await textarea.trigger('input');
-    expect(wrapper.emitted('input')![0]).toEqual(['**hi**']);
+    expect(wrapper.emitted('input')).toEqual([['**hi**']]);
     wrapper.destroy();
   });
 
