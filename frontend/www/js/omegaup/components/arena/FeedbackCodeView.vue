@@ -23,63 +23,102 @@
 <script lang="ts">
 // TODO: Only display the gutters in the component if the logged-in user is an
 // admin or teaching assistant.
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import Vue, { ComponentOptions, defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import CodeMirror from 'codemirror';
 import { EditorOptions, languageModeMap, modeList } from './CodeView.vue';
 import Feedback, { ArenaCourseFeedback, FeedbackStatus } from './Feedback.vue';
 import FeedbackThread from './FeedbackThread.vue';
 
-const FeedbackClass = Vue.extend(Feedback);
-const FeedbackThreadClass = Vue.extend(FeedbackThread);
+const FeedbackClass = Vue.extend(
+  (Feedback as unknown) as ComponentOptions<Vue>,
+);
+const FeedbackThreadClass = Vue.extend(
+  (FeedbackThread as unknown) as ComponentOptions<Vue>,
+);
 
 for (const mode of modeList) {
   require(`codemirror/mode/${mode}/${mode}.js`);
 }
 
-@Component({
-  components: {},
-})
-export default class FeedbackCodeView extends Vue {
-  @Prop() language!: string;
-  @Prop() value!: string;
-  @Prop({ default: true }) readonly!: boolean;
-  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
-  feedbackMap!: Map<number, ArenaCourseFeedback>;
-  @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
-  feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
-  @Ref('cm-editor') private readonly cmEditor!: HTMLTextAreaElement;
-  @Prop() currentUsername!: string;
-  @Prop() currentUserClassName!: string;
-
-  T = T;
-  mode = languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'];
-  mapChangeTracker = 1;
-
-  get feedbackList(): ArenaCourseFeedback[] {
-    if (!this.mapChangeTracker) {
-      throw new Error('unreachable code');
-    }
-    return Array.from(this.feedbackMap.values());
-  }
-
-  get numberOfComments(): number {
-    return this.feedbackList.length;
-  }
-
-  get editorOptions(): EditorOptions {
+export default defineComponent({
+  name: 'FeedbackCodeView',
+  props: {
+    language: {
+      type: String,
+      default: 'cpp17-gcc',
+    },
+    value: {
+      type: String,
+      default: '',
+    },
+    readonly: {
+      type: Boolean,
+      default: true,
+    },
+    feedbackMap: {
+      type: (Map as unknown) as PropType<Map<number, ArenaCourseFeedback>>,
+      default: () => new Map<number, ArenaCourseFeedback>(),
+    },
+    feedbackThreadMap: {
+      type: (Map as unknown) as PropType<Map<number, ArenaCourseFeedback>>,
+      default: () => new Map<number, ArenaCourseFeedback>(),
+    },
+    currentUsername: {
+      type: String,
+      default: '',
+    },
+    currentUserClassName: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['submit-feedback-thread', 'save-feedback-list'],
+  data() {
     return {
-      tabSize: 2,
-      lineNumbers: true,
-      mode: this.mode,
-      readOnly: true,
-      gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
-      viewportMargin: Infinity,
+      T,
+      mode: languageModeMap[this.language] ?? languageModeMap['cpp17-gcc'],
+      mapChangeTracker: 1,
     };
-  }
-
+  },
+  computed: {
+    feedbackList(): ArenaCourseFeedback[] {
+      if (!this.mapChangeTracker) {
+        throw new Error('unreachable code');
+      }
+      return Array.from(this.feedbackMap.values());
+    },
+    numberOfComments(): number {
+      return this.feedbackList.length;
+    },
+    editorOptions(): EditorOptions {
+      return {
+        tabSize: 2,
+        lineNumbers: true,
+        mode: this.mode,
+        readOnly: true,
+        gutters: ['CodeMirror-linenumbers', 'custom-gutter'],
+        viewportMargin: Infinity,
+      };
+    },
+    ensureTenLinesInSolution: {
+      get(): string {
+        const linesToAdd = 10 - this.value.split('\n').length;
+        if (linesToAdd <= 0) {
+          return this.value;
+        }
+        return this.value + '\n'.repeat(linesToAdd);
+      },
+      set(): void {
+        // No-op for v-model binding
+      },
+    },
+  },
   mounted() {
-    const editor = CodeMirror.fromTextArea(this.cmEditor, this.editorOptions);
+    const editor = CodeMirror.fromTextArea(
+      this.$refs['cm-editor'] as HTMLTextAreaElement,
+      this.editorOptions,
+    );
 
     for (const [feedbackKey, feedback] of this.feedbackMap) {
       const feedbackForm = new FeedbackClass({
@@ -171,7 +210,7 @@ export default class FeedbackCodeView extends Vue {
     editor.on(
       'gutterClick',
       (editor: CodeMirror.Editor, lineNumber: number) => {
-        if (editor.lineInfo(lineNumber).widgets?.length ?? 0 > 0) {
+        if ((editor.lineInfo(lineNumber).widgets?.length ?? 0) > 0) {
           // There's already a widget in this line, so avoid creating another one.
           return;
         }
@@ -216,50 +255,39 @@ export default class FeedbackCodeView extends Vue {
         });
       },
     );
-  }
-
-  // Ensures that the code displayed always has at least 10 lines by adding
-  // empty lines if necessary. This makes a better UX.
-  get ensureTenLinesInSolution(): string {
-    let linesToAdd = 10 - this.value.split('\n').length;
-    if (linesToAdd <= 0) {
-      return this.value;
-    }
-    return this.value + '\n'.repeat(linesToAdd);
-  }
-
-  setFeedback({
-    lineNumber,
-    text = null,
-    status,
-  }: {
-    lineNumber: number;
-    text: string | null;
-    status: FeedbackStatus;
-  }): void {
-    this.feedbackMap.set(lineNumber, {
+  },
+  methods: {
+    setFeedback({
       lineNumber,
-      text,
+      text = null,
       status,
-    });
-    this.mapChangeTracker++;
-  }
-
-  deleteFeedback({ lineNumber }: { lineNumber: number }): void {
-    this.feedbackMap.delete(lineNumber);
-    this.mapChangeTracker++;
-  }
-
-  saveFeedbackList(): void {
-    this.$emit(
-      'save-feedback-list',
-      this.feedbackList.map((feedback) => ({
-        lineNumber: feedback.lineNumber,
-        feedback: feedback.text,
-      })),
-    );
-  }
-}
+    }: {
+      lineNumber: number;
+      text: string | null;
+      status: FeedbackStatus;
+    }): void {
+      this.feedbackMap.set(lineNumber, {
+        lineNumber,
+        text,
+        status,
+      });
+      this.mapChangeTracker++;
+    },
+    deleteFeedback({ lineNumber }: { lineNumber: number }): void {
+      this.feedbackMap.delete(lineNumber);
+      this.mapChangeTracker++;
+    },
+    saveFeedbackList(): void {
+      this.$emit(
+        'save-feedback-list',
+        this.feedbackList.map((feedback) => ({
+          lineNumber: feedback.lineNumber,
+          feedback: feedback.text,
+        })),
+      );
+    },
+  },
+});
 </script>
 
 <style lang="scss">

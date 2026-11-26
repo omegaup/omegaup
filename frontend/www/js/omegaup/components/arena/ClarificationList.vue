@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -135,99 +135,138 @@ export enum PopupDisplayed {
   NewClarification,
 }
 
-@Component({
+export default defineComponent({
+  name: 'ClarificationList',
   components: {
     'omegaup-clarification': arena_Clarification,
     'omegaup-arena-new-clarification-popup': arena_NewClarification,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-paginator': common_Paginator,
   },
-})
-export default class ArenaClarificationList extends Vue {
-  @Prop({ default: false }) isAdmin!: boolean;
-  @Prop() clarifications!: types.Clarification[];
-  @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
-  @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
-  @Prop() problemAlias!: null | string;
-  @Prop() username!: null | string;
-  @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop({ default: false }) allowFilterByAssignment!: boolean;
-  @Prop() pageSize!: number;
-  @Prop() page!: number;
-  @Prop() pagerItems!: types.PageItem[];
-
-  T = T;
-  ui = ui;
-  PopupDisplayed = PopupDisplayed;
-  currentPopupDisplayed = this.popupDisplayed;
-  selectedAssignment: string | null = null;
-  selectedProblem: string | null = null;
-
-  onNewClarification(): void {
-    this.currentPopupDisplayed = PopupDisplayed.NewClarification;
-  }
-
-  onPopupDismissed(): void {
-    this.currentPopupDisplayed = PopupDisplayed.None;
-    this.$emit('update:activeTab', 'clarifications');
-  }
-
-  clarificationSelected(clarificationId: number): boolean {
-    return (
-      clarificationsStore.state.selectedClarificationId === clarificationId
-    );
-  }
-
-  get assignmentsNames(): Array<string | null> {
-    return this.allowFilterByAssignment
-      ? [
-          ...new Set(
-            this.clarifications.map(
-              (clarification) => clarification.assignment_alias ?? null,
+  props: {
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    clarifications: {
+      type: Array as PropType<types.Clarification[]>,
+      required: true,
+    },
+    problems: {
+      type: Array as PropType<types.NavbarProblemsetProblem[]>,
+      default: () => [],
+    },
+    users: {
+      type: Array as PropType<types.ContestUser[]>,
+      default: () => [],
+    },
+    popupDisplayed: {
+      type: Number as PropType<PopupDisplayed>,
+      default: PopupDisplayed.None,
+    },
+    problemAlias: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    username: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+    showNewClarificationPopup: {
+      type: Boolean,
+      default: false,
+    },
+    allowFilterByAssignment: {
+      type: Boolean,
+      default: false,
+    },
+    pageSize: {
+      type: Number,
+      default: undefined,
+    },
+    page: {
+      type: Number,
+      default: undefined,
+    },
+    pagerItems: {
+      type: Array as PropType<types.PageItem[]>,
+      default: undefined,
+    },
+  },
+  emits: ['new-clarification', 'update:activeTab', 'clarification-response'],
+  data() {
+    return {
+      T,
+      ui,
+      PopupDisplayed,
+      currentPopupDisplayed: this.popupDisplayed,
+      selectedAssignment: null as string | null,
+      selectedProblem: null as string | null,
+    };
+  },
+  computed: {
+    assignmentsNames(): Array<string | null> {
+      return this.allowFilterByAssignment
+        ? [
+            ...new Set(
+              this.clarifications.map(
+                (clarification) => clarification.assignment_alias ?? null,
+              ),
             ),
+          ]
+        : [];
+    },
+    problemsNames(): string[] {
+      return [
+        ...new Set(
+          this.clarifications.map(
+            (clarification) => clarification.problem_alias,
           ),
-        ]
-      : [];
-  }
-
-  get problemsNames(): string[] {
-    return [
-      ...new Set(
-        this.clarifications.map((clarification) => clarification.problem_alias),
-      ),
-    ];
-  }
-
-  get filteredClarifications(): types.Clarification[] {
-    return this.clarifications.filter(
-      (clarification) =>
-        (this.selectedAssignment === null ||
-          clarification.assignment_alias === this.selectedAssignment) &&
-        (this.selectedProblem === null ||
-          clarification.problem_alias === this.selectedProblem),
-    );
-  }
-
-  @Watch('showNewClarificationPopup')
-  onShowNewClarificationPopupChanged(newValue: boolean): void {
-    if (!newValue) {
-      this.currentPopupDisplayed = PopupDisplayed.None;
-      return;
-    }
-    this.currentPopupDisplayed = PopupDisplayed.NewClarification;
-    this.onNewClarification();
-  }
-
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    this.currentPopupDisplayed = newValue;
-    if (newValue === PopupDisplayed.None) return;
-    if (newValue === PopupDisplayed.NewClarification) {
+        ),
+      ];
+    },
+    filteredClarifications(): types.Clarification[] {
+      return this.clarifications.filter(
+        (clarification) =>
+          (this.selectedAssignment === null ||
+            clarification.assignment_alias === this.selectedAssignment) &&
+          (this.selectedProblem === null ||
+            clarification.problem_alias === this.selectedProblem),
+      );
+    },
+  },
+  watch: {
+    showNewClarificationPopup(newValue: boolean): void {
+      if (!newValue) {
+        this.currentPopupDisplayed = PopupDisplayed.None;
+        return;
+      }
+      this.currentPopupDisplayed = PopupDisplayed.NewClarification;
       this.onNewClarification();
-    }
-  }
-}
+    },
+    popupDisplayed(newValue: PopupDisplayed): void {
+      this.currentPopupDisplayed = newValue;
+      if (newValue === PopupDisplayed.None) return;
+      if (newValue === PopupDisplayed.NewClarification) {
+        this.onNewClarification();
+      }
+    },
+  },
+  methods: {
+    onNewClarification(): void {
+      this.currentPopupDisplayed = PopupDisplayed.NewClarification;
+    },
+    onPopupDismissed(): void {
+      this.currentPopupDisplayed = PopupDisplayed.None;
+      this.$emit('update:activeTab', 'clarifications');
+    },
+    clarificationSelected(clarificationId: number): boolean {
+      return (
+        clarificationsStore.state.selectedClarificationId === clarificationId
+      );
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
