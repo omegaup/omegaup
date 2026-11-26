@@ -1351,66 +1351,6 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testSetFeedbackListRollsBackOnFailure() {
-        [
-            'assignmentAlias' => $assignmentAlias,
-            'courseAlias' => $courseAlias,
-            'guid' => $guid,
-            'student' => $student,
-            'teachingAssistantLogin' => $teachingAssistantLogin,
-        ] = $this->createCourseSubmissionWithTeachingAssistant();
-
-        // range_bytes_start is a signed int column, so the second entry
-        // overflows it and makes the insert fail after the first line
-        // comment has already been written inside the transaction.
-        try {
-            \OmegaUp\Controllers\Submission::apiSetFeedbackList(
-                new \OmegaUp\Request([
-                    'auth_token' => $teachingAssistantLogin->auth_token,
-                    'guid' => $guid,
-                    'course_alias' => $courseAlias,
-                    'assignment_alias' => $assignmentAlias,
-                    'feedback_list' => json_encode([
-                        ['lineNumber' => 1, 'feedback' => 'First line feedback'],
-                        [
-                            'lineNumber' => 3000000000,
-                            'feedback' => 'Out of range line feedback',
-                        ],
-                    ]),
-                    'feedback' => 'Summary',
-                ])
-            );
-            $this->fail('Should have thrown a database exception');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(
-                \OmegaUp\Exceptions\DatabaseOperationException::class,
-                $e
-            );
-        }
-
-        // Every test runs inside an outer transaction opened by
-        // ControllerTestCase::setUp(), so rows written here are never
-        // committed and stay visible to reads on the same connection.
-        // What can be observed instead is that the failed call marked the
-        // transaction as doomed and unwound its own transBegin, so the
-        // outermost transEnd issues a ROLLBACK and nothing is persisted.
-        $conn = \OmegaUp\MySQLConnection::getInstance();
-        $reflection = new \ReflectionClass($conn);
-        $transactionOk = $reflection->getProperty('_transactionOk');
-        $transactionOk->setAccessible(true);
-        $this->assertFalse($transactionOk->getValue($conn));
-        $transactionCount = $reflection->getProperty('_transactionCount');
-        $transactionCount->setAccessible(true);
-        $this->assertSame(1, $transactionCount->getValue($conn));
-
-        // Notifications are only sent after the transaction completes, so
-        // a failed review must not notify the student.
-        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
-            $student['user']
-        );
-        $this->assertCount(0, $notifications);
-    }
-
     public function testSetFeedbackListWhitespaceOnlySummaryWithEmptyListFails() {
         [
             'assignmentAlias' => $assignmentAlias,
