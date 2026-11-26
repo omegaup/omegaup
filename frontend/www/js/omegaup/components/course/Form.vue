@@ -6,7 +6,7 @@
     <div class="card-body px-2 px-sm-4">
       <div class="required-fields-legend">{{ T.wordsRequiredField }}</div>
       <form class="form" data-course-form @submit.prevent="onSubmit">
-        <div class="row">
+        <div class="row course-language-row">
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100 introjs-course-name">
               <span
@@ -626,6 +626,16 @@ export default class CourseDetails extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+
+.multiselect__tag {
+  background: var(--multiselect-tag-background-color);
+}
+
+.course-language-row {
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+}
 
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {

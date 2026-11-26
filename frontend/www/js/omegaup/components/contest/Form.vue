@@ -47,7 +47,7 @@
       <form class="contest-form" novalidate @submit.prevent="onSubmit">
         <div class="accordion mb-3">
           <!-- Basic Info Section -->
-          <div class="card">
+          <div class="card basic-info-card">
             <div class="card-header">
               <h2 class="mb-0">
                 <button
@@ -1626,6 +1626,20 @@ export default class Form extends Vue {
   max-height: 250px;
   overflow-y: auto;
   font-size: 0.9rem;
+}
+
+.multiselect__tag {
+  background: var(--multiselect-tag-background-color);
+}
+
+.basic-info-card {
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+}
+
+.basic-info-card > .basic-info {
+  overflow: visible;
 }
 
 .spinner-border-sm {
