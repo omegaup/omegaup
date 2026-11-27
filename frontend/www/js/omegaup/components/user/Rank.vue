@@ -233,14 +233,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
 Vue.use(PopoverPlugin);
-interface Rank {
-  country: string;
-  classname?: string;
-  username: string;
-  name?: string;
-  score: number;
-  problems_solved: number;
-}
+export type Rank = Pick<
+  types.UserRank['rank'][number],
+  'username' | 'name' | 'score' | 'problems_solved'
+> & {
+  classname?: types.UserRank['rank'][number]['classname'];
+  country?: string;
+  rank?: number;
+};
 
 @Component({
   components: {
@@ -373,7 +373,7 @@ export default class UserRank extends Vue {
   color: var(--arena-contest-list-empty-category-font-color);
 }
 
-[data-user-rank] .tags-input-wrapper-default {
+[data-user-rank] .omegaup-typeahead .multiselect__tags {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
   overflow: hidden;
 }

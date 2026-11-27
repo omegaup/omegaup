@@ -1,10 +1,14 @@
 import { mount } from '@vue/test-utils';
+import type { ComponentOptions } from 'vue';
+import type Vue from 'vue';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 
 import Crons from './Crons.vue';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
+
+const CronsComponent = Crons as ComponentOptions<Vue>;
 
 const startedAt = new Date(Date.UTC(2026, 0, 2, 3, 4, 5));
 
@@ -53,7 +57,7 @@ const weekdayName = (dayOfWeek: number): string =>
   });
 
 const describedSchedule = (schedule: string | null): string | null => {
-  const wrapper = mount(Crons, {
+  const wrapper = mount(CronsComponent, {
     propsData: { jobs: [{ ...jobs[0], schedule }], runs: [] },
   });
   const cell = wrapper.findAll('[data-cron-jobs] tbody tr td').at(1);
@@ -83,7 +87,7 @@ const problemHealthFindings: types.ProblemHealthFinding[] = [
 
 describe('Crons.vue', () => {
   it('Should show each job with the status of its latest run', () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
     const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
     expect(cells.at(0).text()).toBe('update_ranks.py');
@@ -94,7 +98,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should show one row per run with its status and totals', () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
     const rows = wrapper.findAll('.cron-run-row');
 
     expect(rows).toHaveLength(2);
@@ -109,7 +113,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should show phase detail when a run is expanded', async () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
 
     expect(wrapper.find('[data-cron-phases]').exists()).toBe(false);
     await wrapper.findAll('.cron-run-row').at(0).trigger('click');
@@ -121,7 +125,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should list the problems that need attention', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: { jobs, runs, problemHealthFindings },
     });
 
@@ -142,7 +146,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should keep the raw check type reachable on the readable one', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: { jobs, runs, problemHealthFindings },
     });
 
@@ -151,7 +155,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should show a check type it does not recognize as it came', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: {
         jobs,
         runs,
@@ -167,7 +171,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should keep a problem alias inside the arena url', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: {
         jobs,
         runs,
@@ -185,14 +189,14 @@ describe('Crons.vue', () => {
   });
 
   it('Should show a placeholder when no problem needs attention', () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
 
     expect(wrapper.find('[data-problem-health]').exists()).toBe(false);
     expect(wrapper.text()).toContain(T.problemHealthNoFindings);
   });
 
   it('Should collapse an expanded run when it is clicked again', async () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
     const row = wrapper.findAll('.cron-run-row').at(0);
 
     await row.trigger('click');
@@ -202,7 +206,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should show the error output of a run that recorded no phases', async () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
 
     await wrapper.findAll('.cron-run-row').at(1).trigger('click');
 
@@ -213,7 +217,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should badge a status it does not recognize', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: { jobs, runs: [{ ...runs[0], status: 'queued' }] },
     });
 
@@ -221,7 +225,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should dash out the values a run did not record', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: {
         jobs: [{ ...jobs[0], schedule: null }],
         runs: [
@@ -245,7 +249,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should keep zero as a real value instead of a dash', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: {
         jobs,
         runs: [{ ...runs[0], duration_seconds: 0, rows_affected: 0 }],
@@ -258,7 +262,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should report no status for a job that has never run', () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs: [] } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs: [] } });
     const cells = wrapper.findAll('[data-cron-jobs] tbody tr td');
 
     expect(cells.at(2).text()).toBe('—');
@@ -266,7 +270,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should describe a daily schedule next to the expression', () => {
-    const wrapper = mount(Crons, { propsData: { jobs, runs } });
+    const wrapper = mount(CronsComponent, { propsData: { jobs, runs } });
     const cell = wrapper.findAll('[data-cron-jobs] tbody tr td').at(1);
 
     expect(cell.find('code').text()).toBe('19 8 * * *');
@@ -314,7 +318,7 @@ describe('Crons.vue', () => {
   });
 
   it('Should take the newest run as the status of a job', () => {
-    const wrapper = mount(Crons, {
+    const wrapper = mount(CronsComponent, {
       propsData: {
         jobs,
         runs: [
