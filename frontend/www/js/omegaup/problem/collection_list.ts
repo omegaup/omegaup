@@ -97,7 +97,7 @@ OmegaUp.on('ready', () => {
           problems: payload.problems,
           loggedIn: payload.loggedIn,
           selectedTags: payload.selectedTags,
-          excludedTags: excludedTags,
+          excludedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
           language: payload.language,
@@ -130,7 +130,7 @@ OmegaUp.on('ready', () => {
                 difficulty,
                 quality,
                 selectedTags: tag,
-                excludedTags: excludedTag,
+                excludedTags,
               }),
             );
           },
