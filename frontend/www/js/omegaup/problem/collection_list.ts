@@ -118,8 +118,8 @@ OmegaUp.on('ready', () => {
             sortOrder: omegaup.SortOrder,
             difficulty: string,
             quality: string,
-            tag: string[],
-            excludedTag: string[],
+            selectedTags: string[],
+            excludedTags: string[],
           ): void => {
             window.location.replace(
               collectionListURL(payload.level, {
@@ -129,7 +129,7 @@ OmegaUp.on('ready', () => {
                 sortOrder,
                 difficulty,
                 quality,
-                selectedTags: tag,
+                selectedTags,
                 excludedTags,
               }),
             );
