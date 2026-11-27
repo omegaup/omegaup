@@ -997,6 +997,11 @@ export default ArenaContestList;
     text-align: center;
   }
 
+  .empty-category {
+    font-size: 1.125rem;
+    margin: 1.5rem 0.5rem;
+  }
+
   .sticky-search-bar,
   .card-group-menu {
     >>> .card-body {

@@ -898,6 +898,11 @@ export default ArenaContestList;
     text-align: center;
   }
 
+  .empty-category {
+    font-size: 1.125rem;
+    margin: 1.5rem 0.5rem;
+  }
+
   .tabs {
     flex-direction: column;
   }
