@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -100,231 +100,244 @@ import {
 } from '../../grader/util';
 import { sourceTemplates } from '../../grader/GraderTemplates';
 import { getCodeTemplate } from '../../code_templates';
-@Component({
+
+export default defineComponent({
+  name: 'ArenaRunSubmitPopup',
   components: {
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-countdown': omegaup_Countdown,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
-})
-export default class ArenaRunSubmitPopup extends Vue {
-  @Ref() inputFile!: HTMLInputElement;
-  @Prop() languages!: string[];
-  @Prop({ required: true }) nextSubmissionTimestamp!: Date;
-  @Prop() inputLimit!: number;
-  @Prop({ default: null }) preferredLanguage!: null | string;
+  props: {
+    languages: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    nextSubmissionTimestamp: {
+      type: Date,
+      required: true,
+    },
+    inputLimit: {
+      type: Number,
+      default: 0,
+    },
+    preferredLanguage: {
+      type: String as PropType<null | string>,
+      default: null,
+    },
+  },
+  emits: ['dismiss', 'submit-run'],
+  data() {
+    return {
+      T,
+      omegaup,
+      selectedLanguage: this.preferredLanguage as null | string,
+      code: '',
+      now: Date.now(),
+    };
+  },
+  computed: {
+    canSubmit(): boolean {
+      return this.nextSubmissionTimestamp.getTime() <= this.now;
+    },
+    filename(): string {
+      return `Main${this.extension}`;
+    },
+    allowedLanguages(): omegaup.Languages {
+      let allowedLanguages: omegaup.Languages = {};
+      const allLanguages: { language: string; name: string }[] = Object.values(
+        supportedLanguages,
+      ).map((languageInfo: LanguageInfo) => ({
+        language: languageInfo.language,
+        name: languageInfo.name,
+      }));
+      // dont forget about cat ext
+      allLanguages.push({ language: 'cat', name: T.outputOnly });
 
-  T = T;
-  omegaup = omegaup;
-  selectedLanguage: null | string = this.preferredLanguage;
-  code = '';
-  now: number = Date.now();
-
+      allLanguages
+        .filter(
+          (item) =>
+            this.languages.includes(item.language) || item.language === '',
+        )
+        .forEach((optionItem) => {
+          allowedLanguages[optionItem.language] = optionItem.name;
+        });
+      return allowedLanguages;
+    },
+    extension(): string {
+      if (!this.selectedLanguage || this.selectedLanguage === 'cat') {
+        return '';
+      }
+      if (this.selectedLanguage.startsWith('cpp')) {
+        return '.cpp';
+      }
+      if (this.selectedLanguage.startsWith('c11-')) {
+        return '.c';
+      }
+      if (this.selectedLanguage.startsWith('py')) {
+        return '.py';
+      }
+      return `.${this.selectedLanguage}`;
+    },
+  },
+  watch: {
+    selectedLanguage: {
+      immediate: true,
+      handler(
+        newLanguage: null | string,
+        oldLanguage: null | string | undefined,
+      ): void {
+        if (!newLanguage || newLanguage === oldLanguage) return;
+        this.loadBoilerplateForLanguage(newLanguage);
+        if (oldLanguage !== undefined) {
+          SafeStorage.setItem('arena:selectedLanguage', newLanguage);
+        }
+      },
+    },
+    preferredLanguage(): void {
+      this.revalidateLanguage();
+    },
+    languages(): void {
+      this.revalidateLanguage();
+    },
+  },
   mounted(): void {
     const savedLanguage = SafeStorage.getItem('arena:selectedLanguage');
     if (savedLanguage && savedLanguage in this.allowedLanguages) {
       this.selectedLanguage = savedLanguage;
     }
-  }
-
-  getLanguageExtension(language: string): string {
-    if (!language || language === 'cat') {
-      return '';
-    }
-    const languageInfo = supportedLanguages[language];
-    if (languageInfo) {
-      return languageInfo.extension;
-    }
-    // Fallback logic
-    if (language.startsWith('cpp')) {
-      return 'cpp';
-    }
-    if (language.startsWith('c11-')) {
-      return 'c';
-    }
-    if (language.startsWith('py')) {
-      return 'py';
-    }
-    return language;
-  }
-
-  loadBoilerplateForLanguage(language: string): void {
-    if (!language || language === 'cat') {
-      this.code = '';
-      return;
-    }
-    const extension = this.getLanguageExtension(language);
-    if (!extension) {
-      this.code = '';
-      return;
-    }
-    const customTemplate = getCodeTemplate(extension);
-    if (customTemplate !== null) {
-      this.code = customTemplate;
-      return;
-    }
-    this.code = sourceTemplates[extension] ?? '';
-  }
-
-  handleChangeLanguage(language: string): void {
-    this.selectedLanguage = language;
-  }
-
-  @Watch('selectedLanguage', { immediate: true })
-  onSelectedLanguageChanged(
-    newLanguage: null | string,
-    oldLanguage: null | string | undefined,
-  ): void {
-    if (!newLanguage || newLanguage === oldLanguage) return;
-    this.loadBoilerplateForLanguage(newLanguage);
-    if (oldLanguage !== undefined) {
-      SafeStorage.setItem('arena:selectedLanguage', newLanguage);
-    }
-  }
-
-  get canSubmit(): boolean {
-    return this.nextSubmissionTimestamp.getTime() <= this.now;
-  }
-
-  get filename(): string {
-    return `Main${this.extension}`;
-  }
-
-  get allowedLanguages(): omegaup.Languages {
-    let allowedLanguages: omegaup.Languages = {};
-    const allLanguages: { language: string; name: string }[] = Object.values(
-      supportedLanguages,
-    ).map((languageInfo: LanguageInfo) => ({
-      language: languageInfo.language,
-      name: languageInfo.name,
-    }));
-    // dont forget about cat ext
-    allLanguages.push({ language: 'cat', name: T.outputOnly });
-
-    allLanguages
-      .filter(
-        (item) =>
-          this.languages.includes(item.language) || item.language === '',
-      )
-      .forEach((optionItem) => {
-        allowedLanguages[optionItem.language] = optionItem.name;
-      });
-    return allowedLanguages;
-  }
-
-  get extension(): string {
-    if (!this.selectedLanguage || this.selectedLanguage === 'cat') {
-      return '';
-    }
-    if (this.selectedLanguage.startsWith('cpp')) {
-      return '.cpp';
-    }
-    if (this.selectedLanguage.startsWith('c11-')) {
-      return '.c';
-    }
-    if (this.selectedLanguage.startsWith('py')) {
-      return '.py';
-    }
-    return `.${this.selectedLanguage}`;
-  }
-
-  @Watch('preferredLanguage')
-  onPreferredLanguageChanged(): void {
-    this.revalidateLanguage();
-  }
-
-  @Watch('languages')
-  onLanguagesChanged(): void {
-    this.revalidateLanguage();
-  }
-
-  revalidateLanguage(): void {
-    if (
-      this.selectedLanguage &&
-      this.selectedLanguage in this.allowedLanguages
-    ) {
-      return;
-    }
-    if (
-      this.preferredLanguage &&
-      this.preferredLanguage in this.allowedLanguages
-    ) {
-      this.selectedLanguage = this.preferredLanguage;
-      return;
-    }
-    this.selectedLanguage = Object.keys(this.allowedLanguages)[0] || null;
-  }
-
-  onSubmit(): void {
-    if (!this.canSubmit) {
-      ui.warning(
-        ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: Math.ceil(
-            (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
-          ),
-        }),
-      );
-      return;
-    }
-
-    if (!this.selectedLanguage) {
-      ui.error(T.arenaRunSubmitMissingLanguage);
-      return;
-    }
-    const file = this.inputFile.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const result = e.target?.result ?? null;
-        if (result === null) return;
-        this.$emit('submit-run', result as string, this.selectedLanguage);
-      };
-
-      // add txt, p extensions
-      const validExtensions = [...supportedExtensions, 'p', 'txt'];
-      if (
-        this.selectedLanguage !== 'cat' ||
-        file.type.indexOf('text/') === 0 ||
-        validExtensions.includes(this.extension)
-      ) {
-        if (this.inputLimit && file.size >= this.inputLimit) {
-          ui.error(
-            ui.formatString(T.arenaRunSubmitFilesize, {
-              limit: `${this.inputLimit / 1024} KiB`,
-            }),
-          );
-          return;
-        }
-        reader.readAsText(file, 'UTF-8');
+  },
+  methods: {
+    getLanguageExtension(language: string): string {
+      if (!language || language === 'cat') {
+        return '';
+      }
+      const languageInfo = supportedLanguages[language];
+      if (languageInfo) {
+        return languageInfo.extension;
+      }
+      // Fallback logic
+      if (language.startsWith('cpp')) {
+        return 'cpp';
+      }
+      if (language.startsWith('c11-')) {
+        return 'c';
+      }
+      if (language.startsWith('py')) {
+        return 'py';
+      }
+      return language;
+    },
+    loadBoilerplateForLanguage(language: string): void {
+      if (!language || language === 'cat') {
+        this.code = '';
         return;
       }
-      // 512kiB _must_ be enough for anybody.
-      if (file.size >= 512 * 1024) {
-        ui.error(
-          ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }),
+      const extension = this.getLanguageExtension(language);
+      if (!extension) {
+        this.code = '';
+        return;
+      }
+      const customTemplate = getCodeTemplate(extension);
+      if (customTemplate !== null) {
+        this.code = customTemplate;
+        return;
+      }
+      this.code = sourceTemplates[extension] ?? '';
+    },
+    handleChangeLanguage(language: string): void {
+      this.selectedLanguage = language;
+    },
+    revalidateLanguage(): void {
+      if (
+        this.selectedLanguage &&
+        this.selectedLanguage in this.allowedLanguages
+      ) {
+        return;
+      }
+      if (
+        this.preferredLanguage &&
+        this.preferredLanguage in this.allowedLanguages
+      ) {
+        this.selectedLanguage = this.preferredLanguage;
+        return;
+      }
+      this.selectedLanguage = Object.keys(this.allowedLanguages)[0] || null;
+    },
+    onSubmit(): void {
+      if (!this.canSubmit) {
+        ui.warning(
+          ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+            submissionGap: Math.ceil(
+              (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
+            ),
+          }),
         );
         return;
       }
-      reader.readAsDataURL(file);
 
-      return;
-    }
+      if (!this.selectedLanguage) {
+        ui.error(T.arenaRunSubmitMissingLanguage);
+        return;
+      }
+      const inputFile = this.$refs.inputFile as HTMLInputElement;
+      const file = inputFile?.files?.[0];
+      if (file) {
+        const reader = new FileReader();
 
-    if (!this.code) {
-      ui.error(T.arenaRunSubmitEmptyCode);
-      return;
-    }
+        reader.onload = (e) => {
+          const result = e.target?.result ?? null;
+          if (result === null) return;
+          this.$emit('submit-run', result as string, this.selectedLanguage);
+        };
 
-    this.$emit('submit-run', this.code, this.selectedLanguage);
-  }
+        // add txt, p extensions
+        const validExtensions = [...supportedExtensions, 'p', 'txt'];
+        if (
+          this.selectedLanguage !== 'cat' ||
+          file.type.indexOf('text/') === 0 ||
+          validExtensions.includes(this.extension)
+        ) {
+          if (this.inputLimit && file.size >= this.inputLimit) {
+            ui.error(
+              ui.formatString(T.arenaRunSubmitFilesize, {
+                limit: `${this.inputLimit / 1024} KiB`,
+              }),
+            );
+            return;
+          }
+          reader.readAsText(file, 'UTF-8');
+          return;
+        }
+        // 512kiB _must_ be enough for anybody.
+        if (file.size >= 512 * 1024) {
+          ui.error(
+            ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }),
+          );
+          return;
+        }
+        reader.readAsDataURL(file);
 
-  clearForm(): void {
-    this.code = '';
-    this.inputFile.type = 'text';
-    this.inputFile.type = 'file';
-  }
-}
+        return;
+      }
+
+      if (!this.code) {
+        ui.error(T.arenaRunSubmitEmptyCode);
+        return;
+      }
+
+      this.$emit('submit-run', this.code, this.selectedLanguage);
+    },
+    clearForm(): void {
+      this.code = '';
+      const inputFile = this.$refs.inputFile as HTMLInputElement;
+      if (inputFile) {
+        inputFile.type = 'text';
+        inputFile.type = 'file';
+      }
+    },
+  },
+});
 </script>
 
 <style lang="scss">
