@@ -4,9 +4,13 @@
   - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
   - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getRoleAssignments/`](#apiadmingetroleassignments)
+  - [`/api/admin/getRoleDetails/`](#apiadmingetroledetails)
+  - [`/api/admin/getRoles/`](#apiadmingetroles)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/rerunCron/`](#apiadminreruncron)
+  - [`/api/admin/setCronJobEnabled/`](#apiadminsetcronjobenabled)
   - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
   - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
@@ -270,6 +274,10 @@
   - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
   - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
+  - [`/api/user/follow/`](#apiuserfollow)
+  - [`/api/user/followStatus/`](#apiuserfollowstatus)
+  - [`/api/user/followers/`](#apiuserfollowers)
+  - [`/api/user/following/`](#apiuserfollowing)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
@@ -292,6 +300,7 @@
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
+  - [`/api/user/unfollow/`](#apiuserunfollow)
   - [`/api/user/update/`](#apiuserupdate)
   - [`/api/user/updateBasicInfo/`](#apiuserupdatebasicinfo)
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
@@ -377,6 +386,52 @@ Get maintenance mode status
 types.MaintenanceModeStatus;
 ```
 
+## `/api/admin/getRoleAssignments/`
+
+### Description
+
+### Parameters
+
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `assignment_type` | `string`       |             | ✓        |
+| `page`            | `int`          |             | ✓        |
+| `page_size`       | `int`          |             | ✓        |
+| `role`            | `string`       |             | ✓        |
+| `query`           | `null\|string` |             |          |
+
+### Returns
+
+```typescript
+types.RoleAssignmentsResponse;
+```
+
+## `/api/admin/getRoleDetails/`
+
+### Description
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `role` | `string` |             | ✓        |
+
+### Returns
+
+```typescript
+types.RoleDetails;
+```
+
+## `/api/admin/getRoles/`
+
+### Description
+
+### Returns
+
+| Name    | Type                      |
+| ------- | ------------------------- |
+| `roles` | `List[types.RoleSummary]` |
+
 ## `/api/admin/getSystemSettings/`
 
 ### Description
@@ -426,6 +481,24 @@ Queues a manual rerun of a registered cron job for a worker to pick up.
 | Name     | Type      |
 | -------- | --------- |
 | `queued` | `boolean` |
+
+## `/api/admin/setCronJobEnabled/`
+
+### Description
+
+Enables or disables a cron job. A disabled job skips its scheduled runs
+and new rerun requests for it are refused.
+
+### Parameters
+
+| Name      | Type     | Description | Required |
+| --------- | -------- | ----------- | -------- |
+| `enabled` | `bool`   |             | ✓        |
+| `name`    | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/admin/setMaintenanceMode/`
 
@@ -4418,13 +4491,13 @@ Create a new run
 
 ### Parameters
 
-| Name            | Type           | Description | Required |
-| --------------- | -------------- | ----------- | -------- |
-| `language`      | `string`       |             | ✓        |
-| `problem_alias` | `string`       |             | ✓        |
-| `source`        | `string`       |             | ✓        |
-| `contest_alias` | `null\|string` |             |          |
-| `problemset_id` | `int\|null`    |             |          |
+| Name            | Type           | Description                                         | Required |
+| --------------- | -------------- | --------------------------------------------------- | -------- |
+| `language`      | `string`       | Programming language used for the solution          | ✓        |
+| `problem_alias` | `string`       | Alias of the problem                                | ✓        |
+| `source`        | `string`       | Source code of the solution                         | ✓        |
+| `contest_alias` | `null\|string` | Alias of the contest                                |          |
+| `problemset_id` | `int\|null`    | ID of the problemset associated with the submission |          |
 
 ### Returns
 
@@ -4443,9 +4516,9 @@ Gets the details of a run. Includes admin details if admin.
 
 ### Parameters
 
-| Name        | Type     | Description | Required |
-| ----------- | -------- | ----------- | -------- |
-| `run_alias` | `string` |             | ✓        |
+| Name        | Type     | Description             | Required |
+| ----------- | -------- | ----------------------- | -------- |
+| `run_alias` | `string` | Alias (GUID) of the run | ✓        |
 
 ### Returns
 
@@ -4539,15 +4612,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                      | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `offset`        | `int`                                                                                                                                                                                                                     |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                                  |             | ✓        |
-| `rowcount`      | `int`                                                                                                                                                                                                                     |             | ✓        |
-| `username`      | `string`                                                                                                                                                                                                                  |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    |             |          |
+| Name            | Type                                                                                                                                                                                                                      | Description                                                           | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                                     | Number of runs to skip before returning results (used for pagination) | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                                  | Alias of the problem                                                  | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                                     | Maximum number of runs to return                                      | ✓        |
+| `username`      | `string`                                                                                                                                                                                                                  | Filter runs by the user who submitted them                            | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'rk'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` | Filter runs by programming language                                   |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                                 | Filter runs by grading status                                         |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                                    | Filter runs by the judge's verdict                                    |          |
 
 ### Returns
 
@@ -4598,9 +4671,9 @@ Used in the arena, any contestant can view its own codes and compile errors
 
 ### Parameters
 
-| Name        | Type     | Description | Required |
-| ----------- | -------- | ----------- | -------- |
-| `run_alias` | `string` |             | ✓        |
+| Name        | Type     | Description             | Required |
+| ----------- | -------- | ----------------------- | -------- |
+| `run_alias` | `string` | Alias (GUID) of the run | ✓        |
 
 ### Returns
 
@@ -5441,6 +5514,85 @@ Gets extra information of the identity:
 | `verified`        | `boolean`      |
 | `within_last_day` | `boolean`      |
 
+## `/api/user/follow/`
+
+### Description
+
+Makes the current user follow the given user.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/followStatus/`
+
+### Description
+
+Gets the follow counters for the given user, plus whether the current
+user follows them. Intended for rendering a profile's follow button.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+| Name             | Type      |
+| ---------------- | --------- |
+| `followersCount` | `number`  |
+| `followingCount` | `number`  |
+| `isFollowing`    | `boolean` |
+
+## `/api/user/followers/`
+
+### Description
+
+Gets the users that follow the given user, most recent first.
+
+### Parameters
+
+| Name       | Type        | Description | Required |
+| ---------- | ----------- | ----------- | -------- |
+| `username` | `string`    |             | ✓        |
+| `page`     | `null\|int` |             |          |
+| `rowcount` | `null\|int` |             |          |
+
+### Returns
+
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `followers` | `List[types.FollowUser]` |
+| `totalRows` | `number`                 |
+
+## `/api/user/following/`
+
+### Description
+
+Gets the users the given user follows, most recent first.
+
+### Parameters
+
+| Name       | Type        | Description | Required |
+| ---------- | ----------- | ----------- | -------- |
+| `username` | `string`    |             | ✓        |
+| `page`     | `null\|int` |             |          |
+| `rowcount` | `null\|int` |             |          |
+
+### Returns
+
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `following` | `List[types.FollowUser]` |
+| `totalRows` | `number`                 |
+
 ## `/api/user/generateGitToken/`
 
 ### Description
@@ -5830,6 +5982,22 @@ Gets verify status of a user
 | ---------- | --------- |
 | `username` | `string`  |
 | `verified` | `boolean` |
+
+## `/api/user/unfollow/`
+
+### Description
+
+Makes the current user stop following the given user.
+
+### Parameters
+
+| Name       | Type     | Description | Required |
+| ---------- | -------- | ----------- | -------- |
+| `username` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/user/update/`
 

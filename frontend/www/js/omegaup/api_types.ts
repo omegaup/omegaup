@@ -1921,6 +1921,14 @@ export namespace types {
       );
     }
 
+    export function OperationsDashboardPayload(
+      elementId: string = 'payload',
+    ): types.OperationsDashboardPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function PrivacyPolicyDetailsPayload(
       elementId: string = 'payload',
     ): types.PrivacyPolicyDetailsPayload {
@@ -3982,6 +3990,12 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface FollowUser {
+    classname: string;
+    name?: string;
+    username: string;
+  }
+
   export interface FullIDEPayload {
     acceptedLanguages: string[];
     preferredLanguage?: string;
@@ -4308,6 +4322,12 @@ export namespace types {
     status?: string;
     type: string;
     url?: string;
+  }
+
+  export interface OperationsDashboardPayload {
+    accessLevel: string;
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
   }
 
   export interface PageItem {
@@ -4784,6 +4804,39 @@ export namespace types {
     published: boolean;
     rng_seed?: number;
     skip_reason?: string;
+  }
+
+  export interface RoleAssignment {
+    acl_id: number;
+    name: string;
+    resource_alias?: string;
+    resource_type: string;
+  }
+
+  export interface RoleAssignmentsResponse {
+    assignments: types.RoleAssignment[];
+    total_rows: number;
+  }
+
+  export interface RoleDetails {
+    permissions: types.RolePermission[];
+    role: types.RoleSummary;
+  }
+
+  export interface RolePermission {
+    description: string;
+    name: string;
+    permission_id: number;
+    resource_type: string;
+  }
+
+  export interface RoleSummary {
+    description: string;
+    groups_count: number;
+    name: string;
+    permissions_count: number;
+    role_id: number;
+    users_count: number;
   }
 
   export interface Run {
@@ -5535,6 +5588,12 @@ export namespace messages {
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
+  export type AdminGetRoleAssignmentsRequest = { [key: string]: any };
+  export type AdminGetRoleAssignmentsResponse = types.RoleAssignmentsResponse;
+  export type AdminGetRoleDetailsRequest = { [key: string]: any };
+  export type AdminGetRoleDetailsResponse = types.RoleDetails;
+  export type AdminGetRolesRequest = { [key: string]: any };
+  export type AdminGetRolesResponse = { roles: types.RoleSummary[] };
   export type AdminGetSystemSettingsRequest = { [key: string]: any };
   export type AdminGetSystemSettingsResponse = {
     settings: { ephemeralGraderEnabled: boolean };
@@ -5555,6 +5614,8 @@ export namespace messages {
   };
   export type AdminRerunCronRequest = { [key: string]: any };
   export type AdminRerunCronResponse = { queued: boolean };
+  export type AdminSetCronJobEnabledRequest = { [key: string]: any };
+  export type AdminSetCronJobEnabledResponse = {};
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
   export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
@@ -6460,6 +6521,24 @@ export namespace messages {
     verified: boolean;
     within_last_day: boolean;
   };
+  export type UserFollowRequest = { [key: string]: any };
+  export type UserFollowResponse = {};
+  export type UserFollowStatusRequest = { [key: string]: any };
+  export type UserFollowStatusResponse = {
+    followersCount: number;
+    followingCount: number;
+    isFollowing: boolean;
+  };
+  export type UserFollowersRequest = { [key: string]: any };
+  export type UserFollowersResponse = {
+    followers: types.FollowUser[];
+    totalRows: number;
+  };
+  export type UserFollowingRequest = { [key: string]: any };
+  export type UserFollowingResponse = {
+    following: types.FollowUser[];
+    totalRows: number;
+  };
   export type UserGenerateGitTokenRequest = { [key: string]: any };
   export type UserGenerateGitTokenResponse = { token: string };
   export type UserGenerateOmiUsersRequest = { [key: string]: any };
@@ -6527,6 +6606,8 @@ export namespace messages {
     username: string;
     verified: boolean;
   };
+  export type UserUnfollowRequest = { [key: string]: any };
+  export type UserUnfollowResponse = {};
   export type UserUpdateRequest = { [key: string]: any };
   export type UserUpdateResponse = {};
   export type UserUpdateBasicInfoRequest = { [key: string]: any };
@@ -6563,6 +6644,15 @@ export namespace controllers {
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
+    getRoleAssignments: (
+      params?: messages.AdminGetRoleAssignmentsRequest,
+    ) => Promise<messages.AdminGetRoleAssignmentsResponse>;
+    getRoleDetails: (
+      params?: messages.AdminGetRoleDetailsRequest,
+    ) => Promise<messages.AdminGetRoleDetailsResponse>;
+    getRoles: (
+      params?: messages.AdminGetRolesRequest,
+    ) => Promise<messages.AdminGetRolesResponse>;
     getSystemSettings: (
       params?: messages.AdminGetSystemSettingsRequest,
     ) => Promise<messages.AdminGetSystemSettingsResponse>;
@@ -6572,6 +6662,9 @@ export namespace controllers {
     rerunCron: (
       params?: messages.AdminRerunCronRequest,
     ) => Promise<messages.AdminRerunCronResponse>;
+    setCronJobEnabled: (
+      params?: messages.AdminSetCronJobEnabledRequest,
+    ) => Promise<messages.AdminSetCronJobEnabledResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;
@@ -7361,6 +7454,18 @@ export namespace controllers {
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
+    follow: (
+      params?: messages.UserFollowRequest,
+    ) => Promise<messages.UserFollowResponse>;
+    followStatus: (
+      params?: messages.UserFollowStatusRequest,
+    ) => Promise<messages.UserFollowStatusResponse>;
+    followers: (
+      params?: messages.UserFollowersRequest,
+    ) => Promise<messages.UserFollowersResponse>;
+    following: (
+      params?: messages.UserFollowingRequest,
+    ) => Promise<messages.UserFollowingResponse>;
     generateGitToken: (
       params?: messages.UserGenerateGitTokenRequest,
     ) => Promise<messages.UserGenerateGitTokenResponse>;
@@ -7427,6 +7532,9 @@ export namespace controllers {
     statusVerified: (
       params?: messages.UserStatusVerifiedRequest,
     ) => Promise<messages.UserStatusVerifiedResponse>;
+    unfollow: (
+      params?: messages.UserUnfollowRequest,
+    ) => Promise<messages.UserUnfollowResponse>;
     update: (
       params?: messages.UserUpdateRequest,
     ) => Promise<messages.UserUpdateResponse>;
