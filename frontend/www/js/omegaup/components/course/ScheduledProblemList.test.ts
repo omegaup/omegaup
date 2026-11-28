@@ -37,5 +37,9 @@ describe('ScheduledProblemLists.vue', () => {
     expect(
       wrapper.find('[data-course-problemlist] .card-body').text(),
     ).toContain(T.courseAssignmentProblemsEmpty);
+    expect(wrapper.find('.empty-table-message').text()).toContain(
+      T.courseProblemListEmptyDescription,
+    );
+    expect(wrapper.find('.empty-table-message button').exists()).toBe(true);
   });
 });
