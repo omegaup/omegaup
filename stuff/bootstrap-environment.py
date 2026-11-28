@@ -255,6 +255,27 @@ def _purge_old_submissions() -> None:
                     ['/usr/bin/sudo', '/usr/bin/unlink', path])
 
 
+def _aggregate_quality_feedback(args: argparse.Namespace) -> None:
+    '''Applies the quality seal computed from the reviewers' nominations.
+
+    The API only stores `quality_tag` nominations; `Problems.quality_seal` is
+    written by the `aggregate_feedback` cron. Without this step, collections
+    created by the bootstrap script would show no problems by default.
+    '''
+    logging.info('Aggregating quality feedback...')
+    command = [
+        sys.executable,
+        os.path.join(OMEGAUP_ROOT, 'stuff/cron/aggregate_feedback.py'),
+        '--no-track',
+    ]
+    for name, value in [('--user', args.username),
+                        ('--password', args.password),
+                        ('--mysql-config-file', args.mysql_config_file)]:
+        if value is not None:
+            command.extend([name, value])
+    subprocess.check_call(command)
+
+
 def _main() -> None:
     '''Main entrypoint.'''
 
@@ -338,6 +359,8 @@ def _main() -> None:
     for path in args.scripts:
         logging.info('Running script %s...', path)
         _run_script(path, args, now)
+
+    _aggregate_quality_feedback(args)
 
 
 if __name__ == '__main__':
