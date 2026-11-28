@@ -4806,6 +4806,39 @@ export namespace types {
     skip_reason?: string;
   }
 
+  export interface RoleAssignment {
+    acl_id: number;
+    name: string;
+    resource_alias?: string;
+    resource_type: string;
+  }
+
+  export interface RoleAssignmentsResponse {
+    assignments: types.RoleAssignment[];
+    total_rows: number;
+  }
+
+  export interface RoleDetails {
+    permissions: types.RolePermission[];
+    role: types.RoleSummary;
+  }
+
+  export interface RolePermission {
+    description: string;
+    name: string;
+    permission_id: number;
+    resource_type: string;
+  }
+
+  export interface RoleSummary {
+    description: string;
+    groups_count: number;
+    name: string;
+    permissions_count: number;
+    role_id: number;
+    users_count: number;
+  }
+
   export interface Run {
     alias: string;
     classname: string;
@@ -5555,6 +5588,12 @@ export namespace messages {
   };
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
+  export type AdminGetRoleAssignmentsRequest = { [key: string]: any };
+  export type AdminGetRoleAssignmentsResponse = types.RoleAssignmentsResponse;
+  export type AdminGetRoleDetailsRequest = { [key: string]: any };
+  export type AdminGetRoleDetailsResponse = types.RoleDetails;
+  export type AdminGetRolesRequest = { [key: string]: any };
+  export type AdminGetRolesResponse = { roles: types.RoleSummary[] };
   export type AdminGetSystemSettingsRequest = { [key: string]: any };
   export type AdminGetSystemSettingsResponse = {
     settings: { ephemeralGraderEnabled: boolean };
@@ -6605,6 +6644,15 @@ export namespace controllers {
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
+    getRoleAssignments: (
+      params?: messages.AdminGetRoleAssignmentsRequest,
+    ) => Promise<messages.AdminGetRoleAssignmentsResponse>;
+    getRoleDetails: (
+      params?: messages.AdminGetRoleDetailsRequest,
+    ) => Promise<messages.AdminGetRoleDetailsResponse>;
+    getRoles: (
+      params?: messages.AdminGetRolesRequest,
+    ) => Promise<messages.AdminGetRolesResponse>;
     getSystemSettings: (
       params?: messages.AdminGetSystemSettingsRequest,
     ) => Promise<messages.AdminGetSystemSettingsResponse>;

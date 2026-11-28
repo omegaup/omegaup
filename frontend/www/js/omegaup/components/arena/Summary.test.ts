@@ -1,3 +1,4 @@
+import { ComponentOptions } from 'vue';
 import { shallowMount } from '@vue/test-utils';
 import arena_Summary from './Summary.vue';
 import T from '../../lang';
@@ -5,7 +6,7 @@ import T from '../../lang';
 describe('Summary.vue', () => {
   it('Should handle summary', () => {
     const eventTitle = 'Event title';
-    const wrapper = shallowMount(arena_Summary, {
+    const wrapper = shallowMount(arena_Summary as ComponentOptions<Vue>, {
       propsData: {
         title: eventTitle,
         description: 'Event description',
@@ -23,7 +24,7 @@ describe('Summary.vue', () => {
 
   it("Shouldn't show the summary of a course with unlimited duration", () => {
     const eventTitle = 'Event title';
-    const wrapper = shallowMount(arena_Summary, {
+    const wrapper = shallowMount(arena_Summary as ComponentOptions<Vue>, {
       propsData: {
         title: eventTitle,
         description: 'Event description',

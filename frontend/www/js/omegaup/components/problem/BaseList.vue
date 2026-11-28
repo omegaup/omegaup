@@ -265,6 +265,7 @@ export default class BaseList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
   @Prop() selectedTags!: string[];
+  @Prop({ default: () => [] }) excludedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -331,10 +332,14 @@ export default class BaseList extends Vue {
   ];
 
   hrefForProblemTag(selectedTags: string[], problemTag: string): string {
-    if (!selectedTags) return `${this.path}?tag[]=${problemTag}`;
-    let tags = selectedTags.slice();
+    const tags = selectedTags ? selectedTags.slice() : [];
     if (!tags.includes(problemTag)) tags.push(problemTag);
-    return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
+    const queryParameters: { [key: string]: string[] } = { tag: tags };
+    const excludedTags = this.excludedTags.filter((tag) => tag !== problemTag);
+    if (excludedTags.length > 0) {
+      queryParameters.excluded_tag = excludedTags;
+    }
+    return `${this.path}?${ui.buildURLQuery(queryParameters)}`;
   }
 }
 </script>
