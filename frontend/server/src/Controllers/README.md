@@ -4,6 +4,9 @@
   - [`/api/admin/getCronRun/`](#apiadmingetcronrun)
   - [`/api/admin/getCrons/`](#apiadmingetcrons)
   - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
+  - [`/api/admin/getRoleAssignments/`](#apiadmingetroleassignments)
+  - [`/api/admin/getRoleDetails/`](#apiadmingetroledetails)
+  - [`/api/admin/getRoles/`](#apiadmingetroles)
   - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/rerunCron/`](#apiadminreruncron)
@@ -382,6 +385,52 @@ Get maintenance mode status
 ```typescript
 types.MaintenanceModeStatus;
 ```
+
+## `/api/admin/getRoleAssignments/`
+
+### Description
+
+### Parameters
+
+| Name              | Type           | Description | Required |
+| ----------------- | -------------- | ----------- | -------- |
+| `assignment_type` | `string`       |             | ✓        |
+| `page`            | `int`          |             | ✓        |
+| `page_size`       | `int`          |             | ✓        |
+| `role`            | `string`       |             | ✓        |
+| `query`           | `null\|string` |             |          |
+
+### Returns
+
+```typescript
+types.RoleAssignmentsResponse;
+```
+
+## `/api/admin/getRoleDetails/`
+
+### Description
+
+### Parameters
+
+| Name   | Type     | Description | Required |
+| ------ | -------- | ----------- | -------- |
+| `role` | `string` |             | ✓        |
+
+### Returns
+
+```typescript
+types.RoleDetails;
+```
+
+## `/api/admin/getRoles/`
+
+### Description
+
+### Returns
+
+| Name    | Type                      |
+| ------- | ------------------------- |
+| `roles` | `List[types.RoleSummary]` |
 
 ## `/api/admin/getSystemSettings/`
 
