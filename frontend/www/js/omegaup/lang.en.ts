@@ -2349,7 +2349,7 @@ const translations: { [key: string]: string; } = {
   wordsEdit: "Edit",
   wordsEditCourse: "Edit course",
   wordsEmpty: "Empty",
-  wordsEmptyAddStudentInput: "The input field is empty, please type a account name",
+  wordsEmptyAddStudentInput: "The input field is empty, please type an account name",
   wordsEnable: "Enable",
   wordsEndTime: "End",
   wordsEndTimeContest: "End time",
