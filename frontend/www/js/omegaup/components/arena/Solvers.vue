@@ -37,23 +37,30 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import omegaup_Username from '../user/Username.vue';
 
-@Component({
+export default defineComponent({
+  name: 'Solvers',
   components: {
     'omegaup-username': omegaup_Username,
   },
-})
-export default class Solvers extends Vue {
-  @Prop() solvers!: types.BestSolvers[];
-
-  T = T;
-  time = time;
-}
+  props: {
+    solvers: {
+      type: Array as PropType<types.BestSolvers[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      T,
+      time,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>
