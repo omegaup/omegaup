@@ -573,6 +573,7 @@ export class Converter {
       return this._converter.makeHtml(markdown);
     } finally {
       delete this._imageMapping;
+      delete this._sourceMapping;
       delete this._settings;
     }
   }
