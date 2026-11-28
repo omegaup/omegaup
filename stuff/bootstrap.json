@@ -22,7 +22,7 @@
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"selected_tags": "[{\"tagname\":\"problemTagArithmetic\",\"public\":true},{\"tagname\":\"problemTagInputAndOutput\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -48,7 +48,7 @@
 					"languages": "",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"selected_tags": "[{\"tagname\":\"problemTagInputAndOutput\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/readonlylecture.zip"
@@ -74,7 +74,7 @@
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"selected_tags": "[{\"tagname\":\"problemTagConditionals\",\"public\":true},{\"tagname\":\"problemTagArithmetic\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/triangulos.zip"
@@ -99,8 +99,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateMathsInProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagArithmetic\",\"public\":true},{\"tagname\":\"problemTagConditionals\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/triangulos_interactive.zip"
@@ -125,7 +125,7 @@
 					"languages": "kp,kj",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"selected_tags": "[{\"tagname\":\"problemTagSimulation\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/karel_helloworld.zip"
@@ -151,7 +151,7 @@
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"selected_tags": "[{\"tagname\":\"problemTagArithmetic\",\"public\":true},{\"tagname\":\"problemTagInputAndOutput\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -176,8 +176,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateMathsInProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagArithmetic\",\"public\":true},{\"tagname\":\"problemTagNumberTheory\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -202,8 +202,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateMathsInProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagArithmetic\",\"public\":true},{\"tagname\":\"problemTagDivisibilityRules\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -228,8 +228,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateDataStructuresAndAlgorithms",
+					"selected_tags": "[{\"tagname\":\"problemTagStringMatching\",\"public\":true},{\"tagname\":\"problemTagArrays\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -254,8 +254,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateDataStructuresAndAlgorithms",
+					"selected_tags": "[{\"tagname\":\"problemTagStacks\",\"public\":true},{\"tagname\":\"problemTagArrays\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -280,8 +280,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateDataStructuresAndAlgorithms",
+					"selected_tags": "[{\"tagname\":\"problemTagQueues\",\"public\":true},{\"tagname\":\"problemTagArrays\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -306,8 +306,8 @@
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
 					"email_clarifications": 1,
-					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+					"problem_level": "problemLevelIntermediateDataStructuresAndAlgorithms",
+					"selected_tags": "[{\"tagname\":\"problemTagQueues\",\"public\":true},{\"tagname\":\"problemTagLinkedLists\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -1777,6 +1777,22 @@
 					"show_scoreboard_after": "true",
 					"certificate_cutoff": 2
 				}
+			},
+			{
+				"api": "/user/create/",
+				"params": {
+					"username": "test_reviewer_0",
+					"email": "test_reviewer_0@localhost.localdomain",
+					"password": "test_reviewer_0"
+				}
+			},
+			{
+				"api": "/group/addUser/",
+				"fail_ok": true,
+				"params": {
+					"group_alias": "omegaup:quality-reviewer",
+					"usernameOrEmail": "test_reviewer_0"
+				}
 			}
 		]
 	},
@@ -2630,6 +2646,92 @@
 					"contest_alias": "pasado",
 					"finish_time": "$NOW$+1",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_reviewer_0",
+		"password": "test_reviewer_0",
+		"requests": [
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "sumas",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelBasicIntroductionToProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "triangulos",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelBasicIntroductionToProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelIntermediateMathsInProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "karel-helloworld",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelBasicIntroductionToProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "restas",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelBasicIntroductionToProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "multiplicaciones",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelIntermediateMathsInProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "divisiones",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelIntermediateMathsInProgramming\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "pilas",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelIntermediateDataStructuresAndAlgorithms\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "filas",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelIntermediateDataStructuresAndAlgorithms\"}"
+				}
+			},
+			{
+				"api": "/qualityNomination/create/",
+				"params": {
+					"problem_alias": "colas",
+					"nomination": "quality_tag",
+					"contents": "{\"quality_seal\": true, \"tag\": \"problemLevelIntermediateDataStructuresAndAlgorithms\"}"
 				}
 			}
 		]
