@@ -94,7 +94,7 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
     /**
      * Gets the users that follow $userId, most recent first.
      *
-     * @return array{followers: list<array{classname: string, name: null|string, username: string}>, totalRows: int}
+     * @return array{followers: list<array{classname: string, gravatar_32: string, name: null|string, username: string}>, totalRows: int}
      */
     public static function getFollowers(
         int $userId,
@@ -110,6 +110,8 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
                 `Identities` i ON i.identity_id = u.main_identity_id
             LEFT JOIN
                 `User_Rank` ur ON ur.user_id = u.user_id
+            LEFT JOIN
+                `Emails` e ON e.email_id = u.main_email_id
             WHERE
                 uf.followed_user_id = ?';
 
@@ -124,12 +126,13 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
             [$userId]
         ) ?? 0;
 
-        /** @var list<array{classname: string, name: null|string, username: string}> */
-        $followers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{classname: string, email: null|string, name: null|string, username: string}> */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "SELECT
                 i.username,
                 i.name,
-                IFNULL(ur.classname, 'user-rank-unranked') AS classname
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname,
+                e.email
             {$sqlFrom}
             ORDER BY
                 uf.created_at DESC, uf.users_follower_id DESC
@@ -142,7 +145,7 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
         );
 
         return [
-            'followers' => $followers,
+            'followers' => self::withGravatars($rows),
             'totalRows' => $totalRows,
         ];
     }
@@ -150,7 +153,7 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
     /**
      * Gets the users that $userId follows, most recent first.
      *
-     * @return array{following: list<array{classname: string, name: null|string, username: string}>, totalRows: int}
+     * @return array{following: list<array{classname: string, gravatar_32: string, name: null|string, username: string}>, totalRows: int}
      */
     public static function getFollowing(
         int $userId,
@@ -166,6 +169,8 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
                 `Identities` i ON i.identity_id = u.main_identity_id
             LEFT JOIN
                 `User_Rank` ur ON ur.user_id = u.user_id
+            LEFT JOIN
+                `Emails` e ON e.email_id = u.main_email_id
             WHERE
                 uf.follower_user_id = ?';
 
@@ -180,12 +185,13 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
             [$userId]
         ) ?? 0;
 
-        /** @var list<array{classname: string, name: null|string, username: string}> */
-        $following = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{classname: string, email: null|string, name: null|string, username: string}> */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "SELECT
                 i.username,
                 i.name,
-                IFNULL(ur.classname, 'user-rank-unranked') AS classname
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname,
+                e.email
             {$sqlFrom}
             ORDER BY
                 uf.created_at DESC, uf.users_follower_id DESC
@@ -198,8 +204,30 @@ class UsersFollowers extends \OmegaUp\DAO\Base\UsersFollowers {
         );
 
         return [
-            'following' => $following,
+            'following' => self::withGravatars($rows),
             'totalRows' => $totalRows,
         ];
+    }
+
+    /**
+     * @param list<array{classname: string, email: null|string, name: null|string, username: string}> $rows
+     *
+     * @return list<array{classname: string, gravatar_32: string, name: null|string, username: string}>
+     */
+    private static function withGravatars(array $rows): array {
+        $users = [];
+        foreach ($rows as $row) {
+            $users[] = [
+                'classname' => $row['classname'],
+                'gravatar_32' => (
+                    'https://secure.gravatar.com/avatar/' .
+                    md5($row['email'] ?? '') .
+                    '?s=32'
+                ),
+                'name' => $row['name'],
+                'username' => $row['username'],
+            ];
+        }
+        return $users;
     }
 }

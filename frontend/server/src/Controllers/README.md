@@ -5496,11 +5496,9 @@ user follows them. Intended for rendering a profile's follow button.
 
 ### Returns
 
-| Name             | Type      |
-| ---------------- | --------- |
-| `followersCount` | `number`  |
-| `followingCount` | `number`  |
-| `isFollowing`    | `boolean` |
+```typescript
+types.FollowStatus;
+```
 
 ## `/api/user/followers/`
 

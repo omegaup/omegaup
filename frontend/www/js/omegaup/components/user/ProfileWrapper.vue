@@ -8,6 +8,11 @@
           :data="data"
           :selected-tab.sync="currentSelectedTab"
           :has-password="hasPassword"
+          :is-logged-in="isLoggedIn"
+          :follow-status="followStatus"
+          @follow="(payload) => $emit('follow', payload)"
+          @unfollow="(payload) => $emit('unfollow', payload)"
+          @show-list="(listType) => $emit('show-list', listType)"
         >
         </omegaup-user-maininfo>
       </div>
@@ -53,8 +58,20 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    isLoggedIn: {
+      type: Boolean,
+      default: false,
+    },
+    followStatus: {
+      type: Object as PropType<types.FollowStatus>,
+      default: () => ({
+        followersCount: 0,
+        followingCount: 0,
+        isFollowing: false,
+      }),
+    },
   },
-  emits: ['update:selectedTab'],
+  emits: ['update:selectedTab', 'follow', 'unfollow', 'show-list'],
   data(): {
     currentSelectedTab: null | string;
   } {

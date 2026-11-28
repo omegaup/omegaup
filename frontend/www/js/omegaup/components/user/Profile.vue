@@ -5,6 +5,11 @@
       :data="data"
       :selected-tab.sync="currentSelectedTab"
       :has-password="hasPassword"
+      :is-logged-in="isLoggedIn"
+      :follow-status="followStatus"
+      @follow="(payload) => $emit('follow', payload)"
+      @unfollow="(payload) => $emit('unfollow', payload)"
+      @show-list="(listType) => $emit('show-list', listType)"
     >
       <template #message>
         <h1 v-if="!profile.is_own_profile && profile.is_private">
@@ -25,6 +30,16 @@
             :heatmap-data="heatmapData"
             :available-years="availableYears"
             :profile-statistics="profileStatistics"
+            :followers="followers"
+            :following="following"
+            :follow-list-page-size="followListPageSize"
+            @followers-page-changed="
+              (page) => $emit('followers-page-changed', page)
+            "
+            @following-page-changed="
+              (page) => $emit('following-page-changed', page)
+            "
+            @show-list="(listType) => $emit('show-list', listType)"
             @heatmap-year-changed="
               (year) => $emit('heatmap-year-changed', year)
             "
@@ -125,6 +140,7 @@ import user_PreferencesEdit from './PreferencesEdit.vue';
 import { DifficultyStats } from './ProblemSolvingProgress.vue';
 import user_ProfileWrapper from './ProfileWrapper.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
+import { FollowListState } from './FollowList.vue';
 import user_ViewProfile from './ViewProfile.vue';
 
 export interface ProfileStatistics {
@@ -168,6 +184,20 @@ export default class Profile extends Vue {
   }>;
   @Prop({ default: () => [] }) availableYears!: number[];
   @Prop({ default: null }) profileStatistics!: ProfileStatistics | null;
+  @Prop({ default: false }) isLoggedIn!: boolean;
+  @Prop({
+    default: () => ({
+      followersCount: 0,
+      followingCount: 0,
+      isFollowing: false,
+    }),
+  })
+  followStatus!: types.FollowStatus;
+  @Prop({ default: () => ({ users: [], totalRows: 0, page: 1 }) })
+  followers!: FollowListState;
+  @Prop({ default: () => ({ users: [], totalRows: 0, page: 1 }) })
+  following!: FollowListState;
+  @Prop({ default: 20 }) followListPageSize!: number;
 
   T = T;
   ui = ui;
@@ -177,6 +207,14 @@ export default class Profile extends Vue {
   @Watch('viewProfileSelectedTab')
   onViewProfileSelectedTabChanged(newValue: string | null) {
     this.currentViewProfileSelectedTab = newValue;
+  }
+
+  // Keeps the entrypoint in step when the tab changes from inside the view.
+  // Without this it still believes the old tab is showing, so asking for
+  // that same tab again is a no-op.
+  @Watch('currentViewProfileSelectedTab')
+  onCurrentViewProfileSelectedTabChanged(newValue: string | null) {
+    this.$emit('update:viewProfileSelectedTab', newValue);
   }
 
   get currentTitle(): string {

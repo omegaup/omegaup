@@ -55,6 +55,17 @@
           <small>{{ T.profileSolvedProblems }}</small>
         </p>
       </div>
+      <omegaup-user-follow-button
+        :username="profile.username"
+        :is-following="followStatus.isFollowing"
+        :followers-count="followStatus.followersCount"
+        :following-count="followStatus.followingCount"
+        :is-logged-in="isLoggedIn"
+        :is-own-profile="profile.is_own_profile"
+        @follow="(payload) => $emit('follow', payload)"
+        @unfollow="(payload) => $emit('unfollow', payload)"
+        @show-list="(listType) => $emit('show-list', listType)"
+      ></omegaup-user-follow-button>
       <div
         v-if="
           profile.preferred_language &&
@@ -94,6 +105,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
+import user_FollowButton from './FollowButton.vue';
 import user_Username from './Username.vue';
 import { types } from '../../api_types';
 import { Problem } from '../../linkable_resource';
@@ -123,6 +135,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
 @Component({
   components: {
     'omegaup-countryflag': country_Flag,
+    'omegaup-user-follow-button': user_FollowButton,
     'omegaup-user-username': user_Username,
   },
 })
@@ -131,6 +144,15 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop() selectedTab!: string;
   @Prop() hasPassword!: boolean;
+  @Prop({ default: false }) isLoggedIn!: boolean;
+  @Prop({
+    default: () => ({
+      followersCount: 0,
+      followingCount: 0,
+      isFollowing: false,
+    }),
+  })
+  followStatus!: types.FollowStatus;
 
   T = T;
   urlMapping = urlMapping;

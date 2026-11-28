@@ -44,6 +44,10 @@ class UserFollowTest extends \OmegaUp\Test\ControllerTestCase {
             $follower->username,
             $followers['followers'][0]['username']
         );
+        $this->assertStringStartsWith(
+            'https://secure.gravatar.com/avatar/',
+            $followers['followers'][0]['gravatar_32']
+        );
 
         $response = \OmegaUp\Controllers\User::apiUnfollow(
             new \OmegaUp\Request([
@@ -344,5 +348,38 @@ class UserFollowTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('parameterNumberTooLarge', $e->getMessage());
         }
+    }
+
+    /**
+     * The profile page payload carries the follow status, so the page can
+     * render the button and the counters without an extra request.
+     */
+    public function testFollowStatusIsPartOfTheProfilePayload() {
+        ['identity' => $viewer] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $profile] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($viewer);
+        \OmegaUp\Controllers\User::apiFollow(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $profile->username,
+        ]));
+
+        $followStatus = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $profile->username,
+            ])
+        )['templateProperties']['payload']['followStatus'];
+        $this->assertTrue($followStatus['isFollowing']);
+        $this->assertSame(1, $followStatus['followersCount']);
+        $this->assertSame(0, $followStatus['followingCount']);
+
+        // A logged out visitor still gets the counters.
+        $followStatus = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'username' => $profile->username,
+            ])
+        )['templateProperties']['payload']['followStatus'];
+        $this->assertFalse($followStatus['isFollowing']);
+        $this->assertSame(1, $followStatus['followersCount']);
     }
 }

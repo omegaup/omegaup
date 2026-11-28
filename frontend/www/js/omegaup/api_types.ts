@@ -3990,8 +3990,15 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface FollowStatus {
+    followersCount: number;
+    followingCount: number;
+    isFollowing: boolean;
+  }
+
   export interface FollowUser {
     classname: string;
+    gravatar_32: string;
     name?: string;
     username: string;
   }
@@ -5411,6 +5418,7 @@ export namespace types {
   export interface UserProfileDetailsPayload {
     countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
+    followStatus: types.FollowStatus;
     identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
@@ -6485,11 +6493,7 @@ export namespace messages {
   export type UserFollowRequest = { [key: string]: any };
   export type UserFollowResponse = {};
   export type UserFollowStatusRequest = { [key: string]: any };
-  export type UserFollowStatusResponse = {
-    followersCount: number;
-    followingCount: number;
-    isFollowing: boolean;
-  };
+  export type UserFollowStatusResponse = types.FollowStatus;
   export type UserFollowersRequest = { [key: string]: any };
   export type UserFollowersResponse = {
     followers: types.FollowUser[];
