@@ -4,6 +4,37 @@ import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 
+type CollectionListURLParameters = {
+  language: string;
+  query: string;
+  columnName: string;
+  sortOrder: omegaup.SortOrder | string;
+  difficulty: string;
+  quality: string;
+  selectedTags: string[];
+  excludedTags: string[];
+};
+
+export function excludedTagsFromSearch(search: string): string[] {
+  return new URLSearchParams(search).getAll('excluded_tag[]');
+}
+
+export function collectionListURL(
+  level: string,
+  parameters: CollectionListURLParameters,
+): string {
+  return `/problem/collection/${level}/?${ui.buildURLQuery({
+    language: parameters.language,
+    query: parameters.query,
+    order_by: parameters.columnName,
+    sort_order: parameters.sortOrder,
+    difficulty: parameters.difficulty,
+    quality: parameters.quality,
+    tag: parameters.selectedTags,
+    excluded_tag: parameters.excludedTags,
+  })}`;
+}
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CollectionDetailsByLevelPayload();
   const queryString = window.location.search;
@@ -13,6 +44,7 @@ OmegaUp.on('ready', () => {
   let difficulty = 'all';
   let quality = 'onlyQualityProblems';
   let query = '';
+  let excludedTags: string[] = [];
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.get('sort_order')) {
@@ -51,6 +83,7 @@ OmegaUp.on('ready', () => {
         query = queryParam;
       }
     }
+    excludedTags = excludedTagsFromSearch(queryString);
   }
   new Vue({
     el: '#main-container',
@@ -64,6 +97,7 @@ OmegaUp.on('ready', () => {
           problems: payload.problems,
           loggedIn: payload.loggedIn,
           selectedTags: payload.selectedTags,
+          excludedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
           language: payload.language,
@@ -84,21 +118,20 @@ OmegaUp.on('ready', () => {
             sortOrder: omegaup.SortOrder,
             difficulty: string,
             quality: string,
-            tag: string[],
+            selectedTags: string[],
+            excludedTags: string[],
           ): void => {
-            const queryParameters = {
-              language,
-              query,
-              order_by: columnName,
-              sort_order: sortOrder,
-              difficulty,
-              quality,
-              tag,
-            };
             window.location.replace(
-              `/problem/collection/${payload.level}/?${ui.buildURLQuery(
-                queryParameters,
-              )}`,
+              collectionListURL(payload.level, {
+                language,
+                query,
+                columnName,
+                sortOrder,
+                difficulty,
+                quality,
+                selectedTags,
+                excludedTags,
+              }),
             );
           },
         },
