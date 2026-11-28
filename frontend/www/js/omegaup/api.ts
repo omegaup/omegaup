@@ -156,6 +156,18 @@ export const Admin = {
     messages.AdminGetMaintenanceModeRequest,
     messages.AdminGetMaintenanceModeResponse
   >('/api/admin/getMaintenanceMode/'),
+  getRoleAssignments: apiCall<
+    messages.AdminGetRoleAssignmentsRequest,
+    messages.AdminGetRoleAssignmentsResponse
+  >('/api/admin/getRoleAssignments/'),
+  getRoleDetails: apiCall<
+    messages.AdminGetRoleDetailsRequest,
+    messages.AdminGetRoleDetailsResponse
+  >('/api/admin/getRoleDetails/'),
+  getRoles: apiCall<
+    messages.AdminGetRolesRequest,
+    messages.AdminGetRolesResponse
+  >('/api/admin/getRoles/'),
   getSystemSettings: apiCall<
     messages.AdminGetSystemSettingsRequest,
     messages.AdminGetSystemSettingsResponse
