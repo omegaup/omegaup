@@ -720,6 +720,7 @@ CREATE TABLE `Notifications` (
 CREATE TABLE `Permissions` (
   `permission_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
+  `resource_type` enum('entrypoint','endpoint','capability') NOT NULL COMMENT 'Tipo de recurso que protege el permiso: página, API o capacidad.',
   `description` varchar(100) NOT NULL COMMENT 'La descripción humana del permiso.',
   PRIMARY KEY (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los permisos que se pueden dar a los roles.';
@@ -1453,6 +1454,8 @@ CREATE TABLE `User_Readme_Report_Log` (
   `readme_id` int NOT NULL COMMENT 'README reportado',
   `reporter_user_id` int NOT NULL COMMENT 'Usuario que hizo el reporte',
   `report_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del reporte',
+  `reason` varchar(255) DEFAULT NULL COMMENT 'Motivo por el cual se reportó el README',
+  `detail` text COMMENT 'Detalles adicionales sobre el reporte proporcionados por el usuario',
   PRIMARY KEY (`readme_id`,`reporter_user_id`),
   KEY `readme_id` (`readme_id`),
   KEY `reporter_user_id` (`reporter_user_id`),
