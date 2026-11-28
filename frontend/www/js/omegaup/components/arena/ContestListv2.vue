@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="p-5">
+  <b-container fluid class="p-2 p-sm-3 p-md-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -47,7 +47,7 @@
                   </div>
                 </form>
               </b-col>
-              <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
+              <b-col class="col-12 col-md-6 d-flex btns-group p-0">
                 <b-dropdown
                   ref="dropdownOrderBy"
                   no-caret
@@ -56,7 +56,7 @@
                 >
                   <template #button-content>
                     <div>
-                      <font-awesome-icon icon="sort-amount-down" />
+                      <font-awesome-icon icon="sort-amount-down" class="mr-1" />
                       <span v-if="isNonDefaultOrder">
                         {{ activeOrderLabel }}
                         <font-awesome-icon
@@ -144,7 +144,7 @@
                   :variant="isNonDefaultFilter ? 'primary' : 'light'"
                 >
                   <template #button-content>
-                    <font-awesome-icon icon="filter" />
+                    <font-awesome-icon icon="filter" class="mr-1" />
                     <span v-if="isNonDefaultFilter">
                       {{ activeFilterLabel }}
                       <font-awesome-icon
@@ -822,6 +822,7 @@ export default ArenaContestList;
 
 .form-control {
   height: auto;
+  min-width: 0;
 }
 
 .reset-btn {
@@ -833,15 +834,19 @@ export default ArenaContestList;
   border-top: 1px solid var(--arena-reset-border-color);
   border-bottom: 1px solid var(--arena-reset-border-color);
   border-radius: unset;
+  padding: 0.5rem 0.6rem !important;
 }
 
 .btn-primary {
   background-color: var(--arena-button-border-color) !important;
   height: 2.5rem;
-  width: 7.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.input-group-append .btn-primary {
+  width: 7.5rem;
 }
 
 .contest-card {
@@ -909,17 +914,57 @@ export default ArenaContestList;
     text-align: center;
   }
 
+  .empty-category {
+    font-size: 1.125rem;
+    margin: 1.5rem 0.5rem;
+  }
+
   .tabs {
     flex-direction: column;
   }
 
+  .card-group-menu {
+    >>> .card-body {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+
+  .input-group-append .btn-primary {
+    width: auto;
+    min-width: 4.5rem;
+    padding: 0.5rem 0.75rem !important;
+  }
+
   .btns-group {
     justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 
     .dropdown {
-      flex: 1;
-      gap: 1rem;
-      margin-right: 0.8rem;
+      flex: 0 1 auto;
+      max-width: 100%;
+      margin-right: 0;
+
+      .reset-icon {
+        cursor: pointer;
+        opacity: 0.8;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      >>> .btn {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        padding: 0.5rem 0.75rem !important;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        white-space: normal;
+        word-break: break-word;
+      }
     }
   }
 }
