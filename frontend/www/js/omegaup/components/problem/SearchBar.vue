@@ -5,19 +5,8 @@
     <form
       action="/problem/"
       method="GET"
-      class="form-inline d-flex justify-content-center align-items-center flex-wrap form-mobile"
+      class="form-inline d-flex justify-content-start align-items-center flex-wrap form-mobile w-100"
     >
-      <div v-if="tags.length !== 0" class="form-group mr-2 mw-100">
-        <div v-for="tag in tags" :key="tag" class="mr-1">
-          <input type="hidden" name="tag[]" :value="tag" />
-          <span class="badge badge-secondary m-1 p-2">{{
-            T[tag] ? T[tag] : tag
-          }}</span>
-        </div>
-        <a class="remove-all-tags" href="/problem/">
-          <font-awesome-icon :icon="['fas', 'times']" />
-        </a>
-      </div>
       <div class="form-group mr-2">
         <omegaup-common-typeahead
           data-problem-keyword-search
@@ -70,6 +59,17 @@
         type="submit"
         :value="T.wordsSearch"
       />
+      <div v-if="tags.length !== 0" class="selected-tags-row">
+        <div v-for="tag in tags" :key="tag" class="selected-tag mr-1">
+          <input type="hidden" name="tag[]" :value="tag" />
+          <span class="badge badge-secondary m-1 p-2">{{
+            T[tag] ? T[tag] : tag
+          }}</span>
+        </div>
+        <a class="remove-all-tags" href="/problem/">
+          <font-awesome-icon :icon="['fas', 'times']" />
+        </a>
+      </div>
     </form>
   </div>
 </template>
@@ -123,6 +123,24 @@ export default class ProblemSearchBar extends Vue {
   label {
     font-weight: bold;
   }
+}
+.selected-tags-row {
+  display: flex;
+  flex: 0 0 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.5rem;
+}
+.selected-tag {
+  max-width: 100%;
+  min-width: 0;
+}
+.selected-tag .badge {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .card-header {
   border: 1px solid var(--header-problem-card-color);
