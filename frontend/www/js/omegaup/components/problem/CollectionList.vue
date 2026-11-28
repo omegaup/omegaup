@@ -18,17 +18,19 @@
       >
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
+          :selected-excluded-tags="excludedTags"
           :tags="availableTags"
           :public-quality-tags="publicQualityTags"
-          @new-selected-tag="
-            (selectedTags) =>
+          @filters-changed="
+            ({ selected, excluded }) =>
               $emit(
                 'apply-filter',
                 columnName,
                 sortOrder,
                 difficulty,
                 quality,
-                selectedTags,
+                selected,
+                excluded,
               )
           "
         ></omegaup-problem-filter-tags>
@@ -65,6 +67,7 @@
                   difficulty,
                   quality,
                   selectedTags,
+                  excludedTags,
                 )
             "
           ></omegaup-problem-filter-difficulty>
@@ -80,6 +83,7 @@
                   difficulty,
                   quality,
                   selectedTags,
+                  excludedTags,
                 )
             "
           ></omegaup-problem-filter-quality>
@@ -113,6 +117,7 @@
           :problems="problemsToShow"
           :logged-in="loggedIn"
           :selected-tags="selectedTags"
+          :excluded-tags="excludedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -136,6 +141,7 @@
                 difficulty,
                 quality,
                 selectedTags,
+                excludedTags,
               )
           "
         />
@@ -195,7 +201,7 @@ export default class CollectionList extends Vue {
   @Prop() difficulty!: string;
   @Prop() quality!: string;
   @Prop({ default: false }) hideProblemTagsPreference!: boolean;
-
+  @Prop({ default: () => [] }) excludedTags!: string[];
   T = T;
   ToggleSwitchSize = ToggleSwitchSize;
   level = this.data.level;
@@ -254,9 +260,12 @@ export default class CollectionList extends Vue {
 
   get availableTags(): types.TagWithProblemCount[] {
     const tags: types.TagWithProblemCount[] = this.data.frequentTags;
-    const selectedTagNames = new Set<string>(this.selectedTags);
+    const activeTagNames = new Set<string>([
+      ...this.selectedTags,
+      ...this.excludedTags,
+    ]);
     return tags.concat(
-      this.publicQualityTags.filter((tag) => selectedTagNames.has(tag.name)),
+      this.publicQualityTags.filter((tag) => activeTagNames.has(tag.name)),
     );
   }
 

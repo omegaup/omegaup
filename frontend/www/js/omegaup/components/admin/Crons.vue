@@ -147,11 +147,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import * as problemHealth from '../../admin/problem_health';
 
 const CRON_FIELD_COUNT = 5;
@@ -247,80 +248,86 @@ export function describeSchedule(schedule?: string | null): string | null {
   return null;
 }
 
-@Component
-export default class Crons extends Vue {
-  T = T;
-  @Prop({ default: () => [] }) jobs!: types.CronJob[];
-  @Prop({ default: () => [] }) runs!: types.CronRun[];
-  @Prop({ default: () => [] })
-  problemHealthFindings!: types.ProblemHealthFinding[];
-
-  expandedRunId: number | null = null;
-
-  get scheduledJobs(): (types.CronJob & { humanSchedule: string | null })[] {
-    return this.jobs.map((job) => ({
-      ...job,
-      humanSchedule: describeSchedule(job.schedule),
-    }));
-  }
-
-  toggle(runId: number): void {
-    this.expandedRunId = this.expandedRunId === runId ? null : runId;
-  }
-
-  statusClass(status: string | null): string {
-    const classes: Record<string, string> = {
-      success: 'badge badge-success',
-      failure: 'badge badge-danger',
-      running: 'badge badge-secondary',
+export default defineComponent({
+  name: 'AdminCrons',
+  props: {
+    jobs: {
+      type: Array as PropType<types.CronJob[]>,
+      default: () => [],
+    },
+    runs: {
+      type: Array as PropType<types.CronRun[]>,
+      default: () => [],
+    },
+    problemHealthFindings: {
+      type: Array as PropType<types.ProblemHealthFinding[]>,
+      default: () => [],
+    },
+  },
+  data(): {
+    T: typeof T;
+    expandedRunId: number | null;
+  } {
+    return {
+      T,
+      expandedRunId: null,
     };
-    if (!status) {
-      return '';
-    }
-    return classes[status] || 'badge badge-light';
-  }
-
-  problemUrl(alias: string): string {
-    return `/arena/problem/${encodeURIComponent(alias)}/`;
-  }
-
-  checkTypeLabel(checkType: string): string {
-    return problemHealth.checkTypeLabel(checkType);
-  }
-
-  severityLabel(severity: string): string {
-    return problemHealth.severityLabel(severity);
-  }
-
-  severityClass(severity: string): string {
-    return problemHealth.severityClass(severity);
-  }
-
-  // runs arrive newest first.
-  latestRun(name: string): types.CronRun | undefined {
-    return this.runs.find((run) => run.name === name);
-  }
-
-  latestStatus(name: string): string | null {
-    return this.latestRun(name)?.status ?? null;
-  }
-
-  latestStartedAt(name: string): string {
-    return this.formatDate(this.latestRun(name)?.started_at);
-  }
-
-  formatDate(date: Date | null | undefined): string {
-    return date ? time.formatDateTime(date) : '—';
-  }
-
-  formatDuration(seconds: number | null | undefined): string {
-    return typeof seconds === 'number' ? `${seconds.toFixed(2)}s` : '—';
-  }
-
-  formatRows(rows: number | null | undefined): string {
-    return typeof rows === 'number' ? String(rows) : '—';
-  }
-}
+  },
+  computed: {
+    scheduledJobs(): (types.CronJob & { humanSchedule: string | null })[] {
+      return this.jobs.map((job) => ({
+        ...job,
+        humanSchedule: describeSchedule(job.schedule),
+      }));
+    },
+  },
+  methods: {
+    toggle(runId: number): void {
+      this.expandedRunId = this.expandedRunId === runId ? null : runId;
+    },
+    statusClass(status: string | null): string {
+      const classes: Record<string, string> = {
+        success: 'badge badge-success',
+        failure: 'badge badge-danger',
+        running: 'badge badge-secondary',
+      };
+      if (!status) {
+        return '';
+      }
+      return classes[status] || 'badge badge-light';
+    },
+    problemUrl(alias: string): string {
+      return `/arena/problem/${encodeURIComponent(alias)}/`;
+    },
+    checkTypeLabel(checkType: string): string {
+      return problemHealth.checkTypeLabel(checkType);
+    },
+    severityLabel(severity: string): string {
+      return problemHealth.severityLabel(severity);
+    },
+    severityClass(severity: string): string {
+      return problemHealth.severityClass(severity);
+    },
+    latestRun(name: string): types.CronRun | undefined {
+      return this.runs.find((run) => run.name === name);
+    },
+    latestStatus(name: string): string | null {
+      return this.latestRun(name)?.status ?? null;
+    },
+    latestStartedAt(name: string): string {
+      return this.formatDate(this.latestRun(name)?.started_at);
+    },
+    formatDate(date: Date | null | undefined): string {
+      return date ? time.formatDateTime(date) : '—';
+    },
+    formatDuration(seconds: number | null | undefined): string {
+      return typeof seconds === 'number' ? `${seconds.toFixed(2)}s` : '—';
+    },
+    formatRows(rows: number | null | undefined): string {
+      return typeof rows === 'number' ? String(rows) : '—';
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

@@ -57,6 +57,19 @@ class CronJobs extends \OmegaUp\DAO\Base\CronJobs {
     }
 
     /**
+     * Enables or disables a job by name.
+     *
+     * The generated update() writes `updated_at` back, which would keep MySQL
+     * from refreshing it.
+     */
+    public static function setEnabled(string $name, bool $enabled): void {
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE Cron_Jobs SET enabled = ? WHERE name = ?;',
+            [$enabled, $name]
+        );
+    }
+
+    /**
      * Returns every registered cron job ordered by name.
      *
      * @return list<\OmegaUp\DAO\VO\CronJobs>
